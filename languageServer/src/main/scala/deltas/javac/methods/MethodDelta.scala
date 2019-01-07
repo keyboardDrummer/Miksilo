@@ -135,8 +135,6 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
   def getMethods[T <: NodeLike](javaClass: JavaClass[T]): Seq[Method[T]] = NodeWrapper.wrapList(javaClass.members.filter(member => member.shape == Shape))
 
-
-  object ParametersGrammar extends GrammarKey
   object ReturnTypeGrammar extends GrammarKey
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
@@ -148,8 +146,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     val parseReturnType = create(ReturnTypeGrammar, "void" ~> value(VoidTypeDelta.voidType) | parseType)
 
     val parseParameter = MethodParameters.getGrammar(_grammars)
-    val parseParameters = create(ParametersGrammar, "(" ~> parseParameter.manySeparated(",") ~< ")")
-
+    val parseParameters = create(Parameters, "(" ~> parseParameter.manySeparated(",") ~< ")")
 
     val typeParametersGrammar: BiGrammar = find(TypeAbstraction.TypeParametersGrammar)
 

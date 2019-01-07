@@ -20,7 +20,7 @@ import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeCons
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
 import deltas.expression.relational.{AddRelationalPrecedenceDelta, GreaterThanDelta, LessThanDelta}
-import deltas.expression.{ExpressionDelta, IntLiteralDelta, PostFixIncrementDelta, VariableDelta}
+import deltas.expression._
 import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
@@ -71,7 +71,7 @@ object JavaLanguage {
       SelectFieldToByteCodeDelta, SelectFieldDelta) ++ blockWithVariables)
 
   def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDeltaToByteCode, LocalDeclarationDelta,
-    IncrementAssignmentDelta, AssignToVariable, AssignmentToByteCodeDelta, EqualsAssignmentDelta,
+    IncrementAssignmentDelta, AssignToVariable, AssignmentToByteCodeDelta, SimpleAssignmentDelta,
     AssignmentPrecedence, PostFixIncrementToByteCodeDelta, PostFixIncrementDelta, VariableToByteCodeDelta) ++
     Seq(SolveConstraintsDelta,
       ImplicitThisForPrivateMemberSelectionDelta, ThisVariableDelta, MethodDelta, AccessibilityFieldsDelta,

@@ -6,6 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{NodeField, NodeShape}
 import deltas.expression.IntLiteralDelta
+import deltas.javac.methods.MethodDelta
 import deltas.statement.BlockDelta
 
 object SolidityConstructorDelta extends DeltaWithGrammar { // TODO try to re-use other constructor delta's.
@@ -14,12 +15,12 @@ object SolidityConstructorDelta extends DeltaWithGrammar { // TODO try to re-use
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val parameterList = find(SolidityFunctionDelta.Parameters)
+    val parameterList = find(MethodDelta.Parameters)
 
     val modifiers = find(SolidityFunctionDelta.Modifiers)
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
-    val body = blockGrammar.as(SolidityFunctionDelta.Body)
-    val grammar = "constructor" ~ parameterList.as(SolidityFunctionDelta.Parameters) ~ modifiers ~~ body
+    val body = blockGrammar.as(MethodDelta.Body)
+    val grammar = "constructor" ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~~ body
     find(SolidityContractDelta.Members).addAlternative(grammar)
   }
 

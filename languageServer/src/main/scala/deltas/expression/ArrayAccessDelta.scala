@@ -14,7 +14,7 @@ object ArrayAccessDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val grammar = expression.as(Target) ~ "[" ~ expression.as(Index) ~ "]" asNode Shape
+    val grammar = expression.as(Target) ~ "[" ~ expression.as(Index) ~ "]" asLabelledNode Shape
     expression.addAlternative(grammar)
   }
 

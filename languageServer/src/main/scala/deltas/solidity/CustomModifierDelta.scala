@@ -5,6 +5,7 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.NodeShape
+import deltas.javac.methods.MethodDelta
 import deltas.statement.BlockDelta
 
 object CustomModifierDelta extends DeltaWithGrammar {
@@ -13,12 +14,12 @@ object CustomModifierDelta extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val parameterList = find(SolidityFunctionDelta.Parameters)
+    val parameterList = find(MethodDelta.Parameters)
 
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
-    val body = blockGrammar.as(SolidityFunctionDelta.Body)
-    val optionalParameters = (parameterList | value(Seq.empty)).as(SolidityFunctionDelta.Parameters)
-    val grammar = "modifier" ~~ identifier.as(SolidityFunctionDelta.Name) ~
+    val body = blockGrammar.as(MethodDelta.Body)
+    val optionalParameters = (parameterList | value(Seq.empty)).as(MethodDelta.Parameters)
+    val grammar = "modifier" ~~ identifier.as(MethodDelta.Name) ~
       optionalParameters ~~ body
     find(SolidityContractDelta.Members).addAlternative(grammar)
   }

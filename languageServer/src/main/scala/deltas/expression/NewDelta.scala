@@ -1,8 +1,8 @@
-package deltas.javac.classes
+package deltas.expression
 
-import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
@@ -10,18 +10,13 @@ import core.smarts.objects.Reference
 import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
-import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidTypeDelta}
-import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
-import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.constructor.SuperCallExpression.constructorName
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.ExpressionInstance
+import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.call.CallDelta.Arguments
-import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 
-object NewDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
+object NewDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Enables using the new keyword to create a new object."
 
@@ -43,27 +38,12 @@ object NewDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsTo
     expressionGrammar.addAlternative(newGrammar)
   }
 
-  override def dependencies: Set[Contract] = Set(CallStaticOrInstanceDelta, NewByteCodeDelta, InvokeSpecialDelta) //TODO dependencies to CallStaticOrInstanceC can be made more specific. Contracts required.
+  override def dependencies: Set[Contract] = Set(ExpressionDelta, CallDelta)
 
   override val shape = Shape
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {
     expression(Type).asInstanceOf[NodePath]
-  }
-
-  override def toByteCode(path: NodePath, compilation: Compilation): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
-    val call: NewCall[NodePath] = path
-    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
-    val expressionToInstruction = ToByteCodeSkeleton.getToInstructions(compilation)
-    val classInfo: ClassSignature = compiler.findClass(call._type)
-    val classRef = compiler.getClassRef(classInfo)
-    val callArguments = call.arguments
-    val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
-    val callTypes = callArguments.map(argument => ExpressionDelta.getType(compilation)(argument))
-
-    val methodKey = MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
-    Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++
-      Seq(InvokeSpecialDelta.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
   }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {

@@ -6,7 +6,6 @@ import core.language.Language
 import core.language.node.{NodeField, NodeShape}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.methods.MethodParameters
-import deltas.solidity.SolidityFunctionDelta.Parameters
 
 object EventDelta extends DeltaWithGrammar {
 
@@ -21,7 +20,7 @@ object EventDelta extends DeltaWithGrammar {
     val parameter = typeGrammar.as(MethodParameters.Type) ~
       "indexed".spacedOption.as(ParameterIndexed) ~
       identifier.spacedOption.as(MethodParameters.Name) asNode MethodParameters.Shape
-    val parameterList = create(Parameters, parameter.toParameterList)
+    val parameterList = parameter.toParameterList
 
     val grammar = "event" ~~ identifier ~ parameterList ~~ "anonymous".option.as(Anonymous) ~ ";" asNode Shape
     find(SolidityContractDelta.Members).addAlternative(grammar)

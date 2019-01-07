@@ -7,13 +7,13 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.{ExpressionDelta, VariableDelta}
-import deltas.javac.methods.assignment.EqualsAssignmentDelta
+import deltas.javac.methods.assignment.SimpleAssignmentDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.statement.LocalDeclarationDelta.{LocalDeclaration, Name, Type}
 
 object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(EqualsAssignmentDelta, ExpressionAsStatementDelta, LocalDeclarationDelta)
+  override def dependencies: Set[Contract] = Set(SimpleAssignmentDelta, ExpressionAsStatementDelta, LocalDeclarationDelta)
 
   implicit class LocalDeclarationWithInitializer[T <: NodeLike](node: T) extends LocalDeclaration[T](node) {
     def initializer: T = node(Initializer).asInstanceOf[T]
@@ -24,9 +24,8 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
     val statement = find(StatementDelta.Grammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val parseDeclarationWithInitializer = create(Shape,
-      (typeGrammar.as(Type) ~~ identifier.as(Name) ~~ ("=" ~~> expression.as(Initializer)) ~< ";").
-      asNode(Shape))
+    val typeName = find(LocalDeclarationDelta.WithoutSemiColon)
+    val parseDeclarationWithInitializer = typeName ~~ ("=" ~~> expression.as(Initializer)) ~< ";" asLabelledNode Shape
     statement.addAlternative(parseDeclarationWithInitializer)
   }
 
@@ -44,13 +43,13 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
     val name: String = withInitializer.name
     path.shape = LocalDeclarationDelta.Shape
     val target = VariableDelta.neww(name)
-    val assignment = EqualsAssignmentDelta.Shape.createWithSource(
-      EqualsAssignmentDelta.Target -> target,
-      EqualsAssignmentDelta.Value -> path.getWithSource(Initializer))
+    val assignment = SimpleAssignmentDelta.Shape.createWithSource(
+      SimpleAssignmentDelta.Target -> target,
+      SimpleAssignmentDelta.Value -> path.getWithSource(Initializer))
     path.removeField(Initializer)
 
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
-    val originSequence = withInitializer.node.asInstanceOf[NodeSequenceElement]
+    val originSequence = withInitializer.node.asInstanceOf[NodeSequenceElement] //TODO add a try-catch explaining that local declarations must occur inside blocks.
     originSequence.replaceWith(Seq(path.current, assignmentStatement))
   }
 

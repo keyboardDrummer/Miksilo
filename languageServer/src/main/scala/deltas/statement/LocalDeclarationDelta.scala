@@ -13,6 +13,8 @@ import deltas.bytecode.types.TypeSkeleton
 object LocalDeclarationDelta extends StatementInstance
   with DeltaWithGrammar {
 
+  object WithoutSemiColon extends GrammarKey
+
   implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: T = node(Type).asInstanceOf[T]
     def name: String = node.getValue(Name).asInstanceOf[String]
@@ -24,7 +26,7 @@ object LocalDeclarationDelta extends StatementInstance
     import grammars._
     val statement = find(StatementDelta.Grammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-    val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asLabelledNode Shape
+    val parseDeclaration = create(WithoutSemiColon, typeGrammar.as(Type) ~~ identifier.as(Name)) ~< ";" asLabelledNode Shape
     statement.addAlternative(parseDeclaration)
   }
 

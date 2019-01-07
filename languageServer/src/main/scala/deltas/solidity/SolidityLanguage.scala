@@ -1,7 +1,7 @@
 package deltas.solidity
 
 import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
-import deltas.bytecode.types.{ArrayTypeDelta, TypeSkeleton}
+import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
 import deltas.expression._
 import deltas.expression.relational._
 import deltas.javac.CallVariableDelta
@@ -17,10 +17,13 @@ import deltas.trivia.{SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta}
 object SolidityLanguage {
 
   private val genericDeltas = Seq(
+    NewDelta, UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta,
     SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta,
-    LocalDeclarationWithInitializerDelta, LocalDeclarationDelta,
+    ForLoopDelta,
+    LocalDeclarationWithInitializerDelta,
+    LocalDeclarationDelta,
     CallVariableDelta, CallDelta, MemberSelectorDelta,
-    ForLoopDelta, BlockAsStatementDelta, WhileLoopDelta, LabelStatementDelta, GotoStatementDelta,
+    BlockAsStatementDelta, WhileLoopDelta, LabelStatementDelta, GotoStatementDelta,
     IfThenDelta,
     BlockDelta, ReturnExpressionDelta, ExpressionAsStatementDelta, StatementDelta,
     EqualsComparisonDelta,
@@ -30,12 +33,14 @@ object SolidityLanguage {
     DecrementAssignmentDelta, SubtractionDelta,
     IncrementAssignmentDelta, AdditionDelta, AdditivePrecedenceDelta,
     AssignToMemberDelta, SelectFieldDelta, MemberSelectorDelta,
-    AssignToVariable, VariableDelta, EqualsAssignmentDelta, AssignmentPrecedence,
+    AssignToArrayMember,
+    AssignToVariable, VariableDelta, SimpleAssignmentDelta, AssignmentPrecedence,
     ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta,
     ExpressionDelta,
-    FixedSizeArrayTypeDelta, ArrayTypeDelta, ObjectTypeDelta, TypeSkeleton)
+    FixedSizeArrayTypeDelta, ArrayTypeDelta, /*ObjectTypeDelta,*/ TypeSkeleton)
 
   val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar,
+    LocalDeclarationStorageLocationDelta,
     NumberLiteralUnitsDelta,
     EmitStatementDelta,
     UsingForDeclarationDelta, EventDelta, CustomModifierDelta, EnumDelta, StructDelta,
@@ -49,3 +54,6 @@ object SolidityLanguage {
 
   val language = LanguageFromDeltas
 }
+
+
+

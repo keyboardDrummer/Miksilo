@@ -9,10 +9,10 @@ import deltas.javac.expressions.additive.AdditionDelta
 
 trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
 
-  override def dependencies: Set[Contract] = Set(EqualsAssignmentDelta)
+  override def dependencies: Set[Contract] = Set(SimpleAssignmentDelta)
 
   def incrementAssignment(target: Node, value: Node) =
-    new Node(Shape, EqualsAssignmentDelta.Target -> target, EqualsAssignmentDelta.Value -> value)
+    new Node(Shape, SimpleAssignmentDelta.Target -> target, SimpleAssignmentDelta.Value -> value)
 
   def keyword: String
   def operatorShape: NodeShape
@@ -21,18 +21,18 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
     import grammars._
 
     val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
-    val assignmentTarget = find(EqualsAssignmentDelta.AssignmentTargetGrammar)
-    val incrementAssignmentGrammar = assignmentTarget.as(EqualsAssignmentDelta.Target) ~~
-      (keyword ~~> assignmentGrammar.as(EqualsAssignmentDelta.Value)) asNode Shape
+    val assignmentTarget = find(SimpleAssignmentDelta.AssignmentTargetGrammar)
+    val incrementAssignmentGrammar = assignmentTarget.as(SimpleAssignmentDelta.Target) ~~
+      (keyword ~~> assignmentGrammar.as(SimpleAssignmentDelta.Value)) asNode Shape
     assignmentGrammar.addAlternative(incrementAssignmentGrammar)
   }
 
   def transformAssignment(incrementAssignment: NodePath, state: Language): Unit = {
-    val target = EqualsAssignmentDelta.getTarget(incrementAssignment)
+    val target = SimpleAssignmentDelta.getTarget(incrementAssignment)
     val newValue = operatorShape.createWithSource(
-      AdditionDelta.Left -> incrementAssignment.current(EqualsAssignmentDelta.Target),
-      AdditionDelta.Right -> incrementAssignment.getWithSource(EqualsAssignmentDelta.Value))
-    val assignment = EqualsAssignmentDelta.neww(target, newValue)
+      AdditionDelta.Left -> incrementAssignment.current(SimpleAssignmentDelta.Target),
+      AdditionDelta.Right -> incrementAssignment.getWithSource(SimpleAssignmentDelta.Value))
+    val assignment = SimpleAssignmentDelta.neww(target, newValue)
     incrementAssignment.replaceData(assignment)
   }
 

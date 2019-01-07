@@ -11,11 +11,11 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape, Target}
-import deltas.javac.methods.assignment.{AssignmentToByteCodeDelta, EqualsAssignmentDelta}
+import deltas.javac.methods.assignment.{AssignmentToByteCodeDelta, SimpleAssignmentDelta}
 
 object AssignToMemberDelta extends DeltaWithGrammar {
 
-  override def dependencies: Set[Contract] = Set(EqualsAssignmentDelta, SelectFieldDelta)
+  override def dependencies: Set[Contract] = Set(SimpleAssignmentDelta, SelectFieldDelta)
 
   override def inject(language: Language): Unit = {
     AssignmentToByteCodeDelta.hasAssignFromStackByteCode.add(language, MemberSelectorDelta.Shape,
@@ -33,7 +33,7 @@ object AssignToMemberDelta extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val assignTarget = find(EqualsAssignmentDelta.AssignmentTargetGrammar)
+    val assignTarget = find(SimpleAssignmentDelta.AssignmentTargetGrammar)
 
     val variableGrammar = find(VariableDelta.Shape)
     val selectGrammar = ((variableGrammar.as(Target) ~< ".") ~ identifier.as(Member)).asNode(Shape)

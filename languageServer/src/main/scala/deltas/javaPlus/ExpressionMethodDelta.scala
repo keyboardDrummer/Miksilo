@@ -23,7 +23,7 @@ object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
     val visibilityGrammar = find(AccessibilityFieldsDelta.VisibilityField)
     val parseStatic = find(AccessibilityFieldsDelta.Static)
     val parseReturnType = find(MethodDelta.ReturnTypeGrammar).as(ReturnType)
-    val parseParameters = find(MethodDelta.ParametersGrammar).as(Parameters)
+    val parseParameters = find(MethodDelta.Parameters).as(Parameters)
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar).as(Expression)
     val expressionMethodGrammar = (visibilityGrammar ~~ parseStatic ~~ parseReturnType ~~
       identifier.as(Name) ~ parseParameters ~~ ("=" ~~> expressionGrammar)).
