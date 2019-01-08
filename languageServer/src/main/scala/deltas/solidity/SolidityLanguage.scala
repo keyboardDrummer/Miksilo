@@ -24,7 +24,7 @@ object SolidityLanguage {
     LocalDeclarationDelta,
     CallVariableDelta, CallDelta, MemberSelectorDelta,
     BlockAsStatementDelta, WhileLoopDelta, LabelStatementDelta, GotoStatementDelta,
-    IfThenDelta,
+    IfThenElseDelta, IfThenDelta,
     BlockDelta, ReturnExpressionDelta, ExpressionAsStatementDelta, StatementDelta,
     EqualsComparisonDelta,
     LessThanDelta,
@@ -37,9 +37,10 @@ object SolidityLanguage {
     AssignToVariable, VariableDelta, SimpleAssignmentDelta, AssignmentPrecedence,
     ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta,
     ExpressionDelta,
-    FixedSizeArrayTypeDelta, ArrayTypeDelta, /*ObjectTypeDelta,*/ TypeSkeleton)
+    FixedSizeArrayTypeDelta, ArrayTypeDelta, TypeSkeleton)
 
   val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar,
+    InlineAssemblyStatementDelta,
     LocalDeclarationStorageLocationDelta,
     NumberLiteralUnitsDelta,
     EmitStatementDelta,
@@ -48,12 +49,11 @@ object SolidityLanguage {
     Seq(SolidityContractDelta, PragmaDelta) ++
     Seq(MultipleImportsDelta, SingleImportDelta, FileImportDelta) ++
     Seq(SolidityFile) ++
-    Seq(ElementaryTypeDelta)
+    Seq(ElementaryTypeDelta, StorageLocationDelta, StateMutabilityDelta)
 
   val deltas = soliditySpecificDeltas ++ genericDeltas
 
   val language = LanguageFromDeltas
 }
-
 
 

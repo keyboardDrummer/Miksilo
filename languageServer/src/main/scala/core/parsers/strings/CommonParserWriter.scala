@@ -1,7 +1,5 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.UnambiguousEditorParserWriter
-
 trait CommonParserWriter extends StringParserWriter {
 
   def identifier: EditorParser[String] =
@@ -37,6 +35,6 @@ trait CommonParserWriter extends StringParserWriter {
     *  - Followed by `e` or `E` and an optionally signed integer
     *  - Followed by `f`, `f`, `d` or `D` (after the above rule, if both are used)
     */
-  def floatingPointNumber: Parser[String] =
+  def floatingPointNumber: EditorParser[String] =
     """-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r
 }

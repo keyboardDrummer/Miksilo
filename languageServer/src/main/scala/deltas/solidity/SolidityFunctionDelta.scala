@@ -21,9 +21,9 @@ object SolidityFunctionDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-    val storageLocation: BiGrammar = "memory" | "storage" | "calldata"
+    val storageLocation: BiGrammar = find(StorageLocationDelta.StorageLocation)
     val parameter = typeGrammar.as(MethodParameters.Type) ~
-      storageLocation.spacedOption.as(ParameterStorageLocation) ~
+      storageLocation ~
       identifier.spacedOption.as(MethodParameters.Name) asNode MethodParameters.Shape
     val parameterList = create(MethodDelta.Parameters, parameter.toParameterList)
 
@@ -32,7 +32,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar {
     val modifierInvocation = identifier.as(VariableDelta.Name) ~
       (find(CallDelta.CallArgumentsGrammar) | value(Seq.empty)).as(CallDelta.Arguments) asNode CallDelta.Shape
 
-    val stateMutability = "pure" | "view" | "payable"
+    val stateMutability = find(StateMutabilityDelta.Grammar)
     val modifiers = create(Modifiers, (printSpace ~ (modifierInvocation | stateMutability | "external" | "public" | "internal" | "private")).many.as(Modifiers))
     val returnValues = (printSpace ~ "returns" ~~ parameterList | value(Seq.empty)).as(ReturnValues)
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
@@ -43,7 +43,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar {
 
   override def description = "Adds solidity functions"
 
-  override def dependencies = Set(TypeSkeleton, BlockDelta)
+  override def dependencies = Set(TypeSkeleton, BlockDelta, StorageLocationDelta)
 }
 
 
