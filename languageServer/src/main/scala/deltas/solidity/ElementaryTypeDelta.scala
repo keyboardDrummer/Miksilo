@@ -25,7 +25,9 @@ object ElementaryTypeDelta extends DeltaWithGrammar {
     //val Fixed = "fixed", ( "fixed" [0-9]+ "x" [0-9]+ ) ;
     //val Ufixed = "ufixed", ( "ufixed" [0-9]+ "x" [0-9]+ ) ;
     val elementaryTypeNames = Seq("address", "bool", "string", "var") ++ Int ++ Uint ++ Seq("byte") ++ Byte //| Fixed, Ufixed
-    val elementaryTypeName = elementaryTypeNames.map(name => Keyword(name, reserved = false).asInstanceOf[BiGrammar]).reduce((a,b) => a | b)
+    val elementaryTypeName =
+      elementaryTypeNames.map(name => Keyword(name, reserved = false).as(Name).asInstanceOf[BiGrammar]).
+      reduce((a,b) => a | b) asLabelledNode Shape
     typeGrammar.addAlternative(elementaryTypeName)
   }
 

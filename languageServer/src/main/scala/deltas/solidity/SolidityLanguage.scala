@@ -40,6 +40,7 @@ object SolidityLanguage {
     FixedSizeArrayTypeDelta, ArrayTypeDelta, TypeSkeleton)
 
   val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar,
+    MappingTypeDelta,
     InlineAssemblyStatementDelta,
     LocalDeclarationStorageLocationDelta,
     NumberLiteralUnitsDelta,
@@ -55,5 +56,6 @@ object SolidityLanguage {
 
   val language = LanguageFromDeltas
 }
+
 
 

@@ -6,7 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.document.BlankLine
 import core.language.Language
 import core.language.node.{NodeField, NodeShape}
-import deltas.bytecode.types.QualifiedObjectTypeDelta
+import deltas.bytecode.types.UnqualifiedObjectTypeDelta
 import deltas.expression.ExpressionDelta
 
 object SolidityContractDelta extends DeltaWithGrammar {
@@ -24,7 +24,7 @@ object SolidityContractDelta extends DeltaWithGrammar {
     import grammars._
 
     val contractType = ("contract" | "interface" | "library").as(ContractType)
-    val objectType = find(QualifiedObjectTypeDelta.Shape)
+    val objectType = find(UnqualifiedObjectTypeDelta.AnyObjectTypeGrammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val inheritanceSpecifier: BiGrammar = objectType.as(SuperName) ~
       (expression.someSeparated("," ~ printSpace).inParenthesis | value(Seq.empty)).as(SuperArguments) asNode SuperShape
@@ -37,7 +37,7 @@ object SolidityContractDelta extends DeltaWithGrammar {
 
   override def description = "Adds the contract/interface/library"
 
-  override def dependencies = Set(SolidityFile, QualifiedObjectTypeDelta)
+  override def dependencies = Set(SolidityFile, UnqualifiedObjectTypeDelta)
 }
 
 
