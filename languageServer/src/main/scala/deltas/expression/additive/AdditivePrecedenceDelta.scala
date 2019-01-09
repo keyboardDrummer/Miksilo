@@ -1,4 +1,4 @@
-package deltas.javac.expressions.additive
+package deltas.expression.additive
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}

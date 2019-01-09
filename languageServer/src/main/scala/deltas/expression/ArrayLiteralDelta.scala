@@ -8,7 +8,6 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.javac.expressions.ExpressionInstance
 
 object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 

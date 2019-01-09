@@ -9,7 +9,6 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
-import deltas.javac.expressions.ExpressionInstance
 
 object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 

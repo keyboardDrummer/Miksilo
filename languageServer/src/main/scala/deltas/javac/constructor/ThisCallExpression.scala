@@ -9,10 +9,10 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.VoidTypeDelta
-import deltas.expression.ExpressionDelta
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
+import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.javac.methods.call.CallDelta
 
 object ThisCallExpression extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {

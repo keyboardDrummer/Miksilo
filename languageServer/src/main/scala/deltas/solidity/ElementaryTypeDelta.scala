@@ -1,7 +1,7 @@
 package deltas.solidity
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.grammars.Keyword
+import core.bigrammar.grammars.{Keyword, RegexGrammar}
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
@@ -22,12 +22,12 @@ object ElementaryTypeDelta extends DeltaWithGrammar {
 
     val Byte = Seq("bytes", "bytes1", "bytes2", "bytes3", "bytes4", "bytes5", "bytes6", "bytes7", "bytes8", "bytes9", "bytes10", "bytes11", "bytes12", "bytes13", "bytes14", "bytes15", "bytes16", "bytes17", "bytes18", "bytes19", "bytes20", "bytes21", "bytes22", "bytes23", "bytes24", "bytes25", "bytes26", "bytes27", "bytes28", "bytes29", "bytes30", "bytes31", "bytes32");
 
-    //val Fixed = "fixed", ( "fixed" [0-9]+ "x" [0-9]+ ) ;
-    //val Ufixed = "ufixed", ( "ufixed" [0-9]+ "x" [0-9]+ ) ;
-    val elementaryTypeNames = Seq("address", "bool", "string", "var") ++ Int ++ Uint ++ Seq("byte") ++ Byte //| Fixed, Ufixed
+    val Fixed = Keyword("fixed", reserved = false) | RegexGrammar("""fixed[0-9]x[0-9]+""".r) ;
+    val Ufixed = Keyword("ufixed", reserved = false) | RegexGrammar("""ufixed[0-9]x[0-9]+""".r) ;
+    val elementaryTypeNames = Seq("address", "bool", "string", "var") ++ Int ++ Uint ++ Seq("byte") ++ Byte
     val elementaryTypeName =
       elementaryTypeNames.map(name => Keyword(name, reserved = false).as(Name).asInstanceOf[BiGrammar]).
-      reduce((a,b) => a | b) asLabelledNode Shape
+      reduce((a,b) => a | b) | Fixed | Ufixed asLabelledNode Shape
     typeGrammar.addAlternative(elementaryTypeName)
   }
 

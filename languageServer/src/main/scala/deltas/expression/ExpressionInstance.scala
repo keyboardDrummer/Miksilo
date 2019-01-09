@@ -1,13 +1,12 @@
-package deltas.javac.expressions
+package deltas.expression
 
-import core.deltas._
 import core.deltas.path.NodePath
+import core.deltas.{Contract, Delta, HasShape}
 import core.language.node.Node
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expression.ExpressionDelta
 
 trait ExpressionInstance extends Delta with HasShape {
 

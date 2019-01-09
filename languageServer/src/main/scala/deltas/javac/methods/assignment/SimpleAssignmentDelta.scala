@@ -9,8 +9,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expression.ExpressionDelta
-import deltas.javac.expressions.ExpressionInstance
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 
 object SimpleAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
 
@@ -24,7 +23,7 @@ object SimpleAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
     import grammars._
     val targetGrammar = create(AssignmentTargetGrammar, BiFailure())
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar) //TODO shouldn't this use AssignmentPrecedence?
-    val assignmentGrammar = targetGrammar.as(Target) ~~< "=" ~~ expressionGrammar.as(Value) asNode Shape
+    val assignmentGrammar = create(Target, targetGrammar.as(Target)) ~~< "=" ~~ expressionGrammar.as(Value) asNode Shape
     expressionGrammar.addAlternative(assignmentGrammar)
   }
 

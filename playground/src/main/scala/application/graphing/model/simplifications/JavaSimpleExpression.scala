@@ -1,10 +1,10 @@
 package application.graphing.model.simplifications
 
 import core.deltas.Contract
-import deltas.expression.IntLiteralDelta
+import deltas.expression.{IntLiteralDelta, ParenthesisInExpressionDelta}
+import deltas.expression.additive.{AdditionDelta, SubtractionDelta}
 import deltas.expression.relational.LessThanDelta
 import deltas.javac.expressions._
-import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
 import deltas.javac.expressions.equality.EqualityDelta
 import deltas.javac.expressions.literals.{BooleanLiteralDelta, NullDelta}
 import deltas.javac.methods.assignment.AssignmentPrecedence

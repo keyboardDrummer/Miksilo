@@ -1,9 +1,8 @@
-package deltas.javac.expressions
+package deltas.expression
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
-import deltas.expression.ExpressionDelta
 
 object ParenthesisInExpressionDelta extends DeltaWithGrammar {
 

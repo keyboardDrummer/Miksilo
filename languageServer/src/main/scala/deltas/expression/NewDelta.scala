@@ -12,7 +12,6 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidTypeDelta}
 import deltas.javac.constructor.SuperCallExpression.constructorName
-import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.call.CallDelta.Arguments
 

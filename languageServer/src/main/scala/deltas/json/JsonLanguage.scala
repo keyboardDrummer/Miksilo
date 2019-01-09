@@ -1,8 +1,7 @@
 package deltas.json
 
 import core.deltas.{Delta, LanguageFromDeltas}
-import deltas.expression.{ArrayLiteralDelta, DefaultExpressionDelta, ExpressionDelta, IntLiteralDelta}
-import deltas.javac.expressions.ExpressionLanguageDelta
+import deltas.expression._
 import deltas.javac.expressions.literals.BooleanLiteralDelta
 
 object JsonLanguage {

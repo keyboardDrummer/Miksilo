@@ -6,7 +6,8 @@ import core.language.node.Node
 import deltas.bytecode.coreInstructions.integers.AddIntegersDelta
 import deltas.bytecode.coreInstructions.longs.AddLongsDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta}
-import deltas.javac.expressions.additive.AdditionDelta.{Addition, getType}
+import deltas.expression.additive.AdditionDelta
+import deltas.expression.additive.AdditionDelta.{Addition, getType}
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 
 object AdditionToByteCodeDelta extends ConvertsToByteCodeDelta {

@@ -9,8 +9,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
-import deltas.expression.ExpressionDelta
-import deltas.javac.expressions.ExpressionInstance
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.types.BooleanTypeDelta
 
 object ComparisonOperatorDelta {

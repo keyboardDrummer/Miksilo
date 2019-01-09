@@ -21,6 +21,8 @@ import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, In
 import deltas.bytecode.types._
 import deltas.expression.relational.{AddRelationalPrecedenceDelta, GreaterThanDelta, LessThanDelta}
 import deltas.expression._
+import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
+import deltas.expression.prefix.LogicalNotDelta
 import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
@@ -30,7 +32,6 @@ import deltas.javac.expressions.additive._
 import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
 import deltas.javac.expressions.literals._
 import deltas.javac.expressions.postfix.PostFixIncrementToByteCodeDelta
-import deltas.javac.expressions.prefix.NotDelta
 import deltas.javac.expressions.relational.{GreaterThanToByteCodeDelta, LessThanToByteCodeDelta}
 import deltas.javac.methods._
 import deltas.javac.methods.assignment._
@@ -89,7 +90,7 @@ object JavaLanguage {
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
     AddEqualityPrecedence, LessThanToByteCodeDelta, LessThanDelta, GreaterThanToByteCodeDelta, GreaterThanDelta, AddRelationalPrecedenceDelta, AdditionToByteCodeDelta, AdditionDelta,
     SubtractionToByteCodeDelta, SubtractionDelta, AdditivePrecedenceDelta,
-    BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, NotDelta, ParenthesisInExpressionDelta, ExpressionDelta) ++ allByteCodeDeltas
+    BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, LogicalNotDelta, ParenthesisInExpressionDelta, ExpressionDelta) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
     Seq(LessThanInstructionDelta, GreaterThanInstructionDelta, NotInstructionDelta, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsDelta) ++

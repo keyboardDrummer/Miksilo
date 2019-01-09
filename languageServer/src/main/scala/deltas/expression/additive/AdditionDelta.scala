@@ -1,16 +1,15 @@
-package deltas.javac.expressions.additive
+package deltas.expression.additive
 
-import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import core.smarts.{ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
-import deltas.expression.ExpressionDelta
-import deltas.javac.expressions.ExpressionInstance
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 
 object AdditionDelta extends DeltaWithGrammar with ExpressionInstance {
 

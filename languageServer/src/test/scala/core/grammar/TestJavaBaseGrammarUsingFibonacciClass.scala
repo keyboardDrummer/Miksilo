@@ -3,12 +3,12 @@ package core.grammar
 import core.bigrammar.TestLanguageGrammarUtils
 import core.language.node.{Node, NodeComparer}
 import deltas.bytecode.types._
+import deltas.expression.additive.{AdditionDelta, SubtractionDelta}
 import deltas.expression.relational.LessThanDelta
 import deltas.expression.{ExpressionDelta, IntLiteralDelta, VariableDelta}
 import deltas.javac.JavaLanguage
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions._
-import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
 import deltas.javac.methods._
 import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.call.CallDelta

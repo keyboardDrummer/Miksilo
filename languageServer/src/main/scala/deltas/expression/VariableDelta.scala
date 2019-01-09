@@ -9,7 +9,6 @@ import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import core.smarts.{ConstraintBuilder, ResolvesTo}
-import deltas.javac.expressions.ExpressionInstance
 import deltas.javac.methods.call.ReferenceExpressionDelta
 import deltas.javac.methods.{MethodDelta, VariableInfo}
 

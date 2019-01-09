@@ -8,10 +8,10 @@ import core.smarts.ConstraintBuilder
 import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expression.ExpressionDelta
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
-import deltas.javac.expressions.{ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 import deltas.javac.methods.call.CallDelta.Call

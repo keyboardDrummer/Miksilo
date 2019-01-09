@@ -13,8 +13,8 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.types.LongTypeDelta
-import deltas.expression.ExpressionDelta
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.javac.expressions.ConvertsToByteCodeDelta
 
 object LongLiteralDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
   val shape = LongLiteralKey

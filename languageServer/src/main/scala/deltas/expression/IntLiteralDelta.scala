@@ -9,7 +9,6 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.IntTypeDelta
-import deltas.javac.expressions.ExpressionInstance
 
 object IntLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   val shape = Shape

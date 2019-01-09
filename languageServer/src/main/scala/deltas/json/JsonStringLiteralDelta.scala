@@ -9,8 +9,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
-import deltas.expression.ExpressionDelta
-import deltas.javac.expressions.ExpressionInstance
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 
 import scala.util.matching.Regex
 

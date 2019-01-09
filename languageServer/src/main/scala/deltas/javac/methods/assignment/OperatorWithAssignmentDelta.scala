@@ -5,7 +5,7 @@ import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithGrammar, DeltaWithPhase}
 import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
-import deltas.javac.expressions.additive.AdditionDelta
+import deltas.expression.additive.AdditionDelta
 
 trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -21,7 +21,7 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
     import grammars._
 
     val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
-    val assignmentTarget = find(SimpleAssignmentDelta.AssignmentTargetGrammar)
+    val assignmentTarget = find(SimpleAssignmentDelta.Target)
     val incrementAssignmentGrammar = assignmentTarget.as(SimpleAssignmentDelta.Target) ~~
       (keyword ~~> assignmentGrammar.as(SimpleAssignmentDelta.Value)) asNode Shape
     assignmentGrammar.addAlternative(incrementAssignmentGrammar)

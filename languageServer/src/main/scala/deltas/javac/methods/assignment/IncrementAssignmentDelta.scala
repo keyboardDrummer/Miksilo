@@ -1,7 +1,7 @@
 package deltas.javac.methods.assignment
 
 import core.deltas._
-import deltas.javac.expressions.additive.AdditionDelta
+import deltas.expression.additive.AdditionDelta
 
 object IncrementAssignmentDelta extends OperatorWithAssignmentDelta {
 
