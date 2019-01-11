@@ -24,9 +24,9 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
 
     val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = find(SimpleAssignmentDelta.Target)
-    val incrementAssignmentGrammar = assignmentTarget ~~
+    val operatorGrammar = assignmentTarget ~~
       (keyword ~~> assignmentGrammar.as(SimpleAssignmentDelta.Value)) asNode shape
-    assignmentGrammar.addAlternative(incrementAssignmentGrammar)
+    assignmentGrammar.addAlternative(operatorGrammar)
   }
 
   def transformAssignment(incrementAssignment: NodePath, state: Language): Unit = {
