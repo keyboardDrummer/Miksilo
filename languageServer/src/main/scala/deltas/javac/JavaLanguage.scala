@@ -57,7 +57,7 @@ object JavaLanguage {
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewDelta, FieldDeclarationWithInitializer, ConstructorDelta, MemberSelectorAsNamespaceReference, VariableAsNamespaceReference) ++
+      NewToByteCodeDelta, NewDelta, FieldDeclarationWithInitializer, ConstructorDelta, MemberSelectorAsNamespaceReference, VariableAsNamespaceReference) ++
       Seq(ThisCallExpression, SuperCallExpression) ++ fields ++ imports ++
       javaMethod
   }
@@ -72,8 +72,9 @@ object JavaLanguage {
       SelectFieldToByteCodeDelta, SelectFieldDelta) ++ blockWithVariables)
 
   def blockWithVariables: Seq[Delta] = Seq(LocalDeclarationWithInitializerDelta, LocalDeclarationDeltaToByteCode, LocalDeclarationDelta,
-    IncrementAssignmentDelta, AssignToVariable, AssignmentToByteCodeDelta, SimpleAssignmentDelta,
-    AssignmentPrecedence, PostFixIncrementToByteCodeDelta, PostFixIncrementDelta, VariableToByteCodeDelta) ++
+    PostFixIncrementToByteCodeDelta, PostFixIncrementDelta,
+    AddAssignmentDelta, AssignToVariable, AssignmentToByteCodeDelta, SimpleAssignmentDelta,
+    AssignmentPrecedence, VariableToByteCodeDelta) ++
     Seq(SolveConstraintsDelta,
       ImplicitThisForPrivateMemberSelectionDelta, ThisVariableDelta, MethodDelta, AccessibilityFieldsDelta,
       CallVariableDelta, VariableDelta, CallDelta, MemberSelectorDelta) ++ javaClassSkeleton

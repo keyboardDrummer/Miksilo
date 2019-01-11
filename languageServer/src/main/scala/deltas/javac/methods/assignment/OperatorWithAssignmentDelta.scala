@@ -11,8 +11,10 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(SimpleAssignmentDelta)
 
-  def incrementAssignment(target: Node, value: Node) =
-    new Node(Shape, SimpleAssignmentDelta.Target -> target, SimpleAssignmentDelta.Value -> value)
+  val shape: NodeShape
+
+  def neww(target: Node, value: Node) =
+    new Node(shape, SimpleAssignmentDelta.Target -> target, SimpleAssignmentDelta.Value -> value)
 
   def keyword: String
   def operatorShape: NodeShape
@@ -22,8 +24,8 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
 
     val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = find(SimpleAssignmentDelta.Target)
-    val incrementAssignmentGrammar = assignmentTarget.as(SimpleAssignmentDelta.Target) ~~
-      (keyword ~~> assignmentGrammar.as(SimpleAssignmentDelta.Value)) asNode Shape
+    val incrementAssignmentGrammar = assignmentTarget ~~
+      (keyword ~~> assignmentGrammar.as(SimpleAssignmentDelta.Value)) asNode shape
     assignmentGrammar.addAlternative(incrementAssignmentGrammar)
   }
 
@@ -37,8 +39,6 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(Shape, obj => transformAssignment(obj, compilation))
+    PathRoot(program).visitShape(shape, obj => transformAssignment(obj, compilation))
   }
-
-  object Shape extends NodeShape
 }

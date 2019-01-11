@@ -1,9 +1,12 @@
 package deltas.javac.methods.assignment
 
 import core.deltas._
+import core.language.node.NodeShape
 import deltas.expression.additive.AdditionDelta
 
-object IncrementAssignmentDelta extends OperatorWithAssignmentDelta {
+object AddAssignmentDelta extends OperatorWithAssignmentDelta {
+
+  object Shape extends NodeShape
 
   override def description: String = "Defines the += operator."
 
@@ -12,5 +15,7 @@ object IncrementAssignmentDelta extends OperatorWithAssignmentDelta {
   override def keyword = "+="
 
   override def operatorShape = AdditionDelta.Shape
+
+  override val shape = Shape
 }
 

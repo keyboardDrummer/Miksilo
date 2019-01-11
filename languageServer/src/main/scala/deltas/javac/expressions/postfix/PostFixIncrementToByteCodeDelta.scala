@@ -5,7 +5,7 @@ import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node.{Node, NodeShape}
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
-import deltas.expression.PostFixIncrementDelta
+import deltas.expression.{PostFixIncrementDelta, VariableDelta}
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.javac.methods.MethodDelta
 import deltas.javac.methods.assignment.SimpleAssignmentDelta
@@ -16,9 +16,13 @@ object PostFixIncrementToByteCodeDelta extends ConvertsToByteCodeDelta {
 
   override def toByteCode(plusPlus: NodePath, compilation: Compilation): Seq[Node] = {
     val methodCompiler = MethodDelta.getMethodCompiler(compilation)
-    val name: String = plusPlus.getValue(SimpleAssignmentDelta.Target).asInstanceOf[String]
-    val variableAddress = methodCompiler.getVariables(plusPlus)(name).offset
-    Seq(LoadIntegerDelta.load(variableAddress), IncrementIntegerDelta.integerIncrement(variableAddress, 1))
+    val target = plusPlus(SimpleAssignmentDelta.Target).asInstanceOf[NodePath]
+    target.current.shape match {
+      case VariableDelta.Shape =>
+        val name = VariableDelta.Variable[Node](target.current).name
+        val variableAddress = methodCompiler.getVariables(plusPlus)(name).offset
+        Seq(LoadIntegerDelta.load(variableAddress), IncrementIntegerDelta.integerIncrement(variableAddress, 1))
+    }
   }
 
   override def description: String = "Converts post fix increment to bytecode"

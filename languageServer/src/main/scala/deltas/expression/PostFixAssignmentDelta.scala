@@ -25,7 +25,7 @@ trait PostFixAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
     import grammars._
     val target = find(SimpleAssignmentDelta.Target)
     val postFixIncrement = target ~< keyword asNode Shape
-    find(SimpleAssignmentDelta.AssignmentTargetGrammar).addAlternative(postFixIncrement)
+    find(ExpressionDelta.LastPrecedenceGrammar).addAlternative(postFixIncrement)
   }
 
   object Shape extends NodeShape
@@ -34,8 +34,8 @@ trait PostFixAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, plusPlus: NodePath, _type: Type, parentScope: Scope): Unit = {
     builder.typesAreEqual(IntTypeDelta.constraintType, _type)
-    val name = plusPlus.getValue(SimpleAssignmentDelta.Target).asInstanceOf[String]
-    builder.resolve(name, plusPlus.getSourceElement(SimpleAssignmentDelta.Target), parentScope, Some(_type))
+    val target = plusPlus(SimpleAssignmentDelta.Target).asInstanceOf[NodePath]
+    ExpressionDelta.constraints(compilation, builder, target, _type, parentScope)
   }
 }
 
