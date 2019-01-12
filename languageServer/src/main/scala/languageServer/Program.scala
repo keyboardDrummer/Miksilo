@@ -6,8 +6,10 @@ import ch.qos.logback.core.ConsoleAppender
 import ch.qos.logback.core.encoder.LayoutWrappingEncoder
 import ch.qos.logback.core.layout.EchoLayout
 import com.typesafe.scalalogging.LazyLogging
+import core.language.Language
 import deltas.cloudformation.CloudFormationLanguage
 import deltas.javac.JavaLanguage
+import deltas.solidity.SolidityLanguage
 import deltas.verilog.VerilogLanguage
 import languageServer.lsp.{JsonRpcConnection, LSPServer}
 import org.slf4j.LoggerFactory
@@ -16,10 +18,11 @@ import scala.util.Try
 
 object Program extends LazyLogging {
 
-  val languages = Map(
+  val languages: Map[String, Language] = Map(
     "cloudFormation" -> CloudFormationLanguage.language,
     "verilog" -> VerilogLanguage.language,
-    "java" -> JavaLanguage.getJavaFrontend
+    "java" -> JavaLanguage.getJavaFrontend,
+    "solidity" -> SolidityLanguage.language,
   )
 
   def main(args: Array[String]): Unit = {

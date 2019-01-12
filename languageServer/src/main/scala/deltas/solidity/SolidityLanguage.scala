@@ -74,7 +74,7 @@ object SolidityLanguage {
 
   val deltas = soliditySpecificDeltas ++ genericDeltas
 
-  val language = LanguageFromDeltas
+  val language: Language = LanguageFromDeltas(deltas)
 }
 
 object AfterOrDeleteExpressionDelta extends DeltaWithGrammar {
