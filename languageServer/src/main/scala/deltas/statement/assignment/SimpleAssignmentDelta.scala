@@ -1,9 +1,9 @@
-package deltas.javac.methods.assignment
+package deltas.statement.assignment
 
 import core.bigrammar.grammars.BiFailure
-import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder

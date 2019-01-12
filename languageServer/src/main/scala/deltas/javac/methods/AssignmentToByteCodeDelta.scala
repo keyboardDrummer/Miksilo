@@ -1,4 +1,4 @@
-package deltas.javac.methods.assignment
+package deltas.javac.methods
 
 import core.deltas.ShapeProperty
 import core.deltas.path.NodePath
@@ -10,7 +10,8 @@ import deltas.bytecode.coreInstructions.{Duplicate2InstructionDelta, DuplicateIn
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
-import deltas.javac.methods.assignment.SimpleAssignmentDelta.{getTarget, getValue}
+import deltas.statement.assignment.SimpleAssignmentDelta
+import deltas.statement.assignment.SimpleAssignmentDelta.{getTarget, getValue}
 
 trait HasAssignFromStackByteCode {
   def getAssignFromStackByteCode(compilation: Compilation, path: NodePath): Seq[Node]

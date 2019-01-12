@@ -1,8 +1,8 @@
-package deltas.javac.methods.assignment
+package deltas.statement.assignment
 
-import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.Node
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
@@ -14,7 +14,7 @@ import deltas.bytecode.types.LongTypeDelta.LongTypeKey
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
 import deltas.expression.VariableDelta
 import deltas.expression.VariableDelta.Variable
-import deltas.javac.methods.{MethodDelta, VariableInfo}
+import deltas.javac.methods.{AssignmentToByteCodeDelta, MethodDelta, VariableInfo}
 
 object AssignToVariable extends DeltaWithGrammar {
 

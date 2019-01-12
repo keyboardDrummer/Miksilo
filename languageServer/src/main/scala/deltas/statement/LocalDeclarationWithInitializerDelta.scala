@@ -7,9 +7,9 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.{ExpressionDelta, VariableDelta}
-import deltas.javac.methods.assignment.SimpleAssignmentDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.statement.LocalDeclarationDelta.{LocalDeclaration, Name, Type}
+import deltas.statement.assignment.SimpleAssignmentDelta
 
 object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaWithPhase {
 

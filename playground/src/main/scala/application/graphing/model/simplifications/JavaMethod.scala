@@ -4,9 +4,9 @@ import core.deltas.Contract
 import deltas.expression.PostFixIncrementDelta
 import deltas.javac.ImplicitObjectSuperClass
 import deltas.javac.classes.{BasicImportDelta, FieldDeclarationDelta}
-import deltas.javac.methods.assignment.{AssignToVariable, AddAssignmentDelta}
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MemberSelectorDelta}
 import deltas.statement.LocalDeclarationWithInitializerDelta
+import deltas.statement.assignment.{AddAssignmentDelta, AssignToVariable}
 
 object JavaMethod extends DeltaGroup {
 

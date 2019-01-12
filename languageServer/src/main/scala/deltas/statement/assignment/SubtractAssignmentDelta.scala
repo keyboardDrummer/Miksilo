@@ -1,4 +1,4 @@
-package deltas.javac.methods.assignment
+package deltas.statement.assignment
 
 import core.deltas.Contract
 import core.language.node.NodeShape

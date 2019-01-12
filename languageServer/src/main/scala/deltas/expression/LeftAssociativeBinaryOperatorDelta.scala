@@ -10,6 +10,8 @@ trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar {
   object Left extends NodeField
   object Right extends NodeField
 
+  override def dependencies = Set(ExpressionDelta)
+
   implicit class BinaryOperator[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def left: T = node(Left).asInstanceOf[T]
     def left_=(value: T): Unit = node(Left) = value
@@ -18,12 +20,12 @@ trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar {
     def right_=(value: T): Unit = node(Right) = value
   }
 
-  def grammar: GrammarKey
+  def operatorGrammarKey: GrammarKey
   def keyword: String
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val operatorGrammar = find(grammar)
+    val operatorGrammar = find(operatorGrammarKey)
     val withoutOperator = operatorGrammar.inner
     val parseSubtraction = operatorGrammar.as(Left) ~~< keyword ~~ withoutOperator.as(Right) asNode Shape
     operatorGrammar.addAlternative(parseSubtraction)

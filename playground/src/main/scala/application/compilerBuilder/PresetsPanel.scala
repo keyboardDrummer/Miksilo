@@ -14,9 +14,9 @@ import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac._
 import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
-import deltas.javac.methods.assignment.AddAssignmentDelta
 import deltas.javac.methods.{BlockLanguageDelta, ImplicitReturnAtEndOfMethod}
 import deltas.javac.statements.ForLoopContinueDelta
+import deltas.statement.assignment.AddAssignmentDelta
 import deltas.statement.{ForLoopDelta, LocalDeclarationWithInitializerDelta}
 
 object PresetsPanel

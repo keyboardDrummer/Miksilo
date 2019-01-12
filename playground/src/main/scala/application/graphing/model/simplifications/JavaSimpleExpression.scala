@@ -7,8 +7,8 @@ import deltas.expression.relational.LessThanDelta
 import deltas.javac.expressions._
 import deltas.javac.expressions.equality.EqualityDelta
 import deltas.javac.expressions.literals.{BooleanLiteralDelta, NullDelta}
-import deltas.javac.methods.assignment.AssignmentPrecedence
 import deltas.statement.StatementDelta
+import deltas.statement.assignment.AssignmentPrecedence
 
 object JavaSimpleExpression extends DeltaGroup {
 

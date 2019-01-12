@@ -9,7 +9,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.IntTypeDelta
-import deltas.javac.methods.assignment.SimpleAssignmentDelta
+import deltas.statement.assignment.SimpleAssignmentDelta
 
 trait PostFixAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
 

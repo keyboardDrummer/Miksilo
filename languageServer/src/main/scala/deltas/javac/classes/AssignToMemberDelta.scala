@@ -9,9 +9,9 @@ import deltas.bytecode.coreInstructions.objects.PutField
 import deltas.expression.VariableDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ToByteCodeSkeleton
-import deltas.javac.methods.MemberSelectorDelta
+import deltas.javac.methods.{AssignmentToByteCodeDelta, MemberSelectorDelta}
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
-import deltas.javac.methods.assignment.{AssignmentToByteCodeDelta, SimpleAssignmentDelta}
+import deltas.statement.assignment.SimpleAssignmentDelta
 
 object AssignToMemberDelta extends DeltaWithGrammar {
 

@@ -1,4 +1,4 @@
-package deltas.javac.methods.assignment
+package deltas.statement.assignment
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, PathRoot}

@@ -1,6 +1,6 @@
-package deltas.javac.methods.assignment
+package deltas.statement.assignment
 
-import core.deltas._
+import core.deltas.Contract
 import core.language.node.NodeShape
 import deltas.expression.additive.AdditionDelta
 
@@ -18,4 +18,3 @@ object AddAssignmentDelta extends OperatorWithAssignmentDelta {
 
   override val shape = Shape
 }
-

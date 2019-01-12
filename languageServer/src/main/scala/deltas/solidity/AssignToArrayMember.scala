@@ -4,7 +4,7 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import deltas.expression.ArrayAccessDelta
-import deltas.javac.methods.assignment.SimpleAssignmentDelta
+import deltas.statement.assignment.SimpleAssignmentDelta
 
 object AssignToArrayMember extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {

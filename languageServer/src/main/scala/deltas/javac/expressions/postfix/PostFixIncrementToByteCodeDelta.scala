@@ -8,7 +8,7 @@ import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadInt
 import deltas.expression.{PostFixIncrementDelta, VariableDelta}
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.javac.methods.MethodDelta
-import deltas.javac.methods.assignment.SimpleAssignmentDelta
+import deltas.statement.assignment.SimpleAssignmentDelta
 
 object PostFixIncrementToByteCodeDelta extends ConvertsToByteCodeDelta {
 
