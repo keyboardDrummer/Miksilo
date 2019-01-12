@@ -7,6 +7,7 @@ import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkel
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.bitwise._
+import deltas.expression.logical.{LogicalAndDelta, LogicalNotDelta, LogicalOrDelta}
 import deltas.expression.multiplicative.{DivideDelta, ModuloDelta, MultiplicativePrecedenceDelta, MultiplyDelta}
 import deltas.expression.prefix._
 import deltas.expression.relational._
@@ -22,6 +23,9 @@ import deltas.trivia.{SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta}
 object SolidityLanguage {
 
   private val genericDeltas = Seq(
+    BitwiseOrAssignmentDelta, BitwiseXorAssignmentDelta, BitwiseAndAssignmentDelta,
+    BitwiseShiftLeftAssignmentDelta, BitwiseShiftRightAssignmentDelta,
+    MultiplyAssignmentDelta, DivideAssignmentDelta,
     SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta,
     ForLoopContinueDelta, ForLoopDelta,
     LocalDeclarationWithInitializerDelta,
@@ -45,10 +49,11 @@ object SolidityLanguage {
     BitwiseShiftLeftDelta, BitwiseShiftRightDelta, BitwiseAndDelta, BitwiseXorDelta, BitwiseOrDelta,
     LessThanDelta, GreaterThanOrEqualDelta, GreaterThanDelta,
     EqualsComparisonDelta, AddRelationalPrecedenceDelta,
+    LogicalAndDelta, LogicalOrDelta,
+    TernaryDelta,
     AssignToMemberDelta, SelectFieldDelta, MemberSelectorDelta,
     AssignToArrayMember,
     AssignToVariable, VariableDelta, SimpleAssignmentDelta, AssignmentPrecedence,
-    BitwiseNotDelta,
     ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta,
     ParenthesisInExpressionDelta, ExpressionDelta,
     FixedSizeArrayTypeDelta, ArrayTypeDelta, TypeSkeleton)

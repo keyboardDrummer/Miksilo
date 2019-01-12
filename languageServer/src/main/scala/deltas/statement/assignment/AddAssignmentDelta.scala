@@ -1,6 +1,5 @@
 package deltas.statement.assignment
 
-import core.deltas.Contract
 import core.language.node.NodeShape
 import deltas.expression.additive.AdditionDelta
 
@@ -8,13 +7,7 @@ object AddAssignmentDelta extends OperatorWithAssignmentDelta {
 
   object Shape extends NodeShape
 
-  override def description: String = "Defines the += operator."
-
-  override def dependencies: Set[Contract] = Set(AdditionDelta) ++ super.dependencies
-
-  override def keyword = "+="
-
-  override def operatorShape = AdditionDelta.Shape
+  override def operatorDelta = AdditionDelta
 
   override val shape = Shape
 }

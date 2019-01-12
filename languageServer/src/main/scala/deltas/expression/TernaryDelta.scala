@@ -1,20 +1,17 @@
-package deltas.javac.expressions
+package deltas.expression
 
-import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.language.node._
 import core.deltas.path.NodePath
+import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.node.{Node, NodeField, NodeLike, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.ByteCodeMethodInfo
-import deltas.bytecode.simpleBytecode.{InferredStackFrames, LabelDelta, LabelledLocations}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.types.BooleanTypeDelta
 
-object TernaryDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
+  object TernaryDelta extends DeltaWithGrammar with ExpressionInstance {
   def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseBranch).asInstanceOf[T]
 
   def trueBranch[T <: NodeLike](metaObject: T) = metaObject(TrueBranch).asInstanceOf[T]
@@ -23,7 +20,7 @@ object TernaryDelta extends DeltaWithGrammar with ExpressionInstance with Conver
     metaObject(Condition).asInstanceOf[T]
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionDelta, LabelledLocations)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     import grammars._
@@ -59,26 +56,6 @@ object TernaryDelta extends DeltaWithGrammar with ExpressionInstance with Conver
     val trueType = getExpressionType(truePath)
     val falseType = getExpressionType(falsePath)
     TypeSkeleton.union(compilation)(trueType, falseType)
-  }
-
-  override def toByteCode(_ternary: NodePath, compilation: Compilation): Seq[Node] = {
-    val condition = TernaryDelta.getCondition(_ternary)
-    val truePath = TernaryDelta.trueBranch(_ternary)
-    val falsePath = TernaryDelta.falseBranch(_ternary)
-    val methodInfo = _ternary.findAncestorShape(ByteCodeMethodInfo.Shape)
-    val falseLabelName = LabelDelta.getUniqueLabel("false", methodInfo)
-    val falseTarget = InferredStackFrames.label(falseLabelName)
-    val conditionalBranch = LabelledLocations.ifZero(falseLabelName)
-    val endLabelName = LabelDelta.getUniqueLabel("end", methodInfo)
-    val end = InferredStackFrames.label(endLabelName)
-    val goToEnd = LabelledLocations.goTo(endLabelName)
-    val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
-    toInstructions(condition) ++
-      Seq(conditionalBranch) ++
-      toInstructions(truePath) ++
-      Seq(goToEnd, falseTarget) ++
-      toInstructions(falsePath) ++
-      Seq(end)
   }
 
   override def description: String = "Adds the ternary operator."

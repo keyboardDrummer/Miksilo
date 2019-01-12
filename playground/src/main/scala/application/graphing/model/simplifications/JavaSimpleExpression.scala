@@ -1,7 +1,7 @@
 package application.graphing.model.simplifications
 
 import core.deltas.Contract
-import deltas.expression.{IntLiteralDelta, ParenthesisInExpressionDelta}
+import deltas.expression.{IntLiteralDelta, ParenthesisInExpressionDelta, TernaryDelta}
 import deltas.expression.additive.{AdditionDelta, SubtractionDelta}
 import deltas.expression.relational.LessThanDelta
 import deltas.javac.expressions._

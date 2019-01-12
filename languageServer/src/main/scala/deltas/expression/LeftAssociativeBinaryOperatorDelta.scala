@@ -6,11 +6,12 @@ import core.language.Language
 import core.language.node._
 
 trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar {
-  object Shape extends NodeShape
   object Left extends NodeField
   object Right extends NodeField
 
   override def dependencies = Set(ExpressionDelta)
+
+  def neww(left: Node, right: Node) = shape.create(Left -> left, Right -> right)
 
   implicit class BinaryOperator[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def left: T = node(Left).asInstanceOf[T]
@@ -20,6 +21,7 @@ trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar {
     def right_=(value: T): Unit = node(Right) = value
   }
 
+  def shape: NodeShape
   def operatorGrammarKey: GrammarKey
   def keyword: String
 
@@ -27,7 +29,7 @@ trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar {
     import grammars._
     val operatorGrammar = find(operatorGrammarKey)
     val withoutOperator = operatorGrammar.inner
-    val parseSubtraction = operatorGrammar.as(Left) ~~< keyword ~~ withoutOperator.as(Right) asNode Shape
+    val parseSubtraction = operatorGrammar.as(Left) ~~< keyword ~~ withoutOperator.as(Right) asNode shape
     operatorGrammar.addAlternative(parseSubtraction)
   }
 

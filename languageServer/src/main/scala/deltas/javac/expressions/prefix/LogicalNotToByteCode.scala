@@ -4,7 +4,7 @@ import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node.Node
 import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta
-import deltas.expression.prefix.LogicalNotDelta
+import deltas.expression.logical.LogicalNotDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 
 object LogicalNotToByteCode extends ConvertsToByteCodeDelta {
