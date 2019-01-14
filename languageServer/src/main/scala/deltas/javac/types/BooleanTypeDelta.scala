@@ -31,7 +31,7 @@ object BooleanTypeDelta extends ByteCodeTypeInstance
     "boolean" ~> value(booleanType)
   }
 
-  def booleanType = new Node(Shape)
+  val booleanType = new Node(Shape)
 
   object Shape extends NodeShape
 
