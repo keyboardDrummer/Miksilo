@@ -9,7 +9,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
-object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
+object ArrayLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
 
   override def description: String = "Adds the array literal to expressions"
 

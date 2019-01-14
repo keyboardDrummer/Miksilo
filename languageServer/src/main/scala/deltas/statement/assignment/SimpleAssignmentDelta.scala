@@ -9,9 +9,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
 
-object SimpleAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
+object SimpleAssignmentDelta extends DeltaWithGrammar with JavaExpressionInstance {
 
   def getTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
 

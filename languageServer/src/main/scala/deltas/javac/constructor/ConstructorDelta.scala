@@ -26,7 +26,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
     val clazz: JavaClass[Node] = program
     val className = clazz.name
     for (constructor <- getConstructors(program)) {
-      val constructorClassName = constructor(ConstructorClassNameKey).asInstanceOf[String]
+      val constructorClassName = constructor(ClassName).asInstanceOf[String]
       if (!constructorClassName.equals(className))
         throw BadConstructorNameException(program, constructor.node)
 
@@ -35,23 +35,23 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
       constructor(MethodDelta.ReturnType) = VoidTypeDelta.voidType
       constructor(MethodDelta.TypeParameters) = Seq.empty
       constructor(AccessibilityFieldsDelta.Static) = false
-      constructor.data.remove(ConstructorClassNameKey)
+      constructor.data.remove(ClassName)
     }
   }
 
   def getConstructors[T <: NodeLike](javaClass: JavaClass[T]): Seq[Method[T]] = {
-    NodeWrapper.wrapList(javaClass.members.filter(member => member.shape == ConstructorKey))
+    NodeWrapper.wrapList(javaClass.members.filter(member => member.shape == Shape))
   }
 
   def constructor(className: String, _parameters: Seq[Node], _body: Node,
-                  visibility: AccessibilityFieldsDelta.Visibility = PublicVisibility) = new Node(ConstructorKey,
+                  visibility: AccessibilityFieldsDelta.Visibility = PublicVisibility) = new Node(Shape,
     Parameters -> _parameters, Body -> _body, AccessibilityFieldsDelta.VisibilityField -> visibility,
-    ConstructorClassNameKey -> className)
+    ClassName -> className)
 
 
-  object ConstructorKey extends NodeShape
+  object Shape extends NodeShape
 
-  object ConstructorClassNameKey extends NodeField
+  object ClassName extends NodeField
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -59,7 +59,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
     val visibilityModifier = find(AccessibilityFieldsDelta.VisibilityField)
     val parseParameters = find(MethodDelta.Parameters) as Parameters
     val block = find(BlockDelta.BlockGramar).as(Body)
-    val constructorGrammar = visibilityModifier ~~ identifier.as(ConstructorClassNameKey) ~ parseParameters % block asNode ConstructorKey
+    val constructorGrammar = visibilityModifier ~~ identifier.as(ClassName) ~ parseParameters % block asNode Shape
     memberGrammar.addAlternative(constructorGrammar)
   }
 

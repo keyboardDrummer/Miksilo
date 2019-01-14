@@ -11,7 +11,7 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.types.BooleanTypeDelta
 
-  object TernaryDelta extends DeltaWithGrammar with ExpressionInstance {
+  object TernaryDelta extends DeltaWithGrammar with JavaExpressionInstance {
   def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseBranch).asInstanceOf[T]
 
   def trueBranch[T <: NodeLike](metaObject: T) = metaObject(TrueBranch).asInstanceOf[T]

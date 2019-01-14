@@ -12,7 +12,7 @@ import deltas.bytecode.types._
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.constructor.SuperCallExpression
-import deltas.javac.types.MethodType
+import deltas.javac.types.MethodTypeDelta
 import util.{JavaLanguageTest, LanguageTest}
 
 import scala.collection.mutable.ArrayBuffer
@@ -79,14 +79,14 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
       ClassInfoConstant.classRef(24),
       ClassInfoConstant.classRef(25),
       SuperCallExpression.constructorName,
-      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq())),
+      TypeConstant.constructor(MethodTypeDelta.construct(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "main",
-      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq(
+      TypeConstant.constructor(MethodTypeDelta.construct(VoidTypeDelta.voidType, Seq(
         ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.neww(new QualifiedClassName(Seq("java", "lang", "String"))))))),
       fibonacciMethodName,
-      TypeConstant.constructor(MethodType.construct(IntTypeDelta.intType, Seq(IntTypeDelta.intType))),
+      TypeConstant.constructor(MethodTypeDelta.construct(IntTypeDelta.intType, Seq(IntTypeDelta.intType))),
       StackMapTableAttribute.entry,
       SourceFileAttribute.constantPoolKey,
       "Fibonacci.java",
@@ -103,7 +103,7 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
       TypeConstant.constructor(QualifiedObjectTypeDelta.neww(new QualifiedClassName(Seq("java", "io", "PrintStream")))),
       "java/io/PrintStream",
       "print",
-      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq(IntTypeDelta.intType)))
+      TypeConstant.constructor(MethodTypeDelta.construct(VoidTypeDelta.voidType, Seq(IntTypeDelta.intType)))
     )
     new ConstantPool(constantPool)
   }

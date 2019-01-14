@@ -13,8 +13,8 @@ object ExpressionDelta extends DeltaWithGrammar {
 
   implicit class Expression(val node: Node) extends NodeWrapper[Node]
 
-  def getType(compilation: Compilation): NodePath => Node = expression => {
-    getInstance(compilation)(expression).getType(expression, compilation)
+  def getType(compilation: Compilation): NodePath => Node = expression => { //TODO remove
+    getInstance(compilation)(expression).asInstanceOf[JavaExpressionInstance].getType(expression, compilation)
   }
 
   def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {

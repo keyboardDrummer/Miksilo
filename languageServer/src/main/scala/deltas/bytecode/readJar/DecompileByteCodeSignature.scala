@@ -13,7 +13,7 @@ import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import deltas.javac.classes.{ConstantPool, FieldDeclarationDelta}
 import deltas.javac.methods.AccessibilityFieldsDelta.{Static, Visibility, VisibilityField}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameters}
-import deltas.javac.types.{MethodType, TypeAbstraction}
+import deltas.javac.types.{MethodTypeDelta, TypeAbstraction}
 import deltas.statement.BlockDelta
 
 import scala.collection.mutable.ArrayBuffer
@@ -90,8 +90,8 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
           (TypeAbstraction.getBody(_type),TypeAbstraction.getParameters(_type))
         else
           (_type,Seq.empty)
-      val returnType = methodType(MethodType.ReturnType).asInstanceOf[Node]
-      val parameterTypes = methodType(MethodType.Parameters).asInstanceOf[Seq[Node]]
+      val returnType = methodType(MethodTypeDelta.ReturnType).asInstanceOf[Node]
+      val parameterTypes = methodType(MethodTypeDelta.Parameters).asInstanceOf[Seq[Node]]
 	    val parameters = parameterTypes.zipWithIndex.map(parameterTypeWithIndex =>
         MethodParameters.neww("parameter" + parameterTypeWithIndex._2, parameterTypeWithIndex._1))
 

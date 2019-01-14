@@ -3,31 +3,31 @@ package deltas.javac.types
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.BiFailure
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node._
-import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{FunctionType, Type}
 import deltas.bytecode.types.{ByteCodeTypeInstance, TypeSkeleton}
 
-object MethodType extends ByteCodeTypeInstance {
+object MethodTypeDelta extends ByteCodeTypeInstance {
 
-  implicit class MethodTypeWrapper[T <: NodeLike](node: T) {
+  implicit class MethodType[T <: NodeLike](node: T) {
     def returnType: T = node(ReturnType).asInstanceOf[T]
-    def returnType_=(value: T) = node(ReturnType) = value
+    def returnType_=(value: T): Unit = node(ReturnType) = value
 
     def parameterTypes: Seq[T] = node(Parameters).asInstanceOf[Seq[T]]
-    def parameterTypes_=(value: Seq[T]) = node(Parameters) = value
+    def parameterTypes_=(value: Seq[T]): Unit = node(Parameters) = value
   }
 
   def construct(returnType: Node, parameterTypes: Seq[Node]) = {
-    new Node(MethodTypeKey,
+    new Node(Shape,
       Parameters -> parameterTypes,
       ReturnType -> returnType,
       ThrowsSignature -> Seq.empty[Node])
   }
 
-  object MethodTypeKey extends NodeShape
+  object Shape extends NodeShape
 
   object Parameters extends NodeField
 
@@ -35,7 +35,7 @@ object MethodType extends ByteCodeTypeInstance {
 
   object ThrowsSignature extends NodeField
 
-  val shape = MethodTypeKey
+  val shape = Shape
 
   override def description: String = "Defines the method type."
 
@@ -47,7 +47,7 @@ object MethodType extends ByteCodeTypeInstance {
     import grammars._
     val typeGrammar = find(TypeSkeleton.ByteCodeTypeGrammar)
     val throwsGrammar = ("^" ~> typeGrammar)*
-    val methodGrammar = (("(" ~> (typeGrammar*).as(Parameters) ~< ")") ~ typeGrammar.as(ReturnType) ~ throwsGrammar.as(ThrowsSignature)).asNode(MethodTypeKey)
+    val methodGrammar = (("(" ~> (typeGrammar*).as(Parameters) ~< ")") ~ typeGrammar.as(ReturnType) ~ throwsGrammar.as(ThrowsSignature)).asNode(Shape)
     methodGrammar
   }
 

@@ -11,7 +11,7 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.types.IntTypeDelta
 import deltas.statement.assignment.SimpleAssignmentDelta
 
-trait PostFixAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
+trait PostFixAssignmentDelta extends DeltaWithGrammar with JavaExpressionInstance {
 
   def keyword: String
 

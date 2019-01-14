@@ -8,6 +8,11 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
+trait JavaExpressionInstance extends Delta with ExpressionInstance {
+
+  def getType(expression: NodePath, compilation: Compilation): Node //TODO remove
+}
+
 trait ExpressionInstance extends Delta with HasShape {
 
   override def inject(language: Language): Unit = {
@@ -24,6 +29,4 @@ trait ExpressionInstance extends Delta with HasShape {
     constraints(compilation, builder, expression, result, parentScope)
     result
   }
-
-  def getType(expression: NodePath, compilation: Compilation): Node //TODO remove
 }

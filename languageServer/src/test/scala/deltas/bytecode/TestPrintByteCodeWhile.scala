@@ -12,7 +12,7 @@ import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.{IntTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
-import deltas.javac.types.MethodType
+import deltas.javac.types.MethodTypeDelta
 import util.LanguageTest
 
 class TestPrintByteCodeWhile extends FunSuite {
@@ -27,7 +27,7 @@ class TestPrintByteCodeWhile extends FunSuite {
       ClassInfoConstant.classRef(13),
       ClassInfoConstant.classRef(14),
       "<init>",
-      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq())),
+      TypeConstant.constructor(MethodTypeDelta.construct(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "whilee",

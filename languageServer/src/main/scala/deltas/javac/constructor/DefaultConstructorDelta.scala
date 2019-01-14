@@ -12,7 +12,7 @@ object DefaultConstructorDelta extends DeltaWithPhase {
 
   def transformProgram(program: Node, state: Compilation): Unit = {
     val javaClass: JavaClass[Node] = program
-    val noConstructors = !javaClass.members.exists(member => member.shape == ConstructorDelta.ConstructorKey)
+    val noConstructors = !javaClass.members.exists(member => member.shape == ConstructorDelta.Shape)
     if (noConstructors) {
       val defaultConstructor = ConstructorDelta.constructor(javaClass.name, Seq(), BlockDelta.neww(), AccessibilityFieldsDelta.PublicVisibility)
       javaClass.members = Seq(defaultConstructor) ++ javaClass.members

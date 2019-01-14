@@ -6,6 +6,7 @@ import core.language.node.Node
 import deltas.bytecode.coreInstructions.integers.AddIntegersDelta
 import deltas.bytecode.coreInstructions.longs.AddLongsDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta}
+import deltas.expression.LeftAssociativeBinaryOperatorDelta
 import deltas.expression.additive.AdditionDelta
 import deltas.expression.additive.AdditionDelta.getType
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
@@ -13,7 +14,7 @@ import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 object AdditionToByteCodeDelta extends ConvertsToByteCodeDelta {
 
   override def toByteCode(path: NodePath, compilation: Compilation): Seq[Node] = {
-    val addition: AdditionDelta.BinaryOperator[NodePath] = path
+    val addition: LeftAssociativeBinaryOperatorDelta.BinaryOperator[NodePath] = path
     val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(addition.left)
     val secondInstructions = toInstructions(addition.right)

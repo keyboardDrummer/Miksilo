@@ -9,11 +9,11 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
-import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
 
 import scala.util.matching.Regex
 
-object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
+object JsonStringLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
 
   override def description: String = "Adds the usage of JSON string literals, in which the String is considered an identifier, and the quotes are not part of the position"
 

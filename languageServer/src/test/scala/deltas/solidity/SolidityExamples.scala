@@ -34,7 +34,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("interface, funciton call, comment, various expressions") {
+  test("interface, function call, comment, various expressions") {
 
     val program = """pragma solidity ^0.4.0;
                     |

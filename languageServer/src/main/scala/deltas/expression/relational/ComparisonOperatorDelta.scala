@@ -9,7 +9,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
-import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
 import deltas.javac.types.BooleanTypeDelta
 
 object ComparisonOperatorDelta {
@@ -25,14 +25,12 @@ object ComparisonOperatorDelta {
 
 }
 
-trait ComparisonOperatorDelta extends DeltaWithGrammar with ExpressionInstance {
+trait ComparisonOperatorDelta extends DeltaWithGrammar with JavaExpressionInstance {
   import ComparisonOperatorDelta._
 
-  def neww(first: Node, second: Node) = new Node(Shape, Left -> first, Right -> second)
+  def neww(first: Node, second: Node) = new Node(shape, Left -> first, Right -> second)
 
-  val shape: NodeShape = Shape
-
-  object Shape extends NodeShape
+  val shape: NodeShape
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     //TODO add a check for first and secondType. Share code with other comparisons.
@@ -57,8 +55,8 @@ trait ComparisonOperatorDelta extends DeltaWithGrammar with ExpressionInstance {
     import grammars._
 
     val relationalGrammar = find(AddRelationalPrecedenceDelta.RelationalExpressionGrammar)
-    val parseLessThan = ((relationalGrammar.as(Left) ~~< keyword) ~~ relationalGrammar.as(Right)).asNode(Shape)
-    relationalGrammar.addAlternative(parseLessThan)
+    val operatorGrammar = relationalGrammar.as(Left) ~~< keyword ~~ relationalGrammar.as(Right) asNode shape
+    relationalGrammar.addAlternative(operatorGrammar)
   }
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedenceDelta)

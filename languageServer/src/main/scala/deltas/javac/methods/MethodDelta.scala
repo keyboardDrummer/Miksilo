@@ -23,7 +23,7 @@ import deltas.javac.classes.{ClassCompiler, MethodInfo}
 import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.AccessibilityFieldsDelta.{HasAccessibility, PrivateVisibility}
 import deltas.javac.methods.MethodParameters.MethodParameter
-import deltas.javac.types.{MethodType, TypeAbstraction}
+import deltas.javac.types.{MethodTypeDelta, TypeAbstraction}
 import deltas.statement.BlockDelta
 import deltas.statement.BlockDelta.BlockStatement
 
@@ -76,7 +76,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
 
   private def getMethodType[T <: NodeLike](method: Method[T]) = {
     val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[Node])
-    MethodType.construct(method.returnType.asNode, parameterTypes)
+    MethodTypeDelta.construct(method.returnType.asNode, parameterTypes)
   }
 
   override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton,
@@ -196,7 +196,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     val method: Method[NodePath] = path
     val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[NodePath])
     val returnType = method.returnType
-    val methodType = MethodType.getType(compilation, builder, parentScope, parameterTypes, returnType)
+    val methodType = MethodTypeDelta.getType(compilation, builder, parentScope, parameterTypes, returnType)
 
     builder.declare(method.name, parentScope, path.getSourceElement(Name), Some(methodType))
   }

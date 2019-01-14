@@ -5,13 +5,9 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node._
 
-trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar {
+object LeftAssociativeBinaryOperatorDelta {
   object Left extends NodeField
   object Right extends NodeField
-
-  override def dependencies = Set(ExpressionDelta)
-
-  def neww(left: Node, right: Node) = shape.create(Left -> left, Right -> right)
 
   implicit class BinaryOperator[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def left: T = node(Left).asInstanceOf[T]
@@ -20,6 +16,14 @@ trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar {
     def right: T = node(Right).asInstanceOf[T]
     def right_=(value: T): Unit = node(Right) = value
   }
+}
+
+trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar {
+  import LeftAssociativeBinaryOperatorDelta._
+
+  override def dependencies = Set(ExpressionDelta)
+
+  def neww(left: Node, right: Node) = shape.create(Left -> left, Right -> right)
 
   def shape: NodeShape
   def operatorGrammarKey: GrammarKey

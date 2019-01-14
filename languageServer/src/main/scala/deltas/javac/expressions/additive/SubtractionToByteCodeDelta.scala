@@ -4,13 +4,14 @@ import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node.Node
 import deltas.bytecode.coreInstructions.integers.SubtractIntegerDelta
+import deltas.expression.LeftAssociativeBinaryOperatorDelta
 import deltas.expression.additive.SubtractionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 
 object SubtractionToByteCodeDelta extends ConvertsToByteCodeDelta {
 
   override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
-    val subtraction: SubtractionDelta.BinaryOperator[NodePath] = expression
+    val subtraction: LeftAssociativeBinaryOperatorDelta.BinaryOperator[NodePath] = expression
     val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(subtraction.left)
     val secondInstructions = toInstructions(subtraction.right)

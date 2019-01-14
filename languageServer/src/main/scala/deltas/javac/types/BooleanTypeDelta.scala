@@ -15,7 +15,7 @@ object BooleanTypeDelta extends ByteCodeTypeInstance
 {
   val constraintType: Type = PrimitiveType("Boolean")
 
-  override val shape = BooleanTypeKey
+  override val shape = Shape
 
   override def getSuperTypes(_type: Node): Seq[Node] = Seq.empty
 
@@ -31,9 +31,9 @@ object BooleanTypeDelta extends ByteCodeTypeInstance
     "boolean" ~> value(booleanType)
   }
 
-  def booleanType = new Node(BooleanTypeKey)
+  def booleanType = new Node(Shape)
 
-  object BooleanTypeKey extends NodeShape
+  object Shape extends NodeShape
 
   override def description: String = "Defines the boolean type."
 

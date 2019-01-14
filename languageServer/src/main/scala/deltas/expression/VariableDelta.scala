@@ -12,7 +12,7 @@ import core.smarts.{ConstraintBuilder, ResolvesTo}
 import deltas.javac.methods.call.ReferenceExpressionDelta
 import deltas.javac.methods.{MethodDelta, VariableInfo}
 
-object VariableDelta extends DeltaWithGrammar with ExpressionInstance with ReferenceExpressionDelta {
+object VariableDelta extends DeltaWithGrammar with JavaExpressionInstance with ReferenceExpressionDelta {
 
   implicit class Variable[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def name: String = node.getValue(Name).asInstanceOf[String]

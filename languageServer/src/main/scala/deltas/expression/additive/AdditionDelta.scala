@@ -7,9 +7,10 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import core.smarts.{ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
-import deltas.expression.{ExpressionDelta, ExpressionInstance, LeftAssociativeBinaryOperatorDelta}
+import deltas.expression.LeftAssociativeBinaryOperatorDelta.BinaryOperator
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance, LeftAssociativeBinaryOperatorDelta}
 
-object AdditionDelta extends LeftAssociativeBinaryOperatorDelta with ExpressionInstance {
+object AdditionDelta extends LeftAssociativeBinaryOperatorDelta with JavaExpressionInstance {
 
   override def description: String = "Adds the + operator."
 
@@ -17,8 +18,9 @@ object AdditionDelta extends LeftAssociativeBinaryOperatorDelta with ExpressionI
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {
     val getType = ExpressionDelta.getType(compilation)
-    val firstType = getType(expression.left)
-    val secondType = getType(expression.right)
+    val operator: BinaryOperator[NodePath] = expression
+    val firstType = getType(operator.left)
+    val secondType = getType(operator.right)
     firstType match
     {
       case x if x == IntTypeDelta.intType =>

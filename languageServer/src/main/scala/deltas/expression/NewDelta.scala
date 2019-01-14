@@ -15,7 +15,7 @@ import deltas.javac.constructor.SuperCallExpression.constructorName
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.call.CallDelta.Arguments
 
-object NewDelta extends DeltaWithGrammar with ExpressionInstance {
+object NewDelta extends DeltaWithGrammar with JavaExpressionInstance {
 
   override def description: String = "Enables using the new keyword to create a new object."
 

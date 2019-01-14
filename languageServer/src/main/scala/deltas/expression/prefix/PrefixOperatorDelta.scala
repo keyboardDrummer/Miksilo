@@ -9,9 +9,9 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.IntTypeDelta
-import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
 
-trait PrefixOperatorDelta extends DeltaWithGrammar with ExpressionInstance {
+trait PrefixOperatorDelta extends DeltaWithGrammar with JavaExpressionInstance {
 
   def keyword: String
 

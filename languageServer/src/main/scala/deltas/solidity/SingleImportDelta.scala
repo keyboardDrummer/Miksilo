@@ -20,7 +20,7 @@ object SingleImportDelta extends DeltaWithGrammar {
     val newName = find(FileImportDelta.NewName)
     val wildCard = "*" ~> value(Wildcard)
     val singleImport = importPattern(_grammars, Shape, (identifier.as(ElementName) | wildCard) ~~ newName)
-    find(SolidityFile.Members).addAlternative(singleImport)
+    find(FileWithMembersDelta.Members).addAlternative(singleImport)
   }
 
   def importPattern(grammars: LanguageGrammars, shape: NodeShape, inner: BiGrammar): BiGrammar = {
@@ -31,5 +31,5 @@ object SingleImportDelta extends DeltaWithGrammar {
 
   override def description = "Adds importing an entire file"
 
-  override def dependencies = Set(SolidityFile)
+  override def dependencies = Set(FileWithMembersDelta)
 }

@@ -9,13 +9,13 @@ import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import core.smarts.{ConstraintBuilder, ResolvesTo}
-import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.methods.MemberSelectorDelta._
 import deltas.javac.methods.call.ReferenceExpressionDelta
 import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
 
-object SelectFieldDelta extends DeltaWithGrammar with ExpressionInstance with ReferenceExpressionDelta {
+object SelectFieldDelta extends DeltaWithGrammar with JavaExpressionInstance with ReferenceExpressionDelta {
 
   override def description: String = "Enables using the . operator to select a field from a class."
 

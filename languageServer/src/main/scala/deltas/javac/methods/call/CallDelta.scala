@@ -9,10 +9,14 @@ import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{FunctionType, Type}
 import core.smarts.{ConstraintBuilder, ResolvesToType}
-import deltas.expression.ExpressionDelta
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
+import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.methods.MemberSelectorDelta
+import deltas.javac.methods.MemberSelectorDelta.MemberSelector
+import deltas.javac.types.MethodTypeDelta.MethodType
 
-object CallDelta extends DeltaWithGrammar {
+object CallDelta extends DeltaWithGrammar with JavaExpressionInstance {
 
   override def description: String = "Introduces function calls of the form <callee>(<argument list>)"
 
@@ -54,4 +58,33 @@ object CallDelta extends DeltaWithGrammar {
   }
 
   override def dependencies = Set(MemberSelectorDelta, ExpressionDelta)
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, returnType: Type, parentScope: Scope): Unit = {
+    val call: Call[NodePath] = path
+    val calleeReference = ReferenceExpressionSkeleton.getReference(compilation, builder, call.callee, parentScope)
+    CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, calleeReference, returnType)
+  }
+
+  override def shape = Shape
+
+  override def getType(path: NodePath, compilation: Compilation): Node = {
+    val call: Call[NodePath] = path
+    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
+    val methodKey = getMethodKey(call, compiler)
+    val methodInfo = compiler.javaCompiler.find(methodKey)
+    val returnType = new MethodType(methodInfo._type).returnType
+    returnType
+  }
+
+  def getMethodKey(call: Call[NodePath], compiler: ClassCompiler): MethodQuery = {
+    val callCallee: MemberSelector[NodePath] = call.callee
+    val objectExpression = callCallee.target
+    val kind = MemberSelectorDelta.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
+
+    val callArguments = call.arguments
+    val callTypes: Seq[Node] = callArguments.map(argument => ExpressionDelta.getType(compiler.compilation)(argument))
+
+    val member = callCallee.member
+    MethodQuery(kind.info.getQualifiedName, member, callTypes)
+  }
 }

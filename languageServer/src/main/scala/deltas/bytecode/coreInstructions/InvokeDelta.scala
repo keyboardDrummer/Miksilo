@@ -9,7 +9,7 @@ import deltas.bytecode.constants._
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.bytecode.simpleBytecode.ProgramTypeState
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
-import deltas.javac.types.MethodType._
+import deltas.javac.types.MethodTypeDelta._
 
 abstract class InvokeDelta extends InstructionInstance {
 

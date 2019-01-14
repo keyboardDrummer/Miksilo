@@ -23,10 +23,10 @@ object MultipleImportsDelta extends DeltaWithGrammar {
     val namedImport = identifier.as(Name) ~~ newName asNode ElementShape
     val members = "{" ~~ namedImport.manySeparated("," ~ printSpace).as(Imports) ~~ "}"
     val multipleImports = SingleImportDelta.importPattern(_grammars, Shape, members)
-    find(SolidityFile.Members).addAlternative(multipleImports)
+    find(FileWithMembersDelta.Members).addAlternative(multipleImports)
   }
 
   override def description = "Adds importing an entire file"
 
-  override def dependencies = Set(SolidityFile)
+  override def dependencies = Set(FileWithMembersDelta)
 }

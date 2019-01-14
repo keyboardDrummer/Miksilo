@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
-object DefaultExpressionDelta extends DeltaWithGrammar with ExpressionInstance {
+object DefaultExpressionDelta extends DeltaWithGrammar with JavaExpressionInstance {
 
   override def description: String = "Adds a default case to parsing an expression"
 

@@ -1,8 +1,8 @@
 package deltas.solidity
 
-import core.deltas.grammars.LanguageGrammars
-import core.deltas.{DeltaWithGrammar, LanguageFromDeltas, ParseUsingTextualGrammar}
+import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
+import core.smarts.SolveConstraintsDelta
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
@@ -16,6 +16,7 @@ import deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta}
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
 import deltas.javac.statements.{ExpressionAsStatementDelta, ForLoopContinueDelta, WhileBreakDelta}
+import deltas.javac.types.BooleanTypeDelta
 import deltas.statement._
 import deltas.statement.assignment._
 import deltas.trivia.{SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta}
@@ -56,10 +57,13 @@ object SolidityLanguage {
     AssignToVariable, VariableDelta, SimpleAssignmentDelta, AssignmentPrecedence,
     ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta,
     ParenthesisInExpressionDelta, ExpressionDelta,
-    FixedSizeArrayTypeDelta, ArrayTypeDelta, TypeSkeleton)
+    BooleanTypeDelta,
+    FixedSizeArrayTypeDelta, ArrayTypeDelta, TypeSkeleton,
+    SolveConstraintsDelta)
 
   val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar,
     AfterOrDeleteExpressionDelta,
+    SolidityFunctionTypeDelta,
     MappingTypeDelta,
     InlineAssemblyStatementDelta,
     LocalDeclarationStorageLocationDelta,
@@ -69,7 +73,7 @@ object SolidityLanguage {
     SolidityConstructorDelta, SolidityFunctionDelta, StateVariableDeclarationDelta) ++
     Seq(SolidityContractDelta, PragmaDelta) ++
     Seq(MultipleImportsDelta, SingleImportDelta, FileImportDelta) ++
-    Seq(SolidityFile) ++
+    Seq(FileWithMembersDelta) ++
     Seq(ElementaryTypeDelta, StorageLocationDelta, StateMutabilityDelta)
 
   val deltas = soliditySpecificDeltas ++ genericDeltas
@@ -77,15 +81,3 @@ object SolidityLanguage {
   val language: Language = LanguageFromDeltas(deltas)
 }
 
-object AfterOrDeleteExpressionDelta extends DeltaWithGrammar {
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    import grammars._
-    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val grammar = ("after" | "delete") ~~ expression
-    expression.addAlternative(grammar)
-  }
-
-  override def description = "Add after and delete expression"
-
-  override def dependencies = Set(ExpressionDelta)
-}

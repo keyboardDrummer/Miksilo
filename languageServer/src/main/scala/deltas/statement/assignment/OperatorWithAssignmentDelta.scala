@@ -7,7 +7,6 @@ import core.deltas.{Contract, DeltaWithGrammar, DeltaWithPhase}
 import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.expression.LeftAssociativeBinaryOperatorDelta
-import deltas.expression.additive.AdditionDelta
 
 trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -35,8 +34,8 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   def transformAssignment(incrementAssignment: NodePath, state: Language): Unit = {
     val target = SimpleAssignmentDelta.getTarget(incrementAssignment)
     val newValue = operatorDelta.shape.createWithSource(
-      AdditionDelta.Left -> incrementAssignment.current(SimpleAssignmentDelta.Target),
-      AdditionDelta.Right -> incrementAssignment.getWithSource(SimpleAssignmentDelta.Value))
+      LeftAssociativeBinaryOperatorDelta.Left -> incrementAssignment.current(SimpleAssignmentDelta.Target),
+      LeftAssociativeBinaryOperatorDelta.Right -> incrementAssignment.getWithSource(SimpleAssignmentDelta.Value))
     val assignment = SimpleAssignmentDelta.neww(target, newValue)
     incrementAssignment.replaceData(assignment)
   }

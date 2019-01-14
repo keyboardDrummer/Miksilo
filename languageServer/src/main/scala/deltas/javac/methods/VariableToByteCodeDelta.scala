@@ -26,7 +26,7 @@ object VariableToByteCodeDelta extends Delta with ConvertsToByteCodeDelta {
     val variableAddress = variableInfo.offset
     val _type = variableInfo._type
     Seq(_type.shape match {
-      case BooleanTypeDelta.BooleanTypeKey => LoadIntegerDelta.load(variableAddress)
+      case BooleanTypeDelta.Shape => LoadIntegerDelta.load(variableAddress)
       case IntTypeDelta.IntTypeKey => LoadIntegerDelta.load(variableAddress)
       case LongTypeDelta.LongTypeKey => LoadLongDelta.load(variableAddress)
       case QualifiedObjectTypeDelta.Shape => LoadAddressDelta.addressLoad(variableAddress)

@@ -9,9 +9,9 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
 import deltas.expression.additive.AdditionDelta.additionOrSubtractionConstraints
-import deltas.expression.{ExpressionDelta, ExpressionInstance, LeftAssociativeBinaryOperatorDelta}
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance, LeftAssociativeBinaryOperatorDelta}
 
-object SubtractionDelta extends LeftAssociativeBinaryOperatorDelta with ExpressionInstance {
+object SubtractionDelta extends LeftAssociativeBinaryOperatorDelta with JavaExpressionInstance {
   object Shape extends NodeShape
 
   override def dependencies: Set[Contract] = Set(AdditivePrecedenceDelta)
@@ -19,7 +19,7 @@ object SubtractionDelta extends LeftAssociativeBinaryOperatorDelta with Expressi
   override val shape = Shape
 
   override def getType(expression: NodePath, compilation: Compilation): Node = {
-    val subtraction: BinaryOperator[NodePath] = expression
+    val subtraction: LeftAssociativeBinaryOperatorDelta.BinaryOperator[NodePath] = expression
     val getType = ExpressionDelta.getType(compilation)
     val firstType = getType(subtraction.left)
     val secondType = getType(subtraction.right)
@@ -29,8 +29,9 @@ object SubtractionDelta extends LeftAssociativeBinaryOperatorDelta with Expressi
   }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
-    val left = expression.left
-    val right = expression.right
+    val subtraction: LeftAssociativeBinaryOperatorDelta.BinaryOperator[NodePath] = expression
+    val left = subtraction.left
+    val right = subtraction.right
     additionOrSubtractionConstraints(compilation, builder, _type, parentScope, left, right)
   }
 

@@ -133,11 +133,11 @@ object JavaLanguage {
     SignatureAttribute)
 
   def constantEntryDeltas: Seq[Delta] = Seq(QualifiedClassNameConstantDelta, TypeConstant) ++ Seq(MethodTypeConstant, Utf8ConstantDelta, DoubleInfoConstant, LongInfoConstant, FieldRefConstant, InterfaceMethodRefConstant, MethodRefConstant, NameAndTypeConstant,
-    ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodType,
+    ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodTypeDelta,
     InvokeDynamicConstant)
 
   def typeTransformations: Seq[Delta] = Seq(SelectInnerClassDelta, TypeVariableDelta, TypeAbstraction, WildcardTypeArgument, ExtendsDelta,
-    SuperTypeArgument, TypeApplicationDelta, MethodType) ++
+    SuperTypeArgument, TypeApplicationDelta, MethodTypeDelta) ++
     Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta, FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
       ShortTypeDelta, TypeSkeleton)
 

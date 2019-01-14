@@ -13,7 +13,7 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
-import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
 import deltas.javac.classes.MethodQuery
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
@@ -21,7 +21,7 @@ import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.call.CallDelta.Call
 import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
 
-object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
+object SuperCallExpression extends DeltaWithGrammar with JavaExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling a super constructor."
 

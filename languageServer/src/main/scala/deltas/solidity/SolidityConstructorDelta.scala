@@ -1,16 +1,29 @@
 package deltas.solidity
 
 import core.bigrammar.BiGrammar
-import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.Language
-import core.language.node.NodeShape
-import deltas.javac.methods.MethodDelta
+import core.deltas.{DeltaWithGrammar, DeltaWithPhase}
+import core.language.node.{Node, NodeShape}
+import core.language.{Compilation, Language}
+import deltas.javac.constructor.ConstructorDelta.ClassName
+import deltas.javac.constructor.SuperCallExpression
+import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.statement.BlockDelta
 
-object SolidityConstructorDelta extends DeltaWithGrammar { // TODO try to re-use other constructor delta's.
+object SolidityConstructorDelta extends DeltaWithGrammar with DeltaWithPhase { // TODO try to re-use other constructor delta's.
 
   object Shape extends NodeShape
+
+  override def transformProgram(program: Node, state: Compilation): Unit = {
+    program.visitShape(Shape, constructor => {
+      constructor.shape = MethodDelta.Shape
+      constructor(MethodDelta.Name) = SuperCallExpression.constructorName
+      constructor(SolidityFunctionDelta.ReturnValues) = Seq.empty
+      constructor(MethodDelta.TypeParameters) = Seq.empty
+      constructor(AccessibilityFieldsDelta.Static) = false
+      constructor.data.remove(ClassName)
+    })
+  }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
@@ -19,7 +32,7 @@ object SolidityConstructorDelta extends DeltaWithGrammar { // TODO try to re-use
     val modifiers = find(SolidityFunctionDelta.Modifiers)
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
     val body = blockGrammar.as(MethodDelta.Body)
-    val grammar = "constructor" ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~~ body
+    val grammar = "constructor" ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~~ body asNode Shape
     find(SolidityContractDelta.Members).addAlternative(grammar)
   }
 

@@ -16,10 +16,10 @@ object FileImportDelta extends DeltaWithGrammar {
     import grammars._
     val newName = create(NewName, (printSpace ~> "as" ~~> identifier).option.as(NewName))
     val simpleImport = "import" ~~ StringLiteral.as(FileName) ~~ (printSpace ~> "as" ~~> identifier).option.as(NewName) ~ ";" asNode Shape
-    find(SolidityFile.Members).addAlternative(simpleImport)
+    find(FileWithMembersDelta.Members).addAlternative(simpleImport)
   }
 
   override def description = "Adds importing an entire file"
 
-  override def dependencies = Set(SolidityFile)
+  override def dependencies = Set(FileWithMembersDelta)
 }
