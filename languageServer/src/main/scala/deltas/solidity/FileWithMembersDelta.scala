@@ -9,6 +9,7 @@ import core.language.{Compilation, Language}
 import core.language.node.{NodeField, NodeShape}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.PrimitiveType
 import deltas.ConstraintSkeleton
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 
@@ -28,9 +29,12 @@ object FileWithMembersDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def shape = Shape
 
+  val fileType = PrimitiveType("file")
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
+    val fileDeclaration = builder.declare(path.startOfUri.get, parentScope, _type = Some(fileType))
+    val fileScope = builder.declareScope(fileDeclaration, Some(parentScope), s"file '${path.startOfUri.get}'")
     for(member <- path(Members).asInstanceOf[Seq[NodePath]]) {
-      ConstraintSkeleton.constraints(compilation, builder, member, parentScope)
+      ConstraintSkeleton.constraints(compilation, builder, member, fileScope)
     }
   }
 }

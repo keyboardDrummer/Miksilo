@@ -20,7 +20,7 @@ case class ReferenceEdge(target: ConcreteScope) extends GraphEdge
 {
   override def traverse: Boolean = true
 }
-case class ImportEdge(target: ConcreteScope) extends GraphEdge {
+case class ImportEdge(target: GraphNode) extends GraphEdge {
   override def traverse: Boolean = true
 }
 case class DeclaresDeclaration(target: NamedDeclaration) extends GraphEdge {

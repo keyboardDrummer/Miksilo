@@ -1,7 +1,8 @@
 package deltas.solidity
 
+import core.language.{Compilation, InMemoryFileSystem}
 import org.scalatest.FunSuite
-import util.TestLanguageBuilder
+import util.{SourceUtils, TestLanguageBuilder}
 
 class SolidityExamples extends FunSuite {
   val solidity = TestLanguageBuilder.build(SolidityLanguage.deltas)
@@ -102,6 +103,27 @@ class SolidityExamples extends FunSuite {
 
   test("library import") {
 
+    val library = """pragma solidity ^0.4.0;
+                    |
+                    |library IntExtended {
+                    |
+                    |    function increment(uint _self) public pure returns (uint) {
+                    |        return _self+1;
+                    |    }
+                    |
+                    |    function decrement(uint _self) public pure returns (uint) {
+                    |        return _self-1;
+                    |    }
+                    |
+                    |    function incrementByValue(uint _self, uint _value) public pure returns (uint) {
+                    |        return _self + _value;
+                    |    }
+                    |
+                    |    function decrementByValue(uint _self, uint _value) public pure returns (uint) {
+                    |        return _self - _value;
+                    |    }
+                    |}""".stripMargin
+
     val program = """pragma solidity ^0.4.0;
                     |
                     |import "browser/library.sol";
@@ -126,7 +148,11 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = new Compilation(solidity.language, InMemoryFileSystem(Map(
+      "testLibrary.sol" -> SourceUtils.stringToStream(program),
+      "browser/library.sol" -> SourceUtils.stringToStream(library))), Some("testLibrary.sol"))
+
+    compilation.runPhases()
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
