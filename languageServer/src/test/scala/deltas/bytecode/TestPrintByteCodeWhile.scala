@@ -31,7 +31,7 @@ class TestPrintByteCodeWhile extends FunSuite {
       CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "whilee",
-      StackMapTableAttribute.entry,
+      StackMapTableAttributeDelta.entry,
       SourceFileAttribute.constantPoolKey,
       "Whilee.java",
       NameAndTypeConstant.nameAndType(4, 5),
@@ -62,8 +62,8 @@ class TestPrintByteCodeWhile extends FunSuite {
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeDelta.intType)),
-      StackMapTableAttribute.sameFrame(10)))
+    val stackMapTable = StackMapTableAttributeDelta.stackMapTable(9, Seq(StackMapTableAttributeDelta.appendFrame(2, Seq(IntTypeDelta.intType)),
+      StackMapTableAttributeDelta.sameFrame(10)))
     val _while = ByteCodeMethodInfo.methodInfo(8, 5, Seq(CodeAttributeDelta.codeAttribute(6, 2, 1, Seq(
       SmallIntegerConstantDelta.integerConstant(0),
       StoreIntegerDelta.integerStore(0),

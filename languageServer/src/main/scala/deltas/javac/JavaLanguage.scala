@@ -57,7 +57,7 @@ object JavaLanguage {
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
-      NewToByteCodeDelta, NewDelta, FieldDeclarationWithInitializer, ConstructorDelta, MemberSelectorAsNamespaceReference, VariableAsNamespaceReference) ++
+      NewToByteCodeDelta, NewDelta, FieldDeclarationWithInitializer, ConstructorDelta, MemberSelectorAsNamespaceReference, VariableAsNamespaceReferenceDelta) ++
       Seq(ThisCallExpression, SuperCallExpression) ++ fields ++ imports ++
       javaMethod
   }
@@ -128,7 +128,7 @@ object JavaLanguage {
     Seq(ByteCodeMethodInfo, ByteCodeFieldInfo) ++
     typeTransformations ++ Seq(ByteCodeSkeleton)
 
-  val bytecodeAttributes: Seq[DeltaWithGrammar] = Seq(StackMapTableAttribute, LineNumberTable, SourceFileAttribute,
+  val bytecodeAttributes: Seq[DeltaWithGrammar] = Seq(StackMapTableAttributeDelta, LineNumberTable, SourceFileAttribute,
     CodeAttributeDelta, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 

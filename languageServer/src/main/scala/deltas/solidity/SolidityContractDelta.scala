@@ -12,13 +12,12 @@ import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
 import deltas.bytecode.types.UnqualifiedObjectTypeDelta
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassSkeleton}
 import deltas.javac.classes.skeleton.JavaClassSkeleton.ClassImports
 
 object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   object Shape extends NodeShape
-  object Name extends NodeField
   object ContractType extends NodeField
   object SuperContracts extends NodeField
   object Members extends NodeField
@@ -31,8 +30,8 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
     def imports_=(value: Seq[T]): Unit = node(ClassImports) = value
 
-    def name: String = node.getValue(Name).asInstanceOf[String]
-    def name_=(value: String): Unit = node(Name) = value
+    def name: String = node.getValue(JavaClassSkeleton.Name).asInstanceOf[String]
+    def name_=(value: String): Unit = node(JavaClassSkeleton.Name) = value
 
     def members = node(Members).asInstanceOf[Seq[T]]
     def members_=(value: Seq[T]): Unit = node(Members) = value
@@ -52,7 +51,7 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val inheritance = (printSpace ~ "is" ~~ inheritanceSpecifier.someSeparated("," ~ printSpace) | value(Seq.empty)).as(SuperContracts)
     val member = create(Members)
     val members = member.manySeparatedVertical(BlankLine).as(Members)
-    val contract = contractType ~~ identifier.as(Name) ~ inheritance ~ "{" % members % "}" asNode Shape
+    val contract = contractType ~~ identifier.as(JavaClassSkeleton.Name) ~ inheritance ~ "{" % members % "}" asNode Shape
     find(FileWithMembersDelta.Members).addAlternative(contract)
   }
 
@@ -64,7 +63,7 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val contractLike: ContractLike[NodePath] = path
-    val contractDeclaration = builder.declare(contractLike.name, parentScope, path.getSourceElement(Name))
+    val contractDeclaration = builder.declare(contractLike.name, parentScope, path.getSourceElement(JavaClassSkeleton.Name))
     val contractScope = builder.declareScope(contractDeclaration, Some(parentScope), s"contract '${contractLike.name}'")
 
     for(member <- contractLike.members) {

@@ -14,7 +14,7 @@ case class ResolveNamespaceOrObjectVariableAmbiguity(var namespaceOrObjectVariab
       case e:NamedDeclaration =>
         e.origin match {
           case Some(fieldLocation: FieldPath) => fieldLocation.field match {
-            case JavaClassSkeleton.Name => //TODO allow referencing packages.
+            case JavaClassSkeleton.Name => // TODO allow referencing packages. Make this language-agnostic
               solver.unifyDeclarations(scopeDeclaration, namespaceOrObjectVariableDeclaration)
             case _ =>
               unifyObjectVariableDeclaration(solver)

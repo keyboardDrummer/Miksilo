@@ -8,10 +8,8 @@ import core.language.node.Node
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.longs.StoreLongDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
-import deltas.bytecode.types.ArrayTypeDelta.Shape
 import deltas.bytecode.types.IntTypeDelta.IntTypeKey
-import deltas.bytecode.types.LongTypeDelta.LongTypeKey
-import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
+import deltas.bytecode.types.{ArrayTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton}
 import deltas.expression.VariableDelta
 import deltas.expression.VariableDelta.Variable
 import deltas.javac.methods.{AssignmentToByteCodeDelta, MethodDelta, VariableInfo}
@@ -38,8 +36,8 @@ object AssignToVariable extends DeltaWithGrammar {
     byteCodeType.shape match {
       case IntTypeKey => StoreIntegerDelta.integerStore(variableInfo.offset)
       case QualifiedObjectTypeDelta.StackType => StoreAddressDelta.addressStore(variableInfo.offset)
-      case Shape => StoreAddressDelta.addressStore(variableInfo.offset)
-      case LongTypeKey => StoreLongDelta.longStore(variableInfo.offset)
+      case ArrayTypeDelta.Shape => StoreAddressDelta.addressStore(variableInfo.offset)
+      case LongTypeDelta.Shape => StoreLongDelta.longStore(variableInfo.offset)
     }
   }
 

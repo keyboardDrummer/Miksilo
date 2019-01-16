@@ -12,7 +12,7 @@ import deltas.expression.multiplicative.{DivideDelta, ModuloDelta, Multiplicativ
 import deltas.expression.prefix._
 import deltas.expression.relational._
 import deltas.javac.CallVariableDelta
-import deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta}
+import deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta, VariableAsNamespaceReferenceDelta}
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
 import deltas.javac.statements.{ExpressionAsStatementDelta, ForLoopContinueDelta, WhileBreakDelta}
@@ -24,6 +24,7 @@ import deltas.trivia.{SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta}
 object SolidityLanguage {
 
   private val genericDeltas = Seq(
+    VariableAsNamespaceReferenceDelta,
     BitwiseOrAssignmentDelta, BitwiseXorAssignmentDelta, BitwiseAndAssignmentDelta,
     BitwiseShiftLeftAssignmentDelta, BitwiseShiftRightAssignmentDelta,
     MultiplyAssignmentDelta, DivideAssignmentDelta,
@@ -80,7 +81,7 @@ object SolidityLanguage {
 
   val deltas = soliditySpecificDeltas ++ genericDeltas
 
-  val language: Language = LanguageFromDeltas(deltas)
+  val language: Language = LanguageFromDeltas(deltas, addMissingDeltas = false)
 }
 
 

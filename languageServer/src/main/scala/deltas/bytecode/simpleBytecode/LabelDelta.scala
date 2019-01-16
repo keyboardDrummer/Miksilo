@@ -5,7 +5,7 @@ import core.bigrammar.grammars.RegexGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._
 import core.language.{Compilation, Language}
-import deltas.bytecode.attributes.StackMapTableAttribute.StackMapFrameGrammar
+import deltas.bytecode.attributes.StackMapTableAttributeDelta.StackMapFrameGrammar
 import deltas.bytecode.coreInstructions.{InstructionInstance, InstructionSignature}
 
 import scala.collection.mutable

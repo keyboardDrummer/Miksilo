@@ -28,7 +28,7 @@ object VariableToByteCodeDelta extends Delta with ConvertsToByteCodeDelta {
     Seq(_type.shape match {
       case BooleanTypeDelta.Shape => LoadIntegerDelta.load(variableAddress)
       case IntTypeDelta.IntTypeKey => LoadIntegerDelta.load(variableAddress)
-      case LongTypeDelta.LongTypeKey => LoadLongDelta.load(variableAddress)
+      case LongTypeDelta.Shape => LoadLongDelta.load(variableAddress)
       case QualifiedObjectTypeDelta.Shape => LoadAddressDelta.addressLoad(variableAddress)
     })
   }

@@ -52,7 +52,7 @@ object EqualityDelta extends DeltaWithGrammar with JavaExpressionInstance with C
     val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
     val inputType = TypeSkeleton.toStackType(getInputType(equality, compilation), compilation)
     val equalityInstructions: Seq[Node] = inputType.shape match {
-      case LongTypeDelta.LongTypeKey => Seq(CompareLongDelta.compareLong, NotInstructionDelta.not)
+      case LongTypeDelta.Shape => Seq(CompareLongDelta.compareLong, NotInstructionDelta.not)
       case IntTypeDelta.IntTypeKey => Seq(IntegerEqualsInstructionDelta.equals)
     }
     toInstructions(first) ++ toInstructions(second) ++ equalityInstructions

@@ -64,8 +64,8 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
       IntegerReturnInstructionDelta.integerReturn
     )
     val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
-    val stackMapTable = StackMapTableAttribute.stackMapTable(15, Seq(StackMapTableAttribute.sameFrame(9),
-      StackMapTableAttribute.sameLocals1StackItem(12, IntTypeDelta.intType)))
+    val stackMapTable = StackMapTableAttributeDelta.stackMapTable(15, Seq(StackMapTableAttributeDelta.sameFrame(9),
+      StackMapTableAttributeDelta.sameLocals1StackItem(12, IntTypeDelta.intType)))
     val method = ByteCodeMethodInfo.methodInfo(13, 14, Seq(CodeAttributeDelta.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
       Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
     method
@@ -87,7 +87,7 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
         ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.neww(new QualifiedClassName(Seq("java", "lang", "String"))))))),
       fibonacciMethodName,
       TypeConstant.constructor(MethodTypeDelta.construct(IntTypeDelta.intType, Seq(IntTypeDelta.intType))),
-      StackMapTableAttribute.entry,
+      StackMapTableAttributeDelta.entry,
       SourceFileAttribute.constantPoolKey,
       "Fibonacci.java",
       NameAndTypeConstant.nameAndType(7, 8),

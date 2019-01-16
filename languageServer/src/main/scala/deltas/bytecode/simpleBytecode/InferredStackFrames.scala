@@ -6,8 +6,8 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.node.Node
 import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
-import deltas.bytecode.attributes.StackMapTableAttribute
-import deltas.bytecode.attributes.StackMapTableAttribute.{FullFrameLocals, FullFrameStack}
+import deltas.bytecode.attributes.StackMapTableAttributeDelta
+import deltas.bytecode.attributes.StackMapTableAttributeDelta.{FullFrameLocals, FullFrameStack}
 import deltas.bytecode.types.TypeSkeleton
 
 object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
@@ -51,21 +51,21 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
       val addedLocals = locals.drop(sameLocalsPrefix.length)
       val unchangedLocals = removedLocals.isEmpty && addedLocals.isEmpty
       if (unchangedLocals && stack.isEmpty) {
-        new Node(StackMapTableAttribute.SameFrameKey)
+        new Node(StackMapTableAttributeDelta.SameFrameKey)
       }
       else if (unchangedLocals && stack.size == 1) {
-        new Node(StackMapTableAttribute.SameLocals1StackItem,
-          StackMapTableAttribute.SameLocals1StackItemType -> stack.head)
+        new Node(StackMapTableAttributeDelta.SameLocals1StackItem,
+          StackMapTableAttributeDelta.SameLocals1StackItemType -> stack.head)
       }
       else if (stack.isEmpty && addedLocals.isEmpty) {
-        new Node(StackMapTableAttribute.ChopFrame, StackMapTableAttribute.ChopFrameCount -> removedLocals.length)
+        new Node(StackMapTableAttributeDelta.ChopFrame, StackMapTableAttributeDelta.ChopFrameCount -> removedLocals.length)
       }
       else if (stack.isEmpty && removedLocals.isEmpty) {
-        new Node(StackMapTableAttribute.AppendFrame, StackMapTableAttribute.AppendFrameTypes ->
+        new Node(StackMapTableAttributeDelta.AppendFrame, StackMapTableAttributeDelta.AppendFrameTypes ->
           addedLocals.map(l => toStackType(l)))
       }
       else {
-        new Node(StackMapTableAttribute.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
+        new Node(StackMapTableAttributeDelta.FullFrame, FullFrameLocals -> locals, FullFrameStack -> stack)
       }
     }
   }

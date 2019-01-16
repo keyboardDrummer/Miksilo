@@ -13,7 +13,7 @@ import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.bytecode.readJar.ClassFileParser
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta}
 
-object StackMapTableAttribute extends ByteCodeAttribute {
+object StackMapTableAttributeDelta extends ByteCodeAttribute {
 
   val entry = Utf8ConstantDelta.create("StackMapTable")
 
@@ -76,21 +76,21 @@ object StackMapTableAttribute extends ByteCodeAttribute {
   def getBytes(compilation: Compilation, attribute: Node): Seq[Byte] = {
 
     def getFrameByteCode(frame: Node): Seq[Byte] = {
-      val offset = StackMapTableAttribute.getFrameOffset(frame)
+      val offset = StackMapTableAttributeDelta.getFrameOffset(frame)
       frame.shape match {
-        case StackMapTableAttribute.ChopFrame =>
+        case StackMapTableAttributeDelta.ChopFrame =>
             byteToBytes(251 - frame(ChopFrameCount).asInstanceOf[Int]) ++ shortToBytes(offset)
-        case StackMapTableAttribute.SameFrameKey =>
+        case StackMapTableAttributeDelta.SameFrameKey =>
           if (offset > 63)
             byteToBytes(251) ++ shortToBytes(offset)
           else
             byteToBytes(offset)
-        case StackMapTableAttribute.AppendFrame =>
-          val localVerificationTypes = StackMapTableAttribute.getAppendFrameTypes(frame)
+        case StackMapTableAttributeDelta.AppendFrame =>
+          val localVerificationTypes = StackMapTableAttributeDelta.getAppendFrameTypes(frame)
           byteToBytes(252 + localVerificationTypes.length - 1) ++
             shortToBytes(offset) ++ localVerificationTypes.flatMap(info => getVerificationInfoBytes(info, compilation))
-        case StackMapTableAttribute.SameLocals1StackItem =>
-          val _type = StackMapTableAttribute.getSameLocals1StackItemType(frame)
+        case StackMapTableAttributeDelta.SameLocals1StackItem =>
+          val _type = StackMapTableAttributeDelta.getSameLocals1StackItemType(frame)
           val code = 64 + offset
           if (code <= 127) {
             byteToBytes(code) ++ getVerificationInfoBytes(_type, compilation)
@@ -100,7 +100,7 @@ object StackMapTableAttribute extends ByteCodeAttribute {
       }
     }
 
-    val entries = StackMapTableAttribute.getStackMapTableEntries(attribute)
+    val entries = StackMapTableAttributeDelta.getStackMapTableEntries(attribute)
     shortToBytes(entries.length) ++ entries.flatMap(getFrameByteCode)
   }
 
