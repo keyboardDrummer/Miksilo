@@ -2,13 +2,20 @@ package deltas.solidity
 
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.NodePath
-import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
+import core.deltas.path.{FieldPath, NodePath}
+import core.language.node._
 import core.language.{Compilation, Language}
-import core.smarts.ConstraintBuilder
-import core.smarts.scopes.objects.Scope
+import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration}
+import core.smarts.scopes.objects.{Scope, ScopeVariable}
+import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.methods.MethodDelta.{Method, Name}
+import deltas.javac.methods.MethodParameters
+import deltas.javac.methods.MethodParameters.MethodParameter
+import deltas.solidity.SolidityContractDelta.ContractLike
+import deltas.solidity.SolidityFunctionDelta.ReturnValues
+import deltas.solidity.SolidityFunctionTypeDelta.ParameterShape
 
 object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -42,12 +49,50 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val usingFor: UsingFor[NodePath] = path
     val _type = TypeSkeleton.getType(compilation, builder, usingFor._type, parentScope)
-    val contractLikeDeclaration = builder.resolve(usingFor.libraryName, usingFor.getSourceElement(LibraryName), parentScope)
-    val contractLikeScope = builder.getDeclaredScope(contractLikeDeclaration)
-
+    val libraryDeclaration: DeclarationVariable = builder.resolve(usingFor.libraryName, usingFor.getSourceElement(LibraryName), parentScope)
+    val contractLikeScope = builder.getDeclaredScope(libraryDeclaration)
     val typeDeclaration = builder.getDeclarationOfType(_type)
     val typeScope = builder.getDeclaredScope(typeDeclaration)
-    builder.importScope(typeScope, contractLikeScope)
+    builder.add(new UsingForConstraint(compilation, typeScope, contractLikeScope, libraryDeclaration))
+  }
+
+  class UsingForConstraint(compilation: Compilation, var typeScope: Scope, var libraryScope: Scope, var libraryDeclaration: Declaration) extends Constraint {
+
+    override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
+      if (libraryDeclaration == variable)
+        libraryDeclaration = instance
+      super.instantiateDeclaration(variable, instance)
+    }
+
+    override def instantiateScope(variable: ScopeVariable, instance: Scope): Unit = {
+      if (typeScope == variable)
+        typeScope = instance
+      if (libraryScope == variable)
+        libraryScope = instance
+      super.instantiateScope(variable, instance)
+    }
+
+    override def apply(solver: ConstraintSolver): Boolean = {
+      libraryDeclaration match {
+        case d: NamedDeclaration =>
+          val library: ContractLike[NodePath] = d.origin.get.asInstanceOf[FieldPath].parent
+          for(member <- library.members) {
+            if (member.shape == SolidityFunctionDelta.shape) {
+
+              val method: Method[NodePath] = member
+
+              val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[NodePath]).drop(1)
+              val returnParameters: Seq[MethodParameter[NodePath]] = NodeWrapper.wrapList(method(ReturnValues).asInstanceOf[Seq[NodePath]])
+              val returnTypes: Seq[Node] = returnParameters.map(returnParameter => ParameterShape.create(MethodParameters.Type -> returnParameter._type))
+              val methodType = SolidityFunctionTypeDelta.createType(compilation, solver.builder, libraryScope, parameterTypes, returnTypes)
+
+              solver.builder.declare(method.name, typeScope, member.getSourceElement(Name), Some(methodType))
+            }
+          }
+          true
+        case _ => false
+      }
+    }
   }
 }
 

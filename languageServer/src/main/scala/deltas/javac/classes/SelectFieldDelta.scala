@@ -13,7 +13,7 @@ import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.methods.MemberSelectorDelta._
 import deltas.javac.methods.call.ReferenceExpressionDelta
-import deltas.javac.methods.{MemberSelectorDelta, NamespaceOrObjectExpression}
+import deltas.javac.methods.{MemberSelectorDelta, HasScopeSkeleton}
 
 object SelectFieldDelta extends DeltaWithGrammar with JavaExpressionInstance with ReferenceExpressionDelta {
 
@@ -45,7 +45,7 @@ object SelectFieldDelta extends DeltaWithGrammar with JavaExpressionInstance wit
 
   override def getReference(compilation: Compilation, builder: ConstraintBuilder, selector: NodePath, parentScope: Scope): Reference = {
     val target = selector.target
-    val scope = NamespaceOrObjectExpression.getScope(compilation, builder, target, parentScope)
+    val scope = HasScopeSkeleton.getScope(compilation, builder, target, parentScope)
     val member = selector.member
     builder.refer(member, scope, Some(selector.getSourceElement(Member)))
   }

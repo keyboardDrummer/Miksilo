@@ -8,18 +8,18 @@ import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 import deltas.expression.ExpressionDelta
 
-object NamespaceOrObjectExpression {
+object HasScopeSkeleton {
 
   def getScope(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Scope = {
     builder.getDeclaredScope(getScopeDeclaration(compilation, builder, expression, scope))
   }
 
   def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
-    namespaceOrObjectExpression.get(compilation).get(expression.shape).fold({
+    hasDeclaredScope.get(compilation).get(expression.shape).fold({
       val _type = ExpressionDelta.getType(compilation, builder, expression, scope)
       builder.getDeclarationOfType(_type)
     })(reference => reference.getScopeDeclaration(compilation, builder, expression, scope))
   }
 
-  val namespaceOrObjectExpression: ShapeProperty[IsNamespaceOrObjectExpression] = new ShapeProperty[IsNamespaceOrObjectExpression]
+  val hasDeclaredScope: ShapeProperty[HasDeclaredScope] = new ShapeProperty[HasDeclaredScope]
 }

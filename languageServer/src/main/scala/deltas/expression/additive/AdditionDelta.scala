@@ -46,19 +46,10 @@ object AdditionDelta extends LeftAssociativeBinaryOperatorDelta with JavaExpress
   def additionOrSubtractionConstraints(compilation: Compilation, builder: ConstraintBuilder, _type: Type, parentScope: Scope, left: NodePath, right: NodePath): Unit = {
     val firstType = ExpressionDelta.getType(compilation, builder, left, parentScope)
     val secondType = ExpressionDelta.getType(compilation, builder, right, parentScope)
-    builder.add((solver: ConstraintSolver) => {
-      val resolved = solver.resolveType(firstType)
-      val additionTypeOption: Option[Type] = resolved match {
-        case IntTypeDelta.constraintType => Some(IntTypeDelta.constraintType)
-        case LongTypeDelta.constraintType => Some(LongTypeDelta.constraintType)
-        case _ => None
-      }
-      additionTypeOption.fold(false)(additionType => {
-        builder.typesAreEqual(additionType, secondType)
-        builder.typesAreEqual(additionType, _type)
-        true
-      })
-    })
+    builder.typesAreEqual(firstType, secondType)
+    builder.typesAreEqual(_type, _type)
+
+    // TODO add constraint that once _type is resolved, verifies that it's one of the allowed types.
   }
 
   override def operatorGrammarKey = AdditivePrecedenceDelta.Grammar

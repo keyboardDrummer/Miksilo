@@ -13,6 +13,7 @@ import deltas.expression.prefix._
 import deltas.expression.relational._
 import deltas.javac.CallVariableDelta
 import deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta, VariableAsNamespaceReferenceDelta}
+import deltas.javac.expressions.literals.BooleanLiteralDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
 import deltas.javac.statements.{ExpressionAsStatementDelta, ForLoopContinueDelta, WhileBreakDelta}
@@ -56,11 +57,12 @@ object SolidityLanguage {
     AssignToMemberDelta, SelectFieldDelta, MemberSelectorDelta,
     AssignToArrayMember,
     AssignToVariable, VariableDelta, SimpleAssignmentDelta, AssignmentPrecedence,
-    ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta,
+    ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta, BooleanLiteralDelta,
     ParenthesisInExpressionDelta, ExpressionDelta,
     BooleanTypeDelta,
     FixedSizeArrayTypeDelta, ArrayTypeDelta, TypeSkeleton,
     MultiFileDelta,
+    HasNameDelta,
     SolveConstraintsDelta)
 
   val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar,

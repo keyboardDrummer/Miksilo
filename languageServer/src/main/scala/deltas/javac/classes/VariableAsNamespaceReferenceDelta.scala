@@ -10,9 +10,9 @@ import core.smarts.scopes.objects.Scope
 import deltas.expression.VariableDelta
 import deltas.expression.VariableDelta.{Shape, Variable}
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.{IsNamespaceOrObjectExpression, MemberSelectorDelta, ResolveNamespaceOrObjectVariableAmbiguity}
+import deltas.javac.methods.{HasDeclaredScope, MemberSelectorDelta, ResolveNamespaceOrObjectVariableAmbiguity}
 
-object VariableAsNamespaceReferenceDelta extends Delta with IsNamespaceOrObjectExpression {
+object VariableAsNamespaceReferenceDelta extends Delta with HasDeclaredScope {
 
   override def description: String = "Enables recognizing the kind of an identifier, whether is a class, package or object."
 
@@ -43,8 +43,7 @@ object VariableAsNamespaceReferenceDelta extends Delta with IsNamespaceOrObjectE
   override def dependencies: Set[Contract] = Set(VariableDelta)
 
   override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, variable: NodePath, scope: Scope): Declaration = {
-    val namespaceOrObjectVariableDeclaration =
-      builder.resolve(variable.name, variable, scope)
+    val namespaceOrObjectVariableDeclaration = builder.resolve(variable.name, variable, scope)
     val result = builder.declarationVariable()
     builder.add(ResolveNamespaceOrObjectVariableAmbiguity(namespaceOrObjectVariableDeclaration, result))
     result
