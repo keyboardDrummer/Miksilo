@@ -7,6 +7,7 @@ import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import deltas.ConstraintSkeleton
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.solidity.HasNameDelta.HasName
 import deltas.statement.LocalDeclarationDelta
@@ -35,6 +36,8 @@ object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
   object Members extends NodeField
 
   implicit class Struct[T <: NodeLike](node: T) extends HasName[T](node) {
+    def members = node(Members).asInstanceOf[Seq[T]]
+    def members_=(value: Seq[T]): Unit = node(Members) = value
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
@@ -53,7 +56,10 @@ object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val struct: Struct[NodePath] = path
-    val declaration = builder.declare(struct.name, parentScope, path.getSourceElement(HasNameDelta.Name))
+    val declaration = builder.declare2(path.getSourceElement(HasNameDelta.Name), parentScope)
     val structScope = builder.declareScope(declaration, Some(parentScope), s"struct '${struct.name}'")
+    for(member <- struct.members) {
+      ConstraintSkeleton.constraints(compilation, builder, member, structScope)
+    }
   }
 }

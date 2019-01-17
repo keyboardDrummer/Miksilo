@@ -35,7 +35,7 @@ object CloudFormationTemplate extends Delta {
 
       val resources: ObjectLiteral[NodePath] = program.getValue("Resources")
       for(resource <- resources.members) {
-        builder.declare(resource.key, rootScope, resource.getSourceElement(MemberKey), Some(valueType))
+        builder.declare2(resource.getSourceElement(MemberKey), rootScope, Some(valueType))
 
         val resourceMembers: ObjectLiteral[NodePath] = resource.value
         val typeString = resourceMembers.getValue("Type")

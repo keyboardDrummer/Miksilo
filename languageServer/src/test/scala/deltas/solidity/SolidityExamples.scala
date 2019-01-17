@@ -101,7 +101,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("using for on set") {
+  test("using for on set library") {
     val program = """pragma solidity >=0.4.16 <0.6.0;
                     |
                     |library Set {

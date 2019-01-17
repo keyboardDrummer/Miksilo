@@ -40,9 +40,9 @@ object ArrayTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override def description: String = "Defines the array type."
 
-  val arrayType = PrimitiveType("Array")
+  val arrayTypeConstructor = PrimitiveType("Array")
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     val elementType = TypeSkeleton.getType(compilation, builder, _type(ArrayElementType).asInstanceOf[NodeLike], parentScope)
-    TypeApplication(arrayType, Seq(elementType), _type)
+    TypeApplication(arrayTypeConstructor, Seq(elementType), _type)
   }
 }
