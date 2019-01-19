@@ -88,7 +88,7 @@ object JavaLanguage {
     BlockDelta,
     ExpressionAsStatementDelta, StatementDelta) ++ javaSimpleExpression
 
-  def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualityDelta,
+  def javaSimpleExpression: Seq[Delta] = Seq(TernaryToByteCodeDelta, TernaryDelta, EqualityDelta,
     AddEqualityPrecedence, LessThanToByteCodeDelta, LessThanDelta, GreaterThanToByteCodeDelta, GreaterThanDelta, AddRelationalPrecedenceDelta, AdditionToByteCodeDelta, AdditionDelta,
     SubtractionToByteCodeDelta, SubtractionDelta, AdditivePrecedenceDelta,
     BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, LogicalNotDelta, ParenthesisInExpressionDelta, ExpressionDelta) ++ allByteCodeDeltas

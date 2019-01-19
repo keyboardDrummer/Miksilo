@@ -138,9 +138,17 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       typeGraph.isSuperType(TypeNode(l), TypeNode(r))
   }
 
+  def canDeclarationsMatch(left: Declaration, right: Declaration) = (left, right) match {
+    case (_: DeclarationVariable, _) => true
+    case (_, _: DeclarationVariable) => true
+    case _ => left == right
+  }
+
   def couldBeSuperType(superType: Type, subType: Type): Boolean = (resolveType(superType), resolveType(subType)) match {
     case (_: TypeVariable,_) => true
     case (_,_: TypeVariable) => true
+    case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration)) =>
+      canDeclarationsMatch(superDeclaration, subDeclaration) // TODO add test case.
     case (FunctionType(input1, output1, _), FunctionType(input2, output2, _)) =>
       couldBeSuperType(output1, output2) && couldBeSuperType(input2, input1)
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>

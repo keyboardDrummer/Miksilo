@@ -9,6 +9,12 @@ class UnambigiousParserTest extends AssociativityTest
   with PartiallyParseJsonTest
   with ErrorReportingTest {
 
+  test("Basic ambiguity test fails") {
+    lazy val expression: EditorParser[Any] = ("ab" | "a") ~ "bc"
+    val result = expression.parseWholeInput(new StringReader("abc"))
+    assert(!result.successful, result.toString)
+  }
+
   test("if-then-else is right-associative by default") {
     lazy val expr = wholeNumber
     lazy val stmt: EditorParser[Any] = expr |

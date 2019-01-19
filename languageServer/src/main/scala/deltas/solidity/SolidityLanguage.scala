@@ -74,7 +74,8 @@ object SolidityLanguage {
     LocalDeclarationStorageLocationDelta,
     NumberLiteralUnitsDelta,
     EmitStatementDelta,
-    UsingForDeclarationDelta, EventDelta, CustomModifierDelta, EnumDelta, StructDelta,
+    UsingForForElementaryTypesDelta, UsingForDeclarationDelta,
+    EventDelta, CustomModifierDelta, EnumDelta, StructDelta,
     SolidityConstructorDelta, SolidityFunctionDelta, StateVariableDeclarationDelta) ++
     Seq(SolidityContractDelta, PragmaDelta) ++
     Seq(MultipleImportsDelta, SingleImportDelta, FileImportDelta) ++

@@ -3,9 +3,9 @@ package deltas.expression.additive
 import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node._
+import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import core.smarts.{ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
 import deltas.expression.LeftAssociativeBinaryOperatorDelta.BinaryOperator
 import deltas.expression.{ExpressionDelta, JavaExpressionInstance, LeftAssociativeBinaryOperatorDelta}
@@ -47,7 +47,7 @@ object AdditionDelta extends LeftAssociativeBinaryOperatorDelta with JavaExpress
     val firstType = ExpressionDelta.getType(compilation, builder, left, parentScope)
     val secondType = ExpressionDelta.getType(compilation, builder, right, parentScope)
     builder.typesAreEqual(firstType, secondType)
-    builder.typesAreEqual(_type, _type)
+    builder.typesAreEqual(_type, firstType)
 
     // TODO add constraint that once _type is resolved, verifies that it's one of the allowed types.
   }

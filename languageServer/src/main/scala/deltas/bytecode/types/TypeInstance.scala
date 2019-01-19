@@ -9,7 +9,6 @@ import deltas.bytecode.types.TypeSkeleton.HasSuperTypes
 
 trait TypeInstance extends DeltaWithGrammar with HasShape with HasTypeDelta with HasSuperTypes {
 
-
   override def inject(language: Language): Unit = {
     super.inject(language)
     TypeSkeleton.hasSuperTypes.add(language, this)

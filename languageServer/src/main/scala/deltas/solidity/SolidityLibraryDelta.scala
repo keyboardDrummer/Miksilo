@@ -11,6 +11,7 @@ object SolidityLibraryDelta extends Delta {
   override def inject(language: Language): Unit = {
     language.collectConstraints = (compilation, builder) => {
       val rootScope = builder.newScope(debugName = "rootScope")
+
       val assertType = SolidityFunctionTypeDelta.createType(compilation, builder, rootScope, Seq(BooleanTypeDelta.booleanType), Seq.empty)
       builder.declare("assert", rootScope, _type = Some(assertType))
 

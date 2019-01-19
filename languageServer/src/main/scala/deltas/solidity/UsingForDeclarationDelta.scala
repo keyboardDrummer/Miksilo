@@ -10,12 +10,14 @@ import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.javac.methods.MethodDelta.{Method, Name}
-import deltas.javac.methods.MethodParameters
+import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters.MethodParameter
+import deltas.javac.methods.{MethodDelta, MethodParameters}
 import deltas.solidity.SolidityContractDelta.ContractLike
 import deltas.solidity.SolidityFunctionDelta.ReturnValues
 import deltas.solidity.SolidityFunctionTypeDelta.ParameterShape
+
+
 
 object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -50,13 +52,17 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
     val usingFor: UsingFor[NodePath] = path
     val _type = TypeSkeleton.getType(compilation, builder, usingFor._type, parentScope)
     val libraryDeclaration: DeclarationVariable = builder.resolve(usingFor.libraryName, usingFor.getSourceElement(LibraryName), parentScope)
-    val contractLikeScope = builder.getDeclaredScope(libraryDeclaration)
+    val libraryScope = builder.getDeclaredScope(libraryDeclaration)
+
     val typeDeclaration = builder.getDeclarationOfType(_type)
     val typeScope = builder.getDeclaredScope(typeDeclaration)
-    builder.add(new UsingForConstraint(compilation, typeScope, contractLikeScope, libraryDeclaration))
+    builder.add(new UsingForConstraint(compilation, typeScope, libraryScope, libraryDeclaration))
   }
 
-  class UsingForConstraint(compilation: Compilation, var typeScope: Scope, var libraryScope: Scope, var libraryDeclaration: Declaration) extends Constraint {
+  class UsingForConstraint(compilation: Compilation,
+                           var typeScope: Scope,
+                           var libraryScope: Scope,
+                           var libraryDeclaration: Declaration) extends Constraint {
 
     override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
       if (libraryDeclaration == variable)
@@ -86,7 +92,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
               val returnTypes: Seq[Node] = returnParameters.map(returnParameter => ParameterShape.create(MethodParameters.Type -> returnParameter._type))
               val methodType = SolidityFunctionTypeDelta.createType(compilation, solver.builder, libraryScope, parameterTypes, returnTypes)
 
-              solver.builder.declare(method.name, typeScope, member.getSourceElement(Name), Some(methodType))
+              solver.builder.declare2(member.getSourceElement(MethodDelta.Name), typeScope, Some(methodType))
             }
           }
           true

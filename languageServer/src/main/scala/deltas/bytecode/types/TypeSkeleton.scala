@@ -26,7 +26,7 @@ object TypeSkeleton extends DeltaWithGrammar {
       BiGrammarToPrinter.toDocument(_type, grammar).renderString()
   }
 
-  val hasTypes = new ShapeProperty[HasTypeDelta]
+  val hasTypes = new ShapeProperty[HasType]
   override def dependencies: Set[Contract] = Set.empty
 
   def checkAssignableTo(language: Language)(to: Node, from: Node): Unit = {

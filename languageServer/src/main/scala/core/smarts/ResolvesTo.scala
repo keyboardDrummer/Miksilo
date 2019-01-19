@@ -31,7 +31,7 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
       false
   }
 
-  override def getDiagnostic(): Option[FileDiagnostic] = {
+  override def getDiagnostic: Option[FileDiagnostic] = {
     for {
       fileRange <- reference.origin.flatMap(e => e.fileRange)
     } yield {
