@@ -13,7 +13,8 @@ trait JavaExpressionInstance extends Delta with ExpressionInstance {
   def getType(expression: NodePath, compilation: Compilation): Node //TODO remove
 }
 
-trait HasType2 {
+trait IsExpression {
+
   def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit
 
   def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {
@@ -21,10 +22,9 @@ trait HasType2 {
     constraints(compilation, builder, expression, result, parentScope)
     result
   }
-
 }
 
-trait ExpressionInstance extends Delta with HasShape with HasType2 {
+trait ExpressionInstance extends Delta with HasShape with IsExpression {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
@@ -32,6 +32,4 @@ trait ExpressionInstance extends Delta with HasShape with HasType2 {
   }
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
-
-  def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit
 }

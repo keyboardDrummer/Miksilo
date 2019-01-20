@@ -11,7 +11,7 @@ import deltas.bytecode.constants.IntegerInfoConstant
 import deltas.bytecode.coreInstructions.integers.{LoadConstantDelta, SmallIntegerConstantDelta}
 import deltas.bytecode.types.IntTypeDelta
 import deltas.expression.IntLiteralDelta.{Value, getValue}
-import deltas.expression.{ExpressionDelta, HasType2, IntLiteralDelta}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, IsExpression}
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 
 object IntLiteralToByteCodeDelta extends ConvertsToByteCodeDelta {
@@ -19,7 +19,7 @@ object IntLiteralToByteCodeDelta extends ConvertsToByteCodeDelta {
   override def description: String = "Enabled int literals to convert to bytecode"
 
   override def inject(language: Language): Unit = {
-    ExpressionDelta.expressionInstances.update(language, IntLiteralDelta.Shape, original => new HasType2 {
+    ExpressionDelta.expressionInstances.update(language, IntLiteralDelta.Shape, original => new IsExpression {
 
       override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
         original.constraints(compilation, builder, expression, _type, parentScope)

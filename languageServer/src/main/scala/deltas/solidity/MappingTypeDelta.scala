@@ -5,7 +5,7 @@ import core.language.Compilation
 import core.language.node._
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.{PrimitiveType, TypeApplication}
+import core.smarts.types.objects.{PrimitiveType, Type, TypeApplication}
 import deltas.bytecode.types.{TypeInstance, TypeSkeleton}
 
 object MappingTypeDelta extends TypeInstance {
@@ -32,7 +32,7 @@ object MappingTypeDelta extends TypeInstance {
   }
 
   val mappingTypeFunctor = PrimitiveType("mapping")
-  override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope) = {
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
     val mappingType: MappingType[NodeLike] = path
     TypeApplication(mappingTypeFunctor, Seq(
       TypeSkeleton.getType(compilation, builder, mappingType.key, parentScope),
