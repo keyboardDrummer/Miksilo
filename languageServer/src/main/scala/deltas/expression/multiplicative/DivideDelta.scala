@@ -4,7 +4,7 @@ import core.language.node.NodeShape
 import deltas.expression.LeftAssociativeBinaryOperatorDelta
 
 object DivideDelta extends LeftAssociativeBinaryOperatorDelta {
-  override def operatorGrammarKey = MultiplicativePrecedenceDelta.Grammar
+  override def precedenceGrammarKey = MultiplicativePrecedenceDelta.Grammar
 
   override def keyword = "/"
 

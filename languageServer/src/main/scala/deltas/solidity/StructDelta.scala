@@ -56,7 +56,7 @@ object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val struct: Struct[NodePath] = path
-    val declaration = builder.declare2(path.getSourceElement(HasNameDelta.Name), parentScope)
+    val declaration = builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope)
     val structScope = builder.declareScope(declaration, Some(parentScope), s"struct '${struct.name}'")
     for(member <- struct.members) {
       ConstraintSkeleton.constraints(compilation, builder, member, structScope)

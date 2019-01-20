@@ -4,7 +4,7 @@ import core.language.node.NodeShape
 import deltas.expression.{ExpressionDelta, LeftAssociativeBinaryOperatorDelta}
 
 object BitwiseXorDelta extends LeftAssociativeBinaryOperatorDelta {
-  override def operatorGrammarKey = ExpressionDelta.FirstPrecedenceGrammar
+  override def precedenceGrammarKey = ExpressionDelta.FirstPrecedenceGrammar
 
   override def keyword = "^"
   object Shape extends NodeShape

@@ -58,7 +58,7 @@ object SolidityLanguage {
     AssignToArrayMember,
     AssignToVariable, VariableDelta, SimpleAssignmentDelta, AssignmentPrecedence,
     ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta, BooleanLiteralDelta,
-    ParenthesisInExpressionDelta, ExpressionDelta,
+    ParenthesisInExpressionDelta, DefaultExpressionDelta, ExpressionDelta,
     BooleanTypeDelta,
     FixedSizeArrayTypeDelta, ArrayTypeDelta, TypeSkeleton,
     MultiFileDelta,

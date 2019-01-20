@@ -1,18 +1,14 @@
 package deltas.expression
 
-import core.deltas.DeltaWithGrammar
-import core.deltas.grammars.LanguageGrammars
-import core.language.Language
+import core.language.node.NodeShape
 
-object ExponentOperatorDelta extends DeltaWithGrammar {
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    import grammars._
-    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val grammar = expression ~~ "**" ~~ expression
-    expression.addAlternative(grammar)
-  }
+object ExponentOperatorDelta extends LeftAssociativeBinaryOperatorDelta {
 
-  override def description = "Adds the exponent operator **"
+  object Shape extends NodeShape
 
-  override def dependencies = Set(ExpressionDelta)
+  override def shape = Shape
+
+  override def precedenceGrammarKey = ExpressionDelta.FirstPrecedenceGrammar
+
+  override def keyword = "**"
 }

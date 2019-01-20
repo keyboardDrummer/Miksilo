@@ -1,39 +1,24 @@
 package deltas.expression.relational
 
-import core.deltas.grammars.LanguageGrammars
+import core.deltas.Contract
 import core.deltas.path.NodePath
-import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.Compilation
 import core.language.node._
-import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
-import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance, LeftAssociativeBinaryOperatorDelta}
 import deltas.javac.types.BooleanTypeDelta
 
-object ComparisonOperatorDelta {
-
-  implicit class ComparisonOperator[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def left: T = node(Left).asInstanceOf[T]
-    def right: T = node(Right).asInstanceOf[T]
-  }
-
-  object Left extends NodeField
-
-  object Right extends NodeField
-
-}
-
-trait ComparisonOperatorDelta extends DeltaWithGrammar with JavaExpressionInstance {
-  import ComparisonOperatorDelta._
-
-  def neww(first: Node, second: Node) = new Node(shape, Left -> first, Right -> second)
+trait ComparisonOperatorDelta extends LeftAssociativeBinaryOperatorDelta with JavaExpressionInstance {
+  import LeftAssociativeBinaryOperatorDelta._
 
   val shape: NodeShape
 
+  override def precedenceGrammarKey = AddRelationalPrecedenceDelta.RelationalExpressionGrammar
+
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
-    //TODO add a check for first and secondType. Share code with other comparisons.
     val firstType = ExpressionDelta.getType(compilation, builder, expression.left, parentScope)
     val secondType = ExpressionDelta.getType(compilation, builder, expression.right, parentScope)
     builder.typesAreEqual(firstType, secondType)
@@ -50,14 +35,6 @@ trait ComparisonOperatorDelta extends DeltaWithGrammar with JavaExpressionInstan
   }
 
   def keyword: String
-
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
-    import grammars._
-
-    val relationalGrammar = find(AddRelationalPrecedenceDelta.RelationalExpressionGrammar)
-    val operatorGrammar = relationalGrammar.as(Left) ~~< keyword ~~ relationalGrammar.as(Right) asNode shape
-    relationalGrammar.addAlternative(operatorGrammar)
-  }
 
   override def dependencies: Set[Contract] = Set(AddRelationalPrecedenceDelta)
 }

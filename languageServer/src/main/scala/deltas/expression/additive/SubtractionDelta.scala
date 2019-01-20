@@ -4,11 +4,7 @@ import core.deltas.Contract
 import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node._
-import core.smarts.ConstraintBuilder
-import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.Type
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
-import deltas.expression.additive.AdditionDelta.additionOrSubtractionConstraints
 import deltas.expression.{ExpressionDelta, JavaExpressionInstance, LeftAssociativeBinaryOperatorDelta}
 
 object SubtractionDelta extends LeftAssociativeBinaryOperatorDelta with JavaExpressionInstance {
@@ -28,14 +24,7 @@ object SubtractionDelta extends LeftAssociativeBinaryOperatorDelta with JavaExpr
     IntTypeDelta.intType
   }
 
-  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
-    val subtraction: LeftAssociativeBinaryOperatorDelta.BinaryOperator[NodePath] = expression
-    val left = subtraction.left
-    val right = subtraction.right
-    additionOrSubtractionConstraints(compilation, builder, _type, parentScope, left, right)
-  }
-
-  override def operatorGrammarKey = AdditivePrecedenceDelta.Grammar
+  override def precedenceGrammarKey = AdditivePrecedenceDelta.Grammar
 
   override def keyword = "-"
 }

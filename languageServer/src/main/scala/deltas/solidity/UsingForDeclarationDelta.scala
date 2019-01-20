@@ -92,7 +92,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
               val returnTypes: Seq[Node] = returnParameters.map(returnParameter => ParameterShape.create(MethodParameters.Type -> returnParameter._type))
               val methodType = SolidityFunctionTypeDelta.createType(compilation, solver.builder, libraryScope, parameterTypes, returnTypes)
 
-              solver.builder.declare2(member.getSourceElement(MethodDelta.Name), typeScope, Some(methodType))
+              solver.builder.declareSourceElement(member.getSourceElement(MethodDelta.Name), typeScope, Some(methodType))
             }
           }
           true

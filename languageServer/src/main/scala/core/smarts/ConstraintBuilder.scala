@@ -60,7 +60,7 @@ class ConstraintBuilder(val factory: Factory) {
     result
   }
 
-  def declare2(name: SourceElement, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
+  def declareSourceElement(name: SourceElement, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
     declare(name.current.asInstanceOf[String], container, name, _type)
   }
 
