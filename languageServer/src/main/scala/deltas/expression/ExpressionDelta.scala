@@ -25,11 +25,11 @@ object ExpressionDelta extends DeltaWithGrammar {
     getInstance(compilation)(expression).getType(compilation, builder, expression, parentScope)
   }
 
-  def getInstance(language: Language): NodeLike => ExpressionInstance = {
+  def getInstance(language: Language): NodeLike => HasType2 = {
     expression => expressionInstances(language, expression.shape)
   }
 
-  val expressionInstances = new ShapeProperty[ExpressionInstance]
+  val expressionInstances = new ShapeProperty[HasType2]
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     val core = grammars.create(LastPrecedenceGrammar)

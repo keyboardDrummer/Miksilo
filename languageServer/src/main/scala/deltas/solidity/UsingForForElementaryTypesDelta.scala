@@ -29,12 +29,14 @@ object UsingForForElementaryTypesDelta extends Delta {
       }
     })
 
+    val original = ConstraintSkeleton.hasConstraints.get(language, MultiFileDelta.Shape).get
     ConstraintSkeleton.hasConstraints.add(language, MultiFileDelta.Shape, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
         for(name <- ElementaryTypeDelta.elementaryTypeNames) {
           val declaration = builder.declare(name, parentScope, null, Some(ElementaryTypeDelta.elementaryType))
           builder.declareScope(declaration)
         }
+        original.collectConstraints(compilation, builder, path, parentScope)
       }
     })
   }

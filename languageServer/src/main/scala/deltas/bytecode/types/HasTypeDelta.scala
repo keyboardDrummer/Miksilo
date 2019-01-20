@@ -1,13 +1,13 @@
 package deltas.bytecode.types
 
-import core.deltas.{Delta, HasShape}
+import core.deltas.{Delta, HasShape}t
 import core.language.{Compilation, Language}
 import core.language.node.NodeLike
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
-trait HasType {
+trait HasType { // TODO merge with expression instance
   def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope) : Type
 }
 
