@@ -57,7 +57,8 @@ object SolidityLanguage {
     AssignToMemberDelta, SelectFieldDelta, MemberSelectorDelta,
     AssignToArrayMember,
     AssignToVariable, VariableDelta, SimpleAssignmentDelta, AssignmentPrecedence,
-    ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta, BooleanLiteralDelta,
+    ArrayAccessDelta,
+    BracketAccessDelta, ArrayLiteralDelta, IntLiteralDelta, BooleanLiteralDelta,
     ParenthesisInExpressionDelta, DefaultExpressionDelta, ExpressionDelta,
     BooleanTypeDelta,
     FixedSizeArrayTypeDelta, ArrayTypeDelta, TypeSkeleton,
@@ -66,6 +67,7 @@ object SolidityLanguage {
     SolveConstraintsDelta)
 
   val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar,
+    MappingAccessDelta,
     SolidityLibraryDelta,
     AfterOrDeleteExpressionDelta,
     SolidityFunctionTypeDelta,

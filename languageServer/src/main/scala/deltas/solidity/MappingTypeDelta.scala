@@ -31,12 +31,12 @@ object MappingTypeDelta extends TypeInstance {
     "mapping" ~~ (elementaryType.as(Key) ~~ "=>" ~~ typeGrammar.as(Value)).inParenthesis asNode Shape
   }
 
-  val mappingTypeFunctor = PrimitiveType("mapping")
+  val mappingTypeConstructor = PrimitiveType("mapping")
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
     val mappingType: MappingType[NodeLike] = path
-    TypeApplication(mappingTypeFunctor, Seq(
-      TypeSkeleton.getType(compilation, builder, mappingType.key, parentScope),
-      TypeSkeleton.getType(compilation, builder, mappingType.value, parentScope)), path)
+    val keyType = TypeSkeleton.getType(compilation, builder, mappingType.key, parentScope)
+    val valueType = TypeSkeleton.getType(compilation, builder, mappingType.value, parentScope)
+    TypeApplication(mappingTypeConstructor, Seq(keyType, valueType), path)
   }
 
   override def shape = Shape
