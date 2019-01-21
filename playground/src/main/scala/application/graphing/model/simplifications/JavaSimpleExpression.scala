@@ -1,14 +1,14 @@
 package application.graphing.model.simplifications
 
 import core.deltas.Contract
-import deltas.expression.IntLiteralDelta
+import deltas.expression.{IntLiteralDelta, ParenthesisInExpressionDelta, TernaryDelta}
+import deltas.expression.additive.{AdditionDelta, SubtractionDelta}
+import deltas.expression.relational.LessThanDelta
 import deltas.javac.expressions._
-import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
 import deltas.javac.expressions.equality.EqualityDelta
 import deltas.javac.expressions.literals.{BooleanLiteralDelta, NullDelta}
-import deltas.javac.expressions.relational.LessThanDelta
-import deltas.javac.methods.assignment.AssignmentPrecedence
 import deltas.statement.StatementDelta
+import deltas.statement.assignment.AssignmentPrecedence
 
 object JavaSimpleExpression extends DeltaGroup {
 

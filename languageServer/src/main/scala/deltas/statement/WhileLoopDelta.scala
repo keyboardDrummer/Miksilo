@@ -2,12 +2,10 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, PathRoot, NodeSequenceElement}
+import core.deltas.path.{NodePath, NodeSequenceElement, PathRoot}
 import core.language.node._
 import core.language.{Compilation, Language}
-import deltas.bytecode.simpleBytecode.LabelDelta
-import deltas.expressions.ExpressionDelta
-import deltas.javac.methods.MethodDelta
+import deltas.expression.ExpressionDelta
 
 object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -18,7 +16,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
     val statementGrammar = find(StatementDelta.Grammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val blockGrammar = find(BlockDelta.Grammar)
+    val blockGrammar = find(BlockDelta.BlockGramar)
     val whileGrammar = "while" ~> expression.inParenthesis.as(Condition) %
         blockGrammar.as(Body) asLabelledNode Shape
     statementGrammar.addAlternative(whileGrammar)
@@ -29,9 +27,8 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def transformWhileLoop(whileLoopPath: NodePath, compilation: Compilation): Unit = {
-    val method = whileLoopPath.findAncestorShape(MethodDelta.Shape)
     val whileLoop: While[Node] = whileLoopPath.current
-    val label: String = LabelDelta.getUniqueLabel("whileStart", method)
+    val label: String = LabelStatementDelta.getUniqueLabel("whileStart", whileLoopPath)
     val startLabel = LabelStatementDelta.neww(label)
     val ifBody = BlockDelta.neww(Seq(whileLoop.body, GotoStatementDelta.neww(label)))
     val _if = IfThenDelta.neww(whileLoop.condition, ifBody)

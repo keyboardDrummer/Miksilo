@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.deltas.Delta
 import core.smarts.SolveConstraintsDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
 import deltas.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelectionDelta, JavaLanguage}
@@ -59,7 +59,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("Block") {
     val input = "{" + lineSeparator + "    System.out.print(fibonacci(5));" + lineSeparator + "}"
-    TestLanguageGrammarUtils.compareInputWithPrint(input, None, BlockDelta.Grammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, BlockDelta.BlockGramar)
   }
 
   test("PrintAfterImplicitAddition") {

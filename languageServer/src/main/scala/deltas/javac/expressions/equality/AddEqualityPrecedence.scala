@@ -4,7 +4,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.GrammarKey
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 
 object AddEqualityPrecedence extends DeltaWithGrammar {
 

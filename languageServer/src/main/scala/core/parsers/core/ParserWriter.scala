@@ -16,6 +16,7 @@ trait ParserWriter {
   def fail[Result](message: String): Self[Result]
   def lazyParser[Result](inner: => Self[Result]): Self[Result]
 
+  def abort: ParseResult[Nothing]
   def newFailure[Result](input: Input, message: String): ParseResult[Result]
 
   def choice[Result](first: Self[Result], other: => Self[Result], leftIsAlwaysBigger: Boolean = false): Self[Result]

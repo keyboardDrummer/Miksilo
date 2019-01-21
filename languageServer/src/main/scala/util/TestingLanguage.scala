@@ -105,7 +105,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
 
   def buildLanguage: Language = {
     statistics.profile("build language", {
-      LanguageFromDeltas(deltas.map(delta => new WrappedDelta(delta)))
+      LanguageFromDeltas(deltas.map(delta => new WrappedDelta(delta)), false)
     })
   }
 }

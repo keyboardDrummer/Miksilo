@@ -16,7 +16,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onLanguage:systemverilog"
+		"onLanguage:systemverilog",
+		"onLanguage:solidity"
 	],
 	"main": "./out/extension",
 	"contributes": {
@@ -35,7 +36,17 @@
                     ".svh"
                 ],
                 "configuration": "./src/verilog/language-configuration.json"
-            }
+            },
+			{
+				"id": "solidity",
+				"aliases": [
+					"Solidity",
+					"solidity"
+				],
+				"extensions": [
+					".sol"
+				]
+			}
         ],
         "snippets": [
             {

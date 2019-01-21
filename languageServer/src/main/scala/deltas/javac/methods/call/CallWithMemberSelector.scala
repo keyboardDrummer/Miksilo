@@ -7,14 +7,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
-import deltas.expressions.ExpressionDelta
-import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.classes.{ClassCompiler, ClassOrObjectReference, MethodQuery}
 import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.MemberSelectorDelta
-import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 import deltas.javac.methods.call.CallDelta.Call
-import deltas.javac.types.MethodType._
 
 object ReferenceExpressionSkeleton {
   val instances = new ShapeProperty[ReferenceExpression]
@@ -25,7 +20,6 @@ object ReferenceExpressionSkeleton {
 
 trait ReferenceExpression {
   def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference
-
 }
 
 trait ReferenceExpressionDelta extends Delta with HasShape with ReferenceExpression {
@@ -36,37 +30,14 @@ trait ReferenceExpressionDelta extends Delta with HasShape with ReferenceExpress
 }
 
 //TODO extend from Delta, can be done once old getType is out of ExpressionInstance.
-trait CallWithMemberSelector extends CallDelta {
+trait CallWithMemberSelector extends Delta {
 
-  override def dependencies: Set[Contract] = Set(MemberSelectorDelta)
-
-  override val shape = CallDelta.Shape
-
-  override def getType(path: NodePath, compilation: Compilation): Node = {
-    val call: Call[NodePath] = path
-    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
-    val methodKey = getMethodKey(call, compiler)
-    val methodInfo = compiler.javaCompiler.find(methodKey)
-    val returnType = methodInfo._type.returnType
-    returnType
-  }
+  override def dependencies: Set[Contract] = Set(CallDelta, MemberSelectorDelta)
 
   def getGenericCallInstructions(call: Call[NodePath], compilation: Compilation, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
     val expressionToInstruction = ToByteCodeSkeleton.getToInstructions(compilation)
     val callArguments = call.arguments
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
     calleeInstructions ++ argumentInstructions ++ invokeInstructions
-  }
-
-  def getMethodKey(call: Call[NodePath], compiler: ClassCompiler): MethodQuery = {
-    val callCallee: MemberSelector[NodePath] = call.callee
-    val objectExpression = callCallee.target
-    val kind = MemberSelectorDelta.getReferenceKind(compiler, objectExpression).asInstanceOf[ClassOrObjectReference]
-
-    val callArguments = call.arguments
-    val callTypes: Seq[Node] = callArguments.map(argument => ExpressionDelta.getType(compiler.compilation)(argument))
-
-    val member = callCallee.member
-    MethodQuery(kind.info.getQualifiedName, member, callTypes)
   }
 }

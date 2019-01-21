@@ -11,7 +11,7 @@ import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
 import deltas.javac.constructor.SuperCallExpression
-import deltas.javac.types.MethodType
+import deltas.javac.types.MethodTypeDelta
 import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
 
 class TestEmptyClassCompilation extends JavaLanguageTest {
@@ -38,7 +38,7 @@ class TestEmptyClassCompilation extends JavaLanguageTest {
       ClassInfoConstant.classRef(11),
       ClassInfoConstant.classRef(12),
       Utf8ConstantDelta.create(SuperCallExpression.constructorName),
-      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq())),
+      TypeConstant.constructor(MethodTypeDelta.construct(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       NameAndTypeConstant.nameAndType(4, 5),
       QualifiedClassNameConstantDelta.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),

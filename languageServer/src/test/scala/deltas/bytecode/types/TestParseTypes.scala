@@ -5,7 +5,7 @@ import core.deltas.Delta
 import core.language.node.Node
 import org.scalatest.FunSuite
 import deltas.bytecode.attributes.CodeAttributeDelta.CodeKey
-import deltas.bytecode.attributes.{CodeAttributeDelta, StackMapTableAttribute}
+import deltas.bytecode.attributes.{CodeAttributeDelta, StackMapTableAttributeDelta}
 import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import deltas.javac.JavaLanguage
 import deltas.javac.classes.skeleton.QualifiedClassName
@@ -26,8 +26,8 @@ class TestParseTypes extends FunSuite {
 
   test("appendFrame") {
     val input = "appendFrame int int int"
-    val result = TestLanguageGrammarUtils.parse(input, StackMapTableAttribute.StackMapFrameGrammar)
-    assertResult(StackMapTableAttribute.AppendFrame)(result.asInstanceOf[Node].shape)
+    val result = TestLanguageGrammarUtils.parse(input, StackMapTableAttributeDelta.StackMapFrameGrammar)
+    assertResult(StackMapTableAttributeDelta.AppendFrame)(result.asInstanceOf[Node].shape)
   }
 
   test("labelWithAppendFrame") {

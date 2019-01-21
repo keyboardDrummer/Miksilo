@@ -5,6 +5,8 @@ import util.cache.Cache
 
 trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorParserWriter {
 
+  override def abort = EditorParseResult(None, NoFailure)
+
   type ParseResult[+R] = EditorParseResult[R]
 
   override def newFailure[Result](partial: Option[Result], input: Input, message: String) = EditorParseResult(None, ParseFailure(partial, input, message))

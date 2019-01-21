@@ -1,12 +1,9 @@
 package deltas.javac.statements
 
-import core.language.node.Node
 import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithPhase}
+import core.language.node.Node
 import core.language.{Compilation, Language}
-import deltas.bytecode.simpleBytecode.LabelDelta
-import deltas.javac.methods.MethodDelta
-import deltas.statement
 import deltas.statement.ForLoopDelta.ForLoop
 import deltas.statement._
 
@@ -34,9 +31,8 @@ object ForLoopContinueDelta extends DeltaWithPhase {
 
   def addAndReturnBeforeIncrementLabel(forLoopPath: NodePath): String = {
     val forLoop = forLoopPath.current
-    val method = forLoopPath.findAncestorShape(MethodDelta.Shape)
-    val beforeIncrementLabel = LabelDelta.getUniqueLabel("beforeIncrement", method)
-    forLoop(ForLoopDelta.Body) = BlockDelta.neww(Seq(forLoop.body, statement.LabelStatementDelta.neww(beforeIncrementLabel)))
+    val beforeIncrementLabel = LabelStatementDelta.getUniqueLabel("beforeIncrement", forLoopPath)
+    forLoop(ForLoopDelta.Body) = BlockDelta.neww(Seq(forLoop.body, LabelStatementDelta.neww(beforeIncrementLabel)))
     beforeIncrementLabel
   }
 }

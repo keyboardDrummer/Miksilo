@@ -7,37 +7,15 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.bytecode.coreInstructions.floats.FloatReturnInstructionDelta
-import deltas.bytecode.coreInstructions.integers.IntegerReturnInstructionDelta
-import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta
-import deltas.bytecode.coreInstructions.objects.AddressReturnInstructionDelta
-import deltas.bytecode.types._
-import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
+import deltas.expression.ExpressionDelta
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object ReturnExpressionDelta extends ConvertsToByteCodeDelta with StatementInstance
+object ReturnExpressionDelta extends StatementInstance
   with DeltaWithGrammar {
 
   override def description: String = "Allows returning a value using an expression."
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, IntegerReturnInstructionDelta)
-
-  def returnToLines(_return: NodePath, compiler: MethodCompiler): Seq[Node] = {
-    val returnValue: NodePath = getReturnValue(_return)
-    val returnValueInstructions = ToByteCodeSkeleton.getToInstructions(compiler.compilation)(returnValue)
-    val getType = ExpressionDelta.getType(compiler.compilation)
-    returnValueInstructions ++ (getType(returnValue) match
-    {
-      case x if x == IntTypeDelta.intType => Seq(IntegerReturnInstructionDelta.integerReturn)
-      case x if x == LongTypeDelta.longType => Seq(LongReturnInstructionDelta.longReturn)
-      case x if x == FloatTypeDelta.floatType => Seq(FloatReturnInstructionDelta.create)
-      case x if x == DoubleTypeDelta.doubleType => Seq(LongReturnInstructionDelta.longReturn)
-      case x if TypeSkeleton.getSuperTypes(compiler.compilation)(x).
-        contains(QualifiedObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
-      case _ => throw new NotImplementedError()
-    })
-  }
+  override def dependencies: Set[Contract] = Set(StatementDelta, ExpressionDelta)
 
   def getReturnValue[T <: NodeLike](_return: T) = _return(ReturnValue).asInstanceOf[T]
 
@@ -46,22 +24,17 @@ object ReturnExpressionDelta extends ConvertsToByteCodeDelta with StatementInsta
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val statement = find(StatementDelta.Grammar)
 
-    val returnExpression = "return" ~~> expression.as(ReturnValue) ~< ";" asNode ReturnInteger
+    val returnExpression = "return" ~~> expression.as(ReturnValue) ~< ";" asNode Shape
     statement.addAlternative(returnExpression)
   }
 
-  def neww(value: Node): Node = new Node(ReturnInteger, ReturnValue -> value)
+  def neww(value: Node): Node = new Node(Shape, ReturnValue -> value)
 
-  object ReturnInteger extends NodeShape
+  object Shape extends NodeShape
 
   object ReturnValue extends NodeField
 
-  override val shape = ReturnInteger
-
-  override def toByteCode(_return: NodePath, compilation: Compilation): Seq[Node] = {
-    val methodCompiler = MethodDelta.getMethodCompiler(compilation)
-    returnToLines(_return, methodCompiler)
-  }
+  override val shape = Shape
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     ExpressionDelta.getType(compilation, builder, getReturnValue(statement), parentScope)

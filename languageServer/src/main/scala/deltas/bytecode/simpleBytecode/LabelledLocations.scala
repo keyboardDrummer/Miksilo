@@ -6,8 +6,8 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.attributes.CodeAttributeDelta._
-import deltas.bytecode.attributes.StackMapTableAttribute.{StackMapFrameGrammar, offsetGrammarKey}
-import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta, StackMapTableAttribute}
+import deltas.bytecode.attributes.StackMapTableAttributeDelta.{StackMapFrameGrammar, offsetGrammarKey}
+import deltas.bytecode.attributes.{AttributeNameKey, CodeAttributeDelta, StackMapTableAttributeDelta}
 import deltas.bytecode.coreInstructions.GotoDelta
 import deltas.bytecode.coreInstructions.InstructionInstance.Instruction
 import deltas.bytecode.coreInstructions.integers.integerCompare._
@@ -101,21 +101,21 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     for ((location, frame) <- locationsWithFrame) {
       val offset = location - locationAfterPreviousFrame
       if (offset >= 0) { //TODO add a test-case for consecutive labels.
-        frame(StackMapTableAttribute.FrameOffset) = offset
+        frame(StackMapTableAttributeDelta.FrameOffset) = offset
         stackFrames += frame
         locationAfterPreviousFrame = location + 1
       }
     }
     if (stackFrames.nonEmpty) {
-      Seq(StackMapTableAttribute.Shape.create(
-        AttributeNameKey -> StackMapTableAttribute.entry,
-        StackMapTableAttribute.Maps -> stackFrames))
+      Seq(StackMapTableAttributeDelta.Shape.create(
+        AttributeNameKey -> StackMapTableAttributeDelta.entry,
+        StackMapTableAttributeDelta.Maps -> stackFrames))
     }
     else
       Seq.empty[Node]
   }
 
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualDelta, GotoDelta, IfZeroDelta)
+  override def dependencies: Set[Contract] = Set(StackMapTableAttributeDelta, ByteCodeSkeleton, IfIntegerCompareGreaterOrEqualDelta, GotoDelta, IfZeroDelta)
 
   override def description: String = "Replaces the jump instructions from bytecode. " +
     "The new instructions are similar to the old ones except that they use labels as target instead of instruction indices."
@@ -123,7 +123,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     replaceJumpIndicesWithLabels(grammars, language)
     removeOffsetFromStackMapFrameGrammars(grammars)
-    grammars.find(ByteCodeSkeleton.AttributeGrammar).findLabelled(StackMapTableAttribute.Shape).removeMeFromOption()
+    grammars.find(ByteCodeSkeleton.AttributeGrammar).findLabelled(StackMapTableAttributeDelta.Shape).removeMeFromOption()
   }
 
   def removeOffsetFromStackMapFrameGrammars(grammars: LanguageGrammars): Unit = {

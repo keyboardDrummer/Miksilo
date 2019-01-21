@@ -4,7 +4,7 @@ import core.language.Language
 
 import scala.collection.mutable.ArrayBuffer
 
-case class LanguageFromDeltas(topToBottom: Seq[Delta]) extends Language {
+case class LanguageFromDeltas(topToBottom: Seq[Delta], addMissingDeltas: Boolean = true) extends Language {
   private val explicitDeltas = topToBottom.reverse
   val allDeltas = validateDependencies(explicitDeltas)
   for(delta <- allDeltas)
@@ -22,7 +22,7 @@ case class LanguageFromDeltas(topToBottom: Seq[Delta]) extends Language {
       delta.dependencies.foreach(dependency =>
         if (!available.contains(dependency)) {
           dependency match {
-            case deltaDependency: Delta =>
+            case deltaDependency: Delta if addMissingDeltas =>
               if (detectCycleSet.contains(deltaDependency))
                 throw DeltaDependencyViolation(dependency, delta)
               else

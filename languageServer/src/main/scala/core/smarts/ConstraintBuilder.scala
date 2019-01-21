@@ -60,6 +60,10 @@ class ConstraintBuilder(val factory: Factory) {
     result
   }
 
+  def declareSourceElement(name: SourceElement, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
+    declare(name.current.asInstanceOf[String], container, name, _type)
+  }
+
   def declare(name: String, container: Scope, origin: SourceElement = null, _type: Option[Type] = None): NamedDeclaration = { //TODO the order here is inconsistent with resolve.
     val result = new NamedDeclaration(name, Option(origin))
     constraints ::= DeclarationInsideScope(result, container)

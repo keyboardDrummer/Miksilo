@@ -13,6 +13,8 @@ import deltas.bytecode.types.TypeSkeleton
 object LocalDeclarationDelta extends StatementInstance
   with DeltaWithGrammar {
 
+  object WithoutSemiColon extends GrammarKey
+
   implicit class LocalDeclaration[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def _type: T = node(Type).asInstanceOf[T]
     def name: String = node.getValue(Name).asInstanceOf[String]
@@ -24,7 +26,7 @@ object LocalDeclarationDelta extends StatementInstance
     import grammars._
     val statement = find(StatementDelta.Grammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-    val parseDeclaration = typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
+    val parseDeclaration = create(WithoutSemiColon, typeGrammar.as(Type) ~~ identifier.as(Name)) ~< ";" asLabelledNode Shape
     statement.addAlternative(parseDeclaration)
   }
 
@@ -51,8 +53,8 @@ object LocalDeclarationDelta extends StatementInstance
   override def description: String = "Enables declaring a local variable."
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
-    val _languageType = statement(Type).asInstanceOf[NodePath]
-    val _type = TypeSkeleton.getType(compilation, builder, _languageType, parentScope)
-    builder.declare(statement.name, parentScope, statement.getSourceElement(Name), Some(_type))
+    val declaration: LocalDeclaration[NodePath] = statement
+    val _type = TypeSkeleton.getType(compilation, builder, declaration._type, parentScope)
+    builder.declare(declaration.name, parentScope, statement.getSourceElement(Name), Some(_type))
   }
 }

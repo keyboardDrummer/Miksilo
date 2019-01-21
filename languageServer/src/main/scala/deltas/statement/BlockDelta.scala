@@ -27,14 +27,14 @@ object BlockDelta extends ConvertsToByteCodeDelta with DeltaWithGrammar with Sta
 
   object BlockOrStatementGrammar extends GrammarKey
   object StatementAsBlockGrammar extends GrammarKey
-  object Grammar extends GrammarKey
+  object BlockGramar extends GrammarKey
 
   val indentAmount = 4
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
 
-    val blockGrammar = create(Grammar, "{" %> statementGrammar.manyVertical.as(Statements).indent(indentAmount) %< "}" asNode Shape)
+    val blockGrammar = create(BlockGramar, "{" %> statementGrammar.manyVertical.as(Statements).indent(indentAmount) %< "}" asNode Shape)
     val statementAsSequence = statementGrammar.map[Any, Seq[Any]](statement => Seq(statement), x => x.head)
     val statementAsBlockGrammar = create(StatementAsBlockGrammar, statementAsSequence.as(Statements).asNode(Shape))
     create(BlockOrStatementGrammar, blockGrammar | statementAsBlockGrammar)

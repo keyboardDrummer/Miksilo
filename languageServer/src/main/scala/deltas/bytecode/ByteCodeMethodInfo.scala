@@ -13,7 +13,7 @@ import deltas.bytecode.attributes.CodeAttributeDelta.CodeAttribute
 import deltas.bytecode.constants.Utf8ConstantDelta
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
 import deltas.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
-import deltas.javac.types.MethodType.MethodTypeWrapper
+import deltas.javac.types.MethodTypeDelta.MethodType
 
 object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags with HasBytes with HasShape {
 
@@ -33,7 +33,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags with HasByte
       AccessFlagsKey -> flags)
 
   implicit class MethodInfo[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def _type: MethodTypeWrapper[T] = new MethodTypeWrapper[T](typeConstant.value)
+    def _type: MethodType[T] = new MethodType[T](typeConstant.value)
 
     def nameIndex: Int = node(MethodNameIndex).asInstanceOf[Int]
     def nameIndex_=(value: Int): Unit = node(MethodNameIndex) = value

@@ -1,0 +1,39 @@
+package deltas.expression.prefix
+
+import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.NodePath
+import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.node.{Node, NodeField, NodeShape}
+import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.Type
+import deltas.bytecode.types.IntTypeDelta
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
+
+trait PrefixOperatorDelta extends DeltaWithGrammar with JavaExpressionInstance {
+
+  def keyword: String
+
+  override val shape = Shape
+
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
+
+  override def getType(expression: NodePath, compilation: Compilation): Node = IntTypeDelta.intType
+
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val expressionCore = find(ExpressionDelta.LastPrecedenceGrammar)
+    val prefixOperator = keyword ~> expressionCore.as(Target) asNode Shape
+    expressionCore.addAlternative(prefixOperator)
+  }
+
+  object Shape extends NodeShape
+  object Target extends NodeField
+
+  override def description: String = s"Adds the prefix $keyword operator."
+
+  override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    ExpressionDelta.constraints(compilation, builder, expression(Target).asInstanceOf[NodePath], _type, parentScope)
+  }
+}

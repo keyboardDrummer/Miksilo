@@ -8,11 +8,11 @@ import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton, PackageSignature}
-import deltas.javac.methods.{IsNamespaceOrObjectExpression, MemberSelectorDelta, NamespaceOrObjectExpression, ResolveNamespaceOrObjectVariableAmbiguity}
+import deltas.javac.methods.{HasDeclaredScope, MemberSelectorDelta, HasScopeSkeleton, ResolveNamespaceOrObjectVariableAmbiguity}
 import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape}
 
-object MemberSelectorAsNamespaceReference extends Delta with IsNamespaceOrObjectExpression {
-  override def dependencies: Set[Contract] = Set(SelectField, JavaClassSkeleton)
+object MemberSelectorAsNamespaceReference extends Delta with HasDeclaredScope {
+  override def dependencies: Set[Contract] = Set(SelectFieldDelta, JavaClassSkeleton)
 
   override def inject(language: Language): Unit = {
     MemberSelectorDelta.referenceKindRegistry.add(language, Shape, (compilation, selector) => {
@@ -40,7 +40,7 @@ object MemberSelectorAsNamespaceReference extends Delta with IsNamespaceOrObject
   override def getScopeDeclaration(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, scope: Scope): Declaration = {
     val memberSelector: MemberSelector[NodePath] = expression
     val target = memberSelector.target
-    val targetScope = NamespaceOrObjectExpression.getScope(compilation, builder, target, scope)
+    val targetScope = HasScopeSkeleton.getScope(compilation, builder, target, scope)
     val namespaceOrObjectVariableDeclaration =
       builder.resolve(memberSelector.member, expression.getSourceElement(Member), targetScope)
     val result = builder.declarationVariable()

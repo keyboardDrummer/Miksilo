@@ -2,13 +2,12 @@ package deltas.javac.statements
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.{NodePath, NodeSequenceElement, PathRoot}
 import core.language.node.{Node, NodeGrammar, NodeShape}
-import core.deltas.path.{NodePath, PathRoot, NodeSequenceElement}
 import core.language.{Compilation, Language}
 import deltas.bytecode.simpleBytecode.LabelDelta
 import deltas.javac.methods.MethodDelta
-import deltas.statement
-import deltas.statement.{GotoStatementDelta, StatementDelta, WhileLoopDelta}
+import deltas.statement.{GotoStatementDelta, LabelStatementDelta, StatementDelta, WhileLoopDelta}
 
 import scala.collection.mutable
 
@@ -34,13 +33,12 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   def addEndLabel(whilePath: NodePath): String = {
-    val method = whilePath.findAncestorShape(MethodDelta.Shape) //TODO break away from method dependency
-    val endLabel = LabelDelta.getUniqueLabel("whileEnd", method)
-    whilePath.asInstanceOf[NodeSequenceElement].replaceWith(Seq(whilePath.current, statement.LabelStatementDelta.neww(endLabel)))
+    val endLabel = LabelStatementDelta.getUniqueLabel("whileEnd", whilePath)
+    whilePath.asInstanceOf[NodeSequenceElement].replaceWith(Seq(whilePath.current, LabelStatementDelta.neww(endLabel)))
     endLabel
   }
 
   object BreakShape extends NodeShape
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, GotoStatementDelta, WhileLoopDelta)
+  override def dependencies: Set[Contract] = Set(GotoStatementDelta, WhileLoopDelta)
 }

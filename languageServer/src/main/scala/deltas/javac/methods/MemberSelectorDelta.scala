@@ -5,11 +5,13 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node._
 import core.language.{Compilation, Language}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.javac.classes._
-import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
+import deltas.javac.classes.skeleton.ClassSignature
 
 object MemberSelectorDelta extends DeltaWithGrammar {
+
+  override def description: String = "Defines the selector grammar <expression>.<identifier>"
 
   implicit class MemberSelector[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def member: String = node.getValue(Member).asInstanceOf[String]
@@ -19,8 +21,7 @@ object MemberSelectorDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val selection = (expression.as(Target) ~< ".") ~ identifier.as(Member) asNode Shape
-    create(Shape, selection)
+    (expression.as(Target) ~< ".") ~ identifier.as(Member) asLabelledNode Shape
   }
 
   object Shape extends NodeShape
@@ -56,7 +57,5 @@ object MemberSelectorDelta extends DeltaWithGrammar {
 
   val referenceKindRegistry = new ShapeProperty[(Compilation, NodePath) => ReferenceKind]
 
-  override def description: String = "Defines the selector grammar <expression>.<identifier>"
-
-  override def dependencies: Set[Contract] = Set(JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 }

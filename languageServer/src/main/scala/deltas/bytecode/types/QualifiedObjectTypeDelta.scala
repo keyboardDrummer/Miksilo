@@ -64,8 +64,9 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDe
       val packageFull = packageParts.reduce((a,b) => a + "." + b)
       val packageDeclaration = builder.resolveOption(packageFull, origin = _type.asPath, parentScope)
       builder.getDeclaredScope(packageDeclaration)
-    } else
+    } else {
       parentScope
+    }
     val classDeclaration = builder.resolveOption(className, origin = _type.asPath, scope)
     TypeFromDeclaration(classDeclaration)
   }

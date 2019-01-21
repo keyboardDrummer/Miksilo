@@ -3,15 +3,15 @@ package deltas.bytecode.types
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node.{Node, NodeLike, NodeShape}
-import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
 object LongTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
-  override val shape = LongTypeKey
+  override val shape = Shape
 
   override def getSuperTypes(_type: Node): Seq[Node] = Seq.empty
 
@@ -27,12 +27,13 @@ object LongTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
     "long" ~> value(longType)
   }
 
-  val longType = new Node(LongTypeKey)
+  val longType = new Node(Shape)
 
-  object LongTypeKey extends NodeShape
+  object Shape extends NodeShape
 
   override def description: String = "Defines the long type."
 
   val constraintType: Type = PrimitiveType("Long")
-  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = constraintType
+  override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type =
+    constraintType
 }

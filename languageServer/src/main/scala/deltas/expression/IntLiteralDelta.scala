@@ -9,10 +9,8 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.IntTypeDelta
-import deltas.expressions.ExpressionDelta
-import deltas.javac.expressions.ExpressionInstance
 
-object IntLiteralDelta extends ExpressionInstance {
+object IntLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
   val shape = Shape
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)

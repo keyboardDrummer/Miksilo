@@ -11,7 +11,11 @@ const languages: Array<LanguageConfiguration> = [
 	{ 
 		vscodeName: "systemverilog", 
 		miksiloName: "verilog"
-	}
+	},
+	{
+        vscodeName: "solidity",
+        miksiloName: "solidity"
+    }
 ]
 
 export function activate(context: ExtensionContext) {	

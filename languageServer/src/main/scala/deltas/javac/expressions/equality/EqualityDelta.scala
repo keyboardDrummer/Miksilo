@@ -10,12 +10,12 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.longs.CompareLongDelta
 import deltas.bytecode.extraBooleanInstructions.{IntegerEqualsInstructionDelta, NotInstructionDelta}
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance, ToByteCodeSkeleton}
+import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta, TypeSkeleton}
-import deltas.expressions.ExpressionDelta
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
 import deltas.javac.types.BooleanTypeDelta
 
-object EqualityDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
+object EqualityDelta extends DeltaWithGrammar with JavaExpressionInstance with ConvertsToByteCodeDelta {
   override def dependencies: Set[Contract] = Set(AddEqualityPrecedence, IntegerEqualsInstructionDelta)
 
   def getFirst[T <: NodeLike](equality: T): T = equality(FirstKey).asInstanceOf[T]
@@ -52,7 +52,7 @@ object EqualityDelta extends ExpressionInstance with ConvertsToByteCodeDelta {
     val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
     val inputType = TypeSkeleton.toStackType(getInputType(equality, compilation), compilation)
     val equalityInstructions: Seq[Node] = inputType.shape match {
-      case LongTypeDelta.LongTypeKey => Seq(CompareLongDelta.compareLong, NotInstructionDelta.not)
+      case LongTypeDelta.Shape => Seq(CompareLongDelta.compareLong, NotInstructionDelta.not)
       case IntTypeDelta.IntTypeKey => Seq(IntegerEqualsInstructionDelta.equals)
     }
     toInstructions(first) ++ toInstructions(second) ++ equalityInstructions

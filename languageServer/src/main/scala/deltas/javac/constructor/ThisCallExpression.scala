@@ -1,6 +1,6 @@
 package deltas.javac.constructor
 
-import core.deltas.Contract
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{Node, NodeShape}
@@ -9,13 +9,13 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.VoidTypeDelta
-import deltas.expressions.ExpressionDelta
+import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ExpressionInstance}
+import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.javac.methods.call.CallDelta
 
-object ThisCallExpression extends ExpressionInstance with ConvertsToByteCodeDelta {
+object ThisCallExpression extends DeltaWithGrammar with JavaExpressionInstance with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling a different constructor using 'this'"
 

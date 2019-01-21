@@ -20,9 +20,8 @@ object IfThenElseToIfThenAndGotoDelta extends DeltaWithPhase {
   }
 
   def transform(ifElsePath: NodePath, language: Language): Unit = {
-    val method = ifElsePath.findAncestorShape(MethodDelta.Shape)
     val ifThenElse: IfThenElse[NodePath] = ifElsePath
-    val endLabel = LabelDelta.getUniqueLabel("ifThenElseEnd", method)
+    val endLabel = LabelStatementDelta.getUniqueLabel("ifThenElseEnd", ifElsePath)
     val ifThen = IfThenDelta.neww(ifThenElse.condition, BlockDelta.neww(Seq(ifThenElse.thenStatement, GotoStatementDelta.neww(endLabel))))
     val replacement = BlockDelta.neww(Seq(ifThen,
       ifThenElse.elseStatement,

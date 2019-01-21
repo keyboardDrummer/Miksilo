@@ -1,11 +1,10 @@
 package deltas.verilog
 
 import core.language.{Compilation, InMemoryFileSystem}
-import core.language.node.{NodeComparer}
+import core.language.node.NodeComparer
 import deltas.ClearPhases
-import deltas.expression.IntLiteralDelta
-import deltas.expressions.VariableDelta
-import deltas.expressions.VariableDelta.Variable
+import deltas.expression.{IntLiteralDelta, VariableDelta}
+import deltas.expression.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
 import langserver.types.{Location, Range, TextDocumentIdentifier}
 import languageServer.lsp.DocumentPosition

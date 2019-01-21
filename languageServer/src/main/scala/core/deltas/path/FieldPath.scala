@@ -3,7 +3,7 @@ package core.deltas.path
 import core.language.node.{Node, NodeField, SourceRange}
 
 class NodeFieldPath(parent: NodePath, field: NodeField) extends FieldPath(parent, field) with NodeChildPath {
-  override def current: Node = super[FieldPath].current.asInstanceOf[Node]
+  override lazy val current: Node = super[FieldPath].current.asInstanceOf[Node]
   override def range: Option[SourceRange] = super[FieldPath].range.orElse(super[NodeChildPath].range)
 }
 

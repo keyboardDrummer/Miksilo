@@ -3,22 +3,20 @@ package core.grammar
 import core.bigrammar.TestLanguageGrammarUtils
 import core.language.node.{Node, NodeComparer}
 import deltas.bytecode.types._
-import deltas.expression.IntLiteralDelta
-import deltas.expressions.{ExpressionDelta, VariableDelta}
+import deltas.expression.additive.{AdditionDelta, SubtractionDelta}
+import deltas.expression.relational.LessThanDelta
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, TernaryDelta, VariableDelta}
 import deltas.javac.JavaLanguage
 import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.expressions._
-import deltas.javac.expressions.additive.{AdditionDelta, SubtractionDelta}
-import deltas.javac.expressions.relational.LessThanDelta
 import deltas.javac.methods._
-import deltas.javac.methods.assignment.IncrementAssignmentDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.javac.trivia.JavaStyleBlockCommentsDelta
 import deltas.statement.BlockDelta
+import deltas.statement.assignment.AddAssignmentDelta
+import deltas.trivia.SlashStarBlockCommentsDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != JavaStyleBlockCommentsDelta))
+  extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != SlashStarBlockCommentsDelta))
 {
 
   test("BasicClass") {
@@ -63,7 +61,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   test("Addition") {
     val input = "index + 1"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation: Node = AdditionDelta.addition(VariableDelta.neww("index"), IntLiteralDelta.neww(1))
+    val expectation: Node = AdditionDelta.neww(VariableDelta.neww("index"), IntLiteralDelta.neww(1))
     assertResult(expectation)(result)
   }
 
@@ -75,7 +73,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   test("Subtraction") {
     val input = "index - 1"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation: Node = SubtractionDelta.subtraction(VariableDelta.neww("index"), IntLiteralDelta.neww(1))
+    val expectation: Node = SubtractionDelta.neww(VariableDelta.neww("index"), IntLiteralDelta.neww(1))
     assertResult(expectation)(result)
   }
 
@@ -89,7 +87,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   test("IncrementAssignment") {
     val input = "x += 1"
     val result: Any = getExpressionGrammarResult(input)
-    val expectation = IncrementAssignmentDelta.incrementAssignment(VariableDelta.neww("x"), IntLiteralDelta.neww(1))
+    val expectation = AddAssignmentDelta.neww(VariableDelta.neww("x"), IntLiteralDelta.neww(1))
     assertResult(expectation)(result)
   }
 
@@ -130,9 +128,9 @@ class TestJavaBaseGrammarUsingFibonacciClass
 
   def getFibonacciExpression: Node = {
     val condition = LessThanDelta.neww(VariableDelta.neww("index"), IntLiteralDelta.neww(2))
-    val firstCall = CallDelta.neww(VariableDelta.neww("fibonacci"), Seq(SubtractionDelta.subtraction(VariableDelta.neww("index"), IntLiteralDelta.neww(1))))
-    val secondCall = CallDelta.neww(VariableDelta.neww("fibonacci"), Seq(SubtractionDelta.subtraction(VariableDelta.neww("index"), IntLiteralDelta.neww(2))))
-    val expectation = TernaryDelta.ternary(condition, IntLiteralDelta.neww(1), AdditionDelta.addition(firstCall, secondCall))
+    val firstCall = CallDelta.neww(VariableDelta.neww("fibonacci"), Seq(SubtractionDelta.neww(VariableDelta.neww("index"), IntLiteralDelta.neww(1))))
+    val secondCall = CallDelta.neww(VariableDelta.neww("fibonacci"), Seq(SubtractionDelta.neww(VariableDelta.neww("index"), IntLiteralDelta.neww(2))))
+    val expectation = TernaryDelta.ternary(condition, IntLiteralDelta.neww(1), AdditionDelta.neww(firstCall, secondCall))
     expectation
   }
 }

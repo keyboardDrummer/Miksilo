@@ -6,9 +6,11 @@ import java.nio.charset.StandardCharsets
 import com.typesafe.scalalogging.LazyLogging
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.PathRoot
 import core.language.exceptions.BadInputException
 import core.language.node.Node
 import core.smarts.ConstraintBuilder
+import deltas.ConstraintSkeleton
 
 import scala.collection.mutable
 import scala.reflect.io.File
@@ -18,7 +20,11 @@ class Language extends LazyLogging {
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammars = new LanguageGrammars
   var compilerPhases: List[Phase] = List.empty
-  var collectConstraints: (Compilation, ConstraintBuilder) => Unit = _
+  var collectConstraints: (Compilation, ConstraintBuilder) => Unit = (compilation, builder) => {
+    ConstraintSkeleton.constraints(compilation, builder, PathRoot(compilation.program),
+      builder.newScope(debugName = "rootScope"))
+  }
+
   var extraCompileOptions: List[CustomCommand] = List.empty
 
   def compileString(input: String): Compilation = {

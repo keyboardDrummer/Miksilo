@@ -3,15 +3,15 @@ package deltas.verilog
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
-import deltas.expression.IntLiteralDelta
-import deltas.expressions.{ExpressionDelta, VariableDelta}
-import deltas.javac.trivia.{JavaStyleBlockCommentsDelta, JavaStyleLineCommentsDelta}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, VariableDelta}
+import deltas.trivia.{SlashStarBlockCommentsDelta, SlashSlashLineCommentsDelta}
 import deltas.statement.{ForLoopDelta, _}
 import deltas.verilog.preprocessor.{IncludeDelta, PreprocessorDelta}
 
 object VerilogLanguage {
-  val genericDeltas: Seq[Delta] = Seq(JavaStyleBlockCommentsDelta, JavaStyleLineCommentsDelta,
-    ForLoopDelta, WhileLoopDelta, IfThenElseDelta, IfThenDelta, BlockDelta, StatementDelta,
+  val genericDeltas: Seq[Delta] = Seq(SlashStarBlockCommentsDelta, SlashSlashLineCommentsDelta,
+    ForLoopDelta, BlockAsStatementDelta, WhileLoopDelta, LabelStatementDelta, GotoStatementDelta,
+    IfThenElseDelta, IfThenDelta, BlockDelta, StatementDelta,
     IntLiteralDelta, VariableDelta, ExpressionDelta,
     SolveConstraintsDelta)
 

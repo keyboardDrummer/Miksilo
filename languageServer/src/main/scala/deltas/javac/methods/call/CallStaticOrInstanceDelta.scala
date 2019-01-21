@@ -17,7 +17,7 @@ object CallStaticOrInstanceDelta extends CallWithMemberSelector with ConvertsToB
   override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-    val methodKey: MethodQuery = getMethodKey(call, compiler)
+    val methodKey: MethodQuery = CallDelta.getMethodKey(call, compiler)
     val methodRef = compiler.getMethodRefIndex(methodKey)
 
     val methodInfo = compiler.javaCompiler.find(methodKey)
@@ -30,6 +30,8 @@ object CallStaticOrInstanceDelta extends CallWithMemberSelector with ConvertsToB
       CallInstanceDelta.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
     }
   }
+
+  override def shape = CallDelta.Shape
 }
 
 

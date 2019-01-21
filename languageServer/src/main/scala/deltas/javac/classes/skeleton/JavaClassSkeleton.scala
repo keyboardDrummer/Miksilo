@@ -76,7 +76,7 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
   }
 
   def fullyQualify(_type: NodePath, classCompiler: ClassCompiler): Unit =  _type.shape match {
-    case ArrayTypeDelta.ArrayTypeKey => fullyQualify(ArrayTypeDelta.getElementType(_type), classCompiler)
+    case ArrayTypeDelta.Shape => fullyQualify(ArrayTypeDelta.getElementType(_type), classCompiler)
     case UnqualifiedObjectTypeDelta.Shape =>
         val newName = classCompiler.fullyQualify(UnqualifiedObjectTypeDelta.getName(_type))
       _type.asInstanceOf[NodeChildPath].replaceWith(QualifiedObjectTypeDelta.neww(newName))

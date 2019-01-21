@@ -56,5 +56,8 @@ trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
   def %%(bottom: BiGrammar): BiGrammar = {
     (this %< BlankLine) % bottom
   }
+
+  def spacedOption: BiGrammar = (printSpace ~> grammar).option
+  def toParameterList: BiGrammar = grammar.manySeparated(stringToGrammar(",") ~ printSpace).inParenthesis
 }
 

@@ -2,8 +2,9 @@ package deltas.javac.expressions
 
 import core.smarts.SolveConstraintsDelta
 import deltas.ClearPhases
+import deltas.expression.ExpressionLanguageDelta
 import deltas.javac.JavaLanguage
-import util.{TestLanguageBuilder, LanguageTest}
+import util.{LanguageTest, TestLanguageBuilder}
 
 class ExpressionTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
   Seq(SolveConstraintsDelta,

@@ -6,7 +6,7 @@ import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
 import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
 import core.language.Language
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
-import deltas.javac.types.MethodType.MethodTypeKey
+import deltas.javac.types.MethodTypeDelta.Shape
 
 object TypeAbstraction extends DeltaWithGrammar {
 
@@ -43,7 +43,7 @@ object TypeAbstraction extends DeltaWithGrammar {
   def transformByteCodeGrammar(grammars: LanguageGrammars): Unit = {
     import grammars._
     val byteCodeType = find(TypeSkeleton.ByteCodeTypeGrammar)
-    val methodTypeGrammar = find(KeyGrammar(MethodTypeKey))
+    val methodTypeGrammar = find(KeyGrammar(Shape))
     val objectTypeGrammar = find(QualifiedObjectTypeDelta.byteCodeGrammarKey)
     val classBound: BiGrammar = objectTypeGrammar
     val variableGrammar: BiGrammar = identifier.as(ParameterName) ~

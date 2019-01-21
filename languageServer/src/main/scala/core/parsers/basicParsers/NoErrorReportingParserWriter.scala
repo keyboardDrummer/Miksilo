@@ -4,6 +4,7 @@ import core.parsers.core.{NotCorrectingParserWriter, UnambiguousParserWriter}
 import util.cache.{Cache, InfiniteCache}
 
 trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrectingParserWriter {
+
   type ParseResult[+R] = SimpleParseResult[R]
   override type Self[+R] = Parser[R]
   override type ExtraState = Unit
@@ -64,6 +65,8 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
   }
 
   val failureSingleton = new SimpleParseResult[Nothing](None)
+
+  override def abort = failureSingleton
 
   case class SimpleParseResult[+Result](successOption: Option[Success[Result]]) extends UnambiguousParseResult[Result] { // TODO Don't use nested Option
 

@@ -122,6 +122,8 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
 
   implicit def toResult[Result](biggestFailure: OptionFailure[Result]): EditorParseResult[Result] = EditorParseResult(List.empty, biggestFailure)
 
+  override def abort = EditorParseResult(List.empty, NoFailure)
+
   case class EditorParseResult[+Result](successes: List[Success[Result]], biggestFailure: OptionFailure[Result])
     extends AmbiguousParseResult[Result] with EditorResult[Result] {
 

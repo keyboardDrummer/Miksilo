@@ -1,12 +1,20 @@
 package core.parsers
 
-import strings.StringReader
 import ambiguousEditorParsers.AmbiguousEditorParserWriter
+import strings.StringReader
 
 class AmbiguousParserTest extends AssociativityTest
   with LeftRecursionTest
   with PartiallyParseJsonTest
-  with AmbiguousEditorParserWriter {
+  with AmbiguousEditorParserWriter
+  with ErrorReportingTest {
+
+  test("Basic ambiguity test") {
+    lazy val expression: EditorParser[Any] = ("ab" | "a") ~ "bc"
+    val result = expression.parseWholeInput(new StringReader("abc"))
+    assert(result.successful, result.toString)
+  }
+
   test("Optional before recursive and seed") {
     lazy val expression: EditorParser[Any] = optional ~ expression ~ "s" | optional ~ "e"
     val result = expression.parseWholeInput(aesReader)

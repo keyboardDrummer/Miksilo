@@ -12,7 +12,7 @@ import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.{IntTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
-import deltas.javac.types.MethodType
+import deltas.javac.types.MethodTypeDelta
 import util.LanguageTest
 
 class TestPrintByteCodeWhile extends FunSuite {
@@ -27,11 +27,11 @@ class TestPrintByteCodeWhile extends FunSuite {
       ClassInfoConstant.classRef(13),
       ClassInfoConstant.classRef(14),
       "<init>",
-      TypeConstant.constructor(MethodType.construct(VoidTypeDelta.voidType, Seq())),
+      TypeConstant.constructor(MethodTypeDelta.construct(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "whilee",
-      StackMapTableAttribute.entry,
+      StackMapTableAttributeDelta.entry,
       SourceFileAttribute.constantPoolKey,
       "Whilee.java",
       NameAndTypeConstant.nameAndType(4, 5),
@@ -62,8 +62,8 @@ class TestPrintByteCodeWhile extends FunSuite {
       new LineNumberRef(8, 7),
       new LineNumberRef(10, 13)
     ))
-    val stackMapTable = StackMapTableAttribute.stackMapTable(9, Seq(StackMapTableAttribute.appendFrame(2, Seq(IntTypeDelta.intType)),
-      StackMapTableAttribute.sameFrame(10)))
+    val stackMapTable = StackMapTableAttributeDelta.stackMapTable(9, Seq(StackMapTableAttributeDelta.appendFrame(2, Seq(IntTypeDelta.intType)),
+      StackMapTableAttributeDelta.sameFrame(10)))
     val _while = ByteCodeMethodInfo.methodInfo(8, 5, Seq(CodeAttributeDelta.codeAttribute(6, 2, 1, Seq(
       SmallIntegerConstantDelta.integerConstant(0),
       StoreIntegerDelta.integerStore(0),

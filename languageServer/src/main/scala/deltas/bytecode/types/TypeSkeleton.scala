@@ -9,7 +9,6 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.ByteCodeSkeleton
 
 object TypeSkeleton extends DeltaWithGrammar {
   def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
@@ -27,8 +26,8 @@ object TypeSkeleton extends DeltaWithGrammar {
       BiGrammarToPrinter.toDocument(_type, grammar).renderString()
   }
 
-  val hasTypes = new ShapeProperty[HasTypeDelta]
-  override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)
+  val hasTypes = new ShapeProperty[HasType]
+  override def dependencies: Set[Contract] = Set.empty
 
   def checkAssignableTo(language: Language)(to: Node, from: Node): Unit = {
     if (!isAssignableTo(language)(to, from))

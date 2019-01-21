@@ -9,8 +9,8 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
-import deltas.expressions.VariableDelta
-import deltas.expressions.VariableDelta.Variable
+import deltas.expression.VariableDelta
+import deltas.expression.VariableDelta.Variable
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
