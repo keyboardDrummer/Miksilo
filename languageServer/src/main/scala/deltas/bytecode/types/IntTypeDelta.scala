@@ -11,7 +11,7 @@ import core.smarts.types.objects.{PrimitiveType, Type}
 
 object IntTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
-  override val shape = IntTypeKey
+  override val shape = Shape
 
   override def getSuperTypes(_type: Node): Seq[Node] = Seq.empty //TODO extend. long ?
 
@@ -25,14 +25,18 @@ object IntTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
     "int" ~> value(intType)
   }
 
-  val intType = new Node(IntTypeKey)
+  val intType = new Node(Shape)
 
   override def getStackSize: Int = 1
 
-  object IntTypeKey extends NodeShape
+  object Shape extends NodeShape
 
   override def description: String = "Defines the integer type."
 
   val constraintType = PrimitiveType("Int")
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = constraintType
+
+  override def constraintName = constraintType.name
+
+  override def toConstraintType(_type: Type) = intType
 }

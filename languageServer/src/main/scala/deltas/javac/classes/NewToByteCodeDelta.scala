@@ -5,11 +5,11 @@ import core.language.Compilation
 import core.language.node.Node
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
-import deltas.expression.{ExpressionDelta, NewDelta}
+import deltas.expression.NewDelta
 import deltas.expression.NewDelta.NewCall
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
-import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
+import deltas.javac.methods.call.CallDelta
 
 object NewToByteCodeDelta extends ConvertsToByteCodeDelta {
 
@@ -21,11 +21,10 @@ object NewToByteCodeDelta extends ConvertsToByteCodeDelta {
     val classRef = compiler.getClassRef(classInfo)
     val callArguments = call.arguments
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
-    val callTypes = callArguments.map(argument => ExpressionDelta.getType(compilation)(argument))
 
-    val methodKey = MethodQuery(classInfo.getQualifiedName, SuperCallExpression.constructorName, callTypes)
+    val methodRefIndex: Node = CallDelta.getMethodRefIndexFromCallee(compilation, call)
     Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++
-      Seq(InvokeSpecialDelta.invokeSpecial(compiler.getMethodRefIndex(methodKey)))
+      Seq(InvokeSpecialDelta.invokeSpecial(methodRefIndex))
   }
 
   override def shape = NewDelta.Shape

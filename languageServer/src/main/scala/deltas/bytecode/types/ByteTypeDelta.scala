@@ -13,9 +13,9 @@ object ByteTypeDelta extends ByteCodeTypeInstance {
 
   override def description: String = "Adds the byte type."
 
-  object ByteTypeKey extends NodeShape
-  override val shape = ByteTypeKey
-  val me = new Node(ByteTypeKey)
+  object Shape extends NodeShape
+  override val shape = Shape
+  val me = new Node(Shape)
 
   override def getSuperTypes(_type: Node): Seq[Node] = ???
 
@@ -32,4 +32,8 @@ object ByteTypeDelta extends ByteCodeTypeInstance {
   val constraintType = PrimitiveType("Byte")
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type =
     constraintType
+
+  override def constraintName = constraintType.name
+
+  override def toConstraintType(_type: Type) = me
 }

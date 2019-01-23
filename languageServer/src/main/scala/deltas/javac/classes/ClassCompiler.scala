@@ -17,20 +17,20 @@ case class MethodInfo(_type: Node, _static: Boolean) extends ClassMember
 case class MethodQuery(className: QualifiedClassName, methodName: String, argumentTypes: Seq[Node])
 
 case class ClassCompiler(currentClass: Node, compilation: Compilation) {
-  val javaCompiler = JavaClassSkeleton.getState(compilation).javaCompiler
+  val javaCompiler = JavaClassSkeleton.state(compilation).javaCompiler
   val className: String = currentClass.name
   val myPackage: PackageSignature = javaCompiler.getPackage(currentClass._package.toList)
   val currentClassInfo = ClassSignature(myPackage, className)
   lazy val classNames: Map[String, QualifiedClassName] = getClassMapFromImports(currentClass.imports)
 
-  def bind() = {
-    val previous = getState(compilation).classCompiler
-    getState(compilation).classCompiler = this
+  def bind(): Unit = {
+    val previous = JavaClassSkeleton.state(compilation).classCompiler
+    JavaClassSkeleton.state(compilation).classCompiler = this
     myPackage.content(className) = currentClassInfo
 
     for (member <- members.get(compilation).values)
       member.bind(compilation, currentClassInfo, currentClass)
-    getState(compilation).classCompiler = previous
+    JavaClassSkeleton.state(compilation).classCompiler = previous
   }
 
   def findClass(className: String): ClassSignature = javaCompiler.find(fullyQualify(className).parts).asInstanceOf[ClassSignature]
@@ -41,7 +41,7 @@ case class ClassCompiler(currentClass: Node, compilation: Compilation) {
         classNames(className)
       }
     catch {
-      case (_:NoSuchElementException) =>
+      case _:NoSuchElementException =>
         throw new NoSuchElementException(s"Could not find $className in $classNames")
     }
   }
@@ -61,19 +61,8 @@ case class ClassCompiler(currentClass: Node, compilation: Compilation) {
     Utf8ConstantDelta.create(methodName)
   }
 
-  def getFieldRef(info: FieldInfo) = {
-    val classRef = getClassRef(info.parent)
-    val fieldNameAndType = getFieldNameAndType(info)
-    FieldRefConstant.fieldRef(classRef, fieldNameAndType)
-  }
-
   def getClassRef(info: ClassSignature) = {
     ClassInfoConstant.classRef(info.getQualifiedName)
-  }
-
-  def getFieldNameAndType(info: FieldInfo) = {
-    val fieldNameIndex = Utf8ConstantDelta.create(info.name)
-    NameAndTypeConstant.nameAndType(fieldNameIndex, TypeConstant.constructor(info._type))
   }
 
   def findClass(objectType: Node): ClassSignature = {

@@ -5,8 +5,6 @@ import core.deltas.path.NodePath
 import core.language.Compilation
 import core.language.node.Node
 import deltas.bytecode.coreInstructions.InvokeVirtualDelta
-import deltas.javac.classes.MethodQuery
-import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 import deltas.javac.methods.call.CallDelta.Call
@@ -16,10 +14,7 @@ object CallInstanceDelta extends CallWithMemberSelector with ConvertsToByteCodeD
   override def description: String = "Enables calling instance methods."
 
   override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
-    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
-
-    val methodKey: MethodQuery = CallDelta.getMethodKey(call, compiler)
-    val methodRefIndex = compiler.getMethodRefIndex(methodKey)
+    val methodRefIndex = CallDelta.getMethodRefIndexFromCallee(compilation, call.callee)
     getInstructionsGivenMethodRefIndex(call, compilation, methodRefIndex)
   }
 

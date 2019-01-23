@@ -72,7 +72,7 @@ class TestPoptimize extends FunSuite {
     val codeAnnotation = CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())
     val method = ByteCodeMethodInfo.Shape.create(
       ByteCodeMethodInfo.MethodNameIndex -> Utf8ConstantDelta.create("name"),
-      ByteCodeMethodInfo.MethodDescriptor -> TypeConstant.constructor(MethodTypeDelta.construct(VoidTypeDelta.voidType,Seq.empty)),
+      ByteCodeMethodInfo.MethodDescriptor -> TypeConstant.constructor(MethodTypeDelta.neww(VoidTypeDelta.voidType,Seq.empty)),
       ByteCodeMethodInfo.MethodAttributes -> Seq(codeAnnotation.node))
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)

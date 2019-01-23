@@ -5,7 +5,7 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node._
-import core.language.{Compilation, Language}
+import core.language.{Compilation, CompilationState, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.{ConcreteScope, Scope}
@@ -29,7 +29,7 @@ import deltas.statement.BlockDelta.BlockStatement
 
 
 
-object MethodDelta extends DeltaWithGrammar with WithCompilationState
+object MethodDelta extends DeltaWithGrammar
   with ClassMemberDelta with HasDeclarationDelta with HasConstraintsDelta with HasShape {
 
   override def description: String = "Enables Java classes to contain methods."
@@ -49,10 +49,10 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   def compile(compilation: Compilation, program: Node): Unit = {
     val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
 
-    val methods = getMethods(program)
-    program(ByteCodeSkeleton.Methods) = methods.map(method => {
+    val methods = getMethods[NodePath](PathRoot(program))
+    program(ByteCodeSkeleton.Methods) = methods.map((method: Method[NodePath]) => {
       convertMethod(method, classCompiler, compilation)
-      method.node
+      method.node.asNode
     })
   }
 
@@ -74,9 +74,9 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     }
   }
 
-  private def getMethodType[T <: NodeLike](method: Method[T]) = {
-    val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[Node])
-    MethodTypeDelta.construct(method.returnType.asNode, parameterTypes)
+  def getMethodType[T <: NodeLike](method: Method[T]) = {
+    val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[T].asNode)
+    MethodTypeDelta.neww(method.returnType.asNode, parameterTypes)
   }
 
   override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton,
@@ -91,17 +91,17 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
     TypeConstant.constructor(getMethodType(method))
   }
 
-  def convertMethod(method: Method[Node], classCompiler: ClassCompiler, compilation: Compilation): Unit = {
+  def convertMethod(method: Method[NodePath], classCompiler: ClassCompiler, compilation: Compilation): Unit = {
 
     method.shape = ByteCodeMethodInfo.Shape
     AccessibilityFieldsDelta.addAccessFlags(method)
-    method(ByteCodeMethodInfo.MethodNameIndex) = Utf8ConstantDelta.create(getMethodName(method))
-    method.data.remove(Name)
-    val methodDescriptorIndex = getMethodDescriptor(method, classCompiler)
+    method(ByteCodeMethodInfo.MethodNameIndex) = Utf8ConstantDelta.create(method.name)
+    val methodDescriptorIndex = getMethodDescriptor(method.current, classCompiler)
     method(ByteCodeMethodInfo.MethodDescriptor) = methodDescriptorIndex
-    addCodeAnnotation(PathRoot(method))
-    method.data.remove(ReturnType)
-    method.data.remove(Parameters)
+    addCodeAnnotation(method)
+    method.current.data.remove(Name)
+    method.current.data.remove(ReturnType)
+    method.current.data.remove(Parameters)
 
     def addCodeAnnotation(method: NodePath) {
       setMethodCompiler(method, compilation)
@@ -123,11 +123,10 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
   }
 
   def setMethodCompiler(method: Node, compilation: Compilation) {
-    val methodCompiler = MethodCompiler(compilation, method)
-    getState(compilation).methodCompiler = methodCompiler
+    state(compilation) = MethodCompiler(compilation, method)
   }
 
-  def getMethodCompiler(compilation: Compilation) = getState(compilation).methodCompiler
+  def getMethodCompiler(compilation: Compilation) = state(compilation)
 
   def getMethodName(method: Node) = {
     method(Name).asInstanceOf[String]
@@ -173,10 +172,7 @@ object MethodDelta extends DeltaWithGrammar with WithCompilationState
       TypeParameters -> typeParameters)
   }
 
-  def createState = new State()
-  class State {
-    var methodCompiler: MethodCompiler = _
-  }
+  val state = new CompilationState[MethodCompiler](null)
 
   object Shape extends NodeShape
 

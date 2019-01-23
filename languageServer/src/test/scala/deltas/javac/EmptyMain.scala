@@ -29,7 +29,7 @@ class EmptyMain extends FunSuite {
   }
 
   def getMainMethodJava: Node = {
-    val parameters = Seq(MethodParameters.neww("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.neww(QualifiedClassName(Seq("java", "lang", "String"))))))
+    val parameters = Seq(MethodParameters.neww("args", ArrayTypeDelta.neww(QualifiedObjectTypeDelta.neww(QualifiedClassName(Seq("java", "lang", "String"))))))
     MethodDelta.neww("main", VoidTypeDelta.voidType, parameters,  BlockDelta.neww(), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 }

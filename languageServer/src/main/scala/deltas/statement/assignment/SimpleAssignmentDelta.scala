@@ -1,5 +1,4 @@
 package deltas.statement.assignment
-
 import core.bigrammar.grammars.BiFailure
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
@@ -9,9 +8,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 
-object SimpleAssignmentDelta extends DeltaWithGrammar with JavaExpressionInstance {
+object SimpleAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
 
   def getTarget[T <: NodeLike](assignment: T): T = assignment(Target).asInstanceOf[T]
 
@@ -38,11 +37,6 @@ object SimpleAssignmentDelta extends DeltaWithGrammar with JavaExpressionInstanc
   object Value extends NodeField
 
   override val shape = Shape
-
-  override def getType(assignment: NodePath, compilation: Compilation): Node = {
-    val target = getTarget(assignment)
-    ExpressionDelta.getType(compilation)(target)
-  }
 
   override def description: String = "Enables assignment to an abstract target using the = operator."
 

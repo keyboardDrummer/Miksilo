@@ -27,7 +27,7 @@ object ExpressionAsStatementDelta extends ConvertsToByteCodeDelta
 
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     val expression = getExpression(statement)
-    val _type = ExpressionDelta.getType(compilation)(expression)
+    val _type = TypeSkeleton.fromConstraintType(ExpressionDelta.getCachedType(compilation, expression))
     val extra = TypeSkeleton.getTypeSize(_type, compilation) match {
       case 0 => Seq.empty
       case 1 => Seq(PopDelta.pop)

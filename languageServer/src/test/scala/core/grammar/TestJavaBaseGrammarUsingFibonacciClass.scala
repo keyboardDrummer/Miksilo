@@ -117,7 +117,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
     val fibonacciCall = CallDelta.neww(VariableDelta.neww("fibonacci"), Seq(IntLiteralDelta.neww(5)))
     val printCall = CallDelta.neww(MemberSelectorDelta.neww(MemberSelectorDelta.neww(VariableDelta.neww("System"), "out"), "print"),
       Seq(fibonacciCall))
-    MethodDelta.neww("main", VoidTypeDelta.voidType, Seq(MethodParameters.neww("args", ArrayTypeDelta.arrayType(QualifiedObjectTypeDelta.stringType))),
+    MethodDelta.neww("main", VoidTypeDelta.voidType, Seq(MethodParameters.neww("args", ArrayTypeDelta.neww(QualifiedObjectTypeDelta.stringType))),
       BlockDelta.neww(Seq(ExpressionAsStatementDelta.create(printCall))), static = true, AccessibilityFieldsDelta.PublicVisibility)
   }
 

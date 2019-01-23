@@ -552,7 +552,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("casino") {
+  ignore("casino") {
 
     val program = """pragma solidity ^0.4.0;
                     |

@@ -1,12 +1,11 @@
 package deltas.javac.methods.call
 
 import core.deltas._
-import core.language.node.Node
 import core.deltas.path.NodePath
 import core.language.Compilation
-import deltas.javac.classes._
-import deltas.javac.classes.skeleton.JavaClassSkeleton
+import core.language.node.Node
 import deltas.javac.expressions.ConvertsToByteCodeDelta
+import deltas.javac.methods.call.CallDelta.Call
 
 object CallStaticOrInstanceDelta extends CallWithMemberSelector with ConvertsToByteCodeDelta {
 
@@ -14,20 +13,18 @@ object CallStaticOrInstanceDelta extends CallWithMemberSelector with ConvertsToB
 
   override def dependencies: Set[Contract] = CallStaticDelta.dependencies ++ CallInstanceDelta.dependencies
 
-  override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
-    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
+  override def toByteCode(path: NodePath, compilation: Compilation): Seq[Node] = {
+    val call: Call[NodePath] = path
+    val method = CallDelta.getMethodFromCallee(compilation, call.callee)
 
-    val methodKey: MethodQuery = CallDelta.getMethodKey(call, compiler)
-    val methodRef = compiler.getMethodRefIndex(methodKey)
-
-    val methodInfo = compiler.javaCompiler.find(methodKey)
-    val staticCall = methodInfo._static
+    val methodRefIndex = CallDelta.getMethodRefIndexFromMethod(method)
+    val staticCall = method.isStatic
     if (staticCall)
     {
-      CallStaticDelta.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
+      CallStaticDelta.getInstructionsGivenMethodRefIndex(call, compilation, methodRefIndex)
     } else
     {
-      CallInstanceDelta.getInstructionsGivenMethodRefIndex(call, compilation, methodRef)
+      CallInstanceDelta.getInstructionsGivenMethodRefIndex(call, compilation, methodRefIndex)
     }
   }
 

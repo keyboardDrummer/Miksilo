@@ -38,7 +38,7 @@ class TestEmptyClassCompilation extends JavaLanguageTest {
       ClassInfoConstant.classRef(11),
       ClassInfoConstant.classRef(12),
       Utf8ConstantDelta.create(SuperCallExpression.constructorName),
-      TypeConstant.constructor(MethodTypeDelta.construct(VoidTypeDelta.voidType, Seq())),
+      TypeConstant.constructor(MethodTypeDelta.neww(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       NameAndTypeConstant.nameAndType(4, 5),
       QualifiedClassNameConstantDelta.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),

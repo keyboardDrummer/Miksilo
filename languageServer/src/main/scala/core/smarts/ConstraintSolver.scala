@@ -165,6 +165,15 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       typeGraph.isSuperType(TypeNode(l), TypeNode(r))
   }
 
+  def resolveDeclaration(declaration: Declaration): Declaration = declaration match {
+    case v: DeclarationVariable => mappedDeclarationVariables.get(v) match
+    {
+      case Some(value) => resolveDeclaration(value)
+      case _ => declaration
+    }
+    case _ => declaration
+  }
+
   def resolveType(_type: Type): Type = _type match {
     case v: TypeVariable => mappedTypeVariables.get(v) match
     {

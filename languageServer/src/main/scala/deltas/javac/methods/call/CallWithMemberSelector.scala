@@ -3,7 +3,7 @@ package deltas.javac.methods.call
 import core.deltas.path.NodePath
 import core.deltas.{Contract, Delta, HasShape, ShapeProperty}
 import core.language.node._
-import core.language.{Compilation, Language}
+import core.language.{Compilation, CompilationState, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
@@ -11,10 +11,16 @@ import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.call.CallDelta.Call
 
+import scala.collection.mutable
+
 object ReferenceExpressionSkeleton {
   val instances = new ShapeProperty[ReferenceExpression]
+  val references = new CompilationState[mutable.Map[NodePath, Reference]](mutable.Map.empty)
+
   def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference = {
-    instances(compilation, expression.shape).getReference(compilation, builder, expression, parentScope)
+    val result = instances(compilation, expression.shape).getReference(compilation, builder, expression, parentScope)
+    references(compilation).put(expression, result)
+    result
   }
 }
 
@@ -29,7 +35,6 @@ trait ReferenceExpressionDelta extends Delta with HasShape with ReferenceExpress
   }
 }
 
-//TODO extend from Delta, can be done once old getType is out of ExpressionInstance.
 trait CallWithMemberSelector extends Delta {
 
   override def dependencies: Set[Contract] = Set(CallDelta, MemberSelectorDelta)

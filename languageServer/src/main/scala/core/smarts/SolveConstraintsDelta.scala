@@ -3,12 +3,13 @@ package core.smarts
 import com.typesafe.scalalogging.LazyLogging
 import core.deltas.{Contract, Delta}
 import core.language.exceptions.BadInputException
-import core.language.{Language, Phase}
+import core.language.{CompilationState, Language, Phase}
 
 import scala.util.{Failure, Success}
 
 object SolveConstraintsDelta extends Delta with LazyLogging {
 
+  val solverState = new CompilationState[ConstraintSolver](null) // TODO get rid of this using References to Refs/Decls/Types
   override def inject(language: Language): Unit = {
     super.inject(language)
     language.compilerPhases ::= Phase(this, compilation => {
@@ -17,6 +18,8 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
       language.collectConstraints(compilation, builder)
 
       val solver = builder.toSolver
+      solverState(compilation) = solver
+
       solver.run() match {
         case Success(_) =>
           compilation.remainingConstraints = Seq.empty

@@ -37,12 +37,12 @@ object AccessibilityFieldsDelta extends DeltaWithGrammar {
 
   implicit class HasAccessibility[T <: NodeLike](val node: T) extends NodeWrapper[T] {
 
-    def visibility: Visibility = node(AccessibilityFieldsDelta.VisibilityField).asInstanceOf[Visibility]
+    def visibility: Visibility = node.getValue(AccessibilityFieldsDelta.VisibilityField).asInstanceOf[Visibility]
 
-    def isStatic: Boolean = node(AccessibilityFieldsDelta.Static).asInstanceOf[Boolean]
+    def isStatic: Boolean = node.getValue(AccessibilityFieldsDelta.Static).asInstanceOf[Boolean]
   }
 
-  def addAccessFlags[T <: NodeLike](method: HasAccessibility[T]) = {
+  def addAccessFlags[T <: NodeLike](method: HasAccessibility[T]): Unit = {
     var flags = Set[ByteCodeMethodInfo.MethodAccessFlag]()
     if (method.isStatic)
       flags += ByteCodeMethodInfo.StaticAccess

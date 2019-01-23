@@ -8,6 +8,7 @@ import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.NameAndTypeConstant.NameAndTypeConstantWrapper
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
+import deltas.javac.classes.skeleton.QualifiedClassName
 
 object FieldRefConstant extends ConstantPoolEntry {
 
@@ -16,6 +17,12 @@ object FieldRefConstant extends ConstantPoolEntry {
   object ClassInfo extends NodeField
 
   object NameAndType extends NodeField
+
+  def fromPrimitives(className: QualifiedClassName, fieldName: String, fieldType: Node) = {
+    val classRef = ClassInfoConstant.classRef(className)
+    val fieldNameAndType = NameAndTypeConstant.fromNameAndType(fieldName, fieldType)
+    FieldRefConstant.fieldRef(classRef, fieldNameAndType)
+  }
 
   implicit class FieldRefWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def nameAndType: NameAndTypeConstantWrapper[T] = node(NameAndType).asInstanceOf[T]
