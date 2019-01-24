@@ -9,7 +9,6 @@ import scala.util.{Failure, Success}
 
 object SolveConstraintsDelta extends Delta with LazyLogging {
 
-  val solverState = new CompilationState[ConstraintSolver](null) // TODO get rid of this using References to Refs/Decls/Types
   override def inject(language: Language): Unit = {
     super.inject(language)
     language.compilerPhases ::= Phase(this, compilation => {
@@ -18,7 +17,6 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
       language.collectConstraints(compilation, builder)
 
       val solver = builder.toSolver
-      solverState(compilation) = solver
 
       solver.run() match {
         case Success(_) =>

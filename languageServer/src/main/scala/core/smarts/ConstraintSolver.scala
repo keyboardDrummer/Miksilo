@@ -29,9 +29,6 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def environment: Map[Declaration, Type] = proofs.environment
   def environment_=(value: Map[Declaration, Type]): Unit = proofs.environment = value
 
-  var mappedTypeVariables: Map[TypeVariable, Type] = Map.empty
-  var mappedDeclarationVariables: Map[DeclarationVariable, Declaration] = Map.empty
-
   var constraints: Seq[Constraint] = startingConstraints
   var generatedConstraints: Seq[Constraint] = Seq.empty
 
@@ -99,7 +96,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     if (_type.variables.contains(variable))
       return false
 
-    mappedTypeVariables += variable -> _type
+    proofs.mappedTypeVariables += variable -> _type
     allConstraints.foreach(c => c.instantiateType(variable, _type)) //TODO startingConstraints mag ook gewoon constraints zijn.
     environment = environment.mapValues(existingType => existingType.instantiateType(variable, _type))
     true
@@ -121,7 +118,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   /*
   Checks whether the type superType is a super set of the type subType.
    */
-  def isSuperType(superType: Type, subType: Type): Boolean = (resolveType(superType), resolveType(subType)) match {
+  def isSuperType(superType: Type, subType: Type): Boolean = (proofs.resolveType(superType), proofs.resolveType(subType)) match {
     case (_: TypeVariable,_) => false
     case (_,_: TypeVariable) => false
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
@@ -144,7 +141,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case _ => left == right
   }
 
-  def couldBeSuperType(superType: Type, subType: Type): Boolean = (resolveType(superType), resolveType(subType)) match {
+  def couldBeSuperType(superType: Type, subType: Type): Boolean = (proofs.resolveType(superType), proofs.resolveType(subType)) match {
     case (_: TypeVariable,_) => true
     case (_,_: TypeVariable) => true
     case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration)) =>
@@ -165,25 +162,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       typeGraph.isSuperType(TypeNode(l), TypeNode(r))
   }
 
-  def resolveDeclaration(declaration: Declaration): Declaration = declaration match {
-    case v: DeclarationVariable => mappedDeclarationVariables.get(v) match
-    {
-      case Some(value) => resolveDeclaration(value)
-      case _ => declaration
-    }
-    case _ => declaration
-  }
-
-  def resolveType(_type: Type): Type = _type match {
-    case v: TypeVariable => mappedTypeVariables.get(v) match
-    {
-      case Some(value) => resolveType(value)
-      case _ => _type
-    }
-    case _ => _type
-  }
-
-  def unifyTypes(left: Type, right: Type): Boolean = (resolveType(left), resolveType(right)) match {
+  def unifyTypes(left: Type, right: Type): Boolean = (proofs.resolveType(left), proofs.resolveType(right)) match {
     case (TypeVariable(nl, _), TypeVariable(nr, _)) if nl == nr => true
     case (v: TypeVariable,_) => instantiateType(v,right)
     case (_,v: TypeVariable) => instantiateType(v,left)
@@ -221,7 +200,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     allConstraints.foreach(x => x.instantiateDeclaration(variable, instance))
     environment = environment.map(kv => if (kv._1 == variable) (instance, kv._2) else kv)
     environment.values.foreach(t => t.instantiateDeclaration(variable, instance))
-    mappedDeclarationVariables += variable -> instance
+    proofs.mappedDeclarationVariables += variable -> instance
   }
 
   def unifyDeclarations(left: Declaration, right: Declaration): Boolean = (left, right) match {

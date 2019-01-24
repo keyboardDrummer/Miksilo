@@ -5,7 +5,7 @@ import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar, ShapeProperty}
 import core.language.node.{GrammarKey, Node, NodeLike, NodeWrapper}
 import core.language.{Compilation, CompilationState, Language}
-import core.smarts.{ConstraintBuilder, SolveConstraintsDelta}
+import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
@@ -20,7 +20,7 @@ object ExpressionDelta extends DeltaWithGrammar {
 
   val cachedTypes = new CompilationState[Map[NodePath, Type]](Map.empty)
   def getCachedType(compilation: Compilation, expression: NodePath): Type = {
-    SolveConstraintsDelta.solverState(compilation).resolveType(cachedTypes(compilation)(expression))
+    compilation.proofs.resolveType(cachedTypes(compilation)(expression))
   }
 
   def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {

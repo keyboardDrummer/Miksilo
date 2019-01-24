@@ -39,9 +39,8 @@ object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
   def getFieldRefIndex(compilation: Compilation, selector: MemberSelector[NodePath]): Node = {
     val scopeGraph = compilation.proofs.scopeGraph
 
-    val solver = SolveConstraintsDelta.solverState(compilation)
     val targetScopeDeclaration = HasScopeSkeleton.scopeDeclarations(compilation)(selector.target)
-    val targetClass = solver.resolveDeclaration(targetScopeDeclaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
+    val targetClass = compilation.proofs.resolveDeclaration(targetScopeDeclaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
     val qualifiedClassName = JavaClassSkeleton.getQualifiedClassName(targetClass)
 
     val fieldReference = scopeGraph.elementToNode(selector.getSourceElement(MemberSelectorDelta.Member)).asInstanceOf[Reference]
