@@ -26,7 +26,7 @@ trait Key extends AnyRef
   }
 
   private def getClassName(shape: Class[_]): String = {
-    val enclosing = shape.getEnclosingClass
+    val enclosing: Class[_] = shape.getEnclosingClass
     val addition = if (enclosing == null) "" else getClassName(enclosing) + "."
     addition + getDirectClassName(shape)
   }
@@ -44,5 +44,10 @@ trait Key extends AnyRef
   * Defines a field for a Node
   */
 trait NodeField extends GrammarKey
+
+class TypedNodeField[T] extends NodeField {
+  def apply(node: Node): T = node(this).asInstanceOf[T]
+  def update(node: Node, value: T): Unit = node(this) = value
+}
 
 trait GrammarKey extends Key

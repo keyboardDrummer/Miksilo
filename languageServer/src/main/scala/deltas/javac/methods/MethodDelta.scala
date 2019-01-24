@@ -99,9 +99,10 @@ object MethodDelta extends DeltaWithGrammar
     val methodDescriptorIndex = getMethodDescriptor(method.current, classCompiler)
     method(ByteCodeMethodInfo.MethodDescriptor) = methodDescriptorIndex
     addCodeAnnotation(method)
-    method.current.data.remove(Name)
-    method.current.data.remove(ReturnType)
-    method.current.data.remove(Parameters)
+
+//    method.current.data.remove(Name)
+//    method.current.data.remove(ReturnType)
+//    method.current.data.remove(Parameters)
 
     def addCodeAnnotation(method: NodePath) {
       setMethodCompiler(method, compilation)

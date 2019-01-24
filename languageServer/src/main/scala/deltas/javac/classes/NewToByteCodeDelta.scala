@@ -1,19 +1,21 @@
 package deltas.javac.classes
 
-import core.deltas.path.NodePath
+import core.deltas.path.{FieldPath, NodePath}
 import core.language.Compilation
 import core.language.node.Node
+import core.smarts.objects.Reference
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import deltas.expression.NewDelta
 import deltas.expression.NewDelta.NewCall
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassSkeleton}
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
+import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.call.CallDelta
 
 object NewToByteCodeDelta extends ConvertsToByteCodeDelta {
 
-  override def toByteCode(path: NodePath, compilation: Compilation): Seq[Node] = { //TODO deze method moet een stuk kleiner kunnen.
+  override def toByteCode(path: NodePath, compilation: Compilation): Seq[Node] = {
     val call: NewCall[NodePath] = path
     val compiler = JavaClassSkeleton.getClassCompiler(compilation)
     val expressionToInstruction = ToByteCodeSkeleton.getToInstructions(compilation)
@@ -22,7 +24,12 @@ object NewToByteCodeDelta extends ConvertsToByteCodeDelta {
     val callArguments = call.arguments
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
 
-    val methodRefIndex: Node = CallDelta.getMethodRefIndexFromCallee(compilation, call)
+    val scopeGraph = compilation.proofs.scopeGraph
+    val callReference = compilation.proofs.scopeGraph.elementToNode(call).asInstanceOf[Reference]
+    val constructorDeclaration = compilation.proofs.declarations(callReference)
+    val method: Method[NodePath] = constructorDeclaration.origin.get.asInstanceOf[FieldPath].parent
+
+    val methodRefIndex: Node = CallDelta.getMethodRefIndexFromMethod(method)
     Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++
       Seq(InvokeSpecialDelta.invokeSpecial(methodRefIndex))
   }

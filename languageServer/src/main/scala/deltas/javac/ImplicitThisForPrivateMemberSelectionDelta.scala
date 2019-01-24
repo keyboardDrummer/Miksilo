@@ -11,7 +11,7 @@ import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
 import deltas.javac.classes.{FieldDeclarationDelta, ThisVariableDelta}
 import deltas.javac.methods.MethodDelta.Method
-import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
+import deltas.javac.methods.{HasScopeSkeleton, MemberSelectorDelta, MethodDelta}
 
 object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
 
@@ -19,10 +19,12 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton, CallVariableDelta, ThisVariableDelta)
 
-  def addThisToVariable(static: Boolean, clazzName: String, variable: NodeChildPath): Unit = {
-    val newVariableName = if (static) clazzName else ThisVariableDelta.thisName
+  def addThisToVariable(static: Boolean, classDeclaration: NamedDeclaration, variable: NodeChildPath): Unit = {
+    val newVariableName = if (static) classDeclaration.name else ThisVariableDelta.thisName
+    val target = VariableDelta.neww(newVariableName)
+    HasScopeSkeleton.scopeDeclaration(target) = classDeclaration
     val selector = MemberSelectorDelta.Shape.createWithSource(
-      MemberSelectorDelta.Target -> VariableDelta.neww(newVariableName),
+      MemberSelectorDelta.Target -> target,
       MemberSelectorDelta.Member -> variable.getWithSource(VariableDelta.Name))
     variable.replaceWith(selector)
   }
@@ -32,7 +34,8 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val clazz: JavaClass[Node] = program
+    val clazz: JavaClass[NodePath] = PathRoot(program)
+    val clazzDeclaration = compilation.proofs.scopeGraph.elementToNode(clazz.node.getSourceElement(JavaClassSkeleton.Name)).asInstanceOf[NamedDeclaration]
     PathRoot(program).visitShape(VariableDelta.Shape, variable =>  {
       val maybeGraphNode = compilation.proofs.scopeGraph.elementToNode.get(variable)
       val reference: Reference = maybeGraphNode.get.asInstanceOf[Reference]
@@ -42,10 +45,10 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
         declarationNode.shape match {
           case MethodDelta.Shape =>
             val method: Method[Node] = declarationNode
-            addThisToVariable(method.isStatic, clazz.name, variable.asInstanceOf[NodeChildPath])
+            addThisToVariable(method.isStatic, clazzDeclaration, variable.asInstanceOf[NodeChildPath])
           case FieldDeclarationDelta.Shape =>
             val field: Field[Node] = declarationNode
-            addThisToVariable(field.isStatic, clazz.name, variable.asInstanceOf[NodeChildPath])
+            addThisToVariable(field.isStatic, clazzDeclaration, variable.asInstanceOf[NodeChildPath])
           case _ =>
         }
       })

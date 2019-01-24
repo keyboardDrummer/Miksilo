@@ -84,8 +84,8 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
     Utf8ConstantDelta.create(methodName)
   }
 
-  def getMethodRefIndexFromCallee(compilation: Compilation, call: NodePath) = {
-    val method: Method[NodePath] = getMethodFromCallee(compilation, call)
+  def getMethodRefIndexFromCallee(compilation: Compilation, callee: NodePath) = {
+    val method: Method[NodePath] = getMethodFromCallee(compilation, callee)
     getMethodRefIndexFromMethod(method)
   }
 

@@ -4,7 +4,6 @@ import core.deltas.Contract
 import core.deltas.path.{FieldPath, NodePath}
 import core.language.Compilation
 import core.language.node.Node
-import core.smarts.SolveConstraintsDelta
 import core.smarts.objects.{NamedDeclaration, Reference}
 import deltas.bytecode.constants.FieldRefConstant
 import deltas.bytecode.coreInstructions.GetStaticDelta
@@ -12,8 +11,8 @@ import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
-import deltas.javac.methods.{HasScopeSkeleton, MemberSelectorDelta}
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
+import deltas.javac.methods.{HasScopeSkeleton, MemberSelectorDelta}
 
 object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
 
@@ -39,7 +38,7 @@ object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
   def getFieldRefIndex(compilation: Compilation, selector: MemberSelector[NodePath]): Node = {
     val scopeGraph = compilation.proofs.scopeGraph
 
-    val targetScopeDeclaration = HasScopeSkeleton.scopeDeclarations(compilation)(selector.target)
+    val targetScopeDeclaration = HasScopeSkeleton.scopeDeclaration(selector.target)
     val targetClass = compilation.proofs.resolveDeclaration(targetScopeDeclaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
     val qualifiedClassName = JavaClassSkeleton.getQualifiedClassName(targetClass)
 
