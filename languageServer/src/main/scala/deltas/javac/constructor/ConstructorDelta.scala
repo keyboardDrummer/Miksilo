@@ -8,8 +8,8 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
-import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.methods.MethodDelta._
@@ -55,7 +55,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
+    val memberGrammar = find(JavaClassDelta.ClassMemberGrammar)
     val visibilityModifier = find(AccessibilityFieldsDelta.VisibilityField)
     val parseParameters = find(MethodDelta.Parameters) as Parameters
     val block = find(BlockDelta.BlockGramar).as(Body)

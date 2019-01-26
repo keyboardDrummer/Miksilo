@@ -3,7 +3,7 @@ package deltas.javac.constructor
 import core.language.node.Node
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.methods.AccessibilityFieldsDelta
 import deltas.statement.BlockDelta
 

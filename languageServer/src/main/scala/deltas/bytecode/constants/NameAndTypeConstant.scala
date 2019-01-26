@@ -8,6 +8,7 @@ import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.constants.Utf8ConstantDelta.Utf8Constant
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
+import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.extraConstants.TypeConstant.TypeConstantWrapper
 
 object NameAndTypeConstant extends ConstantPoolEntry {
@@ -17,6 +18,11 @@ object NameAndTypeConstant extends ConstantPoolEntry {
   object Name extends NodeField
 
   object Type extends NodeField
+
+  def fromNameAndType(name: String, _type: Node): Node = {
+    val nameIndex = Utf8ConstantDelta.create(name)
+    NameAndTypeConstant.nameAndType(nameIndex, TypeConstant.constructor(_type))
+  }
 
   def nameAndType(nameIndex: Node, typeIndex: Node): Node = new Node(Shape,
     Name -> nameIndex,

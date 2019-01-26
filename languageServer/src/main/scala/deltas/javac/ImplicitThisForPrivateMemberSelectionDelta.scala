@@ -4,27 +4,35 @@ import core.deltas._
 import core.deltas.path._
 import core.language.Compilation
 import core.language.node.Node
-import core.smarts.objects.{NamedDeclaration, Reference}
-import deltas.expression.VariableDelta
-import deltas.javac.classes.FieldDeclarationDelta.Field
-import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
+import core.smarts.SolveConstraintsDelta
+import core.smarts.types.objects.TypeFromDeclaration
+import deltas.expression.{ExpressionDelta, VariableDelta}
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.classes.{FieldDeclarationDelta, ThisVariableDelta}
-import deltas.javac.methods.MethodDelta.Method
+import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
 object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
 
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassSkeleton, CallVariableDelta, ThisVariableDelta)
+  override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassDelta, CallVariableDelta, ThisVariableDelta)
 
-  def addThisToVariable(static: Boolean, clazzName: String, variable: NodeChildPath): Unit = {
-    val newVariableName = if (static) clazzName else ThisVariableDelta.thisName
-    val selector = MemberSelectorDelta.Shape.createWithSource(
-      MemberSelectorDelta.Target -> VariableDelta.neww(newVariableName),
-      MemberSelectorDelta.Member -> variable.getWithSource(VariableDelta.Name))
-    variable.replaceWith(selector)
+  def addThisToVariable(clazz: JavaClass[NodePath], static: Boolean, variable: NodeChildPath): Unit = {
+
+    val newVariableName = if (static) clazz.name else ThisVariableDelta.thisName
+    val target = VariableDelta.neww(newVariableName)
+    ExpressionDelta.constraintType(target) = TypeFromDeclaration(JavaClassDelta.staticDeclaration(clazz.node))
+
+    val variableNameData = variable.getFieldData(VariableDelta.Name)
+    val selector = MemberSelectorDelta.Shape.createWithData(
+      MemberSelectorDelta.Target -> target,
+      MemberSelectorDelta.Member -> variableNameData)
+
+    val variableNode = variable.current
+    variableNode.replaceData(selector, keepData = true)
+    variableNode.removeField(VariableDelta.Name)
   }
 
   def getVariableWithCorrectPath(path: NodePath): NodePath = {
@@ -32,23 +40,13 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val clazz: JavaClass[Node] = program
+    val clazz: JavaClass[NodePath] = PathRoot(program)
     PathRoot(program).visitShape(VariableDelta.Shape, variable =>  {
-      val maybeGraphNode = compilation.proofs.scopeGraph.elementToNode.get(variable)
-      val reference: Reference = maybeGraphNode.get.asInstanceOf[Reference]
-      val maybeDeclaration: Option[NamedDeclaration] = compilation.proofs.declarations.get(reference)
-      maybeDeclaration.foreach(declaration => {
-        val declarationNode = declaration.origin.get.asInstanceOf[FieldPath].parent.current
-        declarationNode.shape match {
-          case MethodDelta.Shape =>
-            val method: Method[Node] = declarationNode
-            addThisToVariable(method.isStatic, clazz.name, variable.asInstanceOf[NodeChildPath])
-          case FieldDeclarationDelta.Shape =>
-            val field: Field[Node] = declarationNode
-            addThisToVariable(field.isStatic, clazz.name, variable.asInstanceOf[NodeChildPath])
-          case _ =>
-        }
-      })
+      val declarationNode: NodePath = SolveConstraintsDelta.getDeclarationOfReference(variable.getSourceElement(VariableDelta.Name))
+      if (declarationNode.shape == MethodDelta.Shape || declarationNode.shape == FieldDeclarationDelta.Shape) {
+        val hasAccessibility: HasAccessibility[NodePath] = new HasAccessibility[NodePath](declarationNode)
+        addThisToVariable(clazz, hasAccessibility.isStatic, variable.asInstanceOf[NodeChildPath])
+      }
     })
   }
 }

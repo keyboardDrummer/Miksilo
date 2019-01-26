@@ -8,10 +8,10 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.types.BooleanTypeDelta
 
-object BooleanLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
+object BooleanLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   val shape = Shape
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
@@ -26,8 +26,6 @@ object BooleanLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance 
   def literal(value: Boolean) = new Node(Shape, Value -> value)
 
   def getValue(literal: Node) = literal(Value).asInstanceOf[Boolean]
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = BooleanTypeDelta.booleanType
 
   object Shape extends NodeShape
 

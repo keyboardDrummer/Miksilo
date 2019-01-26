@@ -3,13 +3,13 @@ package deltas.expression
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.node.{Node, NodeField, NodeShape}
+import core.language.node.{NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
-object ArrayLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
+object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the array literal to expressions"
 
@@ -21,9 +21,6 @@ object ArrayLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
   }
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = ???
-
   object Members extends NodeField
   object Shape extends NodeShape
   override def shape: NodeShape = Shape

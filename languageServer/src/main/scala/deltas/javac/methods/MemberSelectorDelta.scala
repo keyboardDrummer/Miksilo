@@ -2,12 +2,9 @@ package deltas.javac.methods
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.NodePath
+import core.language.Language
 import core.language.node._
-import core.language.{Compilation, Language}
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes._
-import deltas.javac.classes.skeleton.ClassSignature
 
 object MemberSelectorDelta extends DeltaWithGrammar {
 
@@ -37,25 +34,6 @@ object MemberSelectorDelta extends DeltaWithGrammar {
       Target -> _object,
       Member -> member)
   }
-
-  def getClassOrObjectReference(selector: MemberSelector[NodePath], compiler: ClassCompiler): ClassOrObjectReference = {
-    val obj = selector.target
-    getReferenceKind(compiler, obj).asInstanceOf[ClassOrObjectReference]
-  }
-
-  def getReferenceKind(classCompiler: ClassCompiler, expression: NodePath): ReferenceKind = {
-    val getReferenceKindOption = MemberSelectorDelta.referenceKindRegistry.get(classCompiler.compilation).get(expression.shape)
-    getReferenceKindOption.fold[ReferenceKind]({
-      getReferenceKindFromExpressionType(classCompiler, expression)
-    })(implementation => implementation(classCompiler.compilation, expression))
-  }
-
-  def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: NodePath): ClassOrObjectReference = {
-    val classInfo: ClassSignature = classCompiler.findClass(ExpressionDelta.getType(classCompiler.compilation)(expression))
-    ClassOrObjectReference(classInfo, wasClass = false)
-  }
-
-  val referenceKindRegistry = new ShapeProperty[(Compilation, NodePath) => ReferenceKind]
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
 }

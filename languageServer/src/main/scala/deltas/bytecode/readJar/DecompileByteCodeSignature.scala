@@ -9,7 +9,7 @@ import deltas.bytecode.attributes.SignatureAttribute
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 import deltas.javac.classes.{ConstantPool, FieldDeclarationDelta}
 import deltas.javac.methods.AccessibilityFieldsDelta.{Static, Visibility, VisibilityField}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameters}
@@ -52,7 +52,7 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     //    val qualifiedClassName = new QualifiedClassName(constantPool.getUtf8(nameIndex).split("/").toSeq)
 
     val members = new ArrayBuffer[Node]()
-    val javaClass = JavaClassSkeleton.neww(qualifiedClassName.parts.dropRight(1), qualifiedClassName.parts.last, members, List.empty[Node], None)
+    val javaClass = JavaClassDelta.neww(qualifiedClassName.parts.dropRight(1), qualifiedClassName.parts.last, members, List.empty[Node], None)
 
     val fieldInfos = program(ByteCodeSkeleton.ClassFields).asInstanceOf[Seq[Node]]
 

@@ -1,6 +1,5 @@
 package core.deltas.path
 
-import core.language.SourceElement
 import core.language.node._
 
 object NodePath {
@@ -36,7 +35,7 @@ trait NodePath extends NodeLike with AnyPath {
 
   override def dataView: Map[NodeField, Any] = current.data.keys.map(key => (key,apply(key))).toMap
 
-  def getSourceElement(field: NodeField): SourceElement = FieldPath(this, field)
+  def getSourceElement(field: NodeField): FieldPath = FieldPath(this, field)
 
   /*
   A None value means the Path is above the file level.

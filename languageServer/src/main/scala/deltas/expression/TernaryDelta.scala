@@ -8,10 +8,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.types.BooleanTypeDelta
 
-object TernaryDelta extends DeltaWithGrammar with JavaExpressionInstance {
+object TernaryDelta extends DeltaWithGrammar with ExpressionInstance {
   def falseBranch[T <: NodeLike](metaObject: T) = metaObject(FalseBranch).asInstanceOf[T]
 
   def trueBranch[T <: NodeLike](metaObject: T) = metaObject(TrueBranch).asInstanceOf[T]
@@ -45,18 +44,6 @@ object TernaryDelta extends DeltaWithGrammar with JavaExpressionInstance {
   object Shape extends NodeShape
 
   override val shape = Shape
-
-  override def getType(_ternary: NodePath, compilation: Compilation): Node = {
-    val getExpressionType = ExpressionDelta.getType(compilation)
-    val condition = TernaryDelta.getCondition(_ternary)
-    val truePath = TernaryDelta.trueBranch(_ternary)
-    val falsePath = TernaryDelta.falseBranch(_ternary)
-    TypeSkeleton.checkAssignableTo(compilation)(BooleanTypeDelta.booleanType, getExpressionType(condition))
-
-    val trueType = getExpressionType(truePath)
-    val falseType = getExpressionType(falsePath)
-    TypeSkeleton.union(compilation)(trueType, falseType)
-  }
 
   override def description: String = "Adds the ternary operator."
 

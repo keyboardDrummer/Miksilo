@@ -8,7 +8,7 @@ import core.language.node.Node
 import deltas.bytecode.coreInstructions.integers.StoreIntegerDelta
 import deltas.bytecode.coreInstructions.longs.StoreLongDelta
 import deltas.bytecode.coreInstructions.objects.StoreAddressDelta
-import deltas.bytecode.types.IntTypeDelta.IntTypeKey
+import deltas.bytecode.types.IntTypeDelta.Shape
 import deltas.bytecode.types.{ArrayTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton}
 import deltas.expression.VariableDelta
 import deltas.expression.VariableDelta.Variable
@@ -34,7 +34,7 @@ object AssignToVariable extends DeltaWithGrammar {
 
   def getStoreInstruction(variableInfo: VariableInfo, byteCodeType: Node): Node = {
     byteCodeType.shape match {
-      case IntTypeKey => StoreIntegerDelta.integerStore(variableInfo.offset)
+      case Shape => StoreIntegerDelta.integerStore(variableInfo.offset)
       case QualifiedObjectTypeDelta.StackType => StoreAddressDelta.addressStore(variableInfo.offset)
       case ArrayTypeDelta.Shape => StoreAddressDelta.addressStore(variableInfo.offset)
       case LongTypeDelta.Shape => StoreLongDelta.longStore(variableInfo.offset)

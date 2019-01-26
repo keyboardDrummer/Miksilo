@@ -8,10 +8,10 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{IntTypeDelta, TypeSkeleton}
-import deltas.expression.{ExpressionDelta, JavaExpressionInstance, LeftAssociativeBinaryOperatorDelta}
+import deltas.expression.{ExpressionDelta, ExpressionInstance, LeftAssociativeBinaryOperatorDelta}
 import deltas.javac.types.BooleanTypeDelta
 
-trait ComparisonOperatorDelta extends LeftAssociativeBinaryOperatorDelta with JavaExpressionInstance {
+trait ComparisonOperatorDelta extends LeftAssociativeBinaryOperatorDelta with ExpressionInstance {
   import LeftAssociativeBinaryOperatorDelta._
 
   val shape: NodeShape
@@ -23,15 +23,6 @@ trait ComparisonOperatorDelta extends LeftAssociativeBinaryOperatorDelta with Ja
     val secondType = ExpressionDelta.getType(compilation, builder, expression.right, parentScope)
     builder.typesAreEqual(firstType, secondType)
     builder.typesAreEqual(_type, BooleanTypeDelta.constraintType)
-  }
-
-  override def getType(lessThan: NodePath, compilation: Compilation): Node = {
-    val getType = ExpressionDelta.getType(compilation)
-    val firstType = getType(lessThan.left)
-    val secondType = getType(lessThan.right)
-    TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, firstType)
-    TypeSkeleton.checkAssignableTo(compilation)(IntTypeDelta.intType, secondType)
-    BooleanTypeDelta.booleanType
   }
 
   def keyword: String

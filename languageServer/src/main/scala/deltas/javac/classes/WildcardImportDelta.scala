@@ -33,9 +33,9 @@ object WildcardImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
   }
 
   override def inject(language: Language): Unit = {
-    JavaClassSkeleton.importToClassMap.add(language, Shape, (compilation: Compilation, wildcardImport) => {
+    JavaClassDelta.importToClassMap.add(language, Shape, (compilation: Compilation, wildcardImport) => {
       val packageParts = getParts(wildcardImport)
-      val classCompiler = JavaClassSkeleton.getState(compilation).classCompiler
+      val classCompiler = JavaClassDelta.state(compilation).classCompiler
       val compiler = classCompiler.javaCompiler
       val finalPackage = compiler.find(packageParts).asInstanceOf[PackageSignature]
 

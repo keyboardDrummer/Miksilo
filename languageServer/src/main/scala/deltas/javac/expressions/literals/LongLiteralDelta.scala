@@ -13,10 +13,10 @@ import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
 import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.types.LongTypeDelta
-import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 
-object LongLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance with ConvertsToByteCodeDelta {
+object LongLiteralDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
   val shape = LongLiteralKey
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta, SmallIntegerConstantDelta)
@@ -38,8 +38,6 @@ object LongLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance wit
   }
 
   def getValue(literal: Node): Long = literal(ValueKey).asInstanceOf[Long]
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = LongTypeDelta.longType
 
   object LongLiteralKey extends NodeShape
 

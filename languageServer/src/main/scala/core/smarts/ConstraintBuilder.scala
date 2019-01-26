@@ -13,17 +13,17 @@ import scala.collection.mutable
 case class Copy(key: AnyRef, counter: Int)
 class ConstraintBuilder(val factory: Factory) {
 
-  var proofs: Proofs = null
+  var proofs: Proofs = _
 
   val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty   //TODO deze moeten nog resetten
 
   def scopeVariable(parent: Option[Scope] = None): ScopeVariable = {
-    val result = factory.scopeVariable
+    val result = factory.scopeVariable()
     parent.foreach(p => constraints ::= ParentScope(result, p))
     result
   }
 
-  def typeVariable(): TypeVariable = factory.typeVariable
+  def typeVariable(origin: Option[SourceElement] = None): TypeVariable = factory.typeVariable(origin)
 
   var constraints: List[Constraint] = List.empty
 
@@ -84,10 +84,10 @@ class ConstraintBuilder(val factory: Factory) {
   def add(addition: Constraint): Unit = constraints ::= addition
   def add(addition: List[Constraint]): Unit = constraints = addition ++ constraints
 
-  def assignSubType(superType: Type, subType: Type) = add(AssignSubType(subType, superType))
+  def assignSubType(superType: Type, subType: Type): Unit = add(AssignSubType(subType, superType))
 
   def declarationVariable(): DeclarationVariable = {
-    factory.declarationVariable
+    factory.declarationVariable()
   }
 
   def getDeclarationOfType(_type: Type): Declaration = {
@@ -103,7 +103,7 @@ class ConstraintBuilder(val factory: Factory) {
   }
 
   def declarationVariable(_type: Type): DeclarationVariable = {
-    val result = factory.declarationVariable
+    val result = factory.declarationVariable()
     constraints ::= DeclarationHasType(result, _type)
     result
   }
@@ -111,8 +111,8 @@ class ConstraintBuilder(val factory: Factory) {
   /*
   Get the scope declared by the given declaration
    */
-  def getDeclaredScope(declaration: Declaration): ScopeVariable = {
-    val result = scopeVariable()
+  def getDeclaredScope(declaration: Declaration, scopeName: Any = null): ScopeVariable = {
+    val result = scopeVariable(None)
     constraints ::= DeclarationOfScope(declaration, result)
     result
   }

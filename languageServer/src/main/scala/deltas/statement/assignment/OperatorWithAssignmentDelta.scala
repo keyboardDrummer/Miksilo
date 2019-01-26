@@ -33,9 +33,9 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   def transformAssignment(incrementAssignment: NodePath, state: Language): Unit = {
     val target = SimpleAssignmentDelta.getTarget(incrementAssignment)
-    val newValue = operatorDelta.shape.createWithSource(
+    val newValue = operatorDelta.shape.createWithData(
       LeftAssociativeBinaryOperatorDelta.Left -> incrementAssignment.current(SimpleAssignmentDelta.Target),
-      LeftAssociativeBinaryOperatorDelta.Right -> incrementAssignment.getWithSource(SimpleAssignmentDelta.Value))
+      LeftAssociativeBinaryOperatorDelta.Right -> incrementAssignment.getFieldData(SimpleAssignmentDelta.Value))
     val assignment = SimpleAssignmentDelta.neww(target, newValue)
     incrementAssignment.replaceData(assignment)
   }

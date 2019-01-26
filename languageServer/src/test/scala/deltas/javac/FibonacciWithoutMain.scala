@@ -5,7 +5,7 @@ import deltas.bytecode.types.IntTypeDelta
 import deltas.expression.additive.{AdditionDelta, SubtractionDelta}
 import deltas.expression.relational.LessThanDelta
 import deltas.expression.{IntLiteralDelta, TernaryDelta, VariableDelta}
-import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, MethodParameters, ReturnExpressionDelta}
 import deltas.statement.BlockDelta
@@ -23,7 +23,7 @@ class FibonacciWithoutMain {
   }
 
   def getJavaFibonacciWithoutMain: Node = {
-    JavaClassSkeleton.neww(defaultPackage, className, Seq(getFibonacciMethodJava))
+    JavaClassDelta.neww(defaultPackage, className, Seq(getFibonacciMethodJava))
   }
 
   def getFibonacciMethodJava: Node = {

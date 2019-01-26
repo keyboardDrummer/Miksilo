@@ -39,7 +39,7 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
       0.to(max).map(index => localTypes.getOrElse(index, throw new NotImplementedError))
     }
 
-    def toStackType(_type: Node) = TypeSkeleton.toStackType(_type, compilation)
+    def toStackType(_type: Node): Node = TypeSkeleton.toStackType(_type, compilation)
 
     def getStackMap(previousStack: Seq[Node], stack: Seq[Node], previousLocals: Seq[Node], locals: Seq[Node]) = {
       getStackMapHelper(previousStack.map(toStackType), stack.map(toStackType), previousLocals.map(toStackType), locals.map(toStackType))

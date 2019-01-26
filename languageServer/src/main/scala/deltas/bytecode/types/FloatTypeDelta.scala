@@ -3,17 +3,17 @@ package deltas.bytecode.types
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node.{Node, NodeLike, NodeShape}
-import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
 object FloatTypeDelta extends ByteCodeTypeInstance
 {
-  object FloatTypeKey extends NodeShape
-  override val shape = FloatTypeKey
-  val floatType = new Node(FloatTypeKey)
+  object Shape extends NodeShape
+  override val shape = Shape
+  val floatType = new Node(Shape)
 
   override def getSuperTypes(_type: Node): Seq[Node] = ???
 
@@ -31,4 +31,7 @@ object FloatTypeDelta extends ByteCodeTypeInstance
 
   val constraintType = PrimitiveType("Float")
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = constraintType
+  override def constraintName = constraintType.name
+
+  override def fromConstraintType(_type: Type) = floatType
 }

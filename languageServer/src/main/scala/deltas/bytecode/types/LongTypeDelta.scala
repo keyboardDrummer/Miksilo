@@ -33,7 +33,11 @@ object LongTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override def description: String = "Defines the long type."
 
-  val constraintType: Type = PrimitiveType("Long")
+  val constraintType = PrimitiveType("Long")
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type =
     constraintType
+
+  override def constraintName = constraintType.name
+
+  override def fromConstraintType(_type: Type) = longType
 }

@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
-object DefaultExpressionDelta extends DeltaWithGrammar with JavaExpressionInstance {
+object DefaultExpressionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds a default case to parsing an expression"
 
@@ -19,8 +19,6 @@ object DefaultExpressionDelta extends DeltaWithGrammar with JavaExpressionInstan
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
   }
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = throw new Exception("will not implement. Remove method from base")
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._

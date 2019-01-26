@@ -8,9 +8,24 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.Type
+import core.smarts.types.objects.{PrimitiveType, Type, TypeApplication, TypeFromDeclaration}
+
+import scala.collection.mutable
 
 object TypeSkeleton extends DeltaWithGrammar {
+
+  val maps = mutable.Map.empty[String, Type => Node]
+  def fromConstraintType(_type: Type): Node = {
+    def getName(_type: Type): String = _type match {
+      case PrimitiveType(primitiveType) => primitiveType
+      case TypeApplication(constructor, _, _) => getName(constructor)
+      case TypeFromDeclaration(_) => "DECLARATION"
+    }
+
+    val name = getName(_type)
+    maps(name)(_type)
+  }
+
   def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     hasTypes(compilation, _type.shape).getType(compilation, builder, _type, parentScope)
   }
@@ -68,7 +83,7 @@ object TypeSkeleton extends DeltaWithGrammar {
     grammars.create(ByteCodeTypeGrammar)
   }
 
-  val byteCodeInstances = new ShapeProperty[ByteCodeTypeInstance]
+  val byteCodeInstances = new ShapeProperty[ByteCodeTypeInstance]()
 
   trait HasSuperTypes {
     def getSuperTypes(node: Node): Seq[Node]

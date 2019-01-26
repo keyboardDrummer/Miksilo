@@ -6,12 +6,12 @@ import core.language.exceptions.BadInputException
 import core.language.node.Node
 import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.javac.classes.ClassCompiler
-import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.methods.MethodDelta._
 import deltas.statement.{LocalsAnalysis, StatementDelta}
 
 case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
-  val classCompiler: ClassCompiler = JavaClassSkeleton.getClassCompiler(compilation)
+  val classCompiler: ClassCompiler = JavaClassDelta.getClassCompiler(compilation)
 
   private val initialVariables: VariablePool = getInitialVariables
 

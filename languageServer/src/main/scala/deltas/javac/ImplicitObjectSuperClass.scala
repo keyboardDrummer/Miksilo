@@ -3,15 +3,15 @@ package deltas.javac
 import core.language.node.Node
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
-import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
+import deltas.javac.classes.skeleton.JavaClassDelta._
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 
 object ImplicitObjectSuperClass extends DeltaWithPhase {
   val objectName = "Object"
   val packageName = Seq("java", "lang")
   val qualifiedObjectName = new QualifiedClassName(packageName ++ Seq(objectName))
 
-  override def dependencies: Set[Contract] = Set(JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(JavaClassDelta)
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
     if (program.parent.isEmpty) {

@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.IntTypeDelta
 
-object IntLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
+object IntLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   val shape = Shape
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
@@ -25,8 +25,6 @@ object IntLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
   def neww(value: Int) = new Node(Shape, Value -> value)
 
   def getValue(literal: Node): Int = literal(Value).asInstanceOf[Int]
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = IntTypeDelta.intType
 
   object Shape extends NodeShape
 

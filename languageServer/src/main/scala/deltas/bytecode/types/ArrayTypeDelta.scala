@@ -28,7 +28,7 @@ object ArrayTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
     parseType.as(ArrayElementType) ~< "[]" asNode Shape
   }
 
-  def arrayType(elementType: Node): Node = {
+  def neww(elementType: Node): Node = {
     new Node(Shape, ArrayElementType -> elementType)
   }
 
@@ -44,5 +44,12 @@ object ArrayTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     val elementType = TypeSkeleton.getType(compilation, builder, _type(ArrayElementType).asInstanceOf[NodeLike], parentScope)
     TypeApplication(arrayTypeConstructor, Seq(elementType), _type)
+  }
+
+  override def constraintName = arrayTypeConstructor.name
+
+  override def fromConstraintType(_type: Type) = {
+    val elementType = _type.asInstanceOf[TypeApplication].arguments.head
+    neww(TypeSkeleton.fromConstraintType(elementType))
   }
 }
