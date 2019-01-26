@@ -12,8 +12,8 @@ import deltas.javac.classes.FieldDeclarationDelta.Field
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
 import deltas.javac.classes.{FieldDeclarationDelta, ThisVariableDelta}
+import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 import deltas.javac.methods.MethodDelta.Method
-import deltas.javac.methods.{HasScopeSkeleton, MemberSelectorDelta, MethodDelta}
 
 object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
 
@@ -29,7 +29,6 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
     val newVariableName = if (static) classDeclaration.name else ThisVariableDelta.thisName
     val target = VariableDelta.neww(newVariableName)
     ExpressionDelta.nodeType(target) = TypeFromDeclaration(classDeclaration)
-    HasScopeSkeleton.scopeDeclaration(target) = classDeclaration
 
     val variableNameData = variable.getFieldData(VariableDelta.Name)
     val selector = MemberSelectorDelta.Shape.createWithData(
@@ -40,8 +39,6 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
     variableNode.childData.clear()
     variableNode.replaceData(selector, keepData = true)
     variableNode.removeField(VariableDelta.Name)
-    //ExpressionDelta.nodeType(selector) = ExpressionDelta.nodeType(variable) // TODO instead maybe replace while keeping members in the line below?
-    //variable.replaceWith(selector)
   }
 
   def getVariableWithCorrectPath(path: NodePath): NodePath = {
