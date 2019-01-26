@@ -201,21 +201,5 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
       getDeclaration(compilation, builder, member, classScope))
 
     clazzDeclaration
-//
-//
-//
-//
-//    val instanceScope = builder.declareScope(instanceDecl, Some(packageScope))
-//    val staticScope = builder.declareScope(staticDecl, Some(packageScope))
-//
-//    builder.declare(ThisVariableDelta.thisName, instanceScope, null, Some(TypeFromDeclaration(instanceDecl)) )
-//    val bodyScope = builder.newScope(Some(instanceScope))
-//    builder.importScope(bodyScope, staticScope)
-//
-//    val members = clazz.members
-//    members.foreach(member => ConstraintSkeleton.hasDeclarations(compilation, member.shape).
-//      getDeclaration(compilation, builder, member, instanceScope /*bodyScope*/))
-//
-//    staticDecl
   }
 }
