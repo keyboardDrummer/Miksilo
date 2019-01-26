@@ -21,13 +21,13 @@ object ReturnExpressionToByteCodeDelta extends ConvertsToByteCodeDelta {
   def returnToLines(_return: NodePath, compiler: MethodCompiler): Seq[Node] = {
     val returnValue: NodePath = getReturnValue(_return)
     val returnValueInstructions = ToByteCodeSkeleton.getToInstructions(compiler.compilation)(returnValue)
-    val returnType = ExpressionDelta.getCachedType(compiler.compilation, returnValue)
+    val returnType = ExpressionDelta.cachedNodeType(compiler.compilation, returnValue)
     returnValueInstructions ++ (returnType match
     {
-      case IntTypeDelta.constraintType => Seq(IntegerReturnInstructionDelta.integerReturn)
-      case LongTypeDelta.constraintType => Seq(LongReturnInstructionDelta.longReturn)
-      case FloatTypeDelta.constraintType => Seq(FloatReturnInstructionDelta.create)
-      case DoubleTypeDelta.constraintType => Seq(LongReturnInstructionDelta.longReturn)
+      case IntTypeDelta.intType => Seq(IntegerReturnInstructionDelta.integerReturn)
+      case LongTypeDelta.longType => Seq(LongReturnInstructionDelta.longReturn)
+      case FloatTypeDelta.floatType => Seq(FloatReturnInstructionDelta.create)
+      case DoubleTypeDelta.doubleType => Seq(LongReturnInstructionDelta.longReturn)
 //      case x if TypeSkeleton.getSuperTypes(compiler.compilation)(x). TODO fix
 //        contains(QualifiedObjectTypeDelta.rootObjectType) => Seq(AddressReturnInstructionDelta.create)
       case _ => throw new NotImplementedError()
