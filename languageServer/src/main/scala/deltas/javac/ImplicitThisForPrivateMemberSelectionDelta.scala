@@ -23,12 +23,10 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
 
   def addThisToVariable(compilation: Compilation, clazz: JavaClass[NodePath],
                         static: Boolean, variable: NodeChildPath): Unit = {
-    val classDeclaration = if (static) JavaClassSkeleton.staticDeclaration(clazz.node)
-    else JavaClassSkeleton.instanceDeclaration(clazz.node)
 
-    val newVariableName = if (static) classDeclaration.name else ThisVariableDelta.thisName
+    val newVariableName = if (static) clazz.name else ThisVariableDelta.thisName
     val target = VariableDelta.neww(newVariableName)
-    ExpressionDelta.nodeType(target) = TypeFromDeclaration(classDeclaration)
+    ExpressionDelta.nodeType(target) = TypeFromDeclaration(JavaClassSkeleton.staticDeclaration(clazz.node))
 
     val variableNameData = variable.getFieldData(VariableDelta.Name)
     val selector = MemberSelectorDelta.Shape.createWithData(
