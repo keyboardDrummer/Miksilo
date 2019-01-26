@@ -1,3 +1,3 @@
 package core.smarts.objects
 
-case class DeclarationVariable(name: String) extends Declaration
+case class DeclarationVariable(name: String, debugName: Option[Any]) extends Declaration

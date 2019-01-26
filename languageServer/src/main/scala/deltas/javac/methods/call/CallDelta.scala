@@ -53,10 +53,11 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
   }
 
   def callConstraints(compilation: Compilation, builder: ConstraintBuilder, callArguments: Seq[NodePath], parentScope: Scope,
-                      methodReference: Reference, returnType: Type): Unit = {
+                      methodReference: Reference, returnType: Type): Type = {
     val callTypes = callArguments.map(argument => ExpressionDelta.getType(compilation, builder, argument, parentScope))
     val functionType = FunctionType.curry(callTypes, returnType)
     builder.add(new ResolvesToType(methodReference, builder.declarationVariable(), functionType))
+    functionType
   }
 
   override def dependencies = Set(MemberSelectorDelta, ExpressionDelta)
@@ -64,7 +65,8 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, returnType: Type, parentScope: Scope): Unit = {
     val call: Call[NodePath] = path
     val calleeReference = ReferenceExpressionSkeleton.getReference(compilation, builder, call.callee, parentScope)
-    CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, calleeReference, returnType)
+    val functionType = CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, calleeReference, returnType)
+    ExpressionDelta.nodeType(call.callee) = functionType
   }
 
   override def shape = Shape
@@ -97,7 +99,7 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
 
   def getMethodFromCallee(compilation: Compilation, callee: NodePath) = {
     val scopeGraph = compilation.proofs.scopeGraph
-    val constructorReference = ReferenceExpressionSkeleton.references(compilation)(callee)
+    val constructorReference = ReferenceExpressionSkeleton.references(callee)
     val constructorDeclaration = compilation.proofs.declarations(constructorReference)
     val method: Method[NodePath] = constructorDeclaration.origin.get.asInstanceOf[FieldPath].parent
     method

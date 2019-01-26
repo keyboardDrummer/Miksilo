@@ -25,7 +25,9 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
     if (!keepData) {
       data.clear()
       sources.clear()
+      childData.clear()
     }
+    childData ++= node.childData
     data ++= node.data
   }
 
@@ -35,15 +37,29 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   }
 
   var startOfUri: Option[String] = None
+  val childData: mutable.Map[Any, mutable.Map[Key, Any]] = mutable.Map.empty
   val sources: mutable.Map[NodeField, SourceRange] = mutable.Map.empty
   val data: mutable.Map[NodeField, Any] = mutable.Map.empty
   data ++= entries
 
   def dataView: Map[NodeField, Any] = data.toMap
 
+  def getFieldData(field: NodeField): FieldData = {
+    val value = this(field)
+    val source = sources.get(field)
+    val data = childData.get(field)
+    FieldData(value, source, data)
+  }
+
   def getWithSource(field: NodeField): Any = {
     val value = this(field)
     sources.get(field).fold(value)(source => WithSource(value, source))
+  }
+
+  def setWithData(field: NodeField, withSource: FieldData): Unit = {
+    this(field) = withSource.value
+    withSource.range.foreach(r => this.sources(field) = r)
+    withSource.fieldData.foreach(r => this.childData(field) = r)
   }
 
   def setWithSource(field: NodeField, withSource: WithSource): Unit = {
@@ -111,6 +127,7 @@ object Node {
   }
 }
 
+case class FieldData(value: Any, range: Option[SourceRange], fieldData: Option[mutable.Map[Key, Any]])
 case class WithSource(value: Any, range: SourceRange)
 
 

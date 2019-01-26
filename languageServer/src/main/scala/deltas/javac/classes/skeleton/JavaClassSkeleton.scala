@@ -8,8 +8,10 @@ import core.document.BlankLine
 import core.language.node._
 import core.language.{Compilation, CompilationState, Language}
 import core.smarts.ConstraintBuilder
-import core.smarts.objects.Declaration
+import core.smarts.objects.{Declaration, NamedDeclaration}
 import core.smarts.scopes.objects.{Scope, ScopeVariable}
+import core.smarts.types.DeclarationHasType
+import core.smarts.types.objects.TypeFromDeclaration
 import deltas.ConstraintSkeleton
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
@@ -173,6 +175,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     classScope
   }
 
+  val staticDeclaration = new TypedNodeField[NamedDeclaration]
+  val instanceDeclaration = new TypedNodeField[NamedDeclaration]
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Declaration = {
     val clazz: JavaClass[NodePath] = path
 
@@ -187,8 +191,15 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       })
     }
 
+    val holeScope = builder.newScope()
+    val instanceDecl = builder.declare("reservedInstance1212313", holeScope, path.getSourceElement(Name))
+    instanceDeclaration(path) = instanceDecl
+    val staticDecl = builder.declare("blerrrrrp", packageScope, path.getSourceElement(Name))
+    staticDeclaration(path) = staticDecl
+
     //TODO here there should be an instance, a static, and a lexical scope.
     val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getSourceElement(Name))
+    builder.add(DeclarationHasType(clazzDeclaration, TypeFromDeclaration(clazzDeclaration)))
     val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
 
     val members = clazz.members
@@ -196,5 +207,21 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
       getDeclaration(compilation, builder, member, classScope))
 
     clazzDeclaration
+//
+//
+//
+//
+//    val instanceScope = builder.declareScope(instanceDecl, Some(packageScope))
+//    val staticScope = builder.declareScope(staticDecl, Some(packageScope))
+//
+//    builder.declare(ThisVariableDelta.thisName, instanceScope, null, Some(TypeFromDeclaration(instanceDecl)) )
+//    val bodyScope = builder.newScope(Some(instanceScope))
+//    builder.importScope(bodyScope, staticScope)
+//
+//    val members = clazz.members
+//    members.foreach(member => ConstraintSkeleton.hasDeclarations(compilation, member.shape).
+//      getDeclaration(compilation, builder, member, instanceScope /*bodyScope*/))
+//
+//    staticDecl
   }
 }

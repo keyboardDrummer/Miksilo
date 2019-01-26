@@ -17,13 +17,13 @@ class ConstraintBuilder(val factory: Factory) {
 
   val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty   //TODO deze moeten nog resetten
 
-  def scopeVariable(parent: Option[Scope] = None): ScopeVariable = {
-    val result = factory.scopeVariable
+  def scopeVariable(parent: Option[Scope] = None, name: Any = null): ScopeVariable = {
+    val result = factory.scopeVariable(name)
     parent.foreach(p => constraints ::= ParentScope(result, p))
     result
   }
 
-  def typeVariable(): TypeVariable = factory.typeVariable
+  def typeVariable(origin: Option[SourceElement] = None): TypeVariable = factory.typeVariable(origin)
 
   var constraints: List[Constraint] = List.empty
 
@@ -86,12 +86,12 @@ class ConstraintBuilder(val factory: Factory) {
 
   def assignSubType(superType: Type, subType: Type) = add(AssignSubType(subType, superType))
 
-  def declarationVariable(): DeclarationVariable = {
-    factory.declarationVariable
+  def declarationVariable(name: Option[Any] = None): DeclarationVariable = {
+    factory.declarationVariable(name)
   }
 
-  def getDeclarationOfType(_type: Type): Declaration = {
-    val result = declarationVariable()
+  def getDeclarationOfType(_type: Type, declarationName: Option[Any] = None): Declaration = {
+    val result = declarationVariable(declarationName)
     add(TypesAreEqual(TypeFromDeclaration(result), _type))
     result
   }
@@ -103,7 +103,7 @@ class ConstraintBuilder(val factory: Factory) {
   }
 
   def declarationVariable(_type: Type): DeclarationVariable = {
-    val result = factory.declarationVariable
+    val result = factory.declarationVariable()
     constraints ::= DeclarationHasType(result, _type)
     result
   }
@@ -111,8 +111,8 @@ class ConstraintBuilder(val factory: Factory) {
   /*
   Get the scope declared by the given declaration
    */
-  def getDeclaredScope(declaration: Declaration): ScopeVariable = {
-    val result = scopeVariable()
+  def getDeclaredScope(declaration: Declaration, scopeName: Any = null): ScopeVariable = {
+    val result = scopeVariable(None, scopeName)
     constraints ::= DeclarationOfScope(declaration, result)
     result
   }

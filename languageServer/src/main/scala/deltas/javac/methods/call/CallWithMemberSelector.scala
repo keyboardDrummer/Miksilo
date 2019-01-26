@@ -3,7 +3,7 @@ package deltas.javac.methods.call
 import core.deltas.path.NodePath
 import core.deltas.{Contract, Delta, HasShape, ShapeProperty}
 import core.language.node._
-import core.language.{Compilation, CompilationState, Language}
+import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
@@ -11,15 +11,13 @@ import deltas.javac.expressions.ToByteCodeSkeleton
 import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.call.CallDelta.Call
 
-import scala.collection.mutable
-
 object ReferenceExpressionSkeleton {
   val instances = new ShapeProperty[ReferenceExpression]
-  val references = new CompilationState[mutable.Map[NodePath, Reference]](mutable.Map.empty)
+  val references = new TypedNodeField[Reference]
 
   def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference = {
     val result = instances(compilation, expression.shape).getReference(compilation, builder, expression, parentScope)
-    references(compilation).put(expression, result)
+    references(expression) = result
     result
   }
 }

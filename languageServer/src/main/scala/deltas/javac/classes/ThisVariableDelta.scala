@@ -4,9 +4,10 @@ import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
-import core.language.node.GrammarKey
+import core.language.node.{GrammarKey, TypedNodeField}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
+import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.TypeFromDeclaration
 import deltas.ConstraintSkeleton
@@ -27,14 +28,16 @@ object ThisVariableDelta extends DeltaWithGrammar
     variable.addAlternative(thisGrammar)
   }
 
+  val thisDeclarationField = new TypedNodeField[Declaration]
   override def inject(language: Language): Unit = {
     ConstraintSkeleton.hasConstraints.add(language, JavaClassSkeleton.Shape, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
         val classScope = JavaClassSkeleton.getClassScope(compilation, builder, path, parentScope)
         val clazz: JavaClassSkeleton.JavaClass[NodePath] = path
         val clazzName = clazz.name
-        val classDeclaration = builder.resolve(clazzName, path, classScope)
-        builder.declare(thisName, classScope, _type = Some(TypeFromDeclaration(classDeclaration)))
+        val classDeclaration = builder.resolveOption(clazzName, None, classScope)
+        val thisDeclaration = builder.declare(thisName, classScope, _type = Some(TypeFromDeclaration(classDeclaration)))
+        thisDeclarationField(path) = thisDeclaration
       }
     })
     super.inject(language)

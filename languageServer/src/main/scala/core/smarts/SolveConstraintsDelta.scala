@@ -1,14 +1,18 @@
 package core.smarts
 
 import com.typesafe.scalalogging.LazyLogging
+import core.deltas.path.ChildPath
 import core.deltas.{Contract, Delta}
 import core.language.exceptions.BadInputException
-import core.language.{CompilationState, Language, Phase}
+import core.language.node.FieldExtension
+import core.language.{Language, Phase}
+import core.smarts.objects.Declaration
 
 import scala.util.{Failure, Success}
 
 object SolveConstraintsDelta extends Delta with LazyLogging {
 
+  val referenceDeclaration = new FieldExtension[Declaration]()
   override def inject(language: Language): Unit = {
     super.inject(language)
     language.compilerPhases ::= Phase(this, compilation => {
@@ -28,6 +32,9 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
         case Failure(e) => throw e
       }
 
+      for(refDecl <- solver.proofs.declarations) {
+        refDecl._1.origin.foreach(ref => referenceDeclaration(ref.asInstanceOf[ChildPath]) = refDecl._2)
+      }
       compilation.proofs = solver.proofs
       compilation.diagnostics ++= compilation.remainingConstraints.flatMap(
         constraint => constraint.getDiagnostic.toSeq)

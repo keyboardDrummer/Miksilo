@@ -47,6 +47,6 @@ object VariableDelta extends DeltaWithGrammar with ExpressionInstance with Refer
 
   override def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference = {
     val variable: Variable[NodePath] = expression
-    builder.refer(variable.name, parentScope, Some(expression))
+    builder.refer(variable.name, parentScope, Some(expression.getSourceElement(Name)))
   }
 }

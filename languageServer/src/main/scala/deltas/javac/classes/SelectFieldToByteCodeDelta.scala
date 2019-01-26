@@ -4,15 +4,18 @@ import core.deltas.Contract
 import core.deltas.path.{FieldPath, NodePath}
 import core.language.Compilation
 import core.language.node.Node
-import core.smarts.objects.{NamedDeclaration, Reference}
+import core.smarts.SolveConstraintsDelta
+import core.smarts.objects.NamedDeclaration
+import core.smarts.types.objects.TypeFromDeclaration
 import deltas.bytecode.constants.FieldRefConstant
 import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.bytecode.types.TypeSkeleton
+import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
+import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
-import deltas.javac.methods.{HasScopeSkeleton, MemberSelectorDelta}
 
 object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
 
@@ -20,9 +23,8 @@ object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
     val selector: MemberSelector[NodePath] = path
     val fieldRefIndex: Node = getFieldRefIndex(compilation, selector)
 
-    val scopeGraph = compilation.proofs.scopeGraph
-    val targetReference = scopeGraph.elementToNode(selector.target).asInstanceOf[Reference]
-    val targetDeclaration = compilation.proofs.declarations(targetReference).origin.get.asInstanceOf[FieldPath].parent
+    val targetType = ExpressionDelta.getCachedType(compilation, selector.target).asInstanceOf[TypeFromDeclaration]
+    val targetDeclaration = compilation.proofs.resolveDeclaration(targetType.declaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
     val wasClass = targetDeclaration.shape == JavaClassSkeleton.Shape
 
     if (wasClass)
@@ -38,12 +40,11 @@ object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
   def getFieldRefIndex(compilation: Compilation, selector: MemberSelector[NodePath]): Node = {
     val scopeGraph = compilation.proofs.scopeGraph
 
-    val targetScopeDeclaration = HasScopeSkeleton.scopeDeclaration(selector.target)
+    val targetScopeDeclaration = ExpressionDelta.getCachedType(compilation, selector.target).asInstanceOf[TypeFromDeclaration].declaration
     val targetClass = compilation.proofs.resolveDeclaration(targetScopeDeclaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
     val qualifiedClassName = JavaClassSkeleton.getQualifiedClassName(targetClass)
 
-    val fieldReference = scopeGraph.elementToNode(selector.getSourceElement(MemberSelectorDelta.Member)).asInstanceOf[Reference]
-    val fieldDeclaration = compilation.proofs.declarations(fieldReference)
+    val fieldDeclaration = SolveConstraintsDelta.referenceDeclaration(selector.getSourceElement(MemberSelectorDelta.Member))
     val fieldType = compilation.proofs.environment(fieldDeclaration)
     val nodeType = TypeSkeleton.fromConstraintType(fieldType)
 

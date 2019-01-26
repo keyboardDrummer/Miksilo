@@ -9,9 +9,9 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import core.smarts.{ConstraintBuilder, ResolvesTo}
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta._
 import deltas.javac.methods.call.ReferenceExpressionDelta
-import deltas.javac.methods.{HasScopeSkeleton, MemberSelectorDelta}
 
 object SelectFieldDelta extends DeltaWithGrammar with ExpressionInstance with ReferenceExpressionDelta {
 
@@ -32,9 +32,11 @@ object SelectFieldDelta extends DeltaWithGrammar with ExpressionInstance with Re
     builder.add(ResolvesTo(reference, declaration))
   }
 
-  override def getReference(compilation: Compilation, builder: ConstraintBuilder, selector: NodePath, parentScope: Scope): Reference = {
-    val target = selector.target
-    val scope = HasScopeSkeleton.getScope(compilation, builder, target, parentScope)
+  override def getReference(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Reference = {
+    val selector: MemberSelector[NodePath] = path
+    val _type = ExpressionDelta.getType(compilation, builder, selector.target, parentScope)
+    val declaration = builder.getDeclarationOfType(_type, Some("type declaration of ", selector.target))
+    val scope = builder.getDeclaredScope(declaration, ("scope of ", path))
     val member = selector.member
     builder.refer(member, scope, Some(selector.getSourceElement(Member)))
   }

@@ -19,7 +19,7 @@ trait ExpressionInstance extends Delta with HasShape {
   def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit
 
   def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {
-    val result = builder.typeVariable()
+    val result = builder.typeVariable(Some(expression))
     constraints(compilation, builder, expression, result, parentScope)
     result
   }
