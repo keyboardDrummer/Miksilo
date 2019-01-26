@@ -44,7 +44,7 @@ object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
     val targetClass = compilation.proofs.resolveDeclaration(targetScopeDeclaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
     val qualifiedClassName = JavaClassSkeleton.getQualifiedClassName(targetClass)
 
-    val fieldDeclaration = SolveConstraintsDelta.referenceDeclaration(selector.getSourceElement(MemberSelectorDelta.Member))
+    val fieldDeclaration = SolveConstraintsDelta.resolvesToDeclaration(selector.getSourceElement(MemberSelectorDelta.Member))
     val fieldType = compilation.proofs.environment(fieldDeclaration)
     val nodeType = TypeSkeleton.fromConstraintType(fieldType)
 

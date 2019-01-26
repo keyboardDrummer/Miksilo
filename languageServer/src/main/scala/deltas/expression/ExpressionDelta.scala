@@ -13,7 +13,7 @@ object ExpressionDelta extends DeltaWithGrammar {
 
   implicit class Expression(val node: Node) extends NodeWrapper[Node]
 
-  val nodeType = new TypedNodeField[Type]()
+  val nodeType = new TypedNodeField[Type]("type")
   def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     nodeType(expression) = _type
     getInstance(compilation)(expression).constraints(compilation, builder, expression, _type, parentScope)

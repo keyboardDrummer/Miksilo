@@ -28,7 +28,7 @@ object ThisVariableDelta extends DeltaWithGrammar
     variable.addAlternative(thisGrammar)
   }
 
-  val thisDeclarationField = new TypedNodeField[Declaration]
+  val thisDeclarationField = new TypedNodeField[Declaration]("thisDeclaration")
   override def inject(language: Language): Unit = {
     ConstraintSkeleton.hasConstraints.add(language, JavaClassSkeleton.Shape, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {

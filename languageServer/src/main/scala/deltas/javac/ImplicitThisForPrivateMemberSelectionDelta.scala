@@ -36,7 +36,6 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
       MemberSelectorDelta.Member -> variableNameData)
 
     val variableNode = variable.current
-    variableNode.childData.clear()
     variableNode.replaceData(selector, keepData = true)
     variableNode.removeField(VariableDelta.Name)
   }
@@ -50,7 +49,7 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
     val thisDeclaration = compilation.proofs.resolveDeclaration(ThisVariableDelta.thisDeclarationField(clazz.node)).asInstanceOf[NamedDeclaration]
     val clazzDeclaration = compilation.proofs.scopeGraph.elementToNode(clazz.node.getSourceElement(JavaClassSkeleton.Name)).asInstanceOf[NamedDeclaration]
     PathRoot(program).visitShape(VariableDelta.Shape, variable =>  {
-      val maybeDeclaration: Option[NamedDeclaration] = SolveConstraintsDelta.referenceDeclaration.get(variable.getSourceElement(VariableDelta.Name)).
+      val maybeDeclaration: Option[NamedDeclaration] = SolveConstraintsDelta.resolvesToDeclaration.get(variable.getSourceElement(VariableDelta.Name)).
         map(d => compilation.proofs.resolveDeclaration(d).asInstanceOf[NamedDeclaration])
       maybeDeclaration.foreach(declaration => {
         val declarationNode = declaration.origin.get.asInstanceOf[FieldPath].parent.current

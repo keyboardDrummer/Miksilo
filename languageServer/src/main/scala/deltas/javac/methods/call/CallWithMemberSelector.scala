@@ -13,7 +13,7 @@ import deltas.javac.methods.call.CallDelta.Call
 
 object ReferenceExpressionSkeleton {
   val instances = new ShapeProperty[ReferenceExpression]
-  val references = new TypedNodeField[Reference]
+  val references = new TypedNodeField[Reference]("definedReference")
 
   def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference = {
     val result = instances(compilation, expression.shape).getReference(compilation, builder, expression, parentScope)

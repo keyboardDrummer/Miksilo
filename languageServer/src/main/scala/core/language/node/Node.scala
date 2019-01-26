@@ -25,19 +25,20 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
     if (!keepData) {
       data.clear()
       sources.clear()
-      childData.clear()
+      fieldData.clear()
     }
-    childData ++= node.childData
+    fieldData ++= node.fieldData
     data ++= node.data
   }
 
   def removeField(field: NodeField): Unit = {
     sources.remove(field)
     data.remove(field)
+    fieldData.remove(field)
   }
 
   var startOfUri: Option[String] = None
-  val childData: mutable.Map[Any, mutable.Map[Key, Any]] = mutable.Map.empty
+  val fieldData: mutable.Map[NodeField, mutable.Map[NodeField, Any]] = mutable.Map.empty
   val sources: mutable.Map[NodeField, SourceRange] = mutable.Map.empty
   val data: mutable.Map[NodeField, Any] = mutable.Map.empty
   data ++= entries
@@ -47,24 +48,14 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   def getFieldData(field: NodeField): FieldData = {
     val value = this(field)
     val source = sources.get(field)
-    val data = childData.get(field)
+    val data = fieldData.get(field)
     FieldData(value, source, data)
   }
 
-  def getWithSource(field: NodeField): Any = {
-    val value = this(field)
-    sources.get(field).fold(value)(source => WithSource(value, source))
-  }
-
-  def setWithData(field: NodeField, withSource: FieldData): Unit = {
-    this(field) = withSource.value
-    withSource.range.foreach(r => this.sources(field) = r)
-    withSource.fieldData.foreach(r => this.childData(field) = r)
-  }
-
-  def setWithSource(field: NodeField, withSource: WithSource): Unit = {
-    this(field) = withSource.value
-    this.sources(field) = withSource.range
+  def setWithData(field: NodeField, data: FieldData): Unit = {
+    this(field) = data.value
+    data.range.foreach(r => this.sources(field) = r)
+    data.fieldData.foreach(r => this.fieldData(field) = r)
   }
 
   def apply(key: NodeField) = data(key)
@@ -127,7 +118,6 @@ object Node {
   }
 }
 
-case class FieldData(value: Any, range: Option[SourceRange], fieldData: Option[mutable.Map[Key, Any]])
-case class WithSource(value: Any, range: SourceRange)
+case class FieldData(value: Any, range: Option[SourceRange], fieldData: Option[mutable.Map[NodeField, Any]])
 
 

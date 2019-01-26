@@ -1,10 +1,5 @@
 package core.language.node
 
-import core.deltas.path.ChildPath
-
-import scala.collection.mutable
-
-
 trait Key extends AnyRef
 {
   override lazy val toString: String = debugRepresentation
@@ -48,21 +43,5 @@ trait Key extends AnyRef
   * Defines a field for a Node
   */
 trait NodeField extends GrammarKey
-
-class TypedNodeField[T] extends NodeField {
-  def apply(node: Node): T = node(this).asInstanceOf[T]
-  def update(node: Node, value: T): Unit = node(this) = value
-}
-
-class FieldExtension[T] extends NodeField {
-  def get(path: ChildPath): Option[T] = getFieldData(path).get(this).asInstanceOf[Option[T]]
-  def apply(path: ChildPath): T = getFieldData(path)(this).asInstanceOf[T]
-
-  private def getFieldData(path: ChildPath) = {
-    path.parent.current.childData.getOrElseUpdate(path.keyFromParent, mutable.Map.empty)
-  }
-
-  def update(path: ChildPath, value: T): Unit = getFieldData(path)(this) = value
-}
 
 trait GrammarKey extends Key

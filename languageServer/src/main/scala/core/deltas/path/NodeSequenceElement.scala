@@ -28,6 +28,4 @@ case class NodeSequenceElement(parent: NodePath, field: NodeField, index: Int) e
   override def replaceWith(replacement: Any): Unit = replaceWith(Seq(replacement))
 
   override def pathAsString: String = s"${parent.pathAsString}/$field[$index]"
-
-  override def keyFromParent = (field, index)
 }

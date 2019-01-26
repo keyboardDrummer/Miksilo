@@ -26,8 +26,6 @@ case class FieldPath(parent: NodePath, field: NodeField) extends ChildPath {
   override def range: Option[SourceRange] = parent.current.sources.get(field)
 
   override def current = parent.current(field)
-
-  override def keyFromParent = field
 }
 
 

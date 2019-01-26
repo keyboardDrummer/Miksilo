@@ -175,8 +175,8 @@ object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
     classScope
   }
 
-  val staticDeclaration = new TypedNodeField[NamedDeclaration]
-  val instanceDeclaration = new TypedNodeField[NamedDeclaration]
+  val staticDeclaration = new TypedNodeField[NamedDeclaration]("staticDeclaration")
+  val instanceDeclaration = new TypedNodeField[NamedDeclaration]("instanceDeclaration")
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Declaration = {
     val clazz: JavaClass[NodePath] = path
 
