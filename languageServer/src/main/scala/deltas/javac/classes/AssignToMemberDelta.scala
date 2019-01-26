@@ -7,10 +7,9 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.coreInstructions.SwapInstruction
 import deltas.bytecode.coreInstructions.objects.PutField
 import deltas.expression.VariableDelta
-import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ToByteCodeSkeleton
-import deltas.javac.methods.{AssignmentToByteCodeDelta, MemberSelectorDelta}
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
+import deltas.javac.methods.{AssignmentToByteCodeDelta, MemberSelectorDelta}
 import deltas.statement.assignment.SimpleAssignmentDelta
 
 object AssignToMemberDelta extends DeltaWithGrammar {
@@ -20,9 +19,7 @@ object AssignToMemberDelta extends DeltaWithGrammar {
   override def inject(language: Language): Unit = {
     AssignmentToByteCodeDelta.hasAssignFromStackByteCode.add(language, MemberSelectorDelta.Shape,
       (compilation: Compilation, selector: NodePath) => {
-      val compiler = JavaClassSkeleton.getClassCompiler(compilation)
-      val classOrObjectReference = MemberSelectorDelta.getClassOrObjectReference(selector, compiler)
-      val fieldRefIndex = SelectFieldToByteCodeDelta.getFieldRef(selector, compiler, classOrObjectReference)
+      val fieldRefIndex = SelectFieldToByteCodeDelta.getFieldRefIndex(compilation, selector)
 
       val _object = (selector: MemberSelector[NodePath]).target
       val objectInstructions = ToByteCodeSkeleton.getToInstructions(compilation)(_object)

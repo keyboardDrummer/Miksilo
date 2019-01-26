@@ -8,12 +8,12 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
-import deltas.bytecode.types.{ByteCodeTypeInstance, IntTypeDelta, HasStackTypeDelta}
+import deltas.bytecode.types.{ByteCodeTypeInstance, HasStackTypeDelta, IntTypeDelta}
 
 object BooleanTypeDelta extends ByteCodeTypeInstance
   with HasStackTypeDelta //TODO remove this and change VariablePool accordingly.
 {
-  val constraintType: Type = PrimitiveType("Boolean")
+  val constraintType = PrimitiveType("Boolean")
 
   override val shape = Shape
 
@@ -21,7 +21,7 @@ object BooleanTypeDelta extends ByteCodeTypeInstance
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    Keyword("Z", false) ~> value(booleanType)
+    Keyword("Z", reserved = false) ~> value(booleanType)
   }
 
   override def getStackType(_type: Node, language: Language): Node = IntTypeDelta.intType
@@ -40,4 +40,8 @@ object BooleanTypeDelta extends ByteCodeTypeInstance
   override def getStackSize: Int = IntTypeDelta.getStackSize
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = constraintType
+
+  override def constraintName = constraintType.name
+
+  override def fromConstraintType(_type: Type) = booleanType
 }

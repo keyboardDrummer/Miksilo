@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 
-object StringLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
+object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the usage of string literals."
 
@@ -28,8 +28,6 @@ object StringLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
   def literal(value: String) = new Node(Shape, Value -> value)
 
   def getValue(literal: Node): String = literal(Value).asInstanceOf[String]
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = ???
 
   object Shape extends NodeShape
 

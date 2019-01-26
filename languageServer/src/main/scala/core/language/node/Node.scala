@@ -25,30 +25,37 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
     if (!keepData) {
       data.clear()
       sources.clear()
+      fieldData.clear()
     }
+    fieldData ++= node.fieldData
     data ++= node.data
   }
 
   def removeField(field: NodeField): Unit = {
     sources.remove(field)
     data.remove(field)
+    fieldData.remove(field)
   }
 
   var startOfUri: Option[String] = None
+  val fieldData: mutable.Map[NodeField, mutable.Map[NodeField, Any]] = mutable.Map.empty
   val sources: mutable.Map[NodeField, SourceRange] = mutable.Map.empty
   val data: mutable.Map[NodeField, Any] = mutable.Map.empty
   data ++= entries
 
   def dataView: Map[NodeField, Any] = data.toMap
 
-  def getWithSource(field: NodeField): Any = {
+  def getFieldData(field: NodeField): FieldData = {
     val value = this(field)
-    sources.get(field).fold(value)(source => WithSource(value, source))
+    val source = sources.get(field)
+    val data = fieldData.get(field)
+    FieldData(value, source, data)
   }
 
-  def setWithSource(field: NodeField, withSource: WithSource): Unit = {
-    this(field) = withSource.value
-    this.sources(field) = withSource.range
+  def setWithData(field: NodeField, data: FieldData): Unit = {
+    this(field) = data.value
+    data.range.foreach(r => this.sources(field) = r)
+    data.fieldData.foreach(r => this.fieldData(field) = r)
   }
 
   def apply(key: NodeField) = data(key)
@@ -69,10 +76,25 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   }
 
   override def toString: String = {
-    val className = shape.toString
-    if (data.isEmpty)
-      return className
-    s"$className: ${data.map(kv => (kv._1.debugRepresentation, kv._2))}"
+    def inner(visited: mutable.Set[Node]): String = {
+      if (visited.add(this)) {
+        val className = shape.toString
+        if (data.isEmpty)
+          return className
+        return s"$className: ${data.map(kv => (kv._1.debugRepresentation, kv._2))}"
+      }
+      "recursive"
+    }
+
+    var visible = visitedToString.get()
+    if (visible != null)
+      return inner(visible)
+
+    visible = mutable.HashSet.empty
+    visitedToString.set(visible)
+    val result = inner(visible)
+    visitedToString.set(null)
+    result
   }
 
   override def equals(other: Any): Boolean = other match {
@@ -101,6 +123,8 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 }
 
 object Node {
+  val visitedToString = new ThreadLocal[mutable.Set[Node]]()
+
   implicit object PositionOrdering extends Ordering[Position] {
 
     private val ordering = Ordering.by[Position, (Int, Int)](x => (x.line, x.character))
@@ -110,6 +134,6 @@ object Node {
   }
 }
 
-case class WithSource(value: Any, range: SourceRange)
+case class FieldData(value: Any, range: Option[SourceRange], fieldData: Option[mutable.Map[NodeField, Any]])
 
 

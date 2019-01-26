@@ -1,6 +1,5 @@
 package core.language.node
 
-
 trait Key extends AnyRef
 {
   override lazy val toString: String = debugRepresentation
@@ -26,7 +25,7 @@ trait Key extends AnyRef
   }
 
   private def getClassName(shape: Class[_]): String = {
-    val enclosing = shape.getEnclosingClass
+    val enclosing: Class[_] = shape.getEnclosingClass
     val addition = if (enclosing == null) "" else getClassName(enclosing) + "."
     addition + getDirectClassName(shape)
   }

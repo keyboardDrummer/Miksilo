@@ -9,10 +9,10 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.coreInstructions.objects.PushNullDelta
-import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 
-object NullDelta extends DeltaWithGrammar with JavaExpressionInstance with ConvertsToByteCodeDelta {
+object NullDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
 
   val _null = new Node(Shape)
 
@@ -28,8 +28,6 @@ object NullDelta extends DeltaWithGrammar with JavaExpressionInstance with Conve
   object Shape extends NodeShape
 
   override val shape = Shape
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = ???
 
   override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(PushNullDelta.pushNull)

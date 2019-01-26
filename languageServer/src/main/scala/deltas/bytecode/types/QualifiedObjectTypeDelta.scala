@@ -3,14 +3,17 @@ package deltas.bytecode.types
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.{Keyword, Labelled}
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.FieldPath
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
+import core.smarts.objects.NamedDeclaration
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
-import deltas.javac.classes.skeleton.QualifiedClassName
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 
 object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
@@ -69,5 +72,15 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDe
     }
     val classDeclaration = builder.resolveOption(className, origin = _type.asPath, scope)
     TypeFromDeclaration(classDeclaration)
+  }
+
+  override def constraintName = "DECLARATION"
+
+  val _clazz = new TypedNodeField[Node]("clazz")
+  override def fromConstraintType(_type: Type): Node = {
+    val clazz = _type.asInstanceOf[TypeFromDeclaration].declaration.asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
+    val result = neww(JavaClassDelta.getQualifiedClassName(clazz))
+    _clazz(result) = clazz
+    result
   }
 }

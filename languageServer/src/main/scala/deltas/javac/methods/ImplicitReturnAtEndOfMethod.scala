@@ -3,7 +3,7 @@ package deltas.javac.methods
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
 import core.language.node.Node
-import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 
 object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ReturnVoidDelta, ReturnExpressionDelta)

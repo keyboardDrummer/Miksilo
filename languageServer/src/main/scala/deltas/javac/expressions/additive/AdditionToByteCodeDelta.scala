@@ -6,9 +6,8 @@ import core.language.node.Node
 import deltas.bytecode.coreInstructions.integers.AddIntegersDelta
 import deltas.bytecode.coreInstructions.longs.AddLongsDelta
 import deltas.bytecode.types.{IntTypeDelta, LongTypeDelta}
-import deltas.expression.LeftAssociativeBinaryOperatorDelta
 import deltas.expression.additive.AdditionDelta
-import deltas.expression.additive.AdditionDelta.getType
+import deltas.expression.{ExpressionDelta, LeftAssociativeBinaryOperatorDelta}
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 
 object AdditionToByteCodeDelta extends ConvertsToByteCodeDelta {
@@ -18,9 +17,9 @@ object AdditionToByteCodeDelta extends ConvertsToByteCodeDelta {
     val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
     val firstInstructions = toInstructions(addition.left)
     val secondInstructions = toInstructions(addition.right)
-    firstInstructions ++ secondInstructions ++ (getType(addition, compilation) match {
-      case x if x == IntTypeDelta.intType => Seq(AddIntegersDelta.addIntegers())
-      case x if x == LongTypeDelta.longType => Seq(AddLongsDelta.addLongs())
+    firstInstructions ++ secondInstructions ++ (ExpressionDelta.getCachedType(compilation, path) match {
+      case IntTypeDelta.constraintType => Seq(AddIntegersDelta.addIntegers())
+      case LongTypeDelta.constraintType => Seq(AddLongsDelta.addLongs())
       case _ => throw new NotImplementedError()
     })
   }

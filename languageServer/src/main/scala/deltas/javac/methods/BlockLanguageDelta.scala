@@ -6,7 +6,7 @@ import core.deltas.path.PathRoot
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.{ArrayTypeDelta, UnqualifiedObjectTypeDelta, VoidTypeDelta}
-import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.statement.{BlockDelta, StatementDelta}
 
 object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
@@ -30,9 +30,9 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val block = program
-    val mainArgument: Node = MethodParameters.neww("args", ArrayTypeDelta.arrayType(UnqualifiedObjectTypeDelta.neww("String")))
+    val mainArgument: Node = MethodParameters.neww("args", ArrayTypeDelta.neww(UnqualifiedObjectTypeDelta.neww("String")))
     val method = MethodDelta.neww("main",VoidTypeDelta.voidType,Seq(mainArgument), block, static = true, AccessibilityFieldsDelta.PublicVisibility)
-    val javaClass = JavaClassSkeleton.neww(Seq.empty,"Block",Seq(method))
+    val javaClass = JavaClassDelta.neww(Seq.empty,"Block",Seq(method))
     program.replaceData(javaClass)
   }
 

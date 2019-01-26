@@ -1,23 +1,20 @@
 package deltas.javac.methods.call
 
-import core.language.node.Node
-import core.deltas.path.NodePath
 import core.deltas.Contract
+import core.deltas.path.NodePath
 import core.language.Compilation
+import core.language.node.Node
 import deltas.bytecode.coreInstructions.InvokeStaticDelta
-import deltas.javac.classes.MethodQuery
-import deltas.javac.classes.skeleton.JavaClassSkeleton
 import deltas.javac.expressions.ConvertsToByteCodeDelta
+import deltas.javac.methods.call.CallDelta.Call
 
 object CallStaticDelta extends CallWithMemberSelector with ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling static methods."
 
-  override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
-    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
-
-    val methodKey: MethodQuery = CallDelta.getMethodKey(call, compiler)
-    val methodRefIndex = compiler.getMethodRefIndex(methodKey)
+  override def toByteCode(path: NodePath, compilation: Compilation): Seq[Node] = {
+    val call: Call[NodePath] = path
+    val methodRefIndex = CallDelta.getMethodRefIndexFromCallee(compilation, call.callee)
     getInstructionsGivenMethodRefIndex(call, compilation, methodRefIndex)
   }
 

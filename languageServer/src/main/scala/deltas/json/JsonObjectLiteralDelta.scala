@@ -10,11 +10,11 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 
 case class DuplicateObjectLiteralKeys(duplicates: Seq[String]) extends BadInputException
 
-object JsonObjectLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance with Delta {
+object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance with Delta {
 
   override def description: String = "Adds the JSON object literal to expressions"
 
@@ -40,8 +40,6 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with JavaExpressionInstan
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
 
   }
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = ???
 
   implicit class ObjectLiteralMember[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def key: String = node.getValue(MemberKey).asInstanceOf[String]

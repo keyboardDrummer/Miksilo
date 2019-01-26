@@ -8,7 +8,6 @@ import core.language.{Compilation, Language}
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{ConcreteType, Type, TypeApplication}
 import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
-import deltas.bytecode.types.ArrayTypeDelta
 import deltas.solidity.MappingTypeDelta
 
 import scala.collection.mutable
@@ -23,7 +22,7 @@ object MappingAccessDelta extends Delta {
                                resultType: Type, targetType: Type, indexType: Type, parentScope: Scope): Unit = {
         builder.add(new Constraint() {
           override def apply(solver: ConstraintSolver) = {
-            solver.resolveType(targetType) match {
+            solver.proofs.resolveType(targetType) match {
               case TypeApplication(MappingTypeDelta.mappingTypeConstructor, Seq(keyType, valueType),_) =>
                 builder.typesAreEqual(indexType, keyType)
                 builder.typesAreEqual(valueType, resultType)

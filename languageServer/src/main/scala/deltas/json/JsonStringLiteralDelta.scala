@@ -9,13 +9,15 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
-import deltas.expression.{ExpressionDelta, JavaExpressionInstance}
+import deltas.expression.{ExpressionDelta, ExpressionInstance}
 
 import scala.util.matching.Regex
 
-object JsonStringLiteralDelta extends DeltaWithGrammar with JavaExpressionInstance {
+object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
-  override def description: String = "Adds the usage of JSON string literals, in which the String is considered an identifier, and the quotes are not part of the position"
+  override def description: String = "Adds the usage of JSON string literals, " +
+    "in which the String is considered an identifier, " +
+    "and the quotes are not part of the position"
 
   val shape = Shape
 
@@ -32,8 +34,6 @@ object JsonStringLiteralDelta extends DeltaWithGrammar with JavaExpressionInstan
   def literal(value: String) = new Node(Shape, Value -> value)
 
   def getValue(literal: Node): String = literal(Value).asInstanceOf[String]
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = ???
 
   object Shape extends NodeShape
 

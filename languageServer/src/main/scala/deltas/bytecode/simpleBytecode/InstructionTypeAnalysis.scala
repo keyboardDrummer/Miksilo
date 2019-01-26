@@ -30,7 +30,7 @@ abstract class InstructionTypeAnalysis(instructions: Seq[Instruction[Node]])
 
   override def combineState(first: ProgramTypeState, second: ProgramTypeState): Option[ProgramTypeState] = {
     if (first.stackTypes != second.stackTypes)
-      throw new TargetInstructionEnteredWithDifferentLayouts(first, second)
+      throw TargetInstructionEnteredWithDifferentLayouts(first, second)
 
     val firstVariables: Map[Int, Node] = first.variableTypes
     val secondVariables: Map[Int, Node] = second.variableTypes
@@ -41,11 +41,11 @@ abstract class InstructionTypeAnalysis(instructions: Seq[Instruction[Node]])
     val newVariables: Map[Int, Node] = sharedKeys.map(key => {
       val firstValue: Node = firstVariables(key)
       if (firstValue != secondVariables(key))
-        throw new TargetInstructionEnteredWithDifferentLayouts(first, second)
+        throw TargetInstructionEnteredWithDifferentLayouts(first, second)
 
       (key, firstValue)
     }).toMap
-    Some(new ProgramTypeState(first.stackTypes, newVariables))
+    Some(ProgramTypeState(first.stackTypes, newVariables))
   }
 
   override def updateState(state: ProgramTypeState, instructionIndex: Int): ProgramTypeState = {
@@ -56,11 +56,11 @@ abstract class InstructionTypeAnalysis(instructions: Seq[Instruction[Node]])
       val signature = getSignature(state, instruction)
       val input = signature.inputs
       if (input.length > stateStack.length)
-        throw new StackDoesNotFitInstructionInput(instruction, input, stateStack)
+        throw StackDoesNotFitInstructionInput(instruction, input, stateStack)
 
       val stackTop = stateStack.takeRight(input.length)
       if (convertObjectTypesToObjectKey(input) != convertObjectTypesToObjectKey(stackTop))
-        throw new StackDoesNotFitInstructionInput(instruction, input, stateStack)
+        throw StackDoesNotFitInstructionInput(instruction, input, stateStack)
 
       val remainingStack = stateStack.dropRight(input.length)
       val newStack = remainingStack ++ signature.outputs

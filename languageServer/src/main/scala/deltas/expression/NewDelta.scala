@@ -15,7 +15,7 @@ import deltas.javac.constructor.SuperCallExpression.constructorName
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.call.CallDelta.Arguments
 
-object NewDelta extends DeltaWithGrammar with JavaExpressionInstance {
+object NewDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Enables using the new keyword to create a new object."
 
@@ -40,10 +40,6 @@ object NewDelta extends DeltaWithGrammar with JavaExpressionInstance {
   override def dependencies: Set[Contract] = Set(ExpressionDelta, CallDelta)
 
   override val shape = Shape
-
-  override def getType(expression: NodePath, compilation: Compilation): Node = {
-    expression(Type).asInstanceOf[NodePath]
-  }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     val call: NewCall[NodePath] = expression

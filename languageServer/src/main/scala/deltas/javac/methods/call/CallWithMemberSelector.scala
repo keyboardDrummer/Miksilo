@@ -13,8 +13,12 @@ import deltas.javac.methods.call.CallDelta.Call
 
 object ReferenceExpressionSkeleton {
   val instances = new ShapeProperty[ReferenceExpression]
+  val references = new TypedNodeField[Reference]("definedReference")
+
   def getReference(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Reference = {
-    instances(compilation, expression.shape).getReference(compilation, builder, expression, parentScope)
+    val result = instances(compilation, expression.shape).getReference(compilation, builder, expression, parentScope)
+    references(expression) = result
+    result
   }
 }
 
@@ -29,7 +33,6 @@ trait ReferenceExpressionDelta extends Delta with HasShape with ReferenceExpress
   }
 }
 
-//TODO extend from Delta, can be done once old getType is out of ExpressionInstance.
 trait CallWithMemberSelector extends Delta {
 
   override def dependencies: Set[Contract] = Set(CallDelta, MemberSelectorDelta)

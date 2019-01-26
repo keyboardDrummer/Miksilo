@@ -27,7 +27,7 @@ class TestPrintByteCodeWhile extends FunSuite {
       ClassInfoConstant.classRef(13),
       ClassInfoConstant.classRef(14),
       "<init>",
-      TypeConstant.constructor(MethodTypeDelta.construct(VoidTypeDelta.voidType, Seq())),
+      TypeConstant.constructor(MethodTypeDelta.neww(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "whilee",

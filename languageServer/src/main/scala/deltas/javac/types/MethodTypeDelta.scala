@@ -7,7 +7,7 @@ import core.language.Compilation
 import core.language.node._
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.{FunctionType, Type}
+import core.smarts.types.objects._
 import deltas.bytecode.types.{ByteCodeTypeInstance, TypeSkeleton}
 
 object MethodTypeDelta extends ByteCodeTypeInstance {
@@ -20,7 +20,7 @@ object MethodTypeDelta extends ByteCodeTypeInstance {
     def parameterTypes_=(value: Seq[T]): Unit = node(Parameters) = value
   }
 
-  def construct(returnType: Node, parameterTypes: Seq[Node]) = {
+  def neww  (returnType: Node, parameterTypes: Seq[Node]) = {
     new Node(Shape,
       Parameters -> parameterTypes,
       ReturnType -> returnType,
@@ -61,5 +61,20 @@ object MethodTypeDelta extends ByteCodeTypeInstance {
     val parameterTypes = parameters.map(parameter => TypeSkeleton.getType(compilation, builder, parameter, parentScope))
     val returnType = TypeSkeleton.getType(compilation, builder, returnTypeNode, parentScope)
     FunctionType.curry(parameterTypes, returnType)
+  }
+
+  override def constraintName = FuncPrimitive.name
+
+  override def fromConstraintType(_type: Type): Node = {
+    def uncurry(_type: Type): List[Type] = _type match {
+      case TypeApplication(FuncPrimitive, twoArguments, _) =>
+        val argument = twoArguments.head
+        val result = twoArguments.tail.head
+        argument :: uncurry(result)
+      case result => List(result)
+    }
+    val arguments = uncurry(_type)
+    val parameterTypes = arguments.dropRight(1).map(t => TypeSkeleton.fromConstraintType(t))
+    neww(TypeSkeleton.fromConstraintType(arguments.last), parameterTypes)
   }
 }

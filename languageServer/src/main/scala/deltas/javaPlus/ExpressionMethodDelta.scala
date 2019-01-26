@@ -5,15 +5,15 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.methods.MethodDelta.{Name, _}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, ReturnExpressionDelta}
 import deltas.statement.BlockDelta
 
 object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(ReturnExpressionDelta, MethodDelta, JavaClassSkeleton)
+  override def dependencies: Set[Contract] = Set(ReturnExpressionDelta, MethodDelta, JavaClassDelta)
 
   object Shape extends NodeShape
   object Expression extends NodeField
