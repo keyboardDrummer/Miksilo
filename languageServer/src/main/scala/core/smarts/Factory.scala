@@ -10,9 +10,9 @@ import core.smarts.types.objects.TypeVariable
 class Factory
 {
   private var scopeVariableCounter: Int = 0
-  def scopeVariable(name: Any = null): ScopeVariable = {
+  def scopeVariable(): ScopeVariable = {
     scopeVariableCounter += 1
-    ScopeVariable(scopeVariableCounter.toString, name)
+    ScopeVariable(scopeVariableCounter.toString)
   }
 
   private var scopeCounter: Int = 0
@@ -28,8 +28,8 @@ class Factory
   }
 
   private var declarationCounter = 0
-  def declarationVariable(debugName: Option[Any] = None): DeclarationVariable = {
+  def declarationVariable(): DeclarationVariable = {
     declarationCounter += 1
-    DeclarationVariable(declarationCounter.toString, debugName)
+    DeclarationVariable(declarationCounter.toString)
   }
 }

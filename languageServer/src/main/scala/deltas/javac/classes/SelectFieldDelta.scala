@@ -35,8 +35,8 @@ object SelectFieldDelta extends DeltaWithGrammar with ExpressionInstance with Re
   override def getReference(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Reference = {
     val selector: MemberSelector[NodePath] = path
     val _type = ExpressionDelta.getType(compilation, builder, selector.target, parentScope)
-    val declaration = builder.getDeclarationOfType(_type, Some("type declaration of ", selector.target))
-    val scope = builder.getDeclaredScope(declaration, ("scope of ", path))
+    val declaration = builder.getDeclarationOfType(_type)
+    val scope = builder.getDeclaredScope(declaration)
     val member = selector.member
     builder.refer(member, scope, Some(selector.getSourceElement(Member)))
   }

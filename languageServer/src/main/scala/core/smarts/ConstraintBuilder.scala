@@ -13,12 +13,12 @@ import scala.collection.mutable
 case class Copy(key: AnyRef, counter: Int)
 class ConstraintBuilder(val factory: Factory) {
 
-  var proofs: Proofs = null
+  var proofs: Proofs = _
 
   val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty   //TODO deze moeten nog resetten
 
-  def scopeVariable(parent: Option[Scope] = None, name: Any = null): ScopeVariable = {
-    val result = factory.scopeVariable(name)
+  def scopeVariable(parent: Option[Scope] = None): ScopeVariable = {
+    val result = factory.scopeVariable()
     parent.foreach(p => constraints ::= ParentScope(result, p))
     result
   }
@@ -84,14 +84,14 @@ class ConstraintBuilder(val factory: Factory) {
   def add(addition: Constraint): Unit = constraints ::= addition
   def add(addition: List[Constraint]): Unit = constraints = addition ++ constraints
 
-  def assignSubType(superType: Type, subType: Type) = add(AssignSubType(subType, superType))
+  def assignSubType(superType: Type, subType: Type): Unit = add(AssignSubType(subType, superType))
 
-  def declarationVariable(name: Option[Any] = None): DeclarationVariable = {
-    factory.declarationVariable(name)
+  def declarationVariable(): DeclarationVariable = {
+    factory.declarationVariable()
   }
 
-  def getDeclarationOfType(_type: Type, declarationName: Option[Any] = None): Declaration = {
-    val result = declarationVariable(declarationName)
+  def getDeclarationOfType(_type: Type): Declaration = {
+    val result = declarationVariable()
     add(TypesAreEqual(TypeFromDeclaration(result), _type))
     result
   }
@@ -112,7 +112,7 @@ class ConstraintBuilder(val factory: Factory) {
   Get the scope declared by the given declaration
    */
   def getDeclaredScope(declaration: Declaration, scopeName: Any = null): ScopeVariable = {
-    val result = scopeVariable(None, scopeName)
+    val result = scopeVariable(None)
     constraints ::= DeclarationOfScope(declaration, result)
     result
   }
