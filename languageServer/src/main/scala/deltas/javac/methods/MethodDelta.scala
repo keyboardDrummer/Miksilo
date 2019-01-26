@@ -17,7 +17,7 @@ import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.classes.skeleton._
 import deltas.javac.classes.{ClassCompiler, MethodInfo}
 import deltas.javac.expressions.ToByteCodeSkeleton
@@ -47,7 +47,7 @@ object MethodDelta extends DeltaWithGrammar
   }
 
   def compile(compilation: Compilation, program: Node): Unit = {
-    val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
+    val classCompiler = JavaClassDelta.getClassCompiler(compilation)
 
     val methods = getMethods[NodePath](PathRoot(program))
     program(ByteCodeSkeleton.Methods) = methods.map((method: Method[NodePath]) => {
@@ -57,7 +57,7 @@ object MethodDelta extends DeltaWithGrammar
   }
 
   def bind(compilation: Compilation, signature: ClassSignature, program: Node): Unit = {
-    val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
+    val classCompiler = JavaClassDelta.getClassCompiler(compilation)
     val classInfo = classCompiler.currentClassInfo
 
     val methods = getMethods(program)
@@ -79,7 +79,7 @@ object MethodDelta extends DeltaWithGrammar
     MethodTypeDelta.neww(method.returnType.asNode, parameterTypes)
   }
 
-  override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassSkeleton,
+  override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames, JavaClassDelta,
     AccessibilityFieldsDelta)
 
   def getParameterType(parameter: MethodParameter[NodePath], classCompiler: ClassCompiler): Node = {
@@ -155,7 +155,7 @@ object MethodDelta extends DeltaWithGrammar
       parseReturnType.as(ReturnType) ~~ identifier.as(Name) ~ parseParameters.as(Parameters) % block.as(Body)
     val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(Shape))
 
-    val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
+    val memberGrammar = find(JavaClassDelta.ClassMemberGrammar)
     memberGrammar.addAlternative(methodGrammar)
   }
 

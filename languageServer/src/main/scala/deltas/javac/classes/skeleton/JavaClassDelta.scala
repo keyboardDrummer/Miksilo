@@ -24,7 +24,7 @@ import deltas.statement.BlockDelta
 
 import scala.collection.mutable
 
-object JavaClassSkeleton extends DeltaWithGrammar with DeltaWithPhase
+object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
   with HasDeclarationDelta with HasConstraintsDelta {
 
   override def shape: NodeShape = Shape

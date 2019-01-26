@@ -12,8 +12,8 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
-import deltas.javac.classes.skeleton.JavaClassSkeleton.JavaClass
-import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 
 object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
@@ -78,6 +78,6 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDe
 
   override def toConstraintType(_type: Type) = {
     val path = _type.asInstanceOf[TypeFromDeclaration].declaration.asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
-    neww(JavaClassSkeleton.getQualifiedClassName(path))
+    neww(JavaClassDelta.getQualifiedClassName(path))
   }
 }

@@ -9,7 +9,7 @@ trait ClassMemberDelta extends DeltaWithGrammar with HasShape {
   def compile(compilation: Compilation, member: Node): Unit
 
   override def inject(language: Language): Unit = {
-    JavaClassSkeleton.members.add(language, this)
+    JavaClassDelta.members.add(language, this)
     super.inject(language)
   }
 }

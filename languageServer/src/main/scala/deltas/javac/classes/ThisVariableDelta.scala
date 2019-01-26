@@ -12,7 +12,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.TypeFromDeclaration
 import deltas.ConstraintSkeleton
 import deltas.expression.VariableDelta
-import deltas.javac.classes.skeleton.{HasConstraints, JavaClassSkeleton}
+import deltas.javac.classes.skeleton.{HasConstraints, JavaClassDelta}
 import deltas.expression.VariableDelta._
 
 object ThisVariableDelta extends DeltaWithGrammar
@@ -30,10 +30,10 @@ object ThisVariableDelta extends DeltaWithGrammar
 
   val thisDeclarationField = new TypedNodeField[Declaration]("thisDeclaration")
   override def inject(language: Language): Unit = {
-    ConstraintSkeleton.hasConstraints.add(language, JavaClassSkeleton.Shape, new HasConstraints {
+    ConstraintSkeleton.hasConstraints.add(language, JavaClassDelta.Shape, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
-        val classScope = JavaClassSkeleton.getClassScope(compilation, builder, path, parentScope)
-        val clazz: JavaClassSkeleton.JavaClass[NodePath] = path
+        val classScope = JavaClassDelta.getClassScope(compilation, builder, path, parentScope)
+        val clazz: JavaClassDelta.JavaClass[NodePath] = path
         val clazzName = clazz.name
         val classDeclaration = builder.resolveOption(clazzName, None, classScope)
         val thisDeclaration = builder.declare(thisName, classScope, _type = Some(TypeFromDeclaration(classDeclaration)))

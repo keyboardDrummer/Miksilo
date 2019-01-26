@@ -12,7 +12,7 @@ import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
@@ -25,7 +25,7 @@ object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
 
     val targetType = ExpressionDelta.getCachedType(compilation, selector.target).asInstanceOf[TypeFromDeclaration]
     val targetDeclaration = compilation.proofs.resolveDeclaration(targetType.declaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
-    val wasClass = targetDeclaration.shape == JavaClassSkeleton.Shape
+    val wasClass = targetDeclaration.shape == JavaClassDelta.Shape
 
     if (wasClass)
       Seq(GetStaticDelta.getStatic(fieldRefIndex))
@@ -42,7 +42,7 @@ object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
 
     val targetScopeDeclaration = ExpressionDelta.getCachedType(compilation, selector.target).asInstanceOf[TypeFromDeclaration].declaration
     val targetClass = compilation.proofs.resolveDeclaration(targetScopeDeclaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
-    val qualifiedClassName = JavaClassSkeleton.getQualifiedClassName(targetClass)
+    val qualifiedClassName = JavaClassDelta.getQualifiedClassName(targetClass)
 
     val fieldDeclaration = SolveConstraintsDelta.resolvesToDeclaration(selector.getSourceElement(MemberSelectorDelta.Member))
     val fieldType = compilation.proofs.environment(fieldDeclaration)

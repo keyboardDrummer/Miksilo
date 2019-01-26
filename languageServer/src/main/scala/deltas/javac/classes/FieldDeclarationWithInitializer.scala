@@ -8,7 +8,7 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
 import deltas.expression.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.FieldDeclarationDelta.{Field, Name, Type}
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}

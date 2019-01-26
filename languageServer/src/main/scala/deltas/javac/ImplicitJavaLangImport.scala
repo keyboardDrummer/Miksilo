@@ -4,14 +4,14 @@ import core.language.node.Node
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
 import deltas.javac.classes.WildcardImportDelta
-import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.JavaClassDelta._
 
 object ImplicitJavaLangImport extends DeltaWithPhase {
   val javaPackageName: String = "java"
   val langPackageName: String = "lang"
 
-  override def dependencies: Set[Contract] = Set(JavaClassSkeleton, WildcardImportDelta)
+  override def dependencies: Set[Contract] = Set(JavaClassDelta, WildcardImportDelta)
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
     val javaClass: JavaClass[Node] = program

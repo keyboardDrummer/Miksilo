@@ -7,7 +7,7 @@ import deltas.expression.additive.{AdditionDelta, SubtractionDelta}
 import deltas.expression.relational.LessThanDelta
 import deltas.expression.{ExpressionDelta, IntLiteralDelta, TernaryDelta, VariableDelta}
 import deltas.javac.JavaLanguage
-import deltas.javac.classes.skeleton.JavaClassSkeleton
+import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.methods._
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
@@ -22,7 +22,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   test("BasicClass") {
     val input = "package bla; class Help {}"
     val result = TestLanguageGrammarUtils.parse(input)
-    val expectation = JavaClassSkeleton.neww(Seq("bla"), "Help")
+    val expectation = JavaClassDelta.neww(Seq("bla"), "Help")
     assertResult(expectation)(result)
   }
 

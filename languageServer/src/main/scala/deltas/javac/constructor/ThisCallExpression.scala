@@ -10,8 +10,8 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.javac.methods.call.CallDelta
 
@@ -27,7 +27,7 @@ object ThisCallExpression extends DeltaWithGrammar with ExpressionInstance with 
   override def dependencies: Set[Contract] = Set(SuperCallExpression) ++ super.dependencies
 
   override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
-    val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
+    val classCompiler = JavaClassDelta.getClassCompiler(compilation)
     transformThisCall(classCompiler.currentClass, call, compilation)
   }
 

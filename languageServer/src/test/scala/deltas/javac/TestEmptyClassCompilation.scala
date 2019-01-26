@@ -9,7 +9,7 @@ import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeCons
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.ConstantPool
-import deltas.javac.classes.skeleton.{JavaClassSkeleton, QualifiedClassName}
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 import deltas.javac.constructor.SuperCallExpression
 import deltas.javac.types.MethodTypeDelta
 import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
@@ -51,6 +51,6 @@ class TestEmptyClassCompilation extends JavaLanguageTest {
   }
 
   def getEmptyClass: Node = {
-    JavaClassSkeleton.neww(classPackage, className, members = Seq[Node]())
+    JavaClassDelta.neww(classPackage, className, members = Seq[Node]())
   }
 }

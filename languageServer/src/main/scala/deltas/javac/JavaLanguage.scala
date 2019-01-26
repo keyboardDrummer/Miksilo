@@ -25,7 +25,7 @@ import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, Subtr
 import deltas.expression.logical.LogicalNotDelta
 import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
 import deltas.javac.classes._
-import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassSkeleton}
+import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassDelta}
 import deltas.javac.constructor._
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive._
@@ -79,7 +79,7 @@ object JavaLanguage {
       ImplicitThisForPrivateMemberSelectionDelta, ThisVariableDelta, MethodDelta, AccessibilityFieldsDelta,
       CallVariableDelta, VariableDelta, CallDelta, MemberSelectorDelta) ++ javaClassSkeleton
 
-  def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassSkeleton) ++ simpleBlock
+  def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassDelta) ++ simpleBlock
 
   def simpleBlock: Seq[Delta] = noVariableSyntaxSugarStatements ++
     Seq(GotoToByteCodeDelta, GotoStatementDelta, LabelToByteCodeDelta, LabelStatementDelta,

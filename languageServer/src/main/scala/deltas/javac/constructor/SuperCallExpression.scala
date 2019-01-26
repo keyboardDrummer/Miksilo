@@ -14,8 +14,8 @@ import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import deltas.javac.classes.skeleton.JavaClassSkeleton
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.call.CallDelta.Call
@@ -33,7 +33,7 @@ object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance with
   def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallDelta.Arguments -> arguments)
 
   override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
-    val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
+    val classCompiler = JavaClassDelta.getClassCompiler(compilation)
     transformSuperCall(classCompiler.currentClass, call, compilation)
   }
 
@@ -43,7 +43,7 @@ object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance with
 
   def transformToByteCode(path: NodePath, compilation: Compilation, className: String): Seq[Node] = {
     val call: Call[NodePath] = path
-    val compiler = JavaClassSkeleton.getClassCompiler(compilation)
+    val compiler = JavaClassDelta.getClassCompiler(compilation)
     val callArguments = call.arguments
 
     val scopeGraph = compilation.proofs.scopeGraph
@@ -67,7 +67,7 @@ object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance with
   object SuperCall extends NodeShape
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, call: NodePath, _type: Type, parentScope: Scope): Unit = {
-    val clazz: JavaClass[NodePath] = call.findAncestorShape(JavaClassSkeleton.Shape)
+    val clazz: JavaClass[NodePath] = call.findAncestorShape(JavaClassDelta.Shape)
     val parentName = clazz.parent.get
     val superClass = builder.resolve(parentName, call.getSourceElement(ClassParent), parentScope)
     val superScope = builder.getDeclaredScope(superClass)

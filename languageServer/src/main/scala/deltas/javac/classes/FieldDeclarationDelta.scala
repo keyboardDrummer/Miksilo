@@ -11,7 +11,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
-import deltas.javac.classes.skeleton.JavaClassSkeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.classes.skeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
@@ -31,7 +31,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
     def _type: T = node(Type).asInstanceOf[T]
   }
 
-  override def dependencies: Set[Contract] = Set(JavaClassSkeleton, TypeConstant, AccessibilityFieldsDelta)
+  override def dependencies: Set[Contract] = Set(JavaClassDelta, TypeConstant, AccessibilityFieldsDelta)
 
   def neww(_type: Node, name: String) = new Node(Shape, Type -> _type, Name -> name)
 
@@ -54,7 +54,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
   }
 
   def compile(compilation: Compilation, javaClass: Node): Unit = {
-    val classCompiler = JavaClassSkeleton.getClassCompiler(compilation)
+    val classCompiler = JavaClassDelta.getClassCompiler(compilation)
 
     val fields = getFields(javaClass)
     javaClass(ByteCodeSkeleton.ClassFields) = fields.map(field => {
@@ -81,7 +81,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val memberGrammar = find(JavaClassSkeleton.ClassMemberGrammar)
+    val memberGrammar = find(JavaClassDelta.ClassMemberGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
 
     val fieldGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
