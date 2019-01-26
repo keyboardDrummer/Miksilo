@@ -1,27 +1,25 @@
 package deltas.javac.constructor
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.NodePath
-import core.deltas.{Contract, DeltaWithGrammar}
+import core.deltas.path.{ChildPath, NodePath, PathRoot}
+import core.deltas.{Contract, DeltaWithGrammar, DeltaWithPhase}
 import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
 import core.smarts.objects.Reference
 import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import core.smarts.{ConstraintBuilder, SolveConstraintsDelta}
-import deltas.bytecode.coreInstructions.InvokeSpecialDelta
-import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.javac.classes.ThisVariableDelta
 import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.classes.skeleton.JavaClassDelta._
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
-import deltas.javac.methods.MethodDelta.Method
+import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.call.CallDelta.Call
-import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
+import deltas.javac.methods.call.{CallDelta, CallNonVirtualDelta, CallStaticOrInstanceDelta}
 
-object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
+object SuperCallExpressionDelta extends DeltaWithPhase with DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Enables calling a super constructor."
 
@@ -32,24 +30,14 @@ object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance with
 
   def superCall(arguments: Seq[Node] = Seq()) = new Node(SuperCall, CallDelta.Arguments -> arguments)
 
-  override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
-    val classCompiler = JavaClassDelta.getClassCompiler(compilation)
-    transformSuperCall(classCompiler.currentClass, call, compilation)
-  }
-
-  def transformSuperCall(program: Node, call: NodePath, compilation: Compilation): Seq[Node] = {
-    transformToByteCode(call, compilation, program.parent.get)
-  }
-
-  def transformToByteCode(path: NodePath, compilation: Compilation, className: String): Seq[Node] = {
-    val call: Call[NodePath] = path
-    val callArguments = call.arguments
-
-    val method: Method[NodePath] = SolveConstraintsDelta.getDeclarationOfReference(call.node)
-
-    val methodRefIndex = CallDelta.getMethodRefIndexFromMethod(method)
-    val argumentInstructions = callArguments.flatMap(argument => ToByteCodeSkeleton.getToInstructions(compilation)(argument))
-    Seq(LoadAddressDelta.addressLoad(0)) ++ argumentInstructions ++ Seq(InvokeSpecialDelta.invokeSpecial(methodRefIndex))
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+    PathRoot(program).visitShape(SuperCall, path => {
+      val callee = MemberSelectorDelta.neww(ThisVariableDelta.thisVariable, constructorName)
+      val call = CallNonVirtualDelta.Shape.createWithData(
+        CallDelta.Callee -> callee,
+        CallDelta.Arguments -> path.getFieldData(CallDelta.Arguments))
+      path.asInstanceOf[ChildPath].replaceWith(call)
+    })
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

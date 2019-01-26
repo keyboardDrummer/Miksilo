@@ -28,6 +28,7 @@ object ThisVariableDelta extends DeltaWithGrammar
     variable.addAlternative(thisGrammar)
   }
 
+  def thisVariable = VariableDelta.neww(thisName)
   val thisDeclarationField = new TypedNodeField[Declaration]("thisDeclaration")
   override def inject(language: Language): Unit = {
     ConstraintSkeleton.hasConstraints.add(language, JavaClassDelta.Shape, new HasConstraints {
@@ -36,7 +37,8 @@ object ThisVariableDelta extends DeltaWithGrammar
         val clazz: JavaClassDelta.JavaClass[NodePath] = path
         val clazzName = clazz.name
         val classDeclaration = builder.resolveOption(clazzName, None, classScope)
-        val thisDeclaration = builder.declare(thisName, classScope, _type = Some(TypeFromDeclaration(classDeclaration)))
+        val thisDeclaration = builder.declare(thisName, classScope, path.getSourceElement(JavaClassDelta.Name),
+          _type = Some(TypeFromDeclaration(classDeclaration)))
         thisDeclarationField(path) = thisDeclaration
       }
     })

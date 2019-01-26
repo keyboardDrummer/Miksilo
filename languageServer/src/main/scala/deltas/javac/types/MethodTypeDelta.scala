@@ -65,7 +65,7 @@ object MethodTypeDelta extends ByteCodeTypeInstance {
 
   override def constraintName = FuncPrimitive.name
 
-  override def fromConstraintType(_type: Type): Node = {
+  override def fromConstraintType(compilation: Compilation, _type: Type): Node = {
     def uncurry(_type: Type): List[Type] = _type match {
       case TypeApplication(FuncPrimitive, twoArguments, _) =>
         val argument = twoArguments.head
@@ -73,8 +73,8 @@ object MethodTypeDelta extends ByteCodeTypeInstance {
         argument :: uncurry(result)
       case result => List(result)
     }
-    val arguments = uncurry(_type)
-    val parameterTypes = arguments.dropRight(1).map(t => TypeSkeleton.fromConstraintType(t))
-    neww(TypeSkeleton.fromConstraintType(arguments.last), parameterTypes)
+    val arguments = uncurry(_type).map(t => compilation.proofs.resolveType(t))
+    val parameterTypes = arguments.dropRight(1).map(t => TypeSkeleton.fromConstraintType(compilation, t))
+    neww(TypeSkeleton.fromConstraintType(compilation, arguments.last), parameterTypes)
   }
 }

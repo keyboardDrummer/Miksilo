@@ -6,7 +6,7 @@ import core.deltas.{DeltaWithGrammar, DeltaWithPhase}
 import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.javac.constructor.ConstructorDelta.ClassName
-import deltas.javac.constructor.SuperCallExpression
+import deltas.javac.constructor.SuperCallExpressionDelta
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.statement.BlockDelta
 
@@ -17,7 +17,7 @@ object SolidityConstructorDelta extends DeltaWithGrammar with DeltaWithPhase { /
   override def transformProgram(program: Node, state: Compilation): Unit = {
     program.visitShape(Shape, constructor => {
       constructor.shape = MethodDelta.Shape
-      constructor(MethodDelta.Name) = SuperCallExpression.constructorName
+      constructor(MethodDelta.Name) = SuperCallExpressionDelta.constructorName
       constructor(SolidityFunctionDelta.ReturnValues) = Seq.empty
       constructor(MethodDelta.TypeParameters) = Seq.empty
       constructor(AccessibilityFieldsDelta.Static) = false

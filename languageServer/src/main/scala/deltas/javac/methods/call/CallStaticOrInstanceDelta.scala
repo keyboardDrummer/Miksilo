@@ -17,7 +17,7 @@ object CallStaticOrInstanceDelta extends CallWithMemberSelector with ConvertsToB
     val call: Call[NodePath] = path
     val method = CallDelta.getMethodFromCallee(compilation, call.callee)
 
-    val methodRefIndex = CallDelta.getMethodRefIndexFromMethod(method)
+    val methodRefIndex = CallDelta.getMethodRefIndexFromCallee(compilation, call.callee)
     val staticCall = method.isStatic
     if (staticCall)
     {

@@ -34,7 +34,7 @@ import deltas.javac.expressions.literals._
 import deltas.javac.expressions.postfix.PostFixIncrementToByteCodeDelta
 import deltas.javac.expressions.relational.{GreaterThanToByteCodeDelta, LessThanToByteCodeDelta}
 import deltas.javac.methods._
-import deltas.javac.methods.call.{CallDelta, CallStaticOrInstanceDelta}
+import deltas.javac.methods.call.{CallDelta, CallNonVirtualDelta, CallStaticOrInstanceDelta}
 import deltas.javac.statements._
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.javac.types._
@@ -58,7 +58,7 @@ object JavaLanguage {
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
       NewToByteCodeDelta, NewDelta, FieldDeclarationWithInitializer, ConstructorDelta) ++
-      Seq(ThisCallExpression, SuperCallExpression) ++ fields ++ imports ++
+      Seq(ThisCallExpression, SuperCallExpressionDelta) ++ fields ++ imports ++
       javaMethod
   }
 
@@ -77,7 +77,7 @@ object JavaLanguage {
     AssignmentPrecedence, VariableToByteCodeDelta) ++
     Seq(SolveConstraintsDelta,
       ImplicitThisForPrivateMemberSelectionDelta, ThisVariableDelta, MethodDelta, AccessibilityFieldsDelta,
-      CallVariableDelta, VariableDelta, CallDelta, MemberSelectorDelta) ++ javaClassSkeleton
+      CallVariableDelta, VariableDelta, CallNonVirtualDelta, CallDelta, MemberSelectorDelta) ++ javaClassSkeleton
 
   def javaClassSkeleton: Seq[Delta] = Seq(FullyQualifyTypeReferences, JavaClassDelta) ++ simpleBlock
 

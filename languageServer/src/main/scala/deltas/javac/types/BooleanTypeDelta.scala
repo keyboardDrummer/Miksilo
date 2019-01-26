@@ -43,5 +43,5 @@ object BooleanTypeDelta extends ByteCodeTypeInstance
 
   override def constraintName = constraintType.name
 
-  override def fromConstraintType(_type: Type) = booleanType
+  override def fromConstraintType(compilation: Compilation, _type: Type) = booleanType
 }

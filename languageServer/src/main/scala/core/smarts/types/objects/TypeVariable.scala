@@ -10,4 +10,6 @@ case class TypeVariable(name: String, origin: Option[SourceElement] = None) exte
   override def instantiateType(variable: TypeVariable, instance: Type): Type = if (this == variable) instance else this
 
   override def fullyApplied: Boolean = false
+
+  override def toString = s"TypeVariable '$name'"
 }

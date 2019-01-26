@@ -1,8 +1,8 @@
 package deltas.javac.constructor
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.NodePath
-import core.deltas.{Contract, DeltaWithGrammar}
+import core.deltas.path.{ChildPath, NodePath, PathRoot}
+import core.deltas.{Contract, DeltaWithGrammar, DeltaWithPhase}
 import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
@@ -10,12 +10,11 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.ThisVariableDelta
 import deltas.javac.classes.skeleton.JavaClassDelta._
-import deltas.javac.expressions.ConvertsToByteCodeDelta
-import deltas.javac.methods.call.CallDelta
+import deltas.javac.methods.call.{CallDelta, CallNonVirtualDelta}
 
-object ThisCallExpression extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
+object ThisCallExpression extends DeltaWithPhase with DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Enables calling a different constructor using 'this'"
 
@@ -24,15 +23,17 @@ object ThisCallExpression extends DeltaWithGrammar with ExpressionInstance with 
 
   def thisCall(arguments: Seq[Node]) = new Node(ThisCall, CallDelta.Arguments -> arguments)
 
-  override def dependencies: Set[Contract] = Set(SuperCallExpression) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(SuperCallExpressionDelta) ++ super.dependencies
 
-  override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {
-    val classCompiler = JavaClassDelta.getClassCompiler(compilation)
-    transformThisCall(classCompiler.currentClass, call, compilation)
-  }
-
-  def transformThisCall(program: Node, call: NodePath, compilation: Compilation): Seq[Node] = {
-    SuperCallExpression.transformToByteCode(call, compilation, program.name)
+  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+    PathRoot(program).visitShape(ThisCall, path => {
+      val thisVariable = ThisVariableDelta.thisVariable
+      val call = CallNonVirtualDelta.Shape.createWithData(
+        Name -> SuperCallExpressionDelta.constructorName,
+        CallDelta.Callee -> thisVariable,
+        CallDelta.Arguments -> path.getFieldData(CallDelta.Arguments))
+      path.asInstanceOf[ChildPath].replaceWith(call)
+    })
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

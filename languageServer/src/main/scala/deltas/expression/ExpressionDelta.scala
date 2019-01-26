@@ -24,7 +24,7 @@ object ExpressionDelta extends DeltaWithGrammar {
   def cachedNodeType(compilation: Compilation, expression: NodePath): Node = {
     nodeType.get(expression) match {
       case None =>
-        val result = TypeSkeleton.fromConstraintType(getCachedType(compilation, expression))
+        val result = TypeSkeleton.fromConstraintType(compilation, getCachedType(compilation, expression))
         nodeType(expression) = result
         result
       case Some(result) => result

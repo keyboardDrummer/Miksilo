@@ -7,5 +7,5 @@ import core.smarts.scopes.GraphNode
 //TODO Maybe refs should have an optional origin, in case of implicit refs.
 class Reference(val name: String, val origin: Option[SourceElement]) extends GraphNode
 {
-  override def toString = s"Reference($name, $origin)"
+  override def toString = s"Reference '$name'"
 }

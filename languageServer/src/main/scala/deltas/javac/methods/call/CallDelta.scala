@@ -74,6 +74,8 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
   def getMethodRefIndex(className: QualifiedClassName, methodName: String, methodType: Node) = {
     val classRef = ClassInfoConstant.classRef(className)
     val nameAndTypeIndex = getMethodNameAndTypeIndex(methodName, methodType)
+    if(methodName == "<init>")
+      System.out.append("")
     MethodRefConstant.methodRef(classRef, nameAndTypeIndex)
   }
 
@@ -88,7 +90,10 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
 
   def getMethodRefIndexFromCallee(compilation: Compilation, callee: NodePath) = {
     val method: Method[NodePath] = getMethodFromCallee(compilation, callee)
-    getMethodRefIndexFromMethod(method)
+    val methodType = ExpressionDelta.cachedNodeType(compilation, callee)
+    val methodName = ReferenceExpressionSkeleton.references(callee).name
+    val constructorClass: JavaClass[NodePath] = method.ancestors.find(a => a.shape == JavaClassDelta.Shape || a.shape == ByteCodeSkeleton.Shape).get
+    getMethodRefIndex(JavaClassDelta.getQualifiedClassName(constructorClass), methodName, methodType)
   }
 
   def getMethodRefIndexFromMethod(method: Method[NodePath]): Node = {
@@ -98,7 +103,6 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
   }
 
   def getMethodFromCallee(compilation: Compilation, callee: NodePath) = {
-    val scopeGraph = compilation.proofs.scopeGraph
     val callReference = ReferenceExpressionSkeleton.references(callee)
     val callDeclaration = compilation.proofs.declarations(callReference)
     val method: Method[NodePath] = callDeclaration.origin.get.asInstanceOf[FieldPath].parent

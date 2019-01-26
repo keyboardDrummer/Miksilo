@@ -17,13 +17,13 @@ object ImplicitSuperConstructorCall extends DeltaWithPhase {
         addSuperCall = true
       else {
         val firstStatement = statements.head
-        if (firstStatement.shape != SuperCallExpression.SuperCall && firstStatement.shape != ThisCallExpression.ThisCall) {
+        if (firstStatement.shape != SuperCallExpressionDelta.SuperCall && firstStatement.shape != ThisCallExpression.ThisCall) {
           addSuperCall = true
         }
       }
 
       if (addSuperCall)
-        constructor.body.statements = Seq(ExpressionAsStatementDelta.create(SuperCallExpression.superCall())) ++ statements
+        constructor.body.statements = Seq(ExpressionAsStatementDelta.create(SuperCallExpressionDelta.superCall())) ++ statements
     }
   }
 

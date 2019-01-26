@@ -11,7 +11,7 @@ import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types._
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
-import deltas.javac.constructor.SuperCallExpression
+import deltas.javac.constructor.SuperCallExpressionDelta
 import deltas.javac.types.MethodTypeDelta
 import util.{JavaLanguageTest, LanguageTest}
 
@@ -78,7 +78,7 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
       MethodRefConstant.methodRef(22, 23),
       ClassInfoConstant.classRef(24),
       ClassInfoConstant.classRef(25),
-      SuperCallExpression.constructorName,
+      SuperCallExpressionDelta.constructorName,
       TypeConstant.constructor(MethodTypeDelta.neww(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,

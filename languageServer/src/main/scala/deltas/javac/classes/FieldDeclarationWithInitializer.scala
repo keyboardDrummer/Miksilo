@@ -9,7 +9,7 @@ import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
 import deltas.expression.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.FieldDeclarationDelta.{Field, Name, Type}
 import deltas.javac.classes.skeleton.JavaClassDelta._
-import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
+import deltas.javac.constructor.{ConstructorDelta, SuperCallExpressionDelta}
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
@@ -78,6 +78,6 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
   def statementIsSuperCall(statement: Node): Boolean = {
     statement.shape == ExpressionAsStatementDelta.shape &&
-      ExpressionAsStatementDelta.getExpression(statement).shape == SuperCallExpression.SuperCall
+      ExpressionAsStatementDelta.getExpression(statement).shape == SuperCallExpressionDelta.SuperCall
   }
 }

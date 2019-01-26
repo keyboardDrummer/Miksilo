@@ -18,7 +18,7 @@ import deltas.statement.BlockDelta
 
 object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, CallStaticOrInstanceDelta, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpression)
+  override def dependencies: Set[Contract] = Set(MethodDelta, CallStaticOrInstanceDelta, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpressionDelta)
 
   case class BadConstructorNameException(javaClass: Node, constructor: Node) extends BadInputException
 
@@ -31,7 +31,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
         throw BadConstructorNameException(program, constructor.node)
 
       constructor.shape = MethodDelta.Shape
-      constructor(MethodDelta.Name) = SuperCallExpression.constructorName
+      constructor(MethodDelta.Name) = SuperCallExpressionDelta.constructorName
       constructor(MethodDelta.ReturnType) = VoidTypeDelta.voidType
       constructor(MethodDelta.TypeParameters) = Seq.empty
       constructor(AccessibilityFieldsDelta.Static) = false
