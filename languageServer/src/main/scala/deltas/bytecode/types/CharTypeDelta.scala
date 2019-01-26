@@ -34,5 +34,5 @@ object CharTypeDelta extends ByteCodeTypeInstance
 
   override def constraintName = constraintType.name
 
-  override def toConstraintType(_type: Type) = me
+  override def fromConstraintType(_type: Type) = me
 }

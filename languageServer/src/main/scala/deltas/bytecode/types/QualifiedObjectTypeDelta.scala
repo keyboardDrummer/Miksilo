@@ -76,8 +76,11 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDe
 
   override def constraintName = "DECLARATION"
 
-  override def toConstraintType(_type: Type) = {
-    val path = _type.asInstanceOf[TypeFromDeclaration].declaration.asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
-    neww(JavaClassDelta.getQualifiedClassName(path))
+  val _clazz = new TypedNodeField[Node]("clazz")
+  override def fromConstraintType(_type: Type): Node = {
+    val clazz = _type.asInstanceOf[TypeFromDeclaration].declaration.asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
+    val result = neww(JavaClassDelta.getQualifiedClassName(clazz))
+    _clazz(result) = clazz
+    result
   }
 }

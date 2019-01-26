@@ -66,7 +66,7 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
     val call: Call[NodePath] = path
     val calleeReference = ReferenceExpressionSkeleton.getReference(compilation, builder, call.callee, parentScope)
     val functionType = CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, calleeReference, returnType)
-    ExpressionDelta.nodeType(call.callee) = functionType
+    ExpressionDelta.constraintType(call.callee) = functionType
   }
 
   override def shape = Shape

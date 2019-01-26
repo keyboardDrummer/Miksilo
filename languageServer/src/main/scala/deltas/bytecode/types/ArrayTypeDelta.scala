@@ -48,7 +48,7 @@ object ArrayTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override def constraintName = arrayTypeConstructor.name
 
-  override def toConstraintType(_type: Type) = {
+  override def fromConstraintType(_type: Type) = {
     val elementType = _type.asInstanceOf[TypeApplication].arguments.head
     neww(TypeSkeleton.fromConstraintType(elementType))
   }

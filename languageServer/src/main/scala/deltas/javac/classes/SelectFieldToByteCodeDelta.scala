@@ -10,7 +10,7 @@ import core.smarts.types.objects.TypeFromDeclaration
 import deltas.bytecode.constants.FieldRefConstant
 import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
-import deltas.bytecode.types.TypeSkeleton
+import deltas.bytecode.types.{QualifiedObjectTypeDelta, TypeSkeleton}
 import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
@@ -38,10 +38,7 @@ object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
   }
 
   def getFieldRefIndex(compilation: Compilation, selector: MemberSelector[NodePath]): Node = {
-    val scopeGraph = compilation.proofs.scopeGraph
-
-    val targetScopeDeclaration = ExpressionDelta.getCachedType(compilation, selector.target).asInstanceOf[TypeFromDeclaration].declaration
-    val targetClass = compilation.proofs.resolveDeclaration(targetScopeDeclaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
+    val targetClass = QualifiedObjectTypeDelta._clazz(ExpressionDelta.cachedNodeType(compilation, selector.target))
     val qualifiedClassName = JavaClassDelta.getQualifiedClassName(targetClass)
 
     val fieldDeclaration = SolveConstraintsDelta.resolvesToDeclaration(selector.getSourceElement(MemberSelectorDelta.Member))

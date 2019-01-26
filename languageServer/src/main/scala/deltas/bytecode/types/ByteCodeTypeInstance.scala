@@ -11,7 +11,7 @@ trait ByteCodeTypeInstance extends TypeInstance {
   def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar
 
   def constraintName: String
-  def toConstraintType(_type: Type): Node
+  def fromConstraintType(_type: Type): Node
 
   def getStackType(_type: Node, state: Language): Node = _type
 
@@ -27,7 +27,7 @@ trait ByteCodeTypeInstance extends TypeInstance {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    TypeSkeleton.maps.put(constraintName, toConstraintType)
+    TypeSkeleton.maps.put(constraintName, fromConstraintType)
     TypeSkeleton.byteCodeInstances.add(language, shape, this)
   }
 }

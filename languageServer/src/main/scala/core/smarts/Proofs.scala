@@ -4,7 +4,7 @@ import core.language.SourceElement
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.ScopeGraph
 import core.smarts.types.TypeGraph
-import core.smarts.types.objects.{Type, TypeVariable}
+import core.smarts.types.objects.{Type, TypeFromDeclaration, TypeVariable}
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

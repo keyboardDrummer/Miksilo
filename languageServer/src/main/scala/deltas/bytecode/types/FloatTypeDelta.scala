@@ -33,5 +33,5 @@ object FloatTypeDelta extends ByteCodeTypeInstance
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = constraintType
   override def constraintName = constraintType.name
 
-  override def toConstraintType(_type: Type) = floatType
+  override def fromConstraintType(_type: Type) = floatType
 }
