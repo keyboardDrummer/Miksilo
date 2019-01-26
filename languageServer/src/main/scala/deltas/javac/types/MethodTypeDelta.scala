@@ -65,7 +65,7 @@ object MethodTypeDelta extends ByteCodeTypeInstance {
 
   override def constraintName = FuncPrimitive.name
 
-  override def toConstraintType(_type: Type): Node = {
+  override def fromConstraintType(_type: Type): Node = {
     def uncurry(_type: Type): List[Type] = _type match {
       case TypeApplication(FuncPrimitive, twoArguments, _) =>
         val argument = twoArguments.head

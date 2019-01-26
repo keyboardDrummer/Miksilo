@@ -7,25 +7,37 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.Type
+import core.smarts.types.objects.{ConcreteType, Type}
+import deltas.bytecode.types.TypeSkeleton
 
 object ExpressionDelta extends DeltaWithGrammar {
 
   implicit class Expression(val node: Node) extends NodeWrapper[Node]
 
-  val nodeType = new TypedNodeField[Type]("type")
+  val constraintType = new TypedNodeField[Type]("constraintType")
+  val nodeType = new TypedNodeField[Node]("nodeType")
   def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
-    nodeType(expression) = _type
+    constraintType(expression) = _type
     getInstance(compilation)(expression).constraints(compilation, builder, expression, _type, parentScope)
   }
 
-  def getCachedType(compilation: Compilation, expression: NodePath): Type = {
-    compilation.proofs.resolveType(nodeType(expression))
+  def cachedNodeType(compilation: Compilation, expression: NodePath): Node = {
+    nodeType.get(expression) match {
+      case None =>
+        val result = TypeSkeleton.fromConstraintType(getCachedType(compilation, expression))
+        nodeType(expression) = result
+        result
+      case Some(result) => result
+    }
+  }
+
+  def getCachedType(compilation: Compilation, expression: NodePath): ConcreteType = {
+    compilation.proofs.resolveType(constraintType(expression)).asInstanceOf[ConcreteType]
   }
 
   def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {
     val result = getInstance(compilation)(expression).getType(compilation, builder, expression, parentScope)
-    nodeType(expression) = result
+    constraintType(expression) = result
     result
   }
 

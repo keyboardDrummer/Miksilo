@@ -23,7 +23,7 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
 
     val newVariableName = if (static) clazz.name else ThisVariableDelta.thisName
     val target = VariableDelta.neww(newVariableName)
-    ExpressionDelta.nodeType(target) = TypeFromDeclaration(JavaClassDelta.staticDeclaration(clazz.node))
+    ExpressionDelta.constraintType(target) = TypeFromDeclaration(JavaClassDelta.staticDeclaration(clazz.node))
 
     val variableNameData = variable.getFieldData(VariableDelta.Name)
     val selector = MemberSelectorDelta.Shape.createWithData(

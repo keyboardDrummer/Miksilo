@@ -38,5 +38,5 @@ object VoidTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override def constraintName = constraintType.name
 
-  override def toConstraintType(_type: Type) = voidType
+  override def fromConstraintType(_type: Type) = voidType
 }

@@ -38,5 +38,5 @@ object ShortTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override def constraintName = constraintType.name
 
-  override def toConstraintType(_type: Type) = shortType
+  override def fromConstraintType(_type: Type) = shortType
 }
