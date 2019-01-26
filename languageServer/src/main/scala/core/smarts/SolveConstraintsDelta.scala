@@ -1,7 +1,7 @@
 package core.smarts
 
 import com.typesafe.scalalogging.LazyLogging
-import core.deltas.path.{ChildPath, NodePath}
+import core.deltas.path.{AnyPath, ChildPath, NodePath}
 import core.deltas.{Contract, Delta}
 import core.language.exceptions.BadInputException
 import core.language.node.TypedChildField
@@ -12,7 +12,7 @@ import scala.util.{Failure, Success}
 
 object SolveConstraintsDelta extends Delta with LazyLogging {
 
-  def getDeclarationOfReference(path: ChildPath): NodePath = resolvesToDeclaration(path).origin.get.asInstanceOf[ChildPath].parent
+  def getDeclarationOfReference(path: AnyPath): NodePath = resolvesToDeclaration(path).origin.get.asInstanceOf[ChildPath].parent
   val resolvesToDeclaration = new TypedChildField[NamedDeclaration]("resolvesToDeclaration")
   override def inject(language: Language): Unit = {
     super.inject(language)

@@ -19,7 +19,7 @@ import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames, InlineConstantPool, LabelledLocations}
 import deltas.bytecode.types._
-import deltas.expression.relational.{AddRelationalPrecedenceDelta, GreaterThanDelta, LessThanDelta}
+import deltas.expression.relational.{AddRelationalPrecedenceDelta, EqualsComparisonDelta, GreaterThanDelta, LessThanDelta}
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.logical.LogicalNotDelta
@@ -29,7 +29,7 @@ import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassDelta
 import deltas.javac.constructor._
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive._
-import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityDelta}
+import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityToByteCodeDelta}
 import deltas.javac.expressions.literals._
 import deltas.javac.expressions.postfix.PostFixIncrementToByteCodeDelta
 import deltas.javac.expressions.relational.{GreaterThanToByteCodeDelta, LessThanToByteCodeDelta}
@@ -88,7 +88,7 @@ object JavaLanguage {
     BlockDelta,
     ExpressionAsStatementDelta, StatementDelta) ++ javaSimpleExpression
 
-  def javaSimpleExpression: Seq[Delta] = Seq(TernaryToByteCodeDelta, TernaryDelta, EqualityDelta,
+  def javaSimpleExpression: Seq[Delta] = Seq(TernaryToByteCodeDelta, TernaryDelta, EqualityToByteCodeDelta, EqualsComparisonDelta,
     AddEqualityPrecedence, LessThanToByteCodeDelta, LessThanDelta, GreaterThanToByteCodeDelta, GreaterThanDelta, AddRelationalPrecedenceDelta, AdditionToByteCodeDelta, AdditionDelta,
     SubtractionToByteCodeDelta, SubtractionDelta, AdditivePrecedenceDelta,
     BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, LogicalNotDelta, ParenthesisInExpressionDelta, ExpressionDelta) ++ allByteCodeDeltas

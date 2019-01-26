@@ -1,15 +1,15 @@
 package deltas.javac.constructor
 
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{FieldPath, NodePath}
+import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
-import core.smarts.ConstraintBuilder
 import core.smarts.objects.Reference
 import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
+import core.smarts.{ConstraintBuilder, SolveConstraintsDelta}
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
@@ -43,13 +43,9 @@ object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance with
 
   def transformToByteCode(path: NodePath, compilation: Compilation, className: String): Seq[Node] = {
     val call: Call[NodePath] = path
-    val compiler = JavaClassDelta.getClassCompiler(compilation)
     val callArguments = call.arguments
 
-    val scopeGraph = compilation.proofs.scopeGraph
-    val callReference = compilation.proofs.scopeGraph.elementToNode(call).asInstanceOf[Reference]
-    val constructorDeclaration = compilation.proofs.declarations(callReference)
-    val method: Method[NodePath] = constructorDeclaration.origin.get.asInstanceOf[FieldPath].parent
+    val method: Method[NodePath] = SolveConstraintsDelta.getDeclarationOfReference(call.node)
 
     val methodRefIndex = CallDelta.getMethodRefIndexFromMethod(method)
     val argumentInstructions = callArguments.flatMap(argument => ToByteCodeSkeleton.getToInstructions(compilation)(argument))

@@ -35,24 +35,5 @@ object MemberSelectorDelta extends DeltaWithGrammar {
       Member -> member)
   }
 
-//  def getClassOrObjectReference(selector: MemberSelector[NodePath], compiler: ClassCompiler): ClassOrObjectReference = {
-//    val obj = selector.target
-//    getReferenceKind(compiler, obj).asInstanceOf[ClassOrObjectReference]
-//  }
-//
-//  def getReferenceKind(classCompiler: ClassCompiler, expression: NodePath): ReferenceKind = {
-//    val getReferenceKindOption = MemberSelectorDelta.referenceKindRegistry.get(classCompiler.compilation).get(expression.shape)
-//    getReferenceKindOption.fold[ReferenceKind]({
-//      getReferenceKindFromExpressionType(classCompiler, expression)
-//    })(implementation => implementation(classCompiler.compilation, expression))
-//  }
-//
-//  def getReferenceKindFromExpressionType(classCompiler: ClassCompiler, expression: NodePath): ClassOrObjectReference = {
-//    val classInfo: ClassSignature = classCompiler.findClass(ExpressionDelta.getCachedType(classCompiler.compilation, expression))
-//    ClassOrObjectReference(classInfo, wasClass = false)
-//  }
-
-//  val referenceKindRegistry = new ShapeProperty[(Compilation, NodePath) => ReferenceKind]
-
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
 }

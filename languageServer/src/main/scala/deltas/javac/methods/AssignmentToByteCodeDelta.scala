@@ -25,7 +25,7 @@ object AssignmentToByteCodeDelta extends ConvertsToByteCodeDelta {
     val valueInstructions = ToByteCodeSkeleton.getToInstructions(compilation)(value)
     val target = getTarget(assignment)
     val assignInstructions = hasAssignFromStackByteCode(compilation, target.shape).getAssignFromStackByteCode(compilation, target)
-    val valueType = TypeSkeleton.fromConstraintType(ExpressionDelta.getCachedType(compilation, value))
+    val valueType = ExpressionDelta.cachedNodeType(compilation, value)
     val duplicateInstruction = TypeSkeleton.getTypeSize(valueType, compilation) match
     {
       case 1 => DuplicateInstructionDelta.duplicate
