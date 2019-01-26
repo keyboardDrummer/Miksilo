@@ -76,11 +76,25 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   }
 
   override def toString: String = {
-    val className = shape.toString
-    if (data.isEmpty)
-      return className
-    s"$className: ${data.filter(p => !p._1.isInstanceOf[TypedNodeField[_]]).
-      map(kv => (kv._1.debugRepresentation, kv._2))}"
+    def inner(visited: mutable.Set[Node]): String = {
+      if (visited.add(this)) {
+        val className = shape.toString
+        if (data.isEmpty)
+          return className
+        return s"$className: ${data.map(kv => (kv._1.debugRepresentation, kv._2))}"
+      }
+      "recursive"
+    }
+
+    var visible = visitedToString.get()
+    if (visible != null)
+      return inner(visible)
+
+    visible = mutable.HashSet.empty
+    visitedToString.set(visible)
+    val result = inner(visible)
+    visitedToString.set(null)
+    result
   }
 
   override def equals(other: Any): Boolean = other match {
@@ -109,6 +123,8 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 }
 
 object Node {
+  val visitedToString = new ThreadLocal[mutable.Set[Node]]()
+
   implicit object PositionOrdering extends Ordering[Position] {
 
     private val ordering = Ordering.by[Position, (Int, Int)](x => (x.line, x.character))

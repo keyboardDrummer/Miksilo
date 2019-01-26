@@ -61,7 +61,7 @@ case class ClassCompiler(currentClass: Node, compilation: Compilation) {
     Utf8ConstantDelta.create(methodName)
   }
 
-  def getClassRef(info: ClassSignature) = {
+  def getClassRef(info: ClassSignature): Node = {
     ClassInfoConstant.classRef(info.getQualifiedName)
   }
 

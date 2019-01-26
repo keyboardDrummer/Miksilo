@@ -17,9 +17,12 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
 
   var output: String = _
   val state: mutable.Map[Any,Any] = mutable.Map.empty
+  var stopped: Boolean = false
 
   def runPhases(): Unit = {
     for(phase <- language.compilerPhases) {
+      if (stopped)
+        return
       phase.action(this)
     }
   }

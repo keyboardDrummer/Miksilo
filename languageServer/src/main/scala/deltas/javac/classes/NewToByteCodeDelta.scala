@@ -1,9 +1,9 @@
 package deltas.javac.classes
 
-import core.deltas.path.{FieldPath, NodePath}
+import core.deltas.path.{ChildPath, NodePath}
 import core.language.Compilation
 import core.language.node.Node
-import core.smarts.objects.Reference
+import core.smarts.SolveConstraintsDelta
 import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import deltas.expression.NewDelta
@@ -24,10 +24,7 @@ object NewToByteCodeDelta extends ConvertsToByteCodeDelta {
     val callArguments = call.arguments
     val argumentInstructions = callArguments.flatMap(argument => expressionToInstruction(argument))
 
-    val scopeGraph = compilation.proofs.scopeGraph
-    val callReference = compilation.proofs.scopeGraph.elementToNode(call).asInstanceOf[Reference]
-    val constructorDeclaration = compilation.proofs.declarations(callReference)
-    val method: Method[NodePath] = constructorDeclaration.origin.get.asInstanceOf[FieldPath].parent
+    val method: Method[NodePath] = SolveConstraintsDelta.getDeclarationOfReference(call.node.asInstanceOf[ChildPath])
 
     val methodRefIndex: Node = CallDelta.getMethodRefIndexFromMethod(method)
     Seq(NewByteCodeDelta.newInstruction(classRef), DuplicateInstructionDelta.duplicate) ++ argumentInstructions ++
