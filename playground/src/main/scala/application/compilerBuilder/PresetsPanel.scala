@@ -25,7 +25,7 @@ object PresetsPanel
 {
   def getSimplifiedByteCodePreset: Preset = {
     val deltas = Delta.spliceAndFilterTop(JavaLanguage.simpleByteCodeDeltas, JavaLanguage.byteCodeDeltas, Seq(MarkOutputGrammar))
-    Preset("Simplified bytecode", deltas, "Simplified JVM bytecode.")
+    Preset("Simplified bytecode", Seq(ParseUsingTextualGrammar) ++ deltas, "Simplified JVM bytecode.")
   }
 
   def getJavaToSimplifiedByteCodePreset = {
@@ -54,18 +54,17 @@ object PresetsPanel
   }
 
   def getFibonacciExpressionMethodPreset = {
-    Preset("Java with expression method", Seq(ExpressionMethodDelta) ++ getJavaCompilerParticles,
+    Preset("Java with expression method", spliceAfterTransformations(Seq(ParseUsingTextualGrammar), Seq(ExpressionMethodDelta)),
       "Allows you to use an expression as the body of a method.")
   }
 
   def getBlockCompilerPreset = {
-    Preset("Java statement block", Seq(BlockLanguageDelta) ++ getJavaCompilerParticles,
+    Preset("Java statement block", spliceAfterTransformations(Seq(ParseUsingTextualGrammar), Seq(BlockLanguageDelta)),
       "The program consists only of a single statement block.")
   }
 
   def getByteCodePreset = {
-    Preset("Basic bytecode", JavaLanguage.byteCodeDeltas,
-      "Regular JVM bytecode.")
+    Preset("Basic bytecode", Seq(ParseUsingTextualGrammar) ++ JavaLanguage.byteCodeDeltas, "Regular JVM bytecode.")
   }
 
   def getAddImplicitsPreset: Preset = {
@@ -85,7 +84,7 @@ object PresetsPanel
   }
 
   def getLabelledLocations = {
-    Preset("Labelled JVM locations", Seq[Delta](LabelledLocations, MarkOutputGrammar) ++ JavaLanguage.byteCodeDeltas,
+    Preset("Labelled JVM locations", Seq[Delta](ParseUsingTextualGrammar, LabelledLocations, MarkOutputGrammar) ++ JavaLanguage.byteCodeDeltas,
       "Replaces integer offsets by labels to indicate positions in instruction lists.")
   }
 
