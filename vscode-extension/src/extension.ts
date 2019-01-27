@@ -15,6 +15,14 @@ const languages: Array<LanguageConfiguration> = [
 	{
         vscodeName: "solidity",
         miksiloName: "solidity"
+    },
+    {
+         vscodeName: "java",
+         miksiloName: "java"
+    },
+    {
+         vscodeName: "cloudFormation",
+         miksiloName: "cloudFormation"
     }
 ]
 

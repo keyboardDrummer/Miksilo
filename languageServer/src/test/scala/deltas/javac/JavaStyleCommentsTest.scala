@@ -160,8 +160,12 @@ class JavaStyleCommentsTest
   }
 
   test("comments are maintained in bytecode") {
-    val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta) ++
-      JavaLanguage.spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(PrettyPrint(), TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta))))
+    val byteCodeWithComments = Delta.spliceAndFilterTop(
+      JavaLanguage.javaCompilerDeltas,
+      JavaLanguage.byteCodeDeltas,
+      Seq(PrettyPrint(), TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta))
+    val deltas = Seq(TriviaInsideNode, StoreTriviaDelta) ++ byteCodeWithComments
+    val language = new LanguageTest(TestLanguageBuilder.buildWithParser(deltas))
     val result = language.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)

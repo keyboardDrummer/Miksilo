@@ -121,8 +121,8 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
         filter(declaration => declaration.name.startsWith(prefix))
-      missingText = declaration.name.drop(prefixLength)
-      completion = CompletionItem(declaration.name, kind = Some(CompletionItemKind.Text), insertText = Some(missingText))
+      insertText = declaration.name
+      completion = CompletionItem(declaration.name, kind = Some(CompletionItemKind.Text), insertText = Some(insertText))
     } yield completion
 
     CompletionList(isIncomplete = false, completions)

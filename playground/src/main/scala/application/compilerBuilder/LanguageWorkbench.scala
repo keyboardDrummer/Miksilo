@@ -13,12 +13,12 @@ import deltas.javac.JavaLanguage
 import org.jdesktop.swingx.JXList
 
 object LanguageWorkbench {
-  val availableParticles = JavaLanguage.allDeltas ++ Seq(MarkOutputGrammar)
+  val availableDeltas = JavaLanguage.allDeltas ++ Seq(MarkOutputGrammar)
 }
 
 class LanguageWorkbench extends JPanel(new GridBagLayout()) {
 
-  val painter = new DeltaLabelPainter(this, LanguageWorkbench.availableParticles)
+  val painter = new DeltaLabelPainter(this, LanguageWorkbench.availableDeltas)
 
   setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED))
   setAutoscrolls(true)
@@ -62,7 +62,7 @@ class LanguageWorkbench extends JPanel(new GridBagLayout()) {
   }
 
   def getAvailableScrollPane: JPanel = {
-    val availableItems: Seq[Delta] = LanguageWorkbench.availableParticles.toStream.sortBy(i => i.name)
+    val availableItems: Seq[Delta] = LanguageWorkbench.availableDeltas.toStream.sortBy(i => i.name)
     val availableList = new ParticleList()
     availableList.setModel(new AbstractListModel[Delta] {
       def getSize: Int = availableItems.length
