@@ -17,7 +17,9 @@
 	],
 	"activationEvents": [
 		"onLanguage:systemverilog",
-		"onLanguage:solidity"
+		"onLanguage:solidity",
+        "onLanguage:cloudFormation",
+        "onLanguage:java"
 	],
 	"main": "./out/extension",
 	"contributes": {
@@ -46,6 +48,24 @@
 				"extensions": [
 					".sol"
 				]
+			},
+			{
+				"id": "java",
+                "aliases": [
+                  "java"
+                ],
+				"extensions": [
+					".java"
+				]
+			},
+			{
+				"id": "cloudFormation",
+                "aliases": [
+                  "cloudFormation"
+                ],
+				"extensions": [
+					".clfm"
+				]
 			}
         ],
         "snippets": [
@@ -56,9 +76,14 @@
         ],
         "grammars": [
             {
-                "language": "systemverilog",
-                "scopeName": "text.systemverilog",
-                "path": "./src/verilog/tmLanguage.json"
+              "language": "systemverilog",
+              "scopeName": "text.systemverilog",
+              "path": "./src/verilog/tmLanguage.json"
+            },
+            {
+              "language": "cloudFormation",
+              "scopeName": "source.cloudFormation",
+              "path": "./src/cloudFormation/tmLanguage.json"
             }
         ],
         "commands": [
