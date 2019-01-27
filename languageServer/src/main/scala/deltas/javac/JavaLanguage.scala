@@ -53,7 +53,8 @@ object JavaLanguage {
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
     Set(ConstantPoolIndices, SlashStarBlockCommentsDelta, StoreTriviaDelta,
-      TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, ReorderMembersDelta)
+      TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, ReorderMembersDelta,
+      ParseUsingTextualGrammar)
 
   def javaCompilerDeltas: Seq[Delta] = {
     Seq(ClassifyTypeIdentifiers, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass,
@@ -141,11 +142,8 @@ object JavaLanguage {
     Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta, FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
       ShortTypeDelta, TypeSkeleton)
 
-  def spliceBeforeTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
-    Delta.spliceAndFilterTop(javaCompilerDeltas, implicits, splice)
-
-  def spliceAfterTransformations(implicits: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
-    Delta.spliceAndFilterBottom(implicits, javaCompilerDeltas, splice)
+  def spliceBeforeTransformations(bottom: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
+    Delta.spliceAndFilterTop(getJava.topToBottom, bottom, splice)
 
   def getPrettyPrintJavaToByteCodeCompiler: Language = {
     LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(new PrettyPrint)))

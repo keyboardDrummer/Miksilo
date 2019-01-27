@@ -9,5 +9,5 @@ object MarkOutputGrammar extends Delta {
 
   override def dependencies: Set[Contract] = Set.empty
 
-  override def inject(language: Language): Unit = ???
+  override def inject(language: Language): Unit = {}
 }

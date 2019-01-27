@@ -8,9 +8,11 @@ import javax.swing.event.ListSelectionEvent
 import javax.swing.text.AbstractDocument
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
-import core.deltas.Delta
+import core.deltas.{Delta, ParseUsingTextualGrammar}
+import core.smarts.SolveConstraintsDelta
 import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.javaPlus.ExpressionMethodDelta
+import deltas.javac.JavaLanguage.getJava
 import deltas.javac._
 import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
@@ -47,7 +49,7 @@ object PresetsPanel
   }
 
   def getPrettyPrintPreset = {
-    Preset("Pretty Print Java", Seq(MarkOutputGrammar) ++ JavaLanguage.javaCompilerDeltas,
+    Preset("Pretty Print Java", Seq(ParseUsingTextualGrammar, MarkOutputGrammar) ++ JavaLanguage.javaCompilerDeltas,
       "Performs no transformations. Just parses and prints the Java.")
   }
 
@@ -57,28 +59,28 @@ object PresetsPanel
   }
 
   def getBlockCompilerPreset = {
-    new Preset("Java statement block", Seq(BlockLanguageDelta) ++ getJavaCompilerParticles,
+    Preset("Java statement block", Seq(BlockLanguageDelta) ++ getJavaCompilerParticles,
       "The program consists only of a single statement block.")
   }
 
   def getByteCodePreset = {
-    new Preset("Basic bytecode", JavaLanguage.byteCodeDeltas,
+    Preset("Basic bytecode", JavaLanguage.byteCodeDeltas,
       "Regular JVM bytecode.")
   }
 
   def getAddImplicitsPreset: Preset = {
-    val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorDelta, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ImplicitThisForPrivateMemberSelectionDelta, ImplicitReturnAtEndOfMethod)
+    val implicits = Seq[Delta](ParseUsingTextualGrammar, ImplicitJavaLangImport, DefaultConstructorDelta, ImplicitSuperConstructorCall,
+      ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta)
 
-    new Preset("Reveal Java Implicits", JavaLanguage.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
+    Preset("Reveal Java Implicits", spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
   }
 
   def getRevealSyntaxSugar: Preset = {
-    val implicits = Seq[Delta](DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
+    val implicits = Seq[Delta](ParseUsingTextualGrammar, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
       ConstructorDelta, ImplicitReturnAtEndOfMethod, AddAssignmentDelta, ForLoopContinueDelta, ForLoopDelta, LocalDeclarationWithInitializerDelta,
-      ImplicitThisForPrivateMemberSelectionDelta, ImplicitJavaLangImport)
+      ImplicitJavaLangImport, SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta)
 
-    Preset("Reveal Syntax Sugar", JavaLanguage.spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
+    Preset("Reveal Syntax Sugar", spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)),
       "Performs all compiler phases that still maintain a valid Java program.")
   }
 
@@ -102,6 +104,9 @@ object PresetsPanel
     model.addElement(getLabelledLocations)
     model
   }
+
+  def spliceAfterTransformations(top: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
+    Delta.spliceAndFilterBottom(top, getJava.topToBottom, splice)
 }
 
 class PresetsPanel(compilerName: AbstractDocument, selectedParticles: DeltaInstanceList)

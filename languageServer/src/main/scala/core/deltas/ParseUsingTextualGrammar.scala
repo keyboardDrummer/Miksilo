@@ -21,6 +21,9 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
       compilation.program = program
       compilation.program.startOfUri = Some(uri)
     })
+    if (compilation.program == null) {
+      compilation.stopped = true
+    }
     if (!parseResult.successful) {
       compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.biggestRealFailure.get)))
     }
