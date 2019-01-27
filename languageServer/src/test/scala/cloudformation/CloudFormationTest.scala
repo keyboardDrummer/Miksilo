@@ -45,21 +45,21 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
   test("Code completion parameter") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = complete(server, program, new HumanPosition(437, 38))
-    val item = CompletionItem("SSHLocation", kind = Some(CompletionItemKind.Text), insertText = Some("cation"))
+    val item = CompletionItem("SSHLocation", kind = Some(CompletionItemKind.Text), insertText = Some("SSHLocation"))
     assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
   }
 
   test("Code completion property") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = complete(server, program, new HumanPosition(214, 14))
-    val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("cription"))
+    val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("Subscription"))
     assertResult(CompletionList(isIncomplete = false, Seq(item))) (result)
   }
 
   test("Code completion overloaded parameter") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = complete(server, program, new HumanPosition(425, 32))
-    val item = CompletionItem("VpcId", kind = Some(CompletionItemKind.Text), insertText = Some("cId"))
+    val item = CompletionItem("VpcId", kind = Some(CompletionItemKind.Text), insertText = Some("VpcId"))
     assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
   }
 
@@ -83,7 +83,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
     val start = new HumanPosition(6, 14)
     val result = server.complete(DocumentPosition(document, start))
 
-    val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("cription"))
+    val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("Subscription"))
     assertResult(CompletionList(isIncomplete = false, Seq(item))) (result)
   }
 }
