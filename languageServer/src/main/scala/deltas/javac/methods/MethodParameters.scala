@@ -12,6 +12,8 @@ import deltas.bytecode.types.TypeSkeleton
 
 object MethodParameters extends NodeGrammarWriter {
 
+  import deltas.HasNameDelta._
+
   def declare(compilation: Compilation, builder: ConstraintBuilder, parameter: MethodParameter[NodePath],
               parentScope: Scope,
               bodyScope: Scope): Unit = {
@@ -21,12 +23,9 @@ object MethodParameters extends NodeGrammarWriter {
     builder.declare(name, bodyScope, parameter.getSourceElement(Name), Some(parameterType))
   }
 
-  implicit class MethodParameter[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  implicit class MethodParameter[T <: NodeLike](val node: T) extends NodeWrapper[T] with HasName[T] {
     def _type: T = node(Type).asInstanceOf[T]
     def _type_=(value: T): Unit = node(Type) = value
-
-    def name: String = node(Name).asInstanceOf[String]
-    def name_=(value: String): Unit = node(Name) = value
   }
 
   def neww(name: String, _type: Any): Node = {
@@ -39,12 +38,10 @@ object MethodParameters extends NodeGrammarWriter {
     import grammars._
 
     val parseType = find(TypeSkeleton.JavaTypeGrammar)
-    parseType.as(Type) ~~ identifier.as(Name) asNode Shape
+    parseType.as(Type) ~~ find(Name) asNode Shape
   }
 
   object Shape extends NodeShape
-
-  object Name extends NodeField
 
   object Type extends NodeField
 }

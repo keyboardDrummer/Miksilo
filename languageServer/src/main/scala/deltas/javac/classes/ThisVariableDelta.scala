@@ -14,6 +14,7 @@ import deltas.ConstraintSkeleton
 import deltas.expression.VariableDelta
 import deltas.javac.classes.skeleton.{HasConstraints, JavaClassDelta}
 import deltas.expression.VariableDelta._
+import deltas.HasNameDelta.Name
 
 object ThisVariableDelta extends DeltaWithGrammar
 {

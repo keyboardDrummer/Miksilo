@@ -7,14 +7,15 @@ import core.language.node.{NodeField, NodeShape}
 
 object EnumDelta extends DeltaWithGrammar {
 
+  import deltas.HasNameDelta._
+
   object Shape extends NodeShape
-  object Name extends NodeField
   object Values extends NodeField
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
-    val grammar = "enum" ~~ identifier.as(Name) ~ "{" ~ identifier.manySeparated("," ~ printSpace).as(Values) ~ "}" asNode Shape
+    val grammar = "enum" ~~ find(Name) ~ "{" ~ identifier.manySeparated("," ~ printSpace).as(Values) ~ "}" asNode Shape
     find(SolidityContractDelta.Members).addAlternative(grammar)
   }
 

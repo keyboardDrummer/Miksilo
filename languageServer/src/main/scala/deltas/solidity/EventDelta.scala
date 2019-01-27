@@ -7,6 +7,8 @@ import core.language.node.{NodeField, NodeShape}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.methods.MethodParameters
 
+import deltas.HasNameDelta.Name
+
 object EventDelta extends DeltaWithGrammar {
 
   object Shape extends NodeShape
@@ -19,7 +21,7 @@ object EventDelta extends DeltaWithGrammar {
 
     val parameter = typeGrammar.as(MethodParameters.Type) ~
       "indexed".spacedOption.as(ParameterIndexed) ~
-      identifier.spacedOption.as(MethodParameters.Name) asNode MethodParameters.Shape
+      identifier.spacedOption.as(Name) asNode MethodParameters.Shape
     val parameterList = parameter.toParameterList
 
     val grammar = "event" ~~ identifier ~ parameterList ~~ "anonymous".option.as(Anonymous) ~ ";" asNode Shape

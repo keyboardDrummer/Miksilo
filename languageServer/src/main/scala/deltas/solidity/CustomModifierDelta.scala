@@ -8,6 +8,8 @@ import core.language.node.NodeShape
 import deltas.javac.methods.MethodDelta
 import deltas.statement.BlockDelta
 
+import deltas.HasNameDelta.Name
+
 object CustomModifierDelta extends DeltaWithGrammar {
 
   object Shape extends NodeShape
@@ -19,7 +21,7 @@ object CustomModifierDelta extends DeltaWithGrammar {
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
     val body = blockGrammar.as(MethodDelta.Body)
     val optionalParameters = (parameterList | value(Seq.empty)).as(MethodDelta.Parameters)
-    val grammar = "modifier" ~~ identifier.as(MethodDelta.Name) ~
+    val grammar = "modifier" ~~ find(Name) ~
       optionalParameters ~~ body
     find(SolidityContractDelta.Members).addAlternative(grammar)
   }

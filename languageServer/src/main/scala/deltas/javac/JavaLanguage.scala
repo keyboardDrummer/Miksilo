@@ -3,7 +3,7 @@ package deltas.javac
 import core.deltas._
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
-import deltas.{PrettyPrint, RemovePhasesAfterSolveConstraints}
+import deltas.{HasNameDelta, PrettyPrint, RemovePhasesAfterSolveConstraints}
 import deltas.bytecode._
 import deltas.bytecode.additions.PoptimizeDelta
 import deltas.bytecode.attributes._
@@ -89,9 +89,11 @@ object JavaLanguage {
     ExpressionAsStatementDelta, StatementDelta) ++ javaSimpleExpression
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryToByteCodeDelta, TernaryDelta, EqualityToByteCodeDelta, EqualsComparisonDelta,
-    AddEqualityPrecedence, LessThanToByteCodeDelta, LessThanDelta, GreaterThanToByteCodeDelta, GreaterThanDelta, AddRelationalPrecedenceDelta, AdditionToByteCodeDelta, AdditionDelta,
+    AddEqualityPrecedence, LessThanToByteCodeDelta, LessThanDelta, GreaterThanToByteCodeDelta, GreaterThanDelta,
+    AddRelationalPrecedenceDelta, AdditionToByteCodeDelta, AdditionDelta,
     SubtractionToByteCodeDelta, SubtractionDelta, AdditivePrecedenceDelta,
-    BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta, NullDelta, LogicalNotDelta, ParenthesisInExpressionDelta, ExpressionDelta) ++ allByteCodeDeltas
+    BooleanLiteralToByteCodeDelta, BooleanLiteralDelta, LongLiteralDelta, IntLiteralToByteCodeDelta, IntLiteralDelta,
+    NullDelta, LogicalNotDelta, ParenthesisInExpressionDelta, HasNameDelta, ExpressionDelta) ++ allByteCodeDeltas
 
   def allByteCodeDeltas: Seq[Delta] = Seq(OptimizeComparisonInstructionsDelta) ++
     Seq(LessThanInstructionDelta, GreaterThanInstructionDelta, NotInstructionDelta, IntegerEqualsInstructionDelta, ExpandVirtualInstructionsDelta) ++

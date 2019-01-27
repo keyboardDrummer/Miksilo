@@ -15,6 +15,8 @@ import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
 object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
 
+  import deltas.HasNameDelta.Name
+
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
   override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassDelta, CallVariableDelta, ThisVariableDelta)
@@ -25,14 +27,14 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
     val target = VariableDelta.neww(newVariableName)
     ExpressionDelta.constraintType(target) = TypeFromDeclaration(JavaClassDelta.staticDeclaration(clazz.node))
 
-    val variableNameData = variable.getFieldData(VariableDelta.Name)
+    val variableNameData = variable.getFieldData(Name)
     val selector = MemberSelectorDelta.Shape.createWithData(
       MemberSelectorDelta.Target -> target,
       MemberSelectorDelta.Member -> variableNameData)
 
     val variableNode = variable.current
     variableNode.replaceData(selector, keepData = true)
-    variableNode.removeField(VariableDelta.Name)
+    variableNode.removeField(Name)
   }
 
   def getVariableWithCorrectPath(path: NodePath): NodePath = {
@@ -42,9 +44,9 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val clazz: JavaClass[NodePath] = PathRoot(program)
     PathRoot(program).visitShape(VariableDelta.Shape, variable =>  {
-      val declarationNode: NodePath = SolveConstraintsDelta.getDeclarationOfReference(variable.getSourceElement(VariableDelta.Name))
+      val declarationNode: NodePath = SolveConstraintsDelta.getDeclarationOfReference(variable.getSourceElement(Name))
       if (declarationNode.shape == MethodDelta.Shape || declarationNode.shape == FieldDeclarationDelta.Shape) {
-        val hasAccessibility: HasAccessibility[NodePath] = new HasAccessibility[NodePath](declarationNode)
+        val hasAccessibility: HasAccessibility[NodePath] = new HasAccessibility[NodePath]{ def node = declarationNode }
         addThisToVariable(clazz, hasAccessibility.isStatic, variable.asInstanceOf[NodeChildPath])
       }
     })

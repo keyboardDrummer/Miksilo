@@ -9,14 +9,16 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
+import deltas.HasNameDelta.HasName
 import deltas.expression.VariableDelta
 import deltas.expression.VariableDelta.Variable
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
+  import deltas.HasNameDelta.Name
   object Shape extends NodeShape
-  object Name extends NodeField
+
   object Ports extends NodeField
   object Body extends NodeField
 
@@ -27,7 +29,7 @@ object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
     Ports -> ports,
     Body -> body)
 
-  implicit class Module[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  implicit class Module[T <: NodeLike](val node: T) extends NodeWrapper[T] with HasName[T] {
     def ports: Seq[Variable[T]] = NodeWrapper.wrapList(node(Ports).asInstanceOf[Seq[T]])
     def body: Seq[T] = node(Body).asInstanceOf[Seq[T]]
   }
@@ -39,7 +41,7 @@ object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val variable = find(VariableDelta.Shape)
     val parameterList: BiGrammar = (variable.manySeparatedVertical(",").inParenthesis | value(Seq.empty)).as(Ports)
     val body: BiGrammar = member.manyVertical.as(Body)
-    val moduleGrammar: BiGrammar = "module" ~~ identifier.as(Name) ~~ parameterList ~ ";" % body.indent() % "endmodule" asNode Shape
+    val moduleGrammar: BiGrammar = "module" ~~ find(Name) ~~ parameterList ~ ";" % body.indent() % "endmodule" asNode Shape
     find(VerilogFileDelta.Members).addAlternative(moduleGrammar)
   }
 

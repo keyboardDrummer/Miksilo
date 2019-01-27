@@ -7,7 +7,7 @@ trait NodeWrapper[T <: NodeLike] {
   def apply(key: NodeField): Any = node.apply(key)
   def update(key: NodeField, value: Any): Unit = node.update(key, value)
   def shape: NodeShape = node.shape
-  def shape_=(value: NodeShape) = node.shape = value
+  def shape_=(value: NodeShape): Unit = node.shape = value
   def dataView: Map[NodeField, Any] = node.dataView
 }
 

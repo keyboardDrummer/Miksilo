@@ -35,7 +35,7 @@ object AccessibilityFieldsDelta extends DeltaWithGrammar {
 
   override def description: String = "Define static and visibility"
 
-  implicit class HasAccessibility[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  trait HasAccessibility[T <: NodeLike] extends NodeWrapper[T] {
 
     def visibility: Visibility = node.getValue(AccessibilityFieldsDelta.VisibilityField).asInstanceOf[Visibility]
 

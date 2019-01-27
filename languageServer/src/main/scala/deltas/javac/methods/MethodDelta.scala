@@ -32,10 +32,11 @@ import deltas.statement.BlockDelta.BlockStatement
 object MethodDelta extends DeltaWithGrammar
   with ClassMemberDelta with HasDeclarationDelta with HasConstraintsDelta with HasShape {
 
+  import deltas.HasNameDelta._
+
   override def description: String = "Enables Java classes to contain methods."
 
-  implicit class Method[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
-    def name: String = node.getValue(Name).asInstanceOf[String]
+  implicit class Method[T <: NodeLike](val node: T) extends HasAccessibility[T] with HasName[T] {
 
     def returnType: T = node(ReturnType).asInstanceOf[T]
     def returnType_=(value: T): Unit = node(ReturnType) = value
@@ -152,7 +153,7 @@ object MethodDelta extends DeltaWithGrammar
 
     val methodUnmapped: BiGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~
       find(AccessibilityFieldsDelta.Static) ~ typeParametersGrammar.as(TypeParameters) ~
-      parseReturnType.as(ReturnType) ~~ identifier.as(Name) ~ parseParameters.as(Parameters) % block.as(Body)
+      parseReturnType.as(ReturnType) ~~ find(Name) ~ parseParameters.as(Parameters) % block.as(Body)
     val methodGrammar = create(MethodGrammar, methodUnmapped.asNode(Shape))
 
     val memberGrammar = find(JavaClassDelta.ClassMemberGrammar)
@@ -182,8 +183,6 @@ object MethodDelta extends DeltaWithGrammar
   object Body extends NodeField
 
   object ReturnType extends NodeField
-
-  object Name extends NodeField
 
   object Parameters extends NodeField
 

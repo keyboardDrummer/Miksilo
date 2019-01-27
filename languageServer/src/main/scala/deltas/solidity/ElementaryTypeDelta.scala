@@ -43,9 +43,6 @@ object ElementaryTypeDelta extends DeltaWithGrammar with TypeInstance {
 
   override def getJavaGrammar(grammars: LanguageGrammars) = {
     import grammars._
-    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-
-
     find(BooleanTypeDelta.Shape).find(p => p.value.isInstanceOf[Keyword]).get.value.asInstanceOf[Keyword].value = "bool"
 
     val elementaryTypeName = elementaryTypeNames.map(name => Keyword(name, reserved = false).as(Name).asInstanceOf[BiGrammar]).

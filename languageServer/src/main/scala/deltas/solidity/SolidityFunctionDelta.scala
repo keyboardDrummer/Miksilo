@@ -9,10 +9,10 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
+import deltas.HasNameDelta.Name
 import deltas.bytecode.types.TypeSkeleton
-import deltas.expression.VariableDelta
 import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.javac.methods.MethodDelta.{Method, Name}
+import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, MethodParameters}
@@ -32,17 +32,17 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val storageLocation: BiGrammar = find(StorageLocationDelta.StorageLocation)
     val parameter = typeGrammar.as(MethodParameters.Type) ~
       storageLocation ~~
-      identifier.as(MethodParameters.Name) asNode MethodParameters.Shape
+      find(Name) asNode MethodParameters.Shape
     val parameterList = create(MethodDelta.Parameters, parameter.toParameterList)
 
     val returnParameter = typeGrammar.as(MethodParameters.Type) ~
       storageLocation ~
-      identifier.spacedOption.as(MethodParameters.Name) asNode MethodParameters.Shape
+      identifier.spacedOption.as(Name) asNode MethodParameters.Shape
     val returnParameterList = returnParameter.toParameterList
 
-    val name = (identifier | value("<default>")).as(MethodDelta.Name)
+    val name = (identifier | value("<default>")).as(Name)
 
-    val modifierInvocation = identifier.as(VariableDelta.Name) ~
+    val modifierInvocation = find(Name) ~
       (find(CallDelta.CallArgumentsGrammar) | value(Seq.empty)).as(CallDelta.Arguments) asNode CallDelta.Shape
 
     val stateMutability = find(StateMutabilityDelta.Grammar)

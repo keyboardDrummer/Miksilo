@@ -8,10 +8,12 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.{ExpressionDelta, VariableDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
-import deltas.statement.LocalDeclarationDelta.{LocalDeclaration, Name, Type}
+import deltas.statement.LocalDeclarationDelta.{LocalDeclaration, Type}
 import deltas.statement.assignment.SimpleAssignmentDelta
+import deltas.HasNameDelta.Name
 
 object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaWithPhase {
+
 
   override def dependencies: Set[Contract] = Set(SimpleAssignmentDelta, ExpressionAsStatementDelta, LocalDeclarationDelta)
 

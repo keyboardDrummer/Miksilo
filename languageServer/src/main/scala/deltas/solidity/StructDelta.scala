@@ -3,39 +3,21 @@ package deltas.solidity
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
+import core.language.node.{NodeField, NodeLike, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.ConstraintSkeleton
+import deltas.{ConstraintSkeleton, HasNameDelta}
 import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.solidity.HasNameDelta.HasName
+import deltas.HasNameDelta.HasName
 import deltas.statement.LocalDeclarationDelta
-
-object HasNameDelta extends DeltaWithGrammar {
-  object Name extends NodeField
-
-  class HasName[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-
-    def name: String = node.getValue(Name).asInstanceOf[String]
-    def name_=(value: String): Unit = node(Name) = value
-  }
-
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    grammars.create(Name, identifier.as(Name))
-  }
-
-  override def description = "Introduces the concept of a name"
-
-  override def dependencies = Set.empty
-}
 
 object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   object Shape extends NodeShape
   object Members extends NodeField
 
-  implicit class Struct[T <: NodeLike](node: T) extends HasName[T](node) {
+  implicit class Struct[T <: NodeLike](val node: T) extends HasName[T] {
     def members = node(Members).asInstanceOf[Seq[T]]
     def members_=(value: Seq[T]): Unit = node(Members) = value
   }

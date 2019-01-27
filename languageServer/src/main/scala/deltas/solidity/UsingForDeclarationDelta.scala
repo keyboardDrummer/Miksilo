@@ -8,16 +8,15 @@ import core.language.{Compilation, Language}
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration}
 import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
+import deltas.HasNameDelta.Name
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.javac.methods.MethodDelta.Method
+import deltas.javac.methods.MethodParameters
 import deltas.javac.methods.MethodParameters.MethodParameter
-import deltas.javac.methods.{MethodDelta, MethodParameters}
 import deltas.solidity.SolidityContractDelta.ContractLike
 import deltas.solidity.SolidityFunctionDelta.ReturnValues
 import deltas.solidity.SolidityFunctionTypeDelta.ParameterShape
-
-
 
 object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -92,7 +91,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
               val returnTypes: Seq[Node] = returnParameters.map(returnParameter => ParameterShape.create(MethodParameters.Type -> returnParameter._type))
               val methodType = SolidityFunctionTypeDelta.createType(compilation, solver.builder, libraryScope, parameterTypes, returnTypes)
 
-              solver.builder.declareSourceElement(member.getSourceElement(MethodDelta.Name), typeScope, Some(methodType))
+              solver.builder.declareSourceElement(member.getSourceElement(Name), typeScope, Some(methodType))
             }
           }
           true
