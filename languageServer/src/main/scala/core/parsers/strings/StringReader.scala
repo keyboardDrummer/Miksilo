@@ -4,17 +4,19 @@ import core.parsers.sequences.SequenceInput
 
 import scala.util.parsing.input.OffsetPosition
 
-case class StringReader(array: Array[Char], offset: Int = 0) extends SequenceInput[StringReader, Char] {
+case class StringReader(array: ArrayCharSequence, offset: Int = 0) extends SequenceInput[StringReader, Char] {
+
   def this(value: String) {
     this(value.toCharArray)
   }
 
+  val sequence: CharSequence = array
   def drop(amount: Int): StringReader = StringReader(array, offset + amount)
-  def position = OffsetPosition(array, offset)
+  lazy val position = OffsetPosition(sequence, offset)
 
   override def atEnd: Boolean = offset == array.length
 
-  override def head: Char = array(offset)
+  override def head: Char = array.charAt(offset)
 
   override def tail: StringReader = drop(1)
 
