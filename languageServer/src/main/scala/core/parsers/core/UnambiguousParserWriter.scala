@@ -29,13 +29,15 @@ trait UnambiguousParserWriter extends ParserWriter {
     def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
 
       val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
-      parserState.cache.getOrElse(input, {
-        val value: ParseResult[Result] = parseIteratively[Result](parserState, input)
-        if (!parserState.isPartOfACycle) {
-          parserState.cache.put(input, value)
-        }
-        value
-      })
+      parserState.cache.get(input) match {
+        case None =>
+          val value: ParseResult[Result] = parseIteratively[Result](parserState, input)
+          if (!parserState.isPartOfACycle) {
+            parserState.cache.put(input, value)
+          }
+          value
+        case Some(result) => result
+      }
     }
 
     def parseIteratively[Result](parserState: ParserState[Result], input: Input): ParseResult[Result] = {
