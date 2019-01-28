@@ -102,8 +102,8 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
     def parse(input: Input,
               cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
 
-      val state = new PackratParseState(cache, ())
-      state.parseIteratively(parser, input)
+      val state = new PackratParseState(())
+      state.parse(parser, input)
     }
   }
 }
