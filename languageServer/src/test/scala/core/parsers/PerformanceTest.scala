@@ -25,9 +25,10 @@ class PerformanceTest extends FunSuite {
 
     val tenSingleRuns = timeB - timeA
     val oneTenRun = timeC - timeB
-    System.out.print("singleRuns: " + tenSingleRuns)
-    System.out.print("tenRuns: " + oneTenRun)
+    System.out.println("singleRuns: " + tenSingleRuns)
+    System.out.println("tenRuns: " + oneTenRun)
     assert(tenSingleRuns < 2000) // 6498 without perf improvement. 5963 with perf
     assert(oneTenRun < tenSingleRuns) // 8591 without perf improvement. 6651 with perf.
+    //without StateFull singleRuns: 35726tenRuns: 46389
   }
 }
