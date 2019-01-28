@@ -3,6 +3,7 @@ package application.compilerCockpit
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
+import core.parsers.strings.StringReader
 import javax.swing.text.Segment
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
 
@@ -42,7 +43,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
     resetTokenList()
 
-    val resultOption: ParseResult[Seq[MyToken]] = parser.parseWholeInput(new BiGrammarToParser.Reader(text.toString))
+    val resultOption: ParseResult[Seq[MyToken]] = parser.parseWholeInput(new StringReader(text.toString))
     var start = text.offset
     if (resultOption.successful) {
       val tokens = resultOption.get

@@ -29,15 +29,13 @@ trait UnambiguousParserWriter extends ParserWriter {
     def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
 
       val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
-      parserState.cache.get(input) match {
-        case None =>
-          val value: ParseResult[Result] = parseIteratively[Result](parserState, input)
-          if (!parserState.isPartOfACycle) {
-            parserState.cache.put(input, value)
-          }
-          value
-        case Some(result) => result
-      }
+      parserState.cache.getOrElse(input, {
+        val value: ParseResult[Result] = parseIteratively[Result](parserState, input)
+        if (!parserState.isPartOfACycle) {
+          parserState.cache.put(input, value)
+        }
+        value
+      })
     }
 
     def parseIteratively[Result](parserState: ParserState[Result], input: Input): ParseResult[Result] = {
@@ -76,14 +74,12 @@ trait UnambiguousParserWriter extends ParserWriter {
       if (!parserState.callStackSet.contains(input))
         return None
 
-      Some(parserState.recursionIntermediates.get(input) match {
-        case Some(result) => result
-        case None =>
-          parserState.hasBackEdge = true
-          val index = callStack.indexOf(parserState.parser)
-          callStack.take(index + 1).foreach(parser => parserStates(parser).isPartOfACycle = true) // TODO this would also be possible by returning a value that indicates we found a cycle, like the abort!
-          abort
-      })
+      Some(parserState.recursionIntermediates.getOrElse(input, {
+        parserState.hasBackEdge = true
+        val index = callStack.indexOf(parserState.parser)
+        callStack.take(index + 1).foreach(parser => parserStates(parser).isPartOfACycle = true) // TODO this would also be possible by returning a value that indicates we found a cycle, like the abort!
+        abort
+      }))
     }
   }
 }

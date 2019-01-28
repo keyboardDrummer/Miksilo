@@ -1,26 +1,20 @@
 package core.parsers.strings
 
 import core.parsers.editorParsers.DefaultCache
-import core.parsers.sequences.{SequenceInput, SequenceParserWriter}
+import core.parsers.sequences.SequenceParserWriter
 
 import scala.util.matching.Regex
 
 trait StringParserWriter extends SequenceParserWriter {
   type Elem = Char
-  type Input <: StringReaderLike
-
-  trait StringReaderLike extends SequenceInput[Input, Char] {
-    def offset: Int
-    def array: ArrayCharSequence
-    def drop(amount: Int): Input
-  }
+  type Input = StringReader
 
   implicit def literalToExtensions(value: String): ParserExtensions[String] = Literal(value)
   implicit def literal(value: String): Literal = Literal(value)
   implicit def regex(value: Regex): RegexParser = RegexParser(value)
 
   case class Literal(value: String) extends EditorParser[String] {
-    override def parseInternal(inputs: Input, state: ParseStateLike): ParseResult[String] = {
+    override def parseInternal(inputs: StringReader, state: ParseStateLike): ParseResult[String] = {
       var index = 0
       val array = inputs.array
       while(index < value.length) {
@@ -39,7 +33,7 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   case class RegexParser(regex: Regex) extends EditorParser[String] {
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[String] = {
+    override def parseInternal(input: StringReader, state: ParseStateLike): ParseResult[String] = {
       regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
         case Some(matched) =>
           newSuccess(
