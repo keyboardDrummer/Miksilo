@@ -1,7 +1,6 @@
 package application.compilerCockpit
 
 import core.bigrammar.BiGrammarToParser
-import core.parsers.strings.StringReader
 import deltas.javac.JavaLanguage
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.fife.ui.rsyntaxtextarea.TokenTypes
@@ -26,7 +25,7 @@ class TokenMakerFromGrammarTest extends FunSuite {
         |    }
         |}""".stripMargin
 
-    val resultOption: BiGrammarToParser.ParseResult[Seq[MyToken]] = tokenMaker.parser.parseWholeInput(new StringReader(text))
+    val resultOption: BiGrammarToParser.ParseResult[Seq[MyToken]] = tokenMaker.parser.parseWholeInput(new BiGrammarToParser.Reader(text))
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
     val space = MyToken(TokenTypes.WHITESPACE, " ")
@@ -59,7 +58,7 @@ class TokenMakerFromGrammarTest extends FunSuite {
 
     val text = "^"
 
-    val resultOption = tokenMaker.parser.parseWholeInput(new StringReader(text))
+    val resultOption = tokenMaker.parser.parseWholeInput(new BiGrammarToParser.Reader(text))
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
     val expectedTokens = List(MyToken(TokenTypes.ERROR_CHAR, "^"))

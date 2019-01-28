@@ -1,11 +1,44 @@
 package core.parsers
 
 import org.scalatest.FunSuite
-import strings.StringReader
 import editorParsers.EditorParserWriter
 import strings.CommonParserWriter
 
-trait AssociativityTest extends FunSuite with CommonParserWriter with EditorParserWriter {
+import scala.util.parsing.input.OffsetPosition
+
+trait CommonStringReaderParser extends CommonParserWriter with EditorParserWriter {
+  type Input = StringReader
+
+  case class StringReader(array: ArrayCharSequence, offset: Int = 0) extends StringReaderLike {
+
+    def this(value: String) {
+      this(value.toCharArray)
+    }
+
+    val sequence: CharSequence = array
+    def drop(amount: Int): StringReader = StringReader(array, offset + amount)
+    lazy val position = OffsetPosition(sequence, offset)
+
+    override def atEnd: Boolean = offset == array.length
+
+    override def head: Char = array.charAt(offset)
+
+    override def tail: StringReader = drop(1)
+
+    override def hashCode(): Int = offset
+
+    override def equals(obj: Any): Boolean = obj match {
+      case other: StringReader => offset == other.offset
+      case _ => false
+    }
+
+    override def toString: String = {
+      array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
+    }
+  }
+}
+
+trait AssociativityTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {
 
   test("binary operators are right associative by default") {
     lazy val expr: EditorParser[Any] = new EditorLazy(expr) ~< "-" ~ expr | wholeNumber

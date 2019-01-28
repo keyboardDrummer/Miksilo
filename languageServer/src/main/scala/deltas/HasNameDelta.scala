@@ -14,7 +14,7 @@ object HasNameDelta extends DeltaWithGrammar {
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    grammars.create(Name, identifier.as(Name))
+    grammars.create(Name, identifier.as(Name)) // TODO don't create a Labelled BiGrammar here.
   }
 
   override def description = "Introduces the concept of a name"
