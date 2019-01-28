@@ -47,7 +47,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
   }
 
   override def newParseState(cache: Cache[ParseNode, EditorParseResult[Any]]) =
-    new PackratParseState(cache, new DefaultCache)
+    new PackratParseState(new DefaultCache)
 
   class Sequence[+Left, +Right, +Result](left: EditorParser[Left],
                                          _right: => EditorParser[Right],

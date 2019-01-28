@@ -4,12 +4,12 @@ import scala.language.higherKinds
 
 trait ParserWriter {
 
+  case class ParseNode(input: Input, parser: Parser[Any])
+
   type Input <: ParseInput
   type ParseResult[+Result] <: ParseResultLike[Result]
   type Self[+R] <: Parser[R]
   type ExtraState
-
-  case class ParseNode(input: Input, parser: Parser[Any])
 
   def succeed[Result](result: Result): Self[Result]
   def newSuccess[Result](result: Result, remainder: Input): ParseResult[Result]
