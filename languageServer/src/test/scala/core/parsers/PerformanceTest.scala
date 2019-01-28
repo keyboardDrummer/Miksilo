@@ -23,7 +23,6 @@ class PerformanceTest extends FunSuite {
 
     val singleSource = timeB - timeA
     val sourceTimesTen = timeC - timeB
-    assert(sourceTimesTen < singleSource)
     assert(singleSource < 3000)
     System.out.println(s"totalTime:${singleSource + sourceTimesTen}")
   }
