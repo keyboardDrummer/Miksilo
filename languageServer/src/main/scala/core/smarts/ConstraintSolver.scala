@@ -176,6 +176,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
         leftArguments.indices.forall(index =>
           unifyTypes(left.asInstanceOf[TypeApplication].arguments(index), right.asInstanceOf[TypeApplication].arguments(index)))
       else
+
         false
     case _ =>
       false
