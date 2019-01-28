@@ -11,18 +11,26 @@ object StateFull {
   }
 }
 
+class StateFullMap[T, U](origin: StateFull[T], f: T => U) extends StateFull[U] {
+  override def run(state: State) = {
+    val (newState, value) = origin.run(state)
+    (newState, f(value))
+  }
+}
+
+class StateFullFlatMap[T, U](origin: StateFull[T], f: T => StateFull[U]) extends StateFull[U] {
+  override def run(state: State) = {
+    val (newState, value) = origin.run(state)
+    f(value).run(newState)
+  }
+}
+
 trait StateFull[+T] { // TODO Can I get rid of the state monad by using Parser's Input type to store state?
   def run(state: State): (State, T)
 
-  def map[U](f: T => U): StateFull[U] = state => {
-    val (newState, value) = run(state)
-    (newState, f(value))
-  }
+  def map[U](f: T => U): StateFull[U] = new StateFullMap(this, f)
 
-  def flatMap[U](f: T => StateFull[U]): StateFull[U] = state => {
-    val (newState, value) = run(state)
-    f(value).run(newState)
-  }
+  def flatMap[U](f: T => StateFull[U]): StateFull[U] = new StateFullFlatMap(this, f)
 
   def apply(state: State): (State, T) = run(state)
 }
