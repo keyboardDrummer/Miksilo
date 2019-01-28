@@ -71,15 +71,15 @@ trait UnambiguousParserWriter extends ParserWriter {
     }
 
     def getPreviousResult[Result](parserState: ParserState[Result], input: Input): Option[ParseResult[Result]] = {
-      if (parserState.callStackSet.contains(input)) {
-        if (!parserState.recursionIntermediates.contains(input)) {
-          parserState.hasBackEdge = true
-          val index = callStack.indexOf(parserState.parser)
-          callStack.take(index + 1).foreach(parser => parserStates(parser).isPartOfACycle = true) // TODO this would also be possible by returning a value that indicates we found a cycle, like the abort!
-        }
-        return Some(parserState.recursionIntermediates.getOrElse(input, abort))
-      }
-      None
+      if (!parserState.callStackSet.contains(input))
+        return None
+
+      Some(parserState.recursionIntermediates.getOrElse(input, {
+        parserState.hasBackEdge = true
+        val index = callStack.indexOf(parserState.parser)
+        callStack.take(index + 1).foreach(parser => parserStates(parser).isPartOfACycle = true) // TODO this would also be possible by returning a value that indicates we found a cycle, like the abort!
+        abort
+      }))
     }
   }
 }

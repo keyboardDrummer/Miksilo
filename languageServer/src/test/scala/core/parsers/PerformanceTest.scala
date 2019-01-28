@@ -12,12 +12,12 @@ class PerformanceTest extends FunSuite {
     val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     val timeA = System.currentTimeMillis()
-    for(_ <- 1.to(50)) {
+    for(_ <- 1.to(500)) {
       json.compileString(source)
     }
 
     val timeB = System.currentTimeMillis()
-    for(_ <- 1.to(5)) {
+    for(_ <- 1.to(50)) {
       json.compileString(tenTimesSource)
     }
 
@@ -25,7 +25,9 @@ class PerformanceTest extends FunSuite {
 
     val tenSingleRuns = timeB - timeA
     val oneTenRun = timeC - timeB
-    assert(tenSingleRuns < 2000) // 6498 without perf improvement
-    assert(oneTenRun < tenSingleRuns) // 8591 without perf improvement
+    System.out.print("singleRuns: " + tenSingleRuns)
+    System.out.print("tenRuns: " + oneTenRun)
+    assert(tenSingleRuns < 2000) // 6498 without perf improvement. 5963 with perf
+    assert(oneTenRun < tenSingleRuns) // 8591 without perf improvement. 6651 with perf.
   }
 }
