@@ -29,6 +29,6 @@ class PerformanceTest extends FunSuite {
     System.out.println("tenRuns: " + oneTenRun)
     assert(tenSingleRuns < 2000) // 6498 without perf improvement. 5963 with perf
     assert(oneTenRun < tenSingleRuns) // 8591 without perf improvement. 6651 with perf.
-    //without StateFull singleRuns: 35726tenRuns: 46389
+    //without StateFull singleRuns: 35726, tenRuns: 46389; with Statefull: singleRuns: 34129, tenRuns: 43940
   }
 }
