@@ -21,9 +21,9 @@ class PerformanceTest extends FunSuite {
 
     val timeC = System.currentTimeMillis()
 
-    val tenSingleRuns = timeB - timeA
-    val oneTenRun = timeC - timeB
-    assert(tenSingleRuns < 2000)
-    assert(oneTenRun < tenSingleRuns)
+    val singleSource = timeB - timeA
+    val sourceTimesTen = timeC - timeB
+    assert(sourceTimesTen < singleSource)
+    assert(singleSource < 2000)
   }
 }

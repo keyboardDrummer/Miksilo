@@ -1,7 +1,6 @@
 package core.parsers.basicParsers
 
 import core.parsers.core.{NotCorrectingParserWriter, UnambiguousParserWriter}
-import util.cache.{Cache, InfiniteCache}
 
 trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrectingParserWriter {
 
@@ -86,18 +85,16 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
   implicit class BasicParserExtensions[+Result](parser: Parser[Result]) extends ParserExtensions(parser) {
 
-    def parseWholeInput(input: Input,
-                        cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
+    def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      val parseResult = parse(input, cache)
+      val parseResult = parse(input)
       parseResult.successOption match {
         case Some(success) if !success.remainder.atEnd => failureSingleton
         case _ => parseResult
       }
     }
 
-    def parse(input: Input,
-              cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
+    def parse(input: Input): ParseResult[Result] = {
 
       val state = new PackratParseState(())
       state.parse(parser, input)

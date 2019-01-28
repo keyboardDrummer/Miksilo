@@ -1,7 +1,6 @@
 package core.parsers.editorParsers
 
 import core.parsers.core.UnambiguousParserWriter
-import util.cache.Cache
 
 trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorParserWriter {
 
@@ -31,10 +30,9 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
 
-  override def parseWholeInput[Result](parser: EditorParser[Result], input: Input,
-                                       cache: Cache[ParseNode, EditorParseResult[Any]]) = {
+  override def parseWholeInput[Result](parser: EditorParser[Result], input: Input) = {
 
-    val parseResult = parser.parse(input, cache)
+    val parseResult = parser.parse(input)
     parseResult.successOption match {
       case Some(success) =>
         if (success.remainder.atEnd) parseResult
@@ -46,8 +44,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     }
   }
 
-  override def newParseState(cache: Cache[ParseNode, EditorParseResult[Any]]) =
-    new PackratParseState(new DefaultCache)
+  override def newParseState() = new PackratParseState(new DefaultCache)
 
   class Sequence[+Left, +Right, +Result](left: EditorParser[Left],
                                          _right: => EditorParser[Right],

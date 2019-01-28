@@ -1,12 +1,14 @@
 package core.parsers.ambigousParsers
 
 import core.parsers.core.ParserWriter
-import util.cache.Cache
+import util.cache.{Cache, InfiniteCache}
 
 import scala.collection.mutable
 import scala.language.higherKinds
 
 trait AmbiguousParserWriter extends ParserWriter {
+
+  case class ParseNode(input: Input, parser: Parser[Any])
 
   type ParseResult[+Result] <: AmbiguousParseResult[Result]
 
@@ -18,8 +20,8 @@ trait AmbiguousParserWriter extends ParserWriter {
 
   case class SingleSuccess[+Result](result: ParseResult[Result], remainder: Input)
 
-  class PackratParseState(val resultCache: Cache[ParseNode, ParseResult[Any]], val extraState: ExtraState) extends ParseStateLike {
-
+  class PackratParseState(val extraState: ExtraState) extends ParseStateLike {
+    val resultCache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache[ParseNode, ParseResult[Any]]()
     val recursionIntermediates = mutable.HashMap[ParseNode, ParseResult[Any]]()
     val callStackSet = mutable.HashSet[ParseNode]()
     val callStack = mutable.Stack[Parser[Any]]()
