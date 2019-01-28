@@ -1,5 +1,6 @@
 package core.parsers
 
+import strings.StringReader
 import editorParsers.UnambiguousEditorParserWriter
 
 class UnambigiousParserTest extends AssociativityTest
