@@ -1,6 +1,6 @@
 package deltas.javac.expressions
 
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 import langserver.types.{CompletionItem, CompletionItemKind}
 import languageServer.lsp.CompletionList
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
@@ -9,7 +9,7 @@ import util.SourceUtils
 
 class CompletionTest extends FunSuite with LanguageServerTest {
 
-  val server = new MiksiloLanguageServer(JavaLanguage.getJavaFrontend)
+  val server = new MiksiloLanguageServer(JavaToByteCodeLanguage.getJavaFrontend)
 
   test("fibonacci") {
     val program = SourceUtils.getJavaTestFileContents("Fibonacci")

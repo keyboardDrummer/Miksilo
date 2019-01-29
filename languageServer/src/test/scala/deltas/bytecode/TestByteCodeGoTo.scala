@@ -8,7 +8,7 @@ import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompare
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
 import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import deltas.bytecode.types.IntTypeDelta
-import deltas.javac.JavaLanguage
+import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
 import deltas.javac.classes.ConstantPool
 import util.TestLanguageBuilder
 import util.LanguageTest
@@ -22,7 +22,7 @@ class TestByteCodeGoTo extends FunSuite {
 
   test("compareCompiledVersusNativeCode") {
     val labelledWhile = getLabelledJumpWhile
-    val language = TestLanguageBuilder.build(Seq(LabelledLocations) ++ JavaLanguage.byteCodeDeltas)
+    val language = TestLanguageBuilder.build(Seq(LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas)
     val compiledWhile = language.compileAst(labelledWhile).program
     val expectedCode = getExpectedJumpWhile
     LanguageTest.testInstructionEquivalence(compiledWhile, expectedCode)

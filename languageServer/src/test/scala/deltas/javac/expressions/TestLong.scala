@@ -1,7 +1,7 @@
 package deltas.javac.expressions
 
 import deltas.bytecode.additions.PoptimizeDelta
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
 
 class TestLong extends JavaLanguageTest {
@@ -11,7 +11,7 @@ class TestLong extends JavaLanguageTest {
   }
 
   test("longWithoutPoptimize") {
-    val regularParticles = JavaLanguage.javaCompilerDeltas
+    val regularParticles = JavaToByteCodeLanguage.javaCompilerDeltas
     val withoutPoptimize = regularParticles.filter(p => p != PoptimizeDelta)
     new LanguageTest(TestLanguageBuilder.buildWithParser(withoutPoptimize)).compareWithJavacAfterRunning("SimpleLong")
   }

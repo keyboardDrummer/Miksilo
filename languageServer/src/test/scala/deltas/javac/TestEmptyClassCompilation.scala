@@ -21,14 +21,14 @@ class TestEmptyClassCompilation extends JavaLanguageTest {
   test("EquivalentConstantPool") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
-    val compiledCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).compileAst(javaCode).program
+    val compiledCode = TestLanguageBuilder.build(JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(javaCode).program
     compareConstantPools(expectedByteCode, compiledCode)
   }
 
   test("EquivalentMethod") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode = getEmptyClass
-    val compiledCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).compileAst(javaCode).program
+    val compiledCode = TestLanguageBuilder.build(JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(javaCode).program
 
     LanguageTest.testInstructionEquivalence(expectedByteCode, compiledCode)
   }

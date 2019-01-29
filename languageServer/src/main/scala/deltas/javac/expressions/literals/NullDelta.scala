@@ -12,7 +12,20 @@ import deltas.bytecode.coreInstructions.objects.PushNullDelta
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 
-object NullDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsToByteCodeDelta {
+object NullToByteCodeDelta extends ConvertsToByteCodeDelta {
+
+  override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
+    Seq(PushNullDelta.pushNull)
+  }
+
+  override def description = "Converts null to bytecode"
+
+  override def shape = NullDelta.Shape
+
+  override def dependencies = Set(NullDelta, PushNullDelta)
+}
+
+object NullDelta extends DeltaWithGrammar with ExpressionInstance {
 
   val _null = new Node(Shape)
 
@@ -28,10 +41,6 @@ object NullDelta extends DeltaWithGrammar with ExpressionInstance with ConvertsT
   object Shape extends NodeShape
 
   override val shape = Shape
-
-  override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
-    Seq(PushNullDelta.pushNull)
-  }
 
   override def description: String = "Adds the usage of 'null'"
 

@@ -3,7 +3,7 @@ package deltas.javaPlus
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.{ClearPhases, PrettyPrint}
 import org.scalatest.FunSuite
@@ -24,7 +24,7 @@ class ReorderMembersTest extends FunSuite {
         |    int third;
         |}""".stripMargin
 
-    val compiler = TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ReorderMembersDelta) ++ JavaLanguage.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ReorderMembersDelta) ++ JavaToByteCodeLanguage.prettyPrintJavaDeltas)
 
     val compilation = compiler.compile(input)
     assert(compilation.diagnostics.nonEmpty)
@@ -50,7 +50,7 @@ class ReorderMembersTest extends FunSuite {
         |
         |    int third;
         |}""".stripMargin
-    val compiler = TestLanguageBuilder.buildWithParser(Seq(ReorderMembersDelta.ActuallyReorderMembers) ++ JavaLanguage.prettyPrintJavaDeltas)
+    val compiler = TestLanguageBuilder.buildWithParser(Seq(ReorderMembersDelta.ActuallyReorderMembers) ++ JavaToByteCodeLanguage.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     val state = compiler.compile(inputStream)
@@ -83,7 +83,7 @@ class ReorderMembersTest extends FunSuite {
         |}""".stripMargin
     val compiler = TestLanguageBuilder.buildWithParser(Seq(ReorderMembersDelta.ActuallyReorderMembers, PrettyPrint(),
       SlashStarBlockCommentsDelta, StoreTriviaDelta) ++
-      JavaLanguage.javaCompilerDeltas)
+      JavaToByteCodeLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     val state = compiler.compile(inputStream)
@@ -116,7 +116,7 @@ class ReorderMembersTest extends FunSuite {
         |}""".stripMargin
     val compiler = TestLanguageBuilder.buildWithParser(Seq(ReorderMembersDelta.ActuallyReorderMembers, PrettyPrint(),
       SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode) ++
-      JavaLanguage.javaCompilerDeltas)
+      JavaToByteCodeLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
     val state = compiler.compile(inputStream)

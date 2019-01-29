@@ -2,13 +2,13 @@ package deltas.javac.expressions
 
 import core.deltas.Delta
 import deltas.ClearPhases
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 import util.{SourceUtils, TestLanguageBuilder, LanguageTest}
 
 class JavaClassTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
     Delta.spliceAndFilterTop(
-        JavaLanguage.javaCompilerDeltas,
-        JavaLanguage.javaClassSkeleton,
+        JavaToByteCodeLanguage.javaCompilerDeltas,
+        JavaToByteCodeLanguage.javaClassSkeleton,
         Seq(ClearPhases)))) {
 
   test("empty class") {

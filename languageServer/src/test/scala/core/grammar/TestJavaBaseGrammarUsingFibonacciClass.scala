@@ -6,7 +6,7 @@ import deltas.bytecode.types._
 import deltas.expression.additive.{AdditionDelta, SubtractionDelta}
 import deltas.expression.relational.LessThanDelta
 import deltas.expression.{ExpressionDelta, IntLiteralDelta, TernaryDelta, VariableDelta}
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.methods._
 import deltas.javac.methods.call.CallDelta
@@ -16,7 +16,7 @@ import deltas.statement.assignment.AddAssignmentDelta
 import deltas.trivia.SlashStarBlockCommentsDelta
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas.filter(p => p != SlashStarBlockCommentsDelta))
+  extends TestLanguageGrammarUtils(JavaToByteCodeLanguage.javaCompilerDeltas.filter(p => p != SlashStarBlockCommentsDelta))
 {
 
   test("BasicClass") {

@@ -3,7 +3,7 @@ package deltas.bytecode.extraBytecodeInstructions
 import core.language.node.Node
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsDelta
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
 
 import scala.reflect.io.Path
@@ -12,7 +12,7 @@ class TestOptimizeBooleanInstructions extends JavaLanguageTest {
 
   test("ForFibonacci") {
     val withOptimization = parseAndTransform("Fibonacci", Path(""))
-    val withoutOptimizationTransformations = JavaLanguage.javaCompilerDeltas.filter(i => i != OptimizeComparisonInstructionsDelta)
+    val withoutOptimizationTransformations = JavaToByteCodeLanguage.javaCompilerDeltas.filter(i => i != OptimizeComparisonInstructionsDelta)
     val withoutOptimization = new LanguageTest(TestLanguageBuilder.buildWithParser(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
 
     val unoptimizedInstructions = getFibonacciInstructions(withoutOptimization)

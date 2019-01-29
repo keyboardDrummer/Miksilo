@@ -9,8 +9,9 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
+import deltas.statement.BlockDelta.BlockStatement
 
-object BlockDelta extends ConvertsToByteCodeDelta with DeltaWithGrammar with StatementInstance {
+object BlockDelta extends DeltaWithGrammar with StatementInstance {
 
   override def description: String = "Defines a grammar for blocks."
   override def dependencies: Set[Contract] = Set(StatementDelta)
@@ -47,12 +48,6 @@ object BlockDelta extends ConvertsToByteCodeDelta with DeltaWithGrammar with Sta
   }
 
   override def shape: NodeShape = Shape
-
-  override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
-    val toInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
-    val block: BlockStatement[NodePath] = statement
-    block.statements.flatMap(childStatement => toInstructions(childStatement))
-  }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val block: BlockStatement[NodePath] = statement

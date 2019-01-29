@@ -5,13 +5,13 @@ import com.google.common.collect.Lists
 import org.jgrapht.alg.{DijkstraShortestPath, StrongConnectivityInspector}
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.traverse.TopologicalOrderIterator
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 
 import scala.collection.convert.Wrappers
 import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
 
 class DeltaGraph
-  extends GraphFromDeltas(JavaLanguage.allDeltas) {
+  extends GraphFromDeltas(JavaToByteCodeLanguage.allDeltas) {
 
   val simplifications = Seq(ByteCodeWithTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression,
     JavaSimpleStatement, JavaMethod, JavaGroup)

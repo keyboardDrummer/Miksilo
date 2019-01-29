@@ -1,12 +1,10 @@
 package application.graphing.model.simplifications
 
 import core.deltas.Contract
-import deltas.bytecode.types._
-import deltas.javac.JavaLanguage
-import deltas.javac.types.BooleanTypeDelta
+import deltas.javac.ByteCodeLanguage
 
 object ByteCodeWithTypes extends DeltaGroup {
   override def dependants: Set[Contract] = Set(ByteCode)
 
-  override def dependencies: Set[Contract] = JavaLanguage.typeTransformations.toSet
+  override def dependencies: Set[Contract] = ByteCodeLanguage.typeTransformations.toSet
 }
