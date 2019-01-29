@@ -1,7 +1,5 @@
 package core.parsers.core
 
-import util.cache.Cache
-
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.language.higherKinds
@@ -15,38 +13,44 @@ trait UnambiguousParserWriter extends ParserWriter {
     def get: Result
   }
 
-  class PackratParseState(val resultCache: Cache[ParseNode, ParseResult[Any]], val extraState: ExtraState) extends ParseStateLike {
+  class ParserState[Result](val parser: Parser[Result]) {
+    val recursionIntermediates = mutable.HashMap[Input, ParseResult[Result]]()
+    val callStackSet = mutable.HashSet[Input]() // TODO might not be needed if we put an abort in the intermediates.
+    var isPartOfACycle: Boolean = false
+    var hasBackEdge: Boolean = false
+    val cache = mutable.HashMap[Input, ParseResult[Result]]()
+  }
 
-    val recursionIntermediates = mutable.HashMap[ParseNode, ParseResult[Any]]()
-    val callStackSet = mutable.HashSet[ParseNode]()
+  class PackratParseState(val extraState: ExtraState) extends ParseStateLike {
+
+    val parserStates = mutable.HashMap[Parser[Any], ParserState[Any]]()
     val callStack = mutable.Stack[Parser[Any]]()
-    var parsersPartOfACycle: Set[Parser[Any]] = Set.empty
-    val parsersWithBackEdges = mutable.HashSet[Parser[Any]]()
 
     def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
 
-      val node = ParseNode(input, parser)
-      resultCache.get(node).getOrElse({
-        val value: ParseResult[Result] = parseIteratively[Result](parser, input)
-        if (!parsersPartOfACycle.contains(parser)) {
-          resultCache.add(node, value)
-        }
-        value
-      }).asInstanceOf[ParseResult[Result]]
+      val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
+      parserState.cache.get(input) match {
+        case None =>
+          val value: ParseResult[Result] = parseIteratively[Result](parserState, input)
+          if (!parserState.isPartOfACycle) {
+            parserState.cache.put(input, value)
+          }
+          value
+        case Some(result) => result
+      }
     }
 
-    def parseIteratively[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
-      val node = ParseNode(input, parser)
-      getPreviousResult(node) match {
+    def parseIteratively[Result](parserState: ParserState[Result], input: Input): ParseResult[Result] = {
+      getPreviousResult(parserState, input) match {
         case None =>
 
-          callStackSet.add(node)
-          callStack.push(node.parser)
-          var result = parser.parseInternal(input, this)
-          if (result.successful && parsersWithBackEdges.contains(parser)) {
-            result = growResult(node, parser, result, this)
+          parserState.callStackSet.add(input)
+          callStack.push(parserState.parser)
+          var result = parserState.parser.parseInternal(input, this)
+          if (result.successful && parserState.hasBackEdge) {
+            result = growResult(parserState, input, result, this)
           }
-          callStackSet.remove(node)
+          parserState.callStackSet.remove(input)
           callStack.pop()
           result
 
@@ -55,27 +59,29 @@ trait UnambiguousParserWriter extends ParserWriter {
     }
 
     @tailrec
-    private def growResult[Result](node: ParseNode, parser: Parser[Result], previous: ParseResult[Result], state: ParseStateLike): ParseResult[Result] = {
-      recursionIntermediates.put(node, previous)
+    private def growResult[Result](parserState: ParserState[Result], input: Input, previous: ParseResult[Result], state: ParseStateLike): ParseResult[Result] = {
+      parserState.recursionIntermediates.put(input, previous)
 
-      val nextResult: ParseResult[Result] = parser.parseInternal(node.input, state)
+      val nextResult: ParseResult[Result] = parserState.parser.parseInternal(input, state)
       nextResult.getSuccessRemainder match {
         case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
-          growResult(node, parser, nextResult, state)
+          growResult(parserState, input, nextResult, state)
         case _ =>
-          recursionIntermediates.remove(node)
+          parserState.recursionIntermediates.remove(input)
           previous
       }
     }
 
-    def getPreviousResult[Result](node: ParseNode): Option[ParseResult[Result]] = {
-      if (callStackSet.contains(node)) {
-        parsersWithBackEdges.add(node.parser)
-        val index = callStack.indexOf(node.parser)
-        parsersPartOfACycle ++= callStack.take(index + 1)
-        return Some(recursionIntermediates.getOrElse(node, abort).asInstanceOf[ParseResult[Result]])
-      }
-      None
+    def getPreviousResult[Result](parserState: ParserState[Result], input: Input): Option[ParseResult[Result]] = {
+      if (!parserState.callStackSet.contains(input))
+        return None
+
+      Some(parserState.recursionIntermediates.getOrElse(input, {
+        parserState.hasBackEdge = true
+        val index = callStack.indexOf(parserState.parser)
+        callStack.take(index + 1).foreach(parser => parserStates(parser).isPartOfACycle = true) // TODO this would also be possible by returning a value that indicates we found a cycle, like the abort!
+        abort
+      }))
     }
   }
 }
