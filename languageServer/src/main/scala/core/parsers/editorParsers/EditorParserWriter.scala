@@ -19,10 +19,9 @@ trait EditorParserWriter extends ParserWriter {
 
   override def fail[Result](message: String) = Fail(message)
 
-  def parseWholeInput[Result](parser: EditorParser[Result], input: Input,
-                              cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result]
+  def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseResult[Result]
 
-  def newParseState(cache: Cache[ParseNode, ParseResult[Any]]): ParseStateLike
+  def newParseState(): ParseStateLike
 
   case class Succeed[+Result](value: Result) extends EditorParser[Result] {
     override def parseInternal(input: Input, cache: ParseStateLike): ParseResult[Result] = newSuccess(value, input)
@@ -37,15 +36,13 @@ trait EditorParserWriter extends ParserWriter {
     def withDefault[Other >: Result](_default: Other): EditorParser[Other] =
       WithDefault[Other](parser, cache => Some(_default))
 
-    def parseWholeInput(input: Input,
-                        cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
-      EditorParserWriter.this.parseWholeInput(parser, input, cache)
+    def parseWholeInput(input: Input): ParseResult[Result] = {
+      EditorParserWriter.this.parseWholeInput(parser, input)
     }
 
-    def parse(input: Input,
-              cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
+    def parse(input: Input): ParseResult[Result] = {
 
-      val state = newParseState(cache)
+      val state = newParseState()
       state.parse(parser, input)
     }
 

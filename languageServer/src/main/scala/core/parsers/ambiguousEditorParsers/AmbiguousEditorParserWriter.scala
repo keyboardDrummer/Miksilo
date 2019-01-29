@@ -2,7 +2,6 @@ package core.parsers.ambiguousEditorParsers
 
 import core.parsers.ambigousParsers.AmbiguousParserWriter
 import core.parsers.editorParsers.{DefaultCache, EditorParserWriter}
-import util.cache.Cache
 
 trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParserWriter {
 
@@ -18,7 +17,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
   override def newSuccess[Result](result: Result, remainder: Input) =
     EditorParseResult(List(Success(result, remainder)), NoFailure)
 
-  override def newParseState(cache: Cache[ParseNode, EditorParseResult[Any]]) = new PackratParseState(cache, new DefaultCache)
+  override def newParseState() = new PackratParseState(new DefaultCache)
 
   override def newFailure[Result](input: Input, message: String): EditorParseResult[Nothing] = ParseFailure(None, input, message)
 
@@ -35,9 +34,8 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
   override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
 
   override def parseWholeInput[Result](parser: EditorParser[Result],
-                                       input: Input,
-                                       cache: Cache[ParseNode, EditorParseResult[Any]]): EditorParseResult[Result] = {
-    val result = parser.parse(input, cache)
+                                       input: Input): EditorParseResult[Result] = {
+    val result = parser.parse(input)
     if (!result.successful)
       return result
 

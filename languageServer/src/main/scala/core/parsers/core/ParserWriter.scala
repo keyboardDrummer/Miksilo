@@ -9,8 +9,6 @@ trait ParserWriter {
   type Self[+R] <: Parser[R]
   type ExtraState
 
-  case class ParseNode(input: Input, parser: Parser[Any])
-
   def succeed[Result](result: Result): Self[Result]
   def newSuccess[Result](result: Result, remainder: Input): ParseResult[Result]
   def fail[Result](message: String): Self[Result]
