@@ -16,7 +16,7 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
   val resolvesToDeclaration = new TypedChildField[NamedDeclaration]("resolvesToDeclaration")
   override def inject(language: Language): Unit = {
     super.inject(language)
-    language.compilerPhases ::= Phase(this, compilation => {
+    language.compilerPhases += Phase(this, compilation => {
       val factory = new Factory()
       val builder = new ConstraintBuilder(factory)
       language.collectConstraints(compilation, builder)

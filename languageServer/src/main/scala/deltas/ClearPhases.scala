@@ -7,7 +7,7 @@ object ClearPhases extends Delta {
   override def description: String = "Removes all defined phases"
 
   override def inject(language: Language): Unit = {
-    language.compilerPhases = List.empty
+    language.compilerPhases.clear()
   }
 
   override def dependencies: Set[Contract] = Set.empty

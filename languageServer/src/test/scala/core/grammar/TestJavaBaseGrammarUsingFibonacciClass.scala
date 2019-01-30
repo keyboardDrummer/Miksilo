@@ -101,7 +101,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   }
 
   def getMethodGrammarResult(input: String): Any = {
-    val result = TestLanguageGrammarUtils.parse(input, MethodDelta.MethodGrammar)
+    val result = TestLanguageGrammarUtils.parse(input, MethodDelta.Shape)
     result
   }
 

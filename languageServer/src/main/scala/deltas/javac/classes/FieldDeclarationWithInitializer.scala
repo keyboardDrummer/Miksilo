@@ -27,11 +27,10 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-    val memberGrammar = find(ClassMemberGrammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val fieldDeclarationGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
       typeGrammar.as(Type) ~~ identifier.as(Name) ~~ ("=" ~~> expression.as(LocalDeclarationWithInitializerDelta.Initializer)) ~< ";"  asNode Shape
-    memberGrammar.addAlternative(fieldDeclarationGrammar)
+    find(FieldDeclarationDelta.Shape).addAlternative(fieldDeclarationGrammar)
   }
 
   object Shape extends NodeShape
@@ -78,6 +77,6 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
   def statementIsSuperCall(statement: Node): Boolean = {
     statement.shape == ExpressionAsStatementDelta.shape &&
-      ExpressionAsStatementDelta.getExpression(statement).shape == SuperCallExpression.SuperCall
+      ExpressionAsStatementDelta.getExpression(statement).shape == SuperCallExpression.Shape
   }
 }

@@ -17,7 +17,7 @@ object MultiFileDelta extends DeltaWithPhase with HasConstraintsDelta {
   object Files extends NodeField
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val phases = compilation.language.compilerPhases.takeWhile(p => p.key != this)
+    val phases = compilation.language.compilerPhases.reverse.takeWhile(p => p.key != this)
 
     def compileFile(fileReference: String): Node = {
       val fileCompilation = new Compilation(compilation.language, compilation.fileSystem, Some(fileReference))

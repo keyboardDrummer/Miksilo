@@ -54,7 +54,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("FibonacciMainMethod") {
     val input = s"public static void main(java.lang.String[] args)$lineSeparator{$lineSeparator    System.out.print(fibonacci(5));$lineSeparator}"
-    TestLanguageGrammarUtils.compareInputWithPrint(input, None, MethodDelta.MethodGrammar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, MethodDelta.Shape)
   }
 
   test("Block") {

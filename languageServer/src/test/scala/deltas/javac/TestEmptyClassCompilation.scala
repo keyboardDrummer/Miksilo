@@ -10,7 +10,7 @@ import deltas.bytecode.types.VoidTypeDelta
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
-import deltas.javac.constructor.SuperCallExpression
+import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.types.MethodTypeDelta
 import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
 
@@ -37,7 +37,7 @@ class TestEmptyClassCompilation extends JavaLanguageTest {
     val constantPool = new ConstantPool(Seq(MethodRefConstant.methodRef(3, 10),
       ClassInfoConstant.classRef(11),
       ClassInfoConstant.classRef(12),
-      Utf8ConstantDelta.create(SuperCallExpression.constructorName),
+      Utf8ConstantDelta.create(ConstructorDelta.constructorName),
       TypeConstant.constructor(MethodTypeDelta.neww(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       NameAndTypeConstant.nameAndType(4, 5),

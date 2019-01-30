@@ -1,18 +1,12 @@
 package deltas.javac.expressions
 
-import core.deltas.Delta
-import core.smarts.SolveConstraintsDelta
-import deltas.ClearPhases
-import deltas.javac.{ImplicitThisForPrivateMemberSelectionDelta, JavaToByteCodeLanguage}
+import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import util.{LanguageTest, TestLanguageBuilder}
 
 class BlockTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
   Seq(DropPhases(1), BlockLanguageDelta) ++
-    Delta.spliceAndFilterTop(
-      JavaToByteCodeLanguage.blockWithVariables,
-      JavaToByteCodeLanguage.javaClassSkeleton,
-      Seq(SolveConstraintsDelta, ClearPhases)).filter(d => d != ImplicitThisForPrivateMemberSelectionDelta))) {
+    JavaLanguage.blockWithVariables)) {
 
   test("int variable") {
     val program =

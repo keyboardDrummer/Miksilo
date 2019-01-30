@@ -20,7 +20,7 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
   var stopped: Boolean = false
 
   def runPhases(): Unit = {
-    for(phase <- language.compilerPhases) {
+    for(phase <- language.compilerPhases.reverse) {
       if (stopped)
         return
       phase.action(this)

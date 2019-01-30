@@ -1,7 +1,8 @@
 package deltas.javac.methods.call
 
 import core.deltas.path.NodePath
-import core.deltas.{Contract, Delta, HasShape, ShapeProperty}
+import core.deltas._
+import core.deltas.grammars.LanguageGrammars
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
@@ -33,9 +34,14 @@ trait ReferenceExpressionDelta extends Delta with HasShape with ReferenceExpress
   }
 }
 
-trait CallWithMemberSelector extends Delta {
+trait CallWithMemberSelector extends DeltaWithGrammar {
 
   override def dependencies: Set[Contract] = Set(CallDelta, MemberSelectorDelta)
+
+  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
+    import grammars._
+    find(CallDelta.Callee).addAlternative(find(MemberSelectorDelta.Shape))
+  }
 
   def getGenericCallInstructions(call: Call[NodePath], compilation: Compilation, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
     val expressionToInstruction = ToByteCodeSkeleton.getToInstructions(compilation)

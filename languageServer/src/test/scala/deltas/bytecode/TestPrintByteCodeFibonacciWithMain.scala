@@ -11,7 +11,7 @@ import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types._
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
-import deltas.javac.constructor.SuperCallExpression
+import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.types.MethodTypeDelta
 import util.{JavaLanguageTest, LanguageTest}
 
@@ -60,10 +60,10 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
       SmallIntegerConstantDelta.integerConstant(2),
       SubtractIntegerDelta.subtractInteger,
       InvokeStaticDelta.invokeStatic(3),
-      AddIntegersDelta.addIntegers,
+      AddIntegersDelta.addIntegers(),
       IntegerReturnInstructionDelta.integerReturn
     )
-    val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(8, 0)))
+    val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(LineNumberRef(8, 0)))
     val stackMapTable = StackMapTableAttributeDelta.stackMapTable(15, Seq(StackMapTableAttributeDelta.sameFrame(9),
       StackMapTableAttributeDelta.sameLocals1StackItem(12, IntTypeDelta.intType)))
     val method = ByteCodeMethodInfo.methodInfo(13, 14, Seq(CodeAttributeDelta.codeAttribute(9, 3, 1, instructions, Seq(), Seq(lineNumberTable, stackMapTable))),
@@ -78,13 +78,13 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
       MethodRefConstant.methodRef(22, 23),
       ClassInfoConstant.classRef(24),
       ClassInfoConstant.classRef(25),
-      SuperCallExpression.constructorName,
+      ConstructorDelta.constructorName,
       TypeConstant.constructor(MethodTypeDelta.neww(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       LineNumberTable.constantPoolKey,
       "main",
       TypeConstant.constructor(MethodTypeDelta.neww(VoidTypeDelta.voidType, Seq(
-        ArrayTypeDelta.neww(QualifiedObjectTypeDelta.neww(new QualifiedClassName(Seq("java", "lang", "String"))))))),
+        ArrayTypeDelta.neww(QualifiedObjectTypeDelta.neww(QualifiedClassName(Seq("java", "lang", "String"))))))),
       fibonacciMethodName,
       TypeConstant.constructor(MethodTypeDelta.neww(IntTypeDelta.intType, Seq(IntTypeDelta.intType))),
       StackMapTableAttributeDelta.entry,
@@ -97,10 +97,10 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
       ClassInfoConstant.classRef(29),
       NameAndTypeConstant.nameAndType(30, 31),
       "Fibonacci",
-      new QualifiedClassName(Seq("java", "lang", "Object")),
-      new QualifiedClassName(Seq("java", "lang", "System")),
+      QualifiedClassName(Seq("java", "lang", "Object")),
+      QualifiedClassName(Seq("java", "lang", "System")),
       "out",
-      TypeConstant.constructor(QualifiedObjectTypeDelta.neww(new QualifiedClassName(Seq("java", "io", "PrintStream")))),
+      TypeConstant.constructor(QualifiedObjectTypeDelta.neww(QualifiedClassName(Seq("java", "io", "PrintStream")))),
       "java/io/PrintStream",
       "print",
       TypeConstant.constructor(MethodTypeDelta.neww(VoidTypeDelta.voidType, Seq(IntTypeDelta.intType)))
@@ -111,7 +111,7 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
   def getConstructorByteCode: Node = {
     val instructions = Seq(LoadAddressDelta.addressLoad(0),
       InvokeSpecialDelta.invokeSpecial(1), VoidReturnInstructionDelta.voidReturn)
-    val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(1, 0)))
+    val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(LineNumberRef(1, 0)))
     val codeAttribute = Seq(CodeAttributeDelta.codeAttribute(9, 1, 1, instructions, Seq(), Seq(lineNumberTable)))
     ByteCodeMethodInfo.methodInfo(7, 8, codeAttribute, Set())
   }
@@ -122,7 +122,7 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
       InvokeStaticDelta.invokeStatic(3),
       InvokeVirtualDelta.invokeVirtual(4),
       VoidReturnInstructionDelta.voidReturn)
-    val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(new LineNumberRef(4, 0), new LineNumberRef(5, 10)))
+    val lineNumberTable = LineNumberTable.lineNumberTable(10, Seq(LineNumberRef(4, 0), LineNumberRef(5, 10)))
     ByteCodeMethodInfo.methodInfo(11, 12, Seq(CodeAttributeDelta.codeAttribute(9, 2, 1, instructions, Seq(), Seq(lineNumberTable))),
       Set(ByteCodeMethodInfo.PublicAccess, ByteCodeMethodInfo.StaticAccess))
   }

@@ -6,12 +6,12 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodeChildPath, NodePath, PathRoot}
 import core.document.BlankLine
 import core.language.node._
-import core.language.{Compilation, CompilationState, Language}
-import core.smarts.ConstraintBuilder
+import core.language.{Compilation, CompilationState, Language, Phase}
 import core.smarts.objects.{Declaration, NamedDeclaration}
 import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.TypeFromDeclaration
+import core.smarts.{ConstraintBuilder, SolveConstraintsDelta}
 import deltas.ConstraintSkeleton
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
@@ -19,12 +19,14 @@ import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
 import deltas.javac.JavaLang
-import deltas.javac.classes.ClassCompiler
+import deltas.javac.classes.{ClassCompiler, FieldDeclarationDelta}
+import deltas.javac.methods.MethodDelta
+import deltas.javac.methods.MethodDelta.getMethods
 import deltas.statement.BlockDelta
 
 import scala.collection.mutable
 
-object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
+object JavaClassDelta extends DeltaWithGrammar with Delta
   with HasDeclarationDelta with HasConstraintsDelta {
 
   override def shape: NodeShape = Shape
@@ -48,11 +50,11 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
     def parent_=(value: Option[String]): Unit = node(ClassParent) = value
   }
 
-  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+  def transformProgram(program: Node, compilation: Compilation): Unit = {
     transformClass(program)
 
     def transformClass(program: Node) {
-      val javaClass: JavaClass[Node] = program
+      val javaClass: JavaClass[NodePath] = PathRoot(program)
       JavaLang.loadIntoClassPath(compilation)
       javaClass.node.shape = ByteCodeSkeleton.Shape
       val classFile = new ClassFile(javaClass.node)
@@ -70,11 +72,18 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
       program(ByteCodeSkeleton.ClassParentIndex) = parentRef
       program(ByteCodeSkeleton.ClassInterfaces) = Seq()
 
-      for(member <- members.get(compilation).values)
-        member.compile(compilation, javaClass.node)
+      program(ByteCodeSkeleton.ClassFields) = getFields[NodePath](javaClass).map(field =>
+        FieldDeclarationDelta.compile(compilation, field))
+
+      program(ByteCodeSkeleton.Methods) = getMethods[NodePath](javaClass).map(method =>
+        MethodDelta.compile(compilation, method))
 
       javaClass.node.data.remove(Members)
     }
+  }
+
+  def getFields[T <: NodeLike](javaClass: JavaClass[T]): Seq[T] = {
+    javaClass.members.filter(member => member.shape == Shape)
   }
 
   def fullyQualify(_type: NodePath, classCompiler: ClassCompiler): Unit =  _type.shape match {
@@ -93,11 +102,10 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
 
   override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames)
 
-  object ClassMemberGrammar extends GrammarKey
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import language.grammars._
 
-    val classMember: BiGrammar = create(ClassMemberGrammar)
+    val classMember: BiGrammar = find(MethodDelta.Shape) | find(FieldDeclarationDelta.Shape)
     val importGrammar = create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical as ClassImports
     val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
@@ -121,7 +129,6 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
     ClassImports -> imports,
     ClassParent -> mbParent)
 
-  val members = new ShapeProperty[ClassMemberDelta]
   val importToClassMap = new ShapeProperty[(Compilation, Node) => Map[String, QualifiedClassName]]
 
   val state = new CompilationState[State](new State())
@@ -144,6 +151,9 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
   object Name extends NodeField
 
   override def inject(language: Language): Unit = {
+    val phase = Phase(this, compilation => transformProgram(compilation.program, compilation))
+    val solvePhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
+    language.compilerPhases.insert(solvePhaseIndex, phase)
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")

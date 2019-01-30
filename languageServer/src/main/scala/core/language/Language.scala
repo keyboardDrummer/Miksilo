@@ -19,7 +19,7 @@ class Language extends LazyLogging {
 
   val data: mutable.Map[Any, Any] = mutable.Map.empty
   val grammars = new LanguageGrammars
-  var compilerPhases: List[Phase] = List.empty
+  var compilerPhases: mutable.ArrayBuffer[Phase] = mutable.ArrayBuffer.empty
   var collectConstraints: (Compilation, ConstraintBuilder) => Unit = (compilation, builder) => {
     ConstraintSkeleton.constraints(compilation, builder, PathRoot(compilation.program),
       builder.newScope(debugName = "rootScope"))
