@@ -13,7 +13,7 @@ import deltas.javac.constructor._
 import deltas.javac.expressions.equality.AddEqualityPrecedence
 import deltas.javac.expressions.literals.{BooleanLiteralDelta, LongLiteralDelta, NullDelta}
 import deltas.javac.methods._
-import deltas.javac.methods.call.CallDelta
+import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.statements._
 import deltas.javac.types._
 import deltas.statement._
@@ -29,8 +29,10 @@ object JavaLanguage {
 
   def constructors = Seq(DefaultConstructorDelta, ImplicitSuperConstructorCall,
     SuperCallExpression, ThisCallExpression, NewDelta, ConstructorDelta)
-  def fields = Seq(FieldDeclarationWithInitializer, FieldDeclarationDelta,
+
+  def fields = Seq(CallMemberDelta, FieldDeclarationWithInitializer, FieldDeclarationDelta,
     AssignToMemberDelta, SelectFieldDelta, MemberSelectorDelta)
+
   def imports = Seq(ImplicitJavaLangImport, WildcardImportDelta, BasicImportDelta)
 
   def method = Seq(ImplicitReturnAtEndOfMethod,

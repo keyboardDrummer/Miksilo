@@ -1,7 +1,7 @@
 package deltas.javac.expressions
 
 import deltas.RemovePhasesAfterSolveConstraints
-import deltas.javac.JavaToByteCodeLanguage
+import deltas.javac.{JavaLanguage, JavaToByteCodeLanguage}
 import deltas.javac.methods.BlockLanguageDelta
 import langserver.types.{Location, Range}
 import languageServer.{HumanPosition, LanguageServerTest}
@@ -12,7 +12,7 @@ class GotoDefinitionTest extends FunSuite with LanguageServerTest {
 
   private val blockLanguage = TestLanguageBuilder.buildWithParser(Seq(
     DropPhases(1), BlockLanguageDelta) ++
-    Seq(RemovePhasesAfterSolveConstraints) ++ JavaToByteCodeLanguage.blockWithVariables)
+    Seq(RemovePhasesAfterSolveConstraints) ++ JavaLanguage.blockWithVariables)
 
   test("int variable") {
     val program =

@@ -34,14 +34,18 @@ trait ReferenceExpressionDelta extends Delta with HasShape with ReferenceExpress
   }
 }
 
-trait CallWithMemberSelector extends DeltaWithGrammar {
-
+object CallMemberDelta extends DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(CallDelta, MemberSelectorDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     find(CallDelta.Callee).addAlternative(find(MemberSelectorDelta.Shape))
   }
+
+  override def description = "Enabled calling members using the . operator to select the callee"
+}
+
+object CallToByteCode {
 
   def getGenericCallInstructions(call: Call[NodePath], compilation: Compilation, calleeInstructions: Seq[Node], invokeInstructions: Seq[Node]): Seq[Node] = {
     val expressionToInstruction = ToByteCodeSkeleton.getToInstructions(compilation)

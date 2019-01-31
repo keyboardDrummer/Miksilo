@@ -9,7 +9,7 @@ import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector
 import deltas.javac.methods.call.CallDelta.Call
 
-object CallInstanceDelta extends CallWithMemberSelector with ConvertsToByteCodeDelta {
+object CallInstanceDelta extends ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling instance methods."
 
@@ -25,10 +25,10 @@ object CallInstanceDelta extends CallWithMemberSelector with ConvertsToByteCodeD
     val expressionToInstruction = ToByteCodeSkeleton.getToInstructions(compilation)
     val calleeInstructions = expressionToInstruction(objectExpression)
     val invokeInstructions = Seq(InvokeVirtualDelta.invokeVirtual(methodRef))
-    getGenericCallInstructions(call, compilation, calleeInstructions, invokeInstructions)
+    CallToByteCode.getGenericCallInstructions(call, compilation, calleeInstructions, invokeInstructions)
   }
 
-  override def dependencies: Set[Contract] = Set(InvokeVirtualDelta) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(InvokeVirtualDelta, CallMemberDelta)
 
   override def shape = CallDelta.Shape
 }
