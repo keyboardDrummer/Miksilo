@@ -152,8 +152,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
   override def inject(language: Language): Unit = {
     val phase = Phase(this, compilation => transformProgram(compilation.program, compilation))
-    val solvePhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
-    language.compilerPhases.insert(solvePhaseIndex, phase)
+    SolveConstraintsDelta.injectPhaseAfterMe(language, phase)
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")

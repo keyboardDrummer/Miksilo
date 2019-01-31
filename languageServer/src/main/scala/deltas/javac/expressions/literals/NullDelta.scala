@@ -8,22 +8,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.coreInstructions.objects.PushNullDelta
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import deltas.javac.expressions.ConvertsToByteCodeDelta
-
-object NullToByteCodeDelta extends ConvertsToByteCodeDelta {
-
-  override def toByteCode(expression: NodePath, compilation: Compilation): Seq[Node] = {
-    Seq(PushNullDelta.pushNull)
-  }
-
-  override def description = "Converts null to bytecode"
-
-  override def shape = NullDelta.Shape
-
-  override def dependencies = Set(NullDelta, PushNullDelta)
-}
 
 object NullDelta extends DeltaWithGrammar with ExpressionInstance {
 
@@ -36,7 +21,7 @@ object NullDelta extends DeltaWithGrammar with ExpressionInstance {
     expressionGrammar.inner = expressionGrammar.inner | parseNull
   }
 
-  override def dependencies: Set[Contract] = Set(ExpressionDelta, PushNullDelta)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
   object Shape extends NodeShape
 

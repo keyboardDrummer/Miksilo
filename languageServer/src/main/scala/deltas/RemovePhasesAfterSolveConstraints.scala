@@ -10,8 +10,9 @@ object RemovePhasesAfterSolveConstraints extends Delta {
   override def dependencies: Set[Contract] = Set.empty
 
   override def inject(language: Language): Unit = {
+    val bla = List.empty
     val constraintIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
-    language.compilerPhases = language.compilerPhases.take(constraintIndex + 1)
+    language.compilerPhases = language.compilerPhases.drop(constraintIndex)
     super.inject(language)
   }
 

@@ -3,9 +3,9 @@ package core.bigrammar
 import core.deltas.Delta
 import core.smarts.SolveConstraintsDelta
 import deltas.expression.ExpressionDelta
+import deltas.javac._
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
-import deltas.javac._
 import deltas.statement.BlockDelta
 import deltas.{PrettyPrint, RunWithJVM}
 import org.scalatest.FunSuite
@@ -67,10 +67,10 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val expectation = SourceUtils.getJavaTestFileContents("ExplicitFibonacci.java")
 
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorDelta, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta)
-    val newTransformations = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
+      ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelectionDelta)
+    val newDeltas = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
-    val state = TestLanguageBuilder.buildWithParser(newTransformations).compile(input)
+    val state = TestLanguageBuilder.buildWithParser(newDeltas).compile(input)
     val output = state.output
 
     assertResult(expectation)(output)

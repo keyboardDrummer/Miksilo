@@ -8,7 +8,7 @@ class Statistics(parent: Statistics = null) extends LazyLogging {
 
   def profile[T](description: String, action: => T): T = {
     val start = System.nanoTime()
-    val result = action
+    val   result = action
     val end = System.nanoTime()
     val timing = (end - start)/1000000.0
     if (parent != null)

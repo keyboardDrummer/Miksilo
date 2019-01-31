@@ -10,30 +10,13 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
-import deltas.bytecode.coreInstructions.integers.SmallIntegerConstantDelta
-import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.types.LongTypeDelta
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import deltas.javac.expressions.ConvertsToByteCodeDelta
-import deltas.javac.expressions.literals.LongLiteralDelta.getValue
-
-object LongLiteralToByteCodeDelta extends ConvertsToByteCodeDelta {
-
-  override def toByteCode(literal: NodePath, compilation: Compilation): Seq[Node] = {
-    Seq(PushLongDelta.constant(getValue(literal).toInt))
-  }
-
-  override def description = "Converts long literals to bytecode"
-
-  override def shape = LongLiteralDelta.Shape
-
-  override def dependencies = Set(LongLiteralDelta, PushLongDelta)
-}
 
 object LongLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   val shape = Shape
 
-  override def dependencies: Set[Contract] = Set(ExpressionDelta, SmallIntegerConstantDelta)
+  override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
   private def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
 

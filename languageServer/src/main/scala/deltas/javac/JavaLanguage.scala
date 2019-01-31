@@ -2,6 +2,7 @@ package deltas.javac
 
 import core.deltas.Delta
 import core.smarts.SolveConstraintsDelta
+import deltas.bytecode.types._
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.logical.LogicalNotDelta
@@ -14,6 +15,7 @@ import deltas.javac.expressions.literals.{BooleanLiteralDelta, LongLiteralDelta,
 import deltas.javac.methods._
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements._
+import deltas.javac.types._
 import deltas.statement._
 import deltas.statement.assignment.{AddAssignmentDelta, AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
 
@@ -35,11 +37,17 @@ object JavaLanguage {
     ReturnExpressionDelta, ReturnVoidDelta,
     CallVariableDelta, CallDelta, MethodDelta, AccessibilityFieldsDelta) ++ blockWithVariables
 
-  def blockWithVariables = Seq(
-    LocalDeclarationWithInitializerDelta, LocalDeclarationDelta,
-    PostFixIncrementDelta,
-    AddAssignmentDelta, AssignToVariable, SimpleAssignmentDelta,
-    AssignmentPrecedence, VariableDelta) ++ simpleBlock
+  def blockWithVariables = {
+    val movedDeltas = Seq(ForLoopContinueDelta, ForLoopDelta)
+    val aboveForLoop = movedDeltas ++ Seq(
+      LocalDeclarationWithInitializerDelta,
+      LocalDeclarationDelta,
+      PostFixIncrementDelta,
+      AddAssignmentDelta, AssignToVariable, SimpleAssignmentDelta,
+      AssignmentPrecedence, VariableDelta)
+
+    Delta.spliceAndFilterBottom(aboveForLoop, simpleBlock)
+  }
 
   def simpleBlock: Seq[Delta] = Seq(IfThenElseToIfThenAndGotoDelta, ForLoopContinueDelta, ForLoopDelta,
     BlockAsStatementDelta, WhileBreakDelta, WhileContinueDelta, WhileLoopDelta) ++
@@ -52,5 +60,11 @@ object JavaLanguage {
     AddRelationalPrecedenceDelta, AdditionDelta,
     SubtractionDelta, AdditivePrecedenceDelta,
     BooleanLiteralDelta, LongLiteralDelta, IntLiteralDelta,
-    NullDelta, LogicalNotDelta, ParenthesisInExpressionDelta, ExpressionDelta, SolveConstraintsDelta)
+    NullDelta, LogicalNotDelta, ParenthesisInExpressionDelta, ExpressionDelta, SolveConstraintsDelta) ++ types
+
+  def types: Seq[Delta] = Seq(TypeVariableDelta, TypeAbstraction, WildcardTypeArgument, ExtendsDelta,
+    SuperTypeArgument, TypeApplicationDelta, MethodTypeDelta) ++
+    Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta,
+      FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
+      ShortTypeDelta, TypeSkeleton)
 }

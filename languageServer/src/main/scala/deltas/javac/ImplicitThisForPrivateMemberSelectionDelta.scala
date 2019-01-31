@@ -40,10 +40,9 @@ object ImplicitThisForPrivateMemberSelectionDelta extends Delta {
   }
 
   override def inject(language: Language): Unit = {
-    super.inject(language)
     val phase = Phase(this, compilation => transformProgram(compilation.program, compilation))
-    val solvePhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
-    language.compilerPhases.insert(solvePhaseIndex, phase)
+    SolveConstraintsDelta.injectPhaseAfterMe(language, phase)
+    super.inject(language)
   }
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {

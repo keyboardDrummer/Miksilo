@@ -14,7 +14,6 @@ case class PrettyPrint(recover: Boolean = false) extends Delta
     val foundGrammar = language.grammars.root
     language.data(this) = foundGrammar.deepClone
 
-    language.compilerPhases.clear()
     language.compilerPhases += Phase(this, compilation => {
       val grammar = getOutputGrammar(language)
       val documentTry: Try[ResponsiveDocument] = Try(BiGrammarToPrinter.toDocument(compilation.program, grammar))
@@ -26,6 +25,7 @@ case class PrettyPrint(recover: Boolean = false) extends Delta
       }
       val document: ResponsiveDocument = documentTryWithOptionalRecover.get
       compilation.output = document.renderString()
+      compilation.stopped = true
     })
   }
 
