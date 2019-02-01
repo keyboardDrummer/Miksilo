@@ -14,14 +14,15 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
 
   def injectPhaseAfterMe(language: Language, phase: Phase): Unit = {
     val solvePhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
-    language.compilerPhases.insert(solvePhaseIndex, phase)
+    val (left, right) = language.compilerPhases.splitAt(solvePhaseIndex + 1)
+    language.compilerPhases = left ++ (phase :: right)
   }
 
   def getDeclarationOfReference(path: AnyPath): NodePath = resolvesToDeclaration(path).origin.get.asInstanceOf[ChildPath].parent
   val resolvesToDeclaration = new TypedChildField[NamedDeclaration]("resolvesToDeclaration")
   override def inject(language: Language): Unit = {
     super.inject(language)
-    language.compilerPhases += Phase(this, compilation => {
+    language.compilerPhases ::= Phase(this, compilation => {
       val factory = new Factory()
       val builder = new ConstraintBuilder(factory)
       language.collectConstraints(compilation, builder)
