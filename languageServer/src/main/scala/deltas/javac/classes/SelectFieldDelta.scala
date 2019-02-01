@@ -13,7 +13,6 @@ import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta._
 import deltas.javac.methods.call.ReferenceExpressionDelta
 
-// TODO merge with MemberSelectorDelta ???
 object SelectFieldDelta extends DeltaWithGrammar with ExpressionInstance with ReferenceExpressionDelta {
 
   override def description: String = "Enables using the . operator to select a field from a class."

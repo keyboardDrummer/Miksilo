@@ -14,7 +14,7 @@ class DeltaGraph
   extends GraphFromDeltas(JavaToByteCodeLanguage.allDeltas) {
 
   val simplifications = Seq(ByteCodeWithTypes, ByteCode, SimpleByteCode, OptimizedByteCode, JavaSimpleExpression,
-    JavaSimpleStatement, JavaMethod, JavaGroup)
+    JavaSimpleStatement, JavaMethodGroup, JavaGroup)
   addSimplifications()
 
   val sources: JSetWrapper[DeltaVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
