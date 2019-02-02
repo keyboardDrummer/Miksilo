@@ -98,7 +98,6 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
   }
 
   def getMethodFromCallee(compilation: Compilation, callee: NodePath) = {
-    val scopeGraph = compilation.proofs.scopeGraph
     val callReference = ReferenceExpressionSkeleton.references(callee)
     val callDeclaration = compilation.proofs.declarations(callReference)
     val method: Method[NodePath] = callDeclaration.origin.get.asInstanceOf[FieldPath].parent
