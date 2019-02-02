@@ -8,12 +8,11 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
-import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object ReturnVoidDelta extends ConvertsToByteCodeDelta with StatementInstance with DeltaWithGrammar  {
+object ReturnVoidDelta extends StatementInstance with DeltaWithGrammar  {
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, VoidReturnInstructionDelta)
+  override def dependencies: Set[Contract] = Set(MethodDelta)
 
   def returnToLines(_return: Node, compiler: MethodCompiler): Seq[Node] = {
     Seq(VoidReturnInstructionDelta.voidReturn)
@@ -27,15 +26,11 @@ object ReturnVoidDelta extends ConvertsToByteCodeDelta with StatementInstance wi
     statement.inner = statement.inner | returnExpression
   }
 
-  def _return: Node = new Node(ReturnVoidKey)
+  def _return: Node = new Node(Shape)
 
-  object ReturnVoidKey extends NodeShape
+  object Shape extends NodeShape
 
-  override val shape = ReturnVoidKey
-
-  override def toByteCode(_return: NodePath, compilation: Compilation): Seq[Node] = {
-    Seq(VoidReturnInstructionDelta.voidReturn)
-  }
+  override val shape = Shape
 
   override def description: String = "Allows returning void."
 

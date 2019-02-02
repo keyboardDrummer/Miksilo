@@ -11,7 +11,7 @@ import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidTypeDelta}
-import deltas.javac.constructor.SuperCallExpression.constructorName
+import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.call.CallDelta.Arguments
 
@@ -48,7 +48,7 @@ object NewDelta extends DeltaWithGrammar with ExpressionInstance {
     builder.typesAreEqual(classType, _type)
     val classScope = builder.getDeclaredScope(classDeclaration)
 
-    val constructorReference = new Reference(constructorName, Some(call))
+    val constructorReference = new Reference(ConstructorDelta.constructorName, Some(call))
     builder.add(ReferenceInScope(constructorReference, classScope))
     CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, constructorReference, VoidTypeDelta.constraintType)
   }

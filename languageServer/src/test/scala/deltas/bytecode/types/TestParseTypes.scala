@@ -3,12 +3,12 @@ package deltas.bytecode.types
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.Delta
 import core.language.node.Node
-import org.scalatest.FunSuite
 import deltas.bytecode.attributes.CodeAttributeDelta.CodeKey
 import deltas.bytecode.attributes.{CodeAttributeDelta, StackMapTableAttributeDelta}
 import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
-import deltas.javac.JavaLanguage
+import deltas.javac.ByteCodeLanguage
 import deltas.javac.classes.skeleton.QualifiedClassName
+import org.scalatest.FunSuite
 
 class TestParseTypes extends FunSuite {
 
@@ -32,7 +32,7 @@ class TestParseTypes extends FunSuite {
 
   test("labelWithAppendFrame") {
     val input = "label start-4962768465676381896\n        appendFrame int int"
-    val result = TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaLanguage.byteCodeDeltas).
+    val result = TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas).
       parse(input, CodeAttributeDelta.InstructionGrammar)
     assertResult(LabelDelta.Shape)(result.asInstanceOf[Node].shape)
   }
@@ -40,7 +40,7 @@ class TestParseTypes extends FunSuite {
   test("labelWithAppendFrameInInstructions1") {
     val input = "Code: name:9, stack:2, locals:3\n    \n " +
       "label start-4962768465676381896\n        sameFrame\n iload 2 \n    Exceptions:"
-    val result = TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaLanguage.byteCodeDeltas).
+    val result = TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas).
       parse(input, CodeAttributeDelta.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].shape)
   }
@@ -48,7 +48,7 @@ class TestParseTypes extends FunSuite {
   ignore("labelWithAppendFrameInInstructions2") {
     val input = "code: name:9, stack:2, locals:3\n    \n " +
       "label \"start-4962768465676381896\"\n        appendFrame int int\n iload 2 \n    Exceptions:"
-    val result = TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ JavaLanguage.byteCodeDeltas).
+    val result = TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas).
       parse(input, CodeAttributeDelta.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].shape)
   }

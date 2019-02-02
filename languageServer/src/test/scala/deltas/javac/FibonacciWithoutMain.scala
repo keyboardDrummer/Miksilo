@@ -18,7 +18,7 @@ class FibonacciWithoutMain {
 
   def compileAndPrintFibonacciWithoutMain() {
     val fibonacci = getJavaFibonacciWithoutMain
-    val byteCode = TestLanguageBuilder.buildWithParser(JavaLanguage.javaCompilerDeltas).compileAst(fibonacci).program
+    val byteCode = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(fibonacci).program
     LanguageTest.printByteCode(byteCode)
   }
 

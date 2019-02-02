@@ -13,6 +13,12 @@ trait Delta extends Contract with Key {
 
 object Delta {
 
+  def insertUnder(deltas: Seq[Delta], marker: Delta, insert: Seq[Delta]): Seq[Delta] = {
+    val pivot = deltas.indexWhere(particle => marker == particle)
+    val (before,after) = deltas.splitAt(pivot + 1)
+    before ++ insert ++ after
+  }
+
   def replace(deltas: Seq[Delta], marker: Delta, splice: Seq[Delta]): Seq[Delta] = {
     val pivot = deltas.indexWhere(particle => marker == particle)
     val (before,after) = deltas.splitAt(pivot)

@@ -63,7 +63,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     statistics.profile("running phases", {
       for(phase <- language.compilerPhases) {
         statistics.profile("run " + phase.key.description, phase.action(compilation))
-        if (compilation.diagnostics.nonEmpty)
+        if (compilation.stopped)
           return
       }
     })

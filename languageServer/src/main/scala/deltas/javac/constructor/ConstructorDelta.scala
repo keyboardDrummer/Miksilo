@@ -1,24 +1,22 @@
 package deltas.javac.constructor
 
 import core.deltas._
-import core.language.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars
+import core.language.exceptions.BadInputException
 import core.language.node._
 import core.language.{Compilation, Language}
-import deltas.bytecode.coreInstructions.InvokeSpecialDelta
-import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.types.VoidTypeDelta
-import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
-import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.methods.MethodDelta._
-import deltas.javac.methods.call.CallStaticOrInstanceDelta
+import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.statement.BlockDelta
 
 object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, CallStaticOrInstanceDelta, InvokeSpecialDelta, LoadAddressDelta, SuperCallExpression)
+  val constructorName: String = "<init>"
+
+  override def dependencies: Set[Contract] = Set(MethodDelta)
 
   case class BadConstructorNameException(javaClass: Node, constructor: Node) extends BadInputException
 
@@ -31,7 +29,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
         throw BadConstructorNameException(program, constructor.node)
 
       constructor.shape = MethodDelta.Shape
-      constructor(MethodDelta.Name) = SuperCallExpression.constructorName
+      constructor(MethodDelta.Name) = constructorName
       constructor(MethodDelta.ReturnType) = VoidTypeDelta.voidType
       constructor(MethodDelta.TypeParameters) = Seq.empty
       constructor(AccessibilityFieldsDelta.Static) = false
@@ -55,12 +53,11 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val memberGrammar = find(JavaClassDelta.ClassMemberGrammar)
     val visibilityModifier = find(AccessibilityFieldsDelta.VisibilityField)
     val parseParameters = find(MethodDelta.Parameters) as Parameters
     val block = find(BlockDelta.BlockGramar).as(Body)
     val constructorGrammar = visibilityModifier ~~ identifier.as(ClassName) ~ parseParameters % block asNode Shape
-    memberGrammar.addAlternative(constructorGrammar)
+    find(MethodDelta.Shape).addAlternative(constructorGrammar)
   }
 
   override def description: String = "Introduces constructors."

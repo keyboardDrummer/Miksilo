@@ -4,7 +4,7 @@ import core.language.Language
 
 import scala.collection.mutable.ArrayBuffer
 
-case class LanguageFromDeltas(val topToBottom: Seq[Delta], addMissingDeltas: Boolean = true) extends Language {
+case class LanguageFromDeltas(val topToBottom: Seq[Delta], addMissingDeltas: Boolean = false) extends Language {
   private val explicitDeltas = topToBottom.reverse
   val allDeltas = validateDependencies(explicitDeltas)
   for(delta <- allDeltas)

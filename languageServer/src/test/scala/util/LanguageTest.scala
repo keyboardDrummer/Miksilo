@@ -10,14 +10,15 @@ import deltas.PrettyPrint
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
-import deltas.javac.JavaLanguage
+import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
 import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap, FunSuite}
 import util.SourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-class JavaLanguageTest extends LanguageTest(TestLanguageBuilder.buildWithParser(JavaLanguage.javaCompilerDeltas)) {}
+class JavaLanguageTest
+  extends LanguageTest(TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas)) {}
 
 object LanguageTest {
 
@@ -136,7 +137,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     val actualByteCodeAccordingToJavap = runJavaP((actualOutputDirectory / relativeClassPath).toFile)
     val expectedByteCodeAccordingToJavap = runJavaP((expectedOutputDirectory / relativeClassPath).toFile)
 
-    val prettyPrintByteCodeCompiler = TestLanguageBuilder.buildWithParser(Seq(new PrettyPrint) ++ JavaLanguage.byteCodeDeltas)
+    val prettyPrintByteCodeCompiler = TestLanguageBuilder.buildWithParser(Seq(new PrettyPrint) ++ ByteCodeLanguage.byteCodeDeltas)
     val output = prettyPrintByteCodeCompiler.compileAst(state.program).output
     val prettyPrintActualByteCode = output
 

@@ -16,7 +16,7 @@ import util.{LanguageTest, SourceUtils, TestLanguageBuilder}
 import scala.reflect.io.Path
 
 class JavaStyleCommentsTest
-  extends LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++ JavaLanguage.javaCompilerDeltas))
+  extends LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++ JavaToByteCodeLanguage.javaCompilerDeltas))
   with NodeGrammarWriter
 {
   object ParentClass extends NodeShape
@@ -72,7 +72,7 @@ class JavaStyleCommentsTest
 
   test("relational") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
-      JavaLanguage.javaCompilerDeltas))
+      JavaToByteCodeLanguage.javaCompilerDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionDelta.FirstPrecedenceGrammar)
@@ -81,7 +81,7 @@ class JavaStyleCommentsTest
   test("addition") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
-      JavaLanguage.allByteCodeDeltas))
+      ExtendedByteCode.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -92,7 +92,7 @@ class JavaStyleCommentsTest
   test("addition2") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
-      JavaLanguage.allByteCodeDeltas))
+      ExtendedByteCode.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -103,7 +103,7 @@ class JavaStyleCommentsTest
   test("addition3") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(SubtractionDelta, AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
-    JavaLanguage.allByteCodeDeltas))
+      ExtendedByteCode.allByteCodeDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -113,7 +113,7 @@ class JavaStyleCommentsTest
 
   test("addition4") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
-      JavaLanguage.javaCompilerDeltas))
+      JavaToByteCodeLanguage.javaCompilerDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
@@ -122,7 +122,7 @@ class JavaStyleCommentsTest
   }
 
   test("block transformation") {
-    val java = TestLanguageBuilder.buildWithParser(JavaLanguage.javaCompilerDeltas).buildLanguage
+    val java = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).buildLanguage
     val statementGrammar = java.grammars.find(StatementDelta.Grammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
     val blockGrammar = java.grammars.find(BlockDelta.BlockGramar)
@@ -161,8 +161,8 @@ class JavaStyleCommentsTest
 
   test("comments are maintained in bytecode") {
     val byteCodeWithComments = Delta.spliceAndFilterTop(
-      JavaLanguage.javaCompilerDeltas,
-      JavaLanguage.byteCodeDeltas,
+      JavaToByteCodeLanguage.javaCompilerDeltas,
+      ByteCodeLanguage.byteCodeDeltas,
       Seq(PrettyPrint(), TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta))
     val deltas = Seq(TriviaInsideNode, StoreTriviaDelta) ++ byteCodeWithComments
     val language = new LanguageTest(TestLanguageBuilder.buildWithParser(deltas))

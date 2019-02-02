@@ -21,7 +21,7 @@ object Program extends LazyLogging {
   val languages: Map[String, Language] = Map(
     "cloudFormation" -> CloudFormationLanguage.language,
     "verilog" -> VerilogLanguage.language,
-    "java" -> JavaLanguage.getJavaFrontend,
+    "java" -> JavaLanguage.java,
     "solidity" -> SolidityLanguage.language,
   )
 

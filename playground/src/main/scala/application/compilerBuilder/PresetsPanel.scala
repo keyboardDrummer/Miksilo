@@ -12,7 +12,7 @@ import core.deltas.{Delta, ParseUsingTextualGrammar}
 import core.smarts.SolveConstraintsDelta
 import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.javaPlus.ExpressionMethodDelta
-import deltas.javac.JavaLanguage.getJava
+import deltas.javac.JavaToByteCodeLanguage.getJava
 import deltas.javac._
 import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
@@ -24,19 +24,19 @@ import deltas.statement.{ForLoopDelta, LocalDeclarationWithInitializerDelta}
 object PresetsPanel
 {
   def getSimplifiedByteCodePreset: Preset = {
-    val deltas = Delta.spliceAndFilterTop(JavaLanguage.simpleByteCodeDeltas, JavaLanguage.byteCodeDeltas, Seq(MarkOutputGrammar))
+    val deltas = Delta.spliceAndFilterTop(ExtendedByteCode.simpleByteCodeDeltas, ByteCodeLanguage.byteCodeDeltas, Seq(MarkOutputGrammar))
     Preset("Simplified bytecode", Seq(ParseUsingTextualGrammar) ++ deltas, "Simplified JVM bytecode.")
   }
 
   def getJavaToSimplifiedByteCodePreset = {
     Preset("Java to simplified bytecode",
-      JavaLanguage.spliceBeforeTransformations(JavaLanguage.simpleByteCodeDeltas, Seq(MarkOutputGrammar)),
+      JavaToByteCodeLanguage.spliceBeforeTransformations(ExtendedByteCode.simpleByteCodeDeltas, Seq(MarkOutputGrammar)),
       "Compiles Java into simplified bytecode")
   }
 
   def getJavaToExtendedByteCodePreset = {
     Preset("Java to extended bytecode",
-      JavaLanguage.spliceBeforeTransformations(JavaLanguage.allByteCodeDeltas, Seq(MarkOutputGrammar)),
+      JavaToByteCodeLanguage.spliceBeforeTransformations(ExtendedByteCode.allByteCodeDeltas, Seq(MarkOutputGrammar)),
       "Compiles Java into extended bytecode")
   }
 
@@ -45,11 +45,11 @@ object PresetsPanel
   }
 
   def getJavaCompilerParticles: Seq[Delta] = {
-    JavaLanguage.spliceBeforeTransformations(JavaLanguage.byteCodeDeltas, Seq(MarkOutputGrammar))
+    JavaToByteCodeLanguage.spliceBeforeTransformations(ByteCodeLanguage.byteCodeDeltas, Seq(MarkOutputGrammar))
   }
 
   def getPrettyPrintPreset = {
-    Preset("Pretty Print Java", Seq(ParseUsingTextualGrammar, MarkOutputGrammar) ++ JavaLanguage.javaCompilerDeltas,
+    Preset("Pretty Print Java", Seq(ParseUsingTextualGrammar, MarkOutputGrammar) ++ JavaToByteCodeLanguage.javaCompilerDeltas,
       "Performs no transformations. Just parses and prints the Java.")
   }
 
@@ -64,7 +64,7 @@ object PresetsPanel
   }
 
   def getByteCodePreset = {
-    Preset("Basic bytecode", Seq(ParseUsingTextualGrammar) ++ JavaLanguage.byteCodeDeltas, "Regular JVM bytecode.")
+    Preset("Basic bytecode", Seq(ParseUsingTextualGrammar) ++ ByteCodeLanguage.byteCodeDeltas, "Regular JVM bytecode.")
   }
 
   def getAddImplicitsPreset: Preset = {
@@ -84,7 +84,7 @@ object PresetsPanel
   }
 
   def getLabelledLocations = {
-    Preset("Labelled JVM locations", Seq[Delta](ParseUsingTextualGrammar, LabelledLocations, MarkOutputGrammar) ++ JavaLanguage.byteCodeDeltas,
+    Preset("Labelled JVM locations", Seq[Delta](ParseUsingTextualGrammar, LabelledLocations, MarkOutputGrammar) ++ ByteCodeLanguage.byteCodeDeltas,
       "Replaces integer offsets by labels to indicate positions in instruction lists.")
   }
 

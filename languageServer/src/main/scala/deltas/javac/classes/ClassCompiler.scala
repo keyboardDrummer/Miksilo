@@ -2,13 +2,15 @@ package deltas.javac.classes
 
 import java.util.NoSuchElementException
 
-import core.language.node.Node
 import core.language.Compilation
+import core.language.node.Node
 import deltas.bytecode.constants._
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
 import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.classes.skeleton._
+import deltas.javac.methods.MethodDelta
+import deltas.javac.methods.MethodDelta.getMethods
 
 case class FieldInfo(parent: ClassSignature, name: String, _static: Boolean, _type: Node) extends ClassMember
 
@@ -28,8 +30,14 @@ case class ClassCompiler(currentClass: Node, compilation: Compilation) {
     JavaClassDelta.state(compilation).classCompiler = this
     myPackage.content(className) = currentClassInfo
 
-    for (member <- members.get(compilation).values)
-      member.bind(compilation, currentClassInfo, currentClass)
+    val javaClass: JavaClass[Node] = currentClass
+
+    getFields(javaClass).foreach(field =>
+      FieldDeclarationDelta.bind(compilation, currentClassInfo, field))
+
+    getMethods(javaClass).foreach(method =>
+      MethodDelta.bind(compilation, currentClassInfo, method))
+
     JavaClassDelta.state(compilation).classCompiler = previous
   }
 
