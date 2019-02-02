@@ -12,12 +12,6 @@ import scala.util.{Failure, Success}
 
 object SolveConstraintsDelta extends Delta with LazyLogging {
 
-  def injectPhaseAfterMe(language: Language, phase: Phase): Unit = {
-    val solvePhaseIndex = language.compilerPhases.indexWhere(p => p.key == SolveConstraintsDelta)
-    val (left, right) = language.compilerPhases.splitAt(solvePhaseIndex + 1)
-    language.compilerPhases = left ++ (phase :: right)
-  }
-
   def getDeclarationOfReference(path: AnyPath): NodePath = resolvesToDeclaration(path).origin.get.asInstanceOf[ChildPath].parent
   val resolvesToDeclaration = new TypedChildField[NamedDeclaration]("resolvesToDeclaration")
   override def inject(language: Language): Unit = {

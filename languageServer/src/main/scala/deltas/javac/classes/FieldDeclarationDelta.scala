@@ -8,8 +8,6 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
-import deltas.bytecode.ByteCodeFieldInfo
-import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.classes.skeleton._
@@ -31,7 +29,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar
     def _type: T = node(Type).asInstanceOf[T]
   }
 
-  override def dependencies: Set[Contract] = Set(TypeConstant, AccessibilityFieldsDelta)
+  override def dependencies: Set[Contract] = Set(AccessibilityFieldsDelta)
 
   def neww(_type: Node, name: String) = new Node(Shape, Type -> _type, Name -> name)
 
@@ -43,29 +41,6 @@ object FieldDeclarationDelta extends DeltaWithGrammar
 
   def getFields(javaClass: JavaClass[Node]): Seq[Node] = {
     javaClass.members.filter(member => member.shape == Shape)
-  }
-
-  def compile(compilation: Compilation, field: Node): Node = {
-    val classCompiler = JavaClassDelta.getClassCompiler(compilation)
-
-    convertField(field, classCompiler, compilation)
-    field
-  }
-
-  def convertField(node: Node, classCompiler: ClassCompiler, state: Language) {
-    val field: Field[Node] = node
-    val nameIndex = classCompiler.getNameIndex(field.name)
-
-    field(ByteCodeFieldInfo.NameIndex) = nameIndex
-    field.shape = ByteCodeFieldInfo.Shape
-
-    val fieldDescriptor = TypeConstant.constructor(field._type)
-    field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptor
-    field(ByteCodeFieldInfo.AccessFlagsKey) = Set.empty
-    field(ByteCodeFieldInfo.FieldAttributes) = Seq.empty
-
-    field.data.remove(Name)
-    field.data.remove(Type)
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

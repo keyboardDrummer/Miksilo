@@ -18,12 +18,10 @@ import deltas.javac.methods._
 import deltas.javac.methods.call.CallStaticOrInstanceDelta
 import deltas.javac.statements._
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
-import deltas.{PrettyPrint, RemovePhasesAfterSolveConstraints}
+import deltas.PrettyPrint
+import deltas.javac.classes.skeleton.JavaClassToByteCodeDelta
 
 object JavaToByteCodeLanguage {
-
-  def getJavaFrontend: LanguageFromDeltas = LanguageFromDeltas(Seq(RemovePhasesAfterSolveConstraints) ++
-    Seq(ParseUsingTextualGrammar) ++ javaCompilerDeltas)
 
   def getJava: LanguageFromDeltas = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ javaCompilerDeltas)
 
@@ -36,11 +34,12 @@ object JavaToByteCodeLanguage {
 
   def javaCompilerDeltas: Seq[Delta] = {
       Seq(NewToByteCodeDelta, ThisCallToByteCodeDelta, SuperCallToByteCodeExpression,
-        ImplicitThisForPrivateMemberSelectionDelta) ++
+        ImplicitThisForPrivateMemberSelectionDelta, JavaClassToByteCodeDelta) ++
       javaMethod
   }
 
-  def javaMethod: Seq[Delta] =  Seq(ReturnExpressionToByteCodeDelta, CallStaticOrInstanceDelta,
+  def javaMethod: Seq[Delta] =  Seq(ReturnVoidToByteCodeDelta,
+    ReturnExpressionToByteCodeDelta, CallStaticOrInstanceDelta,
       SelectFieldToByteCodeDelta) ++ blockWithVariables
 
   def blockWithVariables: Seq[Delta] = Seq(AssignmentToByteCodeDelta, VariableToByteCodeDelta) ++

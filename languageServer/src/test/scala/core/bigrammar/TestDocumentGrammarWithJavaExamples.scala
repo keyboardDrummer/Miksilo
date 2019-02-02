@@ -67,7 +67,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val expectation = SourceUtils.getJavaTestFileContents("ExplicitFibonacci.java")
 
     val implicits = Seq[Delta](ImplicitJavaLangImport, DefaultConstructorDelta, ImplicitSuperConstructorCall,
-      ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, ImplicitThisForPrivateMemberSelectionDelta)
+      ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta)
     val newDeltas = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
     val state = TestLanguageBuilder.buildWithParser(newDeltas).compile(input)

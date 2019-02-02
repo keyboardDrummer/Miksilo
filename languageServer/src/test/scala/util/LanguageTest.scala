@@ -17,7 +17,8 @@ import util.SourceUtils.LineProcessLogger
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-class JavaLanguageTest extends LanguageTest(TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas)) {}
+class JavaLanguageTest
+  extends LanguageTest(TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas)) {}
 
 object LanguageTest {
 

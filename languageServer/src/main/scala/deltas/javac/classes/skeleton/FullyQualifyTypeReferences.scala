@@ -12,7 +12,7 @@ object FullyQualifyTypeReferences extends Delta {
 
   override def inject(language: Language): Unit = {
     val phase = Phase(this, compilation => transformProgram(compilation.program, compilation))
-    SolveConstraintsDelta.injectPhaseAfterMe(language, phase)
+    language.insertPhaseAfter(phase, SolveConstraintsDelta)
     super.inject(language)
   }
 

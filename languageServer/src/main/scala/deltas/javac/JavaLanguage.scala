@@ -1,6 +1,7 @@
 package deltas.javac
 
-import core.deltas.Delta
+import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
+import core.language.Language
 import core.smarts.SolveConstraintsDelta
 import deltas.bytecode.types._
 import deltas.expression._
@@ -20,6 +21,8 @@ import deltas.statement._
 import deltas.statement.assignment.{AddAssignmentDelta, AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
 
 object JavaLanguage {
+
+  def java: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ deltas)
 
   def deltas = javaClass
 

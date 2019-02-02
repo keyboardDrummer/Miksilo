@@ -8,7 +8,7 @@ import ch.qos.logback.core.layout.EchoLayout
 import com.typesafe.scalalogging.LazyLogging
 import core.language.Language
 import deltas.cloudformation.CloudFormationLanguage
-import deltas.javac.JavaToByteCodeLanguage
+import deltas.javac.JavaLanguage
 import deltas.solidity.SolidityLanguage
 import deltas.verilog.VerilogLanguage
 import languageServer.lsp.{JsonRpcConnection, LSPServer}
@@ -21,7 +21,7 @@ object Program extends LazyLogging {
   val languages: Map[String, Language] = Map(
     "cloudFormation" -> CloudFormationLanguage.language,
     "verilog" -> VerilogLanguage.language,
-    "java" -> JavaToByteCodeLanguage.getJavaFrontend,
+    "java" -> JavaLanguage.java,
     "solidity" -> SolidityLanguage.language,
   )
 

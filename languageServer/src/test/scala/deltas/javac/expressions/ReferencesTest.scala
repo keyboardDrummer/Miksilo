@@ -1,6 +1,6 @@
 package deltas.javac.expressions
 
-import deltas.javac.JavaToByteCodeLanguage
+import deltas.javac.JavaLanguage
 import langserver.types.Range
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
@@ -8,7 +8,7 @@ import util.SourceUtils
 
 class ReferencesTest extends FunSuite with LanguageServerTest {
 
-  val server = new MiksiloLanguageServer(JavaToByteCodeLanguage.getJavaFrontend)
+  val server = new MiksiloLanguageServer(JavaLanguage.java)
 
   val referenceRanges = Seq(Range(HumanPosition(10,16), HumanPosition(10,21)),
     Range(HumanPosition(10,52), HumanPosition(10,57)),
