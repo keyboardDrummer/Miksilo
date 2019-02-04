@@ -11,10 +11,8 @@ import core.smarts.types.objects.{PrimitiveType, TypeApplication}
 import deltas.HasNameDelta
 import deltas.HasNameDelta.{HasName, Name}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.javac.methods.MethodParameters.MethodParameter
-import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, MethodParameters}
 
 object EventDelta extends DeltaWithGrammar with HasConstraintsDelta {
@@ -53,7 +51,7 @@ object EventDelta extends DeltaWithGrammar with HasConstraintsDelta {
       val methodParameter: MethodParameter[NodePath] = parameter
       TypeSkeleton.getType(compilation, builder, methodParameter._type, parentScope)
     })
-    val eventType = TypeApplication(eventConstructor, parameterTypes, null)
+    val eventType = TypeApplication(eventConstructor, parameterTypes, path)
     builder.declareSourceElement(event.getSourceElement(HasNameDelta.Name), parentScope, Some(eventType))
   }
 

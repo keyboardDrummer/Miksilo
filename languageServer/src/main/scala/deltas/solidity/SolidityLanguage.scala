@@ -15,7 +15,7 @@ import deltas.expression.relational._
 import deltas.javac.CallVariableDelta
 import deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta}
 import deltas.javac.expressions.literals.BooleanLiteralDelta
-import deltas.javac.methods.call.CallDelta
+import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
 import deltas.javac.statements.{ExpressionAsStatementDelta, ForLoopContinueDelta, WhileBreakDelta}
 import deltas.javac.types.BooleanTypeDelta
@@ -40,6 +40,7 @@ object SolidityLanguage {
     BlockDelta, ReturnExpressionDelta, ExpressionAsStatementDelta, StatementDelta,
     PostFixIncrementDelta, PostFixDecrementDelta,
     NewDelta, UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta,
+    CallMemberDelta,
     CallDelta, MemberSelectorDelta,
     PrefixIncrementDelta, PrefixDecrementDelta,
     PlusPrefixOperatorDelta, MinusPrefixOperatorDelta,

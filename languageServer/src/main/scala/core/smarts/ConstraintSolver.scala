@@ -148,6 +148,12 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       canDeclarationsMatch(superDeclaration, subDeclaration) // TODO add test case.
     case (FunctionType(input1, output1, _), FunctionType(input2, output2, _)) =>
       couldBeSuperType(output1, output2) && couldBeSuperType(input2, input1)
+    case (TypeApplication(leftFunction, leftArguments, _), TypeApplication(rightFunction, rightArguments, _)) =>
+      if (leftArguments.size == rightArguments.size && couldBeSuperType(leftFunction, rightFunction))
+        leftArguments.indices.forall(index =>
+          couldBeSuperType(leftArguments(index), rightArguments(index)))
+      else
+        false
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
       val closureOutput = closure.instantiate(builder, input)
       builder.add(CheckSubType(output, closureOutput))

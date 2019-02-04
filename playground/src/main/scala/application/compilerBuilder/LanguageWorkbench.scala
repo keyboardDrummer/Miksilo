@@ -9,11 +9,11 @@ import application.compilerBuilder.DeltaInstance._
 import application.compilerCockpit.MarkOutputGrammar
 import application.{InjectorListCellRenderer, StyleSheet}
 import core.deltas.Delta
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 import org.jdesktop.swingx.JXList
 
 object LanguageWorkbench {
-  val availableDeltas = JavaLanguage.allDeltas ++ Seq(MarkOutputGrammar)
+  val availableDeltas = JavaToByteCodeLanguage.allDeltas ++ Seq(MarkOutputGrammar)
 }
 
 class LanguageWorkbench extends JPanel(new GridBagLayout()) {

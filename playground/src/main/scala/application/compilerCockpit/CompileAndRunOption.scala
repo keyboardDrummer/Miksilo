@@ -5,13 +5,13 @@ import java.io.InputStream
 import core.deltas._
 import core.language.Language
 import deltas.RunWithJVM
-import deltas.javac.JavaLanguage
+import deltas.javac.ByteCodeLanguage
 
 object CompileAndRunOption extends CompileOption {
 
   var language: Language = _
   override def initialize(sandbox: LanguageSandbox): Unit = {
-    val deltas = Delta.spliceAndFilterTop(sandbox.deltas, JavaLanguage.byteCodeDeltas, Seq(RunWithJVM))
+    val deltas = Delta.spliceAndFilterTop(sandbox.deltas, ByteCodeLanguage.byteCodeDeltas, Seq(RunWithJVM))
     language = LanguageFromDeltas(deltas)
   }
 

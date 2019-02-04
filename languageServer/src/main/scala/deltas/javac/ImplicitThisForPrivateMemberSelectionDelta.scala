@@ -2,7 +2,7 @@ package deltas.javac
 
 import core.deltas._
 import core.deltas.path._
-import core.language.Compilation
+import core.language.{Compilation, Language, Phase}
 import core.language.node.Node
 import core.smarts.SolveConstraintsDelta
 import core.smarts.types.objects.TypeFromDeclaration
@@ -13,13 +13,13 @@ import deltas.javac.classes.{FieldDeclarationDelta, ThisVariableDelta}
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
-object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
+object ImplicitThisForPrivateMemberSelectionDelta extends Delta {
 
   import deltas.HasNameDelta.Name
 
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassDelta, CallVariableDelta, ThisVariableDelta)
+  override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassDelta, MemberSelectorDelta, CallVariableDelta, ThisVariableDelta)
 
   def addThisToVariable(clazz: JavaClass[NodePath], static: Boolean, variable: NodeChildPath): Unit = {
 
@@ -41,7 +41,13 @@ object ImplicitThisForPrivateMemberSelectionDelta extends DeltaWithPhase {
     path.stopAt(ancestor => ancestor.shape == MethodDelta.Shape)
   }
 
-  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+  override def inject(language: Language): Unit = {
+    val phase = Phase(this, compilation => transformProgram(compilation.program, compilation))
+    language.insertPhaseAfter(phase, SolveConstraintsDelta)
+    super.inject(language)
+  }
+
+  def transformProgram(program: Node, compilation: Compilation): Unit = {
     val clazz: JavaClass[NodePath] = PathRoot(program)
     PathRoot(program).visitShape(VariableDelta.Shape, variable =>  {
       val declarationNode: NodePath = SolveConstraintsDelta.getDeclarationOfReference(variable.getSourceElement(Name))

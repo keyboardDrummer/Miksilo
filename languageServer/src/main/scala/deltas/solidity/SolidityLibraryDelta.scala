@@ -17,6 +17,11 @@ object SolidityLibraryDelta extends Delta {
       val msgScope = builder.declareScope(msgType, Some(rootScope), "msgScope")
       val message = builder.declare("msg", rootScope, _type = Some(TypeFromDeclaration(msgType)))
 
+      builder.declare("data", msgScope)
+      builder.declare("gas", msgScope)
+      builder.declare("sender", msgScope)
+      builder.declare("sig", msgScope)
+      builder.declare("value", msgScope)
 
       val assertType = SolidityFunctionTypeDelta.createType(compilation, builder, rootScope, Seq(BooleanTypeDelta.booleanType), Seq.empty)
       builder.declare("assert", rootScope, _type = Some(assertType))

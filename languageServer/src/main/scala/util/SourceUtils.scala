@@ -5,10 +5,10 @@ import java.nio.charset.StandardCharsets
 import java.util.stream.Collectors
 
 import core.deltas._
-import core.language.node.Node
 import core.language.Compilation
+import core.language.node.Node
 import deltas.bytecode.PrintByteCode
-import deltas.javac.JavaLanguage
+import deltas.javac.ByteCodeLanguage
 
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}
@@ -53,7 +53,7 @@ object SourceUtils {
 
   def getBytes(byteCode: Node): Seq[Byte] = {
     var output: Seq[Byte] = null
-    val deltas: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ JavaLanguage.byteCodeDeltas
+    val deltas: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ ByteCodeLanguage.byteCodeDeltas
     TestLanguageBuilder.build(deltas).compileAst(byteCode)
     output
   }

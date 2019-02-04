@@ -25,6 +25,12 @@ class Language extends LazyLogging {
       builder.newScope(debugName = "rootScope"))
   }
 
+  def insertPhaseAfter(insert: Phase, delta: Delta): Unit = {
+    val index = compilerPhases.indexWhere(phase => phase.key == delta)
+    val (left, right) = compilerPhases.splitAt(index + 1)
+    compilerPhases = left ++ (insert :: right)
+  }
+
   var extraCompileOptions: List[CustomCommand] = List.empty
 
   def compileString(input: String): Compilation = {

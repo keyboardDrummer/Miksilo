@@ -7,7 +7,7 @@ import core.language.node.Node
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.javac.methods.call.CallDelta.Call
 
-object CallStaticOrInstanceDelta extends CallWithMemberSelector with ConvertsToByteCodeDelta {
+object CallStaticOrInstanceDelta extends ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling static and virtual methods."
 

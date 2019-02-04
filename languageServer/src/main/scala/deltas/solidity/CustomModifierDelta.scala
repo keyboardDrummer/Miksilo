@@ -8,10 +8,11 @@ import core.language.node.NodeShape
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.FunctionType
+import core.smarts.types.objects.{FunctionType, Type}
 import deltas.ConstraintSkeleton
 import deltas.HasNameDelta.Name
 import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
+import deltas.expression.{ExpressionDelta, IsExpression}
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters.MethodParameter
@@ -32,7 +33,21 @@ object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val grammar = "modifier" ~~ find(Name) ~
       optionalParameters ~~ body asNode Shape
     find(SolidityContractDelta.Members).addAlternative(grammar)
+
+    val underscoreGrammar = keyword("_") asNode UnderScoreShape
+    find(ExpressionDelta.LastPrecedenceGrammar).addAlternative(underscoreGrammar)
   }
+
+
+  override def inject(language: Language): Unit = {
+    ExpressionDelta.expressionInstances.add(language, UnderScoreShape, new IsExpression {
+      override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+      }
+    })
+    super.inject(language)
+  }
+
+  object UnderScoreShape extends NodeShape
 
   override def description = "Adds solidity custom modifiers"
 

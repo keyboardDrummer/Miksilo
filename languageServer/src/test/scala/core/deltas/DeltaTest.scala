@@ -22,7 +22,7 @@ class DeltaTest extends FunSuite {
       override def inject(language: Language): Unit = {}
     }
 
-    assertResult(Seq(B, A))(LanguageFromDeltas(Seq(A)).allDeltas)
+    assertResult(Seq(B, A))(LanguageFromDeltas(Seq(A), addMissingDeltas = true).allDeltas)
   }
 
   test("cycles in the dependency graph are detected") {

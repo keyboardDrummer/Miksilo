@@ -2,10 +2,9 @@ package deltas.statement
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
-import core.deltas.path.{NodePath, NodeSequenceElement, PathRoot}
+import core.deltas.path.{NodeChildPath, NodePath, NodeSequenceElement, PathRoot}
 import core.language.node._
 import core.language.{Compilation, Language}
-import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.{ExpressionDelta, VariableDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.statement.LocalDeclarationDelta.{LocalDeclaration, Type}
@@ -24,7 +23,6 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statement = find(StatementDelta.Grammar)
-    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val typeName = find(LocalDeclarationDelta.WithoutSemiColon)
     val parseDeclarationWithInitializer = typeName ~~ ("=" ~~> expression.as(Initializer)) ~< ";" asLabelledNode Shape
@@ -51,8 +49,13 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
     path.removeField(Initializer)
 
     val assignmentStatement = ExpressionAsStatementDelta.create(assignment)
-    val originSequence = withInitializer.node.asInstanceOf[NodeSequenceElement] //TODO add a try-catch explaining that local declarations must occur inside blocks.
-    originSequence.replaceWith(Seq(path.current, assignmentStatement))
+    val statements = Seq(path.current, assignmentStatement)
+    withInitializer.node match {
+      case sequenceElement: NodeSequenceElement =>
+        sequenceElement.replaceWith(statements)
+      case element: NodeChildPath =>
+        throw new Exception("Local declaration with initialization must occur in a sequence context.")
+    }
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {

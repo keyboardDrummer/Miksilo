@@ -10,7 +10,7 @@ import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta, VoidReturnInstructionDelta}
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.VoidTypeDelta
-import deltas.javac.JavaLanguage
+import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.types.MethodTypeDelta
 import util.TestLanguageBuilder
@@ -77,7 +77,7 @@ class TestPoptimize extends FunSuite {
 
     method(ByteCodeMethodInfo.AccessFlagsKey) = Set(ByteCodeMethodInfo.StaticAccess)
     val shape = ByteCodeSkeleton.neww(0, 0, new ConstantPool(Seq()), Seq(method))
-    val compiler = TestLanguageBuilder.build(Seq(PoptimizeDelta) ++ JavaLanguage.byteCodeDeltas)
+    val compiler = TestLanguageBuilder.build(Seq(PoptimizeDelta) ++ ByteCodeLanguage.byteCodeDeltas)
     compiler.compileAst(shape)
     NodeWrapper.unwrapList(codeAnnotation.instructions)
   }
