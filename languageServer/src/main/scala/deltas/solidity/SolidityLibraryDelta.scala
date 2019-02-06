@@ -14,6 +14,11 @@ object SolidityLibraryDelta extends Delta {
     language.collectConstraints = (compilation, builder) => {
       val rootScope = builder.newScope(debugName = "rootScope")
 
+      val stringNode = ElementaryTypeDelta.neww("string")
+      val bytesNode = ElementaryTypeDelta.neww("bytes")
+      val stringToBytesConversionType = SolidityFunctionTypeDelta.createType(compilation, builder, rootScope, Seq(stringNode), Seq(bytesNode))
+      builder.declare("bytes", rootScope, _type = Some(stringToBytesConversionType))
+
       val addressDeclaration = builder.resolveOption("address",None, rootScope, _type = Some(ElementaryTypeDelta.elementaryTypeConstructor))
       val addressScope = builder.getDeclaredScope(addressDeclaration)
 

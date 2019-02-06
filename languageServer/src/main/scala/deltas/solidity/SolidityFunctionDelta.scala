@@ -16,7 +16,6 @@ import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, MethodParameters}
-import deltas.solidity.SolidityFunctionTypeDelta.ParameterShape
 import deltas.statement.BlockDelta
 
 object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
@@ -65,7 +64,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
     val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[NodePath])
     val returnParameters: Seq[MethodParameter[NodePath]] = NodeWrapper.wrapList(method(ReturnValues).asInstanceOf[Seq[NodePath]])
-    val returnTypes: Seq[Node] = returnParameters.map(returnParameter => ParameterShape.create(MethodParameters.Type -> returnParameter._type))
+    val returnTypes: Seq[Node] = returnParameters.map(returnParameter => returnParameter._type)
     val methodType = SolidityFunctionTypeDelta.createType(compilation, builder, parentScope, parameterTypes, returnTypes)
 
     builder.declare(method.name, parentScope, path.getSourceElement(Name), Some(methodType))

@@ -62,7 +62,7 @@ object SolidityFunctionTypeDelta extends DeltaWithGrammar with TypeInstance {
   def createType(compilation: Compilation, builder: ConstraintBuilder, parentScope: Scope,
                  parameters: Seq[NodeLike], returnParameters: Seq[NodeLike]): Type = {
     val parameterTypes = parameters.map(parameter => TypeSkeleton.getType(compilation, builder, parameter, parentScope))
-    val returnTypes = returnParameters.map(returnParameter => TypeSkeleton.getType(compilation, builder, returnParameter._type, parentScope))
+    val returnTypes = returnParameters.map(returnParameter => TypeSkeleton.getType(compilation, builder, returnParameter, parentScope))
     val returnAggregate = if (returnTypes.length == 1) returnTypes.head else TypeApplication(returnList, returnTypes, "eariugblrig")
     FunctionType.curry(parameterTypes, returnAggregate)
   }
