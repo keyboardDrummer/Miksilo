@@ -8,15 +8,14 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelDelta
-import deltas.javac.methods.MethodDelta
 
 object LabelStatementDelta extends StatementInstance with DeltaWithGrammar {
 
   import deltas.HasNameDelta._
 
-  def getUniqueLabel(suggestion: String, path: NodePath) = {
-    val method = path.findAncestorShape(MethodDelta.Shape) // TODO use scope graph to find nearest scope
-    LabelDelta.getUniqueLabel("whileStart", method)
+  def getUniqueLabel(compilation: Compilation, suggestion: String, path: NodePath) = {
+    val container = path.ancestors.find(p => !StatementDelta.instances.get(compilation).contains(p.shape)).get
+    LabelDelta.getUniqueLabel("whileStart", container)
   }
 
   override val shape = Shape

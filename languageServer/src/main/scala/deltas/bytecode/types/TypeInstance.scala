@@ -4,7 +4,6 @@ import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.language.Language
-import core.language.node.Node
 import deltas.bytecode.types.TypeSkeleton.HasSuperTypes
 
 trait TypeInstance extends DeltaWithGrammar with HasShape with HasTypeDelta with HasSuperTypes {
@@ -14,8 +13,6 @@ trait TypeInstance extends DeltaWithGrammar with HasShape with HasTypeDelta with
     TypeSkeleton.hasSuperTypes.add(language, this)
     TypeSkeleton.typeInstances.add(language, this)
   }
-
-  def getSuperTypes(_type: Node): Seq[Node]
 
   override def dependencies: Set[Contract] = Set(TypeSkeleton)
 

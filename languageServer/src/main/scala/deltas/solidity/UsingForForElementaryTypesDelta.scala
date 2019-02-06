@@ -7,10 +7,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
-import deltas.ConstraintSkeleton
 import deltas.bytecode.types.{HasType, TypeSkeleton}
 import deltas.javac.classes.skeleton.HasConstraints
-import deltas.solidity.ElementaryTypeDelta.elementaryType
+import deltas.{ConstraintSkeleton, HasNameDelta}
 
 object UsingForForElementaryTypesDelta extends Delta {
   override def description = "Allow the for-using contruct to be used with elementary types"
@@ -23,8 +22,8 @@ object UsingForForElementaryTypesDelta extends Delta {
   override def inject(language: Language): Unit = {
     TypeSkeleton.hasTypes.add(language, ElementaryTypeDelta.Shape, new HasType {
       override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
-        val name = path.getValue(ElementaryTypeDelta.Name).asInstanceOf[String]
-        val typeDeclaration = builder.resolveOption(name, None, parentScope, Some(elementaryType))
+        val name = path.getValue(HasNameDelta.Name).asInstanceOf[String]
+        val typeDeclaration = builder.resolveOption(name, None, parentScope, Some(ElementaryTypeDelta.elementaryTypeConstructor))
         TypeFromDeclaration(typeDeclaration)
       }
     })
@@ -33,7 +32,7 @@ object UsingForForElementaryTypesDelta extends Delta {
     ConstraintSkeleton.hasConstraints.add(language, MultiFileDelta.Shape, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
         for(name <- ElementaryTypeDelta.elementaryTypeNames) {
-          val declaration = builder.declare(name, parentScope, null, Some(ElementaryTypeDelta.elementaryType))
+          val declaration = builder.declare(name, parentScope, null, Some(ElementaryTypeDelta.elementaryTypeConstructor))
           builder.declareScope(declaration)
         }
         original.collectConstraints(compilation, builder, path, parentScope)

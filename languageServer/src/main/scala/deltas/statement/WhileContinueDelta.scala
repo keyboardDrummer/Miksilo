@@ -19,17 +19,17 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val startLabels = new mutable.HashMap[NodePath, String]()
-    PathRoot(program).visitShape(ContinueKey, path => transformContinue(path, startLabels, compilation))
+    PathRoot(program).visitShape(ContinueKey, path => transformContinue(compilation, path, startLabels))
   }
 
-  def transformContinue(continuePath: NodePath, startLabels: mutable.Map[NodePath, String], language: Language): Unit = {
+  def transformContinue(compilation: Compilation, continuePath: NodePath, startLabels: mutable.Map[NodePath, String]): Unit = {
     val containingWhile = continuePath.findAncestorShape(WhileLoopDelta.Shape)
-    val label = startLabels.getOrElseUpdate(containingWhile, addStartLabel(containingWhile))
+    val label = startLabels.getOrElseUpdate(containingWhile, addStartLabel(compilation, containingWhile))
     continuePath.replaceData(GotoStatementDelta.neww(label))
   }
 
-  def addStartLabel(whilePath: NodePath): String = {
-    val startLabel = LabelStatementDelta.getUniqueLabel("whileStart", whilePath)
+  def addStartLabel(compilation: Compilation, whilePath: NodePath): String = {
+    val startLabel = LabelStatementDelta.getUniqueLabel(compilation, "whileStart", whilePath)
     whilePath.asInstanceOf[NodeSequenceElement].replaceWith(Seq(LabelStatementDelta.neww(startLabel), whilePath.current))
     startLabel
   }

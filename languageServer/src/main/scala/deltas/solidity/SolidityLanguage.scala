@@ -87,7 +87,7 @@ object SolidityLanguage {
 
   val deltas = soliditySpecificDeltas ++ genericDeltas
 
-  val language: Language = LanguageFromDeltas(deltas, addMissingDeltas = false)
+  val language: Language = LanguageFromDeltas(deltas)
 }
 
 

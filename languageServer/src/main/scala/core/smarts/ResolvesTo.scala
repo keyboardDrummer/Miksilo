@@ -32,6 +32,7 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
   }
 
   override def getDiagnostic: Option[FileDiagnostic] = {
+    // TODO give specific message if it couldn't resolve because it found multiple definitions
     for {
       fileRange <- reference.origin.flatMap(e => e.fileRange)
     } yield {

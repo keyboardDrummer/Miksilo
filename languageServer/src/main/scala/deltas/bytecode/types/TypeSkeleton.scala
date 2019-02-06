@@ -14,9 +14,9 @@ import scala.collection.mutable
 
 object TypeSkeleton extends DeltaWithGrammar {
 
-  val maps = mutable.Map.empty[String, Type => Node]
+  val maps = mutable.Map.empty[Any, Type => Node]
   def fromConstraintType(_type: Type): Node = {
-    def getName(_type: Type): String = _type match {
+    def getName(_type: Type): Any = _type match {
       case PrimitiveType(primitiveType) => primitiveType
       case TypeApplication(constructor, _, _) => getName(constructor)
       case TypeFromDeclaration(_) => "DECLARATION"

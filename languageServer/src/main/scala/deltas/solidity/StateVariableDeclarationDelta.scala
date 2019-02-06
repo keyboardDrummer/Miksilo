@@ -26,7 +26,7 @@ object StateVariableDeclarationDelta extends DeltaWithGrammar with HasConstraint
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val expression: BiGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val modifiers = (printSpace ~> ("public" | "internal" | "private" | "constant")).many.as(Modifiers)
-    val initializer = (printSpace ~ "=" ~~ expression).option.as(Initializer)
+    val initializer = (printSpace ~> "=" ~~> expression).option.as(Initializer)
     val grammar = typeGrammar.as(LocalDeclarationDelta.Type) ~ modifiers ~~ find(Name) ~ initializer ~ ";" asNode Shape
     find(SolidityContractDelta.Members).addAlternative(grammar)
   }

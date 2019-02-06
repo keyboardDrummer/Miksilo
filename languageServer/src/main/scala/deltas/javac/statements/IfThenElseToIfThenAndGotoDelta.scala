@@ -2,10 +2,8 @@ package deltas.javac.statements
 
 import core.deltas.path.{NodeChildPath, NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithPhase}
+import core.language.Compilation
 import core.language.node._
-import core.language.{Compilation, Language}
-import deltas.bytecode.simpleBytecode.LabelDelta
-import deltas.javac.methods.MethodDelta
 import deltas.statement.IfThenElseDelta.IfThenElse
 import deltas.statement._
 
@@ -16,12 +14,12 @@ object IfThenElseToIfThenAndGotoDelta extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(IfThenElseDelta, GotoStatementDelta, LabelStatementDelta, BlockDelta)
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(shape, path => transform(path, compilation))
+    PathRoot(program).visitShape(shape, path => transform(compilation, path))
   }
 
-  def transform(ifElsePath: NodePath, language: Language): Unit = {
+  def transform(compilation: Compilation, ifElsePath: NodePath): Unit = {
     val ifThenElse: IfThenElse[NodePath] = ifElsePath
-    val endLabel = LabelStatementDelta.getUniqueLabel("ifThenElseEnd", ifElsePath)
+    val endLabel = LabelStatementDelta.getUniqueLabel(compilation, "ifThenElseEnd", ifElsePath)
     val ifThen = IfThenDelta.neww(ifThenElse.condition, BlockDelta.neww(Seq(ifThenElse.thenStatement, GotoStatementDelta.neww(endLabel))))
     val replacement = BlockDelta.neww(Seq(ifThen,
       ifThenElse.elseStatement,

@@ -1,6 +1,6 @@
 package deltas.solidity
 
-import core.bigrammar.grammars.{RegexGrammar, StringGrammar, StringLiteral}
+import core.bigrammar.grammars.{Keyword, RegexGrammar, StringGrammar, StringLiteral}
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
@@ -17,7 +17,7 @@ object InlineAssemblyStatementDelta extends DeltaWithGrammar {
     import grammars._
     val assemblyIdentifierOrList: BiGrammar = identifier | identifier.toParameterList
     val assemblyExpression = create(AssemblyExpression)
-    val assemblyCall: BiGrammar = (identifier | "return" | "address" | "byte") ~
+    val assemblyCall: BiGrammar = (identifier | "return" | Keyword("address", reserved = false) | "byte") ~
       assemblyExpression.toParameterList.option
     assemblyExpression.addAlternative(assemblyCall)
     val hexCharacter = RegexGrammar("""[0-9A-Fa-f]""".r)

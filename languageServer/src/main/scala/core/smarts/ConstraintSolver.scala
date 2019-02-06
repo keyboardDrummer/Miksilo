@@ -121,6 +121,8 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def isSuperType(superType: Type, subType: Type): Boolean = (proofs.resolveType(superType), proofs.resolveType(subType)) match {
     case (_: TypeVariable,_) => false
     case (_,_: TypeVariable) => false
+    case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration)) =>
+      canDeclarationsMatch(superDeclaration, subDeclaration)
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
       val closureOutput = closure.instantiate(builder, input)
       builder.add(CheckSubType(output, closureOutput))
@@ -135,12 +137,14 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       typeGraph.isSuperType(TypeNode(l), TypeNode(r))
   }
 
+  // TODO the 'can' concept is stupid. should be replaced with '=='
   def canDeclarationsMatch(left: Declaration, right: Declaration) = (left, right) match {
     case (_: DeclarationVariable, _) => true
     case (_, _: DeclarationVariable) => true
     case _ => left == right
   }
 
+  // TODO the 'could be' concept is stupid. Should be replaced with 'isSuperType'
   def couldBeSuperType(superType: Type, subType: Type): Boolean = (proofs.resolveType(superType), proofs.resolveType(subType)) match {
     case (_: TypeVariable,_) => true
     case (_,_: TypeVariable) => true
@@ -180,7 +184,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case (TypeApplication(leftFunction, leftArguments, _), TypeApplication(rightFunction, rightArguments, _)) =>
       if (leftArguments.size == rightArguments.size && unifyTypes(leftFunction, rightFunction))
         leftArguments.indices.forall(index =>
-          unifyTypes(left.asInstanceOf[TypeApplication].arguments(index), right.asInstanceOf[TypeApplication].arguments(index)))
+          unifyTypes(leftArguments(index), rightArguments(index)))
       else
 
         false
@@ -204,6 +208,9 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   }
 
   def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
+    if (variable == instance)
+      return
+
     allConstraints.foreach(x => x.instantiateDeclaration(variable, instance))
     environment = environment.map(kv => if (kv._1 == variable) (instance, kv._2) else kv)
     environment.values.foreach(t => t.instantiateDeclaration(variable, instance))
