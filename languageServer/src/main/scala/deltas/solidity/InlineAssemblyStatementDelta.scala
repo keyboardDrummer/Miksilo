@@ -4,13 +4,18 @@ import core.bigrammar.grammars.{Keyword, RegexGrammar, StringGrammar, StringLite
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.Language
-import core.language.node.GrammarKey
+import core.deltas.path.NodePath
+import core.language.{Compilation, Language}
+import core.language.node.{GrammarKey, NodeShape}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.statement.StatementDelta
 
-object InlineAssemblyStatementDelta extends DeltaWithGrammar {
+object InlineAssemblyStatementDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def description = "Adds the inline assembly statement"
 
+  object Shape extends NodeShape
   object AssemblyItem extends GrammarKey
   object AssemblyExpression extends GrammarKey
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
@@ -66,9 +71,15 @@ object InlineAssemblyStatementDelta extends DeltaWithGrammar {
     assemblyItem.addAlternative(assemblySwitch)
 
     assemblyItem.addAlternative(assemblyBlock)
-    val grammar = "assembly" ~~ StringLiteral.option ~ assemblyBlock
+    val grammar = "assembly" ~~ StringLiteral.option ~ assemblyBlock asNode Shape
     find(StatementDelta.Grammar).addAlternative(grammar)
   }
 
   override def dependencies = Set(StatementDelta)
+
+  override def shape = Shape
+
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
+
+  }
 }

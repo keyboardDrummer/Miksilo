@@ -73,6 +73,15 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
     method.parameters.foreach(parameter => {
       MethodParameters.declare(compilation, builder, parameter, parentScope, bodyScope)
     })
+
+    val returnValues = NodeWrapper.wrapList[MethodParameter[NodePath], NodePath](method(ReturnValues).asInstanceOf[Seq[NodePath]])
+    returnValues.foreach(parameter => {
+      val maybeName = parameter.getValue(Name).asInstanceOf[Option[String]]
+      maybeName.foreach(name => {
+        val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
+        builder.declare(name, bodyScope, parameter.getSourceElement(Name), Some(parameterType))
+      })
+    })
     ConstraintSkeleton.constraints(compilation, builder, method.body, bodyScope)
   }
 }

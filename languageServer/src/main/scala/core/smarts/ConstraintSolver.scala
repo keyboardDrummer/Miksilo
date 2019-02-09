@@ -146,6 +146,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
 
   // TODO the 'could be' concept is stupid. Should be replaced with 'isSuperType'
   def couldBeSuperType(superType: Type, subType: Type): Boolean = (proofs.resolveType(superType), proofs.resolveType(subType)) match {
+    case (PrimitiveType(left), PrimitiveType(right)) if left == right => true
     case (_: TypeVariable,_) => true
     case (_,_: TypeVariable) => true
     case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration)) =>

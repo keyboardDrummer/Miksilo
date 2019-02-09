@@ -9,6 +9,9 @@ class ResolvesToType(reference: Reference, declaration: Declaration, var _type: 
   override def apply(solver: ConstraintSolver): Boolean = {
     val initialDeclarations = solver.scopeGraph.resolve(reference)
 
+    if (reference.name == "<init>") {
+      System.out.append("jo")
+    }
     val declarations = initialDeclarations.filter(declaration => {
       solver.environment.get(declaration).fold(false)(declarationType => {
         solver.couldBeSuperType(_type, declarationType)

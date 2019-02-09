@@ -37,7 +37,7 @@ class ConstraintBuilder(val factory: Factory) {
 
   def resolveToType(name: String, origin: SourceElement, scope: Scope, _type: Type) : DeclarationVariable = {
     val declaration = declarationVariable()
-    val reference = new Reference(name, Some(origin))
+    val reference = new Reference(name, Option(origin))
     add(ReferenceInScope(reference, scope))
     add(new ResolvesToType(reference, declaration, _type))
     declaration

@@ -3,9 +3,10 @@ package deltas.solidity
 import core.deltas.Delta
 import core.deltas.path.PathRoot
 import core.language.Language
-import core.smarts.types.objects.TypeFromDeclaration
+import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.ConstraintSkeleton
 import deltas.bytecode.types.TypeSkeleton
+import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.types.BooleanTypeDelta
 
 object SolidityLibraryDelta extends Delta {
@@ -19,11 +20,24 @@ object SolidityLibraryDelta extends Delta {
       val stringToBytesConversionType = SolidityFunctionTypeDelta.createType(compilation, builder, rootScope, Seq(stringNode), Seq(bytesNode))
       builder.declare("bytes", rootScope, _type = Some(stringToBytesConversionType))
 
-      val addressDeclaration = builder.resolveOption("address",None, rootScope, _type = Some(ElementaryTypeDelta.elementaryTypeConstructor))
-      val addressScope = builder.getDeclaredScope(addressDeclaration)
+      val bytesToStringConversionType = SolidityFunctionTypeDelta.createType(compilation, builder, rootScope, Seq(bytesNode), Seq(stringNode))
+      builder.declare("string", rootScope, _type = Some(bytesToStringConversionType))
 
       val uint256Node = ElementaryTypeDelta.neww("uint256")
       val uint256 = TypeSkeleton.getType(compilation, builder, uint256Node, rootScope)
+
+      val intTypeNode = ElementaryTypeDelta.neww("int")
+      val intType = TypeSkeleton.getType(compilation, builder, intTypeNode, rootScope)
+      val uintToIntConversionType = SolidityFunctionTypeDelta.createType(Seq[Type](uint256), Seq[Type](intType))
+      builder.declare("int", rootScope, _type = Some(uintToIntConversionType))
+
+      val addressDeclaration = builder.resolveToType("address",null, rootScope, ElementaryTypeDelta.elementaryTypeKind)
+      val addressScope = builder.getDeclaredScope(addressDeclaration)
+
+      val stringDeclaration = builder.resolveToType("string", null, rootScope, ElementaryTypeDelta.elementaryTypeKind)
+      val stringScope = builder.getDeclaredScope(stringDeclaration)
+      val stringConstructorType = SolidityFunctionTypeDelta.createType(compilation, builder, rootScope, Seq(uint256Node), Seq.empty)
+      builder.declare(ConstructorDelta.constructorName, stringScope, null, Some(stringConstructorType))
 
       builder.declare("balance", addressScope, null, Some(uint256))
       val transferType = SolidityFunctionTypeDelta.createType(compilation, builder, rootScope, Seq(uint256Node), Seq.empty)
