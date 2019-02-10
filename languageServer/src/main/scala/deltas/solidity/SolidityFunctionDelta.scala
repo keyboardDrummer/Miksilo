@@ -11,7 +11,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
 import deltas.HasNameDelta.Name
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.methods.call.CallDelta
@@ -50,7 +50,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
     val body = (";" ~> value(BlockDelta.neww(Seq.empty)) | blockGrammar).as(MethodDelta.Body)
     val grammar = "function" ~~ name ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~ returnValues ~~ body asLabelledNode MethodDelta.Shape
-    find(SolidityContractDelta.Members).addAlternative(grammar)
+    find(JavaClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Adds solidity functions"

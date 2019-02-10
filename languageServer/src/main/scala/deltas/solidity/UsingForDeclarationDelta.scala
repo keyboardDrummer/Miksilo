@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
 import deltas.HasNameDelta.Name
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters
 import deltas.javac.methods.MethodParameters.MethodParameter
@@ -37,7 +37,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val grammar = "using" ~~ identifier.as(LibraryName) ~~ "for" ~~
       ("*" ~> value(Wildcard) | typeGrammar).as(Type) ~ ";" asNode Shape
-    find(SolidityContractDelta.Members).addAlternative(grammar)
+    find(JavaClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Add a using-for namespace member"

@@ -8,7 +8,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.{ConstraintSkeleton, HasNameDelta}
-import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 import deltas.HasNameDelta.HasName
 import deltas.bytecode.types.TypeSkeleton
 import deltas.statement.LocalDeclarationDelta
@@ -28,7 +28,7 @@ object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
     val declaration = find(LocalDeclarationDelta.Shape)
     val grammar = "struct" ~~ find(HasNameDelta.Name) ~ "{" % declaration.manyVertical.as(Members) % "}" asNode Shape
-    find(SolidityContractDelta.Members).addAlternative(grammar)
+    find(JavaClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Adds solidity structs"

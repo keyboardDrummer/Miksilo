@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.HasNameDelta
-import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 
 object EnumDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -34,7 +34,7 @@ object EnumDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val name = find(Name)
     val valueGrammar = name.asNode(ValueShape)
     val grammar = "enum" ~~ name ~ "{" ~ valueGrammar.manySeparated("," ~ printSpace).as(Values) ~ "}" asNode Shape
-    find(SolidityContractDelta.Members).addAlternative(grammar)
+    find(JavaClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Adds enums"

@@ -14,6 +14,7 @@ import deltas.expression.prefix._
 import deltas.expression.relational._
 import deltas.javac.CallVariableDelta
 import deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta}
+import deltas.javac.constructor.DefaultConstructorDelta
 import deltas.javac.expressions.literals.BooleanLiteralDelta
 import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
@@ -79,7 +80,7 @@ object SolidityLanguage {
     EmitStatementDelta,
     UsingForForElementaryTypesDelta, UsingForDeclarationDelta,
     EventDelta, CustomModifierDelta, EnumDelta, StructDelta,
-    SolidityConstructorDelta, SolidityFunctionDelta, StateVariableDeclarationDelta) ++
+    DefaultConstructorDelta, SolidityConstructorDelta, SolidityFunctionDelta, StateVariableDeclarationDelta) ++
     Seq(SolidityContractDelta, PragmaDelta) ++
     Seq(MultipleImportsDelta, SingleImportDelta, FileImportDelta) ++
     Seq(FileWithMembersDelta) ++

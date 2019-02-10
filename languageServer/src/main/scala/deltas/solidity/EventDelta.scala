@@ -11,7 +11,7 @@ import core.smarts.types.objects.{PrimitiveType, TypeApplication}
 import deltas.HasNameDelta
 import deltas.HasNameDelta.{HasName, Name}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.methods.{MethodDelta, MethodParameters}
 
@@ -37,7 +37,7 @@ object EventDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val parameterList = parameter.toParameterList.as(MethodDelta.Parameters)
 
     val grammar = "event" ~~ find(HasNameDelta.Name)  ~ parameterList ~~ "anonymous".option.as(Anonymous) ~ ";" asNode Shape
-    find(SolidityContractDelta.Members).addAlternative(grammar)
+    find(JavaClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Add events as contract members"

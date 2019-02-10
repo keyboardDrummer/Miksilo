@@ -3,20 +3,19 @@ package deltas.solidity
 import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{DeltaWithGrammar, DeltaWithPhase}
-import core.language.node.{Node, NodeShape}
+import core.language.node.Node
 import core.language.{Compilation, Language}
-import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
+import deltas.HasNameDelta.Name
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.constructor.ConstructorDelta.ClassName
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.statement.BlockDelta
-import deltas.HasNameDelta.Name
 
 object SolidityConstructorDelta extends DeltaWithGrammar with DeltaWithPhase { // TODO try to re-use other constructor delta's.
 
-  object Shape extends NodeShape
-
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    program.visitShape(Shape, constructor => {
+    program.visitShape(ConstructorDelta.Shape, constructor => {
       constructor.shape = MethodDelta.Shape
       constructor(Name) = ConstructorDelta.constructorName
       constructor(SolidityFunctionDelta.ReturnValues) = Seq.empty
@@ -33,8 +32,8 @@ object SolidityConstructorDelta extends DeltaWithGrammar with DeltaWithPhase { /
     val modifiers = find(SolidityFunctionDelta.Modifiers)
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
     val body = blockGrammar.as(MethodDelta.Body)
-    val grammar = "constructor" ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~~ body asNode Shape
-    find(SolidityContractDelta.Members).addAlternative(grammar)
+    val grammar = "constructor" ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~~ body asNode ConstructorDelta.Shape
+    find(JavaClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Adds solidity constructors"

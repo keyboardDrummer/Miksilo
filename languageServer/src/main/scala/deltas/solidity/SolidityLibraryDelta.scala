@@ -23,8 +23,10 @@ object SolidityLibraryDelta extends Delta {
       val uint256Node = ElementaryTypeDelta.neww("uint256")
       val uint256 = TypeSkeleton.getType(compilation, builder, uint256Node, rootScope)
 
-      val block = builder.declare("block", rootScope)
-      val blockScope = builder.getDeclaredScope(block)
+      val blockTypeDeclaration = builder.declare("<blockType>", rootScope)
+      val blockType = TypeFromDeclaration(blockTypeDeclaration)
+      builder.declare("block", rootScope, null, Some(blockType))
+      val blockScope = builder.declareScope(blockTypeDeclaration)
       builder.declare("timestamp", blockScope, null, Some(uint256))
 
       val stringNode = ElementaryTypeDelta.neww("string")
