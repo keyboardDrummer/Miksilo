@@ -11,7 +11,8 @@ case class CheckSubType(var subType: Type, var superType: Type) extends TypeCons
         solver.unifyTypes(subType, superType)
       else
         false
-    case _ => solver.isSuperType(superType, subType)
+    case _ =>
+      solver.isSuperType(superType, subType)
   }
 
   override def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {

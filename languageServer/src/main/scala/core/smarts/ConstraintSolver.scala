@@ -121,8 +121,8 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def isSuperType(superType: Type, subType: Type): Boolean = (proofs.resolveType(superType), proofs.resolveType(subType)) match {
     case (_: TypeVariable,_) => false
     case (_,_: TypeVariable) => false
-    case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration)) =>
-      canDeclarationsMatch(superDeclaration, subDeclaration)
+    case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration))
+      if canDeclarationsMatch(superDeclaration, subDeclaration) => true
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
       val closureOutput = closure.instantiate(builder, input)
       builder.add(CheckSubType(output, closureOutput))

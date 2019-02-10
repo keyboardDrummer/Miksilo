@@ -25,7 +25,7 @@ class ShapeProperty[T] {
 
   def add(language: Language, shape: NodeShape, value: T): Unit = map(language).put(shape, value)
 
-  def update(language: Language, shape: NodeShape, updater: T => T): Unit = {
+  def change(language: Language, shape: NodeShape, updater: T => T): Unit = {
     val original = this(language, shape)
     add(language, shape, updater(original))
   }

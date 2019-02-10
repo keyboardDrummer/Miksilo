@@ -18,7 +18,7 @@ import deltas.javac.classes.{ClassCompiler, MethodInfo}
 import deltas.javac.methods.AccessibilityFieldsDelta.{HasAccessibility, PrivateVisibility}
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.types.{MethodTypeDelta, TypeAbstraction}
-import deltas.statement.BlockDelta
+import deltas.statement.{BlockDelta, LabelStatementDelta}
 import deltas.statement.BlockDelta.BlockStatement
 
 
@@ -154,4 +154,9 @@ object MethodDelta extends DeltaWithGrammar
   }
 
   override def shape: NodeShape = Shape
+
+  override def inject(language: Language): Unit = {
+    LabelStatementDelta.isLabelScope.add(language, Shape, Unit)
+    super.inject(language)
+  }
 }

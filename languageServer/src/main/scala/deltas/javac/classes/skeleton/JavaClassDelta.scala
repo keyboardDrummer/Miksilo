@@ -13,7 +13,7 @@ import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.TypeFromDeclaration
 import deltas.ConstraintSkeleton
-import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
+import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
 import deltas.javac.JavaLang
 import deltas.javac.classes.{ClassCompiler, FieldDeclarationDelta}
 import deltas.javac.methods.MethodDelta
@@ -159,7 +159,10 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
     //TODO here there should be an instance, a static, and a lexical scope.
     val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getSourceElement(Name))
-    builder.add(DeclarationHasType(clazzDeclaration, TypeFromDeclaration(clazzDeclaration)))
+    val clazzType = TypeFromDeclaration(clazzDeclaration)
+    builder.add(DeclarationHasType(clazzDeclaration, clazzType))
+    builder.assignSubType(TypeSkeleton.typeKind, clazzType)
+
     val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
     staticDeclaration(path) = clazzDeclaration
 

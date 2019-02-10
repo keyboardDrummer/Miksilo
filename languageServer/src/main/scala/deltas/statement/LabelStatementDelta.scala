@@ -1,6 +1,6 @@
 package deltas.statement
 
-import core.deltas.DeltaWithGrammar
+import core.deltas.{DeltaWithGrammar, ShapeProperty}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{GrammarKey, Node, NodeShape}
@@ -14,9 +14,11 @@ object LabelStatementDelta extends StatementInstance with DeltaWithGrammar {
   import deltas.HasNameDelta._
 
   def getUniqueLabel(compilation: Compilation, suggestion: String, path: NodePath) = {
-    val container = path.ancestors.find(p => !StatementDelta.instances.get(compilation).contains(p.shape)).get
+    val container = path.ancestors.find(p => isLabelScope.get(compilation, p.shape).nonEmpty).get
     LabelDelta.getUniqueLabel("whileStart", container)
   }
+
+  val isLabelScope = new ShapeProperty[Unit]()
 
   override val shape = Shape
 

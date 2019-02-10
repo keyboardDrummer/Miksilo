@@ -3,6 +3,7 @@ package deltas.javac
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
+import deltas.HasNameDelta
 import deltas.bytecode.types._
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
@@ -73,5 +74,5 @@ object JavaLanguage {
     SuperTypeArgument, TypeApplicationDelta, MethodTypeDelta) ++
     Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta,
       FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
-      ShortTypeDelta, TypeSkeleton)
+      ShortTypeDelta, TypeSkeleton) ++ Seq(HasNameDelta)
 }
