@@ -10,6 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.{ConstraintSkeleton, HasNameDelta}
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.HasNameDelta.HasName
+import deltas.bytecode.types.TypeSkeleton
 import deltas.statement.LocalDeclarationDelta
 
 object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
@@ -38,7 +39,7 @@ object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val struct: Struct[NodePath] = path
-    val declaration = builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope)
+    val declaration = builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope, Some(TypeSkeleton.typeKind))
     val structScope = builder.declareScope(declaration, Some(parentScope), s"struct '${struct.name}'")
     for(member <- struct.members) {
       ConstraintSkeleton.constraints(compilation, builder, member, structScope)

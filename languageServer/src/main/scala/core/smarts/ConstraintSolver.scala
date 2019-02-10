@@ -218,12 +218,17 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     proofs.mappedDeclarationVariables += variable -> instance
   }
 
-  def unifyDeclarations(left: Declaration, right: Declaration): Boolean = (left, right) match {
-    case (v:DeclarationVariable,_) =>
-      instantiateDeclaration(v, right); true
-    case (_, v:DeclarationVariable) =>
-      instantiateDeclaration(v, left); true
-    case _ => left == right
+  def unifyDeclarations(left: Declaration, right: Declaration): Boolean = {
+    if (left == DeclarationVariable("48") || right == DeclarationVariable("48")) {
+      System.out.append("")
+    }
+    (left, right) match {
+      case (v: DeclarationVariable, _) =>
+        instantiateDeclaration(v, right); true
+      case (_, v: DeclarationVariable) =>
+        instantiateDeclaration(v, left); true
+      case _ => left == right
+    }
   }
 
   def boundVariables : Set[TypeVariable] = {

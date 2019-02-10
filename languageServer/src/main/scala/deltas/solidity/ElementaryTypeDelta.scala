@@ -63,7 +63,7 @@ object ElementaryTypeDelta extends DeltaWithGrammar with TypeInstance {
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
     val elementaryType: ElementType[NodeLike] = path
     if (elementaryType.name == "address") {
-      TypeFromDeclaration(builder.resolveToType(elementaryType.name, null, parentScope, elementaryTypeKind))
+      TypeFromDeclaration(builder.resolveToType(elementaryType.name, null, parentScope, TypeSkeleton.typeKind))
     } else {
       PrimitiveType(elementaryType.name)
     }

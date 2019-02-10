@@ -23,7 +23,7 @@ object UsingForForElementaryTypesDelta extends Delta {
     TypeSkeleton.hasTypes.add(language, ElementaryTypeDelta.Shape, new HasType {
       override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
         val name = path.getValue(HasNameDelta.Name).asInstanceOf[String]
-        val typeDeclaration = builder.resolveToType(name, null, parentScope, ElementaryTypeDelta.elementaryTypeKind)
+        val typeDeclaration = builder.resolveToType(name, null, parentScope, TypeSkeleton.typeKind)
         TypeFromDeclaration(typeDeclaration)
       }
     })
@@ -32,8 +32,10 @@ object UsingForForElementaryTypesDelta extends Delta {
     ConstraintSkeleton.hasConstraints.add(language, MultiFileDelta.Shape, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
         for(name <- ElementaryTypeDelta.elementaryTypeNames) {
-          val declaration = builder.declare(name, parentScope, null, Some(ElementaryTypeDelta.elementaryTypeKind))
-          builder.declareScope(declaration)
+          if (name != "address") {
+            val declaration = builder.declare(name, parentScope, null, Some(TypeSkeleton.typeKind))
+            builder.declareScope(declaration)
+          }
         }
         original.collectConstraints(compilation, builder, path, parentScope)
       }

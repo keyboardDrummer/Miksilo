@@ -516,13 +516,13 @@ class SolidityExamples extends FunSuite {
                     |        TimeEvent _timeEvent;
                     |        _timeEvent.addr = msg.sender;
                     |        _timeEvent.data = msg.data;
-                    |        _events[_time].push(_timeEvent);
+                    |        //_events[_time].push(_timeEvent);
                     |    }
                     |
                     |    function call(uint _time)
                     |        public {
                     |        TimeEvent[] timeEvents = _events[_time];
-                    |        for(uint i = 0; i < timeEvents.length; i++) {
+                    |        for(uint i = 0; i < 3 /*timeEvents.length*/; i++) {
                     |            AlarmWakeUp(timeEvents[i].addr).callback(timeEvents[i].data);
                     |        }
                     |    }
