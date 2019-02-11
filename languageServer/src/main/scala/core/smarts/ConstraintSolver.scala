@@ -122,7 +122,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case (_: TypeVariable,_) => false
     case (_,_: TypeVariable) => false
     case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration))
-      if canDeclarationsMatch(superDeclaration, subDeclaration) => true
+      if canDeclarationsMatch(superDeclaration, subDeclaration) => true // TODO 'can' used in 'is' doesn't seem correct.
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
       val closureOutput = closure.instantiate(builder, input)
       builder.add(CheckSubType(output, closureOutput))
@@ -137,20 +137,22 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
       typeGraph.isSuperType(TypeNode(l), TypeNode(r))
   }
 
-  // TODO the 'can' concept is stupid. should be replaced with '=='
   def canDeclarationsMatch(left: Declaration, right: Declaration) = (left, right) match {
     case (_: DeclarationVariable, _) => true
     case (_, _: DeclarationVariable) => true
     case _ => left == right
   }
 
-  // TODO the 'could be' concept is stupid. Should be replaced with 'isSuperType'
+  /**
+    * Determines whether a super/sub type relationship can be assigned between two types.
+    */
   def couldBeSuperType(superType: Type, subType: Type): Boolean = (proofs.resolveType(superType), proofs.resolveType(subType)) match {
     case (PrimitiveType(left), PrimitiveType(right)) if left == right => true
     case (_: TypeVariable,_) => true
     case (_,_: TypeVariable) => true
-    case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration)) =>
-      canDeclarationsMatch(superDeclaration, subDeclaration) // TODO add test case.
+    case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration)) // TODO add test case.
+      if canDeclarationsMatch(superDeclaration, subDeclaration) =>
+      true
     case (FunctionType(input1, output1, _), FunctionType(input2, output2, _)) =>
       couldBeSuperType(output1, output2) && couldBeSuperType(input2, input1)
     case (TypeApplication(leftFunction, leftArguments, _), TypeApplication(rightFunction, rightArguments, _)) =>
@@ -219,9 +221,6 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   }
 
   def unifyDeclarations(left: Declaration, right: Declaration): Boolean = {
-    if (left == DeclarationVariable("48") || right == DeclarationVariable("48")) {
-      System.out.append("")
-    }
     (left, right) match {
       case (v: DeclarationVariable, _) =>
         instantiateDeclaration(v, right); true

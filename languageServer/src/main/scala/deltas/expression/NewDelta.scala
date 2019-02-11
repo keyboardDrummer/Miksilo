@@ -50,7 +50,6 @@ object NewDelta extends DeltaWithGrammar with ExpressionInstance {
 
     val constructorReference = new Reference(ConstructorDelta.constructorName, Some(call))
     builder.add(ReferenceInScope(constructorReference, classScope))
-    //TODO this fails with a solidity new call.
     CallDelta.callConstraints(compilation, builder, call.arguments, parentScope, constructorReference, VoidTypeDelta.constraintType)
   }
 }
