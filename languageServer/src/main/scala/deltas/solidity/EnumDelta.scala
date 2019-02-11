@@ -10,6 +10,7 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.HasNameDelta
+import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 
 object EnumDelta extends DeltaWithGrammar with HasConstraintsDelta {
@@ -47,6 +48,7 @@ object EnumDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val enumDeclaration = builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope)
     val enumStaticType: Type = TypeFromDeclaration(enumDeclaration) // TODO switch to using TypeFromScope
     builder.add(DeclarationHasType(enumDeclaration, enumStaticType))
+    builder.assignSubType(TypeSkeleton.typeKind, enumStaticType)
     //val enumType = TypeFromDeclaration(enumDeclaration) TODO this we can do once we have TypeFromScope.
     for(value <- _enum.values) {
       builder.declareSourceElement(value.node.getSourceElement(HasNameDelta.Name), enumStaticScope) // , Some(enumType))

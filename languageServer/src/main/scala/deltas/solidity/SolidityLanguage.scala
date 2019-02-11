@@ -1,10 +1,10 @@
 package deltas.solidity
 
-import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
+import core.deltas._
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
 import deltas.HasNameDelta
-import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
+import deltas.bytecode.types._
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.bitwise._
@@ -74,6 +74,7 @@ object SolidityLanguage {
     AfterOrDeleteExpressionDelta,
     SolidityFunctionTypeDelta,
     MappingTypeDelta,
+    SolidityIntLiteralDelta,
     InlineAssemblyStatementDelta,
     LocalDeclarationStorageLocationDelta,
     NumberLiteralUnitsDelta,
@@ -90,6 +91,10 @@ object SolidityLanguage {
 
   val language: Language = LanguageFromDeltas(deltas)
 }
+
+
+
+
 
 
 

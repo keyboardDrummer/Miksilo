@@ -63,15 +63,18 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val contractLike: ContractLike[NodePath] = path
-      val contractDeclaration = builder.declare(contractLike.name, parentScope, path.getSourceElement(Name), Some(TypeSkeleton.typeKind))
-    builder.add(DeclarationHasType(contractDeclaration, TypeFromDeclaration(contractDeclaration)))
+    val contractDeclaration = builder.declare(contractLike.name, parentScope, path.getSourceElement(Name))
+    val contractStaticType = TypeFromDeclaration(contractDeclaration)
+    val contractInstanceType = TypeFromDeclaration(contractDeclaration) // TODO fix this
+    builder.add(DeclarationHasType(contractDeclaration, contractStaticType))
+    builder.assignSubType(TypeSkeleton.typeKind, contractStaticType)
     val contractScope = builder.declareScope(contractDeclaration, Some(parentScope), s"contract '${contractLike.name}'")
 
     if (Set("interface", "contract").contains(contractLike.contractType)) {
       val addressDeclaration = SolidityLibraryDelta.addressDeclaration(compilation)
       val fromAddressMethod = SolidityFunctionTypeDelta.createType(
         Seq[Type](TypeFromDeclaration(addressDeclaration)),
-        Seq[Type](TypeFromDeclaration(contractDeclaration)))
+        Seq[Type](contractInstanceType))
       builder.declare(contractLike.name, parentScope, _type = Some(fromAddressMethod))
     }
 

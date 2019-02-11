@@ -17,7 +17,7 @@ import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.methods.{MethodDelta, MethodParameters}
-import deltas.statement.BlockDelta
+import deltas.statement.{BlockDelta, LabelStatementDelta}
 
 object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -40,6 +40,7 @@ object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
 
   override def inject(language: Language): Unit = {
+    LabelStatementDelta.isLabelScope.add(language, Shape, Unit)
     ExpressionDelta.expressionInstances.add(language, UnderScoreShape, new IsExpression {
       override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
       }

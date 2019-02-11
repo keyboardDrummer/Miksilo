@@ -40,9 +40,11 @@ object SolidityLibraryDelta extends Delta {
       val uintToIntConversionType = SolidityFunctionTypeDelta.createType(Seq[Type](uint256), Seq[Type](intType))
       builder.declare("int", rootScope, _type = Some(uintToIntConversionType))
 
-      val addressDeclaration = builder.declare(name, rootScope, null, Some(TypeSkeleton.typeKind))
+      val addressDeclaration = builder.declare("address", rootScope, null, Some(TypeSkeleton.typeKind))
       this.addressDeclaration(compilation) = addressDeclaration
-      val addressScope = builder.getDeclaredScope(addressDeclaration)
+      //builder.add(DeclarationHasType(addressDeclaration, TypeFromDeclaration(addressDeclaration)))
+      //builder.assignSubType(TypeSkeleton.typeKind, TypeFromDeclaration(addressDeclaration))
+      val addressScope = builder.declareScope(addressDeclaration)
 
       val stringDeclaration = builder.resolveToType("string", null, rootScope, TypeSkeleton.typeKind)
       val stringScope = builder.getDeclaredScope(stringDeclaration)
