@@ -42,8 +42,6 @@ object SolidityLibraryDelta extends Delta {
 
       val addressDeclaration = builder.declare("address", rootScope, null, Some(TypeSkeleton.typeKind))
       this.addressDeclaration(compilation) = addressDeclaration
-      //builder.add(DeclarationHasType(addressDeclaration, TypeFromDeclaration(addressDeclaration)))
-      //builder.assignSubType(TypeSkeleton.typeKind, TypeFromDeclaration(addressDeclaration))
       val addressScope = builder.declareScope(addressDeclaration)
 
       val stringDeclaration = builder.resolveToType("string", null, rootScope, TypeSkeleton.typeKind)

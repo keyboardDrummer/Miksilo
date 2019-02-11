@@ -17,8 +17,6 @@ import deltas.javac.types.BooleanTypeDelta
 object ElementaryTypeDelta extends DeltaWithGrammar with TypeInstance {
   def neww(value: String): Node = Shape.create(HasNameDelta.Name -> value)
 
-  def getTypeFromString(value: String): Type = ???
-
   object Shape extends NodeShape
 
   override def description= "Add elementary types"
@@ -59,7 +57,6 @@ object ElementaryTypeDelta extends DeltaWithGrammar with TypeInstance {
 
   }
 
-  val elementaryTypeKind = PrimitiveType("elementaryType")
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
     val elementaryType: ElementType[NodeLike] = path
     if (elementaryType.name == "address") {

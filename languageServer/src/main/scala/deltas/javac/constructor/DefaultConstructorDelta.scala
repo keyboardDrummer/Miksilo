@@ -9,7 +9,7 @@ import deltas.javac.methods.AccessibilityFieldsDelta
 import deltas.statement.BlockDelta
 
 object DefaultConstructorDelta extends DeltaWithPhase {
-  override def dependencies: Set[Contract] = Set.empty //Set(ConstructorDelta)
+  override def dependencies: Set[Contract] = Set.empty
 
   def transformProgram(program: Node, state: Compilation): Unit = {
     program.visitShape(JavaClassDelta.Shape, node => {

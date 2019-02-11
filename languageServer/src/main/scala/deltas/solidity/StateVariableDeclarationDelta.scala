@@ -15,7 +15,6 @@ import deltas.statement.LocalDeclarationDelta
 import deltas.HasNameDelta.Name
 
 object StateVariableDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
-  //TypeName ( 'public' | 'internal' | 'private' | 'constant' )* Identifier ('=' Expression)? ';'
 
   object Shape extends NodeShape
   object Modifiers extends NodeField

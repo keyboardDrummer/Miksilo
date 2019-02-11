@@ -91,10 +91,3 @@ object SolidityLanguage {
 
   val language: Language = LanguageFromDeltas(deltas)
 }
-
-
-
-
-
-
-
