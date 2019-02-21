@@ -11,13 +11,12 @@ import core.smarts.scopes.objects.Scope
 import deltas.HasNameDelta.HasName
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.TypeSkeleton
-import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeSkeleton}
 import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.classes.skeleton._
 import deltas.javac.methods.AccessibilityFieldsDelta
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 
-object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
+object FieldDeclarationDelta extends DeltaWithGrammar
   with HasDeclarationDelta
   with HasConstraintsDelta {
 
@@ -32,62 +31,27 @@ object FieldDeclarationDelta extends DeltaWithGrammar with ClassMemberDelta
     def _type: T = node(Type).asInstanceOf[T]
   }
 
-  override def dependencies: Set[Contract] = Set(JavaClassDelta, TypeConstant, AccessibilityFieldsDelta)
+  override def dependencies: Set[Contract] = Set(AccessibilityFieldsDelta)
 
   def neww(_type: Node, name: String) = new Node(Shape, Type -> _type, Name -> name)
 
-  def bind(compilation: Compilation, signature: ClassSignature, javaClass: Node): Unit = {
-
-    val fields = getFields(javaClass)
-    for (field <- fields)
-      bindField(field)
-
-    def bindField(field: Node) = {
-
-      val name: String = Field(field).name
-      val _type = field._type
-      signature.newFieldInfo(name, _type)
-    }
+  def bind(compilation: Compilation, signature: ClassSignature, field: Node): Unit = {
+    val name: String = Field(field).name
+    val _type = field._type
+    signature.newFieldInfo(name, _type)
   }
 
   def getFields(javaClass: JavaClass[Node]): Seq[Node] = {
     javaClass.members.filter(member => member.shape == Shape)
   }
 
-  def compile(compilation: Compilation, javaClass: Node): Unit = {
-    val classCompiler = JavaClassDelta.getClassCompiler(compilation)
-
-    val fields = getFields(javaClass)
-    javaClass(ByteCodeSkeleton.ClassFields) = fields.map(field => {
-      convertField(field, classCompiler, compilation)
-      field
-    })
-  }
-
-  def convertField(node: Node, classCompiler: ClassCompiler, state: Language) {
-    val field: Field[Node] = node
-    val nameIndex = classCompiler.getNameIndex(field.name)
-
-    field(ByteCodeFieldInfo.NameIndex) = nameIndex
-    field.shape = ByteCodeFieldInfo.Shape
-
-    val fieldDescriptor = TypeConstant.constructor(field._type)
-    field(ByteCodeFieldInfo.DescriptorIndex) = fieldDescriptor
-    field(ByteCodeFieldInfo.AccessFlagsKey) = Set.empty
-    field(ByteCodeFieldInfo.FieldAttributes) = Seq.empty
-
-    field.data.remove(Name)
-    field.data.remove(Type)
-  }
-
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val memberGrammar = find(JavaClassDelta.ClassMemberGrammar)
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
 
     val fieldGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
       typeGrammar.as(Type) ~~ find(Name) ~< ";" asNode Shape
-    memberGrammar.addAlternative(create(Shape, fieldGrammar))
+    create(Shape, fieldGrammar)
   }
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {

@@ -16,18 +16,19 @@ object ArrayAccessDelta extends Delta {
                                resultType: Type, targetType: Type, indexType: Type, parentScope: Scope): Unit = {
         builder.add(new Constraint() {
           override def apply(solver: ConstraintSolver) = {
-            solver.proofs.resolveType(targetType) match {
+            val resolvedType = solver.proofs.resolveType(targetType)
+            resolvedType match {
               case TypeApplication(ArrayTypeDelta.arrayTypeConstructor, Seq(elementType),_) =>
                 // TODO builder.typesAreEqual(indexType, IntTypeDelta.constraintType)
                 builder.typesAreEqual(elementType, resultType)
                 true
               case _: ConcreteType =>
                 true
-              case _ => false
+              case _ =>
+                false
             }
           }
         })
-
       }
     })
     super.inject(language)

@@ -1,7 +1,7 @@
 package application.compilerCockpit
 
 import core.bigrammar.BiGrammarToParser
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.fife.ui.rsyntaxtextarea.TokenTypes
 import org.scalatest.FunSuite
@@ -9,7 +9,7 @@ import util.TestLanguageBuilder
 
 class TokenMakerFromGrammarTest extends FunSuite {
 
-  private val language = TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++ JavaLanguage.javaCompilerDeltas)
+  private val language = TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++ JavaToByteCodeLanguage.javaCompilerDeltas)
 
   test("fibonacci") {
     val grammar = language.grammars.root

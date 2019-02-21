@@ -7,7 +7,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{FunctionType, PrimitiveType, Type, TypeApplication}
-import deltas.bytecode.types.{TypeInstance, TypeSkeleton}
+import deltas.bytecode.types.{TypeInstance, TypeSkeleton, VoidTypeDelta}
 import deltas.javac.methods.MethodParameters
 import deltas.javac.types.MethodTypeDelta.ReturnType
 
@@ -62,8 +62,16 @@ object SolidityFunctionTypeDelta extends DeltaWithGrammar with TypeInstance {
   def createType(compilation: Compilation, builder: ConstraintBuilder, parentScope: Scope,
                  parameters: Seq[NodeLike], returnParameters: Seq[NodeLike]): Type = {
     val parameterTypes = parameters.map(parameter => TypeSkeleton.getType(compilation, builder, parameter, parentScope))
-    val returnTypes = returnParameters.map(returnParameter => TypeSkeleton.getType(compilation, builder, returnParameter._type, parentScope))
-    val returnAggregate = if (returnTypes.length == 1) returnTypes.head else TypeApplication(returnList, returnTypes, "eariugblrig")
+    val returnTypes = returnParameters.map(returnParameter => TypeSkeleton.getType(compilation, builder, returnParameter, parentScope))
+    createType(parameterTypes, returnTypes)
+  }
+
+  def createType(parameterTypes: Seq[Type], returnTypes: Seq[Type]) = {
+    val returnAggregate = returnTypes.length match {
+      case 0 => VoidTypeDelta.constraintType
+      case 1 => returnTypes.head
+      case _ => TypeApplication(returnList, returnTypes, "eariugblrig")
+    }
     FunctionType.curry(parameterTypes, returnAggregate)
   }
 

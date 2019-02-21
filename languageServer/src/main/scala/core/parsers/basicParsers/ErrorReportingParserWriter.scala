@@ -89,18 +89,16 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
 
   implicit class ReportingParserExtensions[+Result](parser: Parser[Result]) extends ParserExtensions(parser) {
 
-    def parseWholeInput(input: Input,
-                        cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
+    def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      parse(input, cache) match {
+      parse(input) match {
         case success: ParseSuccess[Result] if !success.remainder.atEnd =>
           Failure(success.remainder, "Did not parse entire input")
         case f => f
       }
     }
 
-    def parse(input: Input,
-              cache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache()): ParseResult[Result] = {
+    def parse(input: Input): ParseResult[Result] = {
 
       val state = new PackratParseState(())
       state.parse(parser, input)

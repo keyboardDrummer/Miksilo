@@ -24,7 +24,7 @@ object CloudFormationTemplate extends Delta {
     val resourceTypes = parsedFile.value("ResourceTypes").as[JsObject]
 
     language.collectConstraints = (compilation, builder) => {
-      val rootScope = builder.newScope(debugName = "universe")
+      val rootScope = builder.newScope(debugName = "rootScope")
 
       addResourceTypesFromSchema(resourceTypes, builder, rootScope)
 
@@ -70,12 +70,12 @@ object CloudFormationTemplate extends Delta {
       builder.declare(pseudoParameter, rootScope, null, Some(valueType))
   }
 
-  private def addParameters(builder: ConstraintBuilder, universe: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
+  private def addParameters(builder: ConstraintBuilder, rootScope: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
     program.get("Parameters") match {
       case Some(_parameters) =>
         val parameters: ObjectLiteral[NodePath] = _parameters
         for (parameter <- parameters.members) {
-          builder.declare(parameter.key, universe, parameter.node.getSourceElement(MemberKey), Some(valueType))
+          builder.declare(parameter.key, rootScope, parameter.node.getSourceElement(MemberKey), Some(valueType))
         }
       case None =>
     }

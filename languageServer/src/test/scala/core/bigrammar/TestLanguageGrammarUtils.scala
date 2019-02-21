@@ -8,7 +8,7 @@ import core.deltas.{Contract, Delta, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.GrammarKey
 import deltas.ClearPhases
-import deltas.javac.JavaLanguage
+import deltas.javac.JavaToByteCodeLanguage
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 
@@ -16,7 +16,7 @@ case class StringKey(value: String) extends GrammarKey {
   override lazy val toString: String = value
 }
 
-object TestLanguageGrammarUtils extends TestLanguageGrammarUtils(JavaLanguage.javaCompilerDeltas)
+object TestLanguageGrammarUtils extends TestLanguageGrammarUtils(JavaToByteCodeLanguage.javaCompilerDeltas)
 
 object TestGrammarUtils extends FunSuite {
 

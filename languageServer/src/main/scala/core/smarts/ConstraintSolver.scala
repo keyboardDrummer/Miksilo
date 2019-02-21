@@ -121,6 +121,8 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   def isSuperType(superType: Type, subType: Type): Boolean = (proofs.resolveType(superType), proofs.resolveType(subType)) match {
     case (_: TypeVariable,_) => false
     case (_,_: TypeVariable) => false
+    case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration))
+      if canDeclarationsMatch(superDeclaration, subDeclaration) => true // TODO 'can' used in 'is' doesn't seem correct.
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
       val closureOutput = closure.instantiate(builder, input)
       builder.add(CheckSubType(output, closureOutput))
@@ -141,13 +143,24 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case _ => left == right
   }
 
+  /**
+    * Determines whether a super/sub type relationship can be assigned between two types.
+    */
   def couldBeSuperType(superType: Type, subType: Type): Boolean = (proofs.resolveType(superType), proofs.resolveType(subType)) match {
+    case (PrimitiveType(left), PrimitiveType(right)) if left == right => true
     case (_: TypeVariable,_) => true
     case (_,_: TypeVariable) => true
-    case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration)) =>
-      canDeclarationsMatch(superDeclaration, subDeclaration) // TODO add test case.
+    case (TypeFromDeclaration(superDeclaration), TypeFromDeclaration(subDeclaration)) // TODO add test case.
+      if canDeclarationsMatch(superDeclaration, subDeclaration) =>
+      true
     case (FunctionType(input1, output1, _), FunctionType(input2, output2, _)) =>
       couldBeSuperType(output1, output2) && couldBeSuperType(input2, input1)
+    case (TypeApplication(leftFunction, leftArguments, _), TypeApplication(rightFunction, rightArguments, _)) =>
+      if (leftArguments.size == rightArguments.size && couldBeSuperType(leftFunction, rightFunction))
+        leftArguments.indices.forall(index =>
+          couldBeSuperType(leftArguments(index), rightArguments(index)))
+      else
+        false
     case (closure: ConstraintClosureType, FunctionType(input, output, _)) =>
       val closureOutput = closure.instantiate(builder, input)
       builder.add(CheckSubType(output, closureOutput))
@@ -174,7 +187,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
     case (TypeApplication(leftFunction, leftArguments, _), TypeApplication(rightFunction, rightArguments, _)) =>
       if (leftArguments.size == rightArguments.size && unifyTypes(leftFunction, rightFunction))
         leftArguments.indices.forall(index =>
-          unifyTypes(left.asInstanceOf[TypeApplication].arguments(index), right.asInstanceOf[TypeApplication].arguments(index)))
+          unifyTypes(leftArguments(index), rightArguments(index)))
       else
 
         false
@@ -198,18 +211,23 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
   }
 
   def instantiateDeclaration(variable: DeclarationVariable, instance: Declaration): Unit = {
+    if (variable == instance)
+      return
+
     allConstraints.foreach(x => x.instantiateDeclaration(variable, instance))
     environment = environment.map(kv => if (kv._1 == variable) (instance, kv._2) else kv)
     environment.values.foreach(t => t.instantiateDeclaration(variable, instance))
     proofs.mappedDeclarationVariables += variable -> instance
   }
 
-  def unifyDeclarations(left: Declaration, right: Declaration): Boolean = (left, right) match {
-    case (v:DeclarationVariable,_) =>
-      instantiateDeclaration(v, right); true
-    case (_, v:DeclarationVariable) =>
-      instantiateDeclaration(v, left); true
-    case _ => left == right
+  def unifyDeclarations(left: Declaration, right: Declaration): Boolean = {
+    (left, right) match {
+      case (v: DeclarationVariable, _) =>
+        instantiateDeclaration(v, right); true
+      case (_, v: DeclarationVariable) =>
+        instantiateDeclaration(v, left); true
+      case _ => left == right
+    }
   }
 
   def boundVariables : Set[TypeVariable] = {

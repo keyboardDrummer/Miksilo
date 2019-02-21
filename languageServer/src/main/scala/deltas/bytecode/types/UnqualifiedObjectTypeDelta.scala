@@ -35,6 +35,6 @@ object UnqualifiedObjectTypeDelta extends TypeInstance {
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     val name = getName(_type)
-    TypeFromDeclaration(builder.resolveOption(name, origin = _type.asPath, parentScope))
+    TypeFromDeclaration(builder.resolveToType(name, _type.asPath.orNull, parentScope, TypeSkeleton.typeKind))
   }
 }

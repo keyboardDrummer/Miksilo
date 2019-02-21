@@ -104,7 +104,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
-  it("can use completion") {
+  ignore("can use completion") {
     val document = TextDocumentItem("a","",0, "content")
     val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
 

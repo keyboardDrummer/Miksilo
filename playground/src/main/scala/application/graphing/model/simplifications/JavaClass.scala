@@ -5,7 +5,7 @@ import deltas.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass}
 
 object JavaClass extends DeltaGroup {
 
-  override def dependencies: Set[Contract] = Set(JavaMethod, ImplicitObjectSuperClass, ImplicitJavaLangImport)
+  override def dependencies: Set[Contract] = Set(JavaMethodGroup, ImplicitObjectSuperClass, ImplicitJavaLangImport)
 
   override def dependants: Set[Contract] = Set(JavaGroup)
 }

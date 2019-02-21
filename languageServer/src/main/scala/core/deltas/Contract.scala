@@ -5,7 +5,7 @@ trait Contract {
 
   override def toString: String = name
   def suffix: String
-  def name: String = {
+  def name: String = { // TODO rename to something less generic.
     try
     {
       val simpleName = getClass.getSimpleName

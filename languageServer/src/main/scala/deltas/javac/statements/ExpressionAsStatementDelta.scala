@@ -7,14 +7,10 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta}
-import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.ExpressionDelta
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.statement.{StatementDelta, StatementInstance}
 
-object ExpressionAsStatementDelta extends ConvertsToByteCodeDelta
-  with StatementInstance
+object ExpressionAsStatementDelta extends StatementInstance
   with DeltaWithGrammar {
 
   object Shape extends NodeShape
@@ -24,17 +20,6 @@ object ExpressionAsStatementDelta extends ConvertsToByteCodeDelta
   def create(expression: Node): Node = new Node(Shape, Expression -> expression)
 
   override val shape = Shape
-
-  override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
-    val expression = getExpression(statement)
-    val _type = ExpressionDelta.cachedNodeType(compilation, expression)
-    val extra = TypeSkeleton.getTypeSize(_type, compilation) match {
-      case 0 => Seq.empty
-      case 1 => Seq(PopDelta.pop)
-      case 2 => Seq(Pop2Delta.pop2)
-    }
-    ToByteCodeSkeleton.getToInstructions(compilation)(expression) ++ extra
-  }
 
   def getExpression[T <: NodeLike](statement: T): T = {
     statement(Expression).asInstanceOf[T]

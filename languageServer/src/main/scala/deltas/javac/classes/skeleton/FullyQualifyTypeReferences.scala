@@ -1,15 +1,22 @@
 package deltas.javac.classes.skeleton
 
 import core.deltas.path.{FieldPath, PathRoot}
-import core.deltas.{Contract, DeltaWithPhase}
-import core.language.Compilation
+import core.deltas.{Contract, Delta}
 import core.language.node.Node
+import core.language.{Compilation, Language, Phase}
+import core.smarts.SolveConstraintsDelta
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
 
-object FullyQualifyTypeReferences extends DeltaWithPhase {
+object FullyQualifyTypeReferences extends Delta {
   override def description: String = "Replaces unqualified type references with qualified ones."
 
-  override def transformProgram(program: Node, compilation: Compilation): Unit = {
+  override def inject(language: Language): Unit = {
+    val phase = Phase(this, compilation => transformProgram(compilation.program, compilation))
+    language.insertPhaseAfter(phase, SolveConstraintsDelta)
+    super.inject(language)
+  }
+
+  def transformProgram(program: Node, compilation: Compilation): Unit = {
     PathRoot(program).visitShape(UnqualifiedObjectTypeDelta.Shape, _type => {
       val declaration = compilation.proofs.gotoDefinition(_type).get.origin.get.asInstanceOf[FieldPath].parent.current
       val clazz: JavaClassDelta.JavaClass[Node] = declaration

@@ -1,6 +1,6 @@
 package core.smarts.types.objects
 
-case class PrimitiveType(name: String) extends ConcreteType {
+case class PrimitiveType(name: Any) extends ConcreteType {
   override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = this
 
   override def variables: Set[TypeVariable] = Set.empty
@@ -9,5 +9,5 @@ case class PrimitiveType(name: String) extends ConcreteType {
 
   override def fullyApplied: Boolean = true
 
-  override def toString: String = name
+  override def toString: String = name.toString
 }

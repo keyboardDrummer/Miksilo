@@ -10,7 +10,7 @@ trait ByteCodeTypeInstance extends TypeInstance {
 
   def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar
 
-  def constraintName: String
+  def constraintName: Any
   def fromConstraintType(_type: Type): Node
 
   def getStackType(_type: Node, state: Language): Node = _type

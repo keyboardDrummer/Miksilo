@@ -20,7 +20,7 @@ class EmptyMain extends FunSuite {
 
   def getByteCode: Node = {
     val java = getJava
-    val byteCode = TestLanguageBuilder.build(JavaLanguage.javaCompilerDeltas).compileAst(java).program
+    val byteCode = TestLanguageBuilder.build(JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(java).program
     byteCode
   }
 

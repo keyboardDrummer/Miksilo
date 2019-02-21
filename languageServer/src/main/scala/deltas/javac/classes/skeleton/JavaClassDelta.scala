@@ -13,18 +13,15 @@ import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.TypeFromDeclaration
 import deltas.ConstraintSkeleton
-import deltas.bytecode.ByteCodeSkeleton
-import deltas.bytecode.ByteCodeSkeleton.ClassFile
-import deltas.bytecode.constants.ClassInfoConstant
-import deltas.bytecode.simpleBytecode.{InferredMaxStack, InferredStackFrames}
-import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
+import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
 import deltas.javac.JavaLang
-import deltas.javac.classes.ClassCompiler
+import deltas.javac.classes.{ClassCompiler, FieldDeclarationDelta}
+import deltas.javac.methods.MethodDelta
 import deltas.statement.BlockDelta
 
 import scala.collection.mutable
 
-object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
+object JavaClassDelta extends DeltaWithGrammar with Delta
   with HasDeclarationDelta with HasConstraintsDelta {
 
   import deltas.HasNameDelta._
@@ -47,33 +44,8 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
     def parent_=(value: Option[String]): Unit = node(ClassParent) = value
   }
 
-  override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    transformClass(program)
-
-    def transformClass(program: Node) {
-      val javaClass: JavaClass[Node] = program
-      JavaLang.loadIntoClassPath(compilation)
-      javaClass.node.shape = ByteCodeSkeleton.Shape
-      val classFile = new ClassFile(javaClass.node)
-      val classCompiler: ClassCompiler = ClassCompiler(javaClass.node, compilation)
-      state(compilation).classCompiler = classCompiler
-      classCompiler.bind()
-
-      val classInfo = classCompiler.currentClassInfo
-      classFile.attributes = Seq()
-
-      val classRef = classCompiler.getClassRef(classInfo)
-      program(ByteCodeSkeleton.ClassNameIndexKey) = classRef
-      val parentName = javaClass.parent.get
-      val parentRef = ClassInfoConstant.classRef(classCompiler.fullyQualify(parentName))
-      program(ByteCodeSkeleton.ClassParentIndex) = parentRef
-      program(ByteCodeSkeleton.ClassInterfaces) = Seq()
-
-      for(member <- members.get(compilation).values)
-        member.compile(compilation, javaClass.node)
-
-      javaClass.node.data.remove(Members)
-    }
+  def getFields[T <: NodeLike](javaClass: JavaClass[T]): Seq[T] = {
+    javaClass.members.filter(member => member.shape == Shape)
   }
 
   def fullyQualify(_type: NodePath, classCompiler: ClassCompiler): Unit =  _type.shape match {
@@ -90,13 +62,12 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
     QualifiedClassName(javaClass._package ++ Seq(javaClass.name))
   }
 
-  override def dependencies: Set[Contract] = Set(BlockDelta, InferredMaxStack, InferredStackFrames)
+  override def dependencies: Set[Contract] = Set(BlockDelta, MethodDelta, FieldDeclarationDelta)
 
-  object ClassMemberGrammar extends GrammarKey
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import language.grammars._
 
-    val classMember: BiGrammar = create(ClassMemberGrammar)
+    val classMember: BiGrammar = find(MethodDelta.Shape) | find(FieldDeclarationDelta.Shape)
     val importGrammar = create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical as ClassImports
     val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
@@ -120,7 +91,6 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
     ClassImports -> imports,
     ClassParent -> mbParent)
 
-  val members = new ShapeProperty[ClassMemberDelta]
   val importToClassMap = new ShapeProperty[(Compilation, Node) => Map[String, QualifiedClassName]]
 
   val state = new CompilationState[State](new State())
@@ -189,7 +159,10 @@ object JavaClassDelta extends DeltaWithGrammar with DeltaWithPhase
 
     //TODO here there should be an instance, a static, and a lexical scope.
     val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getSourceElement(Name))
-    builder.add(DeclarationHasType(clazzDeclaration, TypeFromDeclaration(clazzDeclaration)))
+    val clazzType = TypeFromDeclaration(clazzDeclaration)
+    builder.add(DeclarationHasType(clazzDeclaration, clazzType))
+    builder.assignSubType(TypeSkeleton.typeKind, clazzType)
+
     val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
     staticDeclaration(path) = clazzDeclaration
 

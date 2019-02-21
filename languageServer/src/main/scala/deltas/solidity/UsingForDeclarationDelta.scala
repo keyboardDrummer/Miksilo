@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
 import deltas.HasNameDelta.Name
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters
 import deltas.javac.methods.MethodParameters.MethodParameter
@@ -38,7 +38,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val grammar = "using" ~~ identifier.as(LibraryName) ~~ "for" ~~
       ("*" ~> value(Wildcard) | typeGrammar).as(Type) ~ ";" asNode Shape
-    find(SolidityContractDelta.Members).addAlternative(grammar)
+    find(JavaClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Add a using-for namespace member"
@@ -88,7 +88,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
 
               val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[NodePath]).drop(1)
               val returnParameters: Seq[MethodParameter[NodePath]] = NodeWrapper.wrapList(method(ReturnValues).asInstanceOf[Seq[NodePath]])
-              val returnTypes: Seq[Node] = returnParameters.map(returnParameter => ParameterShape.create(MethodParameters.Type -> returnParameter._type))
+              val returnTypes: Seq[Node] = returnParameters.map(returnParameter => returnParameter._type)
               val methodType = SolidityFunctionTypeDelta.createType(compilation, solver.builder, libraryScope, parameterTypes, returnTypes)
 
               solver.builder.declareSourceElement(member.getSourceElement(Name), typeScope, Some(methodType))

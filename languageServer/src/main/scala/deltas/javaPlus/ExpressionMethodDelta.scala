@@ -30,7 +30,7 @@ object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
     val expressionMethodGrammar = (visibilityGrammar ~~ parseStatic ~~ parseReturnType ~~
       identifier.as(Name) ~ parseParameters ~~ ("=" ~~> expressionGrammar)).
       asNode(Shape)
-    val methodGrammar = find(MethodDelta.MethodGrammar)
+    val methodGrammar = find(MethodDelta.Shape)
     methodGrammar.addAlternative(expressionMethodGrammar)
   }
 

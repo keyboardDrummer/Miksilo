@@ -9,19 +9,20 @@ import core.language.node.{NodeField, NodeLike, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import core.smarts.types.DeclarationHasType
+import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.ConstraintSkeleton
 import deltas.HasNameDelta.{HasName, Name}
-import deltas.bytecode.types.UnqualifiedObjectTypeDelta
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta}
 import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.javac.classes.skeleton.JavaClassDelta.ClassImports
 
 object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
-  object Shape extends NodeShape
   object ContractType extends NodeField
   object SuperContracts extends NodeField
-  object Members extends NodeField
 
   object SuperShape extends NodeShape
   object SuperName extends NodeField
@@ -31,11 +32,13 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
     def imports_=(value: Seq[T]): Unit = node(ClassImports) = value
 
-    def members = node(Members).asInstanceOf[Seq[T]]
-    def members_=(value: Seq[T]): Unit = node(Members) = value
+    def members = node(JavaClassDelta.Members).asInstanceOf[Seq[T]]
+    def members_=(value: Seq[T]): Unit = node(JavaClassDelta.Members) = value
 
     def parents: Seq[T] = node(SuperContracts).asInstanceOf[Seq[T]]
     def parents_=(value: Seq[T]): Unit = node(SuperContracts) = value
+
+    def contractType: String = node.getValue(ContractType).asInstanceOf[String]
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
@@ -47,9 +50,9 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val inheritanceSpecifier: BiGrammar = objectType.as(SuperName) ~
       (expression.someSeparated("," ~ printSpace).inParenthesis | value(Seq.empty)).as(SuperArguments) asNode SuperShape
     val inheritance = (printSpace ~ "is" ~~ inheritanceSpecifier.someSeparated("," ~ printSpace) | value(Seq.empty)).as(SuperContracts)
-    val member = create(Members)
-    val members = member.manySeparatedVertical(BlankLine).as(Members)
-    val contract = contractType ~~ identifier.as(Name) ~ inheritance ~ "{" % members % "}" asNode Shape
+    val member = create(JavaClassDelta.Members)
+    val members = member.manySeparatedVertical(BlankLine).as(JavaClassDelta.Members)
+    val contract = contractType ~~ identifier.as(Name) ~ inheritance ~ "{" % members % "}" asNode JavaClassDelta.Shape
     find(FileWithMembersDelta.Members).addAlternative(contract)
   }
 
@@ -57,12 +60,24 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def dependencies = Set(FileWithMembersDelta, UnqualifiedObjectTypeDelta)
 
-  override def shape = Shape
+  override def shape = JavaClassDelta.Shape
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val contractLike: ContractLike[NodePath] = path
     val contractDeclaration = builder.declare(contractLike.name, parentScope, path.getSourceElement(Name))
+    val contractStaticType = TypeFromDeclaration(contractDeclaration)
+    val contractInstanceType = TypeFromDeclaration(contractDeclaration) // TODO fix this
+    builder.add(DeclarationHasType(contractDeclaration, contractStaticType))
+    builder.assignSubType(TypeSkeleton.typeKind, contractStaticType)
     val contractScope = builder.declareScope(contractDeclaration, Some(parentScope), s"contract '${contractLike.name}'")
+
+    if (Set("interface", "contract").contains(contractLike.contractType)) {
+      val addressDeclaration = SolidityLibraryDelta.addressDeclaration(compilation)
+      val fromAddressMethod = SolidityFunctionTypeDelta.createType(
+        Seq[Type](TypeFromDeclaration(addressDeclaration)),
+        Seq[Type](contractInstanceType))
+      builder.declare(contractLike.name, parentScope, _type = Some(fromAddressMethod))
+    }
 
     for(member <- contractLike.members) {
       ConstraintSkeleton.constraints(compilation, builder, member, contractScope)

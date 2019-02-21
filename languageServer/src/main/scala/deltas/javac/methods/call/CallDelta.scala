@@ -15,8 +15,8 @@ import deltas.bytecode.extraConstants.TypeConstant
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
+import deltas.javac.methods.MethodDelta
 import deltas.javac.methods.MethodDelta.Method
-import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
 object CallDelta extends DeltaWithGrammar with ExpressionInstance {
 
@@ -26,7 +26,7 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
     import grammars._
     val core = find(ExpressionDelta.LastPrecedenceGrammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val calleeGrammar = create(CallDelta.Callee, find(MemberSelectorDelta.Shape)) // TODO don't hardcode MemberSelectorDelta here.
+    val calleeGrammar = create(CallDelta.Callee)
     val callArguments = create(CallDelta.CallArgumentsGrammar, expression.manySeparated(",").inParenthesis)
     val parseCall = calleeGrammar.as(CallDelta.Callee) ~ callArguments.as(CallDelta.Arguments) asLabelledNode CallDelta.Shape
     core.addAlternative(parseCall)
@@ -60,7 +60,7 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
     functionType
   }
 
-  override def dependencies = Set(MemberSelectorDelta, ExpressionDelta)
+  override def dependencies = Set(ExpressionDelta)
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, returnType: Type, parentScope: Scope): Unit = {
     val call: Call[NodePath] = path
@@ -98,7 +98,6 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
   }
 
   def getMethodFromCallee(compilation: Compilation, callee: NodePath) = {
-    val scopeGraph = compilation.proofs.scopeGraph
     val callReference = ReferenceExpressionSkeleton.references(callee)
     val callDeclaration = compilation.proofs.declarations(callReference)
     val method: Method[NodePath] = callDeclaration.origin.get.asInstanceOf[FieldPath].parent

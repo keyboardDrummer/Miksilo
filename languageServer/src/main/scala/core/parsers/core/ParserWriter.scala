@@ -4,8 +4,6 @@ import scala.language.higherKinds
 
 trait ParserWriter {
 
-  case class ParseNode(input: Input, parser: Parser[Any])
-
   type Input <: ParseInput
   type ParseResult[+Result] <: ParseResultLike[Result]
   type Self[+R] <: Parser[R]

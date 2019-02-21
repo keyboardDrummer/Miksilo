@@ -10,12 +10,11 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 import deltas.statement.LocalDeclarationDelta
 import deltas.HasNameDelta.Name
 
 object StateVariableDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
-  //TypeName ( 'public' | 'internal' | 'private' | 'constant' )* Identifier ('=' Expression)? ';'
 
   object Shape extends NodeShape
   object Modifiers extends NodeField
@@ -26,9 +25,9 @@ object StateVariableDeclarationDelta extends DeltaWithGrammar with HasConstraint
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val expression: BiGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val modifiers = (printSpace ~> ("public" | "internal" | "private" | "constant")).many.as(Modifiers)
-    val initializer = (printSpace ~ "=" ~~ expression).option.as(Initializer)
+    val initializer = (printSpace ~> "=" ~~> expression).option.as(Initializer)
     val grammar = typeGrammar.as(LocalDeclarationDelta.Type) ~ modifiers ~~ find(Name) ~ initializer ~ ";" asNode Shape
-    find(SolidityContractDelta.Members).addAlternative(grammar)
+    find(JavaClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Introduce contract fields"

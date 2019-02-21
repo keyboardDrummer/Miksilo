@@ -8,7 +8,7 @@ import util.SourceUtils
 
 class ReferencesTest extends FunSuite with LanguageServerTest {
 
-  val server = new MiksiloLanguageServer(JavaLanguage.getJavaFrontend)
+  val server = new MiksiloLanguageServer(JavaLanguage.java)
 
   val referenceRanges = Seq(Range(HumanPosition(10,16), HumanPosition(10,21)),
     Range(HumanPosition(10,52), HumanPosition(10,57)),

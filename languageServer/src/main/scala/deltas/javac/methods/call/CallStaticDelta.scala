@@ -8,7 +8,7 @@ import deltas.bytecode.coreInstructions.InvokeStaticDelta
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 import deltas.javac.methods.call.CallDelta.Call
 
-object CallStaticDelta extends CallWithMemberSelector with ConvertsToByteCodeDelta {
+object CallStaticDelta extends ConvertsToByteCodeDelta {
 
   override def description: String = "Enables calling static methods."
 
@@ -21,10 +21,10 @@ object CallStaticDelta extends CallWithMemberSelector with ConvertsToByteCodeDel
   def getInstructionsGivenMethodRefIndex(call: NodePath, compilation: Compilation, methodRef: Node): Seq[Node] = {
     val calleeInstructions = Seq[Node]()
     val invokeInstructions = Seq(InvokeStaticDelta.invokeStatic(methodRef))
-    getGenericCallInstructions(call, compilation, calleeInstructions, invokeInstructions)
+    CallToByteCode.getGenericCallInstructions(call, compilation, calleeInstructions, invokeInstructions)
   }
 
-  override def dependencies: Set[Contract] = Set(InvokeStaticDelta) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(InvokeStaticDelta, CallMemberDelta)
 
   override def shape = CallDelta.Shape
 }
