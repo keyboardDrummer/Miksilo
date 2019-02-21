@@ -2,6 +2,7 @@ package languageServer.lsp
 
 import java.io.ByteArrayOutputStream
 
+import core.language.node.{FileRange, SourceRange}
 import langserver.types._
 import languageServer._
 import org.scalatest.{Assertion, AsyncFunSpec}
@@ -75,12 +76,12 @@ class LSPServerTest extends AsyncFunSpec {
   it("can use goto definition") {
     val document = TextDocumentItem("a","",0,"content")
     val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
-    val definitionRange = Range(Position(0, 1), Position(1, 2))
+    val definitionRange = SourceRange(Position(0, 1), Position(1, 2))
 
     val languageServer: LanguageServer = new TestLanguageServer with DefinitionProvider {
-      override def gotoDefinition(parameters: DocumentPosition): Seq[Location] = {
+      override def gotoDefinition(parameters: DocumentPosition): Seq[FileRange] = {
         if (parameters == request)
-          return Seq(Location(parameters.textDocument.uri, definitionRange))
+          return Seq(FileRange(parameters.textDocument.uri, definitionRange))
         Seq.empty
       }
     }
@@ -137,12 +138,12 @@ class LSPServerTest extends AsyncFunSpec {
   it("can use references") {
     val document = TextDocumentItem("a","",0,"content")
     val request = ReferencesParams(TextDocumentIdentifier(document.uri), Position(0, 0), ReferenceContext(false))
-    val referenceRange = Range(Position(0, 1), Position(1, 2))
+    val referenceRange = SourceRange(Position(0, 1), Position(1, 2))
 
     val languageServer: LanguageServer = new TestLanguageServer with ReferencesProvider {
-      override def references(parameters: ReferencesParams): Seq[Location] = {
+      override def references(parameters: ReferencesParams): Seq[FileRange] = {
         if (parameters == request)
-          return Seq(Location(parameters.textDocument.uri, referenceRange))
+          return Seq(FileRange(parameters.textDocument.uri, referenceRange))
         Seq.empty
       }
     }

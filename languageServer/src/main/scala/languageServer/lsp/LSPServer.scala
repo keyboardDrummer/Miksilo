@@ -1,5 +1,6 @@
 package languageServer.lsp
 
+import core.language.node.FileRange
 import langserver.types.{Location, ReferenceContext}
 import languageServer._
 import play.api.libs.json._
@@ -28,7 +29,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
     handler.addRequestHandler[InitializeParams, InitializeResult](LSPProtocol.initialize, initialize)(Json.format, Json.format)
 
-    def addProvider[Provider: ClassTag, Request, Response](method: String, getHandler: Provider => (Request => Response))
+    def addProvider[Provider: ClassTag, Request, Response](method: String, getHandler: Provider => Request => Response)
                                                           (requestFormat: Reads[Request], responseFormat: Writes[Response]): Unit = {
       languageServer match {
         case provider: Provider =>
@@ -39,11 +40,23 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
     implicit val textDocumentPositionParams: OFormat[DocumentPosition] = Json.format
     implicit val referenceContext: OFormat[ReferenceContext] = Json.format
-    addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[Location]])
-    addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[Seq[Location]])
+
+    addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => (position: DocumentPosition) => {
+      val fileRanges = provider.gotoDefinition(position)
+      fileRanges.map(fileRangeToLocation)
+    })(Json.format, Writes.of[Seq[Location]])
+
+    addProvider(LSPProtocol.references, (provider: ReferencesProvider) => (parameters: ReferencesParams) => {
+      val fileRanges = provider.references(parameters)
+      fileRanges.map(fileRangeToLocation)
+    })(Json.format, Writes.of[Seq[Location]])
+
     addProvider(LSPProtocol.completion, (provider: CompletionProvider) => provider.complete)(Json.format, Json.format)
     addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hoverRequest)(Json.format[TextDocumentHoverRequest], Json.format[Hover])
   }
+
+  def fileRangeToLocation(fileRange: FileRange): Location =
+    new Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end))
 
   def addNotificationHandlers(): Unit = {
     handler.addNotificationHandler(LSPProtocol.didOpen, (params: DidOpenTextDocumentParams) => languageServer.didOpen(params.textDocument))(Json.format)

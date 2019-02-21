@@ -96,7 +96,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def initialized(): Unit = {}
 
-  override def gotoDefinition(parameters: DocumentPosition): Seq[Location] = {
+  override def gotoDefinition(parameters: DocumentPosition): Seq[FileRange] = {
     currentDocumentId = parameters.textDocument
     logger.debug("Went into gotoDefinition")
     val location = for {
@@ -104,7 +104,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       element = getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- proofs.gotoDefinition(element)
       fileRange <- definition.origin.flatMap(o => o.fileRange)
-    } yield Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)) //TODO misschien de Types file kopieren en Location vervangen door FileRange?
+    } yield fileRange
     location.toSeq
   }
 
@@ -134,7 +134,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     proofs.scopeGraph.findDeclaration(element).orElse(proofs.gotoDefinition(element))
   }
 
-  override def references(parameters: ReferencesParams): Seq[Location] = {
+  override def references(parameters: ReferencesParams): Seq[FileRange] = {
     currentDocumentId = parameters.textDocument
     logger.debug("Went into references")
     val maybeResult = for {
@@ -152,7 +152,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       if (parameters.context.includeDeclaration)
         fileRanges = definition.origin.flatMap(o => o.fileRange).toSeq ++ fileRanges
 
-      fileRanges.map(fileRange => Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)))
+      fileRanges
     }
     maybeResult.getOrElse(Seq.empty)
   }

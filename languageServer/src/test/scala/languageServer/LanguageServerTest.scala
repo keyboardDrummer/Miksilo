@@ -1,6 +1,7 @@
 package languageServer
 
 import core.language.Language
+import core.language.node.FileRange
 import langserver.types._
 import languageServer.lsp._
 import org.scalatest.FunSuite
@@ -10,17 +11,17 @@ import scala.util.Random
 trait LanguageServerTest extends FunSuite {
 
   val itemUri = "helloWorld"
-  def gotoDefinition(language: Language, program: String, position: HumanPosition): Seq[Location] = {
+  def gotoDefinition(language: Language, program: String, position: HumanPosition): Seq[FileRange] = {
     val server = new MiksiloLanguageServer(language)
     gotoDefinition(server, program, position)
   }
 
-  def gotoDefinition(server: LanguageServer, program: String, position: HumanPosition): Seq[Location] = {
+  def gotoDefinition(server: LanguageServer, program: String, position: HumanPosition): Seq[FileRange] = {
     val document = openDocument(server, program)
     server.asInstanceOf[DefinitionProvider].gotoDefinition(DocumentPosition(document, position))
   }
 
-  def references(server: LanguageServer, program: String, position: HumanPosition, includeDeclaration: Boolean): Seq[Location] = {
+  def references(server: LanguageServer, program: String, position: HumanPosition, includeDeclaration: Boolean): Seq[FileRange] = {
     val document = openDocument(server, program)
     server.asInstanceOf[ReferencesProvider].references(ReferencesParams(document, position, ReferenceContext(includeDeclaration)))
   }
@@ -30,7 +31,7 @@ trait LanguageServerTest extends FunSuite {
     server.asInstanceOf[CompletionProvider].complete(DocumentPosition(document, position))
   }
 
-  def getDiagnostic(server: LanguageServer, program: String): Seq[Diagnostic] = {
+  def getDiagnostics(server: LanguageServer, program: String): Seq[Diagnostic] = {
     var result: Seq[Diagnostic] = null
     val document = openDocument(server, program)
     server.setClient(new LanguageClient {

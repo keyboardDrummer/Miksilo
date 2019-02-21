@@ -1,5 +1,6 @@
 package languageServer
 
+import core.language.node.FileRange
 import langserver.types._
 import languageServer.lsp._
 
@@ -17,13 +18,13 @@ trait CompletionProvider {
 }
 
 trait DefinitionProvider {
-  def gotoDefinition(parameters: DocumentPosition): Seq[Location]
+  def gotoDefinition(parameters: DocumentPosition): Seq[FileRange]
 }
 
 case class ReferencesParams(textDocument: TextDocumentIdentifier, position: Position, context: ReferenceContext)
 
 trait ReferencesProvider {
-  def references(location: ReferencesParams): Seq[Location]
+  def references(location: ReferencesParams): Seq[FileRange]
 }
 
 trait LanguageClient {

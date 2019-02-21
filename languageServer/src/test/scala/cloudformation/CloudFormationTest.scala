@@ -1,6 +1,7 @@
 package cloudformation
 
 import core.bigrammar.TestLanguageGrammarUtils
+import core.language.node.{FileRange, SourceRange}
 import deltas.cloudformation.CloudFormationLanguage
 import langserver.types._
 import languageServer.lsp._
@@ -14,26 +15,26 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
 
   test("No diagnostics") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
-    val result = getDiagnostic(server, program)
+    val result = getDiagnostics(server, program)
     assert(result.size == 1)
   }
 
   test("Goto definition resource reference") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
-    val result: Seq[Location] = gotoDefinition(server, program, new HumanPosition(365, 37))
-    assertResult(Seq(Location(itemUri, Range(new HumanPosition(336,6), new HumanPosition(336,28)))))(result)
+    val result: Seq[FileRange] = gotoDefinition(server, program, new HumanPosition(365, 37))
+    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(336,6), new HumanPosition(336,28)))))(result)
   }
 
   test("Goto definition") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
-    val result: Seq[Location] = gotoDefinition(server, program, new HumanPosition(437, 36))
-    assertResult(Seq(Location(itemUri, Range(new HumanPosition(42,6), new HumanPosition(42,17)))))(result)
+    val result: Seq[FileRange] = gotoDefinition(server, program, new HumanPosition(437, 36))
+    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(42,6), new HumanPosition(42,17)))))(result)
   }
 
   test("Goto definition overloaded parameter") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = gotoDefinition(server, program, new HumanPosition(445, 32))
-    assertResult(Seq(Location(itemUri, Range(new HumanPosition(8,6), new HumanPosition(8,11)))))(result)
+    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(8,6), new HumanPosition(8,11)))))(result)
   }
 
   test("Goto definition overloaded parameter second") {

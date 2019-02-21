@@ -7,34 +7,6 @@ import util.{SourceUtils, TestLanguageBuilder}
 class SolidityExamples extends FunSuite {
   val solidity = TestLanguageBuilder.build(SolidityLanguage.deltas)
 
-  test("contract, fields, functions, return expression, assignment") {
-    val program = """pragma solidity ^0.4.0;
-                    |
-                    |contract MyFirstContract {
-                    |    string private name;
-                    |    uint private age;
-                    |
-                    |    function setName(string newName) public {
-                    |        name = newName;
-                    |    }
-                    |
-                    |    function getName() public view returns (string) {
-                    |        return name;
-                    |    }
-                    |
-                    |    function setAge(uint newAge) public {
-                    |        age = newAge;
-                    |    }
-                    |
-                    |    function getAge() public view returns (uint) {
-                    |        return age;
-                    |    }
-                    |}""".stripMargin
-
-    val compilation = solidity.compile(program)
-    assertResult(Seq.empty)(compilation.diagnostics)
-  }
-
   test("interface, function call, comment, various expressions") {
 
     val program = """pragma solidity ^0.4.0;
