@@ -38,7 +38,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
     val _while = WhileLoopDelta.create(forLoop.condition, BlockDelta.neww(whileBody))
 
     val newStatements = Seq[Node](forLoop.initializer, _while)
-    val block = BlockDelta.Shape.create(BlockDelta.Statements -> newStatements)
+    val block = BlockDelta.neww(newStatements)
     forLoopPath.asInstanceOf[NodeSequenceElement].replaceWith(block)
   }
 

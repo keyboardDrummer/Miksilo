@@ -118,7 +118,23 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   override def get(key: NodeField): Option[Any] = data.get(key)
 
   def range: Option[SourceRange] =
-    if (sources.values.isEmpty) None
+    if (sources.values.isEmpty)  {
+      val nodes: Iterable[Node] = data.values.flatMap(v => v match {
+        case n: Node => Seq[Node](n)
+        case s: Seq[_] => s.flatMap(e => e match {
+          case en: Node => Seq[Node](en)
+          case _ => Seq.empty[Node]
+        })
+        case _ => Seq.empty[Node]
+      })
+      val ranges = nodes.flatMap(n => n.range.toSeq)
+      if (ranges.isEmpty)
+        return None
+      val min = ranges.map(r => r.start).min(PositionOrdering)
+      val max = ranges.map(r => r.end).max(PositionOrdering)
+
+      Some(SourceRange(min, max))
+    }
     else Some(SourceRange(sources.values.map(p => p.start).min(PositionOrdering), sources.values.map(p => p.end).max))
 
   override def getValue(key: NodeField): Any = get(key).get

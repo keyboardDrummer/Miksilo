@@ -1,7 +1,6 @@
 package deltas.solidity
 
 import core.language.node.FileRange
-import langserver.types.Position
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import util.TestLanguageBuilder
 
@@ -36,7 +35,10 @@ class SolidityBasicTest extends LanguageServerTest {
     val server = new MiksiloLanguageServer(SolidityLanguage.language)
     assertResult(Seq.empty)(getDiagnostics(server, program))
 
-    val nameDeclaration: Seq[FileRange] = gotoDefinition(server, program, new HumanPosition(8,10))
-    assert(nameDeclaration.head.range.contains(Position(3, 21)))
+    val nameDeclarations: Seq[FileRange] = gotoDefinition(server, program, new HumanPosition(8,10))
+    assert(nameDeclarations.head.range.contains(HumanPosition(4, 21)))
+
+    val newAgeDeclarations: Seq[FileRange] = gotoDefinition(server, program, new HumanPosition(16,16))
+    assert(newAgeDeclarations.head.range.contains(HumanPosition(15, 28)))
   }
 }

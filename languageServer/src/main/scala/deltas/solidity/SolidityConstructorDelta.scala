@@ -30,7 +30,7 @@ object SolidityConstructorDelta extends DeltaWithGrammar with DeltaWithPhase { /
     val parameterList = find(MethodDelta.Parameters)
 
     val modifiers = find(SolidityFunctionDelta.Modifiers)
-    val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
+    val blockGrammar: BiGrammar = find(BlockDelta.BlockGrammar)
     val body = blockGrammar.as(MethodDelta.Body)
     val grammar = "constructor" ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~~ body asNode ConstructorDelta.Shape
     find(JavaClassDelta.Members).addAlternative(grammar)

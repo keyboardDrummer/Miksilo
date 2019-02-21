@@ -56,7 +56,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
     import grammars._
     val visibilityModifier = find(AccessibilityFieldsDelta.VisibilityField)
     val parseParameters = find(MethodDelta.Parameters) as Parameters
-    val block = find(BlockDelta.BlockGramar).as(Body)
+    val block = find(BlockDelta.BlockGrammar).as(Body)
     val constructorGrammar = visibilityModifier ~~ identifier.as(ClassName) ~ parseParameters % block asNode Shape
     find(MethodDelta.Shape).addAlternative(constructorGrammar)
   }

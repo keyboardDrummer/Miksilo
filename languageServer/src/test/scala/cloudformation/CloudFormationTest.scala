@@ -40,7 +40,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
   test("Goto definition overloaded parameter second") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = gotoDefinition(server, program, new HumanPosition(425, 32))
-    assertResult(Seq(Location(itemUri, Range(new HumanPosition(8,6), new HumanPosition(8,11)))))(result)
+    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(8,6), new HumanPosition(8,11)))))(result)
   }
 
   test("Code completion parameter") {

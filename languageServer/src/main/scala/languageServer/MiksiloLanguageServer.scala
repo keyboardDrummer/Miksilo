@@ -63,7 +63,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     getSourceElementForNode(getCompilation.root, position).get
   }
 
-  def getSourceElementForNode(element: SourceElement, filePosition:FilePosition):Option[SourceElement]={
+  def getSourceElementForNode(element: SourceElement, filePosition: FilePosition): Option[SourceElement] = {
     if (element.isOutsideFile(filePosition.uri))
       return None
 

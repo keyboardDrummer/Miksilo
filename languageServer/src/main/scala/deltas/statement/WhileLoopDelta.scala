@@ -16,7 +16,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
 
     val statementGrammar = find(StatementDelta.Grammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val blockGrammar = find(BlockDelta.BlockGramar)
+    val blockGrammar = find(BlockDelta.BlockGrammar)
     val whileGrammar = "while" ~> expression.inParenthesis.as(Condition) %
         blockGrammar.as(Body) asLabelledNode Shape
     statementGrammar.addAlternative(whileGrammar)

@@ -125,7 +125,7 @@ class JavaStyleCommentsTest
     val java = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).buildLanguage
     val statementGrammar = java.grammars.find(StatementDelta.Grammar)
     statementGrammar.inner = new NodeGrammar("statement", ParentClass)
-    val blockGrammar = java.grammars.find(BlockDelta.BlockGramar)
+    val blockGrammar = java.grammars.find(BlockDelta.BlockGrammar)
     val language = LanguageFromDeltas(Seq.empty)
     language.grammars.root.inner = blockGrammar
     TriviaInsideNode.transformGrammars(language.grammars, language)
