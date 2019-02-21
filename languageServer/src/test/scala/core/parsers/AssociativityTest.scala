@@ -1,23 +1,22 @@
 package core.parsers
 
+import strings.CommonParserWriter
+import langserver.types.Position
 import org.scalatest.FunSuite
 import editorParsers.EditorParserWriter
-import strings.CommonParserWriter
-
-import scala.util.parsing.input.OffsetPosition
 
 trait CommonStringReaderParser extends CommonParserWriter with EditorParserWriter {
   type Input = StringReader
 
-  case class StringReader(array: ArrayCharSequence, offset: Int = 0) extends StringReaderLike {
+  case class StringReader(array: ArrayCharSequence, offset: Int, position: Position) extends StringReaderLike {
 
     def this(value: String) {
-      this(value.toCharArray)
+      this(value.toCharArray, 0, Position(0, 0))
     }
 
     val sequence: CharSequence = array
-    def drop(amount: Int): StringReader = StringReader(array, offset + amount)
-    lazy val position = OffsetPosition(sequence, offset)
+    def drop(amount: Int): StringReader = StringReader(array, offset + amount,
+      newPosition(position, array, offset, amount))
 
     override def atEnd: Boolean = offset == array.length
 

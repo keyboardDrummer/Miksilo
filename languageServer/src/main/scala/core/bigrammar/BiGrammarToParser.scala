@@ -4,9 +4,9 @@ import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
 import core.parsers.editorParsers.UnambiguousEditorParserWriter
 import core.parsers.strings.CommonParserWriter
+import langserver.types.Position
 
 import scala.collection.mutable
-import scala.util.parsing.input.OffsetPosition
 
 case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 
@@ -17,15 +17,16 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
   type Result = AnyWithMap
   type Input = Reader
 
-  class Reader(val array: ArrayCharSequence, val offset: Int, val state: State) extends StringReaderLike {
+  class Reader(val array: ArrayCharSequence, val offset: Int, val state: State, val position: Position) extends StringReaderLike {
+
+    def withState(newState: State): Reader = new Reader(array, offset, newState, position)
 
     def this(text: String) {
-      this(text.toCharArray, 0, Map.empty)
+      this(text.toCharArray, 0, Map.empty, Position(0, 0))
     }
 
-    lazy val position = OffsetPosition(array, offset)
-
-    override def drop(amount: Int) = new Reader(array, offset + amount, state)
+    override def drop(amount: Int) = new Reader(array, offset + amount, state,
+      newPosition(position, array, offset, amount))
 
     override def head = array.charAt(offset)
 

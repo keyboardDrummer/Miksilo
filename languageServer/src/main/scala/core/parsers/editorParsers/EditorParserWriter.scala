@@ -1,7 +1,7 @@
 package core.parsers.editorParsers
 
 import core.parsers.core.ParserWriter
-import util.cache.{Cache, InfiniteCache}
+
 import scala.language.higherKinds
 
 trait EditorParserWriter extends ParserWriter {
@@ -13,6 +13,7 @@ trait EditorParserWriter extends ParserWriter {
   trait EditorResult[+Result] extends ParseResultLike[Result] {
     def biggestFailure: OptionFailure[Result]
     def resultOption: Option[Result]
+    def updateRemainder(f: Input => Input): ParseResult[Result]
   }
 
   override def succeed[Result](result: Result): EditorParser[Result] = Succeed(result)

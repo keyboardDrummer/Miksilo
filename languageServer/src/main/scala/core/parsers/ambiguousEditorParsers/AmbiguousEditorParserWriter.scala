@@ -160,6 +160,8 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     }
 
     override def resultOption = successes.headOption.map(s => s.result).orElse(biggestFailure.partialResult)
+
+    override def updateRemainder(f: Input => Input) = ???
   }
 
 }

@@ -53,7 +53,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       val counter: Int = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
       val field = Trivia(counter)
       val newState = state + (TriviaCounter -> (counter + 1))
-      val newInput = new Reader(input.array, input.offset, newState)
+      val newInput = input.withState(newState)
       val innerResult = parseState.parse(inner, newInput)
       innerResult.map(triviasWithMap => {
         val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
@@ -105,10 +105,10 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       val state = input.state
       val initialCounter = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
       val newState = state + (TriviaCounter -> 0)
-      val newInput = new Reader(input.array, input.offset, newState)
+      val newInput = input.withState(newState)
       val innerParseResult = parseState.parse(inner, newInput)
       innerParseResult.updateRemainder(remainder =>
-        new Reader(remainder.array, remainder.offset, remainder.state + (TriviaCounter -> initialCounter)))
+        remainder.withState(remainder.state + (TriviaCounter -> initialCounter)))
     }
 
     override def getDefault(cache: DefaultCache) = inner.getDefault(cache)

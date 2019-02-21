@@ -1,5 +1,74 @@
 package core.parsers.strings
 
-trait IndentationSensitiveParserWriter {
+import core.parsers.editorParsers.DefaultCache
+import core.parsers.sequences.{SequenceInput, SequenceParserWriter}
+import langserver.types.Position
 
+import scala.util.matching.Regex
+
+trait StringParserWriter extends SequenceParserWriter {
+  type Elem = Char
+  type Input <: StringReaderLike
+
+  trait StringReaderLike extends SequenceInput[Input, Char] {
+    def position: Position
+    def offset: Int
+    def array: ArrayCharSequence
+    def drop(amount: Int): Input
+
+    def newPosition(previous: Position, array: ArrayCharSequence, previousOffset: Int, increase: Int): Position = {
+      var column = previous.character
+      var row = previous.line
+      for(index <- previousOffset.until(previousOffset + increase)) {
+        if (array.charAt(index) == '\n') {
+          row += 1
+          column = 0
+        } else {
+          column += 1
+        }
+      }
+      Position(row, column)
+    }
+  }
+
+  implicit def literalToExtensions(value: String): ParserExtensions[String] = Literal(value)
+  implicit def literal(value: String): Literal = Literal(value)
+  implicit def regex(value: Regex): RegexParser = RegexParser(value)
+
+  case class Literal(value: String) extends EditorParser[String] {
+    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[String] = {
+      var index = 0
+      val array = input.array
+      while(index < value.length) {
+        val arrayIndex = index + input.offset
+        if (array.length <= arrayIndex) {
+          return newFailure(Some(value), input, s"expected '$value' but end of source found")
+        } else if (array.charAt(arrayIndex) != value.charAt(index)) {
+          return newFailure(Some(value), input.drop(index), s"expected '$value' but found '${array.subSequence(input.offset, arrayIndex + 1)}'")
+        }
+        index += 1
+      }
+      newSuccess(value, input.drop(value.length))
+    }
+
+    override def getDefault(cache: DefaultCache): Option[String] = Some(value)
+  }
+
+  case class RegexParser(regex: Regex) extends EditorParser[String] {
+    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[String] = {
+      regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
+        case Some(matched) =>
+          newSuccess(
+            input.array.subSequence(input.offset, input.offset + matched.end).toString,
+            input.drop(matched.end))
+        case None =>
+          val nextCharacter =
+            if (input.array.length == input.offset) "end of source"
+            else input.array.charAt(input.offset)
+          newFailure(input, s"expected '$regex' but found '$nextCharacter'") // Partial regex matching toevoegen
+      }
+    }
+
+    override def getDefault(cache: DefaultCache): Option[String] = None
+  }
 }
