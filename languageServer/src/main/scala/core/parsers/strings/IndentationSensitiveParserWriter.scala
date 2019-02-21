@@ -3,18 +3,18 @@ package core.parsers.strings
 import core.parsers.editorParsers.DefaultCache
 
 trait IndentationSensitiveParserWriter extends StringParserWriter {
-  type Input <: ReaderLike
+  type Input <: IndentationReaderLike
 
-  trait ReaderLike extends StringReaderLike {
+  trait IndentationReaderLike extends StringReaderLike {
     def indentation: Int
 
     def withIndentation(value: Int): Input
   }
 
-  case class IndentationLess[Result](inner: EditorParser[Result]) extends EditorParser[Result] {
+  case class WithIndentation[Result](inner: EditorParser[Result]) extends EditorParser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
       val previous = input.indentation
-      val newInput = input.withIndentation(0)
+      val newInput = input.withIndentation(input.position.character)
       val result: ParseResult[Result] = inner.parseInternal(newInput, state)
       result.updateRemainder(remainder => {
         remainder.withIndentation(previous)
@@ -34,17 +34,19 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   }
 
   def aligned[Element, Sum](element: EditorParser[Element], zero: Sum, reduce: (Element, Sum) => Sum): Self[Sum] = {
-    val many = element.many(zero, reduce)
+    val many = equal(element).many(zero, reduce)
     choice(leftRight(SetIndentation(element), many, reduce), succeed(zero), leftIsAlwaysBigger = true)
   }
 
-  case class WithIndentation[Result](deltaPredicate: Int => Boolean, inner: EditorParser[Result]) extends EditorParser[Result] {
+  def equal[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
+  def greaterThan[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
+  case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, inner: EditorParser[Result]) extends EditorParser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
       val delta = input.position.character - input.indentation
-      if (deltaPredicate(delta)) {
+      if (input.atEnd || deltaPredicate(delta)) {
         state.parse(inner, input)
       } else {
-        newFailure(input, s"indentation ${input.position.character} must be ... ${input.indentation}")
+        newFailure(input, s"indentation ${input.position.character} of character ${input.head} must be $property ${input.indentation}")
       }
     }
 
