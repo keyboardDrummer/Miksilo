@@ -45,7 +45,7 @@ object ReorderMembersDelta extends Delta {
       val methods = javaClass.members.filter(member => member.shape == MethodDelta.Shape)
       val fields = javaClass.members.filter(member => member.shape != MethodDelta.Shape)
 
-      val orderedFields = fields.sortBy(f => !new HasAccessibility(f).isStatic)
+      val orderedFields = fields.sortBy(f => !new HasAccessibility[Node] { def node = f }.isStatic)
 
       javaClass.members = orderedFields ++ methods
     }

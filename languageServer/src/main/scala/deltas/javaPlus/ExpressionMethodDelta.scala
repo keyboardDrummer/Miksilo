@@ -7,13 +7,15 @@ import core.language.{Compilation, Language}
 import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.classes.skeleton.JavaClassDelta._
-import deltas.javac.methods.MethodDelta.{Name, _}
+import deltas.javac.methods.MethodDelta.{Parameters, ReturnType}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, ReturnExpressionDelta}
 import deltas.statement.BlockDelta
 
 object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
 
   override def dependencies: Set[Contract] = Set(ReturnExpressionDelta, MethodDelta, JavaClassDelta)
+
+  import deltas.HasNameDelta.Name
 
   object Shape extends NodeShape
   object Expression extends NodeField

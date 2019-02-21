@@ -29,6 +29,7 @@ class Proofs {
   }
 
   def resolveType(_type: Type): Type = _type match {
+    case TypeFromDeclaration(declaration) => TypeFromDeclaration(resolveDeclaration(declaration))
     case v: TypeVariable => mappedTypeVariables.get(v) match
     {
       case Some(value) => resolveType(value)

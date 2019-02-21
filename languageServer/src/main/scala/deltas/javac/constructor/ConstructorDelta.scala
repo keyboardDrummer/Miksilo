@@ -11,6 +11,7 @@ import deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
 import deltas.javac.methods.MethodDelta._
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.statement.BlockDelta
+import deltas.HasNameDelta.Name
 
 object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 
@@ -29,7 +30,7 @@ object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
         throw BadConstructorNameException(program, constructor.node)
 
       constructor.shape = MethodDelta.Shape
-      constructor(MethodDelta.Name) = constructorName
+      constructor(Name) = constructorName
       constructor(MethodDelta.ReturnType) = VoidTypeDelta.voidType
       constructor(MethodDelta.TypeParameters) = Seq.empty
       constructor(AccessibilityFieldsDelta.Static) = false

@@ -7,7 +7,11 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
-trait ExpressionInstance extends Delta with HasShape {
+trait IsExpression {
+  def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit
+}
+
+trait ExpressionInstance extends Delta with HasShape with IsExpression  {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
@@ -15,12 +19,4 @@ trait ExpressionInstance extends Delta with HasShape {
   }
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
-
-  def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit
-
-  def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {
-    val result = builder.typeVariable(Some(expression))
-    constraints(compilation, builder, expression, result, parentScope)
-    result
-  }
 }

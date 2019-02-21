@@ -5,10 +5,10 @@ import core.language.{Compilation, Language}
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{ConcreteType, Type, TypeApplication}
 import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
-import deltas.bytecode.types.ArrayTypeDelta
+import deltas.solidity.MappingTypeDelta
 
-object ArrayAccessDelta extends Delta {
-  override def description = "Enables accessing array members"
+object MappingAccessDelta extends Delta {
+  override def description = "Enables accessing mapping members"
 
   override def inject(language: Language): Unit = {
     BracketAccessDelta.extraConstraints.get(language).insert(0, new HasExtraBracketConstraints {
@@ -18,9 +18,9 @@ object ArrayAccessDelta extends Delta {
           override def apply(solver: ConstraintSolver) = {
             val resolvedType = solver.proofs.resolveType(targetType)
             resolvedType match {
-              case TypeApplication(ArrayTypeDelta.arrayTypeConstructor, Seq(elementType),_) =>
-                // TODO builder.typesAreEqual(indexType, IntTypeDelta.constraintType)
-                builder.typesAreEqual(elementType, resultType)
+              case TypeApplication(MappingTypeDelta.mappingTypeConstructor, Seq(keyType, valueType),_) =>
+                builder.typesAreEqual(indexType, keyType)
+                builder.typesAreEqual(valueType, resultType)
                 true
               case _: ConcreteType =>
                 true
@@ -29,11 +29,10 @@ object ArrayAccessDelta extends Delta {
             }
           }
         })
-
       }
     })
     super.inject(language)
   }
 
-  override def dependencies = Set(ArrayTypeDelta, /* TODO IntTypeDelta, */ BracketAccessDelta)
+  override def dependencies = Set(MappingTypeDelta, BracketAccessDelta)
 }

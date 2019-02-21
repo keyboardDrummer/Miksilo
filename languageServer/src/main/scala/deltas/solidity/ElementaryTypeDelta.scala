@@ -4,17 +4,20 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.{Keyword, RegexGrammar}
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeField, NodeLike, NodeShape}
+import core.language.node.{Node, NodeLike, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.{PrimitiveType, Type}
+import core.smarts.types.objects.{PrimitiveType, Type, TypeFromDeclaration}
+import deltas.HasNameDelta
+import deltas.HasNameDelta.HasName
 import deltas.bytecode.types.{TypeInstance, TypeSkeleton}
 import deltas.javac.types.BooleanTypeDelta
 
 object ElementaryTypeDelta extends DeltaWithGrammar with TypeInstance {
+  def neww(value: String): Node = Shape.create(HasNameDelta.Name -> value)
+
   object Shape extends NodeShape
-  object Name extends NodeField
 
   override def description= "Add elementary types"
 
@@ -43,18 +46,23 @@ object ElementaryTypeDelta extends DeltaWithGrammar with TypeInstance {
 
   override def getJavaGrammar(grammars: LanguageGrammars) = {
     import grammars._
-    val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
-
-
     find(BooleanTypeDelta.Shape).find(p => p.value.isInstanceOf[Keyword]).get.value.asInstanceOf[Keyword].value = "bool"
 
-    val elementaryTypeName = elementaryTypeNames.map(name => Keyword(name, reserved = false).as(Name).asInstanceOf[BiGrammar]).
+    val elementaryTypeName = elementaryTypeNames.map(name => Keyword(name, reserved = false).as(HasNameDelta.Name).asInstanceOf[BiGrammar]).
         reduce((a,b) => a | b) | fixed | unsignedFixed asLabelledNode Shape
     elementaryTypeName
   }
 
-  val elementaryType = PrimitiveType("elementaryType")
+  implicit class ElementType[T <: NodeLike](val node: T) extends HasName[T] {
+
+  }
+
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
-    PrimitiveType(name)
+    val elementaryType: ElementType[NodeLike] = path
+    if (elementaryType.name == "address") {
+      TypeFromDeclaration(builder.resolveToType(elementaryType.name, null, parentScope, TypeSkeleton.typeKind))
+    } else {
+      PrimitiveType(elementaryType.name)
+    }
   }
 }

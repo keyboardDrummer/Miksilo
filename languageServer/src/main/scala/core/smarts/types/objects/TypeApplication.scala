@@ -1,6 +1,7 @@
 package core.smarts.types.objects
 
 case class TypeApplication(override val function: Type, var arguments: Seq[Type], origin: AnyRef) extends ConcreteType {
+
   override def variables: Set[TypeVariable] = arguments.flatMap(t => t.variables).toSet
 
   override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = TypeApplication(function, arguments.map(a => a.specialize(mapping)), origin)

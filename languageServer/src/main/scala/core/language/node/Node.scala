@@ -81,7 +81,9 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
         val className = shape.toString
         if (data.isEmpty)
           return className
-        return s"$className: ${data.map(kv => (kv._1.debugRepresentation, kv._2))}"
+        return s"$className: ${data.
+          filter(kv => !kv._1.isInstanceOf[TypedNodeField[_]]).
+          map(kv => (kv._1.debugRepresentation, kv._2))}"
       }
       "recursive"
     }

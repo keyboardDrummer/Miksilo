@@ -3,9 +3,10 @@ package deltas.javac.classes
 import core.deltas.Contract
 import core.language.node.Node
 import core.language.{Compilation, Language}
+import deltas.HasNameDelta.Name
 import deltas.bytecode.ByteCodeFieldInfo
 import deltas.bytecode.extraConstants.TypeConstant
-import deltas.javac.classes.FieldDeclarationDelta.{Field, Name, Type}
+import deltas.javac.classes.FieldDeclarationDelta.{Field, Type}
 import deltas.javac.classes.skeleton.JavaClassDelta
 
 object FieldToByteCode {

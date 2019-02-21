@@ -36,16 +36,16 @@ object ExpressionDelta extends DeltaWithGrammar {
   }
 
   def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {
-    val result = getInstance(compilation)(expression).getType(compilation, builder, expression, parentScope)
-    constraintType(expression) = result
+    val result = builder.typeVariable(Some(expression))
+    constraints(compilation, builder, expression, result, parentScope)
     result
   }
 
-  def getInstance(language: Language): NodeLike => ExpressionInstance = {
+  def getInstance(language: Language): NodeLike => IsExpression = {
     expression => expressionInstances(language, expression.shape)
   }
 
-  val expressionInstances = new ShapeProperty[ExpressionInstance]
+  val expressionInstances = new ShapeProperty[IsExpression]
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     val core = grammars.create(LastPrecedenceGrammar)

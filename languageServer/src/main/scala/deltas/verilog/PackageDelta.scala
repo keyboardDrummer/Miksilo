@@ -13,8 +13,9 @@ import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object PackageDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
+  import deltas.HasNameDelta.Name
+
   object Shape extends NodeShape
-  object Name extends NodeField
   object Members extends NodeField
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
@@ -22,7 +23,7 @@ object PackageDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val fileMember = find(VerilogFileDelta.Members)
 
     val packageMember = create(Members)
-    val _package = "package" ~~ identifier.as(Name) ~ ";" %
+    val _package = "package" ~~ find(Name) ~ ";" %
       packageMember.manySeparatedVertical(BlankLine).as(Members) %
       "endpackage" ~~ (":" ~~ identifier).option
     fileMember.addAlternative(_package asNode Shape)

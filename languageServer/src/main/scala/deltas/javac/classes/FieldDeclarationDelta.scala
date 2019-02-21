@@ -8,6 +8,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
+import deltas.HasNameDelta.HasName
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.classes.skeleton._
@@ -18,14 +19,14 @@ object FieldDeclarationDelta extends DeltaWithGrammar
   with HasDeclarationDelta
   with HasConstraintsDelta {
 
+  import deltas.HasNameDelta.Name
+
   override def description: String = "Enables adding a field declaration without an initializer to a Java class."
 
   object Shape extends NodeShape
   object Type extends NodeField
-  object Name extends NodeField
 
-  implicit class Field[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
-    def name: String = node.getValue(Name).asInstanceOf[String]
+  implicit class Field[T <: NodeLike](val node: T) extends HasAccessibility[T] with HasName[T] {
     def _type: T = node(Type).asInstanceOf[T]
   }
 
@@ -48,7 +49,7 @@ object FieldDeclarationDelta extends DeltaWithGrammar
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
 
     val fieldGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~ find(AccessibilityFieldsDelta.Static) ~
-      typeGrammar.as(Type) ~~ identifier.as(Name) ~< ";" asNode Shape
+      typeGrammar.as(Type) ~~ find(Name) ~< ";" asNode Shape
     create(Shape, fieldGrammar)
   }
 

@@ -9,25 +9,25 @@ import core.smarts.objects.Reference
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import core.smarts.{ConstraintBuilder, ResolvesTo}
+import deltas.HasNameDelta
 import deltas.javac.methods.call.ReferenceExpressionDelta
 import deltas.javac.methods.{MethodDelta, VariableInfo}
 
 object VariableDelta extends DeltaWithGrammar with ExpressionInstance with ReferenceExpressionDelta {
 
-  implicit class Variable[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def name: String = node.getValue(Name).asInstanceOf[String]
+  import HasNameDelta._
+
+  implicit class Variable[T <: NodeLike](val node: T) extends HasName[T] {
   }
 
   def neww(name: String) = new Node(Shape, Name -> name)
-
-  object Name extends NodeField
 
   object Shape extends NodeShape
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val core = find(ExpressionDelta.LastPrecedenceGrammar)
-    val variableGrammar = create(Shape, identifier.as(Name) asNode Shape)
+    val variableGrammar = create(Shape, find(Name) asNode Shape)
     core.addAlternative(variableGrammar)
   }
 

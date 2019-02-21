@@ -1,9 +1,10 @@
 package deltas.solidity
 
-import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
+import core.deltas._
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
-import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
+import deltas.HasNameDelta
+import deltas.bytecode.types._
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.bitwise._
@@ -13,6 +14,7 @@ import deltas.expression.prefix._
 import deltas.expression.relational._
 import deltas.javac.CallVariableDelta
 import deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta}
+import deltas.javac.constructor.DefaultConstructorDelta
 import deltas.javac.expressions.literals.BooleanLiteralDelta
 import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
@@ -57,7 +59,8 @@ object SolidityLanguage {
     AssignToMemberDelta, SelectFieldDelta, MemberSelectorDelta,
     AssignToArrayMember,
     AssignToVariable, VariableDelta, SimpleAssignmentDelta, AssignmentPrecedence,
-    ArrayAccessDelta, ArrayLiteralDelta, IntLiteralDelta, BooleanLiteralDelta,
+    ArrayAccessDelta,
+    BracketAccessDelta, ArrayLiteralDelta, IntLiteralDelta, BooleanLiteralDelta,
     ParenthesisInExpressionDelta, DefaultExpressionDelta, ExpressionDelta,
     BooleanTypeDelta,
     FixedSizeArrayTypeDelta, ArrayTypeDelta, TypeSkeleton,
@@ -66,17 +69,19 @@ object SolidityLanguage {
     SolveConstraintsDelta)
 
   val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar,
+    MappingAccessDelta,
     SolidityLibraryDelta,
     AfterOrDeleteExpressionDelta,
     SolidityFunctionTypeDelta,
     MappingTypeDelta,
+    SolidityIntLiteralDelta,
     InlineAssemblyStatementDelta,
     LocalDeclarationStorageLocationDelta,
     NumberLiteralUnitsDelta,
     EmitStatementDelta,
     UsingForForElementaryTypesDelta, UsingForDeclarationDelta,
     EventDelta, CustomModifierDelta, EnumDelta, StructDelta,
-    SolidityConstructorDelta, SolidityFunctionDelta, StateVariableDeclarationDelta) ++
+    DefaultConstructorDelta, SolidityConstructorDelta, SolidityFunctionDelta, StateVariableDeclarationDelta) ++
     Seq(SolidityContractDelta, PragmaDelta) ++
     Seq(MultipleImportsDelta, SingleImportDelta, FileImportDelta) ++
     Seq(FileWithMembersDelta) ++
@@ -84,8 +89,5 @@ object SolidityLanguage {
 
   val deltas = soliditySpecificDeltas ++ genericDeltas
 
-  val language: Language = LanguageFromDeltas(deltas, addMissingDeltas = false)
+  val language: Language = LanguageFromDeltas(deltas)
 }
-
-
-

@@ -32,7 +32,7 @@ object NewDelta extends DeltaWithGrammar with ExpressionInstance {
 
     val objectGrammar = find(UnqualifiedObjectTypeDelta.AnyObjectTypeGrammar)
     val callArgumentsGrammar = find(CallDelta.CallArgumentsGrammar)
-    val newGrammar = "new" ~~> objectGrammar.as(Type) ~ callArgumentsGrammar.as(CallDelta.Arguments) asNode Shape
+      val newGrammar = "new" ~~> find(TypeSkeleton.JavaTypeGrammar).as(Type) ~ callArgumentsGrammar.as(CallDelta.Arguments) asNode Shape
     val expressionGrammar = find(ExpressionDelta.LastPrecedenceGrammar)
     expressionGrammar.addAlternative(newGrammar)
   }

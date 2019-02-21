@@ -1,25 +1,28 @@
 package deltas.statement
 
-import core.deltas.DeltaWithGrammar
+import core.deltas.{DeltaWithGrammar, ShapeProperty}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
+import core.language.node.{GrammarKey, Node, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelDelta
-import deltas.javac.methods.MethodDelta
 
 object LabelStatementDelta extends StatementInstance with DeltaWithGrammar {
-  def getUniqueLabel(suggestion: String, path: NodePath) = {
-    val method = path.findAncestorShape(MethodDelta.Shape) // TODO use scope graph to find nearest scope
-    LabelDelta.getUniqueLabel("whileStart", method)
+
+  import deltas.HasNameDelta._
+
+  def getUniqueLabel(compilation: Compilation, suggestion: String, path: NodePath) = {
+    val container = path.ancestors.find(p => isLabelScope.get(compilation, p.shape).nonEmpty).get
+    LabelDelta.getUniqueLabel("whileStart", container)
   }
+
+  val isLabelScope = new ShapeProperty[Unit]()
 
   override val shape = Shape
 
   object Shape extends NodeShape
-  object Name extends NodeField
 
   def neww(name: String) = new Node(Shape, Name -> name)
 
@@ -30,7 +33,7 @@ object LabelStatementDelta extends StatementInstance with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
-    statementGrammar.addAlternative(create(JavaLabelGrammar, "label" ~~> identifier.as(Name) ~< ";" asNode Shape))
+    statementGrammar.addAlternative(create(JavaLabelGrammar, "label" ~~> find(Name) ~< ";" asNode Shape))
   }
 
   override def description: String = "Adds a label statement"

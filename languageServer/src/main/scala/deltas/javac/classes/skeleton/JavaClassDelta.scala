@@ -13,7 +13,7 @@ import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.TypeFromDeclaration
 import deltas.ConstraintSkeleton
-import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
+import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
 import deltas.javac.JavaLang
 import deltas.javac.classes.{ClassCompiler, FieldDeclarationDelta}
 import deltas.javac.methods.MethodDelta
@@ -24,19 +24,18 @@ import scala.collection.mutable
 object JavaClassDelta extends DeltaWithGrammar with Delta
   with HasDeclarationDelta with HasConstraintsDelta {
 
+  import deltas.HasNameDelta._
+
   override def shape: NodeShape = Shape
 
   override def description: String = "Defines a skeleton for the Java class."
 
-  implicit class JavaClass[T <: NodeLike](val node: T) extends AnyVal {
+  implicit class JavaClass[T <: NodeLike](val node: T) extends HasName[T] {
     def _package: Seq[String] = node(ClassPackage).asInstanceOf[Seq[String]]
     def _package_=(value: Seq[String]): Unit = node(ClassPackage) = value
 
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
     def imports_=(value: Seq[T]): Unit = node(ClassImports) = value
-
-    def name: String = node.getValue(Name).asInstanceOf[String]
-    def name_=(value: String): Unit = node(Name) = value
 
     def members = node(Members).asInstanceOf[Seq[T]]
     def members_=(value: Seq[T]): Unit = node(Members) = value
@@ -73,7 +72,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
     val importsGrammar: BiGrammar = importGrammar.manyVertical as ClassImports
     val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
-    val nameGrammar: BiGrammar = "class" ~~> identifier.as(Name)
+    val nameGrammar: BiGrammar = "class" ~~> find(Name)
     val membersGrammar = "{".%((classMember.manySeparatedVertical(BlankLine) as Members).indent(BlockDelta.indentAmount)) % "}"
     val nameAndParent: BiGrammar = nameGrammar ~~ classParentGrammar.as(ClassParent)
     val classGrammar = packageGrammar % importsGrammar % nameAndParent % membersGrammar asLabelledNode Shape
@@ -110,8 +109,6 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
   object ClassParent extends NodeField
 
   object Members extends NodeField
-
-  object Name extends NodeField
 
   override def inject(language: Language): Unit = {
 
@@ -162,7 +159,10 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
     //TODO here there should be an instance, a static, and a lexical scope.
     val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getSourceElement(Name))
-    builder.add(DeclarationHasType(clazzDeclaration, TypeFromDeclaration(clazzDeclaration)))
+    val clazzType = TypeFromDeclaration(clazzDeclaration)
+    builder.add(DeclarationHasType(clazzDeclaration, clazzType))
+    builder.assignSubType(TypeSkeleton.typeKind, clazzType)
+
     val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
     staticDeclaration(path) = clazzDeclaration
 

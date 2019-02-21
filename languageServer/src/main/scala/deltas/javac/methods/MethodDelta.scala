@@ -18,7 +18,7 @@ import deltas.javac.classes.{ClassCompiler, MethodInfo}
 import deltas.javac.methods.AccessibilityFieldsDelta.{HasAccessibility, PrivateVisibility}
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.types.{MethodTypeDelta, TypeAbstraction}
-import deltas.statement.BlockDelta
+import deltas.statement.{BlockDelta, LabelStatementDelta}
 import deltas.statement.BlockDelta.BlockStatement
 
 
@@ -26,10 +26,11 @@ import deltas.statement.BlockDelta.BlockStatement
 object MethodDelta extends DeltaWithGrammar
   with HasDeclarationDelta with HasConstraintsDelta with HasShape {
 
+  import deltas.HasNameDelta._
+
   override def description: String = "Enables Java classes to contain methods."
 
-  implicit class Method[T <: NodeLike](node: T) extends HasAccessibility[T](node) {
-    def name: String = node.getValue(Name).asInstanceOf[String]
+  implicit class Method[T <: NodeLike](val node: T) extends HasAccessibility[T] with HasName[T] {
 
     def returnType: T = node(ReturnType).asInstanceOf[T]
     def returnType_=(value: T): Unit = node(ReturnType) = value
@@ -99,7 +100,7 @@ object MethodDelta extends DeltaWithGrammar
 
     val methodUnmapped: BiGrammar = find(AccessibilityFieldsDelta.VisibilityField) ~
       find(AccessibilityFieldsDelta.Static) ~ typeParametersGrammar.as(TypeParameters) ~
-      parseReturnType.as(ReturnType) ~~ identifier.as(Name) ~ parseParameters.as(Parameters) % block.as(Body)
+      parseReturnType.as(ReturnType) ~~ find(Name) ~ parseParameters.as(Parameters) % block.as(Body)
     create(Shape, methodUnmapped.asNode(Shape))
   }
 
@@ -124,8 +125,6 @@ object MethodDelta extends DeltaWithGrammar
   object Body extends NodeField
 
   object ReturnType extends NodeField
-
-  object Name extends NodeField
 
   object Parameters extends NodeField
 
@@ -155,4 +154,9 @@ object MethodDelta extends DeltaWithGrammar
   }
 
   override def shape: NodeShape = Shape
+
+  override def inject(language: Language): Unit = {
+    LabelStatementDelta.isLabelScope.add(language, Shape, Unit)
+    super.inject(language)
+  }
 }

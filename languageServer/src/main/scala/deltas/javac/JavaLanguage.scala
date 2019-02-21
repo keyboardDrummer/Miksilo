@@ -3,6 +3,7 @@ package deltas.javac
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
+import deltas.HasNameDelta
 import deltas.bytecode.types._
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
@@ -12,10 +13,10 @@ import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassDelta}
 import deltas.javac.constructor._
 import deltas.javac.expressions.equality.AddEqualityPrecedence
-import deltas.javac.expressions.literals.{BooleanLiteralDelta, LongLiteralDelta, NullDelta}
+import deltas.javac.expressions.literals._
 import deltas.javac.methods._
 import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
-import deltas.javac.statements._
+import deltas.javac.statements.{ExpressionAsStatementDelta, ForLoopContinueDelta, IfThenElseToIfThenAndGotoDelta, WhileBreakDelta}
 import deltas.javac.types._
 import deltas.statement._
 import deltas.statement.assignment.{AddAssignmentDelta, AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
@@ -73,5 +74,5 @@ object JavaLanguage {
     SuperTypeArgument, TypeApplicationDelta, MethodTypeDelta) ++
     Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta,
       FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
-      ShortTypeDelta, TypeSkeleton)
+      ShortTypeDelta, TypeSkeleton) ++ Seq(HasNameDelta)
 }

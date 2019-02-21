@@ -9,15 +9,14 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
+import deltas.HasNameDelta.Name
 import deltas.bytecode.types.TypeSkeleton
-import deltas.expression.VariableDelta
-import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.javac.methods.MethodDelta.{Method, Name}
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.javac.methods.MethodDelta.{Method, Shape}
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, MethodParameters}
-import deltas.solidity.SolidityFunctionTypeDelta.ParameterShape
-import deltas.statement.BlockDelta
+import deltas.statement.{BlockDelta, LabelStatementDelta}
 
 object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -32,17 +31,17 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val storageLocation: BiGrammar = find(StorageLocationDelta.StorageLocation)
     val parameter = typeGrammar.as(MethodParameters.Type) ~
       storageLocation ~~
-      identifier.as(MethodParameters.Name) asNode MethodParameters.Shape
+      find(Name) asNode MethodParameters.Shape
     val parameterList = create(MethodDelta.Parameters, parameter.toParameterList)
 
     val returnParameter = typeGrammar.as(MethodParameters.Type) ~
       storageLocation ~
-      identifier.spacedOption.as(MethodParameters.Name) asNode MethodParameters.Shape
+      identifier.spacedOption.as(Name) asNode MethodParameters.Shape
     val returnParameterList = returnParameter.toParameterList
 
-    val name = (identifier | value("<default>")).as(MethodDelta.Name)
+    val name = (identifier | value("<default>")).as(Name)
 
-    val modifierInvocation = identifier.as(VariableDelta.Name) ~
+    val modifierInvocation = find(Name) ~
       (find(CallDelta.CallArgumentsGrammar) | value(Seq.empty)).as(CallDelta.Arguments) asNode CallDelta.Shape
 
     val stateMutability = find(StateMutabilityDelta.Grammar)
@@ -51,7 +50,12 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
     val body = (";" ~> value(BlockDelta.neww(Seq.empty)) | blockGrammar).as(MethodDelta.Body)
     val grammar = "function" ~~ name ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~ returnValues ~~ body asLabelledNode MethodDelta.Shape
-    find(SolidityContractDelta.Members).addAlternative(grammar)
+    find(JavaClassDelta.Members).addAlternative(grammar)
+  }
+
+  override def inject(language: Language): Unit = {
+    LabelStatementDelta.isLabelScope.add(language, Shape, Unit)
+    super.inject(language)
   }
 
   override def description = "Adds solidity functions"
@@ -65,7 +69,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
     val parameterTypes = method.parameters.map(p => p(MethodParameters.Type).asInstanceOf[NodePath])
     val returnParameters: Seq[MethodParameter[NodePath]] = NodeWrapper.wrapList(method(ReturnValues).asInstanceOf[Seq[NodePath]])
-    val returnTypes: Seq[Node] = returnParameters.map(returnParameter => ParameterShape.create(MethodParameters.Type -> returnParameter._type))
+    val returnTypes: Seq[Node] = returnParameters.map(returnParameter => returnParameter._type)
     val methodType = SolidityFunctionTypeDelta.createType(compilation, builder, parentScope, parameterTypes, returnTypes)
 
     builder.declare(method.name, parentScope, path.getSourceElement(Name), Some(methodType))
@@ -73,6 +77,15 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val bodyScope = builder.newScope(Some(parentScope))
     method.parameters.foreach(parameter => {
       MethodParameters.declare(compilation, builder, parameter, parentScope, bodyScope)
+    })
+
+    val returnValues = NodeWrapper.wrapList[MethodParameter[NodePath], NodePath](method(ReturnValues).asInstanceOf[Seq[NodePath]])
+    returnValues.foreach(parameter => {
+      val maybeName = parameter.getValue(Name).asInstanceOf[Option[String]]
+      maybeName.foreach(name => {
+        val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
+        builder.declare(name, bodyScope, parameter.getSourceElement(Name), Some(parameterType))
+      })
     })
     ConstraintSkeleton.constraints(compilation, builder, method.body, bodyScope)
   }
