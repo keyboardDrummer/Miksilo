@@ -7,7 +7,8 @@ trait SequenceParserWriter extends EditorParserWriter {
   type Input <: SequenceInput[Input, Elem]
 
   def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
-
+  def oneOf(values: Set[Elem]) = ElemPredicate(c => values.contains(c),
+    s"one of '${values.map(e => e.toString).reduce((a,b) => a + ", " + b)}'")
   case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends EditorParser[Elem] {
     override def parseInternal(input: Input, cache: ParseStateLike): ParseResult[Elem] = {
       if (input.atEnd) {

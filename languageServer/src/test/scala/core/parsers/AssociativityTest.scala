@@ -8,32 +8,14 @@ import editorParsers.EditorParserWriter
 trait CommonStringReaderParser extends CommonParserWriter with EditorParserWriter {
   type Input = StringReader
 
-  case class StringReader(array: ArrayCharSequence, offset: Int, position: Position) extends StringReaderLike {
+  class StringReader(array: ArrayCharSequence, offset: Int, position: Position) extends StringReaderBase(array, offset, position) {
 
     def this(value: String) {
       this(value.toCharArray, 0, Position(0, 0))
     }
 
-    val sequence: CharSequence = array
-    def drop(amount: Int): StringReader = StringReader(array, offset + amount,
+    def drop(amount: Int): StringReader = new StringReader(array, offset + amount,
       newPosition(position, array, offset, amount))
-
-    override def atEnd: Boolean = offset == array.length
-
-    override def head: Char = array.charAt(offset)
-
-    override def tail: StringReader = drop(1)
-
-    override def hashCode(): Int = offset
-
-    override def equals(obj: Any): Boolean = obj match {
-      case other: StringReader => offset == other.offset
-      case _ => false
-    }
-
-    override def toString: String = {
-      array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
-    }
   }
 }
 

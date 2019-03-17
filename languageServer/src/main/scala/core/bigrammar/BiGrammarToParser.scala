@@ -17,33 +17,17 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
   type Result = AnyWithMap
   type Input = Reader
 
-  class Reader(val array: ArrayCharSequence, val offset: Int, val state: State, val position: Position) extends StringReaderLike {
+  class Reader(array: ArrayCharSequence, offset: Int, position: Position, val state: State)
+    extends StringReaderBase(array, offset, position) {
 
-    def withState(newState: State): Reader = new Reader(array, offset, newState, position)
+    def withState(newState: State): Reader = new Reader(array, offset, position, newState)
 
     def this(text: String) {
-      this(text.toCharArray, 0, Map.empty, Position(0, 0))
+      this(text.toCharArray, 0, Position(0, 0), Map.empty)
     }
 
-    override def drop(amount: Int) = new Reader(array, offset + amount, state,
-      newPosition(position, array, offset, amount))
-
-    override def head = array.charAt(offset)
-
-    override def tail = drop(1)
-
-    override def atEnd = offset == array.length
-
-    override def hashCode(): Int = offset
-
-    override def equals(obj: Any): Boolean = obj match {
-      case other: Reader => offset == other.offset
-      case _ => false
-    }
-
-    override def toString: String = {
-      array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
-    }
+    override def drop(amount: Int) = new Reader(array, offset + amount,
+      newPosition(position, array, offset, amount), state)
   }
 
   def valueToResult(value: Any): Result = WithMap(value, Map.empty)

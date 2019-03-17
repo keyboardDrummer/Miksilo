@@ -10,6 +10,28 @@ trait StringParserWriter extends SequenceParserWriter {
   type Elem = Char
   type Input <: StringReaderLike
 
+  abstract class StringReaderBase(val array: ArrayCharSequence, val offset: Int, val position: Position) extends StringReaderLike {
+
+    val sequence: CharSequence = array
+
+    override def atEnd: Boolean = offset == array.length
+
+    override def head: Char = array.charAt(offset)
+
+    override def tail: Input = drop(1)
+
+    override def hashCode(): Int = offset
+
+    override def equals(obj: Any): Boolean = obj match {
+      case other: StringReaderBase => offset == other.offset
+      case _ => false
+    }
+
+    override def toString: String = {
+      array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
+    }
+  }
+
   trait StringReaderLike extends SequenceInput[Input, Char] {
     def position: Position
     def offset: Int

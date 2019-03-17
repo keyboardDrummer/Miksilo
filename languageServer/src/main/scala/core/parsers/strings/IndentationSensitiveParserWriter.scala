@@ -1,9 +1,35 @@
 package core.parsers.strings
 
 import core.parsers.editorParsers.DefaultCache
+import langserver.types.Position
+
+trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter {
+  type Input = IndentationReader
+
+  class IndentationReader(array: ArrayCharSequence, offset: Int, position: Position, val indentation: Int)
+    extends StringReaderBase(array, offset, position) with IndentationReaderLike {
+
+    def this(value: String) {
+      this(value.toCharArray, 0, Position(0, 0), 0)
+    }
+
+    def drop(amount: Int): IndentationReader = new IndentationReader(array, offset + amount,
+      newPosition(position, array, offset, amount), indentation)
+
+    override def hashCode(): Int = offset ^ indentation
+
+    override def equals(obj: Any): Boolean = obj match {
+      case other: IndentationReader => offset == other.offset && indentation == other.indentation
+      case _ => false
+    }
+
+    override def withIndentation(value: Int) = new IndentationReader(array, offset, position, value)
+  }
+}
 
 trait IndentationSensitiveParserWriter extends StringParserWriter {
   type Input <: IndentationReaderLike
+
 
   trait IndentationReaderLike extends StringReaderLike {
     def indentation: Int
@@ -24,18 +50,22 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     override def getDefault(cache: DefaultCache): Option[Result] = inner.getDefault(cache)
   }
 
-  case class SetIndentation[Result](inner: EditorParser[Result]) extends EditorParser[Result] {
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
-      val newInput = input.withIndentation(input.position.character)
-      inner.parseInternal(newInput, state)
-    }
+//  case class SetIndentation[Result](inner: EditorParser[Result]) extends EditorParser[Result] {
+//    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
+//      val newInput = input.withIndentation(input.position.character)
+//      inner.parseInternal(newInput, state)
+//    }
+//
+//    override def getDefault(cache: DefaultCache): Option[Result] = inner.getDefault(cache)
+//  }
 
-    override def getDefault(cache: DefaultCache): Option[Result] = inner.getDefault(cache)
+  def alignedList[Element](element: EditorParser[Element]): Self[List[Element]] = {
+    aligned(element, List.empty, (a: Element, b: List[Element]) => a :: b)
   }
 
   def aligned[Element, Sum](element: EditorParser[Element], zero: Sum, reduce: (Element, Sum) => Sum): Self[Sum] = {
     val many = equal(element).many(zero, reduce)
-    choice(leftRight(SetIndentation(element), many, reduce), succeed(zero), leftIsAlwaysBigger = true)
+    WithIndentation(leftRight(element, many, reduce))
   }
 
   def equal[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
