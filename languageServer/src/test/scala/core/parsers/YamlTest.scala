@@ -9,6 +9,38 @@ import langserver.types.Position
 import org.scalatest.FunSuite
 import util.SourceUtils
 
+trait YamlExpression {
+  def toDocument: ResponsiveDocument
+
+  override def toString: String = toDocument.renderString()
+}
+
+case class Object(members: Map[YamlExpression, YamlExpression]) extends YamlExpression {
+
+  override def toDocument: ResponsiveDocument = {
+    members.
+      map(member => member._1.toDocument ~ ":" ~~ member._2.toDocument).
+      reduce((t,b) => t % b)
+  }
+}
+
+case class Array(elements: Seq[YamlExpression]) extends YamlExpression {
+  override def toDocument: ResponsiveDocument = {
+    elements.
+      map(member => ResponsiveDocument.text("- ") ~~ member.toDocument).
+      fold[ResponsiveDocument](Empty)((t: ResponsiveDocument, b: ResponsiveDocument) => t % b)
+  }
+
+}
+
+case class Number(value: Int) extends YamlExpression {
+  override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
+}
+
+case class StringLiteral(value: String) extends YamlExpression {
+  override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
+}
+
 class YamlTest extends FunSuite
   with UnambiguousEditorParserWriter
   with IndentationSensitiveParserWriter with CommonParserWriter {
@@ -70,77 +102,26 @@ class YamlTest extends FunSuite
     override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
   }
 
-  trait YamlExpression {
-    def toDocument: ResponsiveDocument
-
-    override def toString: String = toDocument.renderString()
-  }
-
-  //  var tokens = [
-  //  ['comment', /^#[^\n]*/],
-  //  ['indent', /^\n( *)/],
-  //  ['space', /^ +/],
-  //  ['true', /^\b(enabled|true|yes|on)\b/],
-  //  ['false', /^\b(disabled|false|no|off)\b/],
-  //  ['null', /^\b(null|Null|NULL|~)\b/],
-  //  ['string', /^"(.*?)"/],
-  //  ['string', /^'(.*?)'/],
-  //  ['timestamp', /^((\d{4})-(\d\d?)-(\d\d?)(?:(?:[ \t]+)(\d\d?):(\d\d)(?::(\d\d))?)?)/],
-  //  ['float', /^(\d+\.\d+)/],
-  //  ['int', /^(\d+)/],
-  //  ['doc', /^---/],
-  //  [',', /^,/],
-  //  ['{', /^\{(?![^\n\}]*\}[^\n]*[^\s\n\}])/],
-  //['}', /^\}/],
-  //['[', /^\[(?![^\n\]]*\][^\n]*[^\s\n\]])/],
-  //[']', /^\]/],
-  //['-', /^\-/],
-  //[':', /^[:]/],
-  //['string', /^(?![^:\n\s]*:[^\/]{2})(([^:,\]\}\n\s]|(?!\n)\s(?!\s*?\n)|:\/\/|,(?=[^\n]*\s*[^\]\}\s\n]\s*\n)|[\]\}](?=[^\n]*\s*[^\]\}\s\n]\s*\n))*)(?=[,:\]\}\s\n]|$)/],
-  //  ['id', /^([\w][\w -]*)/]
-  //  ]
-
-  case class Object(members: Map[String, YamlExpression]) extends YamlExpression {
-
-    override def toDocument: ResponsiveDocument = {
-      members.
-        map(member => ResponsiveDocument.text(member._1) ~ ":" ~~ member._2.toDocument).
-        reduce((t,b) => t % b)
-    }
-  }
-
-  case class Array(elements: Seq[YamlExpression]) extends YamlExpression {
-    override def toDocument: ResponsiveDocument = {
-      elements.
-        map(member => ResponsiveDocument.text("- ") ~~ member.toDocument).
-        fold[ResponsiveDocument](Empty)((t: ResponsiveDocument, b: ResponsiveDocument) => t % b)
-    }
-
-  }
-
-  case class Number(value: Int) extends YamlExpression {
-    override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
-  }
-
-  case class StringLiteral(value: String) extends YamlExpression {
-    override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
-  }
-
-  lazy val tag: EditorParser[String] = "!" ~> RegexParser("""[^'!,\[\]{}]*""".r)
+  lazy val tag: EditorParser[String] = "!" ~> RegexParser("""[^'\n !,\[\]{}]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator
   case class TaggedNode(tag: String, node: YamlExpression) extends YamlExpression {
     override def toDocument: ResponsiveDocument = ResponsiveDocument.text("!") ~ tag ~~ node.toDocument
   }
 
-  lazy val parseUntaggedValue = lazyParser(parseBracketArray | parseArray | parseStringLiteral | parseObject | parseNumber)
+  lazy val parseUntaggedFlowValue = parseBracketArray | parseStringLiteral
+  lazy val parseFlowValue = (tag.option ~ parseUntaggedFlowValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
+  lazy val parseUntaggedValue = lazyParser(parseBracketArray | parseArray | parseNumber | parseStringLiteral | parseBlockMapping)
   lazy val parseValue: EditorParser[YamlExpression] = (tag.option ~ parseUntaggedValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
 
-  lazy val parseObject: EditorParser[YamlExpression] = {
-    val member = parseStringLiteralInner ~< literal(":") ~ greaterThan(parseValue)
-    alignedList(member).map(values => Object(values.toMap))
+  lazy val parseBlockMapping: EditorParser[YamlExpression] = {
+    val member = new WithContext(_ =>
+      BlockKey, parseFlowValue) ~< literal(":") ~ greaterThan(parseValue)
+    alignedList(member).map(values => {
+      Object(values.toMap)
+    })
   }
 
   lazy val parseBracketArray: EditorParser[YamlExpression] = {
-    val inner = "[" ~> parseValue.manySeparated(",").map(elements => Array(elements)) ~< "]"
+    val inner = "[" ~> parseFlowValue.manySeparated(",").map(elements => Array(elements)) ~< "]"
     new WithContext(_ => FlowIn, inner)
   }
 
@@ -160,6 +141,8 @@ class YamlTest extends FunSuite
 
   lazy val plainScalar = new WithContext({
     case FlowIn => FlowIn
+    case BlockKey => BlockKey
+    case FlowKey => FlowKey
     case _ => FlowOut
   }, plainStyleMultiLineString | plainStyleSingleLineString)
 
@@ -167,8 +150,8 @@ class YamlTest extends FunSuite
   val nsChars = nbChars + " "
   val flowIndicatorChars = ",[]{}"
 
-  val nsPlainSafeIn =  RegexParser("""([^\n:#'\[\]{},]|:[^\n# '\[\]{},])*""".r) //s"[^$nbChars$flowIndicatorChars]*]".r)
-  val nsPlainSafeOut =  RegexParser("""([^\n':#]|:[^\n #'])*""".r) //s"[^$nbChars]*]".r)
+  val nsPlainSafeIn =  RegexParser("""([^\n:#'\[\]{},]|:[^\n# '\[\]{},])+""".r) //s"[^$nbChars$flowIndicatorChars]*]".r)
+  val nsPlainSafeOut =  RegexParser("""([^\n':#]|:[^\n #'])+""".r) //s"[^$nbChars]*]".r)
 
   val nsPlainSafe = new IfContext(Map(
     FlowIn -> nsPlainSafeIn,
@@ -177,10 +160,10 @@ class YamlTest extends FunSuite
     FlowKey -> nsPlainSafeIn))
 
   lazy val plainStyleSingleLineString = nsPlainSafe
-  lazy val plainStyleMultiLineString = new Sequence(new Sequence(nsPlainSafe, whiteSpace, (l: String, r: String) => r),
+  lazy val plainStyleMultiLineString = new Sequence(new Sequence(nsPlainSafe, whiteSpace, (l: String, r: String) => l),
     greaterThan(WithIndentation(equal(nsPlainSafe).manySeparated("\n"))),
     (firstLine: String, rest: List[String]) => {
-      firstLine + rest.reduce((a,b) => a + b)
+      firstLine + rest.fold("")((a,b) => a + " " + b)
   })
 
   test("plainStyleMultineLineInFlowCollection") {
@@ -190,6 +173,38 @@ class YamlTest extends FunSuite
     val result = plainStyleMultiLineString.parse(new IndentationReader(input).withContext(FlowIn))
     assert(result.successful)
   }
+
+  test("plainStyleMultineLineInFlowCollection2") {
+    val input = """                  [<img src=", !FindInMap [Region2Examples, !Ref 'AWS::Region',
+                  |                                              Examples], /cloudformation_graphic.png" alt="AWS CloudFormation
+                  |                                                           Logo"/>, '<h1>Congratulations, you have successfully launched
+                  |                    the AWS CloudFormation sample.</h1>']""".stripMargin
+    val result = parseValue.parseWholeInput(new IndentationReader(input))
+    assert(result.successful)
+  }
+
+  test("tagged block key") {
+    val input = """      UserData: !Base64
+                  |        Fn::Join:
+                  |          - ''
+                  |          - ['#!/bin/bash -xe
+                  |
+                  |            ', 'yum update -y aws-cfn-bootstrap
+                  |
+                  |            ', '/opt/aws/bin/cfn-init -v ', '         --stack ', !Ref 'AWS::StackName',
+                  |             '         --resource LaunchConfig ', '         --region ', !Ref 'AWS::Region',
+                  |             '
+                  |
+                  |            ', '/opt/aws/bin/cfn-signal -e $? ', '         --stack ', !Ref 'AWS::StackName',
+                  |             '         --resource WebServerGroup ', '         --region ', !Ref 'AWS::Region',
+                  |             '
+                  |
+                  |            ']
+                  |""".stripMargin
+    val result = parseValue.parseWholeInput(new IndentationReader(input))
+    assert(result.successful)
+  }
+
 
   test("string") {
     val program = "'hello'"
@@ -230,7 +245,7 @@ class YamlTest extends FunSuite
       """minecraft: 2""".stripMargin
 
     val result = parseValue.parse(new IndentationReader(program))
-    val expectation = Object(Map("minecraft" -> Number(2)))
+    val expectation = Object(Map(StringLiteral("minecraft") -> Number(2)))
     assertResult(expectation)(result.get)
   }
 
@@ -240,7 +255,7 @@ class YamlTest extends FunSuite
         |cancelled: 3""".stripMargin
 
     val result = parseValue.parse(new IndentationReader(program))
-    val expectation = Object(Map("minecraft" -> Number(2), "cancelled" -> Number(3)))
+    val expectation = Object(Map(StringLiteral("minecraft") -> Number(2), StringLiteral("cancelled") -> Number(3)))
     assertResult(expectation)(result.get)
   }
 //
@@ -297,8 +312,8 @@ class YamlTest extends FunSuite
       """- x: 3
         |  y: 4""".stripMargin
 
-    val result = parseValue.parse(new IndentationReader(program))
-    val expectation = Array(Seq(Object(Map("x" -> Number(3), "y" -> Number(4)))))
+    val result = parseValue.parseWholeInput(new IndentationReader(program))
+    val expectation = Array(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
 //
@@ -332,9 +347,9 @@ class YamlTest extends FunSuite
     val result = parseValue.parse(new IndentationReader(program))
     val expectation = Array(Seq(
       Object(Map(
-        "a" -> Array(Seq(Number(1))))),
+        StringLiteral("a") -> Array(Seq(Number(1))))),
       Object(Map(
-        "b" -> Array(Seq(Number(2)))))
+        StringLiteral("b") -> Array(Seq(Number(2)))))
     ))
     assertResult(expectation)(result.get)
   }
@@ -356,14 +371,14 @@ class YamlTest extends FunSuite
     val expectation =
       Array(Seq(
         Number(2),
-        Object(Map("x" -> Number(3),
-          "y" -> Object(Map("a" -> Number(4), "b" -> Number(5))),
-          "z" -> Array(Seq(Number(2), Number(4))))),
+        Object(Map(StringLiteral("x") -> Number(3),
+          StringLiteral("y") -> Object(Map(StringLiteral("a") -> Number(4), StringLiteral("b") -> Number(5))),
+          StringLiteral("z") -> Array(Seq(Number(2), Number(4))))),
         Number(6),
         Object(Map(
-          "q" ->
+          StringLiteral("q") ->
             Array(Seq(Number(7), Number(8))),
-          "r" -> Number(9)))))
+          StringLiteral("r") -> Number(9)))))
     assertResult(expectation)(result.get)
   }
 
