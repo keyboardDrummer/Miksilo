@@ -179,7 +179,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
   }
 
-  case class EditorParseResult[+Result](successOption: Option[Success[Result]], biggestFailure: OptionFailure[Result]) // TODO only store the failure if it's bigger than the success.
+  case class EditorParseResult[+Result](successOption: Option[Success[Result]], biggestFailure: OptionFailure[Result])
     extends UnambiguousParseResult[Result] with EditorResult [Result] {
 
     def resultOption: Option[Result] = successOption.map(s => s.result).orElse(biggestFailure.partialResult)
@@ -213,7 +213,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     }
 
     def addFailure[Other >: Result](other: OptionFailure[Other]): EditorParseResult[Other] =
-      if (biggestFailure.offset > other.offset) this else
+      if (biggestFailure.offset >= other.offset || successOption.exists(s => s.remainder.offset >= other.offset)) this else
         EditorParseResult(successOption, other)
   }
 
