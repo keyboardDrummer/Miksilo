@@ -167,8 +167,8 @@ class YamlTest extends FunSuite
   val nsChars = nbChars + " "
   val flowIndicatorChars = ",[]{}"
 
-  val nsPlainSafeIn =  RegexParser("""[^\n:#'\[\]{},]*""".r) //s"[^$nbChars$flowIndicatorChars]*]".r)
-  val nsPlainSafeOut =  RegexParser("""[^\n':#]*""".r) //s"[^$nbChars]*]".r)
+  val nsPlainSafeIn =  RegexParser("""([^\n:#'\[\]{},]|:[^\n# '\[\]{},])*""".r) //s"[^$nbChars$flowIndicatorChars]*]".r)
+  val nsPlainSafeOut =  RegexParser("""([^\n':#]|:[^\n #'])*""".r) //s"[^$nbChars]*]".r)
 
   val nsPlainSafe = new IfContext(Map(
     FlowIn -> nsPlainSafeIn,
@@ -177,11 +177,19 @@ class YamlTest extends FunSuite
     FlowKey -> nsPlainSafeIn))
 
   lazy val plainStyleSingleLineString = nsPlainSafe
-  lazy val plainStyleMultiLineString = leftRight(leftRight(nsPlainSafe, "\n", (l: String, r: String) => r),
+  lazy val plainStyleMultiLineString = new Sequence(new Sequence(nsPlainSafe, whiteSpace, (l: String, r: String) => r),
     greaterThan(WithIndentation(equal(nsPlainSafe).manySeparated("\n"))),
     (firstLine: String, rest: List[String]) => {
       firstLine + rest.reduce((a,b) => a + b)
   })
+
+  test("plainStyleMultineLineInFlowCollection") {
+    val input =
+      """/cloudformation_graphic.png" alt="AWS CloudFormation
+        |         Logo"/""".stripMargin
+    val result = plainStyleMultiLineString.parse(new IndentationReader(input).withContext(FlowIn))
+    assert(result.successful)
+  }
 
   test("string") {
     val program = "'hello'"

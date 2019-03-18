@@ -76,7 +76,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
       if (input.atEnd || deltaPredicate(delta)) {
         state.parse(inner, input)
       } else {
-        newFailure(input, s"indentation ${input.position.character} of character ${input.head} must be $property ${input.indentation}")
+        newFailure(input, s"indentation ${input.position.character} of character '${input.head}' must be $property ${input.indentation}")
       }
     }
 
