@@ -219,26 +219,6 @@ class YamlTest extends FunSuite
     val result = parseNumber.parse(new IndentationReader(program))
     assertResult(Number(3))(result.get)
   }
-//
-//  test("inline member") {
-//    val key = FromLinearParser(ident <~ literal(": "))
-//    val member: GridParser[Char, (String, YamlExpression)] = key ~ parseNumber
-//    val program = "hallo: 3"
-//    val result = member.parseEntireGrid(program)
-//    assertResult(ParseSuccess(Size(8, 1), ("hallo", Number(3))))(result)
-//  }
-//
-//  test("inline members") {
-//    val key = FromLinearParser(ident <~ literal(": "))
-//    val member: GridParser[Char, (String, YamlExpression)] = (key ~ parseNumber).name("member")
-//
-//    val program =
-//      minecraft: 2
-//        |cancelled: 3""".stripMargin
-//    val result = member.someVertical.parseEntireGrid(program)
-//    assertResult(ParseSuccess(Size(12, 2), List("minecraft" -> Number(2), "cancelled" -> Number(3))))(result)
-//  }
-//
 
   test("object with single member") {
     val program =
@@ -258,45 +238,7 @@ class YamlTest extends FunSuite
     val expectation = Object(Map(StringLiteral("minecraft") -> Number(2), StringLiteral("cancelled") -> Number(3)))
     assertResult(expectation)(result.get)
   }
-//
-//  test("complex failure") {
-//    val program =
-//      """a:
-//        | b: CannotParse
-//        |c: 4""".stripMargin
-//
-//    val result = parseValue.parseEntireGrid(program)
-//    val failureLocation = result.asInstanceOf[ParseFailure[YamlExpression]].absoluteLocation
-//    assertResult(Location(1, 15))(failureLocation)
-//  }
-//
-//  test("complex failure 2") {
-//    val program =
-//      """a:
-//        |   b: /
-//        |c:
-//        |   4""".stripMargin
-//
-//    val result = parseValue.parseEntireGrid(program)
-//    val failureLocation = result.asInstanceOf[ParseFailure[YamlExpression]].absoluteLocation
-//    assertResult(Location(1, 6))(failureLocation)
-//  }
-//
-//  test("array failure") {
-//    val program =
-//      """- 2
-//        |- 3
-//        |x""".stripMargin
-//
-//    val result = parseValue.parseEntireGrid(program)
-//    val expectation = ("`- ' expected but `x' found", Location(2,0))
-//    assertResult(expectation)(result.testProperties)
-//
-//    val partialResult = parseValue.parse(program).asInstanceOf[ParseSuccess[YamlExpression]]
-//    val partialExpectation = ParseSuccess(Size(3, 2), Array(Seq(Number(2), Number(3))))
-//    assertResult(partialExpectation)(ParseSuccess(partialResult.size, partialResult.result))
-//  }
-//
+
   test("array") {
     val program =
       """- 2
@@ -316,29 +258,29 @@ class YamlTest extends FunSuite
     val expectation = Array(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
-//
-//  test("array object composite 2") {
-//    val program =
-//      """- x: 3
-//        |  y: 4
-//        |- 2""".stripMargin
-//
-//    val result = parseValue.parseEntireGrid(program)
-//    val expectation = ParseSuccess(Size(6, 3), Array(Seq(Object(Map("x" -> Number(3), "y" -> Number(4))), Number(2))))
-//    assertResult(expectation)(result)
-//  }
-//
-//  test("array object composite") {
-//    val program =
-//      """- 2
-//        |- x: 3
-//        |  y: 4""".stripMargin
-//
-//    val result = parseValue.parseEntireGrid(program)
-//    val expectation = ParseSuccess(Size(6, 3), Array(Seq(Number(2), Object(Map("x" -> Number(3), "y" -> Number(4))))))
-//    assertResult(expectation)(result)
-//  }
-//
+
+  test("array object composite 2") {
+    val program =
+      """- x: 3
+        |  y: 4
+        |- 2""".stripMargin
+
+    val result = parseValue.parseWholeInput(new IndentationReader(program))
+    val expectation = Array(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4))), Number(2)))
+    assertResult(expectation)(result.get)
+  }
+
+  test("array object composite") {
+    val program =
+      """- 2
+        |- x: 3
+        |  y: 4""".stripMargin
+
+    val result = parseValue.parseWholeInput(new IndentationReader(program))
+    val expectation = Array(Seq(Number(2), Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
+    assertResult(expectation)(result.get)
+  }
+
   test("complex composite 2") {
     val program =
       """- a: - 1
