@@ -69,10 +69,10 @@ class YamlTest extends FunSuite
     override def drop(amount: Int) = new IndentationReader(array, offset + amount,
       newPosition(position, array, offset, amount), context, indentation)
 
-    override def hashCode(): Int = offset ^ indentation
+    override def hashCode(): Int = offset ^ indentation ^ context.hashCode()
 
     override def equals(obj: Any): Boolean = obj match {
-      case other: IndentationReader => offset == other.offset && indentation == other.indentation
+      case other: IndentationReader => offset == other.offset && indentation == other.indentation && context == other.context
       case _ => false
     }
   }

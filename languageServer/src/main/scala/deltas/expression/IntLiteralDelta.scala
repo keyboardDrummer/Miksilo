@@ -33,6 +33,7 @@ object IntLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   override def description: String = "Adds the usage of int literals."
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+    builder.typesAreEqual(_type, IntTypeDelta.constraintType)
   }
 }
 
