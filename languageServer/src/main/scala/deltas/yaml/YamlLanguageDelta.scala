@@ -9,6 +9,8 @@ import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
 import core.parsers.editorParsers.DefaultCache
 import core.responsiveDocument.ResponsiveDocument
+import deltas.expression.ArrayLiteralDelta
+import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 
 trait YamlContext
 object FlowIn extends YamlContext
@@ -25,18 +27,9 @@ object YamlLanguageDelta extends DeltaWithGrammar {
   val nsChars = nbChars + " "
   def flowIndicatorChars = """,\[\]{}"""
 
-  object ArrayNode extends NodeShape
-  object ArrayMembers extends NodeField
-
   object TaggedNode extends NodeShape
   object TagName extends NodeField
   object TagNode extends NodeField
-
-  object ObjectNode extends NodeShape
-  object ObjectMembers extends NodeField
-  object ObjectMember extends NodeShape
-  object MemberKey extends NodeField
-  object MemberValue extends NodeField
 
   object ContextKey
   class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]]) extends EditorParser[Result] {
@@ -107,13 +100,13 @@ object YamlLanguageDelta extends DeltaWithGrammar {
 
     val parseArray: BiGrammar = {
       val element = keyword("- ") ~> CheckIndentationGrammar.greaterThan(parseValue)
-      CheckIndentationGrammar.aligned(grammars, element).as(ArrayMembers).asNode(ArrayNode)
+      CheckIndentationGrammar.aligned(grammars, element).as(ArrayLiteralDelta.Members).asNode(ArrayLiteralDelta.Shape)
     }
 
     val parseNumber: BiGrammar = integer
 
     val plainSafeOutChars = s"""$nbChars#'"""
-    val plainSafeInChars = s"""$plainSafeOutChars${flowIndicatorChars}"""
+    val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
     val doubleColonPlainSafeIn =  RegexGrammar(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r)
     val doubleColonPlainSafeOut =  RegexGrammar(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r)
 
@@ -143,7 +136,8 @@ object YamlLanguageDelta extends DeltaWithGrammar {
       keyword("'") ~> RegexGrammar("""[^']*""".r) ~< keyword("'"))
     parseStringLiteralInner.addAlternative(plainScalar)
 
-    val parseStringLiteral: BiGrammar = parseStringLiteralInner
+    val parseStringLiteral: BiGrammar =
+      parseStringLiteralInner.as(JsonStringLiteralDelta.Value).asNode(JsonStringLiteralDelta.Shape)
 
     val parseUntaggedFlowValue = new Labelled(UntaggedFlowValueKey)
     val parseFlowValue: BiGrammar = (tag.as(TagName) ~ parseUntaggedFlowValue.as(TagNode) asNode TaggedNode) |
@@ -151,12 +145,13 @@ object YamlLanguageDelta extends DeltaWithGrammar {
 
     lazy val parseBlockMapping: BiGrammar = {
       val member = new WithContext(_ =>
-        BlockKey, parseFlowValue).as(MemberKey) ~< keyword(":") ~ CheckIndentationGrammar.greaterThan(parseValue.as(MemberValue)) asNode ObjectMember
-      CheckIndentationGrammar.aligned(grammars, member).as(ObjectMembers).asNode(ObjectNode)
+        BlockKey, parseFlowValue).as(JsonObjectLiteralDelta.MemberKey) ~< keyword(":") ~
+          CheckIndentationGrammar.greaterThan(parseValue.as(JsonObjectLiteralDelta.MemberValue)) asNode JsonObjectLiteralDelta.MemberShape
+      CheckIndentationGrammar.aligned(grammars, member).as(JsonObjectLiteralDelta.Members).asNode(JsonObjectLiteralDelta.Shape)
     }
 
     lazy val parseBracketArray: BiGrammar = {
-      val inner = "[" ~> parseFlowValue.manySeparated(",").as(ArrayMembers) ~< "]" asNode ArrayNode
+      val inner = "[" ~> parseFlowValue.manySeparated(",").as(ArrayLiteralDelta.Members) ~< "]" asNode ArrayLiteralDelta.Shape
       new WithContext(_ => FlowIn, inner)
     }
     parseUntaggedFlowValue.addAlternative(parseBracketArray)

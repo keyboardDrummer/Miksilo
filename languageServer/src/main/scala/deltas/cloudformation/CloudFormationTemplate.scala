@@ -94,5 +94,5 @@ object CloudFormationTemplate extends Delta {
     }
   }
 
-  override def dependencies: Set[Contract] = Set(JsonObjectLiteralDelta)
+  override def dependencies: Set[Contract] = Set.empty //Set(JsonObjectLiteralDelta)
 }

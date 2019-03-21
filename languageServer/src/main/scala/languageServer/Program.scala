@@ -19,7 +19,8 @@ import scala.util.Try
 object Program extends LazyLogging {
 
   val languages: Map[String, Language] = Map(
-    "cloudFormation" -> CloudFormationLanguage.language,
+    "cloudFormation" -> CloudFormationLanguage.jsonLanguage,
+    "yamlCloudFormation" -> CloudFormationLanguage.yamlLanguage,
     "verilog" -> VerilogLanguage.language,
     "java" -> JavaLanguage.java,
     "solidity" -> SolidityLanguage.language,

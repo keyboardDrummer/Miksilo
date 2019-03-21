@@ -3,7 +3,7 @@ package deltas.yaml
 import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.grammars.CustomGrammar
 import core.bigrammar.printer.Printer.NodePrinter
-import core.bigrammar.{BiGrammar, BiGrammarToParser}
+import core.bigrammar.{BiGrammar, BiGrammarSequenceCombinatorsExtension, BiGrammarToParser}
 import core.deltas.grammars.LanguageGrammars
 import core.responsiveDocument.ResponsiveDocument
 
@@ -28,7 +28,7 @@ object CheckIndentationGrammar {
   def aligned[Element, Sum](grammars: LanguageGrammars, element: BiGrammar): BiGrammar = {
     import grammars._
     val many = equal(element).manyVertical
-    new WithIndentationGrammar(element % many)
+    new WithIndentationGrammar(BiGrammarSequenceCombinatorsExtension.someMap(element % many))
   }
 
   def equal[Result](inner: BiGrammar) = new CheckIndentationGrammar(delta => delta == 0, "equal to", inner)

@@ -29,9 +29,9 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     expressionGrammar.addAlternative(grammar)
   }
 
+  object MemberShape extends NodeShape
   object MemberValue extends NodeField
   object MemberKey extends NodeField
-  object MemberShape extends NodeShape
 
   object Members extends NodeField
   object Shape extends NodeShape
