@@ -1,6 +1,6 @@
 package core.bigrammar.printer
 
-import core.bigrammar.BiGrammarToParser.AnyWithMap
+import core.bigrammar.BiGrammarToParser.{Result}
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
@@ -42,7 +42,7 @@ class BiGrammarToPrinter {
             (first, second) =>
               if (sequence.horizontal) ResponsiveLeftRight(first, second)
               else ResponsiveTopBottom(first, second))
-          val deconstruct = (withMap: AnyWithMap) => sequence.bijective.destruct(withMap.value).map(v => WithMap(v, withMap.namedValues))
+          val deconstruct = (withMap: Result) => sequence.bijective.destruct(withMap.value).map(v => WithMap(v, withMap.namedValues))
           new MapGrammarWithMapPrinter(inner, deconstruct)
         case mapGrammar: MapGrammarWithMap => new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner), mapGrammar.deconstruct)
         case BiFailure(message) => _ => failureToGrammar(message, grammar)

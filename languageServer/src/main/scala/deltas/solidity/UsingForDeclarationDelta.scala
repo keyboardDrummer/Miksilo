@@ -11,12 +11,11 @@ import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
 import deltas.HasNameDelta.Name
 import deltas.bytecode.types.TypeSkeleton
 import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
-import deltas.javac.methods.MethodDelta.MethodDelta.Method
+import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.solidity.SolidityContractDelta.ContractLike
 import deltas.solidity.SolidityFunctionDelta.ReturnValues
-import deltas.solidity.SolidityFunctionTypeDelta.ParameterShape
 
 object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

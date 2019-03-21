@@ -14,8 +14,7 @@ case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParserWriter
   with IndentationSensitiveParserWriter {
 
-  type AnyWithMap = WithMap[Any]
-  type Result = AnyWithMap
+  type Result = WithMap[Any]
   type Input = Reader
 
   object IndentationKey
