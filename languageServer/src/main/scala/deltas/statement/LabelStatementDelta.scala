@@ -8,7 +8,6 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.simpleBytecode.LabelDelta
-import deltas.javac.methods.MethodDelta
 
 object LabelStatementDelta extends StatementInstance with DeltaWithGrammar {
 

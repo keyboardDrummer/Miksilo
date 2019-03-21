@@ -2,7 +2,7 @@ package deltas.expression
 
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.deltas.{Delta, DeltaWithGrammar, Property}
+import core.deltas.{DeltaWithGrammar, Property}
 import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder

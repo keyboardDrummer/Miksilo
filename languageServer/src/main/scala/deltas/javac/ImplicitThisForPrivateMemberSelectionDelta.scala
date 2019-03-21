@@ -17,8 +17,6 @@ object ImplicitThisForPrivateMemberSelectionDelta extends Delta {
 
   import deltas.HasNameDelta.Name
 
-  import deltas.HasNameDelta.Name
-
   override def description: String = "Implicitly prefixes references to private methods with the 'this' qualified if it is missing."
 
   override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassDelta, MemberSelectorDelta, CallVariableDelta, ThisVariableDelta)

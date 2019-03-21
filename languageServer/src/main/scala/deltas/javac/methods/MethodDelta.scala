@@ -26,8 +26,6 @@ object MethodDelta extends DeltaWithGrammar
 
   import deltas.HasNameDelta._
 
-  import deltas.HasNameDelta._
-
   override def description: String = "Enables Java classes to contain methods."
 
   implicit class Method[T <: NodeLike](val node: T) extends HasAccessibility[T] with HasName[T] {

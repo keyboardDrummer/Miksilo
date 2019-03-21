@@ -12,11 +12,8 @@ import deltas.expression.relational.{AddRelationalPrecedenceDelta, EqualsCompari
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassDelta}
 import deltas.javac.constructor._
-import deltas.javac.expressions.TernaryToByteCodeDelta
-import deltas.javac.expressions.additive.{AdditionToByteCodeDelta, SubtractionToByteCodeDelta}
-import deltas.javac.expressions.equality.{AddEqualityPrecedence, EqualityToByteCodeDelta}
+import deltas.javac.expressions.equality.AddEqualityPrecedence
 import deltas.javac.expressions.literals._
-import deltas.javac.expressions.relational.{GreaterThanToByteCodeDelta, LessThanToByteCodeDelta}
 import deltas.javac.methods._
 import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.statements.{ExpressionAsStatementDelta, ForLoopContinueDelta, IfThenElseToIfThenAndGotoDelta, WhileBreakDelta}

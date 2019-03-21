@@ -7,11 +7,10 @@ import core.language.node.Node
 import core.language.{Compilation, Language}
 import deltas.HasNameDelta.Name
 import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
+import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.constructor.ConstructorDelta.ClassName
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.statement.BlockDelta
-import deltas.HasNameDelta.Name
 
 object SolidityConstructorDelta extends DeltaWithGrammar with DeltaWithPhase { // TODO try to re-use other constructor delta's.
 

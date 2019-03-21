@@ -17,8 +17,6 @@ object EnumDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   import deltas.HasNameDelta._
 
-  import deltas.HasNameDelta._
-
   object Shape extends NodeShape
   object Values extends NodeField
 
