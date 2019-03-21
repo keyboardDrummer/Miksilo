@@ -3,7 +3,7 @@ package deltas.cloudformation
 import core.deltas.DeltaWithPhase
 import core.deltas.path._
 import core.language.Compilation
-import core.language.node.Node
+import core.language.node.{FieldData, Node}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import deltas.yaml.YamlLanguageDelta
 
@@ -39,12 +39,13 @@ object TagsToObjectDelta extends DeltaWithPhase {
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     PathRoot(program).visitShape(YamlLanguageDelta.TaggedNode, path => {
       val tagName: String = path.current(YamlLanguageDelta.TagName).asInstanceOf[String]
-      val tagValue: Any = path.current(YamlLanguageDelta.TagNode)
+      val tagValue: FieldData = path.getFieldData(YamlLanguageDelta.TagNode)
       val newNode = Shape.create(Members -> Seq(
-        MemberShape.create(
-          MemberKey -> ("Fn::" + tagName),
+        MemberShape.createWithData(
+          MemberKey -> ((if (tagName == "Ref" ) "" else "Fn::") + tagName),
           MemberValue -> tagValue)
       ))
+      path.range.foreach(r => newNode.sources.put(Members, r)) // TODO it would be nice if we could leave this out, if members would inherit the source position from its chidlren.
       path.asInstanceOf[ChildPath].replaceWith(newNode)
     })
   }
