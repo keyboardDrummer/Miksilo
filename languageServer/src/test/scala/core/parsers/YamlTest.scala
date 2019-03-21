@@ -41,19 +41,20 @@ case class StringLiteral(value: String) extends YamlExpression {
   override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
 }
 
+trait YamlContext
+object FlowIn extends YamlContext
+object FlowOut extends YamlContext
+object BlockIn extends YamlContext
+object BlockOut extends YamlContext
+object BlockKey extends YamlContext
+object FlowKey extends YamlContext
+
 class YamlTest extends FunSuite
   with UnambiguousEditorParserWriter
   with IndentationSensitiveParserWriter with CommonParserWriter {
 
   type Input = IndentationReader
 
-  trait YamlContext
-  object FlowIn extends YamlContext
-  object FlowOut extends YamlContext
-  object BlockIn extends YamlContext
-  object BlockOut extends YamlContext
-  object BlockKey extends YamlContext
-  object FlowKey extends YamlContext
 
   class IndentationReader(array: ArrayCharSequence, offset: Int, position: Position, val context: YamlContext, val indentation: Int)
     extends StringReaderBase(array, offset, position) with IndentationReaderLike {
@@ -102,7 +103,7 @@ class YamlTest extends FunSuite
     override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
   }
 
-  lazy val tag: EditorParser[String] = "!" ~> RegexParser("""[^'\n !,\[\]{}]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator
+  val tag: EditorParser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator
   case class TaggedNode(tag: String, node: YamlExpression) extends YamlExpression {
     override def toDocument: ResponsiveDocument = ResponsiveDocument.text("!") ~ tag ~~ node.toDocument
   }
@@ -146,21 +147,23 @@ class YamlTest extends FunSuite
     case _ => FlowOut
   }, plainStyleMultiLineString | plainStyleSingleLineString)
 
-  val nbChars = "\n"
+  val nbChars = """\n"""
   val nsChars = nbChars + " "
-  val flowIndicatorChars = ",[]{}"
+  def flowIndicatorChars = """,\[\]{}"""
 
-  val nsPlainSafeIn =  RegexParser("""([^\n:#'\[\]{},]|:[^\n# '\[\]{},])+""".r) //s"[^$nbChars$flowIndicatorChars]*]".r)
-  val nsPlainSafeOut =  RegexParser("""([^\n':#]|:[^\n #'])+""".r) //s"[^$nbChars]*]".r)
+  val plainSafeOutChars = s"""$nbChars#'"""
+  val plainSafeInChars = s"""$plainSafeOutChars${flowIndicatorChars}"""
+  val doubleColonPlainSafeIn =  RegexParser(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r)
+  val doubleColonPlainSafeOut =  RegexParser(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r)
 
   val nsPlainSafe = new IfContext(Map(
-    FlowIn -> nsPlainSafeIn,
-    FlowOut -> nsPlainSafeOut,
-    BlockKey -> nsPlainSafeOut,
-    FlowKey -> nsPlainSafeIn))
+    FlowIn -> doubleColonPlainSafeIn,
+    FlowOut -> doubleColonPlainSafeOut,
+    BlockKey -> doubleColonPlainSafeOut,
+    FlowKey -> doubleColonPlainSafeIn))
 
   lazy val plainStyleSingleLineString = nsPlainSafe
-  lazy val plainStyleMultiLineString = new Sequence(new Sequence(nsPlainSafe, whiteSpace, (l: String, r: String) => l),
+  lazy val plainStyleMultiLineString = new Sequence(new Sequence(nsPlainSafe, whiteSpace, (l: String, _: String) => l),
     greaterThan(WithIndentation(equal(nsPlainSafe).manySeparated("\n"))),
     (firstLine: String, rest: List[String]) => {
       firstLine + rest.fold("")((a,b) => a + " " + b)

@@ -50,15 +50,6 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     override def getDefault(cache: DefaultCache): Option[Result] = inner.getDefault(cache)
   }
 
-//  case class SetIndentation[Result](inner: EditorParser[Result]) extends EditorParser[Result] {
-//    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
-//      val newInput = input.withIndentation(input.position.character)
-//      inner.parseInternal(newInput, state)
-//    }
-//
-//    override def getDefault(cache: DefaultCache): Option[Result] = inner.getDefault(cache)
-//  }
-
   def alignedList[Element](element: EditorParser[Element]): Self[List[Element]] = {
     aligned(element, List.empty, (a: Element, b: List[Element]) => a :: b)
   }
@@ -70,6 +61,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
 
   def equal[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
   def greaterThan[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
+
   case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, inner: EditorParser[Result]) extends EditorParser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
       val delta = input.position.character - input.indentation

@@ -3,22 +3,25 @@ package core.bigrammar
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
 import core.parsers.editorParsers.UnambiguousEditorParserWriter
-import core.parsers.strings.CommonParserWriter
+import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import langserver.types.Position
 
 import scala.collection.mutable
 
 case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 
-
 //noinspection ZeroIndexToHead
-object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParserWriter  {
+object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParserWriter
+  with IndentationSensitiveParserWriter {
+
   type AnyWithMap = WithMap[Any]
   type Result = AnyWithMap
   type Input = Reader
 
+  object IndentationKey
   class Reader(array: ArrayCharSequence, offset: Int, position: Position, val state: State)
-    extends StringReaderBase(array, offset, position) {
+    extends StringReaderBase(array, offset, position)
+    with IndentationReaderLike {
 
     def withState(newState: State): Reader = new Reader(array, offset, position, newState)
 
@@ -35,6 +38,10 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
       case other: Reader => offset == other.offset && state.equals(other.state)
       case _ => false
     }
+
+    override def indentation = state.getOrElse(IndentationKey, 0).asInstanceOf[Int]
+
+    override def withIndentation(value: Int) = withState(state + (IndentationKey -> value))
   }
 
   def valueToResult(value: Any): Result = WithMap(value, Map.empty)
