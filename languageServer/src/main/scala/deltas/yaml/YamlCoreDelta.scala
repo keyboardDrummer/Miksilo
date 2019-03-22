@@ -57,14 +57,13 @@ object YamlCoreDelta extends DeltaWithGrammar {
     blockValue.addAlternative(tag.as(TagName) ~ blockValue.as(TagNode) asNode TaggedNode)
 
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val untaggedFlowValue = flowValue.inner // TODO this is dangerous
     val taggedFlowValue = tag.as(TagName) ~ flowValue.as(TagNode) asNode TaggedNode
     flowValue.addAlternative(taggedFlowValue)
 
     val originalBracketArray = find(ArrayLiteralDelta.Shape).inner
     find(ArrayLiteralDelta.Shape).inner = new WithContext(_ => FlowIn, originalBracketArray)
 
-    blockValue.addAlternative(untaggedFlowValue)
+    blockValue.addAlternative(flowValue)
 
     grammars.bodyGrammar.inner = blockValue
   }
