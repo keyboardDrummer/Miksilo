@@ -5,13 +5,13 @@ import core.deltas.path._
 import core.language.Compilation
 import core.language.node.{FieldData, Node}
 import deltas.json.{JsonObjectLiteralDelta, DoubleQuoteStringLiteralDelta}
-import deltas.yaml.YamlLanguageDelta
+import deltas.yaml.YamlCoreDelta
 
 object RemoveTagsInObjectMemberKeys extends DeltaWithPhase {
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
 
-    PathRoot(program).visitShape(YamlLanguageDelta.TaggedNode, path => {
-      val value = path.current(YamlLanguageDelta.TagNode)
+    PathRoot(program).visitShape(YamlCoreDelta.TaggedNode, path => {
+      val value = path.current(YamlCoreDelta.TagNode)
       path match {
         case fp: FieldPath if fp.field == JsonObjectLiteralDelta.MemberKey => fp.replaceWith(value)
         case _ =>
@@ -36,9 +36,9 @@ object TagsToObjectDelta extends DeltaWithPhase {
   import JsonObjectLiteralDelta._
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(YamlLanguageDelta.TaggedNode, path => {
-      val tagName: String = path.current(YamlLanguageDelta.TagName).asInstanceOf[String]
-      val tagValue: FieldData = path.getFieldData(YamlLanguageDelta.TagNode)
+    PathRoot(program).visitShape(YamlCoreDelta.TaggedNode, path => {
+      val tagName: String = path.current(YamlCoreDelta.TagName).asInstanceOf[String]
+      val tagValue: FieldData = path.getFieldData(YamlCoreDelta.TagNode)
       val newNode = Shape.create(Members -> Seq(
         MemberShape.createWithData(
           MemberKey -> ((if (tagName == "Ref" ) "" else "Fn::") + tagName),
@@ -51,5 +51,5 @@ object TagsToObjectDelta extends DeltaWithPhase {
 
   override def description = "Rewrite YAML tags into JSON objects"
 
-  override def dependencies = Set(YamlLanguageDelta)
+  override def dependencies = Set(YamlCoreDelta)
 }

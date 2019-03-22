@@ -2,13 +2,13 @@
 package deltas
 
 import core.deltas.ParseUsingTextualGrammar
-import deltas.yaml.YamlLanguageDelta
+import deltas.yaml.YamlCoreDelta
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 
 class YamlTest extends FunSuite {
 
-  val language = TestLanguageBuilder.build(Seq(ParseUsingTextualGrammar, YamlLanguageDelta))
+  val language = TestLanguageBuilder.build(Seq(ParseUsingTextualGrammar, YamlCoreDelta))
 
   test("tagged block key") {
     val input = """      UserData: !Base64
