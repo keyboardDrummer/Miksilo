@@ -7,7 +7,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.ConcreteScope
 import core.smarts.types.objects.PrimitiveType
 import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, ObjectLiteral}
-import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
+import deltas.json.{JsonObjectLiteralDelta, DoubleQuoteStringLiteralDelta}
 import play.api.libs.json.{JsObject, Json}
 import util.SourceUtils
 
@@ -39,8 +39,8 @@ object CloudFormationTemplate extends Delta {
 
         val resourceMembers: ObjectLiteral[NodePath] = resource.value
         val typeString = resourceMembers.getValue("Type")
-        val resourceType = JsonStringLiteralDelta.getValue(typeString)
-        val typeDeclaration = builder.resolve(resourceType, typeString.getSourceElement(JsonStringLiteralDelta.Value), rootScope)
+        val resourceType = DoubleQuoteStringLiteralDelta.getValue(typeString)
+        val typeDeclaration = builder.resolve(resourceType, typeString.getSourceElement(DoubleQuoteStringLiteralDelta.Value), rootScope)
         val typeScope = builder.getDeclaredScope(typeDeclaration)
 
         resourceMembers.get("Properties").foreach(_properties => {
@@ -56,8 +56,8 @@ object CloudFormationTemplate extends Delta {
       program.visitShape(MemberShape, (_member: NodePath) => {
         val member: JsonObjectLiteralDelta.ObjectLiteralMember[NodePath] = _member
         if (member.key == "Ref") {
-          val value = JsonStringLiteralDelta.getValue(member.value)
-          val refLocation = member.value.getSourceElement(JsonStringLiteralDelta.Value)
+          val value = DoubleQuoteStringLiteralDelta.getValue(member.value)
+          val refLocation = member.value.getSourceElement(DoubleQuoteStringLiteralDelta.Value)
           builder.resolveToType(value, refLocation, rootScope, valueType)
         }
       })

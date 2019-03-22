@@ -67,8 +67,7 @@ class YamlTest extends FunSuite
       this(text.toCharArray, 0, Position(0, 0), BlockOut, 0)
     }
 
-    override def drop(amount: Int) = new IndentationReader(array, offset + amount,
-      newPosition(position, array, offset, amount), context, indentation)
+    override def drop(amount: Int) = new IndentationReader(array, offset + amount, move(amount), context, indentation)
 
     override def hashCode(): Int = offset ^ indentation ^ context.hashCode()
 

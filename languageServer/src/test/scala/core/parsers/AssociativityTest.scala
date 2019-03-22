@@ -14,8 +14,7 @@ trait CommonStringReaderParser extends CommonParserWriter with EditorParserWrite
       this(value.toCharArray, 0, Position(0, 0))
     }
 
-    def drop(amount: Int): StringReader = new StringReader(array, offset + amount,
-      newPosition(position, array, offset, amount))
+    def drop(amount: Int): StringReader = new StringReader(array, offset + amount, move(amount))
   }
 }
 

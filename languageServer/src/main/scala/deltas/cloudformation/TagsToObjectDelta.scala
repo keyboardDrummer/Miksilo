@@ -4,7 +4,7 @@ import core.deltas.DeltaWithPhase
 import core.deltas.path._
 import core.language.Compilation
 import core.language.node.{FieldData, Node}
-import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
+import deltas.json.{JsonObjectLiteralDelta, DoubleQuoteStringLiteralDelta}
 import deltas.yaml.YamlLanguageDelta
 
 object RemoveTagsInObjectMemberKeys extends DeltaWithPhase {
@@ -21,8 +21,7 @@ object RemoveTagsInObjectMemberKeys extends DeltaWithPhase {
     PathRoot(program).visitShape(JsonObjectLiteralDelta.MemberShape, path => {
       val key = path(JsonObjectLiteralDelta.MemberKey).asInstanceOf[NodeChildPath]
       key.current.shape match {
-        case JsonStringLiteralDelta.Shape => key.replaceWith(key.current(JsonStringLiteralDelta.Value))
-        //case YamlLanguageDelta.TaggedNode => key.replaceWith(key.current(YamlLanguageDelta.TagNode))
+        case DoubleQuoteStringLiteralDelta.Shape => key.replaceWith(key.current(DoubleQuoteStringLiteralDelta.Value))
       }
     })
 

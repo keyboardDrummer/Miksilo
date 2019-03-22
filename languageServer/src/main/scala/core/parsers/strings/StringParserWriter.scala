@@ -38,10 +38,10 @@ trait StringParserWriter extends SequenceParserWriter {
     def array: ArrayCharSequence
     def drop(amount: Int): Input
 
-    def newPosition(previous: Position, array: ArrayCharSequence, previousOffset: Int, increase: Int): Position = {
-      var column = previous.character
-      var row = previous.line
-      for(index <- previousOffset.until(previousOffset + increase)) {
+    def move(increase: Int): Position = {
+      var column = position.character
+      var row = position.line
+      for(index <- offset.until(offset + increase)) {
         if (array.charAt(index) == '\n') {
           row += 1
           column = 0

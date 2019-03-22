@@ -6,6 +6,6 @@ import deltas.javac.expressions.literals.BooleanLiteralDelta
 
 object JsonLanguage {
   val deltas: Seq[Delta] = Seq[Delta](ExpressionLanguageDelta, DefaultExpressionDelta, BooleanLiteralDelta, JsonObjectLiteralDelta,
-    ArrayLiteralDelta, JsonStringLiteralDelta, IntLiteralDelta, ExpressionDelta)
+    ArrayLiteralDelta, SingleQuoteStringLiteralDelta, DoubleQuoteStringLiteralDelta, IntLiteralDelta, ExpressionDelta)
   val language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ deltas)
 }

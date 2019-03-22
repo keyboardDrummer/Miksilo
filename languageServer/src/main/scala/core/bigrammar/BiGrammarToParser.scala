@@ -28,8 +28,7 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
       this(text.toCharArray, 0, Position(0, 0), Map.empty)
     }
 
-    override def drop(amount: Int) = new Reader(array, offset + amount,
-      newPosition(position, array, offset, amount), state)
+    override def drop(amount: Int) = new Reader(array, offset + amount, move(amount), state)
 
     override def hashCode(): Int = offset ^ state.hashCode()
 
