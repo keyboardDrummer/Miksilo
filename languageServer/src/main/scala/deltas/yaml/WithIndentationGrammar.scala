@@ -21,7 +21,3 @@ class WithIndentationGrammar(inner: BiGrammar) extends CustomGrammar {
 
   override def containsParser(recursive: BiGrammar => Boolean) = true
 }
-
-
-
-

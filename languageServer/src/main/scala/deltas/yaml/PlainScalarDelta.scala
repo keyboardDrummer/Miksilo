@@ -15,10 +15,8 @@ object PlainScalarDelta extends DeltaWithGrammar {
     val _grammars = grammars
     import grammars._
 
-    val nbChars = """\n"""
-    val nsChars = nbChars + " "
-
-    val plainSafeOutChars = s"""$nbChars#'"""
+    val nonBreakChars = """\n"""
+    val plainSafeOutChars = s"""$nonBreakChars#'"""
     val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
     val doubleColonPlainSafeIn =  RegexGrammar(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r)
     val doubleColonPlainSafeOut =  RegexGrammar(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r)
@@ -48,7 +46,7 @@ object PlainScalarDelta extends DeltaWithGrammar {
 
   }
 
-  override def description = "Adds Yaml's plain scalar"
+  override def description = "Adds the YAML plain scalar"
 
   override def dependencies = Set.empty
 }
