@@ -176,7 +176,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
   }
 
-  case class EditorParseResult[+Result](successOption: Option[Success[Result]], biggestFailure: OptionFailure[Result])
+  final case class EditorParseResult[+Result](successOption: Option[Success[Result]], biggestFailure: OptionFailure[Result])
     extends UnambiguousParseResult[Result] with EditorResult [Result] {
 
     def resultOption: Option[Result] = successOption.map(s => s.result).orElse(biggestFailure.partialResult)

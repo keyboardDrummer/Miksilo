@@ -2,8 +2,6 @@ package core.parsers.strings
 
 import core.parsers.editorParsers.DefaultCache
 
-
-
 trait IndentationSensitiveParserWriter extends StringParserWriter {
   type Input <: IndentationReaderLike
 

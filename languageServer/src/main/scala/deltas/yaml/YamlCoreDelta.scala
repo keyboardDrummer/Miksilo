@@ -46,14 +46,14 @@ object YamlCoreDelta extends DeltaWithGrammar {
     override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
   }
 
-  object BlockValueGrammar extends GrammarKey
+  object IndentationSensitiveExpression extends GrammarKey
 
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     val grammars = _grammars
     import _grammars._
     val tag: BiGrammar = "!" ~> RegexGrammar(s"""[^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator
 
-    val blockValue = create(BlockValueGrammar)
+    val blockValue = create(IndentationSensitiveExpression)
     blockValue.addAlternative(tag.as(TagName) ~ blockValue.as(TagNode) asNode TaggedNode)
 
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)

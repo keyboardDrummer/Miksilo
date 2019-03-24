@@ -6,7 +6,7 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import deltas.expression.ExpressionDelta
-import deltas.json.DoubleQuoteStringLiteralDelta
+import deltas.json.StringLiteralDelta
 
 object PlainScalarDelta extends DeltaWithGrammar {
   def flowIndicatorChars = """,\[\]{}"""
@@ -42,7 +42,7 @@ object PlainScalarDelta extends DeltaWithGrammar {
       case FlowKey => FlowKey
       case _ => FlowOut
     }, plainStyleMultiLineString | plainStyleSingleLineString).
-      as(DoubleQuoteStringLiteralDelta.Value).asNode(DoubleQuoteStringLiteralDelta.Shape)
+      as(StringLiteralDelta.Value).asNode(StringLiteralDelta.Shape)
 
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(plainScalar)
 
