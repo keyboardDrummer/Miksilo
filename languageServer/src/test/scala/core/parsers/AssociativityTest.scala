@@ -1,11 +1,8 @@
-package core.parsers
+package core.parsers2
 
 import org.scalatest.FunSuite
-import strings.StringReader
-import editorParsers.EditorParserWriter
-import strings.CommonParserWriter
 
-trait AssociativityTest extends FunSuite with CommonParserWriter with EditorParserWriter {
+trait AssociativityTest extends FunSuite with CommonStringReaderParser {
 
   test("binary operators are right associative by default") {
     lazy val expr: EditorParser[Any] = new EditorLazy(expr) ~< "-" ~ expr | wholeNumber

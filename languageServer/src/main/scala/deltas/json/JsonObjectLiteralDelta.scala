@@ -22,16 +22,16 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     import grammars._
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val keyGrammar = "\"" ~> RegexGrammar(JsonStringLiteralDelta.stringInnerRegex).as(MemberKey) ~< "\""
+    val keyGrammar = create(MemberKey, "\"" ~> RegexGrammar(StringLiteralDelta.stringInnerRegex).as(MemberKey) ~< "\"")
     val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | value(Unit))).indent() %< "}"
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
   }
 
+  object MemberShape extends NodeShape
   object MemberValue extends NodeField
   object MemberKey extends NodeField
-  object MemberShape extends NodeShape
 
   object Members extends NodeField
   object Shape extends NodeShape

@@ -1,17 +1,16 @@
 package core.bigrammar
 
+import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.TestGrammarUtils.parseAndPrintSame
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, Delta, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.GrammarKey
-import core.parsers.strings.StringReader
 import deltas.ClearPhases
 import deltas.javac.JavaToByteCodeLanguage
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
-import BiGrammarToParser._
 
 case class StringKey(value: String) extends GrammarKey {
   override lazy val toString: String = value
@@ -43,7 +42,7 @@ object TestGrammarUtils extends FunSuite {
 
   def parse(example: String, grammarDocument: BiGrammar): EditorParseResult[Any] = {
     val parser = toParser(grammarDocument)
-    parser.parseWholeInput(new StringReader(example))
+    parser.parseWholeInput(new Reader(example))
   }
 }
 

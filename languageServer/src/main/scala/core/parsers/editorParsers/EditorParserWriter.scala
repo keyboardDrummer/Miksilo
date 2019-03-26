@@ -1,7 +1,7 @@
 package core.parsers.editorParsers
 
 import core.parsers.core.ParserWriter
-import util.cache.{Cache, InfiniteCache}
+
 import scala.language.higherKinds
 
 trait EditorParserWriter extends ParserWriter {
@@ -13,6 +13,7 @@ trait EditorParserWriter extends ParserWriter {
   trait EditorResult[+Result] extends ParseResultLike[Result] {
     def biggestFailure: OptionFailure[Result]
     def resultOption: Option[Result]
+    def updateRemainder(f: Input => Input): ParseResult[Result]
   }
 
   override def succeed[Result](result: Result): EditorParser[Result] = Succeed(result)
@@ -95,12 +96,15 @@ trait EditorParserWriter extends ParserWriter {
       case _: Some[Result] => this
       case None => ParseFailure(Some(value), remainder, message)
     }
+
+    override def mapRemainder(f: Input => Input) = ParseFailure(partialResult, f(remainder), message)
   }
 
   trait OptionFailure[+Result] {
     def offset: Int
     def partialResult: Option[Result]
     def map[NewResult](f: Result => NewResult): OptionFailure[NewResult]
+    def mapRemainder(f: Input => Input): OptionFailure[Result]
 
     def getBiggest[Other >: Result](other: OptionFailure[Other]): OptionFailure[Other] = {
       if (offset > other.offset) this else other
@@ -113,6 +117,8 @@ trait EditorParserWriter extends ParserWriter {
     override def map[NewResult](f: Nothing => NewResult): OptionFailure[NewResult] = this
 
     override def partialResult: Option[Nothing] = None
+
+    override def mapRemainder(f: Input => Input) = this
   }
 
   class EditorLazy[+Result](_inner: => EditorParser[Result]) extends Lazy[Result](_inner) with EditorParser[Result] {

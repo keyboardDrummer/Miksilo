@@ -3,7 +3,6 @@ package core.deltas
 import core.bigrammar.BiGrammarToParser._
 import core.language.node.Node
 import core.language.{Compilation, Language}
-import core.parsers.strings.StringReader
 import core.smarts.FileDiagnostic
 import util.SourceUtils
 
@@ -30,7 +29,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
   }
 
   def parseStream[T](parser: EditorParser[T], input: InputStream): ParseResult[T] = {
-    val reader = new StringReader(SourceUtils.streamToString(input))
+    val reader = new Reader(SourceUtils.streamToString(input))
     parser.parseWholeInput(reader)
   }
 

@@ -26,7 +26,7 @@ class BiGrammarToPrinter {
       val result: NodePrinter = grammar match {
         case choice: Choice => new OrPrinter(toPrinterCached(choice.left), toPrinterCached(choice.right))
         case Delimiter(keyword) => _ => succeed(keyword)
-        case Keyword(keyword, _, verify) => (value) =>
+        case Keyword(keyword, _, verify) => value =>
           if (!verify || value.value == keyword)
             succeed(keyword)
           else

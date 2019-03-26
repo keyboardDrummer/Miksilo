@@ -1,7 +1,7 @@
 package deltas.trivia
 
 import core.bigrammar.BiGrammar.State
-import core.bigrammar.BiGrammarToParser.Result
+import core.bigrammar.BiGrammarToParser.{Result, _}
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
@@ -11,7 +11,6 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.{Key, NodeField, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
-import BiGrammarToParser._
 
 object StoreTriviaDelta extends DeltaWithGrammar {
 
@@ -42,7 +41,9 @@ object StoreTriviaDelta extends DeltaWithGrammar {
   }
 
   object TriviaCounter extends Key
-  case class Trivia(index: Int) extends NodeField
+  case class Trivia(index: Int) extends NodeField {
+    override lazy val toString = s"Trivia$index"
+  }
 
   class StoreTrivia(var triviaGrammar: BiGrammar) extends CustomGrammar with BiGrammar {
 

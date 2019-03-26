@@ -21,8 +21,6 @@ import deltas.javac.types.{MethodTypeDelta, TypeAbstraction}
 import deltas.statement.{BlockDelta, LabelStatementDelta}
 import deltas.statement.BlockDelta.BlockStatement
 
-
-
 object MethodDelta extends DeltaWithGrammar
   with HasDeclarationDelta with HasConstraintsDelta with HasShape {
 

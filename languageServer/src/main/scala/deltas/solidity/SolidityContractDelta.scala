@@ -13,9 +13,10 @@ import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.ConstraintSkeleton
 import deltas.HasNameDelta.{HasName, Name}
+import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta}
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.javac.classes.skeleton.JavaClassDelta.ClassImports
 
 object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {

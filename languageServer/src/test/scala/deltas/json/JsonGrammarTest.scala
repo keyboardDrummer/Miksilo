@@ -23,7 +23,7 @@ class JsonGrammarTest extends FunSuite {
     assertResult(Position(1, 20))(member.getSourceElement(MemberValue).range.get.end)
 
     val stringValue = member.value
-    val stringLocation = stringValue.getSourceElement(JsonStringLiteralDelta.Value)
+    val stringLocation = stringValue.getSourceElement(StringLiteralDelta.Value)
     assertResult(Position(1, 8))(stringLocation.range.get.start)
     assertResult(Position(1, 19))(stringLocation.range.get.end)
   }

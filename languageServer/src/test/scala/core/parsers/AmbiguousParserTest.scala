@@ -1,7 +1,6 @@
-package core.parsers
+package core.parsers2
 
-import ambiguousEditorParsers.AmbiguousEditorParserWriter
-import strings.StringReader
+import core.parsers.ambiguousEditorParsers.AmbiguousEditorParserWriter
 
 class AmbiguousParserTest extends AssociativityTest
   with LeftRecursionTest

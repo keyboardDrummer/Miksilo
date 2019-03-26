@@ -29,7 +29,6 @@ object ArrayAccessDelta extends Delta {
             }
           }
         })
-
       }
     })
     super.inject(language)

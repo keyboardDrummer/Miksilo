@@ -3,21 +3,50 @@ package core.bigrammar
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
 import core.parsers.editorParsers.UnambiguousEditorParserWriter
-import core.parsers.strings.{CommonParserWriter, StringReader}
+import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
+import langserver.types.Position
 
 import scala.collection.mutable
 
 case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 
 //noinspection ZeroIndexToHead
-object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParserWriter  {
+object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParserWriter
+  with IndentationSensitiveParserWriter {
+
   type AnyWithMap = WithMap[Any]
   type Result = StateFull[AnyWithMap]
+  type Input = Reader
+
+  object IndentationKey
+  class Reader(array: ArrayCharSequence, offset: Int, position: Position, val state: State)
+    extends StringReaderBase(array, offset, position)
+    with IndentationReaderLike {
+
+    def withState(newState: State): Reader = new Reader(array, offset, position, newState)
+
+    def this(text: String) {
+      this(text.toCharArray, 0, Position(0, 0), Map.empty)
+    }
+
+    override def drop(amount: Int) = new Reader(array, offset + amount, move(amount), state)
+
+    override def hashCode(): Int = offset
+
+    override def equals(obj: Any): Boolean = obj match {
+      case other: Reader => offset == other.offset && state.equals(other.state)
+      case _ => false
+    }
+
+    override def indentation = state.getOrElse(IndentationKey, 0).asInstanceOf[Int]
+
+    override def withIndentation(value: Int) = withState(state + (IndentationKey -> value))
+  }
 
   def valueToResult(value: Any): Result = (state: State) => (state, WithMap(value, Map.empty))
 
   def toStringParser(grammar: BiGrammar): String => ParseResult[Any] =
-    input => toParser(grammar).parseWholeInput(new StringReader(input))
+    input => toParser(grammar).parseWholeInput(new Reader(input))
 
   def toParser(grammar: BiGrammar): EditorParser[Any] = {
 

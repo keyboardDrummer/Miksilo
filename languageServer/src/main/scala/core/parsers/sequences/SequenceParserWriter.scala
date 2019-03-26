@@ -7,7 +7,6 @@ trait SequenceParserWriter extends EditorParserWriter {
   type Input <: SequenceInput[Input, Elem]
 
   def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
-
   case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends EditorParser[Elem] {
     override def parseInternal(input: Input, cache: ParseStateLike): ParseResult[Elem] = {
       if (input.atEnd) {

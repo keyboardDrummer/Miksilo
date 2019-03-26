@@ -61,10 +61,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       leftResult.successOption match {
         case Some(leftSuccess) =>
           val rightResult = state.parse(right, leftSuccess.remainder)
-          val rightFailure = rightResult.biggestFailure.map(r => combine(leftSuccess.result, r))
-          EditorParseResult(
-            rightResult.successOption.map(r => Success(combine(leftSuccess.result, r.result), r.remainder)),
-            leftFailure.getBiggest(rightFailure))
+          rightResult.map(r => combine(leftSuccess.result, r)).addFailure(leftFailure)
 
         case None =>
           EditorParseResult(None, leftFailure)
@@ -128,49 +125,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     }
   }
 
-//  class FlatMap[+Result, +NewResult](left: EditorParser[Result], getRight: Result => EditorParser[NewResult])
-//    extends EditorParser[NewResult] {
-//
-//    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[NewResult] = {
-//      val leftResult = state.parse(left, input)
-//      leftResult match {
-//        case leftSuccess: ParseSuccess[Result] =>
-//          val right = getRight(leftSuccess.result)
-//          val rightResult = state.parse(right, leftSuccess.remainder)
-//          rightResult match {
-//            case rightSuccess: ParseSuccess[NewResult] =>
-//              rightSuccess.
-//                addFailure(leftSuccess.biggestFailure match {
-//                  case NoFailure => NoFailure
-//                  case ParseFailure(partialResult, remainder, message) =>
-//                    ParseFailure(partialResult.flatMap(leftPartial => getRight(leftPartial).getDefault(state)), remainder, message)
-//                })
-//
-//            case rightFailure: ParseFailure[NewResult] =>
-//              if (leftSuccess.biggestFailure.offset > rightFailure.offset) {
-//                val biggestFailure = leftSuccess.biggestFailure.asInstanceOf[ParseFailure[Result]]
-//                ParseFailure(rightFailure.partialResult, biggestFailure.remainder, biggestFailure.message)
-//              }
-//              else {
-//                rightFailure
-//              }
-//          }
-//
-//        case leftFailure: ParseFailure[Result] =>
-//          val result = for {
-//            leftPartial <- leftFailure.partialResult
-//            rightDefault <- getRight(leftPartial).getDefault(state)
-//          } yield rightDefault
-//          ParseFailure(result, leftFailure.remainder, leftFailure.message)
-//      }
-//    }
-//
-//    override def getDefault(cache: DefaultCache): Option[NewResult] = for {
-//      leftDefault <- cache(left)
-//      rightDefault <- cache(getRight(leftDefault))
-//    } yield rightDefault
-//  }
-
   class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParser[NewResult] {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[NewResult] = {
       state.parse(original, input).map(f)
@@ -179,7 +133,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
   }
 
-  case class EditorParseResult[+Result](successOption: Option[Success[Result]], biggestFailure: OptionFailure[Result])
+  final case class EditorParseResult[+Result](successOption: Option[Success[Result]], biggestFailure: OptionFailure[Result])
     extends UnambiguousParseResult[Result] with EditorResult [Result] {
 
     def resultOption: Option[Result] = successOption.map(s => s.result).orElse(biggestFailure.partialResult)
@@ -190,9 +144,23 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       case f: ParseFailure[Result] => EditorParseResult(successOption, f.addDefault(value))
     }
 
+    def updateRemainder(f: Input => Input): EditorParseResult[Result] = {
+      EditorParseResult(successOption.map(s => Success(s.result, f(s.remainder))), biggestFailure.mapRemainder(f))
+    }
+
     override def getSuccessRemainder = successOption.map(s => s.remainder)
 
-    override def flatMap[NewResult](f: Success[Result] => EditorParseResult[NewResult]) = {
+    override def map[NewResult](f: Result => NewResult): ParseResult[NewResult] = {
+
+      val failure = biggestFailure match {
+        case failure: ParseFailure[Result] =>
+          ParseFailure(failure.partialResult.map(r => f(r)), failure.remainder, failure.message)
+        case NoFailure => NoFailure
+      }
+      EditorParseResult(successOption.map(s => s.map(f)), failure)
+    }
+
+    override def flatMap[NewResult](f: Success[Result] => EditorParseResult[NewResult]): ParseResult[NewResult] = {
 
       val failure = biggestFailure match {
         case failure: ParseFailure[Result] =>
@@ -209,7 +177,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     }
 
     def addFailure[Other >: Result](other: OptionFailure[Other]): EditorParseResult[Other] =
-      if (biggestFailure.offset > other.offset) this else
+      if (biggestFailure.offset >= other.offset || successOption.exists(s => s.remainder.offset >= other.offset)) this else
         EditorParseResult(successOption, other)
   }
 

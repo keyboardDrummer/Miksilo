@@ -13,11 +13,9 @@ import deltas.expression.{ExpressionDelta, ExpressionInstance}
 
 import scala.util.matching.Regex
 
-object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
+object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
-  override def description: String = "Adds the usage of JSON string literals, " +
-    "in which the String is considered an identifier, " +
-    "and the quotes are not part of the position"
+  override def description: String = "Adds the double quoted string literal"
 
   val shape = Shape
 
@@ -43,3 +41,5 @@ object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     builder.typesAreEqual(_type, PrimitiveType("String"))
   }
 }
+
+

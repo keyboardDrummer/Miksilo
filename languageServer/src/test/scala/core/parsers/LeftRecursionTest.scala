@@ -1,11 +1,9 @@
-package core.parsers
+package core.parsers2
 
-import strings.StringReader
-import editorParsers.EditorParserWriter
-import strings.CommonParserWriter
+import core.parsers.editorParsers.EditorParserWriter
 import org.scalatest.FunSuite
 
-trait LeftRecursionTest extends FunSuite with CommonParserWriter with EditorParserWriter {
+trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {
 
   test("left recursion with lazy indirection") {
     lazy val head: EditorParser[Any] = new EditorLazy(head) ~ "a" | "a"
