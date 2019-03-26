@@ -14,7 +14,8 @@ case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParserWriter
   with IndentationSensitiveParserWriter {
 
-  type Result = WithMap[Any]
+  type AnyWithMap = WithMap[Any]
+  type Result = StateFull[AnyWithMap]
   type Input = Reader
 
   object IndentationKey
@@ -42,7 +43,7 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
     override def withIndentation(value: Int) = withState(state + (IndentationKey -> value))
   }
 
-  def valueToResult(value: Any): Result = WithMap(value, Map.empty)
+  def valueToResult(value: Any): Result = (state: State) => (state, WithMap(value, Map.empty))
 
   def toStringParser(grammar: BiGrammar): String => ParseResult[Any] =
     input => toParser(grammar).parseWholeInput(new Reader(input))
@@ -69,7 +70,8 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
   }
 
   private def executeResult(result: Result): Any = {
-    result.value
+    val afterStateRun = result(Map.empty[Any, Any])
+    afterStateRun._2.value
   }
 
   private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => EditorParser[Result], grammar: BiGrammar): EditorParser[Result] = {
@@ -77,10 +79,15 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
       case sequence: BiSequence =>
         val firstParser = recursive(sequence.first)
         val secondParser = recursive(sequence.second)
-        val parser = leftRight(firstParser, secondParser, (first: Result, second: Result) => {
-          val resultValue = sequence.bijective.construct(first.value, second.value)
-          val resultMap = first.namedValues ++ second.namedValues
-          WithMap[Any](resultValue, resultMap)
+        val parser = leftRight(firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
+          for {
+            first <- firstResult
+            second <- secondResult
+          } yield {
+            val resultValue = sequence.bijective.construct(first.value, second.value)
+            val resultMap = first.namedValues ++ second.namedValues
+            WithMap[Any](resultValue, resultMap)
+          }
         })
         parser
       case choice: Choice =>
@@ -93,14 +100,14 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
 
       case many: core.bigrammar.grammars.Many =>
         val innerParser = recursive(many.inner)
-        val parser = innerParser.many[WithMap[List[Any]]](
-          WithMap(List.empty[Any], Map.empty[Any, Any]),
-          (w, w2) => WithMap(w.value :: w2.value, w2.namedValues ++ w.namedValues))
+        val parser = innerParser.many[StateFull[WithMap[List[Any]]]](
+          StateFull.value(WithMap(List.empty[Any], Map.empty[Any, Any])),
+          (element, result) => element.flatMap(w => result.map(w2 => WithMap(w.value :: w2.value, w.namedValues ++ w2.namedValues))))
 
         parser
       case mapGrammar: MapGrammarWithMap =>
         val innerParser = recursive(mapGrammar.inner)
-        innerParser.map(mapGrammar.construct)
+        innerParser.map(result => result.map(mapGrammar.construct))
 
       case BiFailure(message) => fail(message)
       case Print(_) => succeed(Unit).map(valueToResult)

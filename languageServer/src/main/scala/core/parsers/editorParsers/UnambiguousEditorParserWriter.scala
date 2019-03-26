@@ -125,49 +125,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     }
   }
 
-//  class FlatMap[+Result, +NewResult](left: EditorParser[Result], getRight: Result => EditorParser[NewResult])
-//    extends EditorParser[NewResult] {
-//
-//    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[NewResult] = {
-//      val leftResult = state.parse(left, input)
-//      leftResult match {
-//        case leftSuccess: ParseSuccess[Result] =>
-//          val right = getRight(leftSuccess.result)
-//          val rightResult = state.parse(right, leftSuccess.remainder)
-//          rightResult match {
-//            case rightSuccess: ParseSuccess[NewResult] =>
-//              rightSuccess.
-//                addFailure(leftSuccess.biggestFailure match {
-//                  case NoFailure => NoFailure
-//                  case ParseFailure(partialResult, remainder, message) =>
-//                    ParseFailure(partialResult.flatMap(leftPartial => getRight(leftPartial).getDefault(state)), remainder, message)
-//                })
-//
-//            case rightFailure: ParseFailure[NewResult] =>
-//              if (leftSuccess.biggestFailure.offset > rightFailure.offset) {
-//                val biggestFailure = leftSuccess.biggestFailure.asInstanceOf[ParseFailure[Result]]
-//                ParseFailure(rightFailure.partialResult, biggestFailure.remainder, biggestFailure.message)
-//              }
-//              else {
-//                rightFailure
-//              }
-//          }
-//
-//        case leftFailure: ParseFailure[Result] =>
-//          val result = for {
-//            leftPartial <- leftFailure.partialResult
-//            rightDefault <- getRight(leftPartial).getDefault(state)
-//          } yield rightDefault
-//          ParseFailure(result, leftFailure.remainder, leftFailure.message)
-//      }
-//    }
-//
-//    override def getDefault(cache: DefaultCache): Option[NewResult] = for {
-//      leftDefault <- cache(left)
-//      rightDefault <- cache(getRight(leftDefault))
-//    } yield rightDefault
-//  }
-
   class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParser[NewResult] {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[NewResult] = {
       state.parse(original, input).map(f)

@@ -3,7 +3,6 @@ package core.parsers.strings
 import core.parsers.editorParsers.DefaultCache
 import core.parsers.sequences.{SequenceInput, SequenceParserWriter}
 import langserver.types.Position
-
 import scala.util.matching.Regex
 
 trait StringParserWriter extends SequenceParserWriter {

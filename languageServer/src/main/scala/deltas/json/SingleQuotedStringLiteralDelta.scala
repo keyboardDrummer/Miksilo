@@ -16,6 +16,6 @@ object SingleQuotedStringLiteralDelta extends DeltaWithGrammar {
     import grammars._
 
     val grammar = keyword("'") ~> RegexGrammar("""[^']*""".r).as(StringLiteralDelta.Value) ~< keyword("'")
-    find(StringLiteralDelta.Shape).addAlternative(grammar)
+    find(StringLiteralDelta.Shape).addAlternative(grammar.asNode(StringLiteralDelta.Shape))
   }
 }

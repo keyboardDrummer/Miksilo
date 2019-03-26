@@ -1,6 +1,6 @@
 package core.language.node
 
-import core.bigrammar.BiGrammarToParser.{Result}
+import core.bigrammar.BiGrammarToParser.{AnyWithMap, Result}
 import core.bigrammar.grammars.{FieldPosition, MapGrammarWithMap}
 import core.bigrammar.printer.UndefinedDestructuringValue
 import core.bigrammar.{BiGrammar, WithMap}
@@ -34,7 +34,7 @@ object NodeGrammar {
 
   case class ValueNotFound(meta: NodeLike, field: Any)
 
-  def construct(withMap: Result, key: NodeShape): Result = {
+  def construct(withMap: AnyWithMap, key: NodeShape): AnyWithMap = {
     val result = new Node(key)
     result.data ++= withMap.namedValues.collect { case (k: NodeField,v) => (k,v) } // TODO trivia should be stored in a separate array on Node.
     result.sources ++= withMap.namedValues.collect { case (k: FieldPosition,v) => (k.field,v.asInstanceOf[SourceRange]) }

@@ -1,6 +1,6 @@
-package core.parsers
+package core.parsers2
 
-import editorParsers.EditorParserWriter
+import core.parsers.editorParsers.EditorParserWriter
 import org.scalatest.FunSuite
 
 trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {

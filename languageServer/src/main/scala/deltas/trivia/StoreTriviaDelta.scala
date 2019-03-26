@@ -1,7 +1,7 @@
 package deltas.trivia
 
 import core.bigrammar.BiGrammar.State
-import core.bigrammar.BiGrammarToParser.Result
+import core.bigrammar.BiGrammarToParser.{Result, _}
 import core.bigrammar.grammars._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
@@ -11,8 +11,6 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.{Key, NodeField, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
-import BiGrammarToParser._
-import core.parsers.editorParsers.DefaultCache
 
 object StoreTriviaDelta extends DeltaWithGrammar {
 
@@ -47,25 +45,6 @@ object StoreTriviaDelta extends DeltaWithGrammar {
     override lazy val toString = s"Trivia$index"
   }
 
-  class StoreParser(inner: EditorParser[Result]) extends EditorParser[Result] {
-    override def parseInternal(input: Reader, parseState: BiGrammarToParser.ParseStateLike): ParseResult[Result] = {
-      val state = input.state
-      val counter: Int = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
-      val field = Trivia(counter)
-      val newState = state + (TriviaCounter -> (counter + 1))
-      val newInput = input.withState(newState)
-      val innerResult = parseState.parse(inner, newInput)
-      innerResult.map(triviasWithMap => {
-        val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
-        WithMap[Any](Unit, if (trivias.nonEmpty)
-          Map(field -> trivias)
-        else Map.empty)
-      })
-    }
-
-    override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
-  }
-
   class StoreTrivia(var triviaGrammar: BiGrammar) extends CustomGrammar with BiGrammar {
 
     def getFieldAndIncrementCounter: StateFull[NodeField] = (state: State) => {
@@ -77,7 +56,15 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
     override def toParser(recursive: BiGrammar => EditorParser[Result]): EditorParser[Result] = {
       val triviaParser = recursive(triviaGrammar)
-      new StoreParser(triviaParser)
+      triviaParser.map(statefulTrivias =>
+        for {
+          field <- getFieldAndIncrementCounter
+          triviasWithMap <- statefulTrivias
+        } yield {
+          val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
+          WithMap[Any](Unit, if (trivias.nonEmpty) Map(field -> trivias) else Map.empty)
+        }
+      )
     }
 
     override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = new NodePrinter {
@@ -99,21 +86,6 @@ object StoreTriviaDelta extends DeltaWithGrammar {
     override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = new StoreTrivia(newChildren.head)
   }
 
-  class ResetNodeCounterParser(inner: EditorParser[Result]) extends EditorParser[Result] {
-
-    override def parseInternal(input: Reader, parseState: BiGrammarToParser.ParseStateLike): ParseResult[Result] = {
-      val state = input.state
-      val initialCounter = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
-      val newState = state + (TriviaCounter -> 0)
-      val newInput = input.withState(newState)
-      val innerParseResult = parseState.parse(inner, newInput)
-      innerParseResult.updateRemainder(remainder =>
-        remainder.withState(remainder.state + (TriviaCounter -> initialCounter)))
-    }
-
-    override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
-  }
-
   case class NodeCounterReset(var node: BiGrammar) extends CustomGrammar {
 
     override def children = Seq(node)
@@ -132,12 +104,10 @@ object StoreTriviaDelta extends DeltaWithGrammar {
     }
 
     override def toParser(recursive: BiGrammar => EditorParser[Result]): EditorParser[Result] = {
-      val inner = recursive(node)
-      new ResetNodeCounterParser(inner)
+      recursive(node).map(result => resetAndRestoreCounter(result))
     }
 
     override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = {
-
       val nodePrinter: NodePrinter = recursive(node)
       from: WithMap[Any] => {
         resetAndRestoreCounter(nodePrinter.write(from))

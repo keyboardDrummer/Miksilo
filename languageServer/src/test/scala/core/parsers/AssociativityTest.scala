@@ -1,24 +1,8 @@
-package core.parsers
+package core.parsers2
 
-import strings.CommonParserWriter
-import langserver.types.Position
 import org.scalatest.FunSuite
-import editorParsers.EditorParserWriter
 
-trait CommonStringReaderParser extends CommonParserWriter with EditorParserWriter {
-  type Input = StringReader
-
-  class StringReader(array: ArrayCharSequence, offset: Int, position: Position) extends StringReaderBase(array, offset, position) {
-
-    def this(value: String) {
-      this(value.toCharArray, 0, Position(0, 0))
-    }
-
-    def drop(amount: Int): StringReader = new StringReader(array, offset + amount, move(amount))
-  }
-}
-
-trait AssociativityTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {
+trait AssociativityTest extends FunSuite with CommonStringReaderParser {
 
   test("binary operators are right associative by default") {
     lazy val expr: EditorParser[Any] = new EditorLazy(expr) ~< "-" ~ expr | wholeNumber

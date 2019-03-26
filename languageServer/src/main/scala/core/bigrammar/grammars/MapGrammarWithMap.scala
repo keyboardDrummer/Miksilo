@@ -1,11 +1,11 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.BiGrammarToParser.Result
+import core.bigrammar.BiGrammarToParser.AnyWithMap
 
 case class MapGrammarWithMap(var inner: BiGrammar,
-                             construct: Result => Result,
-                             deconstruct: Result => Option[Result]) extends BiGrammar {
+                             construct: AnyWithMap => AnyWithMap,
+                             deconstruct: AnyWithMap => Option[AnyWithMap]) extends BiGrammar {
 
   override def children = Seq(inner)
 
