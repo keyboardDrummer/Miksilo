@@ -31,7 +31,7 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
 
     override def drop(amount: Int) = new Reader(array, offset + amount, move(amount), state)
 
-    override def hashCode(): Int = offset ^ state.hashCode()
+    override def hashCode(): Int = offset
 
     override def equals(obj: Any): Boolean = obj match {
       case other: Reader => offset == other.offset && state.equals(other.state)
