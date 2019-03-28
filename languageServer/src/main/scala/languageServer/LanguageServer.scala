@@ -4,8 +4,10 @@ import langserver.types._
 import languageServer.lsp._
 
 trait DocumentSymbolProvider {
-  def documentSymbols(tdi: TextDocumentIdentifier): Seq[SymbolInformation]
+  def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation]
 }
+
+case class DocumentSymbolParams(textDocument: TextDocumentIdentifier)
 
 trait HoverProvider {
   def hoverRequest(request: TextDocumentHoverRequest): Hover

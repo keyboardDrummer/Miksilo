@@ -166,6 +166,38 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
+  it("can use documentSymbol") {
+    val document = TextDocumentItem("a","",0,"content")
+    val request = DocumentSymbolParams(TextDocumentIdentifier(document.uri))
+    val symbolRange = Range(Position(0, 1), Position(1, 2))
+    val symbolInformation = SymbolInformation("someSymbol", SymbolKind.Variable,
+      Location(request.textDocument.uri, symbolRange), None)
+
+    val languageServer: LanguageServer = new TestLanguageServer with DocumentSymbolProvider {
+      override def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation] = {
+        Seq(symbolInformation)
+      }
+    }
+
+    val serverAndClient = setupServerAndClient(languageServer)
+    val client = serverAndClient.client
+    val gotoPromise = client.documentSymbol(request)
+
+    val serverOutExpectation =
+      """Content-Length: 164
+        |
+        |{"jsonrpc":"2.0","result":[{"name":"someSymbol","kind":13,"location":{"uri":"a","range":{"start":{"line":0,"character":1},"end":{"line":1,"character":2}}}}],"id":0}""".stripMargin
+    val clientOutExpectation =
+      """Content-Length: 101
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/documentSymbol","params":{"textDocument":{"uri":"a"}},"id":0}""".stripMargin
+    gotoPromise.future.map(result => {
+      assert(result == Seq(symbolInformation))
+      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
+    })
+  }
+
   it("can receive diagnostics") {
     val document = TextDocumentItem("a","",0,"content")
 

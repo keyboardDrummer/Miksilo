@@ -1,6 +1,6 @@
 package languageServer.lsp
 
-import langserver.types.{Location, ReferenceContext}
+import langserver.types.{Location, ReferenceContext, SymbolInformation}
 import languageServer._
 import play.api.libs.json._
 
@@ -28,7 +28,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
     handler.addRequestHandler[InitializeParams, InitializeResult](LSPProtocol.initialize, initialize)(Json.format, Json.format)
 
-    def addProvider[Provider: ClassTag, Request, Response](method: String, getHandler: Provider => (Request => Response))
+    def addProvider[Provider: ClassTag, Request, Response](method: String, getHandler: Provider => Request => Response)
                                                           (requestFormat: Reads[Request], responseFormat: Writes[Response]): Unit = {
       languageServer match {
         case provider: Provider =>
@@ -40,6 +40,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
     implicit val textDocumentPositionParams: OFormat[DocumentPosition] = Json.format
     implicit val referenceContext: OFormat[ReferenceContext] = Json.format
     addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[Location]])
+    addProvider(LSPProtocol.documentSymbol, (provider: DocumentSymbolProvider) => provider.documentSymbols)(Json.format, Writes.of[Seq[SymbolInformation]])
     addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[Seq[Location]])
     addProvider(LSPProtocol.completion, (provider: CompletionProvider) => provider.complete)(Json.format, Json.format)
     addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hoverRequest)(Json.format[TextDocumentHoverRequest], Json.format[Hover])

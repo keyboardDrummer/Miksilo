@@ -10,6 +10,12 @@ import scala.util.Random
 trait LanguageServerTest extends FunSuite {
 
   val itemUri = "helloWorld"
+
+  def documentSymbols(server: LanguageServer, program: String): Seq[SymbolInformation] = {
+    val document = openDocument(server, program)
+    server.asInstanceOf[DocumentSymbolProvider].documentSymbols(DocumentSymbolParams(document))
+  }
+
   def gotoDefinition(language: Language, program: String, position: HumanPosition): Seq[Location] = {
     val server = new MiksiloLanguageServer(language)
     gotoDefinition(server, program, position)

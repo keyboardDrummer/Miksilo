@@ -44,6 +44,7 @@ class ScopeGraph extends
   val nodes = mutable.Map.empty[GraphNode, mutable.Set[GraphEdge]]
   val rangeToNode = mutable.Map.empty[FileRange, GraphNode]
   val elementToNode = mutable.Map.empty[SourceElement, GraphNode]
+  var declarationsPerFile = mutable.Map.empty[String, mutable.HashSet[NamedDeclaration]]
 
   def findDeclaration(location: SourceElement): Option[NamedDeclaration] = {
     val declarations = for {
@@ -129,6 +130,13 @@ class ScopeGraph extends
   private def addNode(node: GraphNode, element: SourceElement) {
     elementToNode(element) = node
     element.fileRange.foreach(position => rangeToNode(position) = node)
+    node match {
+      case declaration: NamedDeclaration => element.uriOption.foreach(file => {
+          val declarations = declarationsPerFile.getOrElseUpdate(file, new mutable.HashSet[NamedDeclaration]())
+          declarations.add(declaration)
+        })
+      case _ =>
+    }
   }
 
 }

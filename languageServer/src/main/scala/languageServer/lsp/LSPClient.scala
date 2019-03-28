@@ -1,8 +1,8 @@
 package languageServer.lsp
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
-import langserver.types.{Location, ReferenceContext, TextDocumentIdentifier, TextDocumentItem}
-import languageServer.{LanguageClient, ReferencesParams}
+import langserver.types._
+import languageServer.{DocumentSymbolParams, LanguageClient, ReferencesParams}
 import play.api.libs.json.{Json, OFormat, Reads}
 
 import scala.concurrent.Promise
@@ -24,6 +24,11 @@ class LSPClient(languageClient: LanguageClient, connection: JsonRpcConnection) {
     val result = correlationId
     correlationId += 1
     NumericCorrelationId(result)
+  }
+
+  def documentSymbol(parameters: DocumentSymbolParams): Promise[Seq[SymbolInformation]] = {
+    simpleConnection.sendRequest[DocumentSymbolParams, Seq[SymbolInformation]](
+      LSPProtocol.documentSymbol, getCorrelationId, parameters)(Json.format, Reads.of[Seq[SymbolInformation]])
   }
 
   def references(parameters: ReferencesParams): Promise[Seq[Location]] = {

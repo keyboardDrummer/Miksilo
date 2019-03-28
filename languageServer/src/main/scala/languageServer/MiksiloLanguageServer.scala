@@ -14,6 +14,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider
   with ReferencesProvider
   with CompletionProvider
+  with DocumentSymbolProvider
   with LazyLogging {
 
   var client: LanguageClient = _
@@ -104,7 +105,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       element = getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- proofs.gotoDefinition(element)
       fileRange <- definition.origin.flatMap(o => o.fileRange)
-    } yield Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)) //TODO misschien de Types file kopieren en Location vervangen door FileRange?
+    } yield fileRangeToLocation(fileRange) //TODO misschien de Types file kopieren en Location vervangen door FileRange?
     location.toSeq
   }
 
@@ -152,12 +153,22 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       if (parameters.context.includeDeclaration)
         fileRanges = definition.origin.flatMap(o => o.fileRange).toSeq ++ fileRanges
 
-      fileRanges.map(fileRange => Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end)))
+      fileRanges.map(fileRange => fileRangeToLocation(fileRange))
     }
     maybeResult.getOrElse(Seq.empty)
   }
 
+  private def fileRangeToLocation(fileRange: FileRange) = {
+    Location(fileRange.uri, new langserver.types.Range(fileRange.range.start, fileRange.range.end))
+  }
+
   override def setClient(client: LanguageClient): Unit = {
     this.client = client
+  }
+
+  override def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation] = {
+    currentDocumentId = params.textDocument
+    val declarations = getCompilation.proofs.scopeGraph.declarationsPerFile(params.textDocument.uri).toSeq
+    declarations.map(declaration => SymbolInformation(declaration.name, SymbolKind.Variable, fileRangeToLocation(declaration.origin.get.fileRange.get), None))
   }
 }

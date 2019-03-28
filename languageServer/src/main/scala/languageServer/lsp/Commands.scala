@@ -173,7 +173,7 @@ object MessageActionItem {
 }
 
 case class DocumentPosition(textDocument: TextDocumentIdentifier, position: Position)
-case class DocumentSymbolParams(textDocument: TextDocumentIdentifier) extends ServerCommand
+case class DocumentSymbolParams2(textDocument: TextDocumentIdentifier) extends ServerCommand
 
 case class TextDocumentHoverRequest(params: DocumentPosition) extends ServerCommand
 
