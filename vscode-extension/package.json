@@ -19,7 +19,8 @@
 		"onLanguage:systemverilog",
 		"onLanguage:solidity",
         "onLanguage:cloudFormation",
-        "onLanguage:java"
+        "onLanguage:java",
+		"onLanguage:yamlCloudFormation"
 	],
 	"main": "./out/extension",
 	"contributes": {
