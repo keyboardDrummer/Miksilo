@@ -2,7 +2,7 @@ package languageServer.lsp
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
 import langserver.types._
-import languageServer.{DocumentSymbolParams, LanguageClient, ReferencesParams}
+import languageServer.{DocumentSymbolParams, LanguageClient, ReferencesParams, RenameParams}
 import play.api.libs.json.{Json, OFormat, Reads}
 
 import scala.concurrent.Promise
@@ -24,6 +24,12 @@ class LSPClient(languageClient: LanguageClient, connection: JsonRpcConnection) {
     val result = correlationId
     correlationId += 1
     NumericCorrelationId(result)
+  }
+
+  def rename(parameters: RenameParams): Promise[WorkspaceEdit] = {
+    implicit val editContext: OFormat[TextEdit] = Json.format
+    simpleConnection.sendRequest[RenameParams, WorkspaceEdit](
+      LSPProtocol.rename, getCorrelationId, parameters)(Json.format, Json.format[WorkspaceEdit])
   }
 
   def documentSymbol(parameters: DocumentSymbolParams): Promise[Seq[SymbolInformation]] = {

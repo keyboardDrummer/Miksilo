@@ -9,6 +9,7 @@ class Fibonacci
 
     public static int fibonacci(int index)
     {
-        return index < /* here comes two */ 2 ? 1 : Fibonacci.fibonacci(index - 1) + Fibonacci.fibonacci(index - 2);
+        return index < /* here comes two */ 2 ? 1 :
+                Fibonacci.fibonacci(index - 1) + Fibonacci.fibonacci(index - 2);
     }
 }

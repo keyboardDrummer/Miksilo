@@ -11,6 +11,7 @@ object LSPProtocol {
   val didClose = "textDocument/didClose"
   val didChange = "textDocument/didChange"
   val didSave = "textDocument/didSave"
+  val rename = "textDocument/rename"
   val initialized = "initialized"
   val initialize = "initialize"
 }

@@ -1,6 +1,6 @@
 package languageServer.lsp
 
-import langserver.types.{Location, ReferenceContext, SymbolInformation}
+import langserver.types._
 import languageServer._
 import play.api.libs.json._
 
@@ -44,6 +44,8 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
     addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[Seq[Location]])
     addProvider(LSPProtocol.completion, (provider: CompletionProvider) => provider.complete)(Json.format, Json.format)
     addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hoverRequest)(Json.format[TextDocumentHoverRequest], Json.format[Hover])
+    implicit val textEditContext: OFormat[TextEdit] = Json.format[TextEdit]
+    addProvider(LSPProtocol.rename, (provider: RenameProvider) => provider.rename)(Json.format, Json.format[WorkspaceEdit])
   }
 
   def addNotificationHandlers(): Unit = {
@@ -57,15 +59,16 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
   def initialize(parameters: InitializeParams): InitializeResult = {
     languageServer.initialize(parameters)
-    InitializeResult(getCapabilities)
+    InitializeResult(getCapabilities(parameters.capabilities))
   }
 
-  def getCapabilities: ServerCapabilities = {
+  def getCapabilities(clientCapabilities: ClientCapabilities): ServerCapabilities = {
     ServerCapabilities(
       documentSymbolProvider = languageServer.isInstanceOf[DocumentSymbolProvider],
       referencesProvider = languageServer.isInstanceOf[ReferencesProvider],
       hoverProvider = languageServer.isInstanceOf[HoverProvider],
       definitionProvider = languageServer.isInstanceOf[DefinitionProvider],
+      renameProvider = languageServer.isInstanceOf[RenameProvider],
       completionProvider = languageServer match {
         case provider: CompletionProvider => Some(provider.getOptions)
         case _ => None

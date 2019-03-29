@@ -7,6 +7,12 @@ trait DocumentSymbolProvider {
   def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation]
 }
 
+trait RenameProvider {
+  def rename(params: RenameParams): WorkspaceEdit
+}
+
+case class RenameParams(textDocument: TextDocumentIdentifier, position: Position, newName: String)
+
 case class DocumentSymbolParams(textDocument: TextDocumentIdentifier)
 
 trait HoverProvider {

@@ -41,7 +41,7 @@ class LSPServerTest extends AsyncFunSpec {
 
     val result = Await.result(initializePromise.future, Duration.Inf)
 
-    assert(result.capabilities == serverAndClient.server.getCapabilities)
+    assert(result.capabilities == serverAndClient.server.getCapabilities(ClientCapabilities()))
     assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
     assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
   }
@@ -193,6 +193,41 @@ class LSPServerTest extends AsyncFunSpec {
         |{"jsonrpc":"2.0","method":"textDocument/documentSymbol","params":{"textDocument":{"uri":"a"}},"id":0}""".stripMargin
     gotoPromise.future.map(result => {
       assert(result == Seq(symbolInformation))
+      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
+    })
+  }
+
+  it("can use rename") {
+    val document = TextDocumentItem("a","",0,"content")
+    val request = RenameParams(TextDocumentIdentifier(document.uri), Position(0, 0), "newName")
+    val referenceRange = Range(Position(0, 1), Position(1, 2))
+
+    val expectation = WorkspaceEdit(Map(document.uri -> Seq(
+      TextEdit(referenceRange, "newName"),
+      TextEdit(referenceRange, "newName")
+    )))
+
+    val languageServer: LanguageServer = new TestLanguageServer with RenameProvider {
+      override def rename(params: RenameParams): WorkspaceEdit = {
+        expectation
+      }
+    }
+
+    val serverAndClient = setupServerAndClient(languageServer)
+    val client = serverAndClient.client
+    val gotoPromise = client.rename(request)
+
+    val serverOutExpectation =
+      """Content-Length: 245
+        |
+        |{"jsonrpc":"2.0","result":{"changes":{"a":[{"range":{"start":{"line":0,"character":1},"end":{"line":1,"character":2}},"newText":"newName"},{"range":{"start":{"line":0,"character":1},"end":{"line":1,"character":2}},"newText":"newName"}]}},"id":0}""".stripMargin
+    val clientOutExpectation =
+      """Content-Length: 149
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/rename","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0},"newName":"newName"},"id":0}""".stripMargin
+    gotoPromise.future.map(result => {
+      assert(result == expectation)
       assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
     })

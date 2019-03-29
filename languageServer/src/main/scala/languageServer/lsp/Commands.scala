@@ -173,7 +173,6 @@ object MessageActionItem {
 }
 
 case class DocumentPosition(textDocument: TextDocumentIdentifier, position: Position)
-case class DocumentSymbolParams2(textDocument: TextDocumentIdentifier) extends ServerCommand
 
 case class TextDocumentHoverRequest(params: DocumentPosition) extends ServerCommand
 
@@ -228,14 +227,3 @@ object FileChangeType {
 
 case class DocumentSymbolResult(params: Seq[SymbolInformation]) extends ResultResponse
 
-object ResultResponse extends ResponseCompanion[Any] {
-  import JsonRpcUtils._
-
-  override val ResponseFormats = Message.MessageFormats(
-    "initialize" -> Json.format[InitializeResult],
-    "textDocument/completion" -> Json.format[CompletionList],
-    "textDocument/definition" -> valueFormat(DefinitionResult)(_.params),
-    "textDocument/hover" -> Json.format[Hover],
-    "textDocument/documentSymbol" -> valueFormat(DocumentSymbolResult)(_.params),
-    "shutdown" -> Json.format[ShutdownResult])
-}
