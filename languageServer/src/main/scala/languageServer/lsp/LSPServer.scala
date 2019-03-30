@@ -1,6 +1,6 @@
 package languageServer.lsp
 
-import langserver.types.{Location, ReferenceContext}
+import langserver.types._
 import languageServer._
 import play.api.libs.json._
 
@@ -28,7 +28,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
     handler.addRequestHandler[InitializeParams, InitializeResult](LSPProtocol.initialize, initialize)(Json.format, Json.format)
 
-    def addProvider[Provider: ClassTag, Request, Response](method: String, getHandler: Provider => (Request => Response))
+    def addProvider[Provider: ClassTag, Request, Response](method: String, getHandler: Provider => Request => Response)
                                                           (requestFormat: Reads[Request], responseFormat: Writes[Response]): Unit = {
       languageServer match {
         case provider: Provider =>
@@ -40,9 +40,12 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
     implicit val textDocumentPositionParams: OFormat[DocumentPosition] = Json.format
     implicit val referenceContext: OFormat[ReferenceContext] = Json.format
     addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[Location]])
+    addProvider(LSPProtocol.documentSymbol, (provider: DocumentSymbolProvider) => provider.documentSymbols)(Json.format, Writes.of[Seq[SymbolInformation]])
     addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[Seq[Location]])
     addProvider(LSPProtocol.completion, (provider: CompletionProvider) => provider.complete)(Json.format, Json.format)
     addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hoverRequest)(Json.format[TextDocumentHoverRequest], Json.format[Hover])
+    implicit val textEditContext: OFormat[TextEdit] = Json.format[TextEdit]
+    addProvider(LSPProtocol.rename, (provider: RenameProvider) => provider.rename)(Json.format, Json.format[WorkspaceEdit])
   }
 
   def addNotificationHandlers(): Unit = {
@@ -56,15 +59,16 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
   def initialize(parameters: InitializeParams): InitializeResult = {
     languageServer.initialize(parameters)
-    InitializeResult(getCapabilities)
+    InitializeResult(getCapabilities(parameters.capabilities))
   }
 
-  def getCapabilities: ServerCapabilities = {
+  def getCapabilities(clientCapabilities: ClientCapabilities): ServerCapabilities = {
     ServerCapabilities(
       documentSymbolProvider = languageServer.isInstanceOf[DocumentSymbolProvider],
       referencesProvider = languageServer.isInstanceOf[ReferencesProvider],
       hoverProvider = languageServer.isInstanceOf[HoverProvider],
       definitionProvider = languageServer.isInstanceOf[DefinitionProvider],
+      renameProvider = languageServer.isInstanceOf[RenameProvider],
       completionProvider = languageServer match {
         case provider: CompletionProvider => Some(provider.getOptions)
         case _ => None

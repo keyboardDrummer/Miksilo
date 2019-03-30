@@ -10,9 +10,20 @@ import scala.util.Random
 trait LanguageServerTest extends FunSuite {
 
   val itemUri = "helloWorld"
+
+  def documentSymbols(server: LanguageServer, program: String): Seq[SymbolInformation] = {
+    val document = openDocument(server, program)
+    server.asInstanceOf[DocumentSymbolProvider].documentSymbols(DocumentSymbolParams(document))
+  }
+
   def gotoDefinition(language: Language, program: String, position: HumanPosition): Seq[Location] = {
     val server = new MiksiloLanguageServer(language)
     gotoDefinition(server, program, position)
+  }
+
+  def rename(server: LanguageServer, program: String, position: Position, newName: String): WorkspaceEdit = {
+    val document = openDocument(server, program)
+    server.asInstanceOf[RenameProvider].rename(RenameParams(document, position, newName))
   }
 
   def gotoDefinition(server: LanguageServer, program: String, position: HumanPosition): Seq[Location] = {

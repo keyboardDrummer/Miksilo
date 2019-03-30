@@ -19,8 +19,8 @@ object CloudFormationTemplate extends Delta {
   override def inject(language: Language): Unit = {
     super.inject(language)
 
-    val file = SourceUtils.getTestFileContents("CloudFormationResourceSpecification.json")
-    val parsedFile = Json.parse(file).as[JsObject]
+    val resourceTypeSpecification = SourceUtils.getTestFileContents("CloudFormationResourceSpecification.json")
+    val parsedFile = Json.parse(resourceTypeSpecification).as[JsObject]
     val resourceTypes = parsedFile.value("ResourceTypes").as[JsObject]
 
     language.collectConstraints = (compilation, builder) => {
@@ -32,36 +32,43 @@ object CloudFormationTemplate extends Delta {
 
       addPseudoParameters(builder, rootScope)
       addParameters(builder, rootScope, program)
+      handleResources(builder, rootScope, program)
 
-      val resources: ObjectLiteral[NodePath] = program.getValue("Resources")
-      for(resource <- resources.members) {
-        builder.declareSourceElement(resource.getSourceElement(MemberKey), rootScope, Some(valueType))
+      resolveRefs(builder, rootScope, program)
+    }
+  }
 
-        val resourceMembers: ObjectLiteral[NodePath] = resource.value
-        val typeString = resourceMembers.getValue("Type")
-        val resourceType = StringLiteralDelta.getValue(typeString)
-        val typeDeclaration = builder.resolve(resourceType, typeString.getSourceElement(StringLiteralDelta.Value), rootScope)
-        val typeScope = builder.getDeclaredScope(typeDeclaration)
+  private def handleResources(builder: ConstraintBuilder, rootScope: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
+    val resources: ObjectLiteral[NodePath] = program.getValue("Resources")
+    for (resource <- resources.members) {
+      builder.declareSourceElement(resource.getSourceElement(MemberKey), rootScope, Some(valueType))
 
-        resourceMembers.get("Properties").foreach(_properties => {
-          if (_properties.shape == JsonObjectLiteralDelta.Shape) {
-            val properties: ObjectLiteral[NodePath] = _properties
-            for(property <- properties.members) {
-              builder.resolveToType(property.key, property.node.getSourceElement(MemberKey), typeScope, propertyType)
-            }
+      val resourceMembers: ObjectLiteral[NodePath] = resource.value
+      val typeString = resourceMembers.getValue("Type")
+      val resourceType = StringLiteralDelta.getValue(typeString)
+      val typeDeclaration = builder.resolve(resourceType, typeString.getSourceElement(StringLiteralDelta.Value), rootScope)
+      val typeScope = builder.getDeclaredScope(typeDeclaration)
+
+      resourceMembers.get("Properties").foreach(_properties => {
+        if (_properties.shape == JsonObjectLiteralDelta.Shape) {
+          val properties: ObjectLiteral[NodePath] = _properties
+          for (property <- properties.members) {
+            builder.resolveToType(property.key, property.node.getSourceElement(MemberKey), typeScope, propertyType)
           }
-        })
-      }
-
-      program.visitShape(MemberShape, (_member: NodePath) => {
-        val member: JsonObjectLiteralDelta.ObjectLiteralMember[NodePath] = _member
-        if (member.key == "Ref") {
-          val value = StringLiteralDelta.getValue(member.value)
-          val refLocation = member.value.getSourceElement(StringLiteralDelta.Value)
-          builder.resolveToType(value, refLocation, rootScope, valueType)
         }
       })
     }
+  }
+
+  private def resolveRefs(builder: ConstraintBuilder, rootScope: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
+    program.visitShape(MemberShape, (_member: NodePath) => {
+      val member: JsonObjectLiteralDelta.ObjectLiteralMember[NodePath] = _member
+      if (member.key == "Ref") {
+        val value = StringLiteralDelta.getValue(member.value)
+        val refLocation = member.value.getSourceElement(StringLiteralDelta.Value)
+        builder.resolveToType(value, refLocation, rootScope, valueType)
+      }
+    })
   }
 
   private def addPseudoParameters(builder: ConstraintBuilder, rootScope: ConcreteScope): Unit = {
@@ -94,5 +101,5 @@ object CloudFormationTemplate extends Delta {
     }
   }
 
-  override def dependencies: Set[Contract] = Set.empty //Set(JsonObjectLiteralDelta)
+  override def dependencies: Set[Contract] = Set.empty
 }
