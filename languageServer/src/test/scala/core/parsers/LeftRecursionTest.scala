@@ -5,6 +5,24 @@ import org.scalatest.FunSuite
 
 trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {
 
+  test("handles recursion in complicated graph structures") {
+    lazy val leftMayNotCache = leftRec ~ "b"
+    lazy val leftRec = leftPath.map(x => x)
+    lazy val leftPath: EditorParser[Any] = new EditorLazy(leftMayNotCache | leftRec ~ "a" | "b")
+
+    val input = "bbb"
+    val leftParseResult = leftPath.parseWholeInput(new StringReader(input))
+    assert(leftParseResult.successful)
+    val expectation = (("b","b"),"b")
+    assertResult(expectation)(leftParseResult.get)
+
+    lazy val rightMayNotCache = rightRec ~ "b"
+    lazy val rightRec = rightPath.map(x => x)
+    lazy val rightPath: EditorParser[Any] = new EditorLazy(rightRec ~ "a" | rightMayNotCache | "b")
+    val rightParseResult = rightPath.parseWholeInput(new StringReader(input))
+    assertResult(leftParseResult)(rightParseResult)
+  }
+
   test("left recursion with lazy indirection") {
     lazy val head: EditorParser[Any] = new EditorLazy(head) ~ "a" | "a"
 

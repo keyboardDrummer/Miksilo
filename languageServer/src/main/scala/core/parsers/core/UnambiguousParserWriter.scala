@@ -27,11 +27,13 @@ trait UnambiguousParserWriter extends ParserWriter {
     val callStack = mutable.Stack[Parser[Any]]()
 
     override def getParse[Result](parser: Parser[Result]): Input => ParseResult[Result] = {
-      if (compile.shouldDetectLeftRecursion(parser)) {
+
+      if (compile.nodesThatShouldCache(parser)) {
+        parseCached(parser)
+      }
+      else if (compile.shouldDetectLeftRecursion(parser)) {
         val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
         parseIteratively(parserState)
-      } else if (compile.nodesThatShouldCache(parser)) {
-        parseCached(parser)
       } else {
         input => parser.parseInternal(input, this)
       }
@@ -42,7 +44,11 @@ trait UnambiguousParserWriter extends ParserWriter {
       parserState.cache.get(input) match {
         case None =>
           val value: ParseResult[Result] = parser.parseInternal(input, this)
-          parserState.cache.put(input, value)
+          if (!parserState.isPartOfACycle) {
+            parserState.cache.put(input, value)
+          } else {
+            System.out.append("")
+          }
           value
         case Some(result) => result
       }

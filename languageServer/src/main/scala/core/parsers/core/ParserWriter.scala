@@ -134,10 +134,8 @@ trait ParserWriter {
     GraphAlgorithms.depthFirst[Parser[_]](root,
       node => {
         node.children
-//        val childProperties = getChildProperties(node.getClass.asInstanceOf[Class[Parser[_]]])
-//        childProperties.map(p => p(node))
       },
-      {
+      (firstVisit, path: List[Parser[_]]) => path match {
         case child :: parent :: _ =>
           val incoming = reverseGraph.getOrElseUpdate(child, mutable.HashSet.empty)
           incoming.add(parent)
@@ -147,6 +145,8 @@ trait ParserWriter {
         nodesThatShouldDetectLeftRecursion += cycle.head
         nodesInCycle ++= cycle
       })
+
+    //nodesThatShouldDetectLeftRecursion ++= reverseGraph.keys
     val nodesWithMultipleIncomingEdges: Set[Parser[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
     val nodesWithIncomingCycleEdge: Set[Parser[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
     val nodesThatShouldCache: Set[Parser[_]] = (nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges) -- nodesInCycle

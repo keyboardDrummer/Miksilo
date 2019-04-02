@@ -91,8 +91,8 @@ class JavaStyleCommentsTest
 
   test("addition2") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
-      Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
-      ExtendedByteCode.allByteCodeDeltas))
+      Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta)
+      /*ExtendedByteCode.allByteCodeDeltas*/))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")

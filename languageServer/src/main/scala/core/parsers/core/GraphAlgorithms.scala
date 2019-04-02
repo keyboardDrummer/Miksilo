@@ -6,7 +6,7 @@ object GraphAlgorithms {
 
   def depthFirst[Node](root: Node,
                        getChildren: Node => List[Node],
-                       visit: List[Node] => Unit,
+                       visit: (Boolean, List[Node]) => Unit,
                        backEdgeFound: List[Node] => Unit): Unit = {
     var todoStack = List(List(root))
     var visited = mutable.HashSet.empty[Node]
@@ -15,9 +15,10 @@ object GraphAlgorithms {
       val element = path.head
       todoStack = todoStack.tail
       if (visited.add(element)) {
-        visit(path)
+        visit(true, path)
         todoStack = getChildren(element).map(c => c :: path) ++ todoStack
       } else {
+        visit(false, path)
         if (path.tail.contains(element)) {
           val index = path.tail.indexOf(element)
           if (index >= 0)
