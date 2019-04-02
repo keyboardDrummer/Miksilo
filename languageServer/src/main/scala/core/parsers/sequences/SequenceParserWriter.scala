@@ -22,6 +22,8 @@ trait SequenceParserWriter extends EditorParserWriter {
     }
 
     override def getDefault(cache: DefaultCache): Option[Elem] = None
+
+    override def children = List.empty
   }
 
 }

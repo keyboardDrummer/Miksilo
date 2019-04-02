@@ -22,6 +22,8 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = inner.getDefault(cache)
+
+    override def children = List(inner)
   }
 
   def alignedList[Element](element: EditorParser[Element]): Self[List[Element]] = {
@@ -40,12 +42,14 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
       val delta = input.position.character - input.indentation
       if (input.atEnd || deltaPredicate(delta)) {
-        state.parse(inner, input)
+        state.getParse(inner)(input)
       } else {
         newFailure(input, s"indentation ${input.position.character} of character '${input.head}' must be $property ${input.indentation}")
       }
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = inner.getDefault(cache)
+
+    override def children = List(inner)
   }
 }

@@ -44,7 +44,7 @@ trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with Edit
   test("Optional before choice") {
     lazy val expression: EditorParser[Any] = optional ~ (expression ~ "s" | "e")
     val result = expression.parseWholeInput(aesReader)
-    assert(result.successful, result.toString) // This one fails in PackratParsers, not idea why. I think it succeeds for us because it detects the cycle in the '+' production since the optional has already been parsed.
+    assert(!result.successful, result.toString) // This one fails in unambiguous parsers
   }
 
   /**

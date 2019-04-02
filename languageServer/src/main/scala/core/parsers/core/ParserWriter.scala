@@ -1,5 +1,9 @@
 package core.parsers.core
 
+import util.ExtendedType
+
+import scala.collection.concurrent.TrieMap
+import scala.collection.mutable
 import scala.language.higherKinds
 
 trait ParserWriter {
@@ -27,9 +31,6 @@ trait ParserWriter {
   def leftRight[Left, Right, NewResult](left: Self[Left],
                                         right: => Self[Right],
                                         combine: (Left, Right) => NewResult): Self[NewResult]
-//  = {
-//    flatMap(left, (leftResult: Left) => map(right, (rightResult: Right) => combine(leftResult, rightResult)))
-//  }
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
 
@@ -79,21 +80,25 @@ trait ParserWriter {
 
   trait Parser[+Result] {
     def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result]
+    def children: List[Self[_]]
   }
 
   trait ParseStateLike {
-    def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result]
+    def getParse[Result](parser: Parser[Result]): Input => ParseResult[Result]
     def extraState: ExtraState
   }
 
   class EmptyParseState(val extraState: ExtraState) extends ParseStateLike {
-    override def parse[Result](parser: Parser[Result], input: Input) = parser.parseInternal(input, this)
+
+    override def getParse[Result](parser: Parser[Result]) = input => parser.parseInternal(input, this)
   }
 
-  class Lazy[+Result](_inner: => Parser[Result]) extends Parser[Result] {
-    lazy val inner: Parser[Result] = _inner
+  class Lazy[+Result](_inner: => Self[Result]) extends Parser[Result] {
+    lazy val inner: Self[Result] = _inner
 
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = inner.parseInternal(input, state)
+    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = state.getParse(inner)(input)
+
+    override def children = List(inner)
   }
 
   case class Success[+Result](result: Result, remainder: Input) {
@@ -111,11 +116,47 @@ trait ParserWriter {
     def get = resultOption.get
   }
 
-  class MapParser[Result, NewResult](original: Parser[Result], f: Result => NewResult) extends Parser[NewResult] {
+  class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult) extends Parser[NewResult] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      val result = state.parse(original, input)
+      val result = state.getParse(original)(input)
       result.map(f)
     }
+
+    override def children = List(original)
+  }
+
+  case class Compile(shouldDetectLeftRecursion: Set[Parser[_]], nodesThatShouldCache: Set[Parser[_]])
+
+  def compile[Result](root: Self[Result]): Compile = {
+    var nodesThatShouldDetectLeftRecursion = Set.empty[Parser[_]]
+    var nodesInCycle = Set.empty[Parser[_]]
+    val reverseGraph = mutable.HashMap.empty[Parser[_], mutable.Set[Parser[_]]]
+    GraphAlgorithms.depthFirst[Parser[_]](root,
+      node => {
+        node.children
+//        val childProperties = getChildProperties(node.getClass.asInstanceOf[Class[Parser[_]]])
+//        childProperties.map(p => p(node))
+      },
+      {
+        case child :: parent :: _ =>
+          val incoming = reverseGraph.getOrElseUpdate(child, mutable.HashSet.empty)
+          incoming.add(parent)
+        case _ =>
+      },
+      cycle => {
+        nodesThatShouldDetectLeftRecursion += cycle.head
+        nodesInCycle ++= cycle
+      })
+    val nodesWithMultipleIncomingEdges: Set[Parser[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
+    val nodesWithIncomingCycleEdge: Set[Parser[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
+    val nodesThatShouldCache: Set[Parser[_]] = (nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges) -- nodesInCycle
+    Compile(nodesThatShouldDetectLeftRecursion, nodesThatShouldCache)
+  }
+
+  val cache: TrieMap[Class[_], List[Parser[_] => Parser[_]]] = TrieMap.empty
+
+  def getChildProperties(clazz: Class[Parser[_]]): List[Parser[_] => Parser[_]] = {
+    cache.getOrElseUpdate(clazz, new ExtendedType[Parser[_]](clazz).fieldsOfType[Parser[_]](classOf[Parser[_]]))
   }
 }
 
@@ -135,6 +176,8 @@ trait NotCorrectingParserWriter extends ParserWriter {
   def succeed[Result](result: Result): Self[Result] = new SuccessParser(result)
   class SuccessParser[+Result](result: Result) extends Parser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = newSuccess(result, input)
+
+    override def children = List.empty
   }
 
 }

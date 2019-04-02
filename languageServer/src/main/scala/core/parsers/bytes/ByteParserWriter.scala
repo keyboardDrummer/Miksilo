@@ -35,6 +35,8 @@ trait ByteParserWriter extends NoErrorReportingParserWriter {
     override def parseInternal(input: ByteReader, state: ParseStateLike) = {
       newSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
     }
+
+    override def children = List.empty
   }
 
   def parseString(length: Int) =

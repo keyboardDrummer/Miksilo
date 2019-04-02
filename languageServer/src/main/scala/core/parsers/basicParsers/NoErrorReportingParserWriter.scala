@@ -29,12 +29,14 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
   object FailureParser extends Parser[Nothing] {
     override def parseInternal(input: Input, state: ParseStateLike) = failureSingleton
+
+    override def children = List.empty
   }
 
   class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends Parser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      val firstResult = state.parse(first, input)
-      val secondResult = state.parse(second, input)
+      val firstResult = state.getParse(first)(input)
+      val secondResult = state.getParse(second)(input)
       (firstResult.successOption, secondResult.successOption) match {
         case (Some(firstSuccess), Some(secondSuccess)) =>
           if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset) firstResult else secondResult
@@ -42,25 +44,31 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
         case (_, None) => firstResult
       }
     }
+
+    override def children = List(first, second)
   }
 
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends Parser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      val leftResult = state.parse(left, input)
+      val leftResult = state.getParse(left)(input)
       leftResult.successOption match {
         case None => failureSingleton
-        case Some(leftSuccess) => state.parse(right, leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
+        case Some(leftSuccess) => state.getParse(right)(leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
       }
     }
+
+    override def children = List(left, right)
   }
 
   class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends Parser[NewResult] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      state.parse(left, input).successOption match {
+      state.getParse(left)(input).successOption match {
         case None => failureSingleton
-        case Some(leftSuccess) => state.parse(getRight(leftSuccess.result), leftSuccess.remainder)
+        case Some(leftSuccess) => state.getParse(getRight(leftSuccess.result))(leftSuccess.remainder)
       }
     }
+
+    override def children = ???
   }
 
   val failureSingleton = new SimpleParseResult[Nothing](None)
@@ -95,9 +103,8 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
     }
 
     def parse(input: Input): ParseResult[Result] = {
-
-      val state = new PackratParseState(())
-      state.parse(parser, input)
+      val state = new PackratParseState(compile(parser), ())
+      state.getParse(parser)(input)
     }
   }
 }

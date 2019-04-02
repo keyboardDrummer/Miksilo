@@ -8,6 +8,8 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   type ParseResult[+R] = EditorParseResult[R]
 
+  override def flatMap[Result, NewResult](left: EditorParser[Result], getRight: Result => EditorParser[NewResult]) = ???
+
   override def newFailure[Result](partial: Option[Result], input: Input, message: String) = EditorParseResult(None, ParseFailure(partial, input, message))
 
   override def newSuccess[Result](result: Result, remainder: Input) = EditorParseResult(Some(Success(result, remainder)), NoFailure)
@@ -23,8 +25,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   override def choice[Result](first: EditorParser[Result], other: => EditorParser[Result], leftIsAlwaysBigger: Boolean): EditorParser[Result] =
     if (leftIsAlwaysBigger) new OrElse(first, other) else new BiggestOfTwo(first, other)
-
-  override def flatMap[Result, NewResult](left: EditorParser[Result], f: Result => EditorParser[NewResult]): EditorParser[NewResult] = ??? //new FlatMap(left, f)
 
   override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
 
@@ -44,7 +44,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     }
   }
 
-  override def newParseState() = new PackratParseState(new DefaultCache)
+  override def newParseState(parser: EditorParser[_]) = new PackratParseState(compile(parser), new DefaultCache)
 
   class Sequence[+Left, +Right, +Result](left: EditorParser[Left],
                                          _right: => EditorParser[Right],
@@ -52,7 +52,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     lazy val right: EditorParser[Right] = _right
 
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
-      val leftResult = state.parse(left, input)
+      val leftResult = state.getParse(left)(input)
       val leftFailure = right.getDefault(state).map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).
         getOrElse(leftResult.biggestFailure match {
           case NoFailure => NoFailure
@@ -60,7 +60,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
         })
       leftResult.successOption match {
         case Some(leftSuccess) =>
-          val rightResult = state.parse(right, leftSuccess.remainder)
+          val rightResult = state.getParse(right)(leftSuccess.remainder)
           rightResult.map(r => combine(leftSuccess.result, r)).addFailure(leftFailure)
 
         case None =>
@@ -72,6 +72,8 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       leftDefault <- cache(left)
       rightDefault <- cache(right)
     } yield combine(leftDefault, rightDefault)
+
+    override def children = List(left, right)
   }
 
   class OrElse[+First <: Result, +Second <: Result, +Result](first: EditorParser[First], _second: => EditorParser[Second])
@@ -79,11 +81,11 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     lazy val second = _second
 
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
-      val firstResult = state.parse(first, input)
+      val firstResult = state.getParse(first)(input)
       val result = firstResult.successOption match {
         case Some(_) => firstResult
         case None =>
-          val secondResult = state.parse(second, input)
+          val secondResult = state.getParse(second)(input)
           secondResult.addFailure(firstResult.biggestFailure)
       }
       getDefault(state).fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
@@ -93,6 +95,8 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       val value: Option[First] = cache(first)
       value.orElse(cache(second))
     }
+
+    override def children = List(first, second)
   }
 
   class BiggestOfTwo[+First <: Result, +Second <: Result, +Result](first: EditorParser[First], _second: => EditorParser[Second])
@@ -100,8 +104,8 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     lazy val second = _second
 
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
-      val firstResult = state.parse(first, input)
-      val secondResult = state.parse(second, input)
+      val firstResult = state.getParse(first)(input)
+      val secondResult = state.getParse(second)(input)
       val result = (firstResult.successOption, secondResult.successOption) match {
         case (Some(firstSuccess), Some(secondSuccess)) =>
           if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset)
@@ -123,14 +127,18 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       val value: Option[First] = cache(first)
       value.orElse(cache(second))
     }
+
+    override def children = List(first, second)
   }
 
   class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParser[NewResult] {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[NewResult] = {
-      state.parse(original, input).map(f)
+      state.getParse(original)(input).map(f)
     }
 
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
+
+    override def children = List(original)
   }
 
   final case class EditorParseResult[+Result](successOption: Option[Success[Result]], biggestFailure: OptionFailure[Result])

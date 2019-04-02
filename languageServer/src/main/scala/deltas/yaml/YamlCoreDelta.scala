@@ -34,6 +34,8 @@ object YamlCoreDelta extends DeltaWithGrammar {
     override def getDefault(cache: DefaultCache) = {
       inners.values.flatMap(inner => inner.getDefault(cache)).headOption
     }
+
+    override def children = inners.values.toList
   }
 
   class WithContextParser[Result](update: YamlContext => YamlContext, inner: EditorParser[Result]) extends EditorParser[Result] {
@@ -44,6 +46,8 @@ object YamlCoreDelta extends DeltaWithGrammar {
     }
 
     override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
+
+    override def children = List(inner)
   }
 
   object IndentationSensitiveExpression extends GrammarKey

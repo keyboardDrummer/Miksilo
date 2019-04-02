@@ -91,6 +91,8 @@ class YamlTest extends FunSuite
 
     override def getDefault(cache: DefaultCache) =
       inners.values.flatMap(inner => inner.getDefault(cache)).headOption
+
+    override def children = inners.values.toList
   }
 
   class WithContext[Result](update: YamlContext => YamlContext, inner: EditorParser[Result]) extends EditorParser[Result] {
@@ -100,6 +102,8 @@ class YamlTest extends FunSuite
     }
 
     override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
+
+    override def children = List(inner)
   }
 
   val tag: EditorParser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator

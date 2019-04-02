@@ -21,26 +21,34 @@ trait UnambiguousParserWriter extends ParserWriter {
     val cache = mutable.HashMap[Input, ParseResult[Result]]()
   }
 
-  class PackratParseState(val extraState: ExtraState) extends ParseStateLike {
+  class PackratParseState(val compile: Compile, val extraState: ExtraState) extends ParseStateLike {
 
     val parserStates = mutable.HashMap[Parser[Any], ParserState[Any]]()
     val callStack = mutable.Stack[Parser[Any]]()
 
-    def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
+    override def getParse[Result](parser: Parser[Result]): Input => ParseResult[Result] = {
+      if (compile.shouldDetectLeftRecursion(parser)) {
+        val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
+        parseIteratively(parserState)
+      } else if (compile.nodesThatShouldCache(parser)) {
+        parseCached(parser)
+      } else {
+        input => parser.parseInternal(input, this)
+      }
+    }
 
+    def parseCached[Result](parser: Parser[Result]): Input => ParseResult[Result] = input => {
       val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
       parserState.cache.get(input) match {
         case None =>
-          val value: ParseResult[Result] = parseIteratively[Result](parserState, input)
-          if (!parserState.isPartOfACycle) {
-            parserState.cache.put(input, value)
-          }
+          val value: ParseResult[Result] = parser.parseInternal(input, this)
+          parserState.cache.put(input, value)
           value
         case Some(result) => result
       }
     }
 
-    def parseIteratively[Result](parserState: ParserState[Result], input: Input): ParseResult[Result] = {
+    def parseIteratively[Result](parserState: ParserState[Result]): Input => ParseResult[Result] = input => {
       getPreviousResult(parserState, input) match {
         case None =>
 

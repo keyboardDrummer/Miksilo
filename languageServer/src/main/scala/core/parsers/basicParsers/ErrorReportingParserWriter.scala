@@ -1,7 +1,6 @@
 package core.parsers.basicParsers
 
 import core.parsers.core.{NotCorrectingParserWriter, UnambiguousParserWriter}
-import util.cache.{Cache, InfiniteCache}
 
 trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrectingParserWriter {
   type ParseResult[+R] = ReportingParseResult[R]
@@ -18,45 +17,39 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
   override def choice[Result](first: Parser[Result], other: => Parser[Result], leftIsAlwaysBigger: Boolean) =
     new BiggestOfTwo(first, other)
 
-  override def flatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]): Parser[NewResult] =
-    new FlatMap(left, getRight)
-
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
   case class FailureParser(message: String) extends Parser[Nothing] {
     override def parseInternal(input: Input, state: ParseStateLike) = Failure(input, message)
+
+    override def children = List.empty
   }
 
   class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends Parser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      (state.parse(first, input), state.parse(second, input)) match {
+      (state.getParse(first)(input), state.getParse(second)(input)) match {
         case (firstResult: ParseSuccess[Result], secondResult: ParseSuccess[Result]) =>
           if (firstResult.remainder.offset >= secondResult.remainder.offset) firstResult else secondResult
         case (_:Failure, secondResult) => secondResult
         case (firstResult, _) => firstResult
       }
     }
+
+    override def children = List(first, second)
   }
 
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends Parser[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      state.parse(left, input) match {
-        case leftSuccess: ParseSuccess[Left] => state.parse(right, leftSuccess.remainder) match {
+      state.getParse(left)(input) match {
+        case leftSuccess: ParseSuccess[Left] => state.getParse(right)(leftSuccess.remainder) match {
           case rightSuccess: ParseSuccess[Right] => rightSuccess.map(r => combine(leftSuccess.result, r))
           case f: Failure => f
         }
         case f: Failure => f
       }
     }
-  }
 
-  class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends Parser[NewResult] {
-    override def parseInternal(input: Input, state: ParseStateLike) = {
-      state.parse(left, input) match {
-        case leftSuccess: ParseSuccess[Result] => state.parse(getRight(leftSuccess.result), leftSuccess.remainder)
-        case f: Failure => f
-      }
-    }
+    override def children = List(left, right)
   }
 
   trait ReportingParseResult[+Result] extends UnambiguousParseResult[Result] { }
@@ -99,9 +92,8 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
     }
 
     def parse(input: Input): ParseResult[Result] = {
-
-      val state = new PackratParseState(())
-      state.parse(parser, input)
+      val state = new PackratParseState(compile(parser),())
+      state.getParse(parser)(input)
     }
   }
 }

@@ -73,6 +73,8 @@ trait StringParserWriter extends SequenceParserWriter {
     }
 
     override def getDefault(cache: DefaultCache): Option[String] = Some(value)
+
+    override def children = List.empty
   }
 
   case class RegexParser(regex: Regex) extends EditorParser[String] {
@@ -91,5 +93,7 @@ trait StringParserWriter extends SequenceParserWriter {
     }
 
     override def getDefault(cache: DefaultCache): Option[String] = None
+
+    override def children = List.empty
   }
 }
