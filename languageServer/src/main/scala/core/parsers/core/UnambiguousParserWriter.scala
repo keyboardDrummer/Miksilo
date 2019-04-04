@@ -13,6 +13,25 @@ trait UnambiguousParserWriter extends ParserWriter {
     def get: Result
   }
 
+  class CheckCache[Result](parseState: PackratParseState, parser: Parser[Result])
+    extends ParserState[Result](parseState, parser)
+    with Parse[Result] {
+
+    def apply(input: Input, state: ParseState): ParseResult[Result] = {
+      cache.get (input) match {
+        case None =>
+          state.callStack.push(parser)
+          val value: ParseResult[Result] = parser.parseInternal (input, state)
+          state.callStack.pop()
+          if (!isPartOfACycle) {
+            cache.put (input, value)
+          }
+          value
+        case Some (result) => result
+      }
+    }
+  }
+
   class ParserState[Result](val parseState: PackratParseState, val parser: Parser[Result]) {
     val recursionIntermediates = mutable.HashMap[Input, ParseResult[Result]]()
     val callStackSet = mutable.HashSet[Input]() // TODO might not be needed if we put an abort in the intermediates.
@@ -44,22 +63,6 @@ trait UnambiguousParserWriter extends ParserWriter {
         case _ =>
           recursionIntermediates.remove(input)
           previous
-      }
-    }
-
-    def checkCache(input: Input, state: ParseState): ParseResult[Result] = {
-      cache.get(input) match {
-        case None =>
-          callStackSet.add(input)
-          state.callStack.push(parser)
-          val value: ParseResult[Result] = parser.parseInternal(input, state)
-          callStackSet.remove(input)
-          state.callStack.pop()
-          if (!isPartOfACycle) {
-            cache.put(input, value)
-          }
-          value
-        case Some(result) => result
       }
     }
 
@@ -117,15 +120,16 @@ trait UnambiguousParserWriter extends ParserWriter {
     if (!shouldCache && !shouldDetectLeftRecursion) {
       return parser.parseInternal
     }
-    val parserState = parseState.parserStates.getOrElseUpdate(parser, new ParserState(parseState, parser)).asInstanceOf[ParserState[Result]]
     if (shouldCache && shouldDetectLeftRecursion) {
+      val parserState = parseState.parserStates.getOrElseUpdate(parser, new ParserState(parseState, parser)).asInstanceOf[ParserState[Result]]
       return parserState.cacheAndFixpoint
     }
 
     if (shouldCache) {
-      return parserState.checkCache
+      return parseState.parserStates.getOrElseUpdate(parser, new CheckCache[Any](parseState, parser)).asInstanceOf[Parse[Result]]
     }
 
+    val parserState = parseState.parserStates.getOrElseUpdate(parser, new ParserState(parseState, parser)).asInstanceOf[ParserState[Result]]
     parserState.checkFixpoint
   }
 
