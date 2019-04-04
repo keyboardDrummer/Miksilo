@@ -78,25 +78,31 @@ trait ParserWriter {
         succeed(List.empty[Result])
   }
 
+  trait Parse[+Result] {
+    def apply(input: Input, parseState: ParseStateLike): ParseResult[Result]
+  }
+
   trait Parser[+Result] {
-    def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result]
-    def children: List[Self[_]]
+    def parseInternal(input: Input, parseState: ParseStateLike): ParseResult[Result]
+    def parse: Parse[Result]
+    def children: List[Parser[_]]
+  }
+
+  trait ParserBase[Result] extends Parser[Result] {
+    var parse: Parse[Result] = parseInternal
   }
 
   trait ParseStateLike {
-    def getParse[Result](parser: Parser[Result]): Input => ParseResult[Result]
     def extraState: ExtraState
   }
 
   class EmptyParseState(val extraState: ExtraState) extends ParseStateLike {
-
-    override def getParse[Result](parser: Parser[Result]) = input => parser.parseInternal(input, this)
   }
 
-  class Lazy[+Result](_inner: => Self[Result]) extends Parser[Result] {
+  class Lazy[Result](_inner: => Self[Result]) extends ParserBase[Result] {
     lazy val inner: Self[Result] = _inner
 
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = state.getParse(inner)(input)
+    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = inner.parse(input, state)
 
     override def children = List(inner)
   }
@@ -116,9 +122,9 @@ trait ParserWriter {
     def get = resultOption.get
   }
 
-  class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult) extends Parser[NewResult] {
+  class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult) extends ParserBase[NewResult] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      val result = state.getParse(original)(input)
+      val result = original.parse(input, state)
       result.map(f)
     }
 
@@ -168,16 +174,4 @@ object Processor {
 trait ParseInput {
   def offset: Int
   def atEnd: Boolean
-}
-
-trait NotCorrectingParserWriter extends ParserWriter {
-  type Self[+Result] = Parser[Result]
-
-  def succeed[Result](result: Result): Self[Result] = new SuccessParser(result)
-  class SuccessParser[+Result](result: Result) extends Parser[Result] {
-    override def parseInternal(input: Input, state: ParseStateLike) = newSuccess(result, input)
-
-    override def children = List.empty
-  }
-
 }

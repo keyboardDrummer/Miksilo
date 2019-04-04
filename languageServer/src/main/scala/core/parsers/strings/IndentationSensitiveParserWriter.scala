@@ -11,7 +11,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     def withIndentation(value: Int): Input
   }
 
-  case class WithIndentation[Result](inner: EditorParser[Result]) extends EditorParser[Result] {
+  case class WithIndentation[Result](inner: EditorParser[Result]) extends EditorParserBase[Result] {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
       val previous = input.indentation
       val newInput = input.withIndentation(input.position.character)
@@ -38,11 +38,11 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   def equal[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
   def greaterThan[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
 
-  case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, inner: EditorParser[Result]) extends EditorParser[Result] {
+  case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, inner: EditorParser[Result]) extends EditorParserBase[Result] {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
       val delta = input.position.character - input.indentation
       if (input.atEnd || deltaPredicate(delta)) {
-        state.getParse(inner)(input)
+        inner.parse(input, state)
       } else {
         newFailure(input, s"indentation ${input.position.character} of character '${input.head}' must be $property ${input.indentation}")
       }

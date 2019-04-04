@@ -7,7 +7,7 @@ trait SequenceParserWriter extends EditorParserWriter {
   type Input <: SequenceInput[Input, Elem]
 
   def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
-  case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends EditorParser[Elem] {
+  case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends EditorParserBase[Elem] {
     override def parseInternal(input: Input, cache: ParseStateLike): ParseResult[Elem] = {
       if (input.atEnd) {
         return newFailure(input, s"$kind expected but end of source found")

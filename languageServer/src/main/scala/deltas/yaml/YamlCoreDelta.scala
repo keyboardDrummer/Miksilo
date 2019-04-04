@@ -25,7 +25,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
   object TagNode extends NodeField
 
   object ContextKey
-  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]]) extends EditorParser[Result] {
+  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]]) extends EditorParserBase[Result] {
     override def parseInternal(input: Reader, state: ParseStateLike) = {
       val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
       inners(context).parseInternal(input, state)
@@ -38,7 +38,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
     override def children = inners.values.toList
   }
 
-  class WithContextParser[Result](update: YamlContext => YamlContext, inner: EditorParser[Result]) extends EditorParser[Result] {
+  class WithContextParser[Result](update: YamlContext => YamlContext, inner: EditorParser[Result]) extends EditorParserBase[Result] {
     override def parseInternal(input: Reader, state: ParseStateLike) = {
       val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
       val result = inner.parseInternal(input.withState(input.state + (ContextKey -> update(context))), state)

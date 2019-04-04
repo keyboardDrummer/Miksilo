@@ -19,15 +19,15 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
 
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
-  case class FailureParser(message: String) extends Parser[Nothing] {
+  case class FailureParser(message: String) extends ParserBase[Nothing] {
     override def parseInternal(input: Input, state: ParseStateLike) = Failure(input, message)
 
     override def children = List.empty
   }
 
-  class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends Parser[Result] {
+  class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends ParserBase[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      (state.getParse(first)(input), state.getParse(second)(input)) match {
+      (first.parse(input, state), second.parse(input, state)) match {
         case (firstResult: ParseSuccess[Result], secondResult: ParseSuccess[Result]) =>
           if (firstResult.remainder.offset >= secondResult.remainder.offset) firstResult else secondResult
         case (_:Failure, secondResult) => secondResult
@@ -38,10 +38,10 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
     override def children = List(first, second)
   }
 
-  class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends Parser[Result] {
+  class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends ParserBase[Result] {
     override def parseInternal(input: Input, state: ParseStateLike) = {
-      state.getParse(left)(input) match {
-        case leftSuccess: ParseSuccess[Left] => state.getParse(right)(leftSuccess.remainder) match {
+      left.parse(input, state) match {
+        case leftSuccess: ParseSuccess[Left] => right.parse(leftSuccess.remainder, state) match {
           case rightSuccess: ParseSuccess[Right] => rightSuccess.map(r => combine(leftSuccess.result, r))
           case f: Failure => f
         }
@@ -93,7 +93,7 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
 
     def parse(input: Input): ParseResult[Result] = {
       val state = new PackratParseState(compile(parser),())
-      state.getParse(parser)(input)
+      parser.parse(input, state)
     }
   }
 }

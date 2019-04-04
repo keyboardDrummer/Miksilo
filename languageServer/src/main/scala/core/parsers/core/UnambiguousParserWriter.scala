@@ -26,22 +26,22 @@ trait UnambiguousParserWriter extends ParserWriter {
     val parserStates = mutable.HashMap[Parser[Any], ParserState[Any]]()
     val callStack = mutable.Stack[Parser[Any]]()
 
-    override def getParse[Result](parser: Parser[Result]): Input => ParseResult[Result] = {
-
-      val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
-      val shouldCache = !parserState.isPartOfACycle && compile.nodesThatShouldCache(parser)
-      if (shouldCache && compile.shouldDetectLeftRecursion(parser)) {
-        return parseBoth(parserState)
-      }
-      if (compile.shouldDetectLeftRecursion(parser)) {
-        return parseIteratively(parserState)
-      }
-      if (shouldCache) {
-        return parseCached(parserState)
-      }
-
-      input => parser.parseInternal(input, this)
-    }
+//    override def getParse[Result](parser: Parser[Result]): Input => ParseResult[Result] = {
+//
+//      val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
+//      val shouldCache = !parserState.isPartOfACycle && compile.nodesThatShouldCache(parser)
+//      if (shouldCache && compile.shouldDetectLeftRecursion(parser)) {
+//        return parseBoth(parserState)
+//      }
+//      if (compile.shouldDetectLeftRecursion(parser)) {
+//        return parseIteratively(parserState)
+//      }
+//      if (shouldCache) {
+//        return parseCached(parserState)
+//      }
+//
+//      input => parser.parseInternal(input, this)
+//    }
 
     def parseBoth[Result](parserState: ParserState[Result]): Input => ParseResult[Result] = input => {
       parserState.cache.get(input) match {

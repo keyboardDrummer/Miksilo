@@ -30,7 +30,7 @@ trait ByteParserWriter extends NoErrorReportingParserWriter {
   val ParseShort = XBytes(2).map(bytes => bytes.getShort())
   val ParseUtf8: Parser[Node] = ParseShort.flatMap(length => parseString(length)).map(s => Utf8ConstantDelta.create(s))
 
-  case class XBytes(amount: Int) extends Parser[ByteBuffer] {
+  case class XBytes(amount: Int) extends ParserBase[ByteBuffer] {
 
     override def parseInternal(input: ByteReader, state: ParseStateLike) = {
       newSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
@@ -44,8 +44,8 @@ trait ByteParserWriter extends NoErrorReportingParserWriter {
       new String(bytes.array(), bytes.position(), length, "UTF-8")
     })
 
-  def elems(bytes: Seq[Byte]) = {
-    XBytes(bytes.length).flatMap(parsedBytes => {
+  def elems(bytes: Seq[Byte]): Self[Unit] = {
+    XBytes(bytes.length).flatMap[Unit](parsedBytes => {
       val destination = new Array[Byte](bytes.length)
       parsedBytes.get(destination)
       val result = if (destination sameElements bytes) {

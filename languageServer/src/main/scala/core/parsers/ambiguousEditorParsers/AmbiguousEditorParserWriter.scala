@@ -35,7 +35,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
 
   override def parseWholeInput[Result](parser: EditorParser[Result],
                                        input: Input): EditorParseResult[Result] = {
-    val result = parser.parse(input)
+    val result = parser.parseFinal(input)
     if (!result.successful)
       return result
 
@@ -49,16 +49,16 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     }
   }
 
-  class Sequence[+Left, +Right, +Result](left: EditorParser[Left],
+  class Sequence[+Left, +Right, Result](left: EditorParser[Left],
                                          _right: => EditorParser[Right],
-                                         combine: (Left, Right) => Result) extends EditorParser[Result] {
+                                         combine: (Left, Right) => Result) extends EditorParserBase[Result] {
     lazy val right: EditorParser[Right] = _right
 
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
-      val leftResult = state.getParse(left)(input)
+      val leftResult = left.parse(input, state)
       val leftFailure = right.getDefault(state).map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).getOrElse(NoFailure)
       val rightResults = leftResult.successes.map(leftSuccess => {
-        val rightResult = state.getParse(right)(leftSuccess.remainder)
+        val rightResult = right.parse(leftSuccess.remainder, state)
         val endSuccesses = rightResult.successes.map(rightSuccess => {
           Success(combine(leftSuccess.result, rightSuccess.result), rightSuccess.remainder)
         })
@@ -76,13 +76,13 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     override def children = List(left, right)
   }
 
-  class Choice[+First <: Result, +Second <: Result, +Result](first: EditorParser[First], _second: => EditorParser[Second])
-    extends EditorParser[Result] {
+  class Choice[+First <: Result, +Second <: Result, Result](first: EditorParser[First], _second: => EditorParser[Second])
+    extends EditorParserBase[Result] {
     lazy val second = _second
 
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
-      val firstResult = state.getParse(first)(input)
-      val secondResult = state.getParse(second)(input)
+      val firstResult = first.parse(input, state)
+      val secondResult = second.parse(input, state)
       val result = EditorParseResult[Result](firstResult.successes ++ secondResult.successes,
         firstResult.biggestFailure.getBiggest(secondResult.biggestFailure))
       result
@@ -96,9 +96,9 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     override def children = List(first, second)
   }
 
-  class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParser[NewResult] {
+  class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParserBase[NewResult] {
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[NewResult] = {
-      state.getParse(original)(input).map(f)
+      original.parse(input, state).map(f)
     }
 
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
@@ -107,10 +107,10 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
   }
 
   class WithRemainderParser[Result](original: Self[Result])
-    extends EditorParser[(Result, Input)] {
+    extends EditorParserBase[(Result, Input)] {
 
     override def parseInternal(input: Input, state: ParseStateLike): ParseResult[(Result, Input)] = {
-      val parseResult = state.getParse(original)(input)
+      val parseResult = original.parse(input, state)
 
       val newSuccesses = parseResult.successes.map(success => Success((success.result, success.remainder), success.remainder))
       val biggestFailure = parseResult.biggestFailure match {

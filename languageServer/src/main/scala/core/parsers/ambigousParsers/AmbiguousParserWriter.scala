@@ -22,8 +22,6 @@ trait AmbiguousParserWriter extends ParserWriter {
 
   class PackratParseState(compile: Compile, val extraState: ExtraState) extends ParseStateLike {
 
-    override def getParse[Result](parser: Parser[Result]) = ???
-
     val resultCache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache[ParseNode, ParseResult[Any]]()
     val recursionIntermediates = mutable.HashMap[ParseNode, ParseResult[Any]]()
     val callStackSet = mutable.HashSet[ParseNode]()
