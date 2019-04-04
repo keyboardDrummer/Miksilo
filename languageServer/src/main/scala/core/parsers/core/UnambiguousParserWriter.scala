@@ -28,26 +28,59 @@ trait UnambiguousParserWriter extends ParserWriter {
 
     override def getParse[Result](parser: Parser[Result]): Input => ParseResult[Result] = {
 
-      if (compile.nodesThatShouldCache(parser)) {
-        parseCached(parser)
+      val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
+      val shouldCache = !parserState.isPartOfACycle && compile.nodesThatShouldCache(parser)
+      if (shouldCache && compile.shouldDetectLeftRecursion(parser)) {
+        return parseBoth(parserState)
       }
-      else if (compile.shouldDetectLeftRecursion(parser)) {
-        val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
-        parseIteratively(parserState)
-      } else {
-        input => parser.parseInternal(input, this)
+      if (compile.shouldDetectLeftRecursion(parser)) {
+        return parseIteratively(parserState)
+      }
+      if (shouldCache) {
+        return parseCached(parserState)
+      }
+
+      input => parser.parseInternal(input, this)
+    }
+
+    def parseBoth[Result](parserState: ParserState[Result]): Input => ParseResult[Result] = input => {
+      parserState.cache.get(input) match {
+        case None =>
+
+          val value = getPreviousResult(parserState, input) match {
+            case None =>
+
+              parserState.callStackSet.add(input)
+              callStack.push(parserState.parser)
+              var result = parserState.parser.parseInternal(input, this)
+              if (result.successful && parserState.hasBackEdge) {
+                result = growResult(parserState, input, result, this)
+              }
+              parserState.callStackSet.remove(input)
+              callStack.pop()
+              result
+
+            case Some(result) => result
+          }
+
+          if (!parserState.isPartOfACycle) {
+            parserState.cache.put(input, value)
+          }
+          value
+        case Some(result) => result
       }
     }
 
-    def parseCached[Result](parser: Parser[Result]): Input => ParseResult[Result] = input => {
-      val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
+    def parseCached[Result](parserState: ParserState[Result]): Input => ParseResult[Result] = input => {
       parserState.cache.get(input) match {
         case None =>
-          val value: ParseResult[Result] = parser.parseInternal(input, this)
+          parserState.callStackSet.add(input)
+          callStack.push(parserState.parser)
+          val value: ParseResult[Result] = parserState.parser.parseInternal(input, this)
+          parserState.callStackSet.remove(input)
+          callStack.pop()
           if (!parserState.isPartOfACycle) {
             parserState.cache.put(input, value)
-          } else {
-            System.out.append("")
           }
           value
         case Some(result) => result

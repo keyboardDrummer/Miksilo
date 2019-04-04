@@ -129,7 +129,6 @@ trait ParserWriter {
 
   def compile[Result](root: Self[Result]): Compile = {
     var nodesThatShouldDetectLeftRecursion = Set.empty[Parser[_]]
-    var nodesInCycle = Set.empty[Parser[_]]
     val reverseGraph = mutable.HashMap.empty[Parser[_], mutable.Set[Parser[_]]]
     GraphAlgorithms.depthFirst[Parser[_]](root,
       node => {
@@ -143,13 +142,14 @@ trait ParserWriter {
       },
       cycle => {
         nodesThatShouldDetectLeftRecursion += cycle.head
-        nodesInCycle ++= cycle
       })
 
-    //nodesThatShouldDetectLeftRecursion ++= reverseGraph.keys
+    val components = SCC.scc[Parser[_]](reverseGraph.keys.toSet, node => node.children.toSet)
+    var nodesInCycle: Set[Parser[_]] = components.flatten.toSet
+
     val nodesWithMultipleIncomingEdges: Set[Parser[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
     val nodesWithIncomingCycleEdge: Set[Parser[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
-    val nodesThatShouldCache: Set[Parser[_]] = (nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges) -- nodesInCycle
+    var nodesThatShouldCache: Set[Parser[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
     Compile(nodesThatShouldDetectLeftRecursion, nodesThatShouldCache)
   }
 
