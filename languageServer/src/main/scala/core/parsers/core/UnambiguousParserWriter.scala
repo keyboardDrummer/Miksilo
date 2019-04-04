@@ -17,6 +17,8 @@ trait UnambiguousParserWriter extends ParserWriter {
     extends ParserState[Result](parseState, parser)
     with Parse[Result] {
 
+    val cache = mutable.HashMap[Input, ParseResult[Result]]()
+
     def apply(input: Input, state: ParseState): ParseResult[Result] = {
       cache.get (input) match {
         case None =>
@@ -32,12 +34,13 @@ trait UnambiguousParserWriter extends ParserWriter {
     }
   }
 
-  class ParserState[Result](val parseState: PackratParseState, val parser: Parser[Result]) {
+  trait FixPoint[Result] {
+    def parseState: PackratParseState
+    def parser: Parser[Result]
+
     val recursionIntermediates = mutable.HashMap[Input, ParseResult[Result]]()
     val callStackSet = mutable.HashSet[Input]() // TODO might not be needed if we put an abort in the intermediates.
-    var isPartOfACycle: Boolean = false
     var hasBackEdge: Boolean = false
-    val cache = mutable.HashMap[Input, ParseResult[Result]]()
 
     def getPreviousResult(input: Input): Option[ParseResult[Result]] = {
       if (!callStackSet.contains(input))
@@ -53,7 +56,7 @@ trait UnambiguousParserWriter extends ParserWriter {
     }
 
     @tailrec
-    private def growResult(input: Input, previous: ParseResult[Result]): ParseResult[Result] = {
+    final def growResult(input: Input, previous: ParseResult[Result]): ParseResult[Result] = {
       recursionIntermediates.put(input, previous)
 
       val nextResult: ParseResult[Result] = parser.parseInternal(input, parseState)
@@ -65,26 +68,34 @@ trait UnambiguousParserWriter extends ParserWriter {
           previous
       }
     }
+  }
 
-    def checkFixpoint(input: Input, state: ParseState): ParseResult[Result] = {
+  class DoFixPoint[Result](parseState: PackratParseState, parser: Parser[Result])
+    extends ParserState[Result](parseState, parser) with FixPoint[Result] with Parse[Result] {
+
+    override def apply(input: Input, parseState: PackratParseState) = {
       getPreviousResult(input) match {
         case None =>
 
           callStackSet.add(input)
-          state.callStack.push(parser)
-          var result = parser.parseInternal(input, state)
+          parseState.callStack.push(parser)
+          var result = parser.parseInternal(input, parseState)
           if (result.successful && hasBackEdge) {
             result = growResult(input, result)
           }
           callStackSet.remove(input)
-          state.callStack.pop()
+          parseState.callStack.pop()
           result
 
         case Some(result) => result
       }
     }
+  }
 
-    def cacheAndFixpoint(input: Input, state: ParseState): ParseResult[Result] = {
+  class FixPointAndCache[Result](parseState: PackratParseState, parser: Parser[Result])
+    extends CheckCache(parseState, parser) with FixPoint[Result] {
+
+    override def apply(input: Input, state: PackratParseState) = {
       cache.get(input) match {
         case None =>
 
@@ -113,6 +124,11 @@ trait UnambiguousParserWriter extends ParserWriter {
     }
   }
 
+  class ParserState[Result](val parseState: PackratParseState, val parser: Parser[Result]) {
+
+    var isPartOfACycle: Boolean = false
+  }
+
   override def getParse[Result](parseState: ParseState,
                                 parser: ParserBase[Result],
                                 shouldCache: Boolean,
@@ -121,16 +137,14 @@ trait UnambiguousParserWriter extends ParserWriter {
       return parser.parseInternal
     }
     if (shouldCache && shouldDetectLeftRecursion) {
-      val parserState = parseState.parserStates.getOrElseUpdate(parser, new ParserState(parseState, parser)).asInstanceOf[ParserState[Result]]
-      return parserState.cacheAndFixpoint
+      return parseState.parserStates.getOrElseUpdate(parser, new FixPointAndCache[Any](parseState, parser)).asInstanceOf[Parse[Result]]
     }
 
     if (shouldCache) {
       return parseState.parserStates.getOrElseUpdate(parser, new CheckCache[Any](parseState, parser)).asInstanceOf[Parse[Result]]
     }
 
-    val parserState = parseState.parserStates.getOrElseUpdate(parser, new ParserState(parseState, parser)).asInstanceOf[ParserState[Result]]
-    parserState.checkFixpoint
+    parseState.parserStates.getOrElseUpdate(parser, new DoFixPoint[Any](parseState, parser)).asInstanceOf[Parse[Result]]
   }
 
   type ParseState = PackratParseState
