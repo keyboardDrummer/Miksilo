@@ -19,14 +19,14 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
   case class FailureParser(message: String) extends ParserBase[Nothing] {
-    override def parseInternal(input: Input, state: ParseState) = Failure(input, message)
+    override def parseInternal(input: Input) = Failure(input, message)
 
     override def children = List.empty
   }
 
   class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends ParserBase[Result] {
-    override def parseInternal(input: Input, state: ParseState) = {
-      (first.parse(input, state), second.parse(input, state)) match {
+    override def parseInternal(input: Input) = {
+      (first.parse(input), second.parse(input)) match {
         case (firstResult: ParseSuccess[Result], secondResult: ParseSuccess[Result]) =>
           if (firstResult.remainder.offset >= secondResult.remainder.offset) firstResult else secondResult
         case (_:Failure, secondResult) => secondResult
@@ -38,9 +38,9 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
   }
 
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends ParserBase[Result] {
-    override def parseInternal(input: Input, state: ParseState) = {
-      left.parse(input, state) match {
-        case leftSuccess: ParseSuccess[Left] => right.parse(leftSuccess.remainder, state) match {
+    override def parseInternal(input: Input) = {
+      left.parse(input) match {
+        case leftSuccess: ParseSuccess[Left] => right.parse(leftSuccess.remainder) match {
           case rightSuccess: ParseSuccess[Right] => rightSuccess.map(r => combine(leftSuccess.result, r))
           case f: Failure => f
         }
@@ -92,7 +92,7 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
 
     def parseFinal(input: Input): ParseResult[Result] = {
       val state = new PackratParseState()
-      parser.parse(input, state)
+      parser.parse(input)
     }
   }
 }

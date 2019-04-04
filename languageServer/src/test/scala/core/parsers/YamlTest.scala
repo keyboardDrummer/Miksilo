@@ -85,8 +85,8 @@ class YamlTest extends FunSuite
   }
 
   class IfContext[Result](inners: Map[YamlContext, EditorParser[Result]]) extends EditorParserBase[Result] {
-    override def parseInternal(input: IndentationReader, state: ParseState) = {
-      inners(input.context).parseInternal(input, state)
+    override def parseInternal(input: IndentationReader) = {
+      inners(input.context).parseInternal(input)
     }
 
     override def getDefault(cache: DefaultCache) =
@@ -96,8 +96,8 @@ class YamlTest extends FunSuite
   }
 
   class WithContext[Result](update: YamlContext => YamlContext, inner: EditorParser[Result]) extends EditorParserBase[Result] {
-    override def parseInternal(input: IndentationReader, state: ParseState) = {
-      val result = inner.parseInternal(input.withContext(update(input.context)), state)
+    override def parseInternal(input: IndentationReader) = {
+      val result = inner.parseInternal(input.withContext(update(input.context)))
       result.updateRemainder(r => r.withContext(input.context))
     }
 

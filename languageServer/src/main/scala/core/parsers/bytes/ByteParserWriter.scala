@@ -32,7 +32,7 @@ trait ByteParserWriter extends NoErrorReportingParserWriter {
 
   case class XBytes(amount: Int) extends ParserBase[ByteBuffer] {
 
-    override def parseInternal(input: ByteReader, state: ParseState) = {
+    override def parseInternal(input: ByteReader) = {
       newSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
     }
 

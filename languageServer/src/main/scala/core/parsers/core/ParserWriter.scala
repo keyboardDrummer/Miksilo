@@ -84,23 +84,23 @@ trait ParserWriter {
   }
 
   trait Parse[+Result] {
-    def apply(input: Input, parseState: ParseState): ParseResult[Result]
+    def apply(input: Input): ParseResult[Result]
   }
 
   trait Parser[+Result] {
-    def parseInternal(input: Input, parseState: ParseState): ParseResult[Result]
+    def parseInternal(input: Input): ParseResult[Result]
     def parse: Parse[Result]
     def children: List[Parser[_]]
   }
 
   trait ParserBase[Result] extends Parser[Result] {
-    var parse: Parse[Result] = parseInternal
+    var parse: Parse[Result] = (input: Input) => parseInternal(input)
   }
 
   class Lazy[Result](_inner: => Self[Result]) extends ParserBase[Result] {
     lazy val inner: Self[Result] = _inner
 
-    override def parseInternal(input: Input, state: ParseState): ParseResult[Result] = inner.parse(input, state)
+    override def parseInternal(input: Input) = inner.parse(input)
 
     override def children = List(inner)
   }
@@ -121,8 +121,8 @@ trait ParserWriter {
   }
 
   class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult) extends ParserBase[NewResult] {
-    override def parseInternal(input: Input, state: ParseState) = {
-      val result = original.parse(input, state)
+    override def parseInternal(input: Input) = {
+      val result = original.parse(input)
       result.map(f)
     }
 

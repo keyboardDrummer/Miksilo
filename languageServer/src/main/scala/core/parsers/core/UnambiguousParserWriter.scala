@@ -19,12 +19,12 @@ trait UnambiguousParserWriter extends ParserWriter {
 
     val cache = mutable.HashMap[Input, ParseResult[Result]]()
 
-    def apply(input: Input, state: ParseState): ParseResult[Result] = {
+    def apply(input: Input) = {
       cache.get (input) match {
         case None =>
-          state.callStack.push(parser)
-          val value: ParseResult[Result] = parser.parseInternal (input, state)
-          state.callStack.pop()
+          parseState.callStack.push(parser)
+          val value: ParseResult[Result] = parser.parseInternal(input)
+          parseState.callStack.pop()
           if (!isPartOfACycle) {
             cache.put (input, value)
           }
@@ -59,7 +59,7 @@ trait UnambiguousParserWriter extends ParserWriter {
     final def growResult(input: Input, previous: ParseResult[Result]): ParseResult[Result] = {
       recursionIntermediates.put(input, previous)
 
-      val nextResult: ParseResult[Result] = parser.parseInternal(input, parseState)
+      val nextResult: ParseResult[Result] = parser.parseInternal(input)
       nextResult.getSuccessRemainder match {
         case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
           growResult(input, nextResult)
@@ -73,13 +73,13 @@ trait UnambiguousParserWriter extends ParserWriter {
   class DoFixPoint[Result](parseState: PackratParseState, parser: Parser[Result])
     extends ParserState[Result](parseState, parser) with FixPoint[Result] with Parse[Result] {
 
-    override def apply(input: Input, parseState: PackratParseState) = {
+    override def apply(input: Input) = {
       getPreviousResult(input) match {
         case None =>
 
           callStackSet.add(input)
           parseState.callStack.push(parser)
-          var result = parser.parseInternal(input, parseState)
+          var result = parser.parseInternal(input)
           if (result.successful && hasBackEdge) {
             result = growResult(input, result)
           }
@@ -95,7 +95,7 @@ trait UnambiguousParserWriter extends ParserWriter {
   class FixPointAndCache[Result](parseState: PackratParseState, parser: Parser[Result])
     extends CheckCache(parseState, parser) with FixPoint[Result] {
 
-    override def apply(input: Input, state: PackratParseState) = {
+    override def apply(input: Input) = {
       cache.get(input) match {
         case None =>
 
@@ -104,7 +104,7 @@ trait UnambiguousParserWriter extends ParserWriter {
 
               callStackSet.add(input)
               parseState.callStack.push(parser)
-              var result = parser.parseInternal(input, parseState)
+              var result = parser.parseInternal(input)
               if (result.successful && hasBackEdge) {
                 result = growResult(input, result)
               }

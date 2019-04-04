@@ -27,15 +27,15 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
   object FailureParser extends ParserBase[Nothing] {
-    override def parseInternal(input: Input, state: ParseState) = failureSingleton
+    override def parseInternal(input: Input) = failureSingleton
 
     override def children = List.empty
   }
 
   class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends ParserBase[Result] {
-    override def parseInternal(input: Input, state: ParseState) = {
-      val firstResult = first.parse(input, state)
-      val secondResult = second.parse(input, state)
+    override def parseInternal(input: Input) = {
+      val firstResult = first.parse(input)
+      val secondResult = second.parse(input)
       (firstResult.successOption, secondResult.successOption) match {
         case (Some(firstSuccess), Some(secondSuccess)) =>
           if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset) firstResult else secondResult
@@ -48,11 +48,11 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
   }
 
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends ParserBase[Result] {
-    override def parseInternal(input: Input, state: ParseState) = {
-      val leftResult = left.parse(input, state)
+    override def parseInternal(input: Input) = {
+      val leftResult = left.parse(input)
       leftResult.successOption match {
         case None => failureSingleton
-        case Some(leftSuccess) => right.parse(leftSuccess.remainder, state).map(r => combine(leftSuccess.result, r))
+        case Some(leftSuccess) => right.parse(leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
       }
     }
 
@@ -60,10 +60,10 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
   }
 
   class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends ParserBase[NewResult] {
-    override def parseInternal(input: Input, state: ParseState) = {
-      left.parse(input, state).successOption match {
+    override def parseInternal(input: Input) = {
+      left.parse(input).successOption match {
         case None => failureSingleton
-        case Some(leftSuccess) => getRight(leftSuccess.result).parse(leftSuccess.remainder, state)
+        case Some(leftSuccess) => getRight(leftSuccess.result).parse(leftSuccess.remainder)
       }
     }
 
@@ -105,7 +105,7 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
     def parseFinal(input: Input): ParseResult[Result] = {
       val state = newParseState(parser)
-      parser.parse(input, state)
+      parser.parse(input)
     }
   }
 }
