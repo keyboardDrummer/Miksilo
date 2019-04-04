@@ -19,7 +19,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
   override def newSuccess[Result](result: Result, remainder: Input) =
     EditorParseResult(List(Success(result, remainder)), NoFailure)
 
-  override def newParseState(parser: EditorParser[_]) = new PackratParseState(compile(parser), new DefaultCache())
+  override def newParseState(parser: EditorParser[_]) = new PackratParseState(new DefaultCache())
 
   override def newFailure[Result](input: Input, message: String): EditorParseResult[Nothing] = ParseFailure(None, input, message)
 

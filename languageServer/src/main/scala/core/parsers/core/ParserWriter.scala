@@ -28,6 +28,10 @@ trait ParserWriter {
   def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult]
     //= flatMap(original, (result: Result) => succeed(f(result)))
 
+  def newParseState(root: Self[_]): ParseStateLike
+  def getParse[Result](parseState: ParseStateLike,
+                       parser: ParserBase[Result], shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result]
+
   def leftRight[Left, Right, NewResult](left: Self[Left],
                                         right: => Self[Right],
                                         combine: (Left, Right) => NewResult): Self[NewResult]
@@ -133,7 +137,7 @@ trait ParserWriter {
 
   case class Compile(shouldDetectLeftRecursion: Set[Parser[_]], nodesThatShouldCache: Set[Parser[_]])
 
-  def compile[Result](root: Self[Result]): Compile = {
+  def compile[Result](root: Self[Result]): ParseStateLike = {
     var nodesThatShouldDetectLeftRecursion = Set.empty[Parser[_]]
     val reverseGraph = mutable.HashMap.empty[Parser[_], mutable.Set[Parser[_]]]
     GraphAlgorithms.depthFirst[Parser[_]](root,
@@ -156,7 +160,13 @@ trait ParserWriter {
     val nodesWithMultipleIncomingEdges: Set[Parser[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
     val nodesWithIncomingCycleEdge: Set[Parser[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
     var nodesThatShouldCache: Set[Parser[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
-    Compile(nodesThatShouldDetectLeftRecursion, nodesThatShouldCache)
+
+    val parseState = newParseState(root)
+    for(parser <- reverseGraph.keys) {
+      val base = parser.asInstanceOf[ParserBase[Any]]
+      base.parse = getParse(parseState, base, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
+    }
+    parseState
   }
 
   val cache: TrieMap[Class[_], List[Parser[_] => Parser[_]]] = TrieMap.empty

@@ -44,7 +44,7 @@ trait EditorParserWriter extends ParserWriter {
     }
 
     def parseFinal(input: Input): ParseResult[Result] = {
-      val state = newParseState(parser)
+      val state = compile(parser)
       parser.parse(input, state)
     }
 

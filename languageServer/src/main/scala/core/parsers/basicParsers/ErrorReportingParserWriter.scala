@@ -84,15 +84,15 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
 
     def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      parse(input) match {
+      parseFinal(input) match {
         case success: ParseSuccess[Result] if !success.remainder.atEnd =>
           Failure(success.remainder, "Did not parse entire input")
         case f => f
       }
     }
 
-    def parse(input: Input): ParseResult[Result] = {
-      val state = new PackratParseState(compile(parser),())
+    def parseFinal(input: Input): ParseResult[Result] = {
+      val state = new PackratParseState(())
       parser.parse(input, state)
     }
   }
