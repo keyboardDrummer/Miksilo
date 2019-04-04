@@ -47,8 +47,7 @@ trait UnambiguousParserWriter extends ParserWriter {
       }
     }
 
-    def checkCache(input: Input, _state: ParseStateLike): ParseResult[Result] = {
-      val state = _state.asInstanceOf[PackratParseState]
+    def checkCache(input: Input, state: ParseState): ParseResult[Result] = {
       cache.get(input) match {
         case None =>
           callStackSet.add(input)
@@ -64,8 +63,7 @@ trait UnambiguousParserWriter extends ParserWriter {
       }
     }
 
-    def checkFixpoint(input: Input, _state: ParseStateLike): ParseResult[Result] = {
-      val state = _state.asInstanceOf[PackratParseState]
+    def checkFixpoint(input: Input, state: ParseState): ParseResult[Result] = {
       getPreviousResult(input) match {
         case None =>
 
@@ -83,8 +81,7 @@ trait UnambiguousParserWriter extends ParserWriter {
       }
     }
 
-    def cacheAndFixpoint(input: Input, _state: ParseStateLike): ParseResult[Result] = {
-      val state = _state.asInstanceOf[PackratParseState]
+    def cacheAndFixpoint(input: Input, state: ParseState): ParseResult[Result] = {
       cache.get(input) match {
         case None =>
 
@@ -113,12 +110,13 @@ trait UnambiguousParserWriter extends ParserWriter {
     }
   }
 
-  override def getParse[Result](_parseState: ParseStateLike,
-                                parser: ParserBase[Result], shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result] = {
+  override def getParse[Result](parseState: ParseState,
+                                parser: ParserBase[Result],
+                                shouldCache: Boolean,
+                                shouldDetectLeftRecursion: Boolean): Parse[Result] = {
     if (!shouldCache && !shouldDetectLeftRecursion) {
       return parser.parseInternal
     }
-    val parseState = _parseState.asInstanceOf[PackratParseState]
     val parserState = parseState.parserStates.getOrElseUpdate(parser, new ParserState(parseState, parser)).asInstanceOf[ParserState[Result]]
     if (shouldCache && shouldDetectLeftRecursion) {
       return parserState.cacheAndFixpoint
@@ -131,7 +129,8 @@ trait UnambiguousParserWriter extends ParserWriter {
     parserState.checkFixpoint
   }
 
-  class PackratParseState(val extraState: ExtraState) extends ParseStateLike {
+  type ParseState = PackratParseState
+  class PackratParseState {
     val parserStates = mutable.HashMap[Parser[Any], ParserState[Any]]()
     val callStack = mutable.Stack[Parser[Any]]()
   }

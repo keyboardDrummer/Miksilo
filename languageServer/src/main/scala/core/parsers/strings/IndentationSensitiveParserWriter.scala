@@ -12,7 +12,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   }
 
   case class WithIndentation[Result](inner: EditorParser[Result]) extends EditorParserBase[Result] {
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: ParseState): ParseResult[Result] = {
       val previous = input.indentation
       val newInput = input.withIndentation(input.position.character)
       val result: ParseResult[Result] = inner.parseInternal(newInput, state)
@@ -39,7 +39,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   def greaterThan[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
 
   case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, inner: EditorParser[Result]) extends EditorParserBase[Result] {
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: ParseState): ParseResult[Result] = {
       val delta = input.position.character - input.indentation
       if (input.atEnd || deltaPredicate(delta)) {
         inner.parse(input, state)

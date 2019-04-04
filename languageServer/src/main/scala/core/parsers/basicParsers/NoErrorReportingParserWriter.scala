@@ -6,7 +6,6 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
   type ParseResult[+R] = SimpleParseResult[R]
   override type Self[+R] = Parser[R]
-  override type ExtraState = Unit
 
   override def newSuccess[Result](result: Result, remainder: Input) = SimpleParseResult(Some(Success(result, remainder)))
 
@@ -28,13 +27,13 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
   object FailureParser extends ParserBase[Nothing] {
-    override def parseInternal(input: Input, state: ParseStateLike) = failureSingleton
+    override def parseInternal(input: Input, state: ParseState) = failureSingleton
 
     override def children = List.empty
   }
 
   class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends ParserBase[Result] {
-    override def parseInternal(input: Input, state: ParseStateLike) = {
+    override def parseInternal(input: Input, state: ParseState) = {
       val firstResult = first.parse(input, state)
       val secondResult = second.parse(input, state)
       (firstResult.successOption, secondResult.successOption) match {
@@ -49,7 +48,7 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
   }
 
   class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends ParserBase[Result] {
-    override def parseInternal(input: Input, state: ParseStateLike) = {
+    override def parseInternal(input: Input, state: ParseState) = {
       val leftResult = left.parse(input, state)
       leftResult.successOption match {
         case None => failureSingleton
@@ -61,7 +60,7 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
   }
 
   class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends ParserBase[NewResult] {
-    override def parseInternal(input: Input, state: ParseStateLike) = {
+    override def parseInternal(input: Input, state: ParseState) = {
       left.parse(input, state).successOption match {
         case None => failureSingleton
         case Some(leftSuccess) => getRight(leftSuccess.result).parse(leftSuccess.remainder, state)
@@ -91,7 +90,7 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
   override def lazyParser[Result](inner: => Parser[Result]) = new Lazy(inner)
 
-  override def newParseState(root: Parser[_]) = new PackratParseState(())
+  override def newParseState(root: Parser[_]) = new PackratParseState()
 
   implicit class BasicParserExtensions[+Result](parser: Parser[Result]) extends ParserExtensions(parser) {
 

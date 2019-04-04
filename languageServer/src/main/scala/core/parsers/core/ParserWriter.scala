@@ -11,7 +11,7 @@ trait ParserWriter {
   type Input <: ParseInput
   type ParseResult[+Result] <: ParseResultLike[Result]
   type Self[+R] <: Parser[R]
-  type ExtraState
+  type ParseState
 
   def succeed[Result](result: Result): Self[Result]
   def newSuccess[Result](result: Result, remainder: Input): ParseResult[Result]
@@ -28,9 +28,10 @@ trait ParserWriter {
   def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult]
     //= flatMap(original, (result: Result) => succeed(f(result)))
 
-  def newParseState(root: Self[_]): ParseStateLike
-  def getParse[Result](parseState: ParseStateLike,
-                       parser: ParserBase[Result], shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result]
+  def newParseState(root: Self[_]): ParseState
+  def getParse[Result](parseState: ParseState,
+                       parser: ParserBase[Result],
+                       shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result]
 
   def leftRight[Left, Right, NewResult](left: Self[Left],
                                         right: => Self[Right],
@@ -83,11 +84,11 @@ trait ParserWriter {
   }
 
   trait Parse[+Result] {
-    def apply(input: Input, parseState: ParseStateLike): ParseResult[Result]
+    def apply(input: Input, parseState: ParseState): ParseResult[Result]
   }
 
   trait Parser[+Result] {
-    def parseInternal(input: Input, parseState: ParseStateLike): ParseResult[Result]
+    def parseInternal(input: Input, parseState: ParseState): ParseResult[Result]
     def parse: Parse[Result]
     def children: List[Parser[_]]
   }
@@ -96,17 +97,10 @@ trait ParserWriter {
     var parse: Parse[Result] = parseInternal
   }
 
-  trait ParseStateLike {
-    def extraState: ExtraState
-  }
-
-  class EmptyParseState(val extraState: ExtraState) extends ParseStateLike {
-  }
-
   class Lazy[Result](_inner: => Self[Result]) extends ParserBase[Result] {
     lazy val inner: Self[Result] = _inner
 
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = inner.parse(input, state)
+    override def parseInternal(input: Input, state: ParseState): ParseResult[Result] = inner.parse(input, state)
 
     override def children = List(inner)
   }
@@ -127,7 +121,7 @@ trait ParserWriter {
   }
 
   class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult) extends ParserBase[NewResult] {
-    override def parseInternal(input: Input, state: ParseStateLike) = {
+    override def parseInternal(input: Input, state: ParseState) = {
       val result = original.parse(input, state)
       result.map(f)
     }
@@ -137,7 +131,7 @@ trait ParserWriter {
 
   case class Compile(shouldDetectLeftRecursion: Set[Parser[_]], nodesThatShouldCache: Set[Parser[_]])
 
-  def compile[Result](root: Self[Result]): ParseStateLike = {
+  def compile[Result](root: Self[Result]): ParseState = {
     var nodesThatShouldDetectLeftRecursion = Set.empty[Parser[_]]
     val reverseGraph = mutable.HashMap.empty[Parser[_], mutable.Set[Parser[_]]]
     GraphAlgorithms.depthFirst[Parser[_]](root,

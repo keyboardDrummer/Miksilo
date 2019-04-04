@@ -19,7 +19,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
   override def newSuccess[Result](result: Result, remainder: Input) =
     EditorParseResult(List(Success(result, remainder)), NoFailure)
 
-  override def newParseState(parser: EditorParser[_]) = new PackratParseState(new DefaultCache())
+  override def newParseState(parser: EditorParser[_]) = new PackratParseState()
 
   override def newFailure[Result](input: Input, message: String): EditorParseResult[Nothing] = ParseFailure(None, input, message)
 
@@ -54,9 +54,9 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
                                          combine: (Left, Right) => Result) extends EditorParserBase[Result] {
     lazy val right: EditorParser[Right] = _right
 
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: ParseState): ParseResult[Result] = {
       val leftResult = left.parse(input, state)
-      val leftFailure = right.getDefault(state).map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).getOrElse(NoFailure)
+      val leftFailure = right.default.map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).getOrElse(NoFailure)
       val rightResults = leftResult.successes.map(leftSuccess => {
         val rightResult = right.parse(leftSuccess.remainder, state)
         val endSuccesses = rightResult.successes.map(rightSuccess => {
@@ -80,7 +80,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     extends EditorParserBase[Result] {
     lazy val second = _second
 
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: ParseState): ParseResult[Result] = {
       val firstResult = first.parse(input, state)
       val secondResult = second.parse(input, state)
       val result = EditorParseResult[Result](firstResult.successes ++ secondResult.successes,
@@ -97,7 +97,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
   }
 
   class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParserBase[NewResult] {
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[NewResult] = {
+    override def parseInternal(input: Input, state: ParseState): ParseResult[NewResult] = {
       original.parse(input, state).map(f)
     }
 
@@ -109,7 +109,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
   class WithRemainderParser[Result](original: Self[Result])
     extends EditorParserBase[(Result, Input)] {
 
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[(Result, Input)] = {
+    override def parseInternal(input: Input, state: ParseState): ParseResult[(Result, Input)] = {
       val parseResult = original.parse(input, state)
 
       val newSuccesses = parseResult.successes.map(success => Success((success.result, success.remainder), success.remainder))

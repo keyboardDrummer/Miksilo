@@ -44,16 +44,16 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     }
   }
 
-  override def newParseState(parser: EditorParser[_]) = new PackratParseState(new DefaultCache)
+  override def newParseState(parser: EditorParser[_]) = new PackratParseState()
 
   class Sequence[+Left, +Right, Result](left: EditorParser[Left],
                                          _right: => EditorParser[Right],
                                          combine: (Left, Right) => Result) extends EditorParserBase[Result] {
     lazy val right: EditorParser[Right] = _right
 
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: ParseState): ParseResult[Result] = {
       val leftResult = left.parse(input, state)
-      val leftFailure = right.getDefault(state).map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).
+      val leftFailure = right.default.map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).
         getOrElse(leftResult.biggestFailure match {
           case NoFailure => NoFailure
           case failure: ParseFailure[Left] => ParseFailure(None, failure.remainder, failure.message)
@@ -80,7 +80,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     extends EditorParserBase[Result] {
     lazy val second = _second
 
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
+    override def parseInternal(input: Input, state: ParseState): ParseResult[Result] = {
       val firstResult = first.parse(input, state)
       val result = firstResult.successOption match {
         case Some(_) => firstResult
@@ -88,7 +88,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
           val secondResult = second.parse(input, state)
           secondResult.addFailure(firstResult.biggestFailure)
       }
-      getDefault(state).fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
+      default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = {
@@ -103,7 +103,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     extends EditorParserBase[Result] {
     lazy val second = _second
 
-    def parseInternal(input: Input, state: ParseStateLike): ParseResult[Result] = {
+    def parseInternal(input: Input, state: ParseState): ParseResult[Result] = {
       val firstResult = first.parse(input, state)
       val secondResult = second.parse(input, state)
       val result = (firstResult.successOption, secondResult.successOption) match {
@@ -120,7 +120,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
           firstResult.addFailure(secondResult.biggestFailure)
         case _ => throw new Exception("can not occur")
       }
-      getDefault(state).fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
+      default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = {
@@ -132,7 +132,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
   }
 
   class MapParser[Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParserBase[NewResult] {
-    override def parseInternal(input: Input, state: ParseStateLike): ParseResult[NewResult] = {
+    override def parseInternal(input: Input, state: ParseState): ParseResult[NewResult] = {
       original.parse(input, state).map(f)
     }
 

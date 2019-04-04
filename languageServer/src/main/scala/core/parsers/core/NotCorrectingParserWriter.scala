@@ -6,7 +6,7 @@ trait NotCorrectingParserWriter extends ParserWriter {
   def succeed[Result](result: Result): Self[Result] = new SuccessParser(result)
 
   class SuccessParser[Result](result: Result) extends ParserBase[Result] {
-    override def parseInternal(input: Input, state: ParseStateLike) = newSuccess(result, input)
+    override def parseInternal(input: Input, state: ParseState) = newSuccess(result, input)
 
     override def children = List.empty
   }
