@@ -30,7 +30,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  implicit class EditorParserExtensions[Result](parser: EditorParser[Result]) extends ParserExtensions2(parser) {
+  implicit class EditorParserExtensions[Result](parser: EditorParser[Result]) extends ParserExtensions(parser) {
 
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
 
@@ -60,7 +60,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
     var default: Option[Result] = None
   }
 
-  trait EditorParser[+Result] extends Parser2[Result] with HasGetDefault[Result] {
+  trait EditorParser[+Result] extends Parser[Result] with HasGetDefault[Result] {
     def default: Option[Result]
     def getDefault(cache: DefaultCache): Option[Result] = getDefault(cache)
   }
@@ -189,7 +189,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
   def setDefaults(root: Self[_]): Unit = {
     val cache = new DefaultCache
-    GraphAlgorithms.depthFirst[Parser2[_]](root, parser => parser.children, (first, path) => if (first) {
+    GraphAlgorithms.depthFirst[Parser[_]](root, parser => parser.children, (first, path) => if (first) {
       val parser = path.head.asInstanceOf[EditorParserBase[Any]]
       parser.default = parser.getDefault(cache)
     }, _ => {})

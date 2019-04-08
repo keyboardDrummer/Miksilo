@@ -8,7 +8,7 @@ import scala.language.higherKinds
 
 trait LeftRecursiveParserWriter extends ParserWriter {
 
-  type Self[+Result] <: Parser2[Result]
+  type Self[+Result] <: Parser[Result]
 
   def lazyParser[Result](inner: => Self[Result]): Self[Result]
 
@@ -22,21 +22,21 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     def apply(input: Input): ParseResult[Result]
   }
 
-  trait Parser2[+Result] extends Parser[Result] with Parse[Result] {
+  trait Parser[+Result] extends super.Parser[Result] with Parse[Result] {
     def mustConsume: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
-    def leftChildren: List[Parser2[_]]
-    def children: List[Parser2[_]]
+    def leftChildren: List[Parser[_]]
+    def children: List[Parser[_]]
     def parse: Parse[Result]
   }
 
-  trait ParserBase[Result] extends Parser2[Result] {
+  trait ParserBase[Result] extends Parser[Result] {
     var parse: Parse[Result] = this
     var staticCycle: Boolean = false
     var mustConsume: Boolean = false
   }
 
-  trait SequenceLike[+Result] extends Parser2[Result] {
+  trait SequenceLike[+Result] extends Parser[Result] {
     def left: Self[Any]
     def right: Self[Any]
 
@@ -47,7 +47,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(left) || cache(right)
   }
 
-  trait ChoiceLike[+Result] extends Parser2[Result] {
+  trait ChoiceLike[+Result] extends Parser[Result] {
     def first: Self[Result]
     def second: Self[Result]
 
@@ -58,8 +58,8 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(first) && cache(second)
   }
 
-  trait ParserWrapper[+Result] extends Parser2[Result] {
-    def original: Parser2[Any]
+  trait ParserWrapper[+Result] extends Parser[Result] {
+    def original: Parser[Any]
 
     override def getMustConsume(cache: ConsumeCache) = cache(original)
 
@@ -78,7 +78,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  trait LeafParser[+Result] extends Parser2[Result] {
+  trait LeafParser[+Result] extends Parser[Result] {
     override def leftChildren = List.empty
 
     override def children = List.empty
@@ -101,13 +101,13 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     var nodesThatShouldDetectLeftRecursion = Set.empty[Parser[_]]
     val mustConsumeCache = new ConsumeCache
 
-    val reverseGraph = mutable.HashMap.empty[Parser2[_], mutable.Set[Parser2[_]]]
-    GraphAlgorithms.depthFirst[Parser2[_]](root,
+    val reverseGraph = mutable.HashMap.empty[Parser[_], mutable.Set[Parser[_]]]
+    GraphAlgorithms.depthFirst[Parser[_]](root,
       node => {
         node.asInstanceOf[ParserBase[Any]].mustConsume = mustConsumeCache(node)
         node.children
       },
-      (_, path: List[Parser2[_]]) => path match {
+      (_, path: List[Parser[_]]) => path match {
         case child :: parent :: _ =>
           val incoming = reverseGraph.getOrElseUpdate(child, mutable.HashSet.empty)
           incoming.add(parent)
@@ -117,7 +117,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
         nodesThatShouldDetectLeftRecursion += cycle.head
       })
 
-    GraphAlgorithms.depthFirst[Parser2[_]](root,
+    GraphAlgorithms.depthFirst[Parser[_]](root,
       node => {
         node.leftChildren
       },
@@ -126,12 +126,12 @@ trait LeftRecursiveParserWriter extends ParserWriter {
         nodesThatShouldDetectLeftRecursion += cycle.head
       })
 
-    val components = SCC.scc[Parser2[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
-    val nodesInCycle: Set[Parser2[_]] = components.filter(c => c.size > 1).flatten.toSet
+    val components = SCC.scc[Parser[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
+    val nodesInCycle: Set[Parser[_]] = components.filter(c => c.size > 1).flatten.toSet
 
-    val nodesWithMultipleIncomingEdges: Set[Parser2[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
-    val nodesWithIncomingCycleEdge: Set[Parser2[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
-    val nodesThatShouldCache: Set[Parser2[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
+    val nodesWithMultipleIncomingEdges: Set[Parser[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
+    val nodesWithIncomingCycleEdge: Set[Parser[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
+    val nodesThatShouldCache: Set[Parser[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
 
     nodesInCycle.foreach(n => n.asInstanceOf[ParserBase[Any]].staticCycle = true)
     val parseState = newParseState(root)
@@ -149,9 +149,9 @@ trait LeftRecursiveParserWriter extends ParserWriter {
   }
 
   class ConsumeCache {
-    var values = mutable.Map.empty[Parser2[Any], Boolean]
+    var values = mutable.Map.empty[Parser[Any], Boolean]
 
-    def apply[Result](parser: Parser2[Any]): Boolean = {
+    def apply[Result](parser: Parser[Any]): Boolean = {
       values.get(parser) match {
         case Some(v) => v
         case None =>
@@ -163,7 +163,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     }
   }
 
-  implicit class ParserExtensions2[+Result](parser: Self[Result]) extends ParserExtensions(parser) {
+  implicit class ParserExtensions[+Result](parser: Self[Result]) extends super.ParserExtensions(parser) {
 
     def addAlternative[Other >: Result](getAlternative: (Self[Other], Self[Other]) => Self[Other]): Self[Other] = {
       lazy val result: Self[Other] = lazyParser(parser | getAlternative(parser, result))
