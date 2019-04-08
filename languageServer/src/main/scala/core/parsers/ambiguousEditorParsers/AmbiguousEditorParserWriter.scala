@@ -7,6 +7,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
 
   type ParseResult[+Result] = EditorParseResult[Result]
 
+
   override def combineSuccesses[Result](parseResults: Seq[EditorParseResult[Result]]) =
     EditorParseResult(parseResults.flatMap(s => s.successes).toList,
       parseResults.map(s => s.biggestFailure).fold(NoFailure)((a, b) => a.getBiggest(b)))

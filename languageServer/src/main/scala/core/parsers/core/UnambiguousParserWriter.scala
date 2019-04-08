@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.language.higherKinds
 
-trait UnambiguousParserWriter extends ParserWriter {
+trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
   type ParseResult[+Result] <: UnambiguousParseResult[Result]
 
   trait UnambiguousParseResult[+Result] extends ParseResultLike[Result] {

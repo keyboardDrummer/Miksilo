@@ -33,13 +33,11 @@ trait ByteParserWriter extends MonadicFeedbacklessParserWriter {
   val ParseShort = XBytes(2).map(bytes => bytes.getShort())
   val ParseUtf8: Parser[Node] = ParseShort.flatMap(length => parseString(length)).map(s => Utf8ConstantDelta.create(s))
 
-  case class XBytes(amount: Int) extends ParserBase[ByteBuffer] with LeafParser[ByteBuffer] {
+  case class XBytes(amount: Int) extends Parser[ByteBuffer] {
 
     override def apply(input: ByteReader) = {
       newSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
     }
-
-    override def getMustConsume(cache: ConsumeCache) = amount > 0
   }
 
   def parseString(length: Int) =
@@ -59,10 +57,5 @@ trait ByteParserWriter extends MonadicFeedbacklessParserWriter {
       }
       result
     })
-  }
-
-  // TODO because of the flatMap usage, compile doesn't work, and we don't need it anyways because we don't have left recursion.
-  override def compile[Result](root: Parser[Result]) = {
-    newParseState(root)
   }
 }

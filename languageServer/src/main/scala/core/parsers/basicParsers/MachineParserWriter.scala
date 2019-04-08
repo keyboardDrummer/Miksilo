@@ -1,42 +1,53 @@
 package core.parsers.basicParsers
 
-import core.parsers.core.{NotCorrectingParserWriter, UnambiguousParserWriter}
+import core.parsers.core.ParserWriter
 
-trait FeedbacklessParserWriter extends UnambiguousParserWriter with NotCorrectingParserWriter {
+trait MachineParserWriter extends ParserWriter {
 
-  type ParseResult[+R] = SimpleParseResult[R]
-  override type Self[+R] = Parser[R]
+  type ParseResult[+Result] = SimpleParseResult[Result]
+  override type Self[+Result] = Parser[Result]
+
+  def succeed[Result](result: Result): Self[Result] = new SuccessParser(result)
+
+  class SuccessParser[Result](result: Result) extends Parser[Result] {
+    override def apply(input: Input) = newSuccess(result, input)
+  }
 
   override def newSuccess[Result](result: Result, remainder: Input) = SimpleParseResult(Some(Success(result, remainder)))
-
-  override def succeed[Result](result: Result) = new SuccessParser(result)
 
   override def newFailure[R](input: Input, message: String) = SimpleParseResult(None)
 
   override def fail[Result](message: String) = FailureParser
 
   override def leftRight[Left, Right, NewResult](left: Parser[Left], right: => Parser[Right], combine: (Left, Right) => NewResult) =
-    new LeftRight(left, right, combine)
+    LeftRight(left, right, combine)
 
   override def choice[Result](first: Parser[Result], other: => Parser[Result], leftIsAlwaysBigger: Boolean) =
     new BiggestOfTwo(first, other)
 
-  override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
+  override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = MapParser(original, f)
 
-  object FailureParser extends ParserBase[Nothing] with LeafParser[Nothing] {
+  case class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult)
+    extends Parser[NewResult] {
+
+    override def apply(input: Input) = {
+      val result = original(input)
+      result.map(f)
+    }
+  }
+
+  object FailureParser extends Parser[Nothing] {
     override def apply(input: Input) = failureSingleton
-
-    override def getMustConsume(cache: ConsumeCache) = false
   }
 
   class BiggestOfTwo[Result](val first: Parser[Result], _second: => Parser[Result])
-    extends ParserBase[Result] with ChoiceLike[Result] {
+    extends Parser[Result] {
 
     lazy val second = _second
 
     override def apply(input: Input) = {
-      val firstResult = first.parse(input)
-      val secondResult = second.parse(input)
+      val firstResult = first(input)
+      val secondResult = second(input)
       (firstResult.successOption, secondResult.successOption) match {
         case (Some(firstSuccess), Some(secondSuccess)) =>
           if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset) firstResult else secondResult
@@ -47,13 +58,13 @@ trait FeedbacklessParserWriter extends UnambiguousParserWriter with NotCorrectin
   }
 
   case class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result)
-    extends ParserBase[Result] with SequenceLike[Result] {
+    extends Parser[Result] {
 
     override def apply(input: Input) = {
-      val leftResult = left.parse(input)
+      val leftResult = left(input)
       leftResult.successOption match {
         case None => failureSingleton
-        case Some(leftSuccess) => right.parse(leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
+        case Some(leftSuccess) => right(leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
       }
     }
   }
@@ -62,9 +73,7 @@ trait FeedbacklessParserWriter extends UnambiguousParserWriter with NotCorrectin
 
   override def abort = failureSingleton
 
-  case class SimpleParseResult[+Result](successOption: Option[Success[Result]]) extends UnambiguousParseResult[Result] { // TODO Don't use nested Option
-
-    override def getSuccessRemainder = successOption.map(s => s.remainder)
+  case class SimpleParseResult[+Result](successOption: Option[Success[Result]]) extends ParseResultLike[Result] { // TODO Don't use nested Option
 
     override def get = successOption.get.result
 
@@ -74,17 +83,15 @@ trait FeedbacklessParserWriter extends UnambiguousParserWriter with NotCorrectin
       successOption.fold[SimpleParseResult[NewResult]](failureSingleton)(s => f(s))
 
     override def resultOption = successOption.map(s => s.result)
+
+    override def successful = successOption.nonEmpty
   }
-
-  override def lazyParser[Result](inner: => Parser[Result]) = new Lazy(inner)
-
-  override def newParseState(root: Parser[_]) = new LeftRecursionDetectorState()
 
   implicit class BasicParserExtensions[+Result](parser: Parser[Result]) {
 
     def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      val parseResult = parser.parseRoot(input)
+      val parseResult = parser(input)
       parseResult.successOption match {
         case Some(success) if !success.remainder.atEnd => failureSingleton
         case _ => parseResult

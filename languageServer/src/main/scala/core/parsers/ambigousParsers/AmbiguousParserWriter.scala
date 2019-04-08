@@ -1,17 +1,23 @@
 package core.parsers.ambigousParsers
 
-import core.parsers.core.ParserWriter
+import core.parsers.core.LeftRecursiveParserWriter
 import util.cache.{Cache, InfiniteCache}
 
 import scala.collection.mutable
 import scala.language.higherKinds
 
-trait AmbiguousParserWriter extends ParserWriter {
+trait AmbiguousParserWriter extends LeftRecursiveParserWriter {
 
   case class ParseNode(input: Input, parser: Parser[Any])
 
   type ParseResult[+Result] <: AmbiguousParseResult[Result]
   type ParseState = LeftRecursionDetectorState
+
+  override def getParse[Result](parseState: LeftRecursionDetectorState,
+                                parser: ParserBase[Result],
+                                shouldCache: Boolean,
+                                shouldDetectLeftRecursion: Boolean) =
+    (input: Input) => parseState.parse(parser, input)
 
   trait AmbiguousParseResult[+Result] extends ParseResultLike[Result] {
     def getSingleSuccesses: List[SingleSuccess[Result]]
@@ -20,9 +26,6 @@ trait AmbiguousParserWriter extends ParserWriter {
   def combineSuccesses[Result](successes: Seq[ParseResult[Result]]): ParseResult[Result]
 
   case class SingleSuccess[+Result](result: ParseResult[Result], remainder: Input)
-
-  override def getParse[Result](parseState: ParseState,
-                                parser: ParserBase[Result], shouldCache: Boolean, shouldDetectLeftRecursion: Boolean) = ???
 
   class LeftRecursionDetectorState {
 
