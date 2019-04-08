@@ -5,10 +5,10 @@ trait NotCorrectingParserWriter extends ParserWriter {
 
   def succeed[Result](result: Result): Self[Result] = new SuccessParser(result)
 
-  class SuccessParser[Result](result: Result) extends ParserBase[Result] {
-    override def parseInternal(input: Input) = newSuccess(result, input)
+  class SuccessParser[Result](result: Result) extends ParserBase[Result] with LeafParser[Result] {
+    override def apply(input: Input) = newSuccess(result, input)
 
-    override def children = List.empty
+    override def getMustConsume(cache: ConsumeCache) = false
   }
 
 }

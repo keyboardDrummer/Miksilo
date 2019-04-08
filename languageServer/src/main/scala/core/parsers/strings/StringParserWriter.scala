@@ -56,8 +56,8 @@ trait StringParserWriter extends SequenceParserWriter {
   implicit def literal(value: String): Literal = Literal(value)
   implicit def regex(value: Regex): RegexParser = RegexParser(value)
 
-  case class Literal(value: String) extends EditorParserBase[String] {
-    override def parseInternal(input: Input): ParseResult[String] = {
+  case class Literal(value: String) extends EditorParserBase[String] with LeafParser[String] {
+    override def apply(input: Input): ParseResult[String] = {
       var index = 0
       val array = input.array
       while(index < value.length) {
@@ -74,11 +74,11 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def getDefault(cache: DefaultCache): Option[String] = Some(value)
 
-    override def children = List.empty
+    override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
   }
 
-  case class RegexParser(regex: Regex) extends EditorParserBase[String] {
-    override def parseInternal(input: Input) = {
+  case class RegexParser(regex: Regex) extends EditorParserBase[String] with LeafParser[String] {
+    override def apply(input: Input) = {
       regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
         case Some(matched) =>
           newSuccess(
@@ -94,6 +94,6 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def getDefault(cache: DefaultCache): Option[String] = None
 
-    override def children = List.empty
+    override def getMustConsume(cache: ConsumeCache) = false //regex.findFirstIn("").isEmpty
   }
 }

@@ -26,14 +26,18 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
-  object FailureParser extends ParserBase[Nothing] {
-    override def parseInternal(input: Input) = failureSingleton
+  object FailureParser extends ParserBase[Nothing] with LeafParser[Nothing] {
+    override def apply(input: Input) = failureSingleton
 
-    override def children = List.empty
+    override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  class BiggestOfTwo[Result](first: Parser[Result], second: => Parser[Result]) extends ParserBase[Result] {
-    override def parseInternal(input: Input) = {
+  class BiggestOfTwo[Result](val first: Parser[Result], _second: => Parser[Result])
+    extends ParserBase[Result] with ChoiceLike[Result] {
+
+    lazy val second = _second
+
+    override def apply(input: Input) = {
       val firstResult = first.parse(input)
       val secondResult = second.parse(input)
       (firstResult.successOption, secondResult.successOption) match {
@@ -43,29 +47,31 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
         case (_, None) => firstResult
       }
     }
-
-    override def children = List(first, second)
   }
 
-  class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result) extends ParserBase[Result] {
-    override def parseInternal(input: Input) = {
+  case class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result)
+    extends ParserBase[Result] with SequenceLike[Result] {
+
+    override def apply(input: Input) = {
       val leftResult = left.parse(input)
       leftResult.successOption match {
         case None => failureSingleton
         case Some(leftSuccess) => right.parse(leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
       }
     }
-
-    override def children = List(left, right)
   }
 
   class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends ParserBase[NewResult] {
-    override def parseInternal(input: Input) = {
+    override def apply(input: Input) = {
       left.parse(input).successOption match {
         case None => failureSingleton
         case Some(leftSuccess) => getRight(leftSuccess.result).parse(leftSuccess.remainder)
       }
     }
+
+    override def leftChildren = ???
+
+    override def getMustConsume(cache: ConsumeCache) = cache(left)
 
     override def children = ???
   }

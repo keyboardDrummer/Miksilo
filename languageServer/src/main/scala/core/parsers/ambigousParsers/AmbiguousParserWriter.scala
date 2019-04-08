@@ -52,7 +52,7 @@ trait AmbiguousParserWriter extends ParserWriter {
 
           callStackSet.add(node)
           callStack.push(node.parser)
-          var result = parser.parseInternal(input)
+          var result = parser(input)
           if (result.successful && parsersWithBackEdges.contains(parser)) {
             result = growResult(node, parser, result, this)
           }
@@ -79,7 +79,7 @@ trait AmbiguousParserWriter extends ParserWriter {
             */
 
           recursionIntermediates.put(node, intermediate.result)
-          val nextResult: ParseResult[Result] = parser.parseInternal(node.input)
+          val nextResult: ParseResult[Result] = parser(node.input)
           val singletons = nextResult.getSingleSuccesses
           val grew = singletons.exists(s => s.remainder.offset > intermediate.remainder.offset)
           if (grew) {

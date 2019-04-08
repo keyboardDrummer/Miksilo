@@ -85,25 +85,29 @@ class YamlTest extends FunSuite
   }
 
   class IfContext[Result](inners: Map[YamlContext, EditorParser[Result]]) extends EditorParserBase[Result] {
-    override def parseInternal(input: IndentationReader) = {
-      inners(input.context).parseInternal(input)
+    override def apply(input: IndentationReader) = {
+      inners(input.context)(input)
     }
 
     override def getDefault(cache: DefaultCache) =
       inners.values.flatMap(inner => inner.getDefault(cache)).headOption
 
-    override def children = inners.values.toList
+    override def leftChildren = inners.values.toList
+
+    override def getMustConsume(cache: ConsumeCache) = inners.values.forall(i => cache(i))
+
+    override def children = leftChildren
   }
 
-  class WithContext[Result](update: YamlContext => YamlContext, inner: EditorParser[Result]) extends EditorParserBase[Result] {
-    override def parseInternal(input: IndentationReader) = {
-      val result = inner.parseInternal(input.withContext(update(input.context)))
+  class WithContext[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+
+    override def apply(input: IndentationReader) = {
+      val result = original(input.withContext(update(input.context)))
       result.updateRemainder(r => r.withContext(input.context))
     }
 
-    override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
-
-    override def children = List(inner)
+    override def getDefault(cache: DefaultCache) = original.getDefault(cache)
   }
 
   val tag: EditorParser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator

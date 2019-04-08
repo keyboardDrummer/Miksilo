@@ -7,8 +7,10 @@ trait SequenceParserWriter extends EditorParserWriter {
   type Input <: SequenceInput[Input, Elem]
 
   def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
-  case class ElemPredicate(predicate: Elem => Boolean, kind: String) extends EditorParserBase[Elem] {
-    override def parseInternal(input: Input): ParseResult[Elem] = {
+  case class ElemPredicate(predicate: Elem => Boolean, kind: String)
+    extends EditorParserBase[Elem] with LeafParser[Elem] {
+
+    override def apply(input: Input): ParseResult[Elem] = {
       if (input.atEnd) {
         return newFailure(input, s"$kind expected but end of source found")
       }
@@ -23,7 +25,7 @@ trait SequenceParserWriter extends EditorParserWriter {
 
     override def getDefault(cache: DefaultCache): Option[Elem] = None
 
-    override def children = List.empty
+    override def getMustConsume(cache: ConsumeCache) = true
   }
 
 }

@@ -25,29 +25,35 @@ object YamlCoreDelta extends DeltaWithGrammar {
   object TagNode extends NodeField
 
   object ContextKey
-  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]]) extends EditorParserBase[Result] {
-    override def parseInternal(input: Reader) = {
+  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]])
+    extends EditorParserBase[Result] {
+
+    override def apply(input: Reader) = {
       val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-      inners(context).parseInternal(input)
+      inners(context)(input)
     }
 
     override def getDefault(cache: DefaultCache) = {
       inners.values.flatMap(inner => inner.getDefault(cache)).headOption
     }
 
+    override def leftChildren = children
+
+    override def getMustConsume(cache: BiGrammarToParser.ConsumeCache) = inners.values.forall(i => cache(i))
+
     override def children = inners.values.toList
   }
 
-  class WithContextParser[Result](update: YamlContext => YamlContext, inner: EditorParser[Result]) extends EditorParserBase[Result] {
-    override def parseInternal(input: Reader) = {
+  class WithContextParser[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+
+    override def apply(input: Reader) = {
       val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-      val result = inner.parseInternal(input.withState(input.state + (ContextKey -> update(context))))
+      val result = original(input.withState(input.state + (ContextKey -> update(context))))
       result.updateRemainder(r => r.withState(r.state + (ContextKey -> context)))
     }
 
-    override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
-
-    override def children = List(inner)
+    override def getDefault(cache: DefaultCache) = original.getDefault(cache)
   }
 
   object IndentationSensitiveExpression extends GrammarKey

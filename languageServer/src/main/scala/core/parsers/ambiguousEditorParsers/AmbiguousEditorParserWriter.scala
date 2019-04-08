@@ -49,12 +49,14 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     }
   }
 
-  class Sequence[+Left, +Right, Result](left: EditorParser[Left],
+  class Sequence[+Left, +Right, Result](val left: EditorParser[Left],
                                          _right: => EditorParser[Right],
-                                         combine: (Left, Right) => Result) extends EditorParserBase[Result] {
+                                         combine: (Left, Right) => Result)
+    extends EditorParserBase[Result] with SequenceLike[Result] {
+
     lazy val right: EditorParser[Right] = _right
 
-    override def parseInternal(input: Input) = {
+    override def apply(input: Input) = {
       val leftResult = left.parse(input)
       val leftFailure = right.default.map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).getOrElse(NoFailure)
       val rightResults = leftResult.successes.map(leftSuccess => {
@@ -72,15 +74,13 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
       leftDefault <- cache(left)
       rightDefault <- cache(right)
     } yield combine(leftDefault, rightDefault)
-
-    override def children = List(left, right)
   }
 
-  class Choice[+First <: Result, +Second <: Result, Result](first: EditorParser[First], _second: => EditorParser[Second])
-    extends EditorParserBase[Result] {
+  class Choice[+First <: Result, +Second <: Result, Result](val first: EditorParser[First], _second: => EditorParser[Second])
+    extends EditorParserBase[Result] with ChoiceLike[Result] {
     lazy val second = _second
 
-    override def parseInternal(input: Input) = {
+    override def apply(input: Input) = {
       val firstResult = first.parse(input)
       val secondResult = second.parse(input)
       val result = EditorParseResult[Result](firstResult.successes ++ secondResult.successes,
@@ -92,39 +92,39 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
       val value: Option[First] = cache(first)
       value.orElse(cache(second))
     }
-
-    override def children = List(first, second)
   }
 
-  class MapParser[+Result, NewResult](original: EditorParser[Result], f: Result => NewResult) extends EditorParserBase[NewResult] {
-    override def parseInternal(input: Input) = {
+  class MapParser[+Result, NewResult](val original: EditorParser[Result], f: Result => NewResult)
+    extends EditorParserBase[NewResult] with ParserWrapper[NewResult] {
+
+    override def apply(input: Input) = {
       original.parse(input).map(f)
     }
 
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
 
-    override def children = List(original)
+    override def leftChildren = List(original)
+
+    override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  class WithRemainderParser[Result](original: Self[Result])
-    extends EditorParserBase[(Result, Input)] {
-
-    override def parseInternal(input: Input) = {
-      val parseResult = original.parse(input)
-
-      val newSuccesses = parseResult.successes.map(success => Success((success.result, success.remainder), success.remainder))
-      val biggestFailure = parseResult.biggestFailure match {
-        case failure: ParseFailure[Result] =>
-          ParseFailure(failure.partialResult.map(r => (r, failure.remainder)), failure.remainder, failure.message)
-        case NoFailure => NoFailure
-      }
-      EditorParseResult(newSuccesses, biggestFailure)
-    }
-
-    override def getDefault(cache: DefaultCache): Option[(Result, Input)] = None
-
-    override def children = List(original)
-  }
+//  case class WithRemainderParser[Result](original: Self[Result])
+//    extends EditorParserBase[Success[Result]] with ParserWrapper[Success[Result]] {
+//
+//    override def apply(input: Input) = {
+//      val parseResult = original.parse(input)
+//
+//      val newSuccesses = parseResult.successes.map(success => Success(success, success.remainder))
+//      val biggestFailure = parseResult.biggestFailure match {
+//        case failure: ParseFailure[Result] =>
+//          ParseFailure(failure.partialResult.map(r => Success(r, failure.remainder)), failure.remainder, failure.message)
+//        case NoFailure => NoFailure
+//      }
+//      EditorParseResult(newSuccesses, biggestFailure)
+//    }
+//
+//    override def getDefault(cache: DefaultCache): Option[Success[Result]] = None
+//  }
 
   implicit def toResult[Result](biggestFailure: OptionFailure[Result]): EditorParseResult[Result] = EditorParseResult(List.empty, biggestFailure)
 

@@ -19,13 +19,20 @@ trait UnambiguousParserWriter extends ParserWriter {
 
     val cache = mutable.HashMap[Input, ParseResult[Result]]()
 
-    def apply(input: Input) = {
+    def apply(input: Input): ParseResult[Result] = {
+      if (isPartOfACycle) {
+        return parser(input)
+      }
+
       cache.get (input) match {
         case None =>
           parseState.callStack.push(parser)
-          val value: ParseResult[Result] = parser.parseInternal(input)
+          val value: ParseResult[Result] = parser(input)
           parseState.callStack.pop()
           if (!isPartOfACycle) {
+            if (parser.asInstanceOf[ParserBase[Result]].staticCycle) {
+              System.out.append("")
+            }
             cache.put (input, value)
           }
           value
@@ -59,7 +66,7 @@ trait UnambiguousParserWriter extends ParserWriter {
     final def growResult(input: Input, previous: ParseResult[Result]): ParseResult[Result] = {
       recursionIntermediates.put(input, previous)
 
-      val nextResult: ParseResult[Result] = parser.parseInternal(input)
+      val nextResult: ParseResult[Result] = parser(input)
       nextResult.getSuccessRemainder match {
         case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
           growResult(input, nextResult)
@@ -79,7 +86,7 @@ trait UnambiguousParserWriter extends ParserWriter {
 
           callStackSet.add(input)
           parseState.callStack.push(parser)
-          var result = parser.parseInternal(input)
+          var result = parser(input)
           if (result.successful && hasBackEdge) {
             result = growResult(input, result)
           }
@@ -104,7 +111,7 @@ trait UnambiguousParserWriter extends ParserWriter {
 
               callStackSet.add(input)
               parseState.callStack.push(parser)
-              var result = parser.parseInternal(input)
+              var result = parser(input)
               if (result.successful && hasBackEdge) {
                 result = growResult(input, result)
               }
@@ -126,7 +133,7 @@ trait UnambiguousParserWriter extends ParserWriter {
 
   class ParserState[Result](val parseState: PackratParseState, val parser: Parser[Result]) {
 
-    var isPartOfACycle: Boolean = false
+    var isPartOfACycle: Boolean = false // TODO investigate whether it could be useful to have this property switch back and forth, instead of only switch once.
   }
 
   override def getParse[Result](parseState: ParseState,
@@ -134,7 +141,7 @@ trait UnambiguousParserWriter extends ParserWriter {
                                 shouldCache: Boolean,
                                 shouldDetectLeftRecursion: Boolean): Parse[Result] = {
     if (!shouldCache && !shouldDetectLeftRecursion) {
-      return parser.parseInternal
+      return parser
     }
     if (shouldCache && shouldDetectLeftRecursion) {
       return parseState.parserStates.getOrElseUpdate(parser, new FixPointAndCache[Any](parseState, parser)).asInstanceOf[Parse[Result]]

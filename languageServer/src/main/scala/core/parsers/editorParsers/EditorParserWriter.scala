@@ -22,12 +22,12 @@ trait EditorParserWriter extends ParserWriter {
 
   def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseResult[Result]
 
-  case class Succeed[Result](value: Result) extends EditorParserBase[Result] {
-    override def parseInternal(input: Input) = newSuccess(value, input)
+  case class Succeed[Result](value: Result) extends EditorParserBase[Result] with LeafParser[Result] {
+    override def apply(input: Input) = newSuccess(value, input)
 
     override def getDefault(cache: DefaultCache): Option[Result] = Some(value)
 
-    override def children = List.empty
+    override def getMustConsume(cache: ConsumeCache) = false
   }
 
   implicit class EditorParserExtensions[Result](parser: EditorParser[Result]) extends ParserExtensions(parser) {
@@ -49,8 +49,8 @@ trait EditorParserWriter extends ParserWriter {
 
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
       val withPosition = leftRight(
-        new PositionParser(),
-        new WithRemainderParser(parser),
+        PositionParser,
+        WithRemainderParser(parser),
         (left: Input, resultRight: Success[Result]) => addRange(left, resultRight.remainder, resultRight.result))
       WithDefault(withPosition, cache => parser.getDefault(cache))
     }
@@ -67,28 +67,26 @@ trait EditorParserWriter extends ParserWriter {
 
   def newFailure[Result](partial: Option[Result], input: Input, message: String): ParseResult[Result]
 
-  class PositionParser extends EditorParserBase[Input] {
+  object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
-    override def parseInternal(input: Input) = {
+    override def apply(input: Input) = {
       newSuccess(input, input)
     }
 
     override def getDefault(cache: DefaultCache): Option[Input] = None
 
-    override def children = List.empty
+    override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  class WithRemainderParser[Result](original: Self[Result])
-    extends EditorParserBase[Success[Result]] {
+  case class WithRemainderParser[Result](original: Self[Result])
+    extends EditorParserBase[Success[Result]] with ParserWrapper[Success[Result]] {
 
-    override def parseInternal(input: Input) = {
+    override def apply(input: Input) = {
       val parseResult = original.parse(input)
       parseResult.flatMap[Success[Result]](success => newSuccess(success, success.remainder))
     }
 
     override def getDefault(cache: DefaultCache): Option[Success[Result]] = None
-
-    override def children = List(original)
   }
 
   case class ParseFailure[+Result](partialResult: Option[Result], remainder: Input, message: String)
@@ -132,14 +130,14 @@ trait EditorParserWriter extends ParserWriter {
 
   class EditorLazy[Result](_inner: => EditorParser[Result]) extends Lazy[Result](_inner) with EditorParserBase[Result] {
 
-    override def getDefault(cache: DefaultCache): Option[Result] = cache(inner.asInstanceOf[EditorParser[Result]])
+    override def getDefault(cache: DefaultCache): Option[Result] = cache(original.asInstanceOf[EditorParser[Result]])
   }
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
 
   case class WithDefault[Result](original: Self[Result], _getDefault: DefaultCache => Option[Result])
-    extends EditorParserBase[Result] {
-    override def parseInternal(input: Input): ParseResult[Result] = {
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+    override def apply(input: Input): ParseResult[Result] = {
       val result = original.parse(input)
       if (result.successful) {
         return result
@@ -161,14 +159,12 @@ trait EditorParserWriter extends ParserWriter {
 
     override def getDefault(cache: DefaultCache): Option[Result] =
       _getDefault(cache)
-
-    override def children = List(original)
   }
 
   case class Filter[Other, Result <: Other](original: EditorParser[Result],
                                              predicate: Other => Boolean, getMessage: Other => String)
-    extends EditorParserBase[Result] {
-    override def parseInternal(input: Input): ParseResult[Result] = {
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+    override def apply(input: Input): ParseResult[Result] = {
       val originalResult = original.parse(input)
       originalResult.flatMap(s => {
         if (predicate(s.result))
@@ -181,21 +177,19 @@ trait EditorParserWriter extends ParserWriter {
 
     override def getDefault(cache: DefaultCache): Option[Result] =
       original.getDefault(cache).filter(predicate)
-
-    override def children = List(original)
   }
 
-  case class Fail(message: String) extends EditorParserBase[Nothing] {
+  case class Fail(message: String) extends EditorParserBase[Nothing] with LeafParser[Nothing] {
     override def getDefault(cache: DefaultCache) = None
 
-    override def parseInternal(input: Input) = newFailure(None, input, message)
+    override def apply(input: Input) = newFailure(None, input, message)
 
-    override def children = List.empty
+    override def getMustConsume(cache: ConsumeCache) = false
   }
 
   def setDefaults(root: Self[_]): Unit = {
     val cache = new DefaultCache
-    GraphAlgorithms.depthFirst[Parser[_]](root, parser => parser.children, (first, path) => if (first) {
+    GraphAlgorithms.depthFirst[Parser[_]](root, parser => parser.leftChildren, (first, path) => if (first) {
       val parser = path.head.asInstanceOf[EditorParserBase[Any]]
       parser.default = parser.getDefault(cache)
     }, _ => {})

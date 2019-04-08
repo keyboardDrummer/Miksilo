@@ -30,13 +30,13 @@ trait ByteParserWriter extends NoErrorReportingParserWriter {
   val ParseShort = XBytes(2).map(bytes => bytes.getShort())
   val ParseUtf8: Parser[Node] = ParseShort.flatMap(length => parseString(length)).map(s => Utf8ConstantDelta.create(s))
 
-  case class XBytes(amount: Int) extends ParserBase[ByteBuffer] {
+  case class XBytes(amount: Int) extends ParserBase[ByteBuffer] with LeafParser[ByteBuffer] {
 
-    override def parseInternal(input: ByteReader) = {
+    override def apply(input: ByteReader) = {
       newSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
     }
 
-    override def children = List.empty
+    override def getMustConsume(cache: ConsumeCache) = amount > 0
   }
 
   def parseString(length: Int) =

@@ -11,19 +11,19 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     def withIndentation(value: Int): Input
   }
 
-  case class WithIndentation[Result](inner: EditorParser[Result]) extends EditorParserBase[Result] {
-    override def parseInternal(input: Input) = {
+  case class WithIndentation[Result](original: EditorParser[Result])
+    extends EditorParserBase[Result] with ParserWrapper[Result]{
+
+    override def apply(input: Input) = {
       val previous = input.indentation
       val newInput = input.withIndentation(input.position.character)
-      val result: ParseResult[Result] = inner.parseInternal(newInput)
+      val result: ParseResult[Result] = original(newInput)
       result.updateRemainder(remainder => {
         remainder.withIndentation(previous)
       })
     }
 
-    override def getDefault(cache: DefaultCache): Option[Result] = inner.getDefault(cache)
-
-    override def children = List(inner)
+    override def getDefault(cache: DefaultCache): Option[Result] = original.getDefault(cache)
   }
 
   def alignedList[Element](element: EditorParser[Element]): Self[List[Element]] = {
@@ -38,18 +38,22 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   def equal[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
   def greaterThan[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
 
-  case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, inner: EditorParser[Result]) extends EditorParserBase[Result] {
-    override def parseInternal(input: Input) = {
+  case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: EditorParser[Result])
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+
+    override def apply(input: Input) = {
       val delta = input.position.character - input.indentation
       if (input.atEnd || deltaPredicate(delta)) {
-        inner.parse(input)
+        original.parse(input)
       } else {
         newFailure(input, s"indentation ${input.position.character} of character '${input.head}' must be $property ${input.indentation}")
       }
     }
 
-    override def getDefault(cache: DefaultCache): Option[Result] = inner.getDefault(cache)
+    override def getDefault(cache: DefaultCache): Option[Result] = original.getDefault(cache)
 
-    override def children = List(inner)
+    override def leftChildren = List(original)
+
+    override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 }
