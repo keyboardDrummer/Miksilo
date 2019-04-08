@@ -23,7 +23,7 @@ trait ParserWriter {
 
   def choice[Result](first: Self[Result], other: => Self[Result], leftIsAlwaysBigger: Boolean = false): Self[Result]
 
-  def flatMap[Result, NewResult](left: Self[Result], getRight: Result => Self[NewResult]): Self[NewResult]
+  def flatMap[Result, NewResult](left: Self[Result], getRight: Result => Self[NewResult]): Self[NewResult] // TODO move this down, so it's only ByteParserWriter using it.
 
   def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult]
     //= flatMap(original, (result: Result) => succeed(f(result)))
@@ -38,6 +38,11 @@ trait ParserWriter {
                                         combine: (Left, Right) => NewResult): Self[NewResult]
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
+
+    def parseRoot(input: Input): ParseResult[Result] = {
+      compile(parser)
+      parser.parse(input)
+    }
 
     def addAlternative[Other >: Result](getAlternative: (Self[Other], Self[Other]) => Self[Other]): Self[Other] = {
       lazy val result: Self[Other] = lazyParser(parser | getAlternative(parser, result))

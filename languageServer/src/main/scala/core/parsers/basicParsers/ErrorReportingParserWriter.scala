@@ -11,7 +11,7 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
   override def fail[Result](message: String) = FailureParser(message)
 
   override def leftRight[Left, Right, NewResult](left: Parser[Left], right: => Parser[Right], combine: (Left, Right) => NewResult) =
-    new LeftRight(left, right, combine)
+    LeftRight(left, right, combine)
 
   override def choice[Result](first: Parser[Result], other: => Parser[Result], leftIsAlwaysBigger: Boolean) =
     new BiggestOfTwo(first, other)
@@ -84,16 +84,11 @@ trait ErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrect
 
     def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      parseFinal(input) match {
+      parseRoot(input) match {
         case success: ParseSuccess[Result] if !success.remainder.atEnd =>
           Failure(success.remainder, "Did not parse entire input")
         case f => f
       }
-    }
-
-    def parseFinal(input: Input): ParseResult[Result] = {
-      val state = new PackratParseState()
-      parser.parse(input)
     }
   }
 }

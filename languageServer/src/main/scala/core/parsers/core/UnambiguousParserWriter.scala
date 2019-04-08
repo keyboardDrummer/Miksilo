@@ -13,7 +13,7 @@ trait UnambiguousParserWriter extends ParserWriter {
     def get: Result
   }
 
-  class CheckCache[Result](parseState: PackratParseState, parser: Parser[Result])
+  class CheckCache[Result](parseState: LeftRecursionDetectorState, parser: Parser[Result])
     extends ParserState[Result](parseState, parser)
     with Parse[Result] {
 
@@ -42,7 +42,7 @@ trait UnambiguousParserWriter extends ParserWriter {
   }
 
   trait FixPoint[Result] {
-    def parseState: PackratParseState
+    def parseState: LeftRecursionDetectorState
     def parser: Parser[Result]
 
     val recursionIntermediates = mutable.HashMap[Input, ParseResult[Result]]()
@@ -77,7 +77,7 @@ trait UnambiguousParserWriter extends ParserWriter {
     }
   }
 
-  class DoFixPoint[Result](parseState: PackratParseState, parser: Parser[Result])
+  class DoFixPoint[Result](parseState: LeftRecursionDetectorState, parser: Parser[Result])
     extends ParserState[Result](parseState, parser) with FixPoint[Result] with Parse[Result] {
 
     override def apply(input: Input) = {
@@ -99,7 +99,7 @@ trait UnambiguousParserWriter extends ParserWriter {
     }
   }
 
-  class FixPointAndCache[Result](parseState: PackratParseState, parser: Parser[Result])
+  class FixPointAndCache[Result](parseState: LeftRecursionDetectorState, parser: Parser[Result])
     extends CheckCache(parseState, parser) with FixPoint[Result] {
 
     override def apply(input: Input) = {
@@ -131,7 +131,7 @@ trait UnambiguousParserWriter extends ParserWriter {
     }
   }
 
-  class ParserState[Result](val parseState: PackratParseState, val parser: Parser[Result]) {
+  class ParserState[Result](val parseState: LeftRecursionDetectorState, val parser: Parser[Result]) {
 
     var isPartOfACycle: Boolean = false // TODO investigate whether it could be useful to have this property switch back and forth, instead of only switch once.
   }
@@ -154,8 +154,8 @@ trait UnambiguousParserWriter extends ParserWriter {
     parseState.parserStates.getOrElseUpdate(parser, new DoFixPoint[Any](parseState, parser)).asInstanceOf[Parse[Result]]
   }
 
-  type ParseState = PackratParseState
-  class PackratParseState {
+  type ParseState = LeftRecursionDetectorState
+  class LeftRecursionDetectorState {
     val parserStates = mutable.HashMap[Parser[Any], ParserState[Any]]()
     val callStack = mutable.Stack[Parser[Any]]()
   }

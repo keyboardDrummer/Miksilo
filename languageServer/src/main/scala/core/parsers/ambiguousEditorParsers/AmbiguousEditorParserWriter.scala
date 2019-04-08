@@ -19,7 +19,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
   override def newSuccess[Result](result: Result, remainder: Input) =
     EditorParseResult(List(Success(result, remainder)), NoFailure)
 
-  override def newParseState(parser: EditorParser[_]) = new PackratParseState()
+  override def newParseState(parser: EditorParser[_]) = new LeftRecursionDetectorState()
 
   override def newFailure[Result](input: Input, message: String): EditorParseResult[Nothing] = ParseFailure(None, input, message)
 
@@ -35,7 +35,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
 
   override def parseWholeInput[Result](parser: EditorParser[Result],
                                        input: Input): EditorParseResult[Result] = {
-    val result = parser.parseFinal(input)
+    val result = parser.parseRoot(input)
     if (!result.successful)
       return result
 
@@ -107,24 +107,6 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
 
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
-
-//  case class WithRemainderParser[Result](original: Self[Result])
-//    extends EditorParserBase[Success[Result]] with ParserWrapper[Success[Result]] {
-//
-//    override def apply(input: Input) = {
-//      val parseResult = original.parse(input)
-//
-//      val newSuccesses = parseResult.successes.map(success => Success(success, success.remainder))
-//      val biggestFailure = parseResult.biggestFailure match {
-//        case failure: ParseFailure[Result] =>
-//          ParseFailure(failure.partialResult.map(r => Success(r, failure.remainder)), failure.remainder, failure.message)
-//        case NoFailure => NoFailure
-//      }
-//      EditorParseResult(newSuccesses, biggestFailure)
-//    }
-//
-//    override def getDefault(cache: DefaultCache): Option[Success[Result]] = None
-//  }
 
   implicit def toResult[Result](biggestFailure: OptionFailure[Result]): EditorParseResult[Result] = EditorParseResult(List.empty, biggestFailure)
 

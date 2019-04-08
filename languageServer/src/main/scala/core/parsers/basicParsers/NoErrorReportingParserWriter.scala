@@ -96,22 +96,17 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
   override def lazyParser[Result](inner: => Parser[Result]) = new Lazy(inner)
 
-  override def newParseState(root: Parser[_]) = new PackratParseState()
+  override def newParseState(root: Parser[_]) = new LeftRecursionDetectorState()
 
   implicit class BasicParserExtensions[+Result](parser: Parser[Result]) extends ParserExtensions(parser) {
 
     def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      val parseResult = parseFinal(input)
+      val parseResult = parseRoot(input)
       parseResult.successOption match {
         case Some(success) if !success.remainder.atEnd => failureSingleton
         case _ => parseResult
       }
-    }
-
-    def parseFinal(input: Input): ParseResult[Result] = {
-      val state = newParseState(parser)
-      parser.parse(input)
     }
   }
 }

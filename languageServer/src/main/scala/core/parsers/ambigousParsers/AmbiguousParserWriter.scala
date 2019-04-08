@@ -11,7 +11,7 @@ trait AmbiguousParserWriter extends ParserWriter {
   case class ParseNode(input: Input, parser: Parser[Any])
 
   type ParseResult[+Result] <: AmbiguousParseResult[Result]
-  type ParseState = PackratParseState
+  type ParseState = LeftRecursionDetectorState
 
   trait AmbiguousParseResult[+Result] extends ParseResultLike[Result] {
     def getSingleSuccesses: List[SingleSuccess[Result]]
@@ -24,7 +24,7 @@ trait AmbiguousParserWriter extends ParserWriter {
   override def getParse[Result](parseState: ParseState,
                                 parser: ParserBase[Result], shouldCache: Boolean, shouldDetectLeftRecursion: Boolean) = ???
 
-  class PackratParseState {
+  class LeftRecursionDetectorState {
 
     val resultCache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache[ParseNode, ParseResult[Any]]()
     val recursionIntermediates = mutable.HashMap[ParseNode, ParseResult[Any]]()

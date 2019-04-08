@@ -94,6 +94,6 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def getDefault(cache: DefaultCache): Option[String] = None
 
-    override def getMustConsume(cache: ConsumeCache) = false //regex.findFirstIn("").isEmpty
+    override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
   }
 }

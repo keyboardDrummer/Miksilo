@@ -7,7 +7,10 @@ import core.parsers.basicParsers.NoErrorReportingParserWriter
 import core.parsers.core.ParseInput
 import deltas.bytecode.constants.Utf8ConstantDelta
 
-case class ByteReader(array: Array[Byte], offset: Int = 0) extends ParseInput {
+case class ByteReader(array: Array[Byte], offset: Int) extends ParseInput {
+  def this(array: Array[Byte]) {
+    this(array, 0)
+  }
 
   def drop(amount: Int): ByteReader = ByteReader(array, offset + amount)
 
@@ -29,6 +32,7 @@ trait ByteParserWriter extends NoErrorReportingParserWriter {
   val ParseByte = XBytes(1).map(bytes => bytes.get())
   val ParseShort = XBytes(2).map(bytes => bytes.getShort())
   val ParseUtf8: Parser[Node] = ParseShort.flatMap(length => parseString(length)).map(s => Utf8ConstantDelta.create(s))
+
 
   case class XBytes(amount: Int) extends ParserBase[ByteBuffer] with LeafParser[ByteBuffer] {
 
@@ -56,5 +60,10 @@ trait ByteParserWriter extends NoErrorReportingParserWriter {
       }
       result
     })
+  }
+
+  // TODO because of the flatMap usage, compile doesn't work, and we don't need it anyways because we don't have left recursion.
+  override def compile[Result](root: Parser[Result]) = {
+    newParseState(root)
   }
 }

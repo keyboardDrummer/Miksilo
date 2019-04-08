@@ -32,7 +32,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   override def parseWholeInput[Result](parser: EditorParser[Result], input: Input) = {
 
-    val parseResult = parser.parseFinal(input)
+    val parseResult = parser.parseRoot(input)
     parseResult.successOption match {
       case Some(success) =>
         if (success.remainder.atEnd) parseResult
@@ -44,7 +44,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     }
   }
 
-  override def newParseState(parser: EditorParser[_]) = new PackratParseState()
+  override def newParseState(parser: EditorParser[_]) = new LeftRecursionDetectorState()
 
   class Sequence[+Left, +Right, Result](val left: EditorParser[Left],
                                          _right: => EditorParser[Right],

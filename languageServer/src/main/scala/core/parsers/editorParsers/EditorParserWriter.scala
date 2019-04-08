@@ -41,9 +41,9 @@ trait EditorParserWriter extends ParserWriter {
       EditorParserWriter.this.parseWholeInput(parser, input)
     }
 
-    def parseFinal(input: Input): ParseResult[Result] = {
+    override def parseRoot(input: Input): ParseResult[Result] = {
       setDefaults(parser)
-      val state = compile(parser)
+      compile(parser)
       parser.parse(input)
     }
 
