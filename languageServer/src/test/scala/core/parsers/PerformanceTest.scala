@@ -13,9 +13,9 @@ class PerformanceTest extends FunSuite {
     val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     val timeA = System.currentTimeMillis()
-//    for(_ <- 1.to(multiplier * 10)) {
-//      json.compileString(source)
-//    }
+    for(_ <- 1.to(multiplier * 10)) {
+      json.compileString(source)
+    }
 
     val timeB = System.currentTimeMillis()
     for(_ <- 1.to(multiplier)) {
@@ -26,7 +26,7 @@ class PerformanceTest extends FunSuite {
 
     val singleSource = timeB - timeA
     val sourceTimesTen = timeC - timeB
-    assert(singleSource < 3000 * multiplier)
+    assert(singleSource < 2000 * multiplier)
     System.out.println(s"singleSource:$singleSource")
     System.out.println(s"totalTime:${singleSource + sourceTimesTen}")
   }
