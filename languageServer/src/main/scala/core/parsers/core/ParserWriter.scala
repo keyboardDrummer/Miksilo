@@ -6,6 +6,10 @@ import scala.collection.concurrent.TrieMap
 import scala.collection.mutable
 import scala.language.higherKinds
 
+trait LeftRecursiveParserWriter {
+
+}
+
 trait ParserWriter {
 
   type Input <: ParseInput
@@ -22,8 +26,6 @@ trait ParserWriter {
   def newFailure[Result](input: Input, message: String): ParseResult[Result]
 
   def choice[Result](first: Self[Result], other: => Self[Result], leftIsAlwaysBigger: Boolean = false): Self[Result]
-
-  def flatMap[Result, NewResult](left: Self[Result], getRight: Result => Self[NewResult]): Self[NewResult] // TODO move this down, so it's only ByteParserWriter using it.
 
   def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult]
     //= flatMap(original, (result: Result) => succeed(f(result)))
@@ -56,9 +58,6 @@ trait ParserWriter {
     def ~<[Right](right: Self[Right]) = leftRight(parser, right, Processor.ignoreRight[Result, Right])
 
     def ~>[Right](right: Self[Right]) = leftRight(parser, right, Processor.ignoreLeft[Result, Right])
-
-    def flatMap[NewResult](getRight: Result => Self[NewResult]): Self[NewResult] =
-      ParserWriter.this.flatMap(parser, getRight)
 
     def map[NewResult](f: Result => NewResult): Self[NewResult] = ParserWriter.this.map(parser, f)
 

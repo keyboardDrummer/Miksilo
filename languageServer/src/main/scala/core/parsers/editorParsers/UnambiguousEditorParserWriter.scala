@@ -8,8 +8,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   type ParseResult[+R] = EditorParseResult[R]
 
-  override def flatMap[Result, NewResult](left: EditorParser[Result], getRight: Result => EditorParser[NewResult]) = ???
-
   override def newFailure[Result](partial: Option[Result], input: Input, message: String) = EditorParseResult(None, ParseFailure(partial, input, message))
 
   override def newSuccess[Result](result: Result, remainder: Input) = EditorParseResult(Some(Success(result, remainder)), NoFailure)

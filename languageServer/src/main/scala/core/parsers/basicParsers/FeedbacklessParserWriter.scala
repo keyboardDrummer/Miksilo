@@ -2,7 +2,7 @@ package core.parsers.basicParsers
 
 import core.parsers.core.{NotCorrectingParserWriter, UnambiguousParserWriter}
 
-trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorrectingParserWriter {
+trait FeedbacklessParserWriter extends UnambiguousParserWriter with NotCorrectingParserWriter {
 
   type ParseResult[+R] = SimpleParseResult[R]
   override type Self[+R] = Parser[R]
@@ -20,9 +20,6 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
   override def choice[Result](first: Parser[Result], other: => Parser[Result], leftIsAlwaysBigger: Boolean) =
     new BiggestOfTwo(first, other)
-
-  override def flatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]): Parser[NewResult] =
-    new FlatMap(left, getRight)
 
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = new MapParser(original, f)
 
@@ -61,21 +58,6 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
     }
   }
 
-  class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends ParserBase[NewResult] {
-    override def apply(input: Input) = {
-      left.parse(input).successOption match {
-        case None => failureSingleton
-        case Some(leftSuccess) => getRight(leftSuccess.result).parse(leftSuccess.remainder)
-      }
-    }
-
-    override def leftChildren = ???
-
-    override def getMustConsume(cache: ConsumeCache) = cache(left)
-
-    override def children = ???
-  }
-
   val failureSingleton = new SimpleParseResult[Nothing](None)
 
   override def abort = failureSingleton
@@ -98,11 +80,11 @@ trait NoErrorReportingParserWriter extends UnambiguousParserWriter with NotCorre
 
   override def newParseState(root: Parser[_]) = new LeftRecursionDetectorState()
 
-  implicit class BasicParserExtensions[+Result](parser: Parser[Result]) extends ParserExtensions(parser) {
+  implicit class BasicParserExtensions[+Result](parser: Parser[Result]) {
 
     def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      val parseResult = parseRoot(input)
+      val parseResult = parser.parseRoot(input)
       parseResult.successOption match {
         case Some(success) if !success.remainder.atEnd => failureSingleton
         case _ => parseResult

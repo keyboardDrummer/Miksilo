@@ -3,7 +3,7 @@ package core.parsers.bytes
 import java.nio.ByteBuffer
 
 import core.language.node.Node
-import core.parsers.basicParsers.NoErrorReportingParserWriter
+import core.parsers.basicParsers.MonadicFeedbacklessParserWriter
 import core.parsers.core.ParseInput
 import deltas.bytecode.constants.Utf8ConstantDelta
 
@@ -21,7 +21,7 @@ case class ByteReader(array: Array[Byte], offset: Int) extends ParseInput {
   override def atEnd: Boolean = offset == array.length
 }
 
-trait ByteParserWriter extends NoErrorReportingParserWriter {
+trait ByteParserWriter extends MonadicFeedbacklessParserWriter {
   type Input = ByteReader
   type Elem = Byte
 
@@ -32,7 +32,6 @@ trait ByteParserWriter extends NoErrorReportingParserWriter {
   val ParseByte = XBytes(1).map(bytes => bytes.get())
   val ParseShort = XBytes(2).map(bytes => bytes.getShort())
   val ParseUtf8: Parser[Node] = ParseShort.flatMap(length => parseString(length)).map(s => Utf8ConstantDelta.create(s))
-
 
   case class XBytes(amount: Int) extends ParserBase[ByteBuffer] with LeafParser[ByteBuffer] {
 
@@ -49,7 +48,7 @@ trait ByteParserWriter extends NoErrorReportingParserWriter {
     })
 
   def elems(bytes: Seq[Byte]): Self[Unit] = {
-    XBytes(bytes.length).flatMap[Unit](parsedBytes => {
+    XBytes(bytes.length).flatMap((parsedBytes: ByteBuffer) => {
       val destination = new Array[Byte](bytes.length)
       parsedBytes.get(destination)
       val result = if (destination sameElements bytes) {
