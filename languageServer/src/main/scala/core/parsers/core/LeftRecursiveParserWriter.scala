@@ -97,8 +97,6 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  case class Compile(shouldDetectLeftRecursion: Set[Parser[_]], nodesThatShouldCache: Set[Parser[_]])
-
   def compile[Result](root: Self[Result]): ParseState = {
     var nodesThatShouldDetectLeftRecursion = Set.empty[Parser[_]]
     val mustConsumeCache = new ConsumeCache
@@ -133,7 +131,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
     val nodesWithMultipleIncomingEdges: Set[Parser2[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
     val nodesWithIncomingCycleEdge: Set[Parser2[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
-    val nodesThatShouldCache: Set[Parser2[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges // TODO investigate reducing the amount of nodes to cache, like subtracting nodes that are already cycles.
+    val nodesThatShouldCache: Set[Parser2[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
 
     nodesInCycle.foreach(n => n.asInstanceOf[ParserBase[Any]].staticCycle = true)
     val parseState = newParseState(root)
