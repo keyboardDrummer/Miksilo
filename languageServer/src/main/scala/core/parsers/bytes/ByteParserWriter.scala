@@ -3,7 +3,7 @@ package core.parsers.bytes
 import java.nio.ByteBuffer
 
 import core.language.node.Node
-import core.parsers.basicParsers.MonadicFeedbacklessParserWriter
+import core.parsers.basicParsers.MonadicMachineParserWriter
 import core.parsers.core.ParseInput
 import deltas.bytecode.constants.Utf8ConstantDelta
 
@@ -21,7 +21,7 @@ case class ByteReader(array: Array[Byte], offset: Int) extends ParseInput {
   override def atEnd: Boolean = offset == array.length
 }
 
-trait ByteParserWriter extends MonadicFeedbacklessParserWriter {
+trait ByteParserWriter extends MonadicMachineParserWriter {
   type Input = ByteReader
   type Elem = Byte
 

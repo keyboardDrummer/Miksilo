@@ -1,8 +1,5 @@
 package core.parsers.core
 
-import util.ExtendedType
-
-import scala.collection.concurrent.TrieMap
 import scala.collection.mutable
 import scala.language.higherKinds
 
@@ -18,17 +15,16 @@ trait LeftRecursiveParserWriter extends ParserWriter {
                         parser: Parse[Result],
                         shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result]
 
-
   trait LRParser[+Result] extends super.Parser[Result] {
-    def mustConsume: Boolean
+    def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[LRParser[_]]
     def children: List[LRParser[_]]
   }
 
   trait ParserBase[Result] extends LRParser[Result] {
-    var staticCycle: Boolean = false
-    var mustConsume: Boolean = false
+    var isPartOfStaticCycle: Boolean = false
+    var mustConsumeInput: Boolean = false
   }
 
   trait SequenceLike[+Result] extends LRParser[Result] {
@@ -37,7 +33,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
     override def children = List(left, right)
 
-    override def leftChildren = if (left.mustConsume) List(left) else List(left, right)
+    override def leftChildren = if (left.mustConsumeInput) List(left) else List(left, right)
 
     override def getMustConsume(cache: ConsumeCache) = cache(left) || cache(right)
   }
@@ -102,7 +98,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     val reverseGraph = mutable.HashMap.empty[LRParser[_], mutable.Set[LRParser[_]]]
     GraphAlgorithms.depthFirst[LRParser[_]](root,
       node => {
-        node.asInstanceOf[ParserBase[Any]].mustConsume = mustConsumeCache(node)
+        node.asInstanceOf[ParserBase[Any]].mustConsumeInput = mustConsumeCache(node)
         node.children
       },
       (_, path: List[LRParser[_]]) => path match {
@@ -131,7 +127,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     val nodesWithIncomingCycleEdge: Set[LRParser[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
     val nodesThatShouldCache: Set[LRParser[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
 
-    nodesInCycle.foreach(n => n.asInstanceOf[ParserBase[Any]].staticCycle = true)
+    nodesInCycle.foreach(n => n.asInstanceOf[ParserBase[Any]].isPartOfStaticCycle = true)
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
@@ -153,12 +149,6 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
       recursive(root)
     }
-  }
-
-  val cache: TrieMap[Class[_], List[LRParser[_] => LRParser[_]]] = TrieMap.empty
-
-  def getChildProperties(clazz: Class[LRParser[_]]): List[LRParser[_] => LRParser[_]] = {
-    cache.getOrElseUpdate(clazz, new ExtendedType[LRParser[_]](clazz).fieldsOfType[LRParser[_]](classOf[LRParser[_]]))
   }
 
   class ConsumeCache {
