@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.language.higherKinds
 
-trait UnambiguousParserWriter extends ParserWriter {
+trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
   type ParseResult[+Result] <: UnambiguousParseResult[Result]
 
   trait UnambiguousParseResult[+Result] extends ParseResultLike[Result] {
@@ -13,75 +13,146 @@ trait UnambiguousParserWriter extends ParserWriter {
     def get: Result
   }
 
-  class ParserState[Result](val parser: Parser[Result]) {
-    val recursionIntermediates = mutable.HashMap[Input, ParseResult[Result]]()
-    val callStackSet = mutable.HashSet[Input]() // TODO might not be needed if we put an abort in the intermediates.
-    var isPartOfACycle: Boolean = false
-    var hasBackEdge: Boolean = false
+  class CheckCache[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
+    extends ParserState[Result](parseState, parser)
+    with Parse[Result] {
+
     val cache = mutable.HashMap[Input, ParseResult[Result]]()
-  }
 
-  class PackratParseState(val extraState: ExtraState) extends ParseStateLike {
+    def apply(input: Input): ParseResult[Result] = {
+      if (isPartOfACycle) {
+        return parser(input)
+      }
 
-    val parserStates = mutable.HashMap[Parser[Any], ParserState[Any]]()
-    val callStack = mutable.Stack[Parser[Any]]()
-
-    def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
-
-      val parserState = parserStates.getOrElseUpdate(parser, new ParserState(parser)).asInstanceOf[ParserState[Result]]
-      parserState.cache.get(input) match {
+      cache.get (input) match {
         case None =>
-          val value: ParseResult[Result] = parseIteratively[Result](parserState, input)
-          if (!parserState.isPartOfACycle) {
-            parserState.cache.put(input, value)
+          parseState.callStack.push(parser)
+          val value: ParseResult[Result] = parser(input)
+          parseState.callStack.pop()
+          if (!isPartOfACycle) {
+            cache.put (input, value)
           }
           value
-        case Some(result) => result
+        case Some (result) => result
       }
     }
+  }
 
-    def parseIteratively[Result](parserState: ParserState[Result], input: Input): ParseResult[Result] = {
-      getPreviousResult(parserState, input) match {
+  trait HasDetectFixPoint[Result] {
+    def parseState: LeftRecursionDetectorState
+    def parser: Parse[Result]
+
+    val recursionIntermediates = mutable.HashMap[Input, ParseResult[Result]]()
+    val callStackSet = mutable.HashSet[Input]() // TODO might not be needed if we put an abort in the intermediates.
+    var hasBackEdge: Boolean = false
+
+    def getPreviousResult(input: Input): Option[ParseResult[Result]] = {
+      if (!callStackSet.contains(input))
+        return None
+
+      Some(recursionIntermediates.getOrElse(input, {
+        hasBackEdge = true
+        val index = parseState.callStack.indexOf(parser)
+        parseState.callStack.take(index + 1).
+          foreach(parser => parseState.parserStates(parser).isPartOfACycle = true) // TODO this would also be possible by returning a value that indicates we found a cycle, like the abort!
+        abort
+      }))
+    }
+
+    @tailrec
+    final def growResult(input: Input, previous: ParseResult[Result]): ParseResult[Result] = {
+      recursionIntermediates.put(input, previous)
+
+      val nextResult: ParseResult[Result] = parser(input)
+      nextResult.getSuccessRemainder match {
+        case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
+          growResult(input, nextResult)
+        case _ =>
+          recursionIntermediates.remove(input)
+          previous
+      }
+    }
+  }
+
+  class DetectFixPoint[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
+    extends ParserState[Result](parseState, parser) with HasDetectFixPoint[Result] with Parse[Result] {
+
+    override def apply(input: Input) = {
+      getPreviousResult(input) match {
         case None =>
 
-          parserState.callStackSet.add(input)
-          callStack.push(parserState.parser)
-          var result = parserState.parser.parseInternal(input, this)
-          if (result.successful && parserState.hasBackEdge) {
-            result = growResult(parserState, input, result, this)
+          callStackSet.add(input)
+          parseState.callStack.push(parser)
+          var result = parser(input)
+          if (result.successful && hasBackEdge) {
+            result = growResult(input, result)
           }
-          parserState.callStackSet.remove(input)
-          callStack.pop()
+          callStackSet.remove(input)
+          parseState.callStack.pop()
           result
 
         case Some(result) => result
       }
     }
+  }
 
-    @tailrec
-    private def growResult[Result](parserState: ParserState[Result], input: Input, previous: ParseResult[Result], state: ParseStateLike): ParseResult[Result] = {
-      parserState.recursionIntermediates.put(input, previous)
+  class DetectFixPointAndCache[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
+    extends CheckCache(parseState, parser) with HasDetectFixPoint[Result] {
 
-      val nextResult: ParseResult[Result] = parserState.parser.parseInternal(input, state)
-      nextResult.getSuccessRemainder match {
-        case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
-          growResult(parserState, input, nextResult, state)
-        case _ =>
-          parserState.recursionIntermediates.remove(input)
-          previous
+    override def apply(input: Input) = {
+      cache.get(input) match {
+        case None =>
+
+          val value = getPreviousResult(input) match {
+            case None =>
+
+              callStackSet.add(input)
+              parseState.callStack.push(parser)
+              var result = parser(input)
+              if (result.successful && hasBackEdge) {
+                result = growResult(input, result)
+              }
+              callStackSet.remove(input)
+              parseState.callStack.pop()
+              result
+
+            case Some(result) => result
+          }
+
+          if (!isPartOfACycle) {
+            cache.put(input, value)
+          }
+          value
+        case Some(result) => result
       }
     }
+  }
 
-    def getPreviousResult[Result](parserState: ParserState[Result], input: Input): Option[ParseResult[Result]] = {
-      if (!parserState.callStackSet.contains(input))
-        return None
+  class ParserState[Result](val parseState: LeftRecursionDetectorState, val parser: Parse[Result]) {
+    var isPartOfACycle: Boolean = false // TODO investigate whether it could be useful to have this property switch back and forth, instead of only switch once.
+  }
 
-      Some(parserState.recursionIntermediates.getOrElse(input, {
-        parserState.hasBackEdge = true
-        val index = callStack.indexOf(parserState.parser)
-        callStack.take(index + 1).foreach(parser => parserStates(parser).isPartOfACycle = true) // TODO this would also be possible by returning a value that indicates we found a cycle, like the abort!
-        abort
-      }))
+  override def wrapParse[Result](parseState: ParseState,
+                                 parser: Parse[Result],
+                                 shouldCache: Boolean,
+                                 shouldDetectLeftRecursion: Boolean): Parse[Result] = {
+    if (!shouldCache && !shouldDetectLeftRecursion) {
+      return parser
     }
+    if (shouldCache && shouldDetectLeftRecursion) {
+      return parseState.parserStates.getOrElseUpdate(parser, new DetectFixPointAndCache[Any](parseState, parser)).asInstanceOf[Parse[Result]]
+    }
+
+    if (shouldCache) {
+      return parseState.parserStates.getOrElseUpdate(parser, new CheckCache[Any](parseState, parser)).asInstanceOf[Parse[Result]]
+    }
+
+    parseState.parserStates.getOrElseUpdate(parser, new DetectFixPoint[Any](parseState, parser)).asInstanceOf[Parse[Result]]
+  }
+
+  type ParseState = LeftRecursionDetectorState
+  class LeftRecursionDetectorState {
+    val parserStates = mutable.HashMap[Parse[Any], ParserState[Any]]()
+    val callStack = mutable.Stack[Parse[Any]]()
   }
 }

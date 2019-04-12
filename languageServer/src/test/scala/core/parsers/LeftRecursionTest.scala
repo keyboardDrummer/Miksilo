@@ -1,9 +1,27 @@
-package core.parsers2
+package core.parsers
 
-import core.parsers.editorParsers.EditorParserWriter
+import editorParsers.EditorParserWriter
 import org.scalatest.FunSuite
 
 trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {
+
+  test("handles recursion in complicated graph structures") {
+    lazy val leftMayNotCache = leftRec ~ "b"
+    lazy val leftRec = leftPath.map(x => x)
+    lazy val leftPath: EditorParser[Any] = new EditorLazy(leftMayNotCache | leftRec ~ "a" | "b")
+
+    val input = "bbb"
+    val leftParseResult = leftPath.parseWholeInput(new StringReader(input))
+    assert(leftParseResult.successful)
+    val expectation = (("b","b"),"b")
+    assertResult(expectation)(leftParseResult.get)
+
+    lazy val rightMayNotCache = rightRec ~ "b"
+    lazy val rightRec = rightPath.map(x => x)
+    lazy val rightPath: EditorParser[Any] = new EditorLazy(rightRec ~ "a" | rightMayNotCache | "b")
+    val rightParseResult = rightPath.parseWholeInput(new StringReader(input))
+    assertResult(leftParseResult)(rightParseResult)
+  }
 
   test("left recursion with lazy indirection") {
     lazy val head: EditorParser[Any] = new EditorLazy(head) ~ "a" | "a"
@@ -30,21 +48,15 @@ trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with Edit
     assertResult(expectation)(secondParseResult.get)
   }
 
-  val optional: EditorParserExtensions[Any] =  literal("a").*
+  val optional_a: EditorParserExtensions[Any] =  literal("a").*
   val optionalCopy: EditorParserExtensions[Any] = literal("a").*
   val input = "aes"
   def aesReader = new StringReader(input)
 
   test("Optional before seed") {
-    lazy val expression: EditorParser[Any] = new EditorLazy(expression) ~ "s" | optional ~ "e"
+    lazy val expression: EditorParser[Any] = new EditorLazy(expression) ~ "s" | optional_a ~ "e"
     val result = expression.parseWholeInput(aesReader)
     assert(result.successful, result.toString)
-  }
-
-  test("Optional before choice") {
-    lazy val expression: EditorParser[Any] = optional ~ (expression ~ "s" | "e")
-    val result = expression.parseWholeInput(aesReader)
-    assert(result.successful, result.toString) // This one fails in PackratParsers, not idea why. I think it succeeds for us because it detects the cycle in the '+' production since the optional has already been parsed.
   }
 
   /**
@@ -55,7 +67,7 @@ trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with Edit
    * The expression2 will parse an "s", even though expression1 still needs to parse "s"
   */
   test("Optional before recursive FAILS") {
-    lazy val expression: EditorParser[Any] = optional ~ expression ~ "s" | "e"
+    lazy val expression: EditorParser[Any] = optional_a ~ expression ~ "s" | "e"
     val result = expression.parseWholeInput(aesReader)
     assert(!result.successful, result.toString)
   }
@@ -65,7 +77,7 @@ trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with Edit
     lazy val recursive: EditorParser[Any] = new EditorLazy(recursive) ~ "b" | "b"
     lazy val parser = "a" ~ recursive
     val input = "c"
-    val expectation = ("a", ("b", "b"))
+    val expectation = ("a", "b")
     val result = parser.parseWholeInput(new StringReader(input))
     assertResult(expectation)(result.resultOption.get)
   }

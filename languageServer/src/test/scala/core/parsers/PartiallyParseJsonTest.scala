@@ -1,10 +1,9 @@
-package core.parsers2
+package core.parsers
 
-import core.parsers.editorParsers.EditorParserWriter
 import org.scalatest.FunSuite
+import editorParsers.EditorParserWriter
 
 trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {
-
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression

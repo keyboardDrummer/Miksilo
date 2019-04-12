@@ -6,6 +6,13 @@ import scala.collection.mutable
 
 class ExtendedType[T](_type: Class[T])
 {
+  def fieldsOfType[U](implicit clazz: Class[U]): List[T => U] = {
+    val getters = _type.getMethods.
+      filter(method => method.getParameterCount == 0 && method.getReturnType != null).
+      filter(method => clazz.isAssignableFrom(method.getReturnType))
+    getters.map(method => (obj: T) => method.invoke(obj).asInstanceOf[U]).toList
+  }
+
   def properties: Seq[Property[T, AnyRef]] = {
     val getters = _type.getMethods.filter(method => method.getParameterCount == 0 && method.getReturnType != null)
     val methodsByName = _type.getMethods.map(method => (method.getName,method)).toMap

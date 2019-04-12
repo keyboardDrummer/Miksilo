@@ -1,4 +1,4 @@
-package core.parsers2
+package core.parsers
 
 import org.scalatest.FunSuite
 

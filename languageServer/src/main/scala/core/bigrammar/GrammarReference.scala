@@ -6,7 +6,7 @@ import util.Property
 
 import scala.util.hashing.Hashing
 
-class GrammarReference(val previous: GrammarPath, val property: Property[BiGrammar, AnyRef]) extends GrammarPath
+class GrammarReference(val previous: GrammarPath, val property: Property[BiGrammar, BiGrammar]) extends GrammarPath
 {
   def parent: BiGrammar = previous.value
   private var cachedValue: BiGrammar = _

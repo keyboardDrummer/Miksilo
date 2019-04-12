@@ -25,25 +25,47 @@ object YamlCoreDelta extends DeltaWithGrammar {
   object TagNode extends NodeField
 
   object ContextKey
-  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]]) extends EditorParser[Result] {
-    override def parseInternal(input: Reader, state: ParseStateLike) = {
-      val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-      inners(context).parseInternal(input, state)
+  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]])
+    extends EditorParserBase[Result] {
+
+    override def getParser(recursive: BiGrammarToParser.GetParse): Parse[Result] = {
+      val innerParsers = inners.mapValues(p => recursive(p))
+
+      def apply(input: Reader) = {
+        val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
+        innerParsers(context)(input)
+      }
+
+      apply
     }
 
     override def getDefault(cache: DefaultCache) = {
       inners.values.flatMap(inner => inner.getDefault(cache)).headOption
     }
+
+    override def leftChildren = children
+
+    override def getMustConsume(cache: BiGrammarToParser.ConsumeCache) = inners.values.forall(i => cache(i))
+
+    override def children = inners.values.toList
   }
 
-  class WithContextParser[Result](update: YamlContext => YamlContext, inner: EditorParser[Result]) extends EditorParser[Result] {
-    override def parseInternal(input: Reader, state: ParseStateLike) = {
-      val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-      val result = inner.parseInternal(input.withState(input.state + (ContextKey -> update(context))), state)
-      result.updateRemainder(r => r.withState(r.state + (ContextKey -> context)))
+  class WithContextParser[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+
+    override def getParser(recursive: BiGrammarToParser.GetParse) = {
+      val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
+
+      def apply(input: Reader) = {
+        val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
+        val result = parseOriginal(input.withState(input.state + (ContextKey -> update(context))))
+        result.updateRemainder(r => r.withState(r.state + (ContextKey -> context)))
+      }
+
+      apply
     }
 
-    override def getDefault(cache: DefaultCache) = inner.getDefault(cache)
+    override def getDefault(cache: DefaultCache) = original.getDefault(cache)
   }
 
   object IndentationSensitiveExpression extends GrammarKey

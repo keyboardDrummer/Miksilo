@@ -1,7 +1,7 @@
-package core.parsers2
+package core.parsers
 
-import core.parsers.editorParsers.EditorParserWriter
-import core.parsers.strings.CommonParserWriter
+import editorParsers.EditorParserWriter
+import strings.CommonParserWriter
 import langserver.types.Position
 
 trait CommonStringReaderParser extends CommonParserWriter with EditorParserWriter {

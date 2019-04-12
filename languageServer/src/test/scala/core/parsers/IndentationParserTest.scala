@@ -22,7 +22,7 @@ class IndentationParserTest extends FunSuite with UnambiguousEditorParserWriter
         | a
       """.stripMargin
 
-    val result = expression.parse(new IndentationReader(program))
+    val result = expression.parseRoot(new IndentationReader(program))
     assert(result.successful)
   }
 }

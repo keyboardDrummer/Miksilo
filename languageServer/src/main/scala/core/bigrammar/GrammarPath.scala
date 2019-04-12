@@ -7,12 +7,12 @@ import util.{ExtendedType, GraphBasics, Property}
 import scala.collection.concurrent._
 
 object GrammarPath {
-  val cache: TrieMap[Class[_], List[Property[BiGrammar, AnyRef]]] = TrieMap.empty
+  val cache: TrieMap[Class[_], List[Property[BiGrammar, BiGrammar]]] = TrieMap.empty
 
-  def getBiGrammarProperties(clazz: Class[_]): List[Property[BiGrammar, AnyRef]] = {
+  def getBiGrammarProperties(clazz: Class[_]): List[Property[BiGrammar, BiGrammar]] = {
     cache.getOrElseUpdate(clazz, new ExtendedType(clazz).properties.
       filter(property => classOf[BiGrammar].isAssignableFrom(property._type)).
-      map(p => p.asInstanceOf[Property[BiGrammar, AnyRef]]).toList)
+      map(p => p.asInstanceOf[Property[BiGrammar, BiGrammar]]).toList)
   }
 }
 
