@@ -10,7 +10,10 @@ trait MachineParserWriter extends ParserWriter {
   def succeed[Result](result: Result): Self[Result] = new SuccessParser(result)
 
   class SuccessParser[Result](result: Result) extends Parser[Result] {
-    override def apply(input: Input) = newSuccess(result, input)
+
+    override def getParser(recursive: HasRecursive): Parse[Result] = {
+      input => newSuccess(result, input)
+    }
   }
 
   override def newSuccess[Result](result: Result, remainder: Input) = SimpleParseResult(Some(Success(result, remainder)))
@@ -20,7 +23,7 @@ trait MachineParserWriter extends ParserWriter {
   override def fail[Result](message: String) = FailureParser
 
   override def leftRight[Left, Right, NewResult](left: Parser[Left], right: => Parser[Right], combine: (Left, Right) => NewResult) =
-    LeftRight(left, right, combine)
+    Sequence(left, right, combine)
 
   override def choice[Result](first: Parser[Result], other: => Parser[Result], leftIsAlwaysBigger: Boolean) =
     new BiggestOfTwo(first, other)
@@ -30,14 +33,19 @@ trait MachineParserWriter extends ParserWriter {
   case class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult)
     extends Parser[NewResult] {
 
-    override def apply(input: Input) = {
-      val result = original(input)
-      result.map(f)
+    override def getParser(recursive: HasRecursive): Parse[NewResult] = {
+      val originalParse: Parse[Result] = recursive(original)
+      input: Input => {
+        val result = originalParse(input)
+        result.map[NewResult](f)
+      }
     }
   }
 
   object FailureParser extends Parser[Nothing] {
-    override def apply(input: Input) = failureSingleton
+
+    override def getParser(recursive: HasRecursive): Parse[Nothing] =
+      _ => failureSingleton
   }
 
   class BiggestOfTwo[Result](val first: Parser[Result], _second: => Parser[Result])
@@ -45,26 +53,37 @@ trait MachineParserWriter extends ParserWriter {
 
     lazy val second = _second
 
-    override def apply(input: Input) = {
-      val firstResult = first(input)
-      val secondResult = second(input)
-      (firstResult.successOption, secondResult.successOption) match {
-        case (Some(firstSuccess), Some(secondSuccess)) =>
-          if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset) firstResult else secondResult
-        case (None, _) => secondResult
-        case (_, None) => firstResult
+    override def getParser(recursive: HasRecursive) = {
+      val parseFirst = recursive(first)
+      val parseSecond = recursive(second)
+
+      input: Input => {
+        val firstResult = parseFirst(input)
+        val secondResult = parseSecond(input)
+        (firstResult.successOption, secondResult.successOption) match {
+          case (Some(firstSuccess), Some(secondSuccess)) =>
+            if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset) firstResult else secondResult
+          case (None, _) => secondResult
+          case (_, None) => firstResult
+        }
       }
     }
   }
 
-  case class LeftRight[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result)
+  case class Sequence[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result)
     extends Parser[Result] {
 
-    override def apply(input: Input) = {
-      val leftResult = left(input)
-      leftResult.successOption match {
-        case None => failureSingleton
-        case Some(leftSuccess) => right(leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
+
+    override def getParser(recursive: HasRecursive): Parse[Result] = {
+      val leftParser = recursive(left)
+      val rightParser = recursive(right)
+
+      input => {
+        val leftResult = leftParser(input)
+        leftResult.successOption match {
+          case None => failureSingleton
+          case Some(leftSuccess) => rightParser(leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
+        }
       }
     }
   }
@@ -91,7 +110,12 @@ trait MachineParserWriter extends ParserWriter {
 
     def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      val parseResult = parser(input)
+      lazy val r: HasRecursive = new HasRecursive {
+        def apply[SomeResult](p: Parser[SomeResult]): Parse[SomeResult] = p.getParser(this)
+      }
+
+      val parse = parser.getParser(r)
+      val parseResult = parse(input)
       parseResult.successOption match {
         case Some(success) if !success.remainder.atEnd => failureSingleton
         case _ => parseResult

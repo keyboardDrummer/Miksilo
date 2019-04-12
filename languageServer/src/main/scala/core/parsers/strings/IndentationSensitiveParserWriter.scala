@@ -14,14 +14,22 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   case class WithIndentation[Result](original: EditorParser[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result]{
 
-    override def apply(input: Input) = {
-      val previous = input.indentation
-      val newInput = input.withIndentation(input.position.character)
-      val result: ParseResult[Result] = original(newInput)
-      result.updateRemainder(remainder => {
-        remainder.withIndentation(previous)
-      })
+
+    override def getParser(recursive: HasRecursive): Parse[Result] = {
+      val parseOriginal = recursive(original)
+
+      def apply(input: Input) = {
+        val previous = input.indentation
+        val newInput = input.withIndentation(input.position.character)
+        val result: ParseResult[Result] = parseOriginal(newInput)
+        result.updateRemainder(remainder => {
+          remainder.withIndentation(previous)
+        })
+      }
+
+      apply
     }
+
 
     override def getDefault(cache: DefaultCache): Option[Result] = original.getDefault(cache)
   }
@@ -30,9 +38,9 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     aligned(element, List.empty, (a: Element, b: List[Element]) => a :: b)
   }
 
-  def aligned[Element, Sum](element: EditorParser[Element], zero: Sum, reduce: (Element, Sum) => Sum): Self[Sum] = {
-    val many = equal(element).many(zero, reduce)
-    WithIndentation(leftRight(element, many, reduce))
+  def aligned[Element, Sum](firstLine: EditorParser[Element], zero: Sum, reduce: (Element, Sum) => Sum): Self[Sum] = {
+    val remainingLines = equal(firstLine).many(zero, reduce)
+    WithIndentation(leftRight(firstLine, remainingLines, reduce))
   }
 
   def equal[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
@@ -41,13 +49,18 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: EditorParser[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
-    override def apply(input: Input) = {
-      val delta = input.position.character - input.indentation
-      if (input.atEnd || deltaPredicate(delta)) {
-        original.parse(input)
-      } else {
-        newFailure(input, s"indentation ${input.position.character} of character '${input.head}' must be $property ${input.indentation}")
+    override def getParser(recursive: HasRecursive) = {
+      val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
+
+      def apply(input: Input) = {
+        val delta = input.position.character - input.indentation
+        if (input.atEnd || deltaPredicate(delta)) {
+          parseOriginal(input)
+        } else {
+          newFailure(input, s"indentation ${input.position.character} of character '${input.head}' must be $property ${input.indentation}")
+        }
       }
+      apply
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = original.getDefault(cache)

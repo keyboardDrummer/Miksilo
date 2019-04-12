@@ -7,11 +7,15 @@ trait MonadicFeedbacklessParserWriter extends MachineParserWriter with MonadicPa
   override def flatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]): Parser[NewResult] =
     new FlatMap(left, getRight)
 
-  class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends Parser[NewResult] {
-    override def apply(input: Input) = {
-      left(input).successOption match {
-        case None => failureSingleton
-        case Some(leftSuccess) => getRight(leftSuccess.result)(leftSuccess.remainder)
+  class FlatMap[Result, NewResult](left: Parser[Result], getRight: Result => Parser[NewResult]) extends Parser[NewResult] { // TODO let getRight return a parse.
+
+    override def getParser(recursive: HasRecursive): Parse[NewResult] = {
+      val leftParser = recursive(left)
+      input => {
+        leftParser(input).successOption match {
+          case None => failureSingleton
+          case Some(leftSuccess) => recursive(getRight(leftSuccess.result))(leftSuccess.remainder)
+        }
       }
     }
   }

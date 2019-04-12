@@ -8,6 +8,10 @@ import deltas.expression.ExpressionDelta
 import deltas.json.JsonObjectLiteralDelta
 
 object YamlObjectDelta extends DeltaWithGrammar {
+
+  import JsonObjectLiteralDelta._
+  import CheckIndentationGrammar._
+
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     val _grammars = grammars
     import grammars._
@@ -16,10 +20,10 @@ object YamlObjectDelta extends DeltaWithGrammar {
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
 
     lazy val blockMap: BiGrammar = {
-      val member = new WithContext(_ =>
-        BlockKey, flowValue).as(JsonObjectLiteralDelta.MemberKey) ~< keyword(":") ~
-        CheckIndentationGrammar.greaterThan(blockValue.as(JsonObjectLiteralDelta.MemberValue)) asNode JsonObjectLiteralDelta.MemberShape
-      CheckIndentationGrammar.aligned(_grammars, member).as(JsonObjectLiteralDelta.Members).asNode(JsonObjectLiteralDelta.Shape)
+      val member = new WithContext(_ => BlockKey, flowValue).as(MemberKey) ~< ":" ~
+        greaterThan(blockValue.as(MemberValue)) asNode MemberShape
+
+      aligned(_grammars, member).as(Members).asNode(Shape)
     }
     blockValue.addAlternative(blockMap)
   }

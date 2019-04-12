@@ -1,6 +1,6 @@
 package core.parsers.core
 
-import scala.language.higherKinds
+import scala.language.{existentials, higherKinds}
 
 trait ParserWriter {
 
@@ -62,8 +62,16 @@ trait ParserWriter {
         succeed(List.empty[Result])
   }
 
-  trait Parser[+Result] {
+  trait Parse[+Result] {
     def apply(input: Input): ParseResult[Result]
+  }
+
+  trait HasRecursive {
+    def apply[Result](parser: Parser[Result]): Parse[Result]
+  }
+
+  trait Parser[+Result] {
+    def getParser(recursive: HasRecursive): Parse[Result]
   }
 
   case class Success[+Result](result: Result, remainder: Input) {

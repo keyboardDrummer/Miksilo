@@ -8,15 +8,15 @@ import scala.language.higherKinds
 
 trait AmbiguousParserWriter extends LeftRecursiveParserWriter {
 
-  case class ParseNode(input: Input, parser: Parser[Any])
+  case class ParseNode(input: Input, parser: Parse[Any])
 
   type ParseResult[+Result] <: AmbiguousParseResult[Result]
   type ParseState = LeftRecursionDetectorState
 
-  override def getParse[Result](parseState: LeftRecursionDetectorState,
-                                parser: ParserBase[Result],
-                                shouldCache: Boolean,
-                                shouldDetectLeftRecursion: Boolean) =
+  override def wrapParse[Result](parseState: LeftRecursionDetectorState,
+                                 parser: Parse[Result],
+                                 shouldCache: Boolean,
+                                 shouldDetectLeftRecursion: Boolean) =
     (input: Input) => parseState.parse(parser, input)
 
   trait AmbiguousParseResult[+Result] extends ParseResultLike[Result] {
@@ -32,11 +32,11 @@ trait AmbiguousParserWriter extends LeftRecursiveParserWriter {
     val resultCache: Cache[ParseNode, ParseResult[Any]] = new InfiniteCache[ParseNode, ParseResult[Any]]()
     val recursionIntermediates = mutable.HashMap[ParseNode, ParseResult[Any]]()
     val callStackSet = mutable.HashSet[ParseNode]()
-    val callStack = mutable.Stack[Parser[Any]]()
-    var parsersPartOfACycle: Set[Parser[Any]] = Set.empty
-    val parsersWithBackEdges = mutable.HashSet[Parser[Any]]()
+    val callStack = mutable.Stack[Parse[Any]]()
+    var parsersPartOfACycle: Set[Parse[Any]] = Set.empty
+    val parsersWithBackEdges = mutable.HashSet[Parse[Any]]()
 
-    def parse[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
+    def parse[Result](parser: Parse[Result], input: Input): ParseResult[Result] = {
 
       val node = ParseNode(input, parser)
       resultCache.get(node).getOrElse({
@@ -48,7 +48,7 @@ trait AmbiguousParserWriter extends LeftRecursiveParserWriter {
       }).asInstanceOf[ParseResult[Result]]
     }
 
-    def parseIteratively[Result](parser: Parser[Result], input: Input): ParseResult[Result] = {
+    def parseIteratively[Result](parser: Parse[Result], input: Input): ParseResult[Result] = {
       val node = ParseNode(input, parser)
       getPreviousResult(node) match {
         case None =>
@@ -67,7 +67,7 @@ trait AmbiguousParserWriter extends LeftRecursiveParserWriter {
       }
     }
 
-    private def growResult[Result](node: ParseNode, parser: Parser[Result], previous: ParseResult[Result], state: ParseState): ParseResult[Result] = {
+    private def growResult[Result](node: ParseNode, parser: Parse[Result], previous: ParseResult[Result], state: ParseState): ParseResult[Result] = {
       var intermediatesToGrow: List[SingleSuccess[Result]] = previous.getSingleSuccesses
       var endResults: List[ParseResult[Result]] = List.empty
       var visited = mutable.Set.empty[ParseResult[Result]]

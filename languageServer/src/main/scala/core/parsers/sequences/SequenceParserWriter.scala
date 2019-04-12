@@ -10,17 +10,23 @@ trait SequenceParserWriter extends EditorParserWriter {
   case class ElemPredicate(predicate: Elem => Boolean, kind: String)
     extends EditorParserBase[Elem] with LeafParser[Elem] {
 
-    override def apply(input: Input): ParseResult[Elem] = {
-      if (input.atEnd) {
-        return newFailure(input, s"$kind expected but end of source found")
+
+    override def getParser(recursive: HasRecursive) = {
+
+      def apply(input: Input): ParseResult[Elem] = {
+        if (input.atEnd) {
+          return newFailure(input, s"$kind expected but end of source found")
+        }
+
+        val char = input.head
+        if (predicate(char)) {
+          newSuccess(char, input.tail)
+        }
+        else
+          newFailure(input, s"'$char' was not a $kind")
       }
 
-      val char = input.head
-      if (predicate(char)) {
-        newSuccess(char, input.tail)
-      }
-      else
-        newFailure(input, s"'$char' was not a $kind")
+      apply
     }
 
     override def getDefault(cache: DefaultCache): Option[Elem] = None

@@ -13,7 +13,7 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
     def get: Result
   }
 
-  class CheckCache[Result](parseState: LeftRecursionDetectorState, parser: Parser[Result])
+  class CheckCache[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
     extends ParserState[Result](parseState, parser)
     with Parse[Result] {
 
@@ -40,7 +40,7 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
 
   trait HasDetectFixPoint[Result] {
     def parseState: LeftRecursionDetectorState
-    def parser: Parser[Result]
+    def parser: Parse[Result]
 
     val recursionIntermediates = mutable.HashMap[Input, ParseResult[Result]]()
     val callStackSet = mutable.HashSet[Input]() // TODO might not be needed if we put an abort in the intermediates.
@@ -74,7 +74,7 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
     }
   }
 
-  class DetectFixPoint[Result](parseState: LeftRecursionDetectorState, parser: Parser[Result])
+  class DetectFixPoint[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
     extends ParserState[Result](parseState, parser) with HasDetectFixPoint[Result] with Parse[Result] {
 
     override def apply(input: Input) = {
@@ -96,7 +96,7 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
     }
   }
 
-  class DetectFixPointAndCache[Result](parseState: LeftRecursionDetectorState, parser: Parser[Result])
+  class DetectFixPointAndCache[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
     extends CheckCache(parseState, parser) with HasDetectFixPoint[Result] {
 
     override def apply(input: Input) = {
@@ -128,14 +128,14 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
     }
   }
 
-  class ParserState[Result](val parseState: LeftRecursionDetectorState, val parser: Parser[Result]) {
+  class ParserState[Result](val parseState: LeftRecursionDetectorState, val parser: Parse[Result]) {
     var isPartOfACycle: Boolean = false // TODO investigate whether it could be useful to have this property switch back and forth, instead of only switch once.
   }
 
-  override def getParse[Result](parseState: ParseState,
-                                parser: ParserBase[Result],
-                                shouldCache: Boolean,
-                                shouldDetectLeftRecursion: Boolean): Parse[Result] = {
+  override def wrapParse[Result](parseState: ParseState,
+                                 parser: Parse[Result],
+                                 shouldCache: Boolean,
+                                 shouldDetectLeftRecursion: Boolean): Parse[Result] = {
     if (!shouldCache && !shouldDetectLeftRecursion) {
       return parser
     }
@@ -152,7 +152,7 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
 
   type ParseState = LeftRecursionDetectorState
   class LeftRecursionDetectorState {
-    val parserStates = mutable.HashMap[Parser[Any], ParserState[Any]]()
-    val callStack = mutable.Stack[Parser[Any]]()
+    val parserStates = mutable.HashMap[Parse[Any], ParserState[Any]]()
+    val callStack = mutable.Stack[Parse[Any]]()
   }
 }
