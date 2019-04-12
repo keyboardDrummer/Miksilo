@@ -53,7 +53,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseLeft = recursive(left)
-      val parseRight = recursive(right)
+      lazy val parseRight = recursive(right)
 
       def apply(input: Input) = {
         val leftResult = parseLeft(input)
