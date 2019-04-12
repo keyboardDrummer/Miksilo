@@ -5,6 +5,16 @@ import core.parsers.editorParsers.{DefaultCache, EditorParserWriter}
 
 trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParserWriter {
 
+  object NoFailure extends OptionFailure[Nothing] {
+    override def offset: Int = -1
+
+    override def map[NewResult](f: Nothing => NewResult): OptionFailure[NewResult] = this
+
+    override def partialResult: Option[Nothing] = None
+
+    override def updateRemainder(f: Input => Input) = this
+  }
+
   type ParseResult[+Result] = EditorParseResult[Result]
 
   override def combineSuccesses[Result](parseResults: Seq[EditorParseResult[Result]]) =

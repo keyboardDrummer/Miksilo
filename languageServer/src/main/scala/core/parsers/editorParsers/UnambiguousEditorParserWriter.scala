@@ -4,9 +4,46 @@ import core.parsers.core.UnambiguousParserWriter
 
 trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorParserWriter {
 
-  override def abort = EditorParseResult(None, NoFailure)
+  override def abort = NoFailure
 
-  type ParseResult[+R] = EditorParseResult[R]
+  object NoFailure extends OptionFailure[Nothing] with UnamEditorParseResult[Nothing] {
+    override def offset: Int = -1
+
+    override def map[NewResult](f: Nothing => NewResult): OptionFailure[NewResult] with ParseResult[NewResult] = this
+
+    override def partialResult: Option[Nothing] = None
+
+    override def updateRemainder(f: Input => Input) = this
+
+    override def flatMap[NewResult](f: Success[Nothing] => UnamEditorParseResult[NewResult]) = this
+
+    override def successful = false
+
+    override def resultOption = None
+
+    override def successOption = None
+
+    override def biggestFailure = this
+
+    override def getSuccessRemainder = None
+
+    override def addFailure[Other >: Nothing](other: OptionFailure[Other]) = this
+
+    override def addDefault[Other >: Nothing](value: Other) = this
+  }
+
+  trait UnamEditorParseResult[+Result] extends UnambiguousParseResult[Result] with EditorResult[Result] {
+    def successOption: Option[Success[Result]]
+    def addFailure[Other >: Result](other: OptionFailure[Other]): ParseResult[Other]
+    def addDefault[Other >: Result](value: Other): ParseResult[Other]
+
+    def biggestRealFailure: Option[ParseFailure[Result]] = biggestFailure match {
+      case failure: ParseFailure[Result] => Some(failure)
+      case _ => None
+    }
+  }
+
+  type ParseResult[+R] = UnamEditorParseResult[R]
 
   override def newFailure[Result](partial: Option[Result], input: Input, message: String) = EditorParseResult(None, ParseFailure(partial, input, message))
 
@@ -153,18 +190,18 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
   }
 
   final case class EditorParseResult[+Result](successOption: Option[Success[Result]], biggestFailure: OptionFailure[Result])
-    extends UnambiguousParseResult[Result] with EditorResult [Result] {
+    extends UnambiguousParseResult[Result] with EditorResult [Result] with UnamEditorParseResult[Result] {
 
     def resultOption: Option[Result] = successOption.map(s => s.result).orElse(biggestFailure.partialResult)
     def remainder: Input = getSuccessRemainder.getOrElse(biggestFailure.asInstanceOf[ParseFailure[Result]].remainder)
 
-    def addDefault[Other >: Result](value: Other) = biggestFailure match {
+    def addDefault[Other >: Result](value: Other): EditorParseResult[Other] = biggestFailure match {
       case NoFailure => this
       case f: ParseFailure[Result] => EditorParseResult(successOption, f.addDefault(value))
     }
 
     def updateRemainder(f: Input => Input): EditorParseResult[Result] = {
-      EditorParseResult(successOption.map(s => Success(s.result, f(s.remainder))), biggestFailure.mapRemainder(f))
+      EditorParseResult(successOption.map(s => Success(s.result, f(s.remainder))), biggestFailure.updateRemainder(f))
     }
 
     override def getSuccessRemainder = successOption.map(s => s.remainder)
@@ -179,7 +216,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       EditorParseResult(successOption.map(s => s.map(f)), failure)
     }
 
-    override def flatMap[NewResult](f: Success[Result] => EditorParseResult[NewResult]): ParseResult[NewResult] = {
+    override def flatMap[NewResult](f: Success[Result] => ParseResult[NewResult]): ParseResult[NewResult] = {
 
       val failure = biggestFailure match {
         case failure: ParseFailure[Result] =>
@@ -188,11 +225,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
         case NoFailure => NoFailure
       }
       successOption.map(s => f(s).addFailure(failure)).getOrElse(EditorParseResult(None, failure))
-    }
-
-    def biggestRealFailure: Option[ParseFailure[Result]] = biggestFailure match {
-      case failure: ParseFailure[Result] => Some(failure)
-      case _ => None
     }
 
     def addFailure[Other >: Result](other: OptionFailure[Other]): EditorParseResult[Other] =

@@ -121,28 +121,18 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
       case None => ParseFailure(Some(value), remainder, message)
     }
 
-    override def mapRemainder(f: Input => Input) = ParseFailure(partialResult, f(remainder), message)
+    override def updateRemainder(f: Input => Input) = ParseFailure(partialResult, f(remainder), message)
   }
 
   trait OptionFailure[+Result] {
     def offset: Int
     def partialResult: Option[Result]
     def map[NewResult](f: Result => NewResult): OptionFailure[NewResult]
-    def mapRemainder(f: Input => Input): OptionFailure[Result]
+    def updateRemainder(f: Input => Input): OptionFailure[Result]
 
     def getBiggest[Other >: Result](other: OptionFailure[Other]): OptionFailure[Other] = {
       if (offset > other.offset) this else other
     }
-  }
-
-  object NoFailure extends OptionFailure[Nothing] {
-    override def offset: Int = -1
-
-    override def map[NewResult](f: Nothing => NewResult): OptionFailure[NewResult] = this
-
-    override def partialResult: Option[Nothing] = None
-
-    override def mapRemainder(f: Input => Input) = this
   }
 
   class EditorLazy[Result](_inner: => EditorParser[Result]) extends Lazy[Result](_inner) with EditorParserBase[Result] {
