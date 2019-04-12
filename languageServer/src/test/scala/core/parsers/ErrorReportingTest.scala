@@ -1,6 +1,6 @@
-package core.parsers2
+package core.parsers
 
-import core.parsers.editorParsers.EditorParserWriter
+import editorParsers.EditorParserWriter
 import org.scalatest.FunSuite
 
 trait ErrorReportingTest extends FunSuite with CommonStringReaderParser with EditorParserWriter  {

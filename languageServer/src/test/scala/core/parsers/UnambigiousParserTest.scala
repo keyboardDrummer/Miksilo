@@ -1,6 +1,6 @@
-package core.parsers2
+package core.parsers
 
-import core.parsers.editorParsers.UnambiguousEditorParserWriter
+import editorParsers.UnambiguousEditorParserWriter
 
 class UnambigiousParserTest extends AssociativityTest
   with LeftRecursionTest

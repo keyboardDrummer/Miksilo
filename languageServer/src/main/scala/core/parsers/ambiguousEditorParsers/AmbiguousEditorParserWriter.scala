@@ -57,7 +57,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
 
     override def getParser(recursive: GetParse) = {
       val leftParse = recursive(left)
-      val rightParse = recursive(right)
+      lazy val rightParse = recursive(right)
       input: Input => {
         val leftResult = leftParse(input)
         val leftFailure = right.default.map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).getOrElse(NoFailure)
@@ -85,7 +85,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
 
     override def getParser(recursive: GetParse) = {
       val parseFirst = recursive(first)
-      val parseSecond = recursive(second)
+      lazy val parseSecond = recursive(second)
 
       def apply(input: Input) = {
         val firstResult = parseFirst(input)
