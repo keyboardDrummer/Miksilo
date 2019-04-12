@@ -48,21 +48,15 @@ trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with Edit
     assertResult(expectation)(secondParseResult.get)
   }
 
-  val optional: EditorParserExtensions[Any] =  literal("a").*
+  val optional_a: EditorParserExtensions[Any] =  literal("a").*
   val optionalCopy: EditorParserExtensions[Any] = literal("a").*
   val input = "aes"
   def aesReader = new StringReader(input)
 
   test("Optional before seed") {
-    lazy val expression: EditorParser[Any] = new EditorLazy(expression) ~ "s" | optional ~ "e"
+    lazy val expression: EditorParser[Any] = new EditorLazy(expression) ~ "s" | optional_a ~ "e"
     val result = expression.parseWholeInput(aesReader)
     assert(result.successful, result.toString)
-  }
-
-  test("Optional before choice") {
-    lazy val expression: EditorParser[Any] = optional ~ (expression ~ "s" | "e")
-    val result = expression.parseWholeInput(aesReader)
-    assert(!result.successful, result.toString) // This one fails in unambiguous parsers
   }
 
   /**
@@ -73,7 +67,7 @@ trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with Edit
    * The expression2 will parse an "s", even though expression1 still needs to parse "s"
   */
   test("Optional before recursive FAILS") {
-    lazy val expression: EditorParser[Any] = optional ~ expression ~ "s" | "e"
+    lazy val expression: EditorParser[Any] = optional_a ~ expression ~ "s" | "e"
     val result = expression.parseWholeInput(aesReader)
     assert(!result.successful, result.toString)
   }
@@ -83,7 +77,7 @@ trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with Edit
     lazy val recursive: EditorParser[Any] = new EditorLazy(recursive) ~ "b" | "b"
     lazy val parser = "a" ~ recursive
     val input = "c"
-    val expectation = ("a", ("b", "b"))
+    val expectation = ("a", "b")
     val result = parser.parseWholeInput(new StringReader(input))
     assertResult(expectation)(result.resultOption.get)
   }
