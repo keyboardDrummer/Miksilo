@@ -66,7 +66,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
   class Lazy[Result](_original: => Self[Result]) extends ParserBase[Result] with ParserWrapper[Result] {
     lazy val original: Self[Result] = _original
 
-    override def getParser(recursive: HasRecursive): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parse[Result] = {
       lazy val r = recursive(original)
       input => r(input)
     }
@@ -85,7 +85,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
   case class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult)
     extends ParserBase[NewResult] with ParserWrapper[NewResult] {
 
-    override def getParser(recursive: HasRecursive): Parse[NewResult] = {
+    override def getParser(recursive: GetParse): Parse[NewResult] = {
       val parseOriginal = recursive(original)
       input => parseOriginal(input).map(f)
     }
@@ -140,7 +140,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     def getParse[Result](root: Self[Result]): Parse[Result] = {
       val parseState = newParseState(root)
 
-      def recursive: HasRecursive = new HasRecursive {
+      def recursive: GetParse = new GetParse {
         override def apply[SomeResult](_parser: Parser[SomeResult]): Parse[SomeResult] = {
           val parser = _parser.asInstanceOf[LRParser[SomeResult]]
           val result = parser.getParser(recursive)

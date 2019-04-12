@@ -11,7 +11,7 @@ trait MachineParserWriter extends ParserWriter {
 
   class SuccessParser[Result](result: Result) extends Parser[Result] {
 
-    override def getParser(recursive: HasRecursive): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parse[Result] = {
       input => newSuccess(result, input)
     }
   }
@@ -33,7 +33,7 @@ trait MachineParserWriter extends ParserWriter {
   case class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult)
     extends Parser[NewResult] {
 
-    override def getParser(recursive: HasRecursive): Parse[NewResult] = {
+    override def getParser(recursive: GetParse): Parse[NewResult] = {
       val originalParse: Parse[Result] = recursive(original)
       input: Input => {
         val result = originalParse(input)
@@ -44,7 +44,7 @@ trait MachineParserWriter extends ParserWriter {
 
   object FailureParser extends Parser[Nothing] {
 
-    override def getParser(recursive: HasRecursive): Parse[Nothing] =
+    override def getParser(recursive: GetParse): Parse[Nothing] =
       _ => failureSingleton
   }
 
@@ -53,7 +53,7 @@ trait MachineParserWriter extends ParserWriter {
 
     lazy val second = _second
 
-    override def getParser(recursive: HasRecursive) = {
+    override def getParser(recursive: GetParse) = {
       val parseFirst = recursive(first)
       val parseSecond = recursive(second)
 
@@ -74,7 +74,7 @@ trait MachineParserWriter extends ParserWriter {
     extends Parser[Result] {
 
 
-    override def getParser(recursive: HasRecursive): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parse[Result] = {
       val leftParser = recursive(left)
       val rightParser = recursive(right)
 
@@ -110,7 +110,7 @@ trait MachineParserWriter extends ParserWriter {
 
     def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      lazy val r: HasRecursive = new HasRecursive {
+      lazy val r: GetParse = new GetParse {
         def apply[SomeResult](p: Parser[SomeResult]): Parse[SomeResult] = p.getParser(this)
       }
 

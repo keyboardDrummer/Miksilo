@@ -55,7 +55,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     lazy val right: EditorParser[Right] = _right
 
 
-    override def getParser(recursive: HasRecursive) = {
+    override def getParser(recursive: GetParse) = {
       val leftParse = recursive(left)
       val rightParse = recursive(right)
       input: Input => {
@@ -83,7 +83,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     extends EditorParserBase[Result] with ChoiceLike[Result] {
     lazy val second = _second
 
-    override def getParser(recursive: HasRecursive) = {
+    override def getParser(recursive: GetParse) = {
       val parseFirst = recursive(first)
       val parseSecond = recursive(second)
 

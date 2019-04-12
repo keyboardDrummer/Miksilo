@@ -51,7 +51,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     lazy val right: EditorParser[Right] = _right
 
-    override def getParser(recursive: HasRecursive): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parse[Result] = {
       val parseLeft = recursive(left)
       val parseRight = recursive(right)
 
@@ -88,7 +88,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     lazy val second = _second
 
 
-    override def getParser(recursive: HasRecursive): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parse[Result] = {
       val parseFirst = recursive(first)
       val parseSecond = recursive(second)
 
@@ -119,7 +119,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     lazy val second = _second
 
 
-    override def getParser(recursive: HasRecursive): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parse[Result] = {
       val parseFirst = recursive(first)
       val parseSecond = recursive(second)
 

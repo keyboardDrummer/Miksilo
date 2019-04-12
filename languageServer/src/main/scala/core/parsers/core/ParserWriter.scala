@@ -66,12 +66,12 @@ trait ParserWriter {
     def apply(input: Input): ParseResult[Result]
   }
 
-  trait HasRecursive {
+  trait GetParse {
     def apply[Result](parser: Parser[Result]): Parse[Result]
   }
 
   trait Parser[+Result] {
-    def getParser(recursive: HasRecursive): Parse[Result]
+    def getParser(recursive: GetParse): Parse[Result]
   }
 
   case class Success[+Result](result: Result, remainder: Input) {

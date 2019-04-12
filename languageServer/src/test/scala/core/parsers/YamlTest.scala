@@ -86,7 +86,7 @@ class YamlTest extends FunSuite
 
   class IfContext[Result](inners: Map[YamlContext, EditorParser[Result]]) extends EditorParserBase[Result] {
 
-    override def getParser(recursive: HasRecursive) = {
+    override def getParser(recursive: GetParse) = {
       val innerParsers = inners.mapValues(p => recursive(p).asInstanceOf[Parse[Result]])
       input => innerParsers(input.context)(input)
     }
@@ -104,7 +104,7 @@ class YamlTest extends FunSuite
   class WithContext[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: HasRecursive) = {
+    override def getParser(recursive: GetParse) = {
       val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
 
       def apply(input: IndentationReader) = {

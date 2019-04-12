@@ -59,7 +59,7 @@ trait StringParserWriter extends SequenceParserWriter {
   case class Literal(value: String) extends EditorParserBase[String] with LeafParser[String] {
 
 
-    override def getParser(recursive: HasRecursive) = {
+    override def getParser(recursive: GetParse) = {
 
       def apply(input: Input): ParseResult[String] = {
         var index = 0
@@ -87,7 +87,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
   case class RegexParser(regex: Regex) extends EditorParserBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: HasRecursive) = {
+    override def getParser(recursive: GetParse) = {
 
       def apply(input: Input) = {
         regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {

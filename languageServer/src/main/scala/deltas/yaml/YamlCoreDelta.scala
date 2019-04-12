@@ -28,7 +28,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
   class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]])
     extends EditorParserBase[Result] {
 
-    override def getParser(recursive: BiGrammarToParser.HasRecursive): Parse[Result] = {
+    override def getParser(recursive: BiGrammarToParser.GetParse): Parse[Result] = {
       val innerParsers = inners.mapValues(p => recursive(p))
 
       def apply(input: Reader) = {
@@ -53,7 +53,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
   class WithContextParser[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: BiGrammarToParser.HasRecursive) = {
+    override def getParser(recursive: BiGrammarToParser.GetParse) = {
       val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
 
       def apply(input: Reader) = {

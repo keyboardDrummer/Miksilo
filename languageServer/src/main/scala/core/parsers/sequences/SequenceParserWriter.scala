@@ -11,7 +11,7 @@ trait SequenceParserWriter extends EditorParserWriter {
     extends EditorParserBase[Elem] with LeafParser[Elem] {
 
 
-    override def getParser(recursive: HasRecursive) = {
+    override def getParser(recursive: GetParse) = {
 
       def apply(input: Input): ParseResult[Elem] = {
         if (input.atEnd) {
