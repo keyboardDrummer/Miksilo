@@ -89,6 +89,13 @@ trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with
     assert(result.successful)
     result.resultOption.get
   }
+
+  test("object with single member with string value, where the colon is missing") {
+    val input = """{"person""remy"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    val value = getFailure(result)
+    assertResult(List(("person","remy")))(value.partialResult.get)
+  }
 }
 
 

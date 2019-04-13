@@ -26,7 +26,7 @@ trait CommonParserWriter extends StringParserWriter {
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
   def stringLiteral: EditorParser[String] =
-    literal("\"") ~> """([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r ~< "\""
+    RegexParser(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r).map(r => r.substring(1, r.length)) ~< "\""
 
   /** A number following the rules of `decimalNumber`, with the following
     *  optional additions:

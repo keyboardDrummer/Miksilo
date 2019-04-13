@@ -82,7 +82,10 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  def newFailure[Result](partial: Option[Result], input: Input, message: String): ParseResult[Result]
+  final def newFailure[Result](partial: Option[Result], input: Input, message: String): ParseResult[Result] =
+    newFailure(partial, input, List(ParseError(input, message)))
+
+  def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]): ParseResult[Result]
 
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 

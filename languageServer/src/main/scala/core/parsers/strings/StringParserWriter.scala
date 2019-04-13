@@ -58,8 +58,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
   case class Literal(value: String) extends EditorParserBase[String] with LeafParser[String] {
 
-
-    override def getParser(recursive: GetParse) = {
+    override def getParser(recursive: GetParse): Parse[String] = {
 
       def apply(input: Input): ParseResult[String] = {
         var index = 0

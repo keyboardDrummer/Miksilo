@@ -21,8 +21,8 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     EditorParseResult(parseResults.flatMap(s => s.successes).toList,
       parseResults.map(s => s.biggestFailure).fold(NoFailure)((a, b) => a.getBiggest(b)))
 
-  override def newFailure[Result](partial: Option[Result], input: Input, message: String) =
-    EditorParseResult(List.empty, new ParseFailure(partial, input, message))
+  override def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]) =
+    EditorParseResult(List.empty, ParseFailure(partial, input, errors))
 
   override def newSuccess[Result](result: Result, remainder: Input) =
     EditorParseResult(List(Success(result, remainder)), NoFailure)
