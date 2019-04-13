@@ -108,16 +108,13 @@ trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with
 
   test("multiple recoverable errors") {
     val input = """{"person""remy","friend""jeroen"}"""
-    // This case shows two problem, deze case is probleem. laat zien dat errors en offset geen stricte importance volgorde hebben.
-    // person:remy (1 errors) vs person:remy,friend:jeroen (2 errors)
-    // remy (0 errors) vs (remy:{friend:{jeroen:{}}}} (6 errors)
     val result = jsonParser.parseWholeInput(new StringReader(input))
     val value = getFailure(result)
     assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
   }
 
-  test("ambigious problem") {
-    val input = """{"person""remy":"jeroen"}""" // person:{remy:jeroen} of person:unknown,remy:jeroen of person:remy
+  test("ambiguous problem") {
+    val input = """{"person""remy":"jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
     val value = getFailure(result)
     assertResult(List(("person","remy")))(value.partialResult.get)
