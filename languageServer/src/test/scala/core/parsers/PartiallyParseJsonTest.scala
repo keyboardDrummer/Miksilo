@@ -106,15 +106,36 @@ trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with
     assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
   }
 
-  test("multiple recoverable errors") {
+  test("two members but the comma is missing") {
+    val input = """{"person":"remy""friend":"jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    val value = getFailure(result)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+  }
+
+  test("two members both missing colon") {
     val input = """{"person""remy","friend""jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
     val value = getFailure(result)
     assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
   }
 
+  test("two members, no first colon and comma") {
+    val input = """{"person""remy""friend":"jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    val value = getFailure(result)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+  }
+
+  test("two members, no colons or comma") {
+    val input = """{"person""remy""friend""jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    val value = getFailure(result)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+  }
+
   test("ambiguous problem") {
-    val input = """{"person""remy":"jeroen"}"""
+    val input = """{"person""remy":"jeroen"}""" // person:unknown,remy:jeroen of person:{remy:jeroen}
     val result = jsonParser.parseWholeInput(new StringReader(input))
     val value = getFailure(result)
     assertResult(List(("person","remy")))(value.partialResult.get)

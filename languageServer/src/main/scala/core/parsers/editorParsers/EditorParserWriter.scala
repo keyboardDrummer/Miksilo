@@ -143,7 +143,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
       (this, other) match {
         case (f1: ParseFailure[Result], f2: ParseFailure[Result]) =>
           val minimumOffset = Math.min(f1.offset, f2.offset)
-          val errorDiff = f1.errors.count(e => e.location.offset <= minimumOffset) - f2.errors.count(e => e.location.offset <= minimumOffset)
+          val errorDiff = f1.errors.count(e => e.location.offset < minimumOffset) - f2.errors.count(e => e.location.offset < minimumOffset)
           if (errorDiff > 0) {
             f2
           } else if (errorDiff < 0) {

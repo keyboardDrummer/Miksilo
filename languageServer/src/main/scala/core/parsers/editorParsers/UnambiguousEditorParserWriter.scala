@@ -127,7 +127,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
                   case None => rightResult.biggestFailure match {
                     case rightFailure: ParseFailure[Right] if rightFailure.offset > failure.offset =>
                       val result = rightFailure.partialResult.map(r => combine(failure.partialResult.get, r))
-                      val r = newFailure(result, failure.remainder, failure.errors ++ rightFailure.errors)
+                      val r = newFailure(result, rightFailure.remainder, failure.errors ++ rightFailure.errors)
                       r
                     case _ =>
                       EditorParseResult(None, leftFailure)
