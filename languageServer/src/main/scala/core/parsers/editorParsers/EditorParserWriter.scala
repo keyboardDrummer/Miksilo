@@ -155,16 +155,16 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
           return result
         }
 
-        result.biggestFailure match {
-          case failure: ParseFailure[Result] =>
-            if (failure.partialResult.isEmpty || failure.remainder == input) {
-              val _default = default
-              if (_default.nonEmpty) {
-                return result.addDefault(_default.get, force = true)
-              }
+        val biggestFailure = result.biggestFailure
+        if (biggestFailure.offset >= input.offset) {
+          if (biggestFailure.partialResult.isEmpty || biggestFailure.offset == input.offset) {
+            val _default = default
+            if (_default.nonEmpty) {
+              return result.addDefault(_default.get, force = true)
             }
-          case _ =>
+          }
         }
+
         result
       }
 
