@@ -22,14 +22,14 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
       parseResults.map(s => s.biggestFailure).fold(NoFailure)((a, b) => a.getBiggest(b)))
 
   override def newFailure[Result](partial: Option[Result], input: Input, message: String) =
-    EditorParseResult(List.empty, ParseFailure(partial, input, message))
+    EditorParseResult(List.empty, new ParseFailure(partial, input, message))
 
   override def newSuccess[Result](result: Result, remainder: Input) =
     EditorParseResult(List(Success(result, remainder)), NoFailure)
 
   override def newParseState(parser: EditorParser[_]) = new LeftRecursionDetectorState()
 
-  override def newFailure[Result](input: Input, message: String): EditorParseResult[Nothing] = ParseFailure(None, input, message)
+  override def newFailure[Result](input: Input, message: String): EditorParseResult[Nothing] = new ParseFailure(None, input, message)
 
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
@@ -50,7 +50,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
     val resultsAtEnd = result.successes.filter(r => r.remainder.atEnd)
     if (resultsAtEnd.isEmpty) {
       val best = result.successes.maxBy(r => r.remainder.offset)
-      val failedSuccess = ParseFailure(Some(best.result), best.remainder, "Did not parse entire input")
+      val failedSuccess = new ParseFailure(Some(best.result), best.remainder, "Did not parse entire input")
       failedSuccess.getBiggest(result.biggestFailure)
     } else {
       EditorParseResult(resultsAtEnd, result.biggestFailure)
@@ -150,7 +150,7 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
       val failure = biggestFailure match {
         case failure: ParseFailure[Result] =>
           val newResult = failure.partialResult.flatMap(r => f(Success(r, failure.remainder)).resultOption)
-          ParseFailure(newResult, failure.remainder, failure.message)
+          ParseFailure(newResult, failure.remainder, failure.errors)
         case NoFailure => NoFailure
       }
       combineSuccesses(newSuccesses).addFailure(failure)

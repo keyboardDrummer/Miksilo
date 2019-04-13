@@ -107,22 +107,27 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
     override def getDefault(cache: DefaultCache): Option[Success[Result]] = None
   }
 
-  case class ParseFailure[+Result](partialResult: Option[Result], remainder: Input, message: String)
+  case class ParseError(location: Input, message: String)
+  case class ParseFailure[+Result](partialResult: Option[Result], remainder: Input, errors: List[ParseError])
     extends OptionFailure[Result] {
 
+    def this(partialResult: Option[Result], remainder: Input, message: String) = {
+      this(partialResult, remainder, List(ParseError(remainder, message)))
+    }
+
     override def map[NewResult](f: Result => NewResult): ParseFailure[NewResult] =
-      ParseFailure(partialResult.map(r => f(r)), remainder, message)
+      ParseFailure(partialResult.map(r => f(r)), remainder, errors)
 
     override def offset: Int = remainder.offset
 
-    override def toString: String = message
+    override def toString: String = errors.map(e => e.message).reduce((a,b) => a + ", " + b)
 
     def addDefault[Other >: Result](value: Other, force: Boolean): ParseFailure[Other] = partialResult match {
       case Some(_) if !force => this
-      case _ => ParseFailure(Some(value), remainder, message)
+      case _ => ParseFailure(Some(value), remainder, errors)
     }
 
-    override def updateRemainder(f: Input => Input) = ParseFailure(partialResult, f(remainder), message)
+    override def updateRemainder(f: Input => Input) = ParseFailure(partialResult, f(remainder), errors)
   }
 
   trait OptionFailure[+Result] {

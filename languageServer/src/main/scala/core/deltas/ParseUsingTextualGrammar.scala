@@ -24,7 +24,8 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
       compilation.stopped = true
     }
     if (!parseResult.successful) {
-      compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.biggestRealFailure.get)))
+      val diagnostics = DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.biggestRealFailure.get)
+      compilation.diagnostics ++= diagnostics.map(d => FileDiagnostic(uri, d))
     }
   }
 

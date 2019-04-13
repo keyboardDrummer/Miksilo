@@ -44,11 +44,11 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   type ParseResult[+R] = UnamEditorParseResult[R]
 
-  override def newFailure[Result](partial: Option[Result], input: Input, message: String) = EditorParseResult(None, ParseFailure(partial, input, message))
+  override def newFailure[Result](partial: Option[Result], input: Input, message: String) = EditorParseResult(None, new ParseFailure(partial, input, message))
 
   override def newSuccess[Result](result: Result, remainder: Input) = EditorParseResult(Some(Success(result, remainder)), RecursionDetectedOrNoFailure)
 
-  override def newFailure[Result](input: Input, message: String) = EditorParseResult(None, ParseFailure(None, input, message))
+  override def newFailure[Result](input: Input, message: String) = EditorParseResult(None, new ParseFailure(None, input, message))
 
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
@@ -71,7 +71,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       case Some(success) =>
         if (success.remainder.atEnd) parseResult
         else {
-          val failedSuccess = ParseFailure(Some(success.result), success.remainder, "Did not parse entire input")
+          val failedSuccess = new ParseFailure(Some(success.result), success.remainder, "Did not parse entire input")
           EditorParseResult(None, failedSuccess.getBiggest(parseResult.biggestFailure))
         }
       case None => parseResult
@@ -95,7 +95,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
         val leftResult = parseLeft(input)
         val leftFailure = right.default.map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).
           getOrElse(leftResult.biggestFailure match {
-            case failure: ParseFailure[Left] => ParseFailure(None, failure.remainder, failure.message)
+            case failure: ParseFailure[Left] => ParseFailure(None, failure.remainder, failure.errors)
             case RecursionDetectedOrNoFailure => RecursionDetectedOrNoFailure
           })
         leftResult.successOption match {
@@ -209,7 +209,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
       val failure = biggestFailure match {
         case failure: ParseFailure[Result] =>
-          ParseFailure(failure.partialResult.map(r => f(r)), failure.remainder, failure.message)
+          ParseFailure(failure.partialResult.map(r => f(r)), failure.remainder, failure.errors)
         case RecursionDetectedOrNoFailure => RecursionDetectedOrNoFailure
       }
       EditorParseResult(successOption.map(s => s.map(f)), failure)
@@ -220,7 +220,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       val failure = biggestFailure match {
         case failure: ParseFailure[Result] =>
           val newResult = failure.partialResult.flatMap(r => f(Success(r, failure.remainder)).resultOption)
-          ParseFailure(newResult, failure.remainder, failure.message)
+          ParseFailure(newResult, failure.remainder, failure.errors)
         case RecursionDetectedOrNoFailure => RecursionDetectedOrNoFailure
       }
       successOption.map(s => f(s).addFailure(failure)).getOrElse(EditorParseResult(None, failure))

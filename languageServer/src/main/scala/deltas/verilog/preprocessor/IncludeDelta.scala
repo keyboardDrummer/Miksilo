@@ -30,8 +30,8 @@ object IncludeDelta extends DirectiveDelta {
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[NodeSequenceElement].replaceWith(value.members)
       case None =>
-        val diagnostic = DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.biggestRealFailure.get)
-        compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
+        val diagnostics = DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.biggestRealFailure.get)
+        compilation.diagnostics ++= diagnostics.map(d => FileDiagnostic(filePath.toString(), d))
     }
   }
 
