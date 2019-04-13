@@ -6,7 +6,9 @@ import editorParsers.EditorParserWriter
 trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
-  object UnknownExpression
+  object UnknownExpression {
+    override def toString = "unknown"
+  }
   private lazy val jsonParser: EditorParser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression)
 
   test("object with single member with number value") {
@@ -92,6 +94,30 @@ trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with
 
   test("object with single member with string value, where the colon is missing") {
     val input = """{"person""remy"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    val value = getFailure(result)
+    assertResult(List(("person","remy")))(value.partialResult.get)
+  }
+
+  test("two members but the first misses a colon") {
+    val input = """{"person""remy","friend":"jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    val value = getFailure(result)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+  }
+
+  test("multiple recoverable errors") {
+    val input = """{"person""remy","friend""jeroen"}"""
+    // This case shows two problem, deze case is probleem. laat zien dat errors en offset geen stricte importance volgorde hebben.
+    // person:remy (1 errors) vs person:remy,friend:jeroen (2 errors)
+    // remy (0 errors) vs (remy:{friend:{jeroen:{}}}} (6 errors)
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    val value = getFailure(result)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+  }
+
+  test("ambigious problem") {
+    val input = """{"person""remy":"jeroen"}""" // person:{remy:jeroen} of person:unknown,remy:jeroen of person:remy
     val result = jsonParser.parseWholeInput(new StringReader(input))
     val value = getFailure(result)
     assertResult(List(("person","remy")))(value.partialResult.get)

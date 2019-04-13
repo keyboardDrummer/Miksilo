@@ -110,11 +110,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
                 val rightResult = parseRight(failure.remainder)
                 rightResult.successOption match {
                   case Some(success) =>
-                    if (success.remainder.offset <= failure.offset)
-                      return EditorParseResult(None, leftFailure)
-
-                    val result = combine(failure.partialResult.get, success.result)
-                    val halfFailure = newFailure(Some(result), success.remainder, failure.errors)
                     val fullFailure: OptionFailure[Result] = rightResult.biggestFailure match {
                       case rightFailure: ParseFailure[Right] =>
                         val result = rightFailure.partialResult.map(r => combine(failure.partialResult.get, r))
@@ -122,6 +117,11 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
                       case RecursionDetectedOrNoFailure =>
                         RecursionDetectedOrNoFailure
                     }
+                    if (success.remainder.offset <= failure.offset)
+                      return EditorParseResult(None, leftFailure.getBiggest(fullFailure))
+
+                    val result = combine(failure.partialResult.get, success.result)
+                    val halfFailure = newFailure(Some(result), success.remainder, failure.errors)
                     val r = halfFailure.addFailure(fullFailure)
                     r
                   case None => rightResult.biggestFailure match {
@@ -257,9 +257,15 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       successOption.map(s => f(s).addFailure(failure)).getOrElse(EditorParseResult(None, failure))
     }
 
-    def addFailure[Other >: Result](other: OptionFailure[Other]): EditorParseResult[Other] =
-      if (biggestFailure.offset >= other.offset || successOption.exists(s => s.remainder.offset >= other.offset)) this else
+    def addFailure[Other >: Result](other: OptionFailure[Other]): EditorParseResult[Other] = {
+      if (successOption.exists(s => s.remainder.offset >= other.offset))
+        return this
+      val biggest = biggestFailure.getBiggest(other)
+      if (biggest == biggestFailure)
+        this
+      else
         EditorParseResult(successOption, other)
+    }
   }
 
 }

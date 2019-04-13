@@ -140,7 +140,21 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
     def updateRemainder(f: Input => Input): OptionFailure[Result]
 
     def getBiggest[Other >: Result](other: OptionFailure[Other]): OptionFailure[Other] = {
-      if (offset > other.offset) this else other
+      (this, other) match {
+        case (f1: ParseFailure[Result], f2: ParseFailure[Result]) =>
+          val minimumOffset = Math.min(f1.offset, f2.offset)
+          val errorDiff = f1.errors.count(e => e.location.offset <= minimumOffset) - f2.errors.count(e => e.location.offset <= minimumOffset)
+          if (errorDiff > 0) {
+            f2
+          } else if (errorDiff < 0) {
+            f1
+          } else if (f2.offset > f1.offset) {
+            f2
+          } else
+            f1
+        case _ =>
+          if (offset >= other.offset) this else other
+      }
     }
   }
 
