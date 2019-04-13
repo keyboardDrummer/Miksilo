@@ -135,9 +135,9 @@ trait AmbiguousEditorParserWriter extends AmbiguousParserWriter with EditorParse
       if (biggestFailure.offset >= other.offset) this else
         EditorParseResult(successes, other)
 
-    def addDefault[Other >: Result](value: Other) = biggestFailure match {
+    def addDefault[Other >: Result](value: Other, force: Boolean = false) = biggestFailure match {
       case NoFailure => this
-      case f: ParseFailure[Result] => EditorParseResult(successes, f.addDefault(value))
+      case f: ParseFailure[Result] => EditorParseResult(successes, f.addDefault(value, force))
     }
 
     override def getSingleSuccesses =

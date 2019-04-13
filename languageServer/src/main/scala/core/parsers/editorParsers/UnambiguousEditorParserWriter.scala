@@ -29,13 +29,12 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     override def addFailure[Other >: Nothing](other: OptionFailure[Other]) = this
 
-    override def addDefault[Other >: Nothing](value: Other) = this
+    override def addDefault[Other >: Nothing](value: Other, force: Boolean) = this
   }
 
   trait UnamEditorParseResult[+Result] extends UnambiguousParseResult[Result] with EditorResult[Result] {
     def successOption: Option[Success[Result]]
     def addFailure[Other >: Result](other: OptionFailure[Other]): ParseResult[Other]
-    def addDefault[Other >: Result](value: Other): ParseResult[Other]
 
     def biggestRealFailure: Option[ParseFailure[Result]] = biggestFailure match {
       case failure: ParseFailure[Result] => Some(failure)
@@ -137,7 +136,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
             val secondResult = parseSecond(input)
             secondResult.addFailure(firstResult.biggestFailure)
         }
-        default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
+        default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d, force = false))
       }
 
       apply
@@ -195,8 +194,8 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     def resultOption: Option[Result] = successOption.map(s => s.result).orElse(biggestFailure.partialResult)
     def remainder: Input = getSuccessRemainder.getOrElse(biggestFailure.asInstanceOf[ParseFailure[Result]].remainder)
 
-    def addDefault[Other >: Result](value: Other): EditorParseResult[Other] = biggestFailure match {
-      case f: ParseFailure[Result] => EditorParseResult(successOption, f.addDefault(value))
+    def addDefault[Other >: Result](value: Other, force: Boolean): EditorParseResult[Other] = biggestFailure match {
+      case f: ParseFailure[Result] => EditorParseResult(successOption, f.addDefault(value, force))
       case RecursionDetectedOrNoFailure => this
     }
 

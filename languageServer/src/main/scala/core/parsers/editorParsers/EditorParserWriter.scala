@@ -14,6 +14,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
     def biggestFailure: OptionFailure[Result]
     def resultOption: Option[Result]
     def updateRemainder(f: Input => Input): ParseResult[Result]
+    def addDefault[Other >: Result](value: Other, force: Boolean = false): ParseResult[Other]
   }
 
   override def succeed[Result](result: Result): EditorParser[Result] = Succeed(result)
@@ -116,9 +117,9 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
     override def toString: String = message
 
-    def addDefault[Other >: Result](value: Other): ParseFailure[Other] = partialResult match {
-      case _: Some[Result] => this
-      case None => ParseFailure(Some(value), remainder, message)
+    def addDefault[Other >: Result](value: Other, force: Boolean): ParseFailure[Other] = partialResult match {
+      case Some(_) if !force => this
+      case _ => ParseFailure(Some(value), remainder, message)
     }
 
     override def updateRemainder(f: Input => Input) = ParseFailure(partialResult, f(remainder), message)
@@ -159,7 +160,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
             if (failure.partialResult.isEmpty || failure.remainder == input) {
               val _default = default
               if (_default.nonEmpty) {
-                return newFailure(_default, failure.remainder, failure.message)
+                return result.addDefault(_default.get, force = true)
               }
             }
           case _ =>
