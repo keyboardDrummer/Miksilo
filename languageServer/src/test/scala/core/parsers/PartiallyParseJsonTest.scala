@@ -134,6 +134,13 @@ trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with
     assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
   }
 
+  test("nested two members without colons/comma") {
+    val input = """{"directory"{"person""remy""friend""jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    val value = getFailure(result)
+    assertResult(List(("directory",List(("person","remy"), ("friend","jeroen")))))(value.partialResult.get)
+  }
+
   test("ambiguous problem") {
     val input = """{"person""remy":"jeroen"}""" // person:unknown,remy:jeroen of person:{remy:jeroen}
     val result = jsonParser.parseWholeInput(new StringReader(input))
