@@ -94,54 +94,61 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
       def apply(input: Input): ParseResult[Result] = {
         val leftResult = parseLeft(input)
-        val leftFailure = right.default.map(rightDefault => leftResult.biggestFailure.map(l => combine(l, rightDefault))).
-          getOrElse(leftResult.biggestFailure match {
-            case failure: ParseFailure[Left] => ParseFailure(None, failure.remainder, failure.errors)
-            case RecursionDetectedOrNoFailure => RecursionDetectedOrNoFailure
-          })
+        lazy val leftFailureDefaultRight = getLeftFailureDefaultRight(leftResult.biggestFailure)
         leftResult.successOption match {
           case Some(leftSuccess) =>
             val rightResult = parseRight(leftSuccess.remainder)
-            rightResult.map(r => combine(leftSuccess.result, r)).addFailure(leftFailure)
+            rightResult.map(r => combine(leftSuccess.result, r)).addFailure(leftFailureDefaultRight)
 
           case None =>
             leftResult.biggestFailure match {
-              case failure: ParseFailure[_] if failure.partialResult.nonEmpty =>
-                val rightResult = parseRight(failure.remainder)
-                rightResult.successOption match {
-                  case Some(success) =>
-                    val fullFailure: OptionFailure[Result] = rightResult.biggestFailure match {
-                      case rightFailure: ParseFailure[Right] =>
-                        val result = rightFailure.partialResult.map(r => combine(failure.partialResult.get, r))
-                        ParseFailure(result, rightFailure.remainder, failure.errors ++ rightFailure.errors)
-                      case RecursionDetectedOrNoFailure =>
-                        RecursionDetectedOrNoFailure
-                    }
-                    if (success.remainder.offset <= failure.offset)
-                      return EditorParseResult(None, leftFailure.getBiggest(fullFailure))
-
-                    val result = combine(failure.partialResult.get, success.result)
-                    val halfFailure = newFailure(Some(result), success.remainder, failure.errors)
-                    val r = halfFailure.addFailure(fullFailure)
-                    r
-                  case None => rightResult.biggestFailure match {
-                    case rightFailure: ParseFailure[Right] if rightFailure.offset > failure.offset =>
-                      val result = rightFailure.partialResult.map(r => combine(failure.partialResult.get, r))
-                      val r = newFailure(result, rightFailure.remainder, failure.errors ++ rightFailure.errors)
-                      r
-                    case _ =>
-                      EditorParseResult(None, leftFailure)
-                  }
-                }
+              case leftFailure: ParseFailure[Left] if leftFailure.partialResult.nonEmpty =>
+                parseRightAfterLeftFailure(leftFailure)
               case _ =>
-                EditorParseResult(None, leftFailure)
+                EditorParseResult(None, leftFailureDefaultRight)
             }
+        }
+      }
+
+      def parseRightAfterLeftFailure(leftFailure: ParseFailure[Left]): ParseResult[Result] = {
+        val rightResult = parseRight(leftFailure.remainder)
+        rightResult.successOption match {
+          case Some(success) =>
+            val fullFailure: OptionFailure[Result] = rightResult.biggestFailure match {
+              case rightFailure: ParseFailure[Right] =>
+                val result = rightFailure.partialResult.map(r => combine(leftFailure.partialResult.get, r))
+                ParseFailure(result, rightFailure.remainder, leftFailure.errors ++ rightFailure.errors)
+              case RecursionDetectedOrNoFailure =>
+                RecursionDetectedOrNoFailure
+            }
+            if (success.remainder.offset <= leftFailure.offset)
+              return EditorParseResult(None, getLeftFailureDefaultRight(leftFailure).getBiggest(fullFailure))
+
+            val result = combine(leftFailure.partialResult.get, success.result)
+            val halfFailure = newFailure(Some(result), success.remainder, leftFailure.errors)
+            val r = halfFailure.addFailure(fullFailure)
+            r
+          case None => rightResult.biggestFailure match {
+            case rightFailure: ParseFailure[Right] if rightFailure.offset > leftFailure.offset =>
+              val result = rightFailure.partialResult.map(r => combine(leftFailure.partialResult.get, r))
+              val r = newFailure(result, rightFailure.remainder, leftFailure.errors ++ rightFailure.errors)
+              r
+            case _ =>
+              EditorParseResult(None, getLeftFailureDefaultRight(leftFailure))
+          }
         }
       }
 
       apply
     }
 
+    private def getLeftFailureDefaultRight[Other >: Left](leftFailure: OptionFailure[Other]): OptionFailure[Result] = {
+      right.default.map(rightDefault => leftFailure.map(l => combine(l, rightDefault))).
+        getOrElse(leftFailure match {
+          case failure: ParseFailure[Left] => ParseFailure(None, failure.remainder, failure.errors)
+          case RecursionDetectedOrNoFailure => RecursionDetectedOrNoFailure
+        })
+    }
 
     override def getDefault(cache: DefaultCache): Option[Result] = for {
       leftDefault <- cache(left)
