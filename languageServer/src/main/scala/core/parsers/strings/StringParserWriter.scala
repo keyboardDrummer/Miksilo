@@ -60,7 +60,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def getParser(recursive: GetParse): Parse[String] = {
 
-      def apply(input: Input): ParseResult[String] = {
+      def apply(input: Input, errorAllowance: Int): ParseResult[String] = {
         var index = 0
         val array = input.array
         while(index < value.length) {
@@ -88,7 +88,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def getParser(recursive: GetParse) = {
 
-      def apply(input: Input) = {
+      def apply(input: Input, errorAllowance: Int) = {
         regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
           case Some(matched) =>
             newSuccess(

@@ -35,8 +35,8 @@ trait ByteParserWriter extends MonadicMachineParserWriter {
 
   case class XBytes(amount: Int) extends Parser[ByteBuffer] {
 
-    override def getParser(recursive: GetParse): Parse[ByteBuffer] = {
-      input: Input => newSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
+    override def parse(input: ByteReader) = {
+      newSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
     }
   }
 

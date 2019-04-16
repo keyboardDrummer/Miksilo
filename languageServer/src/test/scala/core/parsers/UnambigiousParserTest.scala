@@ -65,57 +65,57 @@ class UnambigiousParserTest extends AssociativityTest
   test("object with single member with string value, where the colon is missing") {
     val input = """{"person""remy"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getFailure(result)
-    assertResult(List(("person","remy")))(value.partialResult.get)
+    assert(!result.successful)
+    assertResult(List(("person","remy")))(result.resultOption.get)
   }
 
   test("two members but the first misses a colon") {
     val input = """{"person""remy","friend":"jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getFailure(result)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
   }
 
   test("two members but the comma is missing") {
     val input = """{"person":"remy""friend":"jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getFailure(result)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
   }
 
   test("two members both missing colon") {
     val input = """{"person""remy","friend""jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getFailure(result)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
   }
 
   test("two members, no first colon and comma") {
     val input = """{"person""remy""friend":"jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getFailure(result)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
   }
 
   test("two members, no colons or comma") {
     val input = """{"person""remy""friend""jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getFailure(result)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(value.partialResult.get)
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
   }
 
   test("nested two members without colons/comma") {
     val input = """{"directory"{"person""remy""friend""jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getFailure(result)
-    assertResult(List(("directory",List(("person","remy"), ("friend","jeroen")))))(value.partialResult.get)
+    assert(!result.successful)
+    assertResult(List(("directory",List(("person","remy"), ("friend","jeroen")))))(result.resultOption.get)
   }
 
   test("ambiguous problem") {
     val input = """{"person""remy":"jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getFailure(result)
-    assertResult(List(("person","remy")))(value.partialResult.get)
+    assert(!result.successful)
+    assertResult(List(("person","remy")))(result.resultOption.get)
   }
   // Partially Parse tests end
 }

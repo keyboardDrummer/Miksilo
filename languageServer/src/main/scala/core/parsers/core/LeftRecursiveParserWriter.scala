@@ -15,6 +15,18 @@ trait LeftRecursiveParserWriter extends ParserWriter {
                         parser: Parse[Result],
                         shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result]
 
+  trait Parse[+Result] {
+    def apply(input: Input, errorAllowance: Int): ParseResult[Result]
+  }
+
+  trait GetParse {
+    def apply[Result](parser: Parser[Result]): Parse[Result]
+  }
+
+  trait Parser[+Result] {
+    def getParser(recursive: GetParse): Parse[Result]
+  }
+
   trait LRParser[+Result] extends super.Parser[Result] {
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
@@ -64,7 +76,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       lazy val parseOriginal = recursive(original)
-      input => parseOriginal(input)
+      (input, allowance) => parseOriginal(input, allowance)
     }
 
     override def leftChildren = List(original)
@@ -83,7 +95,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
     override def getParser(recursive: GetParse): Parse[NewResult] = {
       val parseOriginal = recursive(original)
-      input => parseOriginal(input).map(f)
+      (input, allowance) => parseOriginal(input, allowance).map(f)
     }
 
     override def leftChildren = List(original)
@@ -173,9 +185,9 @@ trait LeftRecursiveParserWriter extends ParserWriter {
       result
     }
 
-    def parseRoot(input: Input): ParseResult[Result] = {
+    def parseRoot(input: Input, errorAllowance: Int): ParseResult[Result] = {
       val analysis = compile(parser)
-      analysis.getParse(parser)(input)
+      analysis.getParse(parser)(input, errorAllowance)
     }
   }
 }

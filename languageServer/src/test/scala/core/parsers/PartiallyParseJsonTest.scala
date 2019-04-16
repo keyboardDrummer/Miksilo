@@ -77,14 +77,9 @@ trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with
 
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    val failure: ParseFailure[Any] = getFailure(result)
-    assert(failure.partialResult.nonEmpty)
-    assertResult(expectation)(failure.partialResult.get)
-  }
-
-  protected def getFailure(result: ParseResult[Any]): ParseFailure[Any] = {
     assert(!result.successful)
-    result.biggestFailure.asInstanceOf[ParseFailure[Any]]
+    assert(result.resultOption.nonEmpty)
+    assertResult(expectation)(result.resultOption.get)
   }
 
   private def getSuccessValue(result: ParseResult[Any]) = {

@@ -4,6 +4,12 @@ import core.parsers.core.ParserWriter
 
 trait MachineParserWriter extends ParserWriter {
 
+  type Parser[+Result] = MachineParser[Result]
+
+  trait MachineParser[+Result] {
+    def parse(input: Input): ParseResult[Result]
+  }
+
   type ParseResult[+Result] = SimpleParseResult[Result]
   override type Self[+Result] = Parser[Result]
 
@@ -11,8 +17,8 @@ trait MachineParserWriter extends ParserWriter {
 
   class SuccessParser[Result](result: Result) extends Parser[Result] {
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
-      input => newSuccess(result, input)
+    override def parse(input: Input): ParseResult[Result] = {
+      newSuccess(result, input)
     }
   }
 
@@ -33,19 +39,14 @@ trait MachineParserWriter extends ParserWriter {
   case class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult)
     extends Parser[NewResult] {
 
-    override def getParser(recursive: GetParse): Parse[NewResult] = {
-      val originalParse: Parse[Result] = recursive(original)
-      input: Input => {
-        val result = originalParse(input)
-        result.map[NewResult](f)
-      }
+    override def parse(input: Input) = {
+      val result = original.parse(input)
+      result.map[NewResult](f)
     }
   }
 
   object FailureParser extends Parser[Nothing] {
-
-    override def getParser(recursive: GetParse): Parse[Nothing] =
-      _ => failureSingleton
+    override def parse(input: Input) = failureSingleton
   }
 
   class BiggestOfTwo[Result](val first: Parser[Result], _second: => Parser[Result])
@@ -53,19 +54,14 @@ trait MachineParserWriter extends ParserWriter {
 
     lazy val second = _second
 
-    override def getParser(recursive: GetParse) = {
-      val parseFirst = recursive(first)
-      val parseSecond = recursive(second)
-
-      input: Input => {
-        val firstResult = parseFirst(input)
-        val secondResult = parseSecond(input)
-        (firstResult.successOption, secondResult.successOption) match {
-          case (Some(firstSuccess), Some(secondSuccess)) =>
-            if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset) firstResult else secondResult
-          case (None, _) => secondResult
-          case (_, None) => firstResult
-        }
+    override def parse(input: Input) = {
+      val firstResult = first.parse(input)
+      val secondResult = second.parse(input)
+      (firstResult.successOption, secondResult.successOption) match {
+        case (Some(firstSuccess), Some(secondSuccess)) =>
+          if (firstSuccess.remainder.offset >= secondSuccess.remainder.offset) firstResult else secondResult
+        case (None, _) => secondResult
+        case (_, None) => firstResult
       }
     }
   }
@@ -73,17 +69,11 @@ trait MachineParserWriter extends ParserWriter {
   case class Sequence[Left, Right, Result](left: Parser[Left], right: Parser[Right], combine: (Left, Right) => Result)
     extends Parser[Result] {
 
-
-    override def getParser(recursive: GetParse): Parse[Result] = {
-      val leftParser = recursive(left)
-      val rightParser = recursive(right)
-
-      input => {
-        val leftResult = leftParser(input)
-        leftResult.successOption match {
-          case None => failureSingleton
-          case Some(leftSuccess) => rightParser(leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
-        }
+    override def parse(input: Input) = {
+      val leftResult = left.parse(input)
+      leftResult.successOption match {
+        case None => failureSingleton
+        case Some(leftSuccess) => right.parse(leftSuccess.remainder).map(r => combine(leftSuccess.result, r))
       }
     }
   }
@@ -110,12 +100,7 @@ trait MachineParserWriter extends ParserWriter {
 
     def parseWholeInput(input: Input): ParseResult[Result] = {
 
-      lazy val r: GetParse = new GetParse {
-        def apply[SomeResult](p: Parser[SomeResult]): Parse[SomeResult] = p.getParser(this)
-      }
-
-      val parse = parser.getParser(r)
-      val parseResult = parse(input)
+      val parseResult = parser.parse(input)
       parseResult.successOption match {
         case Some(success) if !success.remainder.atEnd => failureSingleton
         case _ => parseResult

@@ -19,19 +19,19 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
 
     val cache = mutable.HashMap[Input, ParseResult[Result]]()
 
-    def apply(input: Input): ParseResult[Result] = {
+    def apply(input: Input, errorAllowance: Int): ParseResult[Result] = {
       if (isPartOfACycle) {
-        return parser(input)
+        return parser(input, errorAllowance)
       }
 
       cache.get (input) match {
         case None =>
           parseState.callStack.push(parser)
-          val value: ParseResult[Result] = parser(input)
+          val value: ParseResult[Result] = parser(input, errorAllowance)
           parseState.callStack.pop()
-          if (!isPartOfACycle) {
-            cache.put (input, value)
-          }
+//          if (!isPartOfACycle) {
+//            cache.put (input, value)
+//          }
           value
         case Some (result) => result
       }
@@ -60,13 +60,13 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
     }
 
     @tailrec
-    final def growResult(input: Input, previous: ParseResult[Result]): ParseResult[Result] = {
+    final def growResult(input: Input, errorAllowance: Int, previous: ParseResult[Result]): ParseResult[Result] = {
       recursionIntermediates.put(input, previous)
 
-      val nextResult: ParseResult[Result] = parser(input)
+      val nextResult: ParseResult[Result] = parser(input, errorAllowance)
       nextResult.getSuccessRemainder match {
         case Some(remainder) if remainder.offset > previous.getSuccessRemainder.get.offset =>
-          growResult(input, nextResult)
+          growResult(input, errorAllowance, nextResult)
         case _ =>
           recursionIntermediates.remove(input)
           previous
@@ -77,15 +77,15 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
   class DetectFixPoint[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
     extends ParserState[Result](parseState, parser) with HasDetectFixPoint[Result] with Parse[Result] {
 
-    override def apply(input: Input) = {
+    override def apply(input: Input, errorAllowance: Int) = {
       getPreviousResult(input) match {
         case None =>
 
           callStackSet.add(input)
           parseState.callStack.push(parser)
-          var result = parser(input)
+          var result = parser(input, errorAllowance)
           if (result.successful && hasBackEdge) {
-            result = growResult(input, result)
+            result = growResult(input, errorAllowance, result)
           }
           callStackSet.remove(input)
           parseState.callStack.pop()
@@ -99,7 +99,7 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
   class DetectFixPointAndCache[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
     extends CheckCache(parseState, parser) with HasDetectFixPoint[Result] {
 
-    override def apply(input: Input) = {
+    override def apply(input: Input, errorAllowance: Int) = {
       cache.get(input) match {
         case None =>
 
@@ -108,9 +108,9 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
 
               callStackSet.add(input)
               parseState.callStack.push(parser)
-              var result = parser(input)
+              var result = parser(input, errorAllowance)
               if (result.successful && hasBackEdge) {
-                result = growResult(input, result)
+                result = growResult(input, errorAllowance, result)
               }
               callStackSet.remove(input)
               parseState.callStack.pop()
@@ -119,9 +119,9 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
             case Some(result) => result
           }
 
-          if (!isPartOfACycle) {
-            cache.put(input, value)
-          }
+//          if (!isPartOfACycle) {
+//            cache.put(input, value)
+//          }
           value
         case Some(result) => result
       }
@@ -154,5 +154,6 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
   class LeftRecursionDetectorState {
     val parserStates = mutable.HashMap[Parse[Any], ParserState[Any]]()
     val callStack = mutable.Stack[Parse[Any]]()
+    var maxErrors = 0
   }
 }

@@ -6,12 +6,12 @@ import scala.language.higherKinds
 
 trait EditorParserWriter extends LeftRecursiveParserWriter {
 
-  type ExtraState = DefaultCache
   type Self[+Result] = EditorParser[Result]
   type ParseResult[+Result] <: EditorResult[Result]
 
   trait EditorResult[+Result] extends ParseResultLike[Result] {
-    def biggestFailure: OptionFailure[Result]
+    def offset: Int
+    def errors: List[ParseError]
     def resultOption: Option[Result]
     def updateRemainder(f: Input => Input): ParseResult[Result]
     def addDefault[Other >: Result](value: Other, force: Boolean = false): ParseResult[Other]
@@ -26,7 +26,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
   case class Succeed[Result](value: Result) extends EditorParserBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
-      input => newSuccess(value, input)
+      (input: Input, _) => newSuccess(value, input)
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = Some(value)
@@ -45,10 +45,10 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
       EditorParserWriter.this.parseWholeInput(parser, input)
     }
 
-    override def parseRoot(input: Input): ParseResult[Result] = {
+    override def parseRoot(input: Input, errorAllowance: Int): ParseResult[Result] = {
       setDefaults(parser)
       val analysis = compile(parser)
-      analysis.getParse(parser)(input)
+      analysis.getParse(parser)(input, errorAllowance)
     }
 
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
@@ -74,7 +74,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
     override def getParser(recursive: GetParse): Parse[NewResult] = {
       val parseOriginal = recursive(original)
-      input => parseOriginal(input).map(f)
+      (input, errorAllowance) => parseOriginal(input, errorAllowance).map(f)
     }
 
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
@@ -90,7 +90,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
     override def getParser(recursive: GetParse): Parse[Input] = {
-      input => newSuccess(input, input)
+      (input, _) => newSuccess(input, input)
     }
 
     override def getDefault(cache: DefaultCache): Option[Input] = None
@@ -104,7 +104,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
     override def getParser(recursive: GetParse): Parse[Success[Result]] = {
       val parseOriginal = recursive(original)
-      input => parseOriginal(input).flatMap(success => newSuccess(success, success.remainder))
+      (input, errorAllowance) => parseOriginal(input, errorAllowance).flatMap(success => newSuccess(success, success.remainder))
     }
 
     override def getDefault(cache: DefaultCache): Option[Success[Result]] = None
@@ -171,15 +171,14 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original)
 
-      def apply(input: Input): ParseResult[Result] = {
-        val result = parseOriginal(input)
+      def apply(input: Input, errorAllowance: Int): ParseResult[Result] = {
+        val result = parseOriginal(input, errorAllowance)
         if (result.successful) {
           return result
         }
 
-        val biggestFailure = result.biggestFailure
-        if (biggestFailure.offset >= input.offset) {
-          if (biggestFailure.partialResult.isEmpty || biggestFailure.offset == input.offset) {
+        if (result.offset >= input.offset) {
+          if (result.resultOption.isEmpty || result.offset == input.offset) {
             val _default = default
             if (_default.nonEmpty) {
               return result.addDefault(_default.get, force = true)
@@ -204,8 +203,8 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original)
-      input => {
-        val originalResult = parseOriginal(input)
+      (input, errorAllowance) => {
+        val originalResult = parseOriginal(input, errorAllowance)
         originalResult.flatMap(s => {
           if (predicate(s.result))
             newSuccess(s.result, s.remainder)
@@ -225,7 +224,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
 
     override def getParser(recursive: GetParse): Parse[Nothing] = {
-      input => newFailure(None, input, message)
+      (input, _) => newFailure(None, input, message)
     }
 
     override def getMustConsume(cache: ConsumeCache) = false

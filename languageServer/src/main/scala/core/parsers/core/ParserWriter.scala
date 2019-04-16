@@ -62,17 +62,8 @@ trait ParserWriter {
         succeed(List.empty[Result])
   }
 
-  trait Parse[+Result] {
-    def apply(input: Input): ParseResult[Result]
-  }
 
-  trait GetParse {
-    def apply[Result](parser: Parser[Result]): Parse[Result]
-  }
-
-  trait Parser[+Result] {
-    def getParser(recursive: GetParse): Parse[Result]
-  }
+  type Parser[+Result]
 
   case class Success[+Result](result: Result, remainder: Input) {
     def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)

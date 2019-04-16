@@ -11,8 +11,7 @@ trait ErrorReportingTest extends FunSuite with CommonStringReaderParser with Edi
     val input = "bb"
     val parseResult = head.parseWholeInput(new StringReader(input))
     assert(!parseResult.successful)
-    val failure = parseResult.biggestFailure.asInstanceOf[ParseFailure[_]]
-    assertResult("expected 'a' but found 'b'")(failure.errors.head.message)
+    assertResult("expected 'a' but found 'b'")(parseResult.errors.head.message)
   }
 
   test("left recursion with lazy indirection error v2") {
@@ -21,7 +20,6 @@ trait ErrorReportingTest extends FunSuite with CommonStringReaderParser with Edi
     val input = "bb"
     val parseResult = head.parseWholeInput(new StringReader(input))
     assert(!parseResult.successful)
-    val failure = parseResult.biggestFailure.asInstanceOf[ParseFailure[_]]
-    assertResult("expected 'a' but found 'b'")(failure.errors.head.message)
+    assertResult("expected 'a' but found 'b'")(parseResult.errors.head.message)
   }
 }
