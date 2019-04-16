@@ -105,17 +105,17 @@ class UnambigiousParserTest extends AssociativityTest
   }
 
   test("nested two members without colons/comma") {
-    val input = """{"directory"{"person""remy""friend""jeroen"}"""
+    val input = """{"directory"{"person""remy""friend""jeroen"}}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
     assert(!result.successful)
-    assertResult(List(("directory",List(("person","remy"), ("friend","jeroen")))))(result.resultOption.get)
+    assertResult(List(("directory",List("person" -> "remy", "friend" -> "jeroen"))))(result.resultOption.get)
   }
 
-  test("ambiguous problem") {
+  test("starting brace insertion") {
     val input = """{"person""remy":"jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
     assert(!result.successful)
-    assertResult(List(("person","remy")))(result.resultOption.get)
+    assertResult(List(("person",List(("remy","jeroen")))))(result.resultOption.get)
   }
   // Partially Parse tests end
 }

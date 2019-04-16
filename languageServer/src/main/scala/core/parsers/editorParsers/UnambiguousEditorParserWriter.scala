@@ -71,14 +71,15 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     var didNotProgress = 0
     while(!parseResult.remainder.atEnd) {
       //Increment maxErrors
-      maxErrors += Math.max(parseResult.errors.size, maxErrors) + 1
+      maxErrors += maxErrors + 1
+      //maxErrors += Math.max(parseResult.errors.size, maxErrors) + 1
       val newResult = parser.parseRoot(input, maxErrors).asInstanceOf[EditorParseResult[Result]]
       if (newResult == parseResult) {
         didNotProgress += 1
       } else {
         didNotProgress = 0
       }
-      if (didNotProgress > 0) {
+      if (didNotProgress > 5) {
         if (parseResult.errors.isEmpty) {
           val didNotFinishError = ParseError(parseResult.remainder, "Did not parse entire input")
           return parseResult.addErrors(List(didNotFinishError))
