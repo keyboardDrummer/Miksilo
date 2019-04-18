@@ -9,15 +9,18 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
 
   trait UnambiguousParseResult[+Result] extends ParseResultLike[Result] {
     def getSuccessRemainder: Option[Input]
+    def errorsRequiredForChange: Int
     override def successful: Boolean = getSuccessRemainder.nonEmpty
     def get: Result
   }
+
+  case class CacheValue[Result](maxErrorAllowance: Int, result: ParseResult[Result])
 
   class CheckCache[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
     extends ParserState[Result](parseState, parser)
     with Parse[Result] {
 
-    val cache = mutable.HashMap[Input, ParseResult[Result]]()
+    val cache = mutable.HashMap[Input, CacheValue[Result]]()
 
     def apply(input: Input, errorAllowance: Int): ParseResult[Result] = {
       if (isPartOfACycle) {
@@ -25,15 +28,17 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
       }
 
       cache.get (input) match {
-        case None =>
+        case Some (value) if value.maxErrorAllowance >= errorAllowance => value.result
+        case _ =>
           parseState.callStack.push(parser)
           val value: ParseResult[Result] = parser(input, errorAllowance)
           parseState.callStack.pop()
-//          if (!isPartOfACycle) {
-//            cache.put (input, value)
-//          }
+          if (!isPartOfACycle) {
+            val maxErrors = if (value.errorsRequiredForChange == Int.MaxValue) value.errorsRequiredForChange else
+              errorAllowance
+            cache.put (input, CacheValue(maxErrors, value))
+          }
           value
-        case Some (result) => result
       }
     }
   }
@@ -99,9 +104,14 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
   class DetectFixPointAndCache[Result](parseState: LeftRecursionDetectorState, parser: Parse[Result])
     extends CheckCache(parseState, parser) with HasDetectFixPoint[Result] {
 
-    override def apply(input: Input, errorAllowance: Int) = {
+    override def apply(input: Input, errorAllowance: Int): ParseResult[Result] = {
+//      if (isPartOfACycle) {
+//        return parser(input, errorAllowance)
+//      }
+
       cache.get(input) match {
-        case None =>
+        case Some (value) if value.maxErrorAllowance >= errorAllowance => value.result
+        case _ =>
 
           val value = getPreviousResult(input) match {
             case None =>
@@ -119,11 +129,12 @@ trait UnambiguousParserWriter extends LeftRecursiveParserWriter {
             case Some(result) => result
           }
 
-//          if (!isPartOfACycle) {
-//            cache.put(input, value)
-//          }
+          if (!isPartOfACycle) {
+            val maxErrors = if (value.errorsRequiredForChange == Int.MaxValue) value.errorsRequiredForChange else
+              errorAllowance
+            cache.put (input, CacheValue(maxErrors,value))
+          }
           value
-        case Some(result) => result
       }
     }
   }

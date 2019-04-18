@@ -27,8 +27,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     override def addDefault[Other >: Nothing](value: Other, force: Boolean) = this
 
-    override def addErrors(errors: List[ParseError], changesAfterMoreErrors: Int) = this
-
     override def errorsRequiredForChange = Int.MaxValue
 
     override def errorCount = Int.MaxValue
@@ -38,7 +36,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   trait UnamEditorParseResult[+Result] extends UnambiguousParseResult[Result] with EditorResult[Result] {
     def successOption: Option[Success[Result]]
-    def addErrors(errors: List[ParseError], changesAfterMoreErrors: Int): ParseResult[Result]
   }
 
   type ParseResult[+R] = UnamEditorParseResult[R]
@@ -243,12 +240,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     override def offset = remainder.offset
 
     override def successOption = if (errors.isEmpty) Some(Success(resultOption.get, remainder)) else None
-
-    override def addErrors(errors: List[ParseError], changesAfterMoreErrors: Int) = {
-      val offset = errors.headOption.map(h => h.location.offset).getOrElse(-1)
-      EditorParseResult(resultOption, remainder, this.errors.filter(e => e.location.offset > offset) ++ errors,
-        Math.min(this.errorsRequiredForChange, changesAfterMoreErrors))
-    }
 
     override def errorCount = errors.size
 
