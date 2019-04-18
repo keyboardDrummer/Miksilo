@@ -82,7 +82,7 @@ trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with
     assertResult(expectation)(result.resultOption.get)
   }
 
-  private def getSuccessValue(result: ParseResult[Any]) = {
+  private def getSuccessValue(result: ParseWholeResult[Any]) = {
     assert(result.successful)
     result.resultOption.get
   }

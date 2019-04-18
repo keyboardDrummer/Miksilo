@@ -11,7 +11,9 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
   trait EditorResult[+Result] extends ParseResultLike[Result] {
     def offset: Int
-    def errors: List[ParseError]
+    def errorCount: Int
+    def withErrorsRequiredForChange(value: Int): ParseResult[Result]
+    def errorsRequiredForChange: Int
     def resultOption: Option[Result]
     def updateRemainder(f: Input => Input): ParseResult[Result]
     def addDefault[Other >: Result](value: Other, force: Boolean = false): ParseResult[Other]
@@ -21,7 +23,12 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
   override def fail[Result](message: String) = Fail(message)
 
-  def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseResult[Result]
+  case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[ParseError]) {
+    def successful = errors.isEmpty
+    def get: Result = resultOption.get
+  }
+
+  def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result]
 
   case class Succeed[Result](value: Result) extends EditorParserBase[Result] with LeafParser[Result] {
 
@@ -41,7 +48,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
     def withDefault[Other >: Result](_default: Other): EditorParser[Other] =
       WithDefault[Other](parser, cache => Some(_default))
 
-    def parseWholeInput(input: Input): ParseResult[Result] = {
+    def parseWholeInput(input: Input): ParseWholeResult[Result] = {
       EditorParserWriter.this.parseWholeInput(parser, input)
     }
 

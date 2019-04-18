@@ -15,7 +15,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
 
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
-    val parseResult: ParseResult[Node] = parseStream(parser, inputStream)
+    val parseResult: ParseWholeResult[Node] = parseStream(parser, inputStream)
     parseResult.resultOption.foreach(program => {
       compilation.program = program
       compilation.program.startOfUri = Some(uri)
@@ -29,7 +29,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
     }
   }
 
-  def parseStream[T](parser: EditorParser[T], input: InputStream): ParseResult[T] = {
+  def parseStream[T](parser: EditorParser[T], input: InputStream): ParseWholeResult[T] = {
     val reader = new Reader(SourceUtils.streamToString(input))
     parser.parseWholeInput(reader)
   }

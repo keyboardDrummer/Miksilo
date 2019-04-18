@@ -24,9 +24,9 @@ object IncludeDelta extends DirectiveDelta {
 
     val parser = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
-    parseResult.successOption match {
-      case Some(success) =>
-        val value: VerilogFile[Node] = success.result.asInstanceOf[Node]
+    parseResult.resultOption match {
+      case Some(result) =>
+        val value: VerilogFile[Node] = result.asInstanceOf[Node]
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[NodeSequenceElement].replaceWith(value.members)
       case None =>

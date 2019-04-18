@@ -32,8 +32,8 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     val typeGrammar = language.grammars.find(ByteCodeTypeGrammar)
     val parser = toStringParser(typeGrammar)
     val sourceLessParser = (input: String) => {
-      val result = parser(input)
-      result.map(r => r.asInstanceOf[Node].visit(node => {
+      val result = parser(input).resultOption
+      result.foreach(r => r.asInstanceOf[Node].visit(node => {
         node.sources.clear()
       }))
       result
