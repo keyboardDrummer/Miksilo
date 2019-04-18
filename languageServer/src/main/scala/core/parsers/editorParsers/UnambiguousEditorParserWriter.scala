@@ -115,17 +115,14 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
                 case RecursionDetected => RecursionDetected
                 case EditorParseResult(rightOption, rightRemainder, rightErrors, rightChangesAfterMoreErrors) =>
                   EditorParseResult(
-                    leftOption.flatMap(l => rightOption.map(r => combine(l,r))),
+                    leftOption.flatMap(l => rightOption.map(r => combine(l,r))).orElse(default),
                     rightRemainder,
                     rightErrors ++ leftErrors,
                     Math.min(rightChangesAfterMoreErrors, changesAfterMoreErrors))
               }
             }
             else {
-              //val leftWithRightDefault = right.default.map(rightDefault => leftResult.map(l => combine(l, rightDefault)).updateRemainder(_ => input))
-              val r = EditorParseResult(None, input, leftErrors, leftErrors.size - errorAllowance)
-              //leftWithRightDefault.getOrElse(r)
-              r
+              EditorParseResult(default, input, leftErrors, leftErrors.size - errorAllowance)
             }
 
           case RecursionDetected => RecursionDetected
