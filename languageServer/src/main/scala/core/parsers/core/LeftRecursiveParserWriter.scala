@@ -119,15 +119,13 @@ trait LeftRecursiveParserWriter extends ParserWriter {
           incoming.add(parent)
         case _ =>
       },
-      cycle => {
-        nodesThatShouldDetectLeftRecursion += cycle.head
-      })
+      _ => {})
 
     GraphAlgorithms.depthFirst[LRParser[_]](root,
       node => {
         node.leftChildren
       },
-      (_, path: List[LRParser[_]]) => {},
+      (_, _: List[LRParser[_]]) => {},
       cycle => {
         nodesThatShouldDetectLeftRecursion += cycle.head
       })

@@ -14,7 +14,7 @@ import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.TypeFromDeclaration
 import deltas.ConstraintSkeleton
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
-import deltas.javac.JavaLang
+import deltas.javac.JavaStandardLibrary
 import deltas.javac.classes.{ClassCompiler, FieldDeclarationDelta}
 import deltas.javac.methods.MethodDelta
 import deltas.statement.BlockDelta
@@ -114,7 +114,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
-      val proofs = JavaLang.getProofs(compilation, builder.factory, defaultPackageScope)
+      val proofs = JavaStandardLibrary.getProofs(compilation, builder.factory, defaultPackageScope)
       builder.proofs = proofs
 
       ConstraintSkeleton.constraints(

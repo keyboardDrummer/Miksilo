@@ -118,6 +118,14 @@ class UnambigiousParserTest extends AssociativityTest
     assertResult(List(("person",List(("remy","jeroen")))))(result.resultOption.get)
   }
 
+  test("virtual left recursion through error correction") {
+    val input = """doesNotMatchInput"""
+    lazy val parser: EditorParser[Any] = "{" ~ parser | "x"
+    val result = parser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult(List(("person",List(("remy","jeroen")))))(result.resultOption.get)
+  }
+
 
   // Add test for left recursion and errors
   // Add test with multiple errors in one branch "b" => "a" "b" "c"

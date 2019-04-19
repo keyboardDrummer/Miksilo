@@ -69,15 +69,11 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       return ParseWholeResult(None, List(ParseError(input, "grammar was broken")))
 
     var parseResult = firstResult.asInstanceOf[EditorParseResult[Result]]
-    var didNotProgress = 0
     while(!parseResult.remainder.atEnd) {
       maxErrors += parseResult.errorsRequiredForChange
       val newResult = parser.parseRoot(input, maxErrors).asInstanceOf[EditorParseResult[Result]]
-      if (newResult == parseResult) {
-        didNotProgress += 1
-      } else {
-        didNotProgress = 0
-      }
+      // Sometimes we may not get a parseResult change even though we applied errorsRequiredForChange,
+      // because when we didn't parse right, we don't know how many more errors right needs
       if (newResult.errorsRequiredForChange == Int.MaxValue) {
         if (parseResult.errors.isEmpty) {
           val didNotFinishError = ParseError(parseResult.remainder, "Did not parse entire input")
@@ -229,9 +225,13 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       EditorParseResult(resultOption.map(f), remainder, errors, errorsRequiredForChange)
     }
 
-    // TODO this is wrong
     override def flatMap[NewResult](f: Success[Result] => ParseResult[NewResult]): ParseResult[NewResult] = {
-      resultOption.map(r => f(Success(r, remainder))).getOrElse(EditorParseResult(None, remainder, errors, errorsRequiredForChange))
+      resultOption.map(r => f(Success(r, remainder)) match {
+        case RecursionDetected => RecursionDetected
+        case mapResult: EditorParseResult[NewResult] =>
+          EditorParseResult(mapResult.resultOption, mapResult.remainder, mapResult.errors ++ this.errors,
+            Math.min(mapResult.errorsRequiredForChange, errorsRequiredForChange))
+      }).getOrElse(EditorParseResult(None, remainder, errors, errorsRequiredForChange))
     }
 
     override def offset = remainder.offset

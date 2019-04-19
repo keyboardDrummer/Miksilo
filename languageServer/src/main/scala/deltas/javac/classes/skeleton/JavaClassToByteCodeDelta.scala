@@ -7,7 +7,7 @@ import core.language.{Compilation, Language, Phase}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
-import deltas.javac.JavaLang
+import deltas.javac.JavaStandardLibrary
 import deltas.javac.classes.skeleton.JavaClassDelta.{JavaClass, Members, getFields, state}
 import deltas.javac.classes.{ClassCompiler, FieldToByteCode}
 import deltas.javac.methods.MethodDelta.getMethods
@@ -27,7 +27,7 @@ object JavaClassToByteCodeDelta extends Delta {
 
     def transformClass(program: Node) {
       val javaClass: JavaClass[NodePath] = PathRoot(program)
-      JavaLang.loadIntoClassPath(compilation)
+      JavaStandardLibrary.loadIntoClassPath(compilation)
       javaClass.node.shape = ByteCodeSkeleton.Shape
       val classFile = new ClassFile(javaClass.node)
       val classCompiler: ClassCompiler = ClassCompiler(javaClass.node, compilation)
