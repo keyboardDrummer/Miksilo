@@ -35,7 +35,6 @@ trait LeftRecursiveParserWriter extends ParserWriter {
   }
 
   trait ParserBase[Result] extends LRParser[Result] {
-    var isPartOfStaticCycle: Boolean = false
     var mustConsumeInput: Boolean = false
   }
 
@@ -119,13 +118,6 @@ trait LeftRecursiveParserWriter extends ParserWriter {
           incoming.add(parent)
         case _ =>
       },
-      _ => {})
-
-    GraphAlgorithms.depthFirst[LRParser[_]](root,
-      node => {
-        node.leftChildren
-      },
-      (_, _: List[LRParser[_]]) => {},
       cycle => {
         nodesThatShouldDetectLeftRecursion += cycle.head
       })
@@ -137,7 +129,6 @@ trait LeftRecursiveParserWriter extends ParserWriter {
     val nodesWithIncomingCycleEdge: Set[LRParser[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
     val nodesThatShouldCache: Set[LRParser[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
 
-    nodesInCycle.foreach(n => n.asInstanceOf[ParserBase[Any]].isPartOfStaticCycle = true)
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
