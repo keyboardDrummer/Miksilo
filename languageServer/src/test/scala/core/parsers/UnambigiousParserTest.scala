@@ -108,7 +108,7 @@ class UnambigiousParserTest extends AssociativityTest
     val input = """{"directory"{"person""remy""friend""jeroen"}}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
     assert(!result.successful)
-    assertResult(List("directory" -> List("person" -> "remy"), "friend" -> "jeroen"))(result.resultOption.get)
+    assertResult(List("directory" -> List("person" -> "remy", "friend" -> "jeroen")))(result.resultOption.get)
   }
 
   test("starting brace insertion") {

@@ -104,10 +104,10 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
         val leftResult = parseLeft(input, leftAllowance)
 
         leftResult match {
-          case EditorParseResult(leftOption,_leftRemainder, leftErrors, changesAfterMoreErrors) =>
+          case EditorParseResult(leftOption, leftRemainder, leftErrors, changesAfterMoreErrors) =>
             if (leftErrors.size <= errorAllowance) {
               val rightRemainingErrors = errorAllowance - leftErrors.size
-              parseRight(_leftRemainder, rightRemainingErrors) match {
+              parseRight(leftRemainder, rightRemainingErrors) match {
                 case RecursionDetected => RecursionDetected
                 case EditorParseResult(rightOption, rightRemainder, rightErrors, rightChangesAfterMoreErrors) =>
                   EditorParseResult(
@@ -118,7 +118,8 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
               }
             }
             else {
-              EditorParseResult(default, input, leftErrors, leftErrors.size - errorAllowance)
+              EditorParseResult(leftOption.flatMap(l => right.default.map(r => combine(l,r))),
+                leftRemainder, leftErrors, leftErrors.size - errorAllowance)
             }
 
           case RecursionDetected => RecursionDetected
@@ -176,7 +177,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       def apply(input: Input, errorAllowance: Int) = {
         val firstResult = parseFirst(input, errorAllowance)
         val secondResult = parseSecond(input, errorAllowance)
-        val errorsRequiredForChange = Math.min(firstResult.errorsRequiredForChange, secondResult.errorsRequiredForChange)
         val result = {
           if (firstResult == RecursionDetected || secondResult == RecursionDetected) {
             if (firstResult == RecursionDetected)
@@ -188,12 +188,15 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
             val firstOverflow = Math.max(0, firstResult.errorCount - errorAllowance)
             val secondOverflow = Math.max(0, secondResult.errorCount - errorAllowance)
             firstOverflow.compare(secondOverflow) match {
-              case 1 => secondResult
-              case -1 => firstResult
-              case 0 => if (firstResult.offset > secondResult.offset) firstResult else secondResult
+              case 1 => secondResult.withErrorsRequiredForChange(firstOverflow)
+              case -1 => firstResult.withErrorsRequiredForChange(secondOverflow)
+              case 0 =>
+                val errorsRequiredForChange = Math.min(firstResult.errorsRequiredForChange, secondResult.errorsRequiredForChange)
+                val r = if (firstResult.offset > secondResult.offset) firstResult else secondResult
+                r.withErrorsRequiredForChange(errorsRequiredForChange)
             }
           }
-        }.withErrorsRequiredForChange(errorsRequiredForChange)
+        }
         default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
       }
 
