@@ -59,7 +59,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("Block") {
     val input = "{" + lineSeparator + "    System.out.print(fibonacci(5));" + lineSeparator + "}"
-    TestLanguageGrammarUtils.compareInputWithPrint(input, None, BlockDelta.BlockGramar)
+    TestLanguageGrammarUtils.compareInputWithPrint(input, None, BlockDelta.BlockGrammar)
   }
 
   test("PrintAfterImplicitAddition") {

@@ -12,7 +12,7 @@ object BlockAsStatementDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
-    val blockGrammar = find(BlockDelta.BlockGramar)
+    val blockGrammar = find(BlockDelta.BlockGrammar)
     statementGrammar.addAlternative(blockGrammar)
   }
 }

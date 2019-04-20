@@ -192,7 +192,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
               case -1 => firstResult.withErrorsRequiredForChange(secondOverflow)
               case 0 =>
                 val errorsRequiredForChange = Math.min(firstResult.errorsRequiredForChange, secondResult.errorsRequiredForChange)
-                val r = if (firstResult.offset > secondResult.offset) firstResult else secondResult
+                val r = if (firstResult.offset >= secondResult.offset) firstResult else secondResult
                 r.withErrorsRequiredForChange(errorsRequiredForChange)
             }
           }

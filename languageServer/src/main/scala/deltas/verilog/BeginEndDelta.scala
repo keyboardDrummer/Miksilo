@@ -16,7 +16,7 @@ object BeginEndDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val statement = find(StatementDelta.Grammar)
-    val block = find(BlockDelta.BlockGramar)
+    val block = find(BlockDelta.BlockGrammar)
     val label = (":" ~~< identifier).option.as(Label)
     val beginEnd = "begin" ~ label ~ (statement ~< ";").manyVertical.as(BlockDelta.Statements) ~ "end" asNode BlockDelta.Shape
     block.inner = beginEnd
