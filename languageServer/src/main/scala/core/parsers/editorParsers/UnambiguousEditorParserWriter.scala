@@ -100,7 +100,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       lazy val parseRight = recursive(right)
 
       def apply(input: Input, errorAllowance: Int): ParseResult[Result] = {
-        val leftAllowance = errorAllowance / 2 + errorAllowance % 2
+        val leftAllowance = errorAllowance //(errorAllowance * 0.9).toInt /// 2 + errorAllowance % 2
         val leftResult = parseLeft(input, leftAllowance)
 
         leftResult match {
