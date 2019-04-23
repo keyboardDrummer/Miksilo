@@ -1,9 +1,9 @@
 package deltas.json
 
-import core.bigrammar.grammars.{Keyword, Parse, RegexGrammar}
-import core.deltas.{Delta, DeltaWithGrammar}
+import core.bigrammar.grammars.{Keyword, Parse}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.deltas.{Delta, DeltaWithGrammar}
 import core.language.exceptions.BadInputException
 import core.language.node._
 import core.language.{Compilation, Language}
@@ -22,8 +22,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     import grammars._
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val keyGrammar = create(MemberKey, RegexGrammar(StringLiteralDelta.stringInnerRegex).
-      map[String, String](r => r.substring(1, r.length), s => "\"" + s).as(MemberKey) ~< "\"")
+    val keyGrammar = find(StringLiteralDelta.Shape).inner.asInstanceOf[NodeGrammar].inner
     val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | value(Unit))).indent() %< "}"
     val grammar = inner.asLabelledNode(Shape)
@@ -32,7 +31,6 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
   object MemberShape extends NodeShape
   object MemberValue extends NodeField
-  object MemberKey extends NodeField
 
   object Members extends NodeField
   object Shape extends NodeShape
@@ -43,7 +41,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
   }
 
   implicit class ObjectLiteralMember[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def key: String = node.getValue(MemberKey).asInstanceOf[String]
+    def key: String = node.getValue(StringLiteralDelta.Value).asInstanceOf[String]
     def value: T = node(MemberValue).asInstanceOf[T]
   }
 

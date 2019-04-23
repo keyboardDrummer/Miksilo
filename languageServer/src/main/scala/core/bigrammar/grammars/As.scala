@@ -8,11 +8,11 @@ import core.bigrammar.{BiGrammar, WithMap}
 import core.language.node.{NodeField, SourceRange}
 import core.responsiveDocument.ResponsiveDocument
 
-case class As(var inner: BiGrammar, field: NodeField) extends CustomGrammar
+case class As(var inner: BiGrammar, field: NodeField, changePosition: SourceRange => SourceRange = null) extends CustomGrammar
 {
   override def children: Seq[BiGrammar] = Seq(inner)
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = As(newChildren.head, field)
+  override def withChildren(newChildren: Seq[BiGrammar]) = As(newChildren.head, field, changePosition)
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(inner)
 
@@ -26,7 +26,10 @@ case class As(var inner: BiGrammar, field: NodeField) extends CustomGrammar
       WithMap(Unit, state + (field -> value))
     })
     innerParser.withRange[Result]((left, right, result: Result) => result.map[AnyWithMap]({ case WithMap(value, state) =>
-      WithMap[Any](value, state + (FieldPosition(field) -> SourceRange(left.position, right.position)))
+      var range = SourceRange(left.position, right.position)
+      if (changePosition != null)
+        range = changePosition(range)
+      WithMap[Any](value, state + (FieldPosition(field) -> range))
     }))
   }
 }
