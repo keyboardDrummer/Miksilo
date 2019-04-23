@@ -70,18 +70,18 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     var parseResult = firstResult.asInstanceOf[EditorParseResult[Result]]
     while(!parseResult.remainder.atEnd) {
-      maxErrors += parseResult.errorsRequiredForChange
-      val newResult = parser.parseRoot(input, maxErrors).asInstanceOf[EditorParseResult[Result]]
       // Sometimes we may not get a parseResult change even though we applied errorsRequiredForChange,
       // because when we didn't parse right, we don't know how many more errors right needs
-      if (newResult.errorsRequiredForChange == Int.MaxValue) {
+      if (parseResult.errorsRequiredForChange == Int.MaxValue) {
         if (parseResult.errors.isEmpty) {
           val didNotFinishError = ParseError(parseResult.remainder, "Did not parse entire input")
           return ParseWholeResult(parseResult.resultOption, List(didNotFinishError))
         }
         return ParseWholeResult(parseResult.resultOption, parseResult.errors)
       }
-      parseResult = newResult
+
+      maxErrors += parseResult.errorsRequiredForChange
+      parseResult = parser.parseRoot(input, maxErrors).asInstanceOf[EditorParseResult[Result]]
     }
     ParseWholeResult(parseResult.resultOption, parseResult.errors)
   }
