@@ -1,6 +1,6 @@
 package deltas.json
 
-import core.bigrammar.grammars.{Keyword, Parse}
+import core.bigrammar.grammars.{Keyword, Parse, RegexGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Delta, DeltaWithGrammar}
@@ -11,6 +11,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.json.StringLiteralDelta.{Value, dropPrefix, stringInnerRegex}
 
 case class DuplicateObjectLiteralKeys(duplicates: Seq[String]) extends BadInputException
 
@@ -22,7 +23,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     import grammars._
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val keyGrammar = find(StringLiteralDelta.Shape).inner.asInstanceOf[NodeGrammar].inner
+    val keyGrammar = dropPrefix(RegexGrammar(stringInnerRegex), MemberKey, "\"") ~< "\""
     val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | value(Unit))).indent() %< "}"
     val grammar = inner.asLabelledNode(Shape)
@@ -30,6 +31,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
   }
 
   object MemberShape extends NodeShape
+  object MemberKey extends NodeField
   object MemberValue extends NodeField
 
   object Members extends NodeField
@@ -41,7 +43,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
   }
 
   implicit class ObjectLiteralMember[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def key: String = node.getValue(StringLiteralDelta.Value).asInstanceOf[String]
+    def key: String = node.getValue(MemberKey).asInstanceOf[String]
     def value: T = node(MemberValue).asInstanceOf[T]
   }
 

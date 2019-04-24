@@ -20,7 +20,7 @@ object YamlObjectDelta extends DeltaWithGrammar {
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
 
     lazy val blockMap: BiGrammar = {
-      val member = new WithContext(_ => BlockKey, flowValue).as(StringLiteralDelta.Value) ~< ":" ~
+      val member = new WithContext(_ => BlockKey, flowValue).as(MemberKey) ~< ":" ~
         greaterThan(blockValue.as(MemberValue)) asNode MemberShape
 
       aligned(_grammars, member).as(Members).asNode(Shape)

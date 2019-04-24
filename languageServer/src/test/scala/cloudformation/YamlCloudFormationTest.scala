@@ -55,4 +55,20 @@ class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
 
     assertResult(expectation)(result)
   }
+
+  test("Broken in the middle") {
+    val program =
+      """Parameters:
+        |  KeyName: The EC2 Key Pair to allow SSH access to the instances
+        |  MemberWithOnlyKey
+        |Resources:
+        |  LaunchConfig:
+        |    Type: AWS::AutoScaling::LaunchConfiguration
+        |    Properties:
+        |      KeyName: !Ref 'KeyName'
+      """.stripMargin
+    val result: Seq[Location] = gotoDefinition(yamlServer, program, new HumanPosition(10, 22))
+    val expectation = Seq(Location(itemUri, Range(new HumanPosition(443, 3), new HumanPosition(443, 25))))
+    assertResult(expectation)(result)
+  }
 }

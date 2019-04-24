@@ -8,6 +8,7 @@ import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
 import core.parsers.editorParsers.DefaultCache
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
+import deltas.json.StringLiteralDelta
 
 trait YamlContext
 object FlowIn extends YamlContext
@@ -73,13 +74,14 @@ object YamlCoreDelta extends DeltaWithGrammar {
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     val grammars = _grammars
     import _grammars._
-    val tag: BiGrammar = "!" ~> RegexGrammar(s"""[^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator
+    val tag: BiGrammar = StringLiteralDelta.dropPrefix(RegexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r),
+      TagName, "!") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
     val blockValue = create(IndentationSensitiveExpression)
-    blockValue.addAlternative(tag.as(TagName) ~ blockValue.as(TagNode) asNode TaggedNode)
+    blockValue.addAlternative(tag ~ blockValue.as(TagNode) asNode TaggedNode)
 
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val taggedFlowValue = tag.as(TagName) ~ flowValue.as(TagNode) asNode TaggedNode
+    val taggedFlowValue = tag ~ flowValue.as(TagNode) asNode TaggedNode
     flowValue.addAlternative(taggedFlowValue)
 
     val originalBracketArray = find(ArrayLiteralDelta.Shape).inner

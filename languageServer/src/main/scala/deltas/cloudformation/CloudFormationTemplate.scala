@@ -6,7 +6,7 @@ import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.ConcreteScope
 import core.smarts.types.objects.PrimitiveType
-import deltas.json.JsonObjectLiteralDelta.{MemberShape, ObjectLiteral}
+import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, ObjectLiteral}
 import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
 import play.api.libs.json.{JsObject, Json}
 import util.SourceUtils
@@ -41,7 +41,7 @@ object CloudFormationTemplate extends Delta {
   private def handleResources(builder: ConstraintBuilder, rootScope: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
     val resources: ObjectLiteral[NodePath] = program.getValue("Resources")
     for (resource <- resources.members) {
-      builder.declareSourceElement(resource.getSourceElement(StringLiteralDelta.Value), rootScope, Some(valueType))
+      builder.declareSourceElement(resource.getSourceElement(MemberKey), rootScope, Some(valueType))
 
       val resourceMembers: ObjectLiteral[NodePath] = resource.value
       val typeString = resourceMembers.getValue("Type")
@@ -53,7 +53,7 @@ object CloudFormationTemplate extends Delta {
         if (_properties.shape == JsonObjectLiteralDelta.Shape) {
           val properties: ObjectLiteral[NodePath] = _properties
           for (property <- properties.members) {
-            builder.resolveToType(property.key, property.node.getSourceElement(StringLiteralDelta.Value), typeScope, propertyType)
+            builder.resolveToType(property.key, property.node.getSourceElement(MemberKey), typeScope, propertyType)
           }
         }
       })
@@ -82,7 +82,7 @@ object CloudFormationTemplate extends Delta {
       case Some(_parameters) =>
         val parameters: ObjectLiteral[NodePath] = _parameters
         for (parameter <- parameters.members) {
-          builder.declare(parameter.key, rootScope, parameter.node.getSourceElement(StringLiteralDelta.Value), Some(valueType))
+          builder.declare(parameter.key, rootScope, parameter.node.getSourceElement(MemberKey), Some(valueType))
         }
       case None =>
     }
