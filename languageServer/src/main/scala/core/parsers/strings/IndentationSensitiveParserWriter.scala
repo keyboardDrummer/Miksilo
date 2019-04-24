@@ -17,10 +17,10 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original)
 
-      def apply(input: Input, errorAllowance: Int) = {
+      def apply(input: Input) = {
         val previous = input.indentation
         val newInput = input.withIndentation(input.position.character)
-        val result: ParseResult[Result] = parseOriginal(newInput, errorAllowance)
+        val result: ParseResult[Result] = parseOriginal(newInput)
         result.updateRemainder(remainder => {
           remainder.withIndentation(previous)
         })
@@ -51,10 +51,10 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     override def getParser(recursive: GetParse) = {
       val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
 
-      def apply(input: Input, errorAllowance: Int) = {
+      def apply(input: Input) = {
         val delta = input.position.character - input.indentation
         if (input.atEnd || deltaPredicate(delta)) {
-          parseOriginal(input, errorAllowance)
+          parseOriginal(input)
         } else {
           newFailure(input, s"indentation ${input.position.character} of character '${input.head}' must be $property ${input.indentation}")
         }

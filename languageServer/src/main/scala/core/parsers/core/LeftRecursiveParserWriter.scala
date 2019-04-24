@@ -16,7 +16,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
                         shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result]
 
   trait Parse[+Result] {
-    def apply(input: Input, errorAllowance: Int): ParseResult[Result]
+    def apply(input: Input): ParseResult[Result]
   }
 
   trait GetParse {
@@ -75,7 +75,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       lazy val parseOriginal = recursive(original)
-      (input, allowance) => parseOriginal(input, allowance)
+      input => parseOriginal(input)
     }
 
     override def leftChildren = List(original)
@@ -94,7 +94,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
     override def getParser(recursive: GetParse): Parse[NewResult] = {
       val parseOriginal = recursive(original)
-      (input, allowance) => parseOriginal(input, allowance).map(f)
+      input => parseOriginal(input).map(f)
     }
 
     override def leftChildren = List(original)
@@ -174,9 +174,9 @@ trait LeftRecursiveParserWriter extends ParserWriter {
       result
     }
 
-    def parseRoot(input: Input, errorAllowance: Int): ParseResult[Result] = {
+    def parseRoot(input: Input): ParseResult[Result] = {
       val analysis = compile(parser)
-      analysis.getParse(parser)(input, errorAllowance)
+      analysis.getParse(parser)(input)
     }
   }
 }

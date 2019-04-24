@@ -13,7 +13,7 @@ trait SequenceParserWriter extends EditorParserWriter {
 
     override def getParser(recursive: GetParse) = {
 
-      def apply(input: Input, errorAllowance: Int): ParseResult[Elem] = {
+      def apply(input: Input): ParseResult[Elem] = {
         if (input.atEnd) {
           return newFailure(input, s"$kind expected but end of source found")
         }

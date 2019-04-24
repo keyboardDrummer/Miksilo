@@ -5,8 +5,14 @@ import editorParsers.UnambiguousEditorParserWriter
 class UnambigiousParserTest extends AssociativityTest
   with LeftRecursionTest
   with UnambiguousEditorParserWriter
-  with PartiallyParseJsonTest
   with ErrorReportingTest {
+
+  private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
+  private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
+  object UnknownExpression {
+    override def toString = "unknown"
+  }
+  protected lazy val jsonParser: EditorParser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression)
 
   test("Basic ambiguity test fails") {
     lazy val expression: EditorParser[Any] = ("ab" | "a") ~ "bc"

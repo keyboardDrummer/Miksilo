@@ -84,16 +84,16 @@ trait MachineParserWriter extends ParserWriter {
 
   case class SimpleParseResult[+Result](successOption: Option[Success[Result]]) extends ParseResultLike[Result] { // TODO Don't use nested Option
 
-    override def get = successOption.get.result
+    def get = successOption.get.result
 
     override def map[NewResult](f: Result => NewResult) = SimpleParseResult(successOption.map(s => s.map(f)))
 
-    override def flatMap[NewResult](f: Success[Result] => SimpleParseResult[NewResult]) =
-      successOption.fold[SimpleParseResult[NewResult]](failureSingleton)(s => f(s))
-
-    override def resultOption = successOption.map(s => s.result)
-
-    override def successful = successOption.nonEmpty
+//    override def flatMap[NewResult](f: Success[Result] => SimpleParseResult[NewResult]) =
+//      successOption.fold[SimpleParseResult[NewResult]](failureSingleton)(s => f(s))
+//
+//    override def resultOption = successOption.map(s => s.result)
+//
+    def successful = successOption.nonEmpty
   }
 
   implicit class BasicParserExtensions[+Result](parser: Parser[Result]) {

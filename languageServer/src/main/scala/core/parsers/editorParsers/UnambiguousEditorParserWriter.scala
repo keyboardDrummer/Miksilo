@@ -2,50 +2,72 @@ package core.parsers.editorParsers
 
 import core.parsers.core.UnambiguousParserWriter
 
+import scala.collection.mutable
+
 trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorParserWriter {
 
-  override def abort = RecursionDetected
+  override def abort = Results[Nothing](List.empty)
 
-  object RecursionDetected extends OptionFailure[Nothing] with UnamEditorParseResult[Nothing] {
-    override def offset: Int = -1
+  case class Results[+Result](options: List[ParseContinuable[Result]]) extends EditorResult[Result] {
+    def this(single: ParseContinuable[Result]) = this(List(single))
 
-    override def map[NewResult](f: Nothing => NewResult): OptionFailure[NewResult] with ParseResult[NewResult] = this
+    def updateRemainder(f: Input => Input) = {
+      mapResult(r => EditorParseResult(r.resultOption, f(r.remainder), r.errors))
+    }
 
-    override def partialResult: Option[Nothing] = None
+    def mapResult[NewResult](f: EditorParseResult[Result] => EditorParseResult[NewResult]): Results[NewResult] = {
+      Results[NewResult](options.map {
+        case continuation: ParseContinuation[Result] => continuation.mapResult(f)
+        case result: EditorParseResult[Result] => f(result)
+      })
+    }
 
-    override def updateRemainder(f: Input => Input) = this
+    def flatMap[NewResult](f: EditorParseResult[Result] => Results[NewResult]): Results[NewResult] = {
+      Results(options.flatMap({
+        case continuation: ParseContinuation[Result] => List(continuation.flatMap(f))
+        case result: EditorParseResult[Result] => f(result).options
+      }))
+    }
 
-    override def flatMap[NewResult](f: Success[Nothing] => UnamEditorParseResult[NewResult]) = this
-
-    override def successful = false
-
-    override def resultOption = None
-
-    override def successOption = None
-
-    override def getSuccessRemainder = None
-
-    override def addDefault[Other >: Nothing](value: Other, force: Boolean) = this
-
-    override def errorsRequiredForChange = Int.MaxValue
-
-    override def errorCount = Int.MaxValue
-
-    override def withErrorsRequiredForChange(value: Int) = if (value == errorsRequiredForChange) this else ???
+    override def map[NewResult](f: Result => NewResult) = {
+      Results(options.map(o => o.map(f)))
+    }
   }
 
-  trait UnamEditorParseResult[+Result] extends UnambiguousParseResult[Result] with EditorResult[Result] {
-    def successOption: Option[Success[Result]]
+  trait ParseContinuable[+Result] {
+    def map[NewResult](f: Result => NewResult): ParseContinuable[NewResult]
   }
 
-  type ParseResult[+R] = UnamEditorParseResult[R]
+  case class ParseContinuation[+Result](remainder: Input, errors: List[ParseError], continuation: () => Results[Result])
+    extends ParseContinuable[Result] {
+
+    def flatMap[NewResult](f: EditorParseResult[Result] => Results[NewResult]): ParseContinuation[NewResult] = {
+      ParseContinuation(remainder, errors, () => {
+        val intermediate = continuation()
+        intermediate.flatMap(f)
+      })
+    }
+
+    def mapResult[NewResult](f: EditorParseResult[Result] => EditorParseResult[NewResult]): ParseContinuation[NewResult] = {
+      ParseContinuation(remainder, errors, () => {
+        val intermediate = continuation()
+        intermediate.mapResult(f)
+      })
+    }
+
+    override def map[NewResult](f: Result => NewResult): ParseContinuation[NewResult] = {
+      ParseContinuation(remainder, errors, () => continuation().map(f))
+    }
+  }
+
+  type ParseResult[+Result] = Results[Result]
 
   override def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]) =
-    EditorParseResult(partial, input, errors, Int.MaxValue)
+    new Results[Result](EditorParseResult(partial, input, errors))
 
-  override def newSuccess[Result](result: Result, remainder: Input) = EditorParseResult(Some(result), remainder, List.empty, Int.MaxValue)
+  override def newSuccess[Result](result: Result, remainder: Input) = new Results(EditorParseResult(Some(result), remainder, List.empty))
 
-  override def newFailure[Result](input: Input, message: String) = EditorParseResult(None, input, List(ParseError(input, message)), Int.MaxValue)
+  override def newFailure[Result](input: Input, message: String) = new Results(EditorParseResult(None, input, List(ParseError(input, message))))
 
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
@@ -55,7 +77,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
   override def succeed[NR](result: NR): EditorParser[NR] = Succeed(result)
 
   override def choice[Result](first: EditorParser[Result], other: => EditorParser[Result], leftIsAlwaysBigger: Boolean): EditorParser[Result] =
-    if (leftIsAlwaysBigger) new OrElse(first, other) else new BiggestOfTwo(first, other)
+    /*if (leftIsAlwaysBigger) new OrElse(first, other) else*/ new BiggestOfTwo(first, other)
 
   override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
 
@@ -63,27 +85,24 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   override def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 
-    var maxErrors = 0
-    val firstResult = parser.parseRoot(input, maxErrors)
-    if (firstResult == RecursionDetected)
-      return ParseWholeResult(None, List(ParseError(input, "grammar was broken")))
+    val ordering = Ordering.by[ParseContinuation[Any], (Int, Int)](c => (-c.errors.size, c.remainder.offset))
+    val queue = new mutable.PriorityQueue[ParseContinuation[Any]]()(ordering)
+    queue.enqueue(ParseContinuation(input, List.empty, () => parser.parseRoot(input)))
 
-    var parseResult = firstResult.asInstanceOf[EditorParseResult[Result]]
-    while(!parseResult.remainder.atEnd) {
-      // Sometimes we may not get a parseResult change even though we applied errorsRequiredForChange,
-      // because when we didn't parse right, we don't know how many more errors right needs
-      if (parseResult.errorsRequiredForChange == Int.MaxValue) {
-        if (parseResult.errors.isEmpty) {
-          val didNotFinishError = ParseError(parseResult.remainder, "Did not parse entire input")
-          return ParseWholeResult(parseResult.resultOption, List(didNotFinishError))
+    while(queue.nonEmpty) {
+      val element = queue.dequeue()
+      val options = element.continuation().options
+      for(option <- options) {
+        option match {
+          case EditorParseResult(resultOption, resultRemainder, resultErrors) if resultRemainder.atEnd =>
+            return ParseWholeResult(resultOption.asInstanceOf[Option[Result]], resultErrors)
+          case continuation: ParseContinuation[Any] => queue.enqueue(continuation)
+          case _ =>
         }
-        return ParseWholeResult(parseResult.resultOption, parseResult.errors)
       }
-
-      maxErrors += parseResult.errorsRequiredForChange
-      parseResult = parser.parseRoot(input, maxErrors).asInstanceOf[EditorParseResult[Result]]
     }
-    ParseWholeResult(parseResult.resultOption, parseResult.errors)
+    val didNotFinishError = ParseError(input, "Did not parse entire input")
+    ParseWholeResult(None, List(didNotFinishError))
   }
 
   override def newParseState(parser: EditorParser[_]) = new LeftRecursionDetectorState()
@@ -99,31 +118,22 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       val parseLeft = recursive(left)
       lazy val parseRight = recursive(right)
 
-      def apply(input: Input, errorAllowance: Int): ParseResult[Result] = {
-        val leftAllowance = errorAllowance //(errorAllowance * 0.9).toInt /// 2 + errorAllowance % 2
-        val leftResult = parseLeft(input, leftAllowance)
+      def apply(input: Input): ParseResult[Result] = {
+        val leftResults = parseLeft(input)
 
-        leftResult match {
-          case EditorParseResult(leftOption, leftRemainder, leftErrors, changesAfterMoreErrors) =>
-            if (leftErrors.size <= errorAllowance) {
-              val rightRemainingErrors = errorAllowance - leftErrors.size
-              parseRight(leftRemainder, rightRemainingErrors) match {
-                case RecursionDetected => RecursionDetected
-                case EditorParseResult(rightOption, rightRemainder, rightErrors, rightChangesAfterMoreErrors) =>
-                  EditorParseResult(
-                    leftOption.flatMap(l => rightOption.map(r => combine(l,r))).orElse(default),
-                    rightRemainder,
-                    rightErrors ++ leftErrors,
-                    Math.min(rightChangesAfterMoreErrors, changesAfterMoreErrors))
-              }
-            }
-            else {
-              EditorParseResult(leftOption.flatMap(l => right.default.map(r => combine(l,r))),
-                leftRemainder, leftErrors, leftErrors.size - errorAllowance)
-            }
-
-          case RecursionDetected => RecursionDetected
-        }
+        val waitAfterErrorLeftResults = Results(leftResults.options.map {
+          case continuation: ParseContinuation[Left] => continuation
+          case result: EditorParseResult[Left] => if (result.errors.isEmpty) result else
+            new ParseContinuation[Left](result.remainder, result.errors, () => new Results(result))
+        })
+        waitAfterErrorLeftResults.flatMap[Result]({ case EditorParseResult(leftOption, leftRemainder, leftErrors) =>
+          parseRight(leftRemainder).mapResult[Result]({ case EditorParseResult(rightOption, rightRemainder, rightErrors) =>
+            EditorParseResult(
+              leftOption.flatMap(l => rightOption.map(r => combine(l,r))),
+              rightRemainder,
+              rightErrors ++ leftErrors)
+          })
+        })
       }
 
       apply
@@ -135,35 +145,63 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     } yield combine(leftDefault, rightDefault)
   }
 
-  class OrElse[+First <: Result, +Second <: Result, Result](val first: EditorParser[First], _second: => EditorParser[Second])
-    extends EditorParserBase[Result] with ChoiceLike[Result] {
 
-    lazy val second = _second
+  implicit class EditorParserExtensions[Result](parser: EditorParser[Result]) extends ParserExtensions(parser) {
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
-      val parseFirst = recursive(first)
-      val parseSecond = recursive(second)
+    def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
 
-      def apply(input: Input, errorAllowance: Int) = {
-        val firstResult = parseFirst(input, errorAllowance)
-        val result = if (firstResult.errorCount > errorAllowance || firstResult == RecursionDetected) {
-          val secondResult = parseSecond(input, errorAllowance)
-          secondResult
-        } else {
-          firstResult
-        }
-        default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d, force = false))
-      }
+    def withDefault[Other >: Result](_default: Other): EditorParser[Other] =
+      WithDefault[Other](parser, cache => Some(_default))
 
-      apply
+    def parseWholeInput(input: Input): ParseWholeResult[Result] = {
+      UnambiguousEditorParserWriter.this.parseWholeInput(parser, input)
     }
 
+    override def parseRoot(input: Input): ParseResult[Result] = {
+      setDefaults(parser)
+      val analysis = compile(parser)
+      analysis.getParse(parser)(input)
+    }
 
-    override def getDefault(cache: DefaultCache): Option[Result] = {
-      val value: Option[First] = cache(first)
-      value.orElse(cache(second))
+    def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
+      val withPosition = leftRight(
+        PositionParser,
+        WithRemainderParser(parser),
+        (left: Input, resultRight: Success[Result]) => addRange(left, resultRight.remainder, resultRight.result))
+      WithDefault(withPosition, cache => parser.getDefault(cache))
     }
   }
+
+
+//  class OrElse[+First <: Result, +Second <: Result, Result](val first: EditorParser[First], _second: => EditorParser[Second])
+//    extends EditorParserBase[Result] with ChoiceLike[Result] {
+//
+//    lazy val second = _second
+//
+//    override def getParser(recursive: GetParse): Parse[Result] = {
+//      val parseFirst = recursive(first)
+//      val parseSecond = recursive(second)
+//
+//      def apply(input: Input, errorAllowance: Int) = {
+//        val firstResult = parseFirst(input, errorAllowance)
+//        val result = if (firstResult.errorCount > errorAllowance || firstResult == RecursionDetected) {
+//          val secondResult = parseSecond(input, errorAllowance)
+//          secondResult
+//        } else {
+//          firstResult
+//        }
+//        default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d, force = false))
+//      }
+//
+//      apply
+//    }
+//
+//
+//    override def getDefault(cache: DefaultCache): Option[Result] = {
+//      val value: Option[First] = cache(first)
+//      value.orElse(cache(second))
+//    }
+//  }
 
   class BiggestOfTwo[+First <: Result, +Second <: Result, Result](val first: EditorParser[First], _second: => EditorParser[Second])
     extends EditorParserBase[Result] with ChoiceLike[Result] {
@@ -174,32 +212,11 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      def apply(input: Input, errorAllowance: Int) = {
-        val firstResult = parseFirst(input, errorAllowance)
-        val secondResult = parseSecond(input, errorAllowance)
-        val result = {
-          if (firstResult == RecursionDetected || secondResult == RecursionDetected) {
-            if (firstResult == RecursionDetected)
-              secondResult
-            else
-              firstResult
-          }
-          else {
-            val firstOverflow = Math.max(0, firstResult.errorCount - errorAllowance)
-            val secondOverflow = Math.max(0, secondResult.errorCount - errorAllowance)
-            firstOverflow.compare(secondOverflow) match {
-              case 1 => secondResult.withErrorsRequiredForChange(firstOverflow)
-              case -1 => firstResult.withErrorsRequiredForChange(secondOverflow)
-              case 0 =>
-                val errorsRequiredForChange = Math.min(firstResult.errorsRequiredForChange, secondResult.errorsRequiredForChange)
-                val r = if (firstResult.offset == secondResult.offset) {
-                  if (firstResult.errorCount > secondResult.errorCount) secondResult else firstResult
-                } else if (firstResult.offset >= secondResult.offset) firstResult else secondResult
-                r.withErrorsRequiredForChange(errorsRequiredForChange)
-            }
-          }
-        }
-        default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
+      def apply(input: Input) = {
+        val firstResult = parseFirst(input)
+        val secondResult = parseSecond(input)
+        Results(firstResult.options ++ secondResult.options)
+        //default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
       }
 
       apply
@@ -211,41 +228,97 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     }
   }
 
-  final case class EditorParseResult[+Result](resultOption: Option[Result], remainder: Input, errors: List[ParseError], errorsRequiredForChange: Int)
-    extends UnambiguousParseResult[Result] with EditorResult [Result] with UnamEditorParseResult[Result] {
+  case class EditorParseResult[+Result](resultOption: Option[Result], remainder: Input, errors: List[ParseError])
+    extends ParseContinuable[Result] {
 
-    def addDefault[Other >: Result](value: Other, force: Boolean): EditorParseResult[Other] = resultOption match {
-      case Some(_) if !force => this
-      case _ => EditorParseResult(Some(value), remainder, errors, errorsRequiredForChange)
+//    def addDefault[Other >: Result](value: Other, force: Boolean): EditorParseResult[Other] = resultOption match {
+//      case Some(_) if !force => this
+//      case _ => EditorParseResult(Some(value), remainder, errors)
+//    }
+//
+//    def updateRemainder(f: Input => Input): EditorParseResult[Result] = {
+//      EditorParseResult(resultOption, f(remainder), errors)
+//    }
+    // override def getSuccessRemainder = successOption.map(s => s.remainder)
+
+    override def map[NewResult](f: Result => NewResult): EditorParseResult[NewResult] = {
+      EditorParseResult(resultOption.map(f), remainder, errors)
     }
 
-    def updateRemainder(f: Input => Input): EditorParseResult[Result] = {
-      EditorParseResult(resultOption, f(remainder), errors, errorsRequiredForChange)
+//    override def flatMap[NewResult](f: Success[Result] => ParseResult[NewResult]): ParseResult[NewResult] = {
+//      resultOption.map(r => f(Success(r, remainder)) match {
+//        case RecursionDetected => RecursionDetected
+//        case mapResult: EditorParseResult[NewResult] =>
+//          EditorParseResult(mapResult.resultOption, mapResult.remainder, mapResult.errors ++ this.errors,
+//            Math.min(mapResult.errorsRequiredForChange, errorsRequiredForChange))
+//      }).getOrElse(EditorParseResult(None, remainder, errors, errorsRequiredForChange))
+//    }
+
+//    override def offset = remainder.offset
+//
+//    override def successOption = if (errors.isEmpty) Some(Success(resultOption.get, remainder)) else None
+//
+//    override def errorCount = errors.size
+  }
+
+  case class WithDefault[Result](original: Self[Result], _getDefault: DefaultCache => Option[Result])
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+
+    override def getParser(recursive: GetParse): Parse[Result] = {
+      val parseOriginal = recursive(original)
+
+      def apply(input: Input): ParseResult[Result] = {
+        val result = parseOriginal(input)
+        result.mapResult(parseResult => {
+          val newResultOption =
+            if (parseResult.remainder.offset == input.offset)
+              default.orElse(parseResult.resultOption)
+            else
+              parseResult.resultOption.orElse(default)
+          EditorParseResult(newResultOption, parseResult.remainder, parseResult.errors)
+        })
+      }
+
+      apply
     }
 
-    override def getSuccessRemainder = successOption.map(s => s.remainder)
+    override def getDefault(cache: DefaultCache): Option[Result] =
+      _getDefault(cache)
+  }
 
-    override def map[NewResult](f: Result => NewResult): ParseResult[NewResult] = {
+  case class Filter[Other, Result <: Other](original: EditorParser[Result],
+                                            predicate: Other => Boolean, getMessage: Other => String)
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
 
-      EditorParseResult(resultOption.map(f), remainder, errors, errorsRequiredForChange)
+
+    override def getParser(recursive: GetParse): Parse[Result] = {
+      val parseOriginal = recursive(original)
+      input => {
+        val originalResult = parseOriginal(input)
+        originalResult.mapResult(s => {
+          s.resultOption match {
+            case Some(result) => if (predicate(result)) s else EditorParseResult(default, s.remainder,
+              ParseError(s.remainder, getMessage(result)) :: s.errors)
+            case None => s
+          }
+        })
+      }
     }
 
-    override def flatMap[NewResult](f: Success[Result] => ParseResult[NewResult]): ParseResult[NewResult] = {
-      resultOption.map(r => f(Success(r, remainder)) match {
-        case RecursionDetected => RecursionDetected
-        case mapResult: EditorParseResult[NewResult] =>
-          EditorParseResult(mapResult.resultOption, mapResult.remainder, mapResult.errors ++ this.errors,
-            Math.min(mapResult.errorsRequiredForChange, errorsRequiredForChange))
-      }).getOrElse(EditorParseResult(None, remainder, errors, errorsRequiredForChange))
+    override def getDefault(cache: DefaultCache): Option[Result] =
+      original.getDefault(cache).filter(predicate)
+  }
+
+  case class WithRemainderParser[Result](original: Self[Result])
+    extends EditorParserBase[Success[Result]] with ParserWrapper[Success[Result]] {
+
+    override def getParser(recursive: GetParse): Parse[Success[Result]] = {
+      val parseOriginal = recursive(original)
+      input => parseOriginal(input).mapResult(r =>
+        EditorParseResult(r.resultOption.map(v => Success(v, r.remainder)), r.remainder, r.errors))
     }
 
-    override def offset = remainder.offset
-
-    override def successOption = if (errors.isEmpty) Some(Success(resultOption.get, remainder)) else None
-
-    override def errorCount = errors.size
-
-    override def withErrorsRequiredForChange(value: Int) = EditorParseResult(resultOption, remainder, errors, value)
+    override def getDefault(cache: DefaultCache): Option[Success[Result]] = None
   }
 
 }

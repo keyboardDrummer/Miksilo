@@ -10,13 +10,11 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
   type ParseResult[+Result] <: EditorResult[Result]
 
   trait EditorResult[+Result] extends ParseResultLike[Result] {
-    def offset: Int
-    def errorCount: Int
-    def withErrorsRequiredForChange(value: Int): ParseResult[Result]
-    def errorsRequiredForChange: Int
-    def resultOption: Option[Result]
+//    def offset: Int
+//    def errorCount: Int
+//    def resultOption: Option[Result]
     def updateRemainder(f: Input => Input): ParseResult[Result]
-    def addDefault[Other >: Result](value: Other, force: Boolean = false): ParseResult[Other]
+//    def addDefault[Other >: Result](value: Other, force: Boolean = false): ParseResult[Other]
   }
 
   override def succeed[Result](result: Result): EditorParser[Result] = Succeed(result)
@@ -33,38 +31,12 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
   case class Succeed[Result](value: Result) extends EditorParserBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
-      (input: Input, _) => newSuccess(value, input)
+      input: Input => newSuccess(value, input)
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = Some(value)
 
     override def getMustConsume(cache: ConsumeCache) = false
-  }
-
-  implicit class EditorParserExtensions[Result](parser: EditorParser[Result]) extends ParserExtensions(parser) {
-
-    def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
-
-    def withDefault[Other >: Result](_default: Other): EditorParser[Other] =
-      WithDefault[Other](parser, cache => Some(_default))
-
-    def parseWholeInput(input: Input): ParseWholeResult[Result] = {
-      EditorParserWriter.this.parseWholeInput(parser, input)
-    }
-
-    override def parseRoot(input: Input, errorAllowance: Int): ParseResult[Result] = {
-      setDefaults(parser)
-      val analysis = compile(parser)
-      analysis.getParse(parser)(input, errorAllowance)
-    }
-
-    def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
-      val withPosition = leftRight(
-        PositionParser,
-        WithRemainderParser(parser),
-        (left: Input, resultRight: Success[Result]) => addRange(left, resultRight.remainder, resultRight.result))
-      WithDefault(withPosition, cache => parser.getDefault(cache))
-    }
   }
 
   trait EditorParserBase[Result] extends ParserBase[Result] with EditorParser[Result] {
@@ -81,7 +53,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
     override def getParser(recursive: GetParse): Parse[NewResult] = {
       val parseOriginal = recursive(original)
-      (input, errorAllowance) => parseOriginal(input, errorAllowance).map(f)
+      input => parseOriginal(input).map(f)
     }
 
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
@@ -97,24 +69,12 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
     override def getParser(recursive: GetParse): Parse[Input] = {
-      (input, _) => newSuccess(input, input)
+      input => newSuccess(input, input)
     }
 
     override def getDefault(cache: DefaultCache): Option[Input] = None
 
     override def getMustConsume(cache: ConsumeCache) = false
-  }
-
-  case class WithRemainderParser[Result](original: Self[Result])
-    extends EditorParserBase[Success[Result]] with ParserWrapper[Success[Result]] {
-
-
-    override def getParser(recursive: GetParse): Parse[Success[Result]] = {
-      val parseOriginal = recursive(original)
-      (input, errorAllowance) => parseOriginal(input, errorAllowance).flatMap(success => newSuccess(success, success.remainder))
-    }
-
-    override def getDefault(cache: DefaultCache): Option[Success[Result]] = None
   }
 
   case class ParseError(location: Input, message: String)
@@ -172,66 +132,13 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
 
-  case class WithDefault[Result](original: Self[Result], _getDefault: DefaultCache => Option[Result])
-    extends EditorParserBase[Result] with ParserWrapper[Result] {
-
-    override def getParser(recursive: GetParse): Parse[Result] = {
-      val parseOriginal = recursive(original)
-
-      def apply(input: Input, errorAllowance: Int): ParseResult[Result] = {
-        val result = parseOriginal(input, errorAllowance)
-        if (result.successful) {
-          return result
-        }
-
-        if (result.offset >= input.offset) {
-          if (result.resultOption.isEmpty || result.offset == input.offset) {
-            val _default = default
-            if (_default.nonEmpty) {
-              return result.addDefault(_default.get, force = true)
-            }
-          }
-        }
-
-        result
-      }
-
-      apply
-    }
-
-    override def getDefault(cache: DefaultCache): Option[Result] =
-      _getDefault(cache)
-  }
-
-  case class Filter[Other, Result <: Other](original: EditorParser[Result],
-                                             predicate: Other => Boolean, getMessage: Other => String)
-    extends EditorParserBase[Result] with ParserWrapper[Result] {
-
-
-    override def getParser(recursive: GetParse): Parse[Result] = {
-      val parseOriginal = recursive(original)
-      (input, errorAllowance) => {
-        val originalResult = parseOriginal(input, errorAllowance)
-        originalResult.flatMap(s => {
-          if (predicate(s.result))
-            newSuccess(s.result, s.remainder)
-          else {
-            newFailure(default, s.remainder, getMessage(s.result))
-          }
-        })
-      }
-    }
-
-    override def getDefault(cache: DefaultCache): Option[Result] =
-      original.getDefault(cache).filter(predicate)
-  }
 
   case class Fail(message: String) extends EditorParserBase[Nothing] with LeafParser[Nothing] {
     override def getDefault(cache: DefaultCache) = None
 
 
     override def getParser(recursive: GetParse): Parse[Nothing] = {
-      (input, _) => newFailure(None, input, message)
+      input => newFailure(None, input, message)
     }
 
     override def getMustConsume(cache: ConsumeCache) = false

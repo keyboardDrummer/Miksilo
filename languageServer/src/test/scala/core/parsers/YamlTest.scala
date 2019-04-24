@@ -88,7 +88,7 @@ class YamlTest extends FunSuite
 
     override def getParser(recursive: GetParse) = {
       val innerParsers = inners.mapValues(p => recursive(p).asInstanceOf[Parse[Result]])
-      (input, allowance) => innerParsers(input.context)(input, allowance)
+      (input) => innerParsers(input.context)(input)
     }
 
     override def getDefault(cache: DefaultCache) =
@@ -107,9 +107,9 @@ class YamlTest extends FunSuite
     override def getParser(recursive: GetParse) = {
       val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
 
-      def apply(input: IndentationReader, allowance: Int) = {
+      def apply(input: IndentationReader) = {
         val context: YamlContext = input.context
-        val result = parseOriginal(input.withContext(update(input.context)), allowance)
+        val result = parseOriginal(input.withContext(update(input.context)))
         result.updateRemainder(r => r.withContext(input.context))
       }
 

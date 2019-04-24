@@ -2,8 +2,9 @@ package core.parsers
 
 import editorParsers.EditorParserWriter
 import org.scalatest.FunSuite
+import editorParsers.UnambiguousEditorParserWriter
 
-trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {
+trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with UnambiguousEditorParserWriter {
 
   test("handles recursion in complicated graph structures") {
     lazy val leftMayNotCache = leftRec ~ "b"

@@ -3,7 +3,9 @@ package core.parsers
 import org.scalatest.FunSuite
 import editorParsers.EditorParserWriter
 
-trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with EditorParserWriter {
+import editorParsers.UnambiguousEditorParserWriter
+
+class PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with UnambiguousEditorParserWriter {
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression {
@@ -25,7 +27,7 @@ trait PartiallyParseJsonTest extends FunSuite with CommonStringReaderParser with
     assertResult(List(("person","remy")))(value)
   }
 
-  test("garbage after number") {
+  ignore("garbage after number") {
     val input = """3blaa"""
     assertInputGivesPartialFailureExpectation(input, "3")
   }

@@ -70,14 +70,16 @@ trait ParserWriter {
   }
 
   trait ParseResultLike[+Result] {
-    def map[NewResult](f: Result => NewResult): ParseResult[NewResult] = {
-      flatMap(s => newSuccess(f(s.result), s.remainder))
-    }
+    def map[NewResult](f: Result => NewResult): ParseResult[NewResult]
 
-    def flatMap[NewResult](f: Success[Result] => ParseResult[NewResult]): ParseResult[NewResult]
-    def successful: Boolean
-    def resultOption: Option[Result]
-    def get = resultOption.get
+//    = {
+//      flatMap(s => newSuccess(f(s.result), s.remainder))
+//    }
+
+    //def flatMap[NewResult](f: Success[Result] => ParseResult[NewResult]): ParseResult[NewResult]
+    //def successful: Boolean
+    //def resultOption: Option[Result]
+    //def get = resultOption.get
   }
 
 }
