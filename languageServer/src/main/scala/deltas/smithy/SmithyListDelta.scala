@@ -34,8 +34,8 @@ object SmithyListDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder,
                                   path: NodePath, parentScope: Scope): Unit = {
-    builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope,
-      Some(RelativeShapeIdentifierDelta.shapeType))
+    builder.declare(path.getField(HasNameDelta.Name), parentScope,
+      RelativeShapeIdentifierDelta.shapeType)
 
     ConstraintSkeleton.constraints(compilation, builder, path(ElementShape).asInstanceOf[NodePath], parentScope)
   }

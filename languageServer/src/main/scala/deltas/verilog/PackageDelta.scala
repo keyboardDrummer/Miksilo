@@ -45,7 +45,7 @@ object PackageDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val _package: Package[NodePath] = path
-    val packageDeclaration = builder.declare(_package.name, parentScope, path.getSourceElement(Name))
+    val packageDeclaration = builder.declare(_package.name, parentScope, path.getField(Name))
     val packageScope = builder.declareScope(packageDeclaration, debugName = "package")
 
     for(member <- _package.members) {

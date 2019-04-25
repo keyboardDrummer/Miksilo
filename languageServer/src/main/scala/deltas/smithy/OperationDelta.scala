@@ -44,7 +44,7 @@ object OperationDelta extends DeltaWithGrammar with HasConstraintsDelta {
   }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
-    builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope, Some(operationType))
+    builder.declare(path.getField(HasNameDelta.Name), parentScope, operationType)
     val operation: Operation[NodePath] = path
     operation.argumentType.foreach(argumentType => {
       ConstraintSkeleton.constraints(compilation, builder, argumentType, parentScope)

@@ -45,7 +45,7 @@ object ServiceDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val service: Service[NodePath] = path
 
-    builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope, Some(serviceType))
+    builder.declare(path.getField(HasNameDelta.Name), parentScope, serviceType)
 
     ResourceDelta.addResources(builder, parentScope, service.body)
 
@@ -55,7 +55,7 @@ object ServiceDelta extends DeltaWithGrammar with HasConstraintsDelta {
         val resourcesArray: ArrayLiteral[NodePath] = resources
         resourcesArray.members.foreach(resource => {
           if (resource.shape == JsonStringLiteralDelta.Shape) {
-            builder.resolveToType(resource.getSourceElement(JsonStringLiteralDelta.Value), parentScope, OperationDelta.operationType)
+            builder.resolveToType(resource.getField(JsonStringLiteralDelta.Value), parentScope, OperationDelta.operationType)
           }
         })
       }

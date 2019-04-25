@@ -21,11 +21,11 @@ class JsonGrammarTest extends FunSuite {
 
     val result: ObjectLiteral[NodePath] = PathRoot(utils.parse(example).asInstanceOf[Node])
     val member = result.members.head
-    assertResult(Position(1, 7))(member.getSourceElement(MemberValue).range.get.start)
-    assertResult(Position(1, 20))(member.getSourceElement(MemberValue).range.get.end)
+    assertResult(Position(1, 7))(member.getField(MemberValue).range.get.start)
+    assertResult(Position(1, 20))(member.getField(MemberValue).range.get.end)
 
     val stringValue = member.value
-    val stringLocation = stringValue.getSourceElement(JsonStringLiteralDelta.Value)
+    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value)
     assertResult(Position(1, 8))(stringLocation.range.get.start)
     assertResult(Position(1, 19))(stringLocation.range.get.end)
   }

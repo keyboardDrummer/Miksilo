@@ -39,7 +39,7 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
   val lifeCycleOperations = Seq("create","read","update","delete","list")
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val resource: Resource[NodePath] = path
-    builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope, Some(resourceType))
+    builder.declare(path.getField(HasNameDelta.Name), parentScope, resourceType)
 
     val body = resource.body
     addResources(builder, parentScope, body)
@@ -52,7 +52,7 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
           identifierMember.value
           val shapeReference = identifierMember.value
           if (shapeReference.shape == JsonStringLiteralDelta.Shape) {
-            builder.resolveToType(shapeReference.getSourceElement(JsonStringLiteralDelta.Value), parentScope,
+            builder.resolveToType(shapeReference.getField(JsonStringLiteralDelta.Value), parentScope,
               RelativeShapeIdentifierDelta.shapeType)
           }
         })
@@ -63,7 +63,7 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
       val operationOption = resource.body.get(lifeCycleOperation)
       operationOption.foreach(operation => {
         if (operation.shape == JsonStringLiteralDelta.Shape) {
-          builder.resolveToType(operation.getSourceElement(JsonStringLiteralDelta.Value), parentScope,
+          builder.resolveToType(operation.getField(JsonStringLiteralDelta.Value), parentScope,
             OperationDelta.operationType)
         }
       })
@@ -77,7 +77,7 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
         val resourcesArray: ArrayLiteral[NodePath] = resources
         resourcesArray.members.foreach(resource => {
           if (resource.shape == JsonStringLiteralDelta.Shape) {
-            builder.resolveToType(resource.getSourceElement(JsonStringLiteralDelta.Value), parentScope, resourceType)
+            builder.resolveToType(resource.getField(JsonStringLiteralDelta.Value), parentScope, resourceType)
           }
         })
       }

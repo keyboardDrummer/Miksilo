@@ -33,7 +33,7 @@ object SimpleShapeDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def shape = Shape
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
-    builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope,
-      Some(RelativeShapeIdentifierDelta.shapeType))
+    builder.declare(path.getField(HasNameDelta.Name), parentScope,
+      RelativeShapeIdentifierDelta.shapeType)
   }
 }

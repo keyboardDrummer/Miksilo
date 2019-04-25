@@ -49,7 +49,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val usingFor: UsingFor[NodePath] = path
     val _type = TypeSkeleton.getType(compilation, builder, usingFor._type, parentScope)
-    val libraryDeclaration: DeclarationVariable = builder.resolve(usingFor.libraryName, usingFor.getSourceElement(LibraryName), parentScope)
+    val libraryDeclaration: DeclarationVariable = builder.resolve(usingFor.libraryName, usingFor.getField(LibraryName), parentScope)
     val libraryScope = builder.getDeclaredScope(libraryDeclaration)
 
     val typeDeclaration = builder.getDeclarationOfType(_type)
@@ -90,7 +90,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
               val returnTypes: Seq[Node] = returnParameters.map(returnParameter => returnParameter._type)
               val methodType = SolidityFunctionTypeDelta.createType(compilation, solver.builder, libraryScope, parameterTypes, returnTypes)
 
-              solver.builder.declareSourceElement(member.getSourceElement(Name), typeScope, Some(methodType))
+              solver.builder.declare(member.getField(Name), typeScope, methodType)
             }
           }
           true

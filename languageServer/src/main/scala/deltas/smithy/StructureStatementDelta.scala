@@ -50,13 +50,13 @@ object StructureStatementDelta extends DeltaWithGrammar with HasConstraintsDelta
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder,
                                   path: NodePath, parentScope: Scope): Unit = {
-    val structureDeclaration = builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope,
-      Some(RelativeShapeIdentifierDelta.shapeType))
+    val structureDeclaration = builder.declare(path.getField(HasNameDelta.Name), parentScope,
+      RelativeShapeIdentifierDelta.shapeType)
     val structureScope = builder.declareScope(structureDeclaration)
 
     val structure: Structure[NodePath] = path
     structure.members.foreach(member => {
-      builder.declareSourceElement(member.getSourceElement(HasNameDelta.Name), structureScope, Some(shapeType))
+      builder.declare(member.getField(HasNameDelta.Name), structureScope, shapeType)
       ConstraintSkeleton.constraints(compilation, builder, member._type, parentScope)
     })
   }

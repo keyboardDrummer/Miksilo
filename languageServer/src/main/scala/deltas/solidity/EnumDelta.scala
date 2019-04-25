@@ -45,13 +45,13 @@ object EnumDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val _enum: Enum[NodePath] = path
     val enumStaticScope = builder.newScope()
-    val enumDeclaration = builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope)
+    val enumDeclaration = builder.declare(path.getField(HasNameDelta.Name), parentScope)
     val enumStaticType: Type = TypeFromDeclaration(enumDeclaration) // TODO switch to using TypeFromScope
     builder.add(DeclarationHasType(enumDeclaration, enumStaticType))
     builder.assignSubType(TypeSkeleton.typeKind, enumStaticType)
     //val enumType = TypeFromDeclaration(enumDeclaration) TODO this we can do once we have TypeFromScope.
     for(value <- _enum.values) {
-      builder.declareSourceElement(value.node.getSourceElement(HasNameDelta.Name), enumStaticScope) // , Some(enumType))
+      builder.declare(value.node.getField(HasNameDelta.Name), enumStaticScope) // , Some(enumType))
     }
   }
 

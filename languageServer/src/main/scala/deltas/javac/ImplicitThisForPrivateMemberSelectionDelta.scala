@@ -50,7 +50,7 @@ object ImplicitThisForPrivateMemberSelectionDelta extends Delta {
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val clazz: JavaClass[NodePath] = PathRoot(program)
     PathRoot(program).visitShape(VariableDelta.Shape, variable =>  {
-      val declarationNode: NodePath = SolveConstraintsDelta.getDeclarationOfReference(variable.getSourceElement(Name))
+      val declarationNode: NodePath = SolveConstraintsDelta.getDeclarationOfReference(variable.getField(Name))
       if (declarationNode.shape == MethodDelta.Shape || declarationNode.shape == FieldDeclarationDelta.Shape) {
         val hasAccessibility: HasAccessibility[NodePath] = new HasAccessibility[NodePath]{ def node = declarationNode }
         addThisToVariable(clazz, hasAccessibility.isStatic, variable.asInstanceOf[NodeChildPath])
