@@ -121,18 +121,19 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       def apply(input: Input): ParseResult[Result] = {
         val leftResults = parseLeft(input)
 
-        val waitAfterErrorLeftResults = Results(leftResults.options.map {
-          case continuation: ParseContinuation[Left] => continuation
-          case result: EditorParseResult[Left] => if (result.errors.isEmpty) result else
-            new ParseContinuation[Left](result.remainder, result.errors, () => new Results(result))
-        })
-        waitAfterErrorLeftResults.flatMap[Result]({ case EditorParseResult(leftOption, leftRemainder, leftErrors) =>
-          parseRight(leftRemainder).mapResult[Result]({ case EditorParseResult(rightOption, rightRemainder, rightErrors) =>
+        leftResults.flatMap[Result]({ case EditorParseResult(leftOption, leftRemainder, leftErrors) =>
+
+          lazy val next = parseRight(leftRemainder).mapResult[Result]({ case EditorParseResult(rightOption, rightRemainder, rightErrors) =>
             EditorParseResult(
               leftOption.flatMap(l => rightOption.map(r => combine(l,r))),
               rightRemainder,
               rightErrors ++ leftErrors)
           })
+
+          if (leftErrors.nonEmpty)
+            Results(List(ParseContinuation(leftRemainder, leftErrors, () => next)))
+          else
+            next
         })
       }
 
