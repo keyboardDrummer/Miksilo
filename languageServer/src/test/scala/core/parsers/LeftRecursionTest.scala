@@ -1,13 +1,23 @@
 package core.parsers
 
 import org.scalatest.FunSuite
-import editorParsers.CorrectingParserWriter
+import editorParsers.LeftRecursiveCorrectingParserWriter
 
-class LeftRecursionTest extends FunSuite with CommonStringReaderParser with CorrectingParserWriter {
+class LeftRecursionTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   val optional_a: EditorParserExtensions[Any] =  literal("a").*
   val optionalCopy: EditorParserExtensions[Any] = literal("a").*
   def aesReader = new StringReader("aes")
+
+  test("left recursion with lazy indirection") {
+    lazy val head: EditorParser[Any] = new EditorLazy(head) ~ "a" | "a"
+
+    val input = "aaa"
+    val parseResult = head.parseWholeInput(new StringReader(input))
+    assert(parseResult.successful)
+    val expectation = (("a","a"),"a")
+    assertResult(expectation)(parseResult.get)
+  }
 
   test("handles recursion in complicated graph structures") {
     lazy val leftMayNotCache = leftRec ~ "b"
@@ -25,16 +35,6 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Corr
     lazy val rightPath: EditorParser[Any] = new EditorLazy(rightRec ~ "a" | rightMayNotCache | "b")
     val rightParseResult = rightPath.parseWholeInput(new StringReader(input))
     assertResult(leftParseResult)(rightParseResult)
-  }
-
-  test("left recursion with lazy indirection") {
-    lazy val head: EditorParser[Any] = new EditorLazy(head) ~ "a" | "a"
-
-    val input = "aaa"
-    val parseResult = head.parseWholeInput(new StringReader(input))
-    assert(parseResult.successful)
-    val expectation = (("a","a"),"a")
-    assertResult(expectation)(parseResult.get)
   }
 
   test("left recursion inside left recursion") {

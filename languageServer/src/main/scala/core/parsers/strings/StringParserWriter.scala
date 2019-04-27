@@ -62,8 +62,8 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original)
 
-      input: Input => {
-        val result = parseOriginal(input)
+      (input: Input, state: ParseState) => {
+        val result = parseOriginal(input, state)
         result.mapReady(parseResult => {
           val remainder = parseResult.remainder
           if (remainder.atEnd)
@@ -90,7 +90,7 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getParser(recursive: GetParse): Parse[String] = {
 
       lazy val result: Parse[String] = new Parse[String] {
-        def apply(input: Input): ParseResult[String] = {
+        def apply(input: Input, state: ParseState): ParseResult[String] = {
           var index = 0
           val array = input.array
           while (index < value.length) {
@@ -101,7 +101,7 @@ trait StringParserWriter extends SequenceParserWriter {
               val message = s"expected '$value' but found '${array.subSequence(input.offset, arrayIndex + 1)}'"
 
               //return newFailure(Some(value), input, message)
-              return drop(Some(value), input, message, result)
+              return drop(Some(value), input, state, message, result)
             }
             index += 1
           }
@@ -122,7 +122,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def getParser(recursive: GetParse): Parse[String] = {
 
-      def apply(input: Input): ParseResult[String] = {
+      def apply(input: Input, state: ParseState): ParseResult[String] = {
         regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
           case Some(matched) =>
             newSuccess(
@@ -134,7 +134,7 @@ trait StringParserWriter extends SequenceParserWriter {
             }
 
             val message = s"expected '$regex' but found '${input.array.charAt(input.offset)}'"
-            drop(None, input, message, apply)
+            drop(None, input, state, message, apply)
         }
       }
 
@@ -146,12 +146,14 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
   }
 
-  def drop[Result](resultOption: Option[Result], input: Input, errorMessage: String, parse: Parse[Result]): SortedParseResults[Result] = {
+  def drop[Result](resultOption: Option[Result],
+                   input: Input, state: ParseState,
+                   errorMessage: String, parse: Parse[Result]): SortedParseResults[Result] = {
     val errors = List(ParseError(input, errorMessage))
     val withoutDrop = ReadyParseResult(resultOption, input, errors)
     val dropError = List(ParseError(input, s"Dropped '${input.head}'", 4))
     val dropped = DelayedParseResult(input, dropError, () => {
-      parse.apply(input.drop(1)).addErrors(dropError)
+      parse.apply(input.drop(1), state).addErrors(dropError)
     })
     new SRCons[Result](withoutDrop, singleResult(dropped))
   }

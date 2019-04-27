@@ -1,9 +1,9 @@
 package core.parsers
 
 import org.scalatest.FunSuite
-import editorParsers.CorrectingParserWriter
+import editorParsers.LeftRecursiveCorrectingParserWriter
 
-class CorrectJsonTest extends FunSuite with CommonStringReaderParser with CorrectingParserWriter {
+class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression {
@@ -158,7 +158,10 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with Correc
   otherwise the seed value 'x' will never be inserted.
   Maybe we can allow no consumed input only for the seed value?
 
+  If we disallow growing beyond the seed when there is input consumption, then we disable trying
+  {{{{{ and {{x}} for input (1)
 
+  While input (2) still parses to {x}
    */
   test("virtual left recursion through error correction") {
     val input = """doesNotMatchGrammar"""

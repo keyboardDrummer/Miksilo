@@ -2,7 +2,7 @@
 package core2.parsers
 
 import core.document.Empty
-import core.parsers.editorParsers.{DefaultCache, CorrectingParserWriter}
+import core.parsers.editorParsers.{CorrectingParserWriter, DefaultCache, LeftRecursiveCorrectingParserWriter}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.responsiveDocument.ResponsiveDocument
 import langserver.types.Position
@@ -50,11 +50,10 @@ object BlockKey extends YamlContext
 object FlowKey extends YamlContext
 
 class YamlTest extends FunSuite
-  with CorrectingParserWriter
+  with LeftRecursiveCorrectingParserWriter
   with IndentationSensitiveParserWriter with CommonParserWriter {
 
   type Input = IndentationReader
-
 
   class IndentationReader(array: ArrayCharSequence, offset: Int, position: Position, val context: YamlContext, val indentation: Int)
     extends StringReaderBase(array, offset, position) with IndentationReaderLike {
@@ -88,7 +87,7 @@ class YamlTest extends FunSuite
 
     override def getParser(recursive: GetParse) = {
       val innerParsers = inners.mapValues(p => recursive(p).asInstanceOf[Parse[Result]])
-      (input) => innerParsers(input.context)(input)
+      (input, state) => innerParsers(input.context)(input, state)
     }
 
     override def getDefault(cache: DefaultCache) =
@@ -104,12 +103,12 @@ class YamlTest extends FunSuite
   class WithContext[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse) = {
+    override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
 
-      def apply(input: IndentationReader) = {
+      def apply(input: IndentationReader, state: ParseState): ParseResult[Result] = {
         val context: YamlContext = input.context
-        val result = parseOriginal(input.withContext(update(input.context)))
+        val result = parseOriginal(input.withContext(update(input.context)), state)
         result.updateRemainder(r => r.withContext(input.context))
       }
 

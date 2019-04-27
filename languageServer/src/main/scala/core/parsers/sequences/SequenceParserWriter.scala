@@ -12,9 +12,9 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     extends EditorParserBase[Elem] with LeafParser[Elem] {
 
 
-    override def getParser(recursive: GetParse) = {
+    override def getParser(recursive: GetParse): Parse[Elem] = {
 
-      def apply(input: Input): ParseResult[Elem] = {
+      def apply(input: Input, state: ParseState): ParseResult[Elem] = {
         if (input.atEnd) {
           return newFailure(input, s"$kind expected but end of source found")
         }

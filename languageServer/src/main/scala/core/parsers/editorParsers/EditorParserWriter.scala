@@ -22,7 +22,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
   case class Succeed[Result](value: Result) extends EditorParserBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
-      input: Input => newSuccess(value, input)
+      (input: Input, state) => newSuccess(value, input)
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = Some(value)
@@ -44,7 +44,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
     override def getParser(recursive: GetParse): Parse[NewResult] = {
       val parseOriginal = recursive(original)
-      input => parseOriginal(input).map(f)
+      (input, state) => parseOriginal(input, state).map(f)
     }
 
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
@@ -60,7 +60,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
     override def getParser(recursive: GetParse): Parse[Input] = {
-      input => newSuccess(input, input)
+      (input, state) => newSuccess(input, input)
     }
 
     override def getDefault(cache: DefaultCache): Option[Input] = None
@@ -83,7 +83,7 @@ trait EditorParserWriter extends LeftRecursiveParserWriter {
 
 
     override def getParser(recursive: GetParse): Parse[Nothing] = {
-      input => newFailure(None, input, message)
+      (input, state) => newFailure(None, input, message)
     }
 
     override def getMustConsume(cache: ConsumeCache) = false

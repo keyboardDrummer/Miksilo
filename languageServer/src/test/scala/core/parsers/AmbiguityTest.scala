@@ -1,9 +1,9 @@
 package core.parsers
 
 import org.scalatest.FunSuite
-import editorParsers.CorrectingParserWriter
+import editorParsers.LeftRecursiveCorrectingParserWriter
 
-class AmbiguityTest extends FunSuite with CommonStringReaderParser with CorrectingParserWriter {
+class AmbiguityTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   val optional_a: EditorParserExtensions[Any] =  literal("a").*
   val optionalCopy: EditorParserExtensions[Any] = literal("a").*

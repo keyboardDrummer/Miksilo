@@ -1,9 +1,9 @@
 package core.parsers
 
 import org.scalatest.FunSuite
-import editorParsers.CorrectingParserWriter
+import editorParsers.LeftRecursiveCorrectingParserWriter
 
-class AssociativityTest extends FunSuite with CommonStringReaderParser with CorrectingParserWriter {
+class AssociativityTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   test("if-then-else is right-associative by default") {
     lazy val expr = wholeNumber

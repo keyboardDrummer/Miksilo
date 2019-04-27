@@ -9,14 +9,15 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
   def lazyParser[Result](inner: => Self[Result]): Self[Result]
 
-  def newParseState(root: Self[_]): ParseState
-
-  def wrapParse[Result](parseState: ParseState,
-                        parser: Parse[Result],
+  def wrapParse[Result](parser: Parse[Result],
                         shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result]
 
+
+  def newParseState(input: Input): ParseState
+  type ParseState
+
   trait Parse[+Result] {
-    def apply(input: Input): ParseResult[Result]
+    def apply(input: Input, state: ParseState): ParseResult[Result]
   }
 
   trait GetParse {
@@ -75,7 +76,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       lazy val parseOriginal = recursive(original)
-      input => parseOriginal(input)
+      (input, state) => parseOriginal(input, state)
     }
 
     override def leftChildren = List(original)
@@ -94,7 +95,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
     override def getParser(recursive: GetParse): Parse[NewResult] = {
       val parseOriginal = recursive(original)
-      input => parseOriginal(input).map(f)
+      (input, state) => parseOriginal(input, state).map(f)
     }
 
     override def leftChildren = List(original)
@@ -135,7 +136,6 @@ trait LeftRecursiveParserWriter extends ParserWriter {
   case class ParserAnalysis(nodesThatShouldCache: Set[LRParser[_]], nodesThatShouldDetectLeftRecursion: Set[LRParser[_]]) {
 
     def getParse[Result](root: Self[Result]): Parse[Result] = {
-      val parseState = newParseState(root)
       var cacheOfParses = new mutable.HashMap[Parser[Any], Parse[Any]]
 
       def recursive: GetParse = new GetParse {
@@ -143,7 +143,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
           cacheOfParses.getOrElseUpdate(_parser, {
             val parser = _parser.asInstanceOf[LRParser[SomeResult]]
             val result = parser.getParser(recursive)
-            wrapParse(parseState, result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
+            wrapParse(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
           }).asInstanceOf[Parse[SomeResult]]
         }
       }
@@ -176,7 +176,7 @@ trait LeftRecursiveParserWriter extends ParserWriter {
 
     def parseRoot(input: Input): ParseResult[Result] = {
       val analysis = compile(parser)
-      analysis.getParse(parser)(input)
+      analysis.getParse(parser)(input, newParseState(input))
     }
   }
 }

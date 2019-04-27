@@ -1,8 +1,11 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.UnambiguousParserWriter
+import core.parsers.core.LeftRecursiveParserWriter
 
-trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWriter {
+import scala.annotation.tailrec
+import scala.collection.mutable
+
+trait CorrectingParserWriter extends LeftRecursiveParserWriter with EditorParserWriter {
 
   def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 
@@ -53,9 +56,6 @@ trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWr
   override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
-
-
-  override def newParseState(parser: EditorParser[_]) = new LeftRecursionDetectorState()
 
   override def abort = ??? //SortedResults[Nothing](List.empty)
 
@@ -219,8 +219,8 @@ trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWr
       val parseLeft = recursive(left)
       lazy val parseRight = recursive(right)
 
-      def apply(input: Input): ParseResult[Result] = {
-        val leftResults = parseLeft(input)
+      def apply(input: Input, state: ParseState): ParseResult[Result] = {
+        val leftResults = parseLeft(input, state)
 
         leftResults.flatMapReady[Result]((leftResult: ReadyParseResult[Left]) => {
 
@@ -228,7 +228,7 @@ trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWr
             leftResult.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
             rightResult.remainder,
             rightResult.errors)
-          lazy val next = parseRight(leftResult.remainder).mapWithErrors[Result](mapRightResult, leftResult.errors)
+          lazy val next = parseRight(leftResult.remainder, state).mapWithErrors[Result](mapRightResult, leftResult.errors)
 
           if (leftResult.errors.nonEmpty)
             singleResult(DelayedParseResult(leftResult.remainder, leftResult.errors, () => next))
@@ -261,7 +261,7 @@ trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWr
     override def parseRoot(input: Input): ParseResult[Result] = {
       setDefaults(parser)
       val analysis = compile(parser)
-      analysis.getParse(parser)(input)
+      analysis.getParse(parser)(input, newParseState(input))
     }
 
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
@@ -313,9 +313,9 @@ trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWr
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      def apply(input: Input) = {
-        val firstResult = parseFirst(input)
-        val secondResult = parseSecond(input)
+      def apply(input: Input, state: ParseState) = {
+        val firstResult = parseFirst(input, state)
+        val secondResult = parseSecond(input, state)
         firstResult.merge(secondResult)
         //default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
       }
@@ -336,8 +336,8 @@ trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWr
       val parseOriginal = recursive(original)
 
       new Parse[Result] {
-        def apply(input: Input): ParseResult[Result] = {
-          val result = parseOriginal(input)
+        def apply(input: Input, state: ParseState): ParseResult[Result] = {
+          val result = parseOriginal(input, state)
           result.mapReady(parseResult => {
             val newResultOption =
               if (parseResult.remainder.offset == input.offset)
@@ -361,8 +361,8 @@ trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWr
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original)
-      input => {
-        val originalResult = parseOriginal(input)
+      (input, state) => {
+        val originalResult = parseOriginal(input, state)
         originalResult.mapReady(s => {
           s.resultOption match {
             case Some(result) => if (predicate(result)) s else ReadyParseResult(default, s.remainder,
@@ -382,7 +382,7 @@ trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWr
 
     override def getParser(recursive: GetParse): Parse[Success[Result]] = {
       val parseOriginal = recursive(original)
-      input => parseOriginal(input).mapReady(r =>
+      (input, state) => parseOriginal(input, state).mapReady(r =>
         ReadyParseResult(r.resultOption.map(v => Success(v, r.remainder)), r.remainder, r.errors))
     }
 
