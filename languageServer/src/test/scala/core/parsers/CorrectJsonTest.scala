@@ -150,6 +150,16 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with Correc
     assertResult(List(("person",List(("remy","jeroen")))))(result.resultOption.get)
   }
 
+  /*
+  Suppose we have grammar 'expr = { expr } | x' and several inputs
+  1. 'veryLongGarbageString'
+  2. }
+  To be able to parse (2), we must allow running growResults even if no extra input has been consumed,
+  otherwise the seed value 'x' will never be inserted.
+  Maybe we can allow no consumed input only for the seed value?
+
+
+   */
   test("virtual left recursion through error correction") {
     val input = """doesNotMatchGrammar"""
     lazy val parser: EditorParser[Any] = "{" ~ parser | "x"
