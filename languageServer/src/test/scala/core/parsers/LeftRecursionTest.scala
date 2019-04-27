@@ -65,10 +65,10 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
    *   expression2 = expression2 ~ "s" | "e"
    * The expression2 will parse an "s", even though expression1 still needs to parse "s"
   */
-  test("Optional before recursive FAILS") {
+  test("Optional before recursive") {
     lazy val expression: EditorParser[Any] = optional_a ~ expression ~ "s" | "e"
     val result = expression.parseWholeInput(aesReader)
-    assert(!result.successful, result.toString)
+    assert(result.successful, result.toString)
   }
 
 

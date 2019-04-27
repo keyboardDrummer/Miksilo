@@ -10,7 +10,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 
     def emptyQueue(queue: SortedParseResults[Result]): ParseWholeResult[Result] = {
-      var bestResult: ReadyParseResult[Result] = null
+      var bestResult: ReadyParseResult[Result] =
+        ReadyParseResult(None, input, List(ParseError(input, "Grammar is recursive without a base case", Int.MaxValue)))
       var queue = parser.parseRoot(input)
       while(queue.isInstanceOf[SRCons[Result]]) {
         val cons = queue.asInstanceOf[SRCons[Result]]
@@ -121,6 +122,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
     lazy val tail = _tail
+
+
+//    // Detect incorrect ordering.
 //    def results: List[LazyParseResult[Result]] = head :: (tail match {
 //      case SREmpty => List.empty
 //      case cons: SRCons[Result] => cons.results
@@ -133,6 +137,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 //      }
 //    }
 
+//    // Detect multiple access of tail
 //    var switch = true
 //    def tail = {
 //      if (switch) {
