@@ -58,8 +58,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
 
-  override def abort = ??? //SortedResults[Nothing](List.empty)
-
   trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
     def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults[Other]
 
@@ -122,7 +120,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
     lazy val tail = _tail
-
 
 //    // Detect incorrect ordering.
 //    def results: List[LazyParseResult[Result]] = head :: (tail match {
@@ -340,18 +337,16 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original)
 
-      new Parse[Result] {
-        def apply(input: Input, state: ParseState): ParseResult[Result] = {
-          val result = parseOriginal(input, state)
-          result.mapReady(parseResult => {
-            val newResultOption =
-              if (parseResult.remainder.offset == input.offset)
-                default.orElse(parseResult.resultOption)
-              else
-                parseResult.resultOption.orElse(default)
-            ReadyParseResult(newResultOption, parseResult.remainder, parseResult.errors)
-          })
-        }
+      (input: Input, state: ParseState) => {
+        val result = parseOriginal(input, state)
+        result.mapReady(parseResult => {
+          val newResultOption =
+            if (parseResult.remainder.offset == input.offset)
+              default.orElse(parseResult.resultOption)
+            else
+              parseResult.resultOption.orElse(default)
+          ReadyParseResult(newResultOption, parseResult.remainder, parseResult.errors)
+        })
       }
     }
 

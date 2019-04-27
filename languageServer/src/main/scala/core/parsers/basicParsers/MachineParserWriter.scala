@@ -80,19 +80,12 @@ trait MachineParserWriter extends ParserWriter {
 
   val failureSingleton = new SimpleParseResult[Nothing](None)
 
-  override def abort = failureSingleton
-
   case class SimpleParseResult[+Result](successOption: Option[Success[Result]]) extends ParseResultLike[Result] { // TODO Don't use nested Option
 
     def get = successOption.get.result
 
     override def map[NewResult](f: Result => NewResult) = SimpleParseResult(successOption.map(s => s.map(f)))
 
-//    override def flatMap[NewResult](f: Success[Result] => SimpleParseResult[NewResult]) =
-//      successOption.fold[SimpleParseResult[NewResult]](failureSingleton)(s => f(s))
-//
-//    override def resultOption = successOption.map(s => s.result)
-//
     def successful = successOption.nonEmpty
   }
 
