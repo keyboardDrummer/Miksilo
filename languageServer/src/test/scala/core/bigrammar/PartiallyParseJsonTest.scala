@@ -81,8 +81,14 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
   }
 
   test("real life example") {
-    val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subsc"""
-    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subsc",UnknownExpression))))))))
+    val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subscription"}}}}"""
+    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription",UnknownExpression))))))))
+    assertInputGivesPartialFailureExpectation(input, expectation)
+  }
+
+  test("real life example 2") {
+    val input = """{"Resources":{"NotificationTopic":{"Properties":{"Subsc"""
+    val expectation = List(("Resources",List(("NotificationTopic",List(("Properties",List(("Subsc",UnknownExpression))))))))
     assertInputGivesPartialFailureExpectation(input, expectation)
   }
 

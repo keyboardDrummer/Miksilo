@@ -6,6 +6,35 @@ import scala.annotation.tailrec
 
 trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorParserWriter {
 
+
+  def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons(parseResult, SREmpty)
+
+  type ParseResult[+Result] = SortedParseResults[Result]
+
+  override def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]) =
+    singleResult(ReadyParseResult(partial, input, errors))
+
+  override def newSuccess[Result](result: Result, remainder: Input) = singleResult(ReadyParseResult(Some(result), remainder, List.empty))
+
+  override def newFailure[Result](input: Input, message: String) = singleResult(ReadyParseResult(None, input, List(ParseError(input, message))))
+
+  override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
+                                                 right: => EditorParser[Right],
+                                                 combine: (Left, Right) => NewResult): EditorParser[NewResult] =
+    new Sequence(left, right, combine)
+
+  override def succeed[NR](result: NR): EditorParser[NR] = Succeed(result)
+
+  override def choice[Result](first: EditorParser[Result], other: => EditorParser[Result], leftIsAlwaysBigger: Boolean): EditorParser[Result] =
+  /*if (leftIsAlwaysBigger) new OrElse(first, other) else*/ new BiggestOfTwo(first, other)
+
+  override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
+
+  override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
+
+
+  override def newParseState(parser: EditorParser[_]) = new LeftRecursionDetectorState()
+
   override def abort = ??? //SortedResults[Nothing](List.empty)
 
   trait SortedParseResults[+Result] extends EditorResult[Result]  {
@@ -82,7 +111,11 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   trait LazyParseResult[+Result] {
 
-    def score: Double
+    def score: Double = {
+      remainder.offset / (errors.size + 1)
+    }
+    def errors: List[ParseError]
+    def remainder: Input
 
     def flatMap[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
@@ -121,31 +154,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     override def flatMap[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]) = f(this)
   }
 
-  def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons(parseResult, SREmpty)
-
-  type ParseResult[+Result] = SortedParseResults[Result]
-
-  override def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]) =
-    singleResult(ReadyParseResult(partial, input, errors))
-
-  override def newSuccess[Result](result: Result, remainder: Input) = singleResult(ReadyParseResult(Some(result), remainder, List.empty))
-
-  override def newFailure[Result](input: Input, message: String) = singleResult(ReadyParseResult(None, input, List(ParseError(input, message))))
-
-  override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
-                                                 right: => EditorParser[Right],
-                                                 combine: (Left, Right) => NewResult): EditorParser[NewResult] =
-    new Sequence(left, right, combine)
-
-  override def succeed[NR](result: NR): EditorParser[NR] = Succeed(result)
-
-  override def choice[Result](first: EditorParser[Result], other: => EditorParser[Result], leftIsAlwaysBigger: Boolean): EditorParser[Result] =
-    /*if (leftIsAlwaysBigger) new OrElse(first, other) else*/ new BiggestOfTwo(first, other)
-
-  override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
-
-  override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
-
   override def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 
     @tailrec
@@ -170,8 +178,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     emptyQueue(parser.parseRoot(input))
   }
-
-  override def newParseState(parser: EditorParser[_]) = new LeftRecursionDetectorState()
 
   class Sequence[+Left, +Right, Result](val left: EditorParser[Left],
                                          _right: => EditorParser[Right],
