@@ -120,18 +120,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
-    val tail = _tail
-    def results: List[LazyParseResult[Result]] = head :: (tail match {
-      case SREmpty => List.empty
-      case cons: SRCons[Result] => cons.results
-    })
-
-    val score = head.score
-    for(result <- results.drop(0)) {
-      if (result.score > score) {
-        System.out.append("")
-      }
-    }
+    lazy val tail = _tail
+//    def results: List[LazyParseResult[Result]] = head :: (tail match {
+//      case SREmpty => List.empty
+//      case cons: SRCons[Result] => cons.results
+//    })
+//
+//    val score = head.score
+//    for(result <- results.drop(0)) {
+//      if (result.score > score) {
+//        System.out.append("")
+//      }
+//    }
 
 //    var switch = true
 //    def tail = {
