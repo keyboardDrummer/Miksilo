@@ -5,17 +5,6 @@ import editorParsers.LeftRecursiveCorrectingParserWriter
 
 class AssociativityTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
-
-  test("if-then-else can not be made left-associative") {
-    lazy val expr = wholeNumber
-    val stmt: EditorParser[Any] = expr.
-      addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after).
-      addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after ~ "else" ~ after)
-    val input = "if1thenif2then3else4"
-    val result = stmt.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-  }
-
   test("binary operators are right associative by default") {
     lazy val expr: EditorParser[Any] = new EditorLazy(expr) ~< "-" ~ expr | wholeNumber
     val input = "1-2-3"
@@ -71,19 +60,6 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
 
     val nestedIf = (("2", "then"), "3")
     assertResult((((("1","then"),nestedIf),"else"),"4"))(result.get)
-  }
-
-  test("if-then-else is right-associative by default") {
-    lazy val expr = wholeNumber
-    lazy val stmt: EditorParser[Any] = expr |
-      "if" ~> expr ~ "then" ~ stmt ~ "else" ~ stmt |
-      "if" ~> expr ~ "then" ~ stmt
-    val input = "if1thenif2then3else4"
-    val result = stmt.parseWholeInput(new StringReader(input))
-    assert(result.successful)
-
-    val nestedIf = (((("2", "then"), "3"), "else"), "4")
-    assertResult((("1","then"),nestedIf))(result.get)
   }
 
   test("if-then-else can be made left-associative") {

@@ -53,7 +53,7 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   override def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
-    parse(ParseWholeInput(parser),input)
+    parse(ParseWholeInput(parser), input)
   }
 
   case class ParseWholeInput[Result](original: Self[Result])
