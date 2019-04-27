@@ -2,9 +2,9 @@ package core.parsers
 
 import editorParsers.EditorParserWriter
 import org.scalatest.FunSuite
-import editorParsers.UnambiguousEditorParserWriter
+import editorParsers.CorrectingParserWriter
 
-trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with UnambiguousEditorParserWriter {
+class LeftRecursionTest extends FunSuite with CommonStringReaderParser with CorrectingParserWriter {
 
   test("handles recursion in complicated graph structures") {
     lazy val leftMayNotCache = leftRec ~ "b"
@@ -51,8 +51,7 @@ trait LeftRecursionTest extends FunSuite with CommonStringReaderParser with Unam
 
   val optional_a: EditorParserExtensions[Any] =  literal("a").*
   val optionalCopy: EditorParserExtensions[Any] = literal("a").*
-  val input = "aes"
-  def aesReader = new StringReader(input)
+  def aesReader = new StringReader("aes")
 
   test("Optional before seed") {
     lazy val expression: EditorParser[Any] = new EditorLazy(expression) ~ "s" | optional_a ~ "e"

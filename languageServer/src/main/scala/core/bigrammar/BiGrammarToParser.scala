@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers.editorParsers.UnambiguousEditorParserWriter
+import core.parsers.editorParsers.CorrectingParserWriter
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import langserver.types.Position
 
@@ -11,7 +11,7 @@ import scala.collection.mutable
 case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 
 //noinspection ZeroIndexToHead
-object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParserWriter
+object BiGrammarToParser extends CommonParserWriter with CorrectingParserWriter
   with IndentationSensitiveParserWriter {
 
   type AnyWithMap = WithMap[Any]

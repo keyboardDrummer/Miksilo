@@ -1,11 +1,14 @@
 package core.parsers
 
-import editorParsers.UnambiguousEditorParserWriter
+import editorParsers.CorrectingParserWriter
 
 class UnambigiousParserTest extends AssociativityTest
-  with LeftRecursionTest
-  with UnambiguousEditorParserWriter
+  with CorrectingParserWriter
   with ErrorReportingTest {
+
+  val optional_a: EditorParserExtensions[Any] =  literal("a").*
+  val optionalCopy: EditorParserExtensions[Any] = literal("a").*
+  def aesReader = new StringReader("aes")
 
   private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
@@ -65,63 +68,6 @@ class UnambigiousParserTest extends AssociativityTest
     lazy val expression: EditorParser[Any] = optional_a ~ choice("e", expression ~ "s", true)
     val result = expression.parseWholeInput(aesReader)
     assert(!result.successful, result.toString)
-  }
-
-  // Partially Parse tests start
-  test("object with single member with string value, where the colon is missing") {
-    val input = """{"person""remy"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy")))(result.resultOption.get)
-  }
-
-  test("two members but the first misses a colon") {
-    val input = """{"person""remy","friend":"jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
-  }
-
-  test("two members but the comma is missing") {
-    val input = """{"person":"remy""friend":"jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
-  }
-
-  test("two members both missing colon") {
-    val input = """{"person""remy","friend""jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
-  }
-
-  test("two members, no first colon and comma") {
-    val input = """{"person""remy""friend":"jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
-  }
-
-  test("two members, no colons or comma") {
-    val input = """{"person""remy""friend""jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
-  }
-
-  test("nested two members without colons/comma") {
-    val input = """{"directory"{"person""remy""friend""jeroen"}}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List("directory" -> List("person" -> "remy", "friend" -> "jeroen")))(result.resultOption.get)
-  }
-
-  test("starting brace insertion") {
-    val input = """{"person""remy":"jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person",List(("remy","jeroen")))))(result.resultOption.get)
   }
 
   test("virtual left recursion through error correction") {

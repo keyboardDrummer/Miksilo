@@ -52,6 +52,35 @@ trait StringParserWriter extends SequenceParserWriter {
     }
   }
 
+  override def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
+    parse(ParseWholeInput(parser),input)
+  }
+
+  case class ParseWholeInput[Result](original: Self[Result])
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+
+    override def getParser(recursive: GetParse): Parse[Result] = {
+      val parseOriginal = recursive(original)
+
+      input: Input => {
+        val result = parseOriginal(input)
+        result.mapReady(parseResult => {
+          val remainder = parseResult.remainder
+          if (remainder.atEnd)
+            parseResult
+          else {
+            val missing = remainder.array.subSequence(remainder.offset, remainder.array.length())
+            val remainderLength = missing.length()
+            val error = ParseError(remainder, s"Found '$missing' instead of end of input", remainderLength)
+            ReadyParseResult(parseResult.resultOption, remainder.drop(remainderLength), List(error) ++ parseResult.errors)
+          }
+        })
+      }
+    }
+
+    override def getDefault(cache: DefaultCache) = cache(original)
+  }
+
   implicit def literalToExtensions(value: String): ParserExtensions[String] = Literal(value)
   implicit def literal(value: String): Literal = Literal(value)
   implicit def regex(value: Regex): RegexParser = RegexParser(value)
@@ -105,7 +134,6 @@ trait StringParserWriter extends SequenceParserWriter {
             }
 
             val message = s"expected '$regex' but found '${input.array.charAt(input.offset)}'"
-            //return newFailure(None, input, message)
             drop(None, input, message, apply)
         }
       }
@@ -121,9 +149,9 @@ trait StringParserWriter extends SequenceParserWriter {
   def drop[Result](resultOption: Option[Result], input: Input, errorMessage: String, parse: Parse[Result]): SortedParseResults[Result] = {
     val errors = List(ParseError(input, errorMessage))
     val withoutDrop = ReadyParseResult(resultOption, input, errors)
-    val dropErrors = List(ParseError(input, "dropped one character"), ParseError(input, errorMessage))
-    val dropped = DelayedParseResult(input, dropErrors, () => {
-      parse.apply(input.drop(1)).addErrors(dropErrors)
+    val dropError = List(ParseError(input, s"Dropped '${input.head}'", 4))
+    val dropped = DelayedParseResult(input, dropError, () => {
+      parse.apply(input.drop(1)).addErrors(dropError)
     })
     new SRCons[Result](withoutDrop, singleResult(dropped))
   }

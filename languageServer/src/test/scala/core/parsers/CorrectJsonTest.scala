@@ -1,38 +1,31 @@
-package core.bigrammar
+package core.parsers
 
-import core.bigrammar.grammars.{Labelled, NumberGrammar, StringLiteral}
-import core.language.node.GrammarKey
 import org.scalatest.FunSuite
+import editorParsers.CorrectingParserWriter
 
-class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
-
-  import BiGrammarToParser._
-
-  object Json extends GrammarKey
-  val jsonGrammar = new Labelled(Json)
-  private val memberParser: BiGrammar = StringLiteral ~< ":" ~ jsonGrammar
-  private val objectParser: BiGrammar = "{" ~> memberParser.manySeparated(",") ~< "}"
+class CorrectJsonTest extends FunSuite with CommonStringReaderParser with CorrectingParserWriter {
+  private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
+  private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression {
-    override def toString = "<unknown>"
+    override def toString = "unknown"
   }
-  jsonGrammar.inner = new core.bigrammar.grammars.WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
-  val jsonParser = toParser(jsonGrammar)
+  protected lazy val jsonParser: EditorParser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression)
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    val result = jsonParser.parseWholeInput(new Reader(input))
+    val result = jsonParser.parseWholeInput(new StringReader(input))
     val value = getSuccessValue(result)
     assertResult(List(("person","3")))(value)
   }
 
   test("object with single member with string value") {
     val input = """{"person":"remy"}"""
-    val result = jsonParser.parseWholeInput(new Reader(input))
+    val result = jsonParser.parseWholeInput(new StringReader(input))
     val value = getSuccessValue(result)
     assertResult(List(("person","remy")))(value)
   }
 
-  test("garbage after number") {
+  ignore("garbage after number") {
     val input = """3blaa"""
     assertInputGivesPartialFailureExpectation(input, "3")
   }
@@ -94,19 +87,70 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
     assertInputGivesPartialFailureExpectation(input, expectation)
   }
 
-  test("some test that triggers the case that Sequence left and right fail, the left failure is bigger and the right has no default but a partialResult") {
-
-  }
-
   test("garbage before key") {
     val input = """{g"person":3}"""
     val expectation = List("person" -> "3")
     assertInputGivesPartialFailureExpectation(input, expectation)
   }
 
+  // Partially Parse tests start
+  test("object with single member with string value, where the colon is missing") {
+    val input = """{"person""remy"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult(List(("person","remy")))(result.resultOption.get)
+  }
 
+  test("two members but the first misses a colon") {
+    val input = """{"person""remy","friend":"jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+  }
+
+  test("two members but the comma is missing") {
+    val input = """{"person":"remy""friend":"jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+  }
+
+  test("two members both missing colon") {
+    val input = """{"person""remy","friend""jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+  }
+
+  test("two members, no first colon and comma") {
+    val input = """{"person""remy""friend":"jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+  }
+
+  test("two members, no colons or comma") {
+    val input = """{"person""remy""friend""jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+  }
+
+  test("nested two members without colons/comma") {
+    val input = """{"directory"{"person""remy""friend""jeroen"}}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult(List("directory" -> List("person" -> "remy", "friend" -> "jeroen")))(result.resultOption.get)
+  }
+
+  test("starting brace insertion") {
+    val input = """{"person""remy":"jeroen"}"""
+    val result = jsonParser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult(List(("person",List(("remy","jeroen")))))(result.resultOption.get)
+  }
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
-    val result = jsonParser.parseWholeInput(new Reader(input))
+    val result = jsonParser.parseWholeInput(new StringReader(input))
     assert(!result.successful)
     assert(result.resultOption.nonEmpty)
     assertResult(expectation)(result.resultOption.get)

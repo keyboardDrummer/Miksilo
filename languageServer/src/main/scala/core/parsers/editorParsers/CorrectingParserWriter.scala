@@ -2,30 +2,28 @@ package core.parsers.editorParsers
 
 import core.parsers.core.UnambiguousParserWriter
 
-import scala.annotation.tailrec
+trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWriter {
 
-trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorParserWriter {
+  def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 
-  override def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
-
-    @tailrec
     def emptyQueue(queue: SortedParseResults[Result]): ParseWholeResult[Result] = {
-      queue match {
-        case SREmpty =>
-          val didNotFinishError = ParseError(input, "Did not parse entire input")
-          ParseWholeResult(None, List(didNotFinishError))
-        case cons: SRCons[Result] =>
-          var newQueue = cons.tail
-          val parseResult = cons.head
-          parseResult match {
-            case ReadyParseResult(resultOption, resultRemainder, resultErrors) if resultRemainder.atEnd =>
-              return ParseWholeResult(resultOption.asInstanceOf[Option[Result]], resultErrors)
-            case delayedResult: DelayedParseResult[Any] =>
-              newQueue = newQueue.merge(delayedResult.continuation())
-            case _ =>
-          }
-          emptyQueue(newQueue)
+      var bestResult: ReadyParseResult[Result] = null
+      var queue = parser.parseRoot(input)
+      while(queue.isInstanceOf[SRCons[Result]]) {
+        val cons = queue.asInstanceOf[SRCons[Result]]
+        val parseResult = cons.head
+        queue = parseResult match {
+          case parseResult: ReadyParseResult[Result] =>
+            bestResult = if (bestResult != null && bestResult.score >= parseResult.score) bestResult else parseResult
+            if (bestResult.remainder.atEnd)
+              SREmpty
+            else
+              cons.tail
+          case delayedResult: DelayedParseResult[Any] =>
+            cons.tail.merge(delayedResult.continuation())
+        }
       }
+      ParseWholeResult(bestResult.resultOption, bestResult.errors)
     }
 
     emptyQueue(parser.parseRoot(input))
@@ -61,18 +59,11 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
   override def abort = ??? //SortedResults[Nothing](List.empty)
 
-  trait SortedParseResults[+Result] extends EditorResult[Result]  {
+  trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
     def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults[Other]
 
     def addErrors(errors: List[ParseError]): SortedParseResults[Result] = {
-      mapResult({
-        case delayed: DelayedParseResult[Result] => DelayedParseResult(delayed.remainder, delayed.errors ++ errors, () => {
-          val intermediate = delayed.continuation()
-          intermediate.addErrors(errors)
-        })
-        case ready: ReadyParseResult[Result] =>
-          ReadyParseResult(ready.resultOption, ready.remainder, ready.errors ++ errors)
-      })
+      mapWithErrors(x => x, errors)
     }
 
     def mapWithErrors[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
@@ -88,11 +79,11 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       })
     }
 
-    def mapResultSimple[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): SortedParseResults[NewResult] = {
+    def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): SortedParseResults[NewResult] = {
       mapResult({
         case delayed: DelayedParseResult[Result] => DelayedParseResult(delayed.remainder, delayed.errors, () => {
             val intermediate = delayed.continuation()
-            intermediate.mapResultSimple(f)
+            intermediate.mapReady(f)
           })
         case ready: ReadyParseResult[Result] => f(ready)
       })
@@ -100,10 +91,20 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults[NewResult]
 
-    def flatMap[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
+    def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
+      flatMap[NewResult] {
+        case delayed: DelayedParseResult[Result] => singleResult(DelayedParseResult(delayed.remainder, delayed.errors, () => {
+          val intermediate = delayed.continuation()
+          intermediate.flatMapReady(f)
+        }))
+        case ready: ReadyParseResult[Result] => f(ready)
+      }
+    }
+
+    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
 
     def updateRemainder(f: Input => Input) = {
-      mapResultSimple(r => ReadyParseResult(r.resultOption, f(r.remainder), r.errors))
+      mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.errors))
     }
   }
 
@@ -112,7 +113,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     override def mapResult[NewResult](f: LazyParseResult[Nothing] => LazyParseResult[NewResult]): SREmpty.type = this
 
-    override def flatMap[NewResult](f: ReadyParseResult[Nothing] => SortedParseResults[NewResult]) = this
+    override def flatMap[NewResult](f: LazyParseResult[Nothing] => SortedParseResults[NewResult]) = this
 
     override def map[NewResult](f: Nothing => NewResult) = this
   }
@@ -145,11 +146,11 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 //    }
 
     override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]) = {
-      new SRCons[NewResult](f(head), tail.mapResult(f))
+      flatMap(r => singleResult(f(r)))
     }
 
-    def flatMap[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
-      head.flatMap(f) match {
+    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
+      f(head) match {
         case SREmpty => tail.flatMap(f)
         case cons: SRCons[NewResult] => // Try not to evaluate tail, but if head's score gets worse, we have to otherwise the sorting may be incorrect.
           if (cons.head.score >= head.score)
@@ -177,14 +178,13 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
   trait LazyParseResult[+Result] {
 
     def score: Double =
-      // -errors.size // gives us the most correct result, but can be very slow
-      remainder.offset - 5 * errors.size // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
-      // remainder.offset / (errors.size + 1) // compromise
+      -errorSize // gives us the most correct result, but can be very slow
+      // remainder.offset - 5 * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
+      // remainder.offset / (errorSize + 1) // compromise
 
+    def errorSize = errors.map(e => e.edits).sum
     def errors: List[ParseError]
     def remainder: Input
-
-    def flatMap[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
   }
 
@@ -193,13 +193,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     if (errors.isEmpty) {
       System.out.append("")
-    }
-
-    def flatMap[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
-      singleResult(DelayedParseResult(remainder, errors, () => {
-        val intermediate = continuation()
-        intermediate.flatMap(f)
-      }))
     }
 
     override def map[NewResult](f: Result => NewResult): DelayedParseResult[NewResult] = {
@@ -213,8 +206,6 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
     override def map[NewResult](f: Result => NewResult): ReadyParseResult[NewResult] = {
       ReadyParseResult(resultOption.map(f), remainder, errors)
     }
-
-    override def flatMap[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]) = f(this)
   }
 
   class Sequence[+Left, +Right, Result](val left: EditorParser[Left],
@@ -231,16 +222,16 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       def apply(input: Input): ParseResult[Result] = {
         val leftResults = parseLeft(input)
 
-        leftResults.flatMap[Result]({ case ReadyParseResult(leftOption, leftRemainder, leftErrors) =>
+        leftResults.flatMapReady[Result]((leftResult: ReadyParseResult[Left]) => {
 
           def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
-            leftOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
+            leftResult.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
             rightResult.remainder,
             rightResult.errors)
-          lazy val next = parseRight(leftRemainder).mapWithErrors[Result](mapRightResult, leftErrors)
+          lazy val next = parseRight(leftResult.remainder).mapWithErrors[Result](mapRightResult, leftResult.errors)
 
-          if (leftErrors.nonEmpty)
-            singleResult(DelayedParseResult(leftRemainder, leftErrors, () => next))
+          if (leftResult.errors.nonEmpty)
+            singleResult(DelayedParseResult(leftResult.remainder, leftResult.errors, () => next))
           else
             next
         })
@@ -264,7 +255,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       WithDefault[Other](parser, cache => Some(_default))
 
     def parseWholeInput(input: Input): ParseWholeResult[Result] = {
-      UnambiguousEditorParserWriter.this.parseWholeInput(parser, input)
+      CorrectingParserWriter.this.parseWholeInput(parser, input)
     }
 
     override def parseRoot(input: Input): ParseResult[Result] = {
@@ -347,7 +338,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       new Parse[Result] {
         def apply(input: Input): ParseResult[Result] = {
           val result = parseOriginal(input)
-          result.mapResultSimple(parseResult => {
+          result.mapReady(parseResult => {
             val newResultOption =
               if (parseResult.remainder.offset == input.offset)
                 default.orElse(parseResult.resultOption)
@@ -372,7 +363,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
       val parseOriginal = recursive(original)
       input => {
         val originalResult = parseOriginal(input)
-        originalResult.mapResultSimple(s => {
+        originalResult.mapReady(s => {
           s.resultOption match {
             case Some(result) => if (predicate(result)) s else ReadyParseResult(default, s.remainder,
               ParseError(s.remainder, getMessage(result)) :: s.errors)
@@ -391,7 +382,7 @@ trait UnambiguousEditorParserWriter extends UnambiguousParserWriter with EditorP
 
     override def getParser(recursive: GetParse): Parse[Success[Result]] = {
       val parseOriginal = recursive(original)
-      input => parseOriginal(input).mapResultSimple(r =>
+      input => parseOriginal(input).mapReady(r =>
         ReadyParseResult(r.resultOption.map(v => Success(v, r.remainder)), r.remainder, r.errors))
     }
 

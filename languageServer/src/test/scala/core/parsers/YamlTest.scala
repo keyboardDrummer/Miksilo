@@ -2,7 +2,7 @@
 package core2.parsers
 
 import core.document.Empty
-import core.parsers.editorParsers.{DefaultCache, UnambiguousEditorParserWriter}
+import core.parsers.editorParsers.{DefaultCache, CorrectingParserWriter}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.responsiveDocument.ResponsiveDocument
 import langserver.types.Position
@@ -50,7 +50,7 @@ object BlockKey extends YamlContext
 object FlowKey extends YamlContext
 
 class YamlTest extends FunSuite
-  with UnambiguousEditorParserWriter
+  with CorrectingParserWriter
   with IndentationSensitiveParserWriter with CommonParserWriter {
 
   type Input = IndentationReader
