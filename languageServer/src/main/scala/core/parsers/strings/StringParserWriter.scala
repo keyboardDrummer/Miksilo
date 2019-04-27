@@ -105,8 +105,8 @@ trait StringParserWriter extends SequenceParserWriter {
             }
 
             val message = s"expected '$regex' but found '${input.array.charAt(input.offset)}'"
-            return newFailure(None, input, message)
-            //drop(input, message, apply)
+            //return newFailure(None, input, message)
+            drop(None, input, message, apply)
         }
       }
 

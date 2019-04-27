@@ -32,7 +32,7 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
     assertResult(List(("person","remy")))(value)
   }
 
-  ignore("garbage after number") {
+  test("garbage after number") {
     val input = """3blaa"""
     assertInputGivesPartialFailureExpectation(input, "3")
   }
@@ -96,6 +96,12 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
 
   test("some test that triggers the case that Sequence left and right fail, the left failure is bigger and the right has no default but a partialResult") {
 
+  }
+
+  test("garbage before key") {
+    val input = """{g"person":3}"""
+    val expectation = List("person" -> "3")
+    assertInputGivesPartialFailureExpectation(input, expectation)
   }
 
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
