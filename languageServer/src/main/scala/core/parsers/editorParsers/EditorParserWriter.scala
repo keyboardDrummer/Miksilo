@@ -1,10 +1,10 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{GraphAlgorithms, LeftRecursiveParserWriter}
+import core.parsers.core.{GraphAlgorithms, OptimizingParserWriter}
 
 import scala.language.higherKinds
 
-trait EditorParserWriter extends LeftRecursiveParserWriter {
+trait EditorParserWriter extends OptimizingParserWriter {
 
   type Self[+Result] = EditorParser[Result]
 

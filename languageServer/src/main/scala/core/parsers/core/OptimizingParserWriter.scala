@@ -3,7 +3,7 @@ package core.parsers.core
 import scala.collection.mutable
 import scala.language.higherKinds
 
-trait LeftRecursiveParserWriter extends ParserWriter {
+trait OptimizingParserWriter extends ParserWriter {
 
   type Self[+Result] <: LRParser[Result]
 

@@ -1,11 +1,11 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.LeftRecursiveParserWriter
+import core.parsers.core.OptimizingParserWriter
 
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-trait CorrectingParserWriter extends LeftRecursiveParserWriter with EditorParserWriter {
+trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
 
   def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 

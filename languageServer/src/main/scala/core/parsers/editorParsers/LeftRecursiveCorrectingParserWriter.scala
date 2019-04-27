@@ -32,47 +32,41 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   type ParseState = FixPointState
 
 
-  override def newParseState(input: Input) = FindFixPoint(input, Map.empty)
+  override def newParseState(input: Input) = FixPointState(input, Map.empty)
 
   trait HasDetectFixPoint[Result] {
     def parser: Parse[Result]
 
-    def getPreviousResult(input: Input, state: FixPointState): Option[ParseResult[Result]] = {
-      state match {
-        case found: FoundFixPoint =>
-          if (found.parse == parser && input == found.input)
-            Some(found.intermediate.asInstanceOf[ParseResult[Result]])
-          else
-            None
-        case find: FindFixPoint =>
-          find.callStack.get(parser) match {
-            case Some(switch) if find.input == input =>
-              switch.foundRecursion = true
+    def getPreviousResult(input: Input, state: ParseState): Option[ParseResult[Result]] = {
+      state.parsers.get(parser) match {
+        case Some(innerState) if state.input == input =>
+          innerState match {
+            case found: FoundFixPoint =>
+              Some(found.intermediate.asInstanceOf[ParseResult[Result]])
+            case find: FindFixPoint =>
+              find.switch.foundRecursion = true
               Some(SREmpty)
-            case _ => None
           }
+        case _ => None
       }
     }
 
-    def growResult(input: Input, previous: ReadyParseResult[Result]): ParseResult[Result] = {
+    def growResult(input: Input, state: ParseState, previous: ReadyParseResult[Result]): ParseResult[Result] = {
 
-      val nextResult: ParseResult[Result] = parser(input, FoundFixPoint(input, parser, singleResult(previous)))
+      val nextResult: ParseResult[Result] = parser(input, FixPointState(input, state.parsers + (parser -> FoundFixPoint(singleResult(previous)))))
       nextResult.flatMapReady(ready => {
         if (ready.remainder.offset > previous.remainder.offset)
-          growResult(input, ready)
+          growResult(input, state, ready)
         else
           singleResult(previous)
       })
     }
   }
 
-  trait FixPointState {
-
-  }
-
-  case class FindFixPoint(input: Input, callStack: Map[Parse[Any], FoundRecursionSwitch]) extends FixPointState
-
-  case class FoundFixPoint(input: Input, parse: Parse[Any], intermediate: ParseResult[Any]) extends FixPointState
+  trait ParserState
+  case class FixPointState(input: Input, parsers: Map[Parse[Any], ParserState])
+  case class FindFixPoint(switch: FoundRecursionSwitch) extends ParserState
+  case class FoundFixPoint(intermediate: ParseResult[Any]) extends ParserState
 
   class FoundRecursionSwitch {
     var foundRecursion: Boolean = false
@@ -85,18 +79,15 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         case None =>
 
           val switch = new FoundRecursionSwitch()
-          val newState = state match {
-            case find: FindFixPoint =>
-              if (input == find.input)
-                FindFixPoint(input, find.callStack + (parser -> switch))
-              else
-                FindFixPoint(input, Map(parser -> switch))
-            case found: FoundFixPoint => found
+          val newState = if (state.input == input) {
+            FixPointState(input, state.parsers + (parser -> FindFixPoint(switch)))
+          } else {
+            FixPointState(input, Map(parser -> FindFixPoint(switch)))
           }
-          var result = parser(input, newState)
+          val result = parser(input, newState)
           result.flatMapReady(ready => {
             if (switch.foundRecursion) {
-              growResult(input, ready)
+              growResult(input, newState, ready)
             } else
               singleResult(ready)
           })
