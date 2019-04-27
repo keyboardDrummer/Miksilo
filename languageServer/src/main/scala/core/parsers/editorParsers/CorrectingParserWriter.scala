@@ -6,29 +6,25 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 
-    def emptyQueue(queue: SortedParseResults[Result]): ParseWholeResult[Result] = {
-      var bestResult: ReadyParseResult[Result] =
-        ReadyParseResult(None, input, List(ParseError(input, "Grammar is always recursive", Int.MaxValue)))
+    var bestResult: ReadyParseResult[Result] =
+      ReadyParseResult(None, input, List(ParseError(input, "Grammar is always recursive", Int.MaxValue)))
 
-      var queue = parser.parseRoot(input)
-      while(queue.isInstanceOf[SRCons[Result]]) {
-        val cons = queue.asInstanceOf[SRCons[Result]]
-        val parseResult = cons.head
-        queue = parseResult match {
-          case parseResult: ReadyParseResult[Result] =>
-            bestResult = if (bestResult != null && bestResult.score >= parseResult.score) bestResult else parseResult
-            if (bestResult.remainder.atEnd)
-              SREmpty
-            else
-              cons.tail
-          case delayedResult: DelayedParseResult[Any] =>
-            cons.tail.merge(delayedResult.continuation())
-        }
+    var queue = parser.parseRoot(input)
+    while(queue.isInstanceOf[SRCons[Result]]) {
+      val cons = queue.asInstanceOf[SRCons[Result]]
+      val parseResult = cons.head
+      queue = parseResult match {
+        case parseResult: ReadyParseResult[Result] =>
+          bestResult = if (bestResult != null && bestResult.score >= parseResult.score) bestResult else parseResult
+          if (bestResult.remainder.atEnd)
+            SREmpty
+          else
+            cons.tail
+        case delayedResult: DelayedParseResult[Any] =>
+          cons.tail.merge(delayedResult.continuation())
       }
-      ParseWholeResult(bestResult.resultOption, bestResult.errors)
     }
-
-    emptyQueue(parser.parseRoot(input))
+    ParseWholeResult(bestResult.resultOption, bestResult.errors)
   }
 
   def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons(parseResult, SREmpty)
