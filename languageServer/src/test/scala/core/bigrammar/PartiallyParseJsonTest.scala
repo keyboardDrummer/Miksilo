@@ -12,7 +12,9 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
   val jsonGrammar = new Labelled(Json)
   private val memberParser: BiGrammar = StringLiteral ~< ":" ~ jsonGrammar
   private val objectParser: BiGrammar = "{" ~> memberParser.manySeparated(",") ~< "}"
-  object UnknownExpression
+  object UnknownExpression {
+    override def toString = "<unknown>"
+  }
   jsonGrammar.inner = new core.bigrammar.grammars.WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
   val jsonParser = toParser(jsonGrammar)
 

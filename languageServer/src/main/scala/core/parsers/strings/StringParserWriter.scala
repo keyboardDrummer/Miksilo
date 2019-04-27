@@ -60,22 +60,27 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def getParser(recursive: GetParse): Parse[String] = {
 
-      def apply(input: Input): ParseResult[String] = {
-        var index = 0
-        val array = input.array
-        while(index < value.length) {
-          val arrayIndex = index + input.offset
-          if (array.length <= arrayIndex) {
-            return newFailure(Some(value), input, s"expected '$value' but end of source found")
-          } else if (array.charAt(arrayIndex) != value.charAt(index)) {
-            return newFailure(Some(value), input.drop(index), s"expected '$value' but found '${array.subSequence(input.offset, arrayIndex + 1)}'")
+      lazy val result: Parse[String] = new Parse[String] {
+        def apply(input: Input): ParseResult[String] = {
+          var index = 0
+          val array = input.array
+          while (index < value.length) {
+            val arrayIndex = index + input.offset
+            if (array.length <= arrayIndex) {
+              return newFailure(Some(value), input, s"expected '$value' but end of source found")
+            } else if (array.charAt(arrayIndex) != value.charAt(index)) {
+              val message = s"expected '$value' but found '${array.subSequence(input.offset, arrayIndex + 1)}'"
+
+              //return newFailure(Some(value), input, message)
+              return drop(Some(value), input, message, result)
+            }
+            index += 1
           }
-          index += 1
+          newSuccess(value, input.drop(value.length))
         }
-        newSuccess(value, input.drop(value.length))
       }
 
-      apply
+      result
     }
 
 
@@ -86,19 +91,22 @@ trait StringParserWriter extends SequenceParserWriter {
 
   case class RegexParser(regex: Regex) extends EditorParserBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: GetParse) = {
+    override def getParser(recursive: GetParse): Parse[String] = {
 
-      def apply(input: Input) = {
+      def apply(input: Input): ParseResult[String] = {
         regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
           case Some(matched) =>
             newSuccess(
               input.array.subSequence(input.offset, input.offset + matched.end).toString,
               input.drop(matched.end))
           case None =>
-            val nextCharacter =
-              if (input.array.length == input.offset) "end of source"
-              else input.array.charAt(input.offset)
-            newFailure(input, s"expected '$regex' but found '$nextCharacter'") // Partial regex matching toevoegen
+            if (input.atEnd) {
+              return newFailure(input, s"expected '$regex' but found end of source")
+            }
+
+            val message = s"expected '$regex' but found '${input.array.charAt(input.offset)}'"
+            return newFailure(None, input, message)
+            //drop(input, message, apply)
         }
       }
 
@@ -108,5 +116,15 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getDefault(cache: DefaultCache): Option[String] = None
 
     override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
+  }
+
+  def drop[Result](resultOption: Option[Result], input: Input, errorMessage: String, parse: Parse[Result]): SortedParseResults[Result] = {
+    val errors = List(ParseError(input, errorMessage))
+    val withoutDrop = ReadyParseResult(resultOption, input, errors)
+    val dropErrors = List(ParseError(input, "dropped one character"), ParseError(input, errorMessage))
+    val dropped = DelayedParseResult(input, dropErrors, () => {
+      parse.apply(input.drop(1)).addErrors(dropErrors)
+    })
+    new SRCons[Result](withoutDrop, singleResult(dropped))
   }
 }

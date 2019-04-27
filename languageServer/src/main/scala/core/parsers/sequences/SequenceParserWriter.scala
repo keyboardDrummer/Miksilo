@@ -1,8 +1,8 @@
 package core.parsers.sequences
 
-import core.parsers.editorParsers.{DefaultCache, EditorParserWriter}
+import core.parsers.editorParsers.{DefaultCache, EditorParserWriter, UnambiguousEditorParserWriter}
 
-trait SequenceParserWriter extends EditorParserWriter {
+trait SequenceParserWriter extends UnambiguousEditorParserWriter {
   type Elem
   type Input <: SequenceInput[Input, Elem]
 
