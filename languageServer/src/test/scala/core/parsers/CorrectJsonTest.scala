@@ -25,129 +25,122 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
     assertResult(List(("person","remy")))(value)
   }
 
-  ignore("garbage after number") {
+  test("garbage after number") {
     val input = """3blaa"""
-    assertInputGivesPartialFailureExpectation(input, "3")
+    assertParse(input, "3", 1)
   }
 
   test("nothing as input") {
     val input = ""
-    assertInputGivesPartialFailureExpectation(input, UnknownExpression)
+    assertParse(input, UnknownExpression, 1)
   }
 
   test("object start with nothing else") {
     val input = """{"""
-    assertInputGivesPartialFailureExpectation(input, List.empty)
+    assertParse(input, List.empty, 1)
   }
 
   test("object member with only the key") {
     val input = """{"person""""
     val expectation = List(("""person""", UnknownExpression))
-    assertInputGivesPartialFailureExpectation(input, expectation)
+    assertParse(input, expectation, 3)
   }
 
   test("object member with no expression") {
     val input = """{"person":"""
     val expectation = List(("person", UnknownExpression))
-    assertInputGivesPartialFailureExpectation(input, expectation)
+    assertParse(input, expectation, 2)
   }
 
   test("object member with only an unfinished key") {
     val input = """{"person"""
     val expectation = List(("person", UnknownExpression))
-    assertInputGivesPartialFailureExpectation(input, expectation)
+    assertParse(input, expectation, 4)
   }
 
   test("object member with an unfinished value") {
     val input = """{"person":"remy"""
-    assertInputGivesPartialFailureExpectation(input, List(("person", "remy")))
+    assertParse(input, List(("person", "remy")), 2)
   }
 
   test("object with a single member and comma") {
     val input = """{"person":3,"""
     val expectation = List(("person", "3"))
-    assertInputGivesPartialFailureExpectation(input, expectation)
+    assertParse(input, expectation, 2)
   }
 
   test("object with a single member and half second member") {
     val input = """{"person":3,"second""""
     val expectation = List(("person", "3"), ("second", UnknownExpression))
-    assertInputGivesPartialFailureExpectation(input, expectation)
+    assertParse(input, expectation, 3)
   }
 
   test("real life example") {
     val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subscription"}}}}"""
     val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription",UnknownExpression))))))))
-    assertInputGivesPartialFailureExpectation(input, expectation)
+    assertParse(input, expectation, 2)
   }
 
   test("real life example 2") {
     val input = """{"Resources":{"NotificationTopic":{"Properties":{"Subsc"""
     val expectation = List(("Resources",List(("NotificationTopic",List(("Properties",List(("Subsc",UnknownExpression))))))))
-    assertInputGivesPartialFailureExpectation(input, expectation)
+    assertParse(input, expectation, 7)
   }
 
   test("garbage before key") {
     val input = """{g"person":3}"""
     val expectation = List("person" -> "3")
-    assertInputGivesPartialFailureExpectation(input, expectation)
+    assertParse(input, expectation, 1)
   }
 
   // Partially Parse tests start
   test("object with single member with string value, where the colon is missing") {
     val input = """{"person""remy"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy")))(result.resultOption.get)
+    val expectation = List(("person", "remy"))
+    assertParse(input, expectation, 1)
   }
 
   test("two members but the first misses a colon") {
     val input = """{"person""remy","friend":"jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    assertParse(input, expectation, 1)
   }
 
   test("two members but the comma is missing") {
     val input = """{"person":"remy""friend":"jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    assertParse(input, expectation, 1)
   }
 
   test("two members both missing colon") {
     val input = """{"person""remy","friend""jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    assertParse(input, expectation, 2)
   }
 
   test("two members, no first colon and comma") {
     val input = """{"person""remy""friend":"jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    assertParse(input, expectation, 2)
   }
 
   test("two members, no colons or comma") {
     val input = """{"person""remy""friend""jeroen"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person","remy"), ("friend","jeroen")))(result.resultOption.get)
+    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    assertParse(input, expectation, 3)
   }
 
   test("nested two members without colons/comma") {
     val input = """{"directory"{"person""remy""friend""jeroen"}}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List("directory" -> List("person" -> "remy", "friend" -> "jeroen")))(result.resultOption.get)
+    val expectation = List("directory" -> List("person" -> "remy", "friend" -> "jeroen"))
+    assertParse(input, expectation, 4)
   }
 
   test("starting brace insertion") {
     val input = """{"person""remy":"jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult(List(("person",List(("remy","jeroen")))))(result.resultOption.get)
+    val expectation = List(("person",List(("remy","jeroen"))))
+    assertParse(input, expectation, 3)
   }
 
   /*
@@ -166,18 +159,16 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   test("virtual left recursion through error correction") {
     val input = """doesNotMatch"""
     lazy val parser: EditorParser[Any] = "{" ~ parser | "x"
-    val result = parser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
-    assertResult("x")(result.resultOption.get)
+    assertParse(input, "1", 1)
   }
 
   // Add test for left recursion and errors
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
 
-  private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
+  private def assertParse(input: String, expectation: Any, errorCount: Int) = {
     val result = jsonParser.parseWholeInput(new StringReader(input))
-    assert(!result.successful)
+    assertResult(errorCount)(result.errors.size, result.errors)
     assert(result.resultOption.nonEmpty)
     assertResult(expectation)(result.resultOption.get)
   }

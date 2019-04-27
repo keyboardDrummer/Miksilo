@@ -2,16 +2,14 @@ package core.parsers.editorParsers
 
 import core.parsers.core.OptimizingParserWriter
 
-import scala.annotation.tailrec
-import scala.collection.mutable
-
 trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
 
   def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 
     def emptyQueue(queue: SortedParseResults[Result]): ParseWholeResult[Result] = {
       var bestResult: ReadyParseResult[Result] =
-        ReadyParseResult(None, input, List(ParseError(input, "Grammar is recursive without a base case", Int.MaxValue)))
+        ReadyParseResult(None, input, List(ParseError(input, "Grammar is always recursive", Int.MaxValue)))
+
       var queue = parser.parseRoot(input)
       while(queue.isInstanceOf[SRCons[Result]]) {
         val cons = queue.asInstanceOf[SRCons[Result]]
@@ -121,18 +119,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     lazy val tail = _tail
 
-//    // Detect incorrect ordering.
-//    def results: List[LazyParseResult[Result]] = head :: (tail match {
-//      case SREmpty => List.empty
-//      case cons: SRCons[Result] => cons.results
-//    })
-//
-//    val score = head.score
-//    for(result <- results.drop(0)) {
-//      if (result.score > score) {
-//        System.out.append("")
-//      }
-//    }
+    // Detect incorrect ordering.
+    def results: List[LazyParseResult[Result]] = head :: (tail match {
+      case SREmpty => List.empty
+      case cons: SRCons[Result] => cons.results
+    })
+
+    val score = head.score
+    for(result <- results.drop(0)) {
+      if (result.score > score) {
+        throw new Exception("sorting was incorrect")
+      }
+    }
 
 //    // Detect multiple access of tail
 //    var switch = true
@@ -151,14 +149,20 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       flatMap(r => singleResult(f(r)))
     }
 
+    var counter = 0
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
       f(head) match {
         case SREmpty => tail.flatMap(f)
         case cons: SRCons[NewResult] => // Try not to evaluate tail, but if head's score gets worse, we have to otherwise the sorting may be incorrect.
           if (cons.head.score >= head.score)
             new SRCons[NewResult](cons.head, cons.tail.merge(tail.flatMap(f)))
-          else
+          else {
+            counter += 1
+            if (counter > 100) {
+              System.out.append("")
+            }
             cons.merge(tail.flatMap(f))
+          }
       }
     }
 

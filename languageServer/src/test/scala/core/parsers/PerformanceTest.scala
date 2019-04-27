@@ -6,7 +6,7 @@ import util.SourceUtils
 
 class PerformanceTest extends FunSuite {
 
-  test("performance") {
+  test("correct JSON performance") {
     val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val json = JsonLanguage.language
     val multiplier = 1

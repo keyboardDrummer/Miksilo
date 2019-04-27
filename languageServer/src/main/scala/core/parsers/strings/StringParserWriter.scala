@@ -36,6 +36,7 @@ trait StringParserWriter extends SequenceParserWriter {
     def offset: Int
     def array: ArrayCharSequence
     def drop(amount: Int): Input
+    def remaining = array.length() - offset
 
     def move(increase: Int): Position = {
       var column = position.character
@@ -122,23 +123,25 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def getParser(recursive: GetParse): Parse[String] = {
 
-      def apply(input: Input, state: ParseState): ParseResult[String] = {
-        regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
-          case Some(matched) =>
-            newSuccess(
-              input.array.subSequence(input.offset, input.offset + matched.end).toString,
-              input.drop(matched.end))
-          case None =>
-            if (input.atEnd) {
-              return newFailure(input, s"expected '$regex' but found end of source")
-            }
+      lazy val result: Parse[String] = new Parse[String] {
+        def apply(input: Input, state: ParseState): ParseResult[String] = {
+          regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
+            case Some(matched) =>
+              newSuccess(
+                input.array.subSequence(input.offset, input.offset + matched.end).toString,
+                input.drop(matched.end))
+            case None =>
+              if (input.atEnd) {
+                return newFailure(input, s"expected '$regex' but found end of source")
+              }
 
-            val message = s"expected '$regex' but found '${input.array.charAt(input.offset)}'"
-            drop(None, input, state, message, apply)
+              val message = s"expected '$regex' but found '${input.array.charAt(input.offset)}'"
+              drop(None, input, state, message, result)
+          }
         }
       }
 
-      apply
+      result
     }
 
     override def getDefault(cache: DefaultCache): Option[String] = None
@@ -149,12 +152,22 @@ trait StringParserWriter extends SequenceParserWriter {
   def drop[Result](resultOption: Option[Result],
                    input: Input, state: ParseState,
                    errorMessage: String, parse: Parse[Result]): SortedParseResults[Result] = {
-    val errors = List(ParseError(input, errorMessage))
-    val withoutDrop = ReadyParseResult(resultOption, input, errors)
-    val dropError = List(ParseError(input, s"Dropped '${input.head}'", 4))
+    val withoutDrop = ReadyParseResult(resultOption, input, List(ParseError(input, errorMessage)))
+    new SRCons[Result](withoutDrop, drop(1, resultOption, input, state, parse))
+  }
+
+  def drop[Result](amount: Int,
+                   resultOption: Option[Result],
+                   input: Input, state: ParseState,
+                   parse: Parse[Result]): SortedParseResults[Result] = {
+
+    if (amount == input.remaining)
+      return SREmpty
+
+    val dropError = List(ParseError(input, s"Dropped '${input.head}'", Math.sqrt(amount) * 4))
     val dropped = DelayedParseResult(input, dropError, () => {
-      parse.apply(input.drop(1), state).addErrors(dropError)
+      parse.apply(input.drop(amount), state).addErrors(dropError)
     })
-    new SRCons[Result](withoutDrop, singleResult(dropped))
+    new SRCons[Result](dropped, drop(amount + 1, resultOption, input, state, parse))
   }
 }

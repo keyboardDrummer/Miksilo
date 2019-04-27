@@ -68,7 +68,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class ParseError(location: Input, message: String, edits: Int = 1)
+  case class ParseError(location: Input, message: String, edits: Double = 1)
 
   class EditorLazy[Result](_inner: => EditorParser[Result]) extends Lazy[Result](_inner) with EditorParserBase[Result] {
 
