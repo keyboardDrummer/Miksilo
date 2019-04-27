@@ -149,6 +149,19 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with Correc
     assert(!result.successful)
     assertResult(List(("person",List(("remy","jeroen")))))(result.resultOption.get)
   }
+
+  test("virtual left recursion through error correction") {
+    val input = """doesNotMatchGrammar"""
+    lazy val parser: EditorParser[Any] = "{" ~ parser | "x"
+    val result = parser.parseWholeInput(new StringReader(input))
+    assert(!result.successful)
+    assertResult("x")(result.resultOption.get)
+  }
+
+  // Add test for left recursion and errors
+  // Add test with multiple errors in one branch "b" => "a" "b" "c"
+  // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
+
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
     val result = jsonParser.parseWholeInput(new StringReader(input))
     assert(!result.successful)
