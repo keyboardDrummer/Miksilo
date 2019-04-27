@@ -44,7 +44,10 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
     override def getParser(recursive: GetParse): Parse[NewResult] = {
       val parseOriginal = recursive(original)
-      (input, state) => parseOriginal(input, state).map(f)
+
+      new Parse[NewResult] {
+        override def apply(input: Input, state: ParseState): ParseResult[NewResult] = parseOriginal(input, state).map(f)
+      }
     }
 
     override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)

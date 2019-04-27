@@ -117,33 +117,33 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
-    lazy val tail = _tail
+    //lazy val tail = _tail
 
     // Detect incorrect ordering.
-    def results: List[LazyParseResult[Result]] = head :: (tail match {
-      case SREmpty => List.empty
-      case cons: SRCons[Result] => cons.results
-    })
-
-    val score = head.score
-    for(result <- results.drop(0)) {
-      if (result.score > score) {
-        throw new Exception("sorting was incorrect")
-      }
-    }
-
-//    // Detect multiple access of tail
-//    var switch = true
-//    def tail = {
-//      if (switch) {
-//        switch = false
-//        val result = _tail
-//        result
-//      }
-//      else {
-//        ???
+//    def results: List[LazyParseResult[Result]] = head :: (tail match {
+//      case SREmpty => List.empty
+//      case cons: SRCons[Result] => cons.results
+//    })
+//
+//    val score = head.score
+//    for(result <- results.drop(0)) {
+//      if (result.score > score) {
+//        throw new Exception("sorting was incorrect")
 //      }
 //    }
+
+    // Detect multiple access of tail
+    var switch = true
+    def tail = {
+      if (switch) {
+        switch = false
+        val result = _tail
+        result
+      }
+      else {
+        ???
+      }
+    }
 
     override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]) = {
       flatMap(r => singleResult(f(r)))
@@ -183,7 +183,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   trait LazyParseResult[+Result] {
 
-    def score: Double =
+    val score: Double =
       // -errorSize // gives us the most correct result, but can be very slow
       remainder.offset - 5 * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
       // remainder.offset / (errorSize + 1) // compromise
@@ -225,25 +225,26 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       val parseLeft = recursive(left)
       lazy val parseRight = recursive(right)
 
-      def apply(input: Input, state: ParseState): ParseResult[Result] = {
-        val leftResults = parseLeft(input, state)
+      new Parse[Result] {
+        override def apply(input: Input, state: ParseState) = {
+          val leftResults = parseLeft(input, state)
 
-        leftResults.flatMapReady[Result]((leftResult: ReadyParseResult[Left]) => {
+          leftResults.flatMapReady[Result]((leftResult: ReadyParseResult[Left]) => {
 
-          def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
-            leftResult.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
-            rightResult.remainder,
-            rightResult.errors)
-          lazy val next = parseRight(leftResult.remainder, state).mapWithErrors[Result](mapRightResult, leftResult.errors)
+            def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
+              leftResult.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
+              rightResult.remainder,
+              rightResult.errors)
 
-          if (leftResult.errors.nonEmpty)
-            singleResult(DelayedParseResult(leftResult.remainder, leftResult.errors, () => next))
-          else
-            next
-        })
+            lazy val next = parseRight(leftResult.remainder, state).mapWithErrors[Result](mapRightResult, leftResult.errors)
+
+            if (leftResult.errors.nonEmpty)
+              singleResult(DelayedParseResult(leftResult.remainder, leftResult.errors, () => next))
+            else
+              next
+          })
+        }
       }
-
-      apply
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = for {
@@ -279,37 +280,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
   }
 
-
-//  class OrElse[+First <: Result, +Second <: Result, Result](val first: EditorParser[First], _second: => EditorParser[Second])
-//    extends EditorParserBase[Result] with ChoiceLike[Result] {
-//
-//    lazy val second = _second
-//
-//    override def getParser(recursive: GetParse): Parse[Result] = {
-//      val parseFirst = recursive(first)
-//      val parseSecond = recursive(second)
-//
-//      def apply(input: Input, errorAllowance: Int) = {
-//        val firstResult = parseFirst(input, errorAllowance)
-//        val result = if (firstResult.errorCount > errorAllowance || firstResult == RecursionDetected) {
-//          val secondResult = parseSecond(input, errorAllowance)
-//          secondResult
-//        } else {
-//          firstResult
-//        }
-//        default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d, force = false))
-//      }
-//
-//      apply
-//    }
-//
-//
-//    override def getDefault(cache: DefaultCache): Option[Result] = {
-//      val value: Option[First] = cache(first)
-//      value.orElse(cache(second))
-//    }
-//  }
-
   class BiggestOfTwo[+First <: Result, +Second <: Result, Result](val first: EditorParser[First], _second: => EditorParser[Second])
     extends EditorParserBase[Result] with ChoiceLike[Result] {
 
@@ -319,14 +289,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      def apply(input: Input, state: ParseState) = {
-        val firstResult = parseFirst(input, state)
-        val secondResult = parseSecond(input, state)
-        firstResult.merge(secondResult)
-        //default.fold[ParseResult[Result]](result)(d => result.addDefault[Result](d))
+      new Parse[Result] {
+        override def apply(input: Input, state: ParseState) = {
+          val firstResult = parseFirst(input, state)
+          val secondResult = parseSecond(input, state)
+          firstResult.merge(secondResult)
+        }
       }
-
-      apply
     }
 
     override def getDefault(cache: DefaultCache): Option[Result] = {
@@ -341,16 +310,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original)
 
-      (input: Input, state: ParseState) => {
-        val result = parseOriginal(input, state)
-        result.mapReady(parseResult => {
-          val newResultOption =
-            if (parseResult.remainder.offset == input.offset)
-              default.orElse(parseResult.resultOption)
-            else
-              parseResult.resultOption.orElse(default)
-          ReadyParseResult(newResultOption, parseResult.remainder, parseResult.errors)
-        })
+      new Parse[Result] {
+        override def apply(input: Input, state: ParseState) = {
+          val result = parseOriginal(input, state)
+          result.mapReady(parseResult => {
+            val newResultOption =
+              if (parseResult.remainder.offset == input.offset)
+                default.orElse(parseResult.resultOption)
+              else
+                parseResult.resultOption.orElse(default)
+            ReadyParseResult(newResultOption, parseResult.remainder, parseResult.errors)
+          })
+        }
       }
     }
 

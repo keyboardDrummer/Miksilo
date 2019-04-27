@@ -63,19 +63,21 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original)
 
-      (input: Input, state: ParseState) => {
-        val result = parseOriginal(input, state)
-        result.mapReady(parseResult => {
-          val remainder = parseResult.remainder
-          if (remainder.atEnd)
-            parseResult
-          else {
-            val missing = remainder.array.subSequence(remainder.offset, remainder.array.length())
-            val remainderLength = missing.length()
-            val error = ParseError(remainder, s"Found '$missing' instead of end of input", remainderLength)
-            ReadyParseResult(parseResult.resultOption, remainder.drop(remainderLength), List(error) ++ parseResult.errors)
-          }
-        })
+      new Parse[Result] {
+        override def apply(input: Input, state: ParseState) = {
+          val result = parseOriginal(input, state)
+          result.mapReady(parseResult => {
+            val remainder = parseResult.remainder
+            if (remainder.atEnd)
+              parseResult
+            else {
+              val missing = remainder.array.subSequence(remainder.offset, remainder.array.length())
+              val remainderLength = missing.length()
+              val error = ParseError(remainder, s"Found '$missing' instead of end of input", remainderLength)
+              ReadyParseResult(parseResult.resultOption, remainder.drop(remainderLength), List(error) ++ parseResult.errors)
+            }
+          })
+        }
       }
     }
 
@@ -164,7 +166,8 @@ trait StringParserWriter extends SequenceParserWriter {
     if (amount == input.remaining)
       return SREmpty
 
-    val dropError = List(ParseError(input, s"Dropped '${input.head}'", Math.sqrt(amount) * 4))
+    val errorMessage = s"Dropped '${input.array.subSequence(input.offset, input.offset + amount)}'"
+    val dropError = List(ParseError(input, errorMessage, Math.sqrt(amount) * 4))
     val dropped = DelayedParseResult(input, dropError, () => {
       parse.apply(input.drop(amount), state).addErrors(dropError)
     })
