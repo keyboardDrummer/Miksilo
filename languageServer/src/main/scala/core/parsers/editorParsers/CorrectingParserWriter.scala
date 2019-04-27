@@ -178,8 +178,8 @@ trait CorrectingParserWriter extends UnambiguousParserWriter with EditorParserWr
   trait LazyParseResult[+Result] {
 
     def score: Double =
-      -errorSize // gives us the most correct result, but can be very slow
-      // remainder.offset - 5 * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
+      // -errorSize // gives us the most correct result, but can be very slow
+      remainder.offset - 5 * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
       // remainder.offset / (errorSize + 1) // compromise
 
     def errorSize = errors.map(e => e.edits).sum
