@@ -154,23 +154,13 @@ trait StringParserWriter extends SequenceParserWriter {
   def drop[Result](resultOption: Option[Result],
                    input: Input, state: ParseState,
                    errorMessage: String, parse: Parse[Result]): SortedParseResults[Result] = {
-    val withoutDrop = ReadyParseResult(resultOption, input, List(ParseError(input, errorMessage)))
-    new SRCons[Result](withoutDrop, drop(1, resultOption, input, state, parse))
-  }
 
-  def drop[Result](amount: Int,
-                   resultOption: Option[Result],
-                   input: Input, state: ParseState,
-                   parse: Parse[Result]): SortedParseResults[Result] = {
-
-    if (amount == input.remaining)
-      return SREmpty
-
-    val errorMessage = s"Dropped '${input.array.subSequence(input.offset, input.offset + amount)}'"
-    val dropError = List(ParseError(input, errorMessage, Math.sqrt(amount) * 4))
+    val errors = List(ParseError(input, errorMessage))
+    val withoutDrop = ReadyParseResult(resultOption, input, errors)
+    val dropError = List(ParseError(input, s"Dropped '${input.head}'", 4))
     val dropped = DelayedParseResult(input, dropError, () => {
-      parse.apply(input.drop(amount), state).addErrors(dropError)
+      parse.apply(input.drop(1), state).addErrors(dropError)
     })
-    new SRCons[Result](dropped, drop(amount + 1, resultOption, input, state, parse))
+    new SRCons[Result](withoutDrop, singleResult(dropped))
   }
 }

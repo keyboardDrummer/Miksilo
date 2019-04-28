@@ -115,7 +115,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     //lazy val tail = _tail
 
-    // Detect incorrect ordering.
+
+//    // Detect incorrect ordering.
 //    def results: List[LazyParseResult[Result]] = head :: (tail match {
 //      case SREmpty => List.empty
 //      case cons: SRCons[Result] => cons.results
@@ -145,20 +146,14 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       flatMap(r => singleResult(f(r)))
     }
 
-    var counter = 0
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
       f(head) match {
         case SREmpty => tail.flatMap(f)
         case cons: SRCons[NewResult] => // Try not to evaluate tail, but if head's score gets worse, we have to otherwise the sorting may be incorrect.
           if (cons.head.score >= head.score)
             new SRCons[NewResult](cons.head, cons.tail.merge(tail.flatMap(f)))
-          else {
-            counter += 1
-            if (counter > 100) {
-              System.out.append("")
-            }
+          else
             cons.merge(tail.flatMap(f))
-          }
       }
     }
 
