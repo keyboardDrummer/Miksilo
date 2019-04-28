@@ -2,9 +2,7 @@ package core.parsers.strings
 
 trait CommonParserWriter extends StringParserWriter {
 
-  def identifier: EditorParser[String] =
-    elem(Character.isJavaIdentifierStart, "identifier start") ~
-      (elem(Character.isJavaIdentifierPart(_: Char), "identifier part")*) ^^ (t => (t._1 :: t._2).mkString)
+  def identifier: EditorParser[String] = RegexParser("""[_a-zA-Z][_a-zA-Z0-9]*""".r)
 
   /** An integer, without sign or with a negative sign. */
   def wholeNumber: EditorParser[String] =
