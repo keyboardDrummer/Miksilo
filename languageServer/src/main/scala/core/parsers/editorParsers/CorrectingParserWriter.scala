@@ -52,7 +52,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
 
-  trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
+  sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
     def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults[Other]
 
     def addErrors(errors: List[ParseError]): SortedParseResults[Result] = {
@@ -111,7 +111,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     override def map[NewResult](f: Nothing => NewResult) = this
   }
 
-  class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
+  final class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
     //lazy val tail = _tail
 
