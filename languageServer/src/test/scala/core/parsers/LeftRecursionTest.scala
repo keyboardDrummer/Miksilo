@@ -71,7 +71,6 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
     assert(result.successful, result.toString)
   }
 
-
   test("Recursive defaults") {
     lazy val recursive: EditorParser[Any] = new EditorLazy(recursive) ~ "b" | "b"
     lazy val parser = "a" ~ recursive

@@ -20,8 +20,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
             SREmpty
           else
             cons.tail
-        case delayedResult: DelayedParseResult[Any] =>
-          cons.tail.merge(delayedResult.continuation())
+        case delayedResult: DelayedParseResult[Result] =>
+          val results = delayedResult.results
+          cons.tail.merge(results)
       }
     }
     ParseWholeResult(bestResult.resultOption, bestResult.errors)
@@ -62,8 +63,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def mapWithErrors[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
                                  oldErrors: List[ParseError]): SortedParseResults[NewResult] = {
       mapResult({
-        case delayed: DelayedParseResult[Result] => DelayedParseResult(delayed.remainder, delayed.errors ++ oldErrors, () => {
-          val intermediate = delayed.continuation()
+        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.errors ++ oldErrors, () => {
+          val intermediate = delayed.results
           intermediate.mapWithErrors(f, oldErrors)
         })
         case ready: ReadyParseResult[Result] =>
@@ -74,8 +75,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): SortedParseResults[NewResult] = {
       mapResult({
-        case delayed: DelayedParseResult[Result] => DelayedParseResult(delayed.remainder, delayed.errors, () => {
-            val intermediate = delayed.continuation()
+        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.errors, () => {
+            val intermediate = delayed.results
             intermediate.mapReady(f)
           })
         case ready: ReadyParseResult[Result] => f(ready)
@@ -86,8 +87,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
       flatMap[NewResult] {
-        case delayed: DelayedParseResult[Result] => singleResult(DelayedParseResult(delayed.remainder, delayed.errors, () => {
-          val intermediate = delayed.continuation()
+        case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.remainder, delayed.errors, () => {
+          val intermediate = delayed.results
           intermediate.flatMapReady(f)
         }))
         case ready: ReadyParseResult[Result] => f(ready)
@@ -113,7 +114,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   final class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
-    //lazy val tail = _tail
+    def getTail = tail
+    lazy val tail = _tail
 
 
 //    // Detect incorrect ordering.
@@ -130,17 +132,17 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 //    }
 
     // Detect multiple access of tail
-    var switch = true
-    def tail = {
-      if (switch) {
-        switch = false
-        val result = _tail
-        result
-      }
-      else {
-        ???
-      }
-    }
+//    var switch = true
+//    def tail = {
+//      if (switch) {
+//        switch = false
+//        val result = _tail
+//        result
+//      }
+//      else {
+//        ???
+//      }
+//    }
 
     override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]) = {
       flatMap(r => singleResult(f(r)))
@@ -185,7 +187,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
   }
 
-  case class DelayedParseResult[+Result](remainder: Input, errors: List[ParseError], continuation: () => SortedParseResults[Result])
+  class DelayedParseResult[Result](val remainder: Input, val errors: List[ParseError], _getResults: () => SortedParseResults[Result])
     extends LazyParseResult[Result] {
 
     if (errors.isEmpty) {
@@ -193,8 +195,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def map[NewResult](f: Result => NewResult): DelayedParseResult[NewResult] = {
-      DelayedParseResult(remainder, errors, () => continuation().map(f))
+      new DelayedParseResult(remainder, errors, () => _getResults().map(f))
     }
+
+    lazy val results: SortedParseResults[Result] = _getResults()
   }
 
   case class ReadyParseResult[+Result](resultOption: Option[Result], remainder: Input, errors: List[ParseError])
@@ -230,7 +234,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
             lazy val next = parseRight(leftResult.remainder, state).mapWithErrors[Result](mapRightResult, leftResult.errors)
 
             if (leftResult.errors.nonEmpty)
-              singleResult(DelayedParseResult(leftResult.remainder, leftResult.errors, () => next))
+              singleResult(new DelayedParseResult(leftResult.remainder, leftResult.errors, () => next))
             else
               next
           })

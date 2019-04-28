@@ -158,7 +158,7 @@ trait StringParserWriter extends SequenceParserWriter {
     val errors = List(ParseError(input, errorMessage))
     val withoutDrop = ReadyParseResult(resultOption, input, errors)
     val dropError = List(ParseError(input, s"Dropped '${input.head}'", 4))
-    val dropped = DelayedParseResult(input, dropError, () => {
+    val dropped = new DelayedParseResult(input, dropError, () => {
       parse.apply(input.drop(1), state).addErrors(dropError)
     })
     new SRCons[Result](withoutDrop, singleResult(dropped))
