@@ -10,10 +10,10 @@ trait ParserWriter {
   type ParseState
 
   def succeed[Result](result: Result): Self[Result]
-  protected def newSuccess[Result](result: Result, remainder: Input): ParseResult[Result]
+  def newSuccess[Result](result: Result, remainder: Input): ParseResult[Result]
   def fail[Result](message: String): Self[Result]
 
-  protected def newFailure[Result](input: Input, message: String): ParseResult[Result]
+  def newFailure[Result](input: Input, message: String): ParseResult[Result]
 
   def choice[Result](first: Self[Result], other: => Self[Result], leftIsAlwaysBigger: Boolean = false): Self[Result]
 

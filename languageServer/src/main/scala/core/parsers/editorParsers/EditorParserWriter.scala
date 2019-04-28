@@ -55,10 +55,10 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  final protected def newFailure[Result](partial: Option[Result], input: Input, message: String): ParseResult[Result] =
+  final def newFailure[Result](partial: Option[Result], input: Input, message: String): ParseResult[Result] =
     newFailure(partial, input, List(ParseError(input, message)))
 
-  protected def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]): ParseResult[Result]
+  def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]): ParseResult[Result]
 
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
