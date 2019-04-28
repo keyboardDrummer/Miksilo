@@ -5,11 +5,11 @@ import langserver.types.Position
 trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter {
   type Input = IndentationReader
 
-  class IndentationReader(array: ArrayCharSequence, offset: Int, position: Position, val indentation: Int)
-    extends StringReaderBase(array, offset, position) with IndentationReaderLike {
+  class IndentationReader(array: ArrayCharSequence, offset: Int, scoredPosition: ScoredPosition, val indentation: Int)
+    extends StringReaderBase(array, offset, scoredPosition) with IndentationReaderLike {
 
     def this(value: String) {
-      this(value.toCharArray, 0, Position(0, 0), 0)
+      this(value.toCharArray, 0, ScoredPosition(0, Position(0, 0)), 0)
     }
 
     def drop(amount: Int): IndentationReader = new IndentationReader(array, offset + amount, move(amount), indentation)
@@ -21,6 +21,6 @@ trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter
       case _ => false
     }
 
-    override def withIndentation(value: Int) = new IndentationReader(array, offset, position, value)
+    override def withIndentation(value: Int) = new IndentationReader(array, offset, scoredPosition, value)
   }
 }

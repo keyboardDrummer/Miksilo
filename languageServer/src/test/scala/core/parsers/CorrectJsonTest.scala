@@ -1,5 +1,6 @@
 package core.parsers
 
+import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
 import editorParsers.LeftRecursiveCorrectingParserWriter
 
@@ -11,18 +12,24 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   }
   protected lazy val jsonParser: EditorParser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression)
 
+  test("test whether correct inputs always return a ready in one go") {
+    val input = """{ "VpcId" : {
+                  |  "ConstraintDescription" : "must be the VPC Id of an existing Virtual Private Cloud."
+                  |}}""".stripMargin
+    val result = JsonLanguage.language.compileString(input)
+    //parseJson(input, 3, 0)
+  }
+
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getSuccessValue(result)
-    assertResult(List(("person","3")))(value)
+    parseJson(input, List(("person","3")), 0)
   }
 
   test("object with single member with string value") {
     val input = """{"person":"remy"}"""
     val result = jsonParser.parseWholeInput(new StringReader(input))
     val value = getSuccessValue(result)
-    assertResult(List(("person","remy")))(value)
+    parseJson(input, List(("person","remy")), 0)
   }
 
   test("garbage after number") {
@@ -88,9 +95,15 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   }
 
   test("garbage before key") {
-    val input = """{g"person":3}"""
-    val expectation = List("person" -> "3")
+    val input = """{g"person":"remy"}"""
+    val expectation = List("person" -> "remy")
     parseJson(input, expectation, 1)
+  }
+
+  test("garbage before key 2") {
+    val input = """{g"person"hj:nh"remy"}"""
+    val expectation = List("person" -> "remy")
+    parseJson(input, expectation, 5)
   }
 
   // Partially Parse tests start

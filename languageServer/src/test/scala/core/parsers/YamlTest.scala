@@ -2,10 +2,9 @@
 package core2.parsers
 
 import core.document.Empty
-import core.parsers.editorParsers.{CorrectingParserWriter, DefaultCache, LeftRecursiveCorrectingParserWriter}
-import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
+import core.parsers.editorParsers.{DefaultCache, LeftRecursiveCorrectingParserWriter}
+import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, ScoredPosition}
 import core.responsiveDocument.ResponsiveDocument
-import langserver.types.Position
 import org.scalatest.FunSuite
 import util.SourceUtils
 
@@ -55,7 +54,7 @@ class YamlTest extends FunSuite
 
   type Input = IndentationReader
 
-  class IndentationReader(array: ArrayCharSequence, offset: Int, position: Position, val context: YamlContext, val indentation: Int)
+  class IndentationReader(array: ArrayCharSequence, offset: Int, position: ScoredPosition, val context: YamlContext, val indentation: Int)
     extends StringReaderBase(array, offset, position) with IndentationReaderLike {
 
     override def withIndentation(value: Int) = new IndentationReader(array, offset, position, context, value)
@@ -63,7 +62,7 @@ class YamlTest extends FunSuite
     def withContext(newState: YamlContext): IndentationReader = new IndentationReader(array, offset, position, newState, indentation)
 
     def this(text: String) {
-      this(text.toCharArray, 0, Position(0, 0), BlockOut, 0)
+      this(text.toCharArray, 0, ScoredPosition.zero, BlockOut, 0)
     }
 
     override def drop(amount: Int) = new IndentationReader(array, offset + amount, move(amount), context, indentation)

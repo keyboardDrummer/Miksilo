@@ -1,11 +1,10 @@
 package core.parsers.sequences
 
-import core.parsers.editorParsers.{DefaultCache, EditorParserWriter, CorrectingParserWriter}
+import core.parsers.editorParsers.{CorrectingParserWriter, DefaultCache}
 
 trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem
   type Input <: SequenceInput[Input, Elem]
-
 
   def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
   case class ElemPredicate(predicate: Elem => Boolean, kind: String)

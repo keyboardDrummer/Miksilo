@@ -1,8 +1,14 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.OptimizingParserWriter
+import core.parsers.core.{OptimizingParserWriter, ParseInput}
+
+trait CorrectingInput extends ParseInput {
+  def offsetScore: Int
+}
 
 trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
+
+  type Input <: CorrectingInput
 
   def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 
@@ -176,10 +182,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   trait LazyParseResult[+Result] {
 
-    val score: Double =
-      // -errorSize // gives us the most correct result, but can be very slow
-      remainder.offset - 5 * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
-      // remainder.offset / (errorSize + 1) // compromise
+    val score: Double =  {
+      val result =
+        // -errorSize // gives us the most correct result, but can be very slow
+        remainder.offsetScore - 5 * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
+        // remainder.offset / (errorSize + 1) // compromise
+      result // result + (if (errorSize == 0) 100 else 0) // This is so that for correct inputs, we only need a single iteration.
+    }
 
     def errorSize = errors.map(e => e.edits).sum
     def errors: List[ParseError]

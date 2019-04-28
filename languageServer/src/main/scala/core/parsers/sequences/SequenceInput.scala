@@ -1,8 +1,8 @@
 package core.parsers.sequences
 
-import core.parsers.core.ParseInput
+import core.parsers.editorParsers.CorrectingInput
 
-trait SequenceInput[Input, Elem] extends ParseInput {
+trait SequenceInput[Input, Elem] extends CorrectingInput {
   def head: Elem
   def tail: Input
 }
