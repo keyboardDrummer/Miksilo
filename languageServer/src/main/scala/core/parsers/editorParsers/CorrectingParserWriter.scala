@@ -2,22 +2,90 @@ package core.parsers.editorParsers
 
 import core.parsers.core.OptimizingParserWriter
 
+class OuterParent {
+  type Input
+}
+
+trait Outer {
+
+  type Input = Int
+
+  final class Inner {
+    val y = 4
+  }
+  def inner = new Inner()
+  def traitImpl = new TraitImpl[Int](new NotFinal)
+  def traitImpl2 = new TraitImpl2[Int]()
+
+  trait InnerTrait[T]
+  final class TraitImpl[T](notFinal: NotFinal) extends InnerTrait[T] {
+    val y = 4
+  }
+
+  class NotFinal {
+    val x = 3
+  }
+
+  class TraitImpl2[T] extends InnerTrait[T] {
+    val y = 4
+  }
+}
+
+class OuterClass extends Outer {
+
+}
+
 trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
 
+  sealed trait SortedParseResults2[+Result] extends ParseResultLike[Result] {
+    def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults2[Other]
+
+    def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults2[NewResult]
+
+    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults2[NewResult]
+
+  }
+
+  object SREmpty2 extends SortedParseResults2[Nothing] {
+    override def merge[Other >: Nothing](other: SortedParseResults[Other]) = ???
+
+    override def mapResult[NewResult](f: LazyParseResult[Nothing] => LazyParseResult[NewResult]) = ???
+
+    override def flatMap[NewResult](f: LazyParseResult[Nothing] => SortedParseResults[NewResult]) = ???
+
+    override def map[NewResult](f: Nothing => NewResult) = ???
+  }
+
+  final protected class SRCons2[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults2[Result]) extends SortedParseResults2[Result] {
+    lazy val tail = _tail
+    override def map[NewResult](f: Result => NewResult) = ???
+
+    override def merge[Other >: Nothing](other: SortedParseResults[Other]) = ???
+
+    override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]) = ???
+
+    override def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]) = ???
+  }
+
   def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
+    val inner = new OuterClass().inner
+    val traitImpl = new OuterClass().traitImpl
+    val traitImpl2 = new OuterClass().traitImpl2
+    val e = SREmpty2
+    val c = new SRCons2(null, e)
 
     var bestResult: ReadyParseResult[Result] =
       ReadyParseResult(None, input, List(ParseError(input, "Grammar is always recursive", Int.MaxValue)))
 
     var queue = parser.parseRoot(input)
-    while(queue.isInstanceOf[SRCons[Result]]) {
-      val cons = queue.asInstanceOf[SRCons[Result]]
+    while(queue.isInstanceOf[SRCons2[Result]]) {
+      val cons = queue.asInstanceOf[SRCons2[Result]]
       val parseResult = cons.head
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
           bestResult = if (bestResult != null && bestResult.score >= parseResult.score) bestResult else parseResult
           if (bestResult.remainder.atEnd)
-            SREmpty
+            SREmpty2
           else
             cons.tail
         case delayedResult: DelayedParseResult[Result] =>
@@ -28,16 +96,16 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     ParseWholeResult(bestResult.resultOption, bestResult.errors)
   }
 
-  def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons(parseResult, SREmpty)
+  protected def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons2(parseResult, SREmpty2)
 
-  type ParseResult[+Result] = SortedParseResults[Result]
+  type ParseResult[+Result] = SortedParseResults2[Result]
 
-  override def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]) =
+  override protected def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]) =
     singleResult(ReadyParseResult(partial, input, errors))
 
-  override def newSuccess[Result](result: Result, remainder: Input) = singleResult(ReadyParseResult(Some(result), remainder, List.empty))
+  override protected def newSuccess[Result](result: Result, remainder: Input) = singleResult(ReadyParseResult(Some(result), remainder, List.empty))
 
-  override def newFailure[Result](input: Input, message: String) = singleResult(ReadyParseResult(None, input, List(ParseError(input, message))))
+  override protected def newFailure[Result](input: Input, message: String) = singleResult(ReadyParseResult(None, input, List(ParseError(input, message))))
 
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
@@ -53,126 +121,126 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
 
-  sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
-    def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults[Other]
-
-    def addErrors(errors: List[ParseError]): SortedParseResults[Result] = {
-      mapWithErrors(x => x, errors)
-    }
-
-    def mapWithErrors[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
-                                 oldErrors: List[ParseError]): SortedParseResults[NewResult] = {
-      mapResult({
-        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.errors ++ oldErrors, () => {
-          val intermediate = delayed.results
-          intermediate.mapWithErrors(f, oldErrors)
-        })
-        case ready: ReadyParseResult[Result] =>
-          val newReady = f(ready)
-          ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.errors ++ oldErrors)
-      })
-    }
-
-    def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): SortedParseResults[NewResult] = {
-      mapResult({
-        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.errors, () => {
-            val intermediate = delayed.results
-            intermediate.mapReady(f)
-          })
-        case ready: ReadyParseResult[Result] => f(ready)
-      })
-    }
-
-    def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults[NewResult]
-
-    def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
-      flatMap[NewResult] {
-        case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.remainder, delayed.errors, () => {
-          val intermediate = delayed.results
-          intermediate.flatMapReady(f)
-        }))
-        case ready: ReadyParseResult[Result] => f(ready)
-      }
-    }
-
-    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
-
-    def updateRemainder(f: Input => Input) = {
-      mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.errors))
-    }
-  }
-
-  object SREmpty extends SortedParseResults[Nothing] {
-    override def merge[Other >: Nothing](other: SortedParseResults[Other]) = other
-
-    override def mapResult[NewResult](f: LazyParseResult[Nothing] => LazyParseResult[NewResult]): SREmpty.type = this
-
-    override def flatMap[NewResult](f: LazyParseResult[Nothing] => SortedParseResults[NewResult]) = this
-
-    override def map[NewResult](f: Nothing => NewResult) = this
-  }
-
-  final class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
-
-    def getTail = tail
-    lazy val tail = _tail
-
-
-//    // Detect incorrect ordering.
-//    def results: List[LazyParseResult[Result]] = head :: (tail match {
-//      case SREmpty => List.empty
-//      case cons: SRCons[Result] => cons.results
-//    })
+//  sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
+//    def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults[Other]
 //
-//    val score = head.score
-//    for(result <- results.drop(0)) {
-//      if (result.score > score) {
-//        throw new Exception("sorting was incorrect")
+//    def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults[NewResult]
+//
+//    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
+//
+//    def addErrors(errors: List[ParseError]): SortedParseResults[Result] = {
+//      mapWithErrors(x => x, errors)
+//    }
+//
+//    def mapWithErrors[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
+//                                 oldErrors: List[ParseError]): SortedParseResults[NewResult] = {
+//      mapResult({
+//        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.errors ++ oldErrors, () => {
+//          val intermediate = delayed.results
+//          intermediate.mapWithErrors(f, oldErrors)
+//        })
+//        case ready: ReadyParseResult[Result] =>
+//          val newReady = f(ready)
+//          ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.errors ++ oldErrors)
+//      })
+//    }
+//
+//    def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): SortedParseResults[NewResult] = {
+//      mapResult({
+//        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.errors, () => {
+//            val intermediate = delayed.results
+//            intermediate.mapReady(f)
+//          })
+//        case ready: ReadyParseResult[Result] => f(ready)
+//      })
+//    }
+//
+//    def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
+//      flatMap[NewResult] {
+//        case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.remainder, delayed.errors, () => {
+//          val intermediate = delayed.results
+//          intermediate.flatMapReady(f)
+//        }))
+//        case ready: ReadyParseResult[Result] => f(ready)
 //      }
 //    }
-
-    // Detect multiple access of tail
-//    var switch = true
-//    def tail = {
-//      if (switch) {
-//        switch = false
-//        val result = _tail
-//        result
-//      }
-//      else {
-//        ???
+//
+//    def updateRemainder(f: Input => Input) = {
+//      mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.errors))
+//    }
+//  }
+//
+//  object SREmpty extends SortedParseResults[Nothing] {
+//    override def merge[Other >: Nothing](other: SortedParseResults[Other]) = other
+//
+//    override def mapResult[NewResult](f: LazyParseResult[Nothing] => LazyParseResult[NewResult]): SREmpty.type = this
+//
+//    override def flatMap[NewResult](f: LazyParseResult[Nothing] => SortedParseResults[NewResult]) = this
+//
+//    override def map[NewResult](f: Nothing => NewResult) = this
+//  }
+//
+//  final protected class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
+//
+//    def getTail = tail
+//    lazy val tail = _tail
+//
+//
+////    // Detect incorrect ordering.
+////    def results: List[LazyParseResult[Result]] = head :: (tail match {
+////      case SREmpty => List.empty
+////      case cons: SRCons[Result] => cons.results
+////    })
+////
+////    val score = head.score
+////    for(result <- results.drop(0)) {
+////      if (result.score > score) {
+////        throw new Exception("sorting was incorrect")
+////      }
+////    }
+//
+//    // Detect multiple access of tail
+////    var switch = true
+////    def tail = {
+////      if (switch) {
+////        switch = false
+////        val result = _tail
+////        result
+////      }
+////      else {
+////        ???
+////      }
+////    }
+//
+//    override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]) = {
+//      flatMap(r => singleResult(f(r)))
+//    }
+//
+//    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
+//      f(head) match {
+//        case SREmpty => tail.flatMap(f)
+//        case cons: SRCons[NewResult] => // Try not to evaluate tail, but if head's score gets worse, we have to otherwise the sorting may be incorrect.
+//          if (cons.head.score >= head.score)
+//            new SRCons[NewResult](cons.head, cons.tail.merge(tail.flatMap(f)))
+//          else
+//            cons.merge(tail.flatMap(f))
 //      }
 //    }
-
-    override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]) = {
-      flatMap(r => singleResult(f(r)))
-    }
-
-    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
-      f(head) match {
-        case SREmpty => tail.flatMap(f)
-        case cons: SRCons[NewResult] => // Try not to evaluate tail, but if head's score gets worse, we have to otherwise the sorting may be incorrect.
-          if (cons.head.score >= head.score)
-            new SRCons[NewResult](cons.head, cons.tail.merge(tail.flatMap(f)))
-          else
-            cons.merge(tail.flatMap(f))
-      }
-    }
-
-    override def map[NewResult](f: Result => NewResult): SRCons[NewResult] = {
-      new SRCons(head.map(f), tail.map(f))
-    }
-
-    override def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults[Other] = {
-      other match {
-        case SREmpty => this
-        case other: SRCons[Other] => if (head.score >= other.head.score) {
-          new SRCons(head, tail.merge(other))
-        } else
-          new SRCons(other.head, this.merge(other.tail))
-      }
-    }
-  }
+//
+//    override def map[NewResult](f: Result => NewResult): SRCons[NewResult] = {
+//      new SRCons(head.map(f), tail.map(f))
+//    }
+//
+//    override def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults[Other] = {
+//      other match {
+//        case SREmpty => this
+//        case other: SRCons[Other] => if (head.score >= other.head.score) {
+//          new SRCons(head, tail.merge(other))
+//        } else
+//          new SRCons(other.head, this.merge(other.tail))
+//      }
+//    }
+//  }
 
   trait LazyParseResult[+Result] {
 
@@ -187,7 +255,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
   }
 
-  class DelayedParseResult[Result](val remainder: Input, val errors: List[ParseError], _getResults: () => SortedParseResults[Result])
+  class DelayedParseResult[Result](val remainder: Input, val errors: List[ParseError], _getResults: () => SortedParseResults2[Result])
     extends LazyParseResult[Result] {
 
     if (errors.isEmpty) {
@@ -198,7 +266,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       new DelayedParseResult(remainder, errors, () => _getResults().map(f))
     }
 
-    lazy val results: SortedParseResults[Result] = _getResults()
+    lazy val results: SortedParseResults2[Result] = _getResults()
   }
 
   case class ReadyParseResult[+Result](resultOption: Option[Result], remainder: Input, errors: List[ParseError])
