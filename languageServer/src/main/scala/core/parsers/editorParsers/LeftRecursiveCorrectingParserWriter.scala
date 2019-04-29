@@ -96,7 +96,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               singleResult(ready)
           })
 
-        case Some(result) => result
+        case Some(result) =>
+          result
       }
     }
   }
@@ -106,16 +107,16 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def apply(input: Input, state: ParseState): ParseResult[Result] = {
 
-      cache.get(input) match {
-        case Some(value) =>
-          value
-        case _ =>
+      getPreviousResult(input, state) match {
+        case Some(intermediate) =>
+          intermediate
 
-          getPreviousResult(input, state) match {
-            case Some(intermediate) =>
-              intermediate
+        case None =>
 
-            case None =>
+          cache.get(input) match {
+            case Some(value) =>
+              value
+            case _ =>
 
               val detector = new FindFixPoint()
               val newState = if (state.input == input) {
@@ -126,14 +127,16 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                 FixPointState(input, List(parser), Map(parser -> detector))
               }
               val result = parser(input, newState)
-              result.flatMapReady(ready => {
-                val fullyGrown = if (detector.foundRecursion)
+              val grownResult = result.flatMapReady(ready => {
+                if (detector.foundRecursion)
                   growResult(input, newState, ready)
                 else
                   singleResult(ready)
+              })
+              grownResult.mapReady(ready => {
                 if (!detector.partOfCycle)
-                  cache.put(input, result)
-                fullyGrown
+                  cache.put(input, grownResult)
+                ready
               })
           }
       }
