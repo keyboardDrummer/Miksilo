@@ -204,7 +204,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def map[NewResult](f: Result => NewResult): DelayedParseResult[NewResult] = {
-      new DelayedParseResult(remainder, errors, () => _getResults().map(f))
+      new DelayedParseResult(remainder, errors, () => results.map(f))
     }
 
     lazy val results: SortedParseResults[Result] = _getResults()
