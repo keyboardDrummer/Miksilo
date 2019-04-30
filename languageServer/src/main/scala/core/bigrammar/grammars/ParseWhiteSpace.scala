@@ -13,7 +13,7 @@ object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithou
   val regex: Regex = """\s+""".r
 
   override def getParser(keywords: scala.collection.Set[String]): EditorParser[Any] =
-    RegexGrammar(regex).getParser(keywords)
+    RegexGrammar(regex, "whitespace").getParser(keywords)
 
   override def write(from: WithMap[Any]): TryState[ResponsiveDocument] =
     if (regex.replaceSomeIn(from.value.asInstanceOf[String], _ => Some("")).isEmpty) TryState.value(Empty)

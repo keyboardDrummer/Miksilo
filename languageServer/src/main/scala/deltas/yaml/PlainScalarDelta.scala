@@ -18,8 +18,8 @@ object PlainScalarDelta extends DeltaWithGrammar {
     val nonBreakChars = """\n"""
     val plainSafeOutChars = s"""$nonBreakChars#'"""
     val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
-    val doubleColonPlainSafeIn =  RegexGrammar(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r)
-    val doubleColonPlainSafeOut =  RegexGrammar(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r)
+    val doubleColonPlainSafeIn =  RegexGrammar(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r, "plain scalar")
+    val doubleColonPlainSafeOut =  RegexGrammar(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r, "plain scalar")
 
     val nsPlainSafe: BiGrammar = new IfContext(Map(
       FlowIn -> doubleColonPlainSafeIn,

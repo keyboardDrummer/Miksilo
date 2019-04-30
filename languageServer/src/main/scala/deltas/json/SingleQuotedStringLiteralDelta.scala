@@ -16,7 +16,7 @@ object SingleQuotedStringLiteralDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
 
-    val grammar = StringLiteralDelta.dropPrefix(RegexGrammar("""'[^']*""".r), Value, "'") ~< keyword("'")
+    val grammar = StringLiteralDelta.dropPrefix(RegexGrammar("""'[^']*""".r, "single quote string literal"), Value, "'") ~< keyword("'")
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar.asNode(StringLiteralDelta.Shape))
   }
 }

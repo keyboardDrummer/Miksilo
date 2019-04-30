@@ -43,7 +43,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   override def newSuccess[Result](result: Result, remainder: Input) = singleResult(ReadyParseResult(Some(result), remainder, List.empty))
 
-  override def newFailure[Result](input: Input, message: String) = singleResult(ReadyParseResult(None, input, List(ParseError(input, message))))
+  def newFailure[Result](input: Input, message: String) = singleResult(ReadyParseResult(None, input, List(ParseError(input, message))))
 
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
@@ -263,7 +263,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
 
     def withDefault[Other >: Result](_default: Other): EditorParser[Other] =
-      WithDefault[Other](parser, cache => Some(_default))
+      this | Fail(Some(_default), "a default")
 
     def parseWholeInput(input: Input): ParseWholeResult[Result] = {
       CorrectingParserWriter.this.parseWholeInput(parser, input)
@@ -280,7 +280,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         PositionParser,
         WithRemainderParser(parser),
         (left: Input, resultRight: Success[Result]) => addRange(left, resultRight.remainder, resultRight.result))
-      WithDefault(withPosition, cache => parser.getDefault(cache))
+      withPosition // WithDefault(withPosition, cache => parser.getDefault(cache))
     }
   }
 

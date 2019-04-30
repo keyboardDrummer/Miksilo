@@ -10,8 +10,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   override def succeed[Result](result: Result): EditorParser[Result] = Succeed(result)
 
-  override def fail[Result](message: String) = Fail(message)
-
   case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[ParseError]) {
     def successful = errors.isEmpty
     def get: Result = resultOption.get
@@ -55,9 +53,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  final def newFailure[Result](partial: Option[Result], input: Input, message: String): ParseResult[Result] =
-    newFailure(partial, input, List(ParseError(input, message)))
-
   def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]): ParseResult[Result]
 
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
@@ -81,12 +76,11 @@ trait EditorParserWriter extends OptimizingParserWriter {
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
 
 
-  case class Fail(message: String) extends EditorParserBase[Nothing] with LeafParser[Nothing] {
+  case class Fail[Result](value: Option[Result], message: String) extends EditorParserBase[Result] with LeafParser[Result] {
     override def getDefault(cache: DefaultCache) = None
 
-
-    override def getParser(recursive: GetParse): Parse[Nothing] = {
-      (input, state) => newFailure(None, input, message)
+    override def getParser(recursive: GetParse): Parse[Result] = {
+      (input, _) => newFailure(value, input, List(ParseError(input, message, 0.1)))
     }
 
     override def getMustConsume(cache: ConsumeCache) = false

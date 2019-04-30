@@ -25,7 +25,7 @@ object InlineAssemblyStatementDelta extends DeltaWithGrammar with HasConstraints
     val assemblyCall: BiGrammar = (identifier | "return" | Keyword("address", reserved = false) | "byte") ~
       assemblyExpression.toParameterList.option
     assemblyExpression.addAlternative(assemblyCall)
-    val hexCharacter = RegexGrammar("""[0-9A-Fa-f]""".r)
+    val hexCharacter = RegexGrammar("""[0-9A-Fa-f]""".r, "hex character")
     val hexPair = hexCharacter ~ hexCharacter
     val hexLiteral: BiGrammar = "hex" ~~ ("\"" ~~ hexPair.many ~~ "\"" | "'" ~~ hexPair.many ~~ "'")
 

@@ -26,7 +26,7 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val innerGrammar = dropPrefix(RegexGrammar(stringInnerRegex), Value, "\"") ~< "\""
+    val innerGrammar = dropPrefix(RegexGrammar(stringInnerRegex, "string literal"), Value, "\"") ~< "\""
     val grammar = innerGrammar.asLabelledNode(Shape)
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar)
   }

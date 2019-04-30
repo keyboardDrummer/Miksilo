@@ -109,7 +109,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
         val innerParser = recursive(mapGrammar.inner)
         innerParser.map(result => result.map(mapGrammar.construct))
 
-      case BiFailure(message) => fail(message)
+      case BiFailure(message) => Fail(None, message)
       case Print(_) => succeed(Unit).map(valueToResult)
       case ValueGrammar(value) => succeed(value).map(valueToResult)
 

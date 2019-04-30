@@ -24,9 +24,7 @@ trait MachineParserWriter extends ParserWriter {
 
   override def newSuccess[Result](result: Result, remainder: Input) = SimpleParseResult(Some(Success(result, remainder)))
 
-  override def newFailure[R](input: Input, message: String) = SimpleParseResult(None)
-
-  override def fail[Result](message: String) = FailureParser
+  def fail[Result](message: String) = FailureParser
 
   override def leftRight[Left, Right, NewResult](left: Parser[Left], right: => Parser[Right], combine: (Left, Right) => NewResult) =
     Sequence(left, right, combine)

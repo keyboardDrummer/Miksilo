@@ -29,10 +29,10 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
         BiGrammarToParser.toParser(inner, keywords) ^^ (s => MyToken(_type, s.asInstanceOf[String]))
     })
 
-    val whiteSpaceToken = regex(new Regex("\\s+")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s))
+    val whiteSpaceToken = regex(new Regex("\\s+"), "whitespace") ^^ (s => MyToken(TokenTypes.WHITESPACE, s))
     val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken)
 
-    val errorToken = regex(new Regex(".")) ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
+    val errorToken = regex(new Regex("."), "anything") ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
     (allTokenParsers.reduce((a, b) => a | b) | errorToken).*
   }
 

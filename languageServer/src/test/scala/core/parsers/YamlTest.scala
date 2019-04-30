@@ -75,7 +75,7 @@ class YamlTest extends FunSuite
     }
   }
 
-  val whiteSpace = RegexParser("""\s*""".r)
+  val whiteSpace = RegexParser("""\s*""".r, "whitespace")
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
                                                  combine: (Left, Right) => NewResult): EditorParser[NewResult] = {
@@ -117,7 +117,7 @@ class YamlTest extends FunSuite
     override def getDefault(cache: DefaultCache) = original.getDefault(cache)
   }
 
-  val tag: EditorParser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator
+  val tag: EditorParser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
   case class TaggedNode(tag: String, node: YamlExpression) extends YamlExpression {
     override def toDocument: ResponsiveDocument = ResponsiveDocument.text("!") ~ tag ~~ node.toDocument
   }
@@ -151,7 +151,7 @@ class YamlTest extends FunSuite
   lazy val parseStringLiteral: EditorParser[YamlExpression] =
     parseStringLiteralInner.map(s => StringLiteral(s))
   lazy val parseStringLiteralInner: EditorParser[String] =
-    regex("""'[^']*'""".r).map(n => n.drop(1).dropRight(1)) | plainScalar
+    regex("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
 
 
   lazy val plainScalar = new WithContext({
@@ -167,8 +167,8 @@ class YamlTest extends FunSuite
 
   val plainSafeOutChars = s"""$nbChars#'"""
   val plainSafeInChars = s"""$plainSafeOutChars${flowIndicatorChars}"""
-  val doubleColonPlainSafeIn =  RegexParser(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r)
-  val doubleColonPlainSafeOut =  RegexParser(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r)
+  val doubleColonPlainSafeIn =  RegexParser(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r, "plain scalar")
+  val doubleColonPlainSafeOut =  RegexParser(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r, "plain scalar")
 
   val nsPlainSafe = new IfContext(Map(
     FlowIn -> doubleColonPlainSafeIn,

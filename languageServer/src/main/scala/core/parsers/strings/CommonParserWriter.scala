@@ -2,11 +2,11 @@ package core.parsers.strings
 
 trait CommonParserWriter extends StringParserWriter {
 
-  def identifier: EditorParser[String] = RegexParser("""[_a-zA-Z][_a-zA-Z0-9]*""".r)
+  def identifier: EditorParser[String] = RegexParser("""[_a-zA-Z][_a-zA-Z0-9]*""".r, "identifier")
 
   /** An integer, without sign or with a negative sign. */
   def wholeNumber: EditorParser[String] =
-    """-?\d+""".r
+    RegexParser("""-?\d+""".r, "whole number")
   /** Number following one of these rules:
     *
     *  - An integer. For example: `13`
@@ -15,7 +15,7 @@ trait CommonParserWriter extends StringParserWriter {
     *  - A decimal point followed by a fractional part. For example: `.1`
     */
   def decimalNumber: EditorParser[String] =
-    """(\d+(\.\d*)?|\d*\.\d+)""".r
+    RegexParser("""(\d+(\.\d*)?|\d*\.\d+)""".r, "decimal number")
   /** Double quotes (`"`) enclosing a sequence of:
     *
     *  - Any character except double quotes, control characters or backslash (`\`)
@@ -24,7 +24,7 @@ trait CommonParserWriter extends StringParserWriter {
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
   def stringLiteral: EditorParser[String] =
-    RegexParser(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r).map(r => r.substring(1, r.length)) ~< "\""
+    RegexParser(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r, "string literal").map(r => r.substring(1, r.length)) ~< "\""
 
   /** A number following the rules of `decimalNumber`, with the following
     *  optional additions:
@@ -34,5 +34,5 @@ trait CommonParserWriter extends StringParserWriter {
     *  - Followed by `f`, `f`, `d` or `D` (after the above rule, if both are used)
     */
   def floatingPointNumber: EditorParser[String] =
-    """-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r
+    RegexParser("""-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r, "floating point number")
 }

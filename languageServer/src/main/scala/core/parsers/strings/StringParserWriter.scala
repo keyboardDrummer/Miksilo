@@ -99,7 +99,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
   implicit def literalToExtensions(value: String): ParserExtensions[String] = Literal(value)
   implicit def literal(value: String): Literal = Literal(value)
-  implicit def regex(value: Regex): RegexParser = RegexParser(value)
+  implicit def regex(value: Regex, regexName: String): RegexParser = RegexParser(value, regexName)
 
   case class Literal(value: String) extends EditorParserBase[String] with LeafParser[String] {
 
@@ -134,7 +134,7 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
   }
 
-  case class RegexParser(regex: Regex) extends EditorParserBase[String] with LeafParser[String] {
+  case class RegexParser(regex: Regex, regexName: String) extends EditorParserBase[String] with LeafParser[String] {
 
     override def getParser(recursive: GetParse): Parse[String] = {
 
@@ -147,11 +147,12 @@ trait StringParserWriter extends SequenceParserWriter {
                 input.drop(matched.end))
             case None =>
               if (input.atEnd) {
-                return newFailure(input, s"expected '$regex' but found end of source")
+                val message = s"expected $regexName but found end of source"
+                return singleResult(ReadyParseResult(None, input, List(ParseError(input, message, 10))))
               }
 
-              val message = s"expected '$regex' but found '${input.array.charAt(input.offset)}'"
-              drop(None, input, state, message, result)
+              val message = s"expected $regexName but found '${input.array.charAt(input.offset)}'"
+              drop(None, input, state, message, result, regexName)
           }
         }
       }
