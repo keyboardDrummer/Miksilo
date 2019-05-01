@@ -51,7 +51,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               Some(found.intermediate.asInstanceOf[ParseResult[Result]])
             case find: FindFixPoint =>
               find.foundRecursion = true
-              Some(SREmpty)
+              Some(Empty)
           }
         case _ => None
       }
@@ -133,11 +133,12 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                 else
                   singleResult(ready)
               })
-              grownResult.mapReady(ready => {
-                if (!detector.partOfCycle)
-                  cache.put(input, grownResult)
-                ready
-              })
+              grownResult
+//              grownResult.mapReady(ready => {
+////                if (!detector.partOfCycle)
+////                  cache.put(input, grownResult)
+//                ready
+//              })
           }
       }
     }

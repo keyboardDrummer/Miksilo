@@ -10,6 +10,9 @@ trait CommonStringReaderParser extends CommonParserWriter with EditorParserWrite
 
   class StringReader(array: ArrayCharSequence, offset: Int, scoredPosition: ScoredPosition) extends StringReaderBase(array, offset, scoredPosition) {
 
+    if (offset == 12)
+      System.out.append("")
+
     def this(value: String) {
       this(value.toCharArray, 0, ScoredPosition(0, Position(0, 0)))
     }
