@@ -15,7 +15,7 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
   object UnknownExpression {
     override def toString = "<unknown>"
   }
-  jsonGrammar.inner = new core.bigrammar.grammars.WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
+  jsonGrammar.inner = new core.bigrammar.grammars.WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression, "value")
   val jsonParser = toParser(jsonGrammar)
 
   test("object with single member with number value") {

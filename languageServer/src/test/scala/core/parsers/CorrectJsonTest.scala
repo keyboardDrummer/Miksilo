@@ -10,7 +10,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   object UnknownExpression {
     override def toString = "unknown"
   }
-  protected lazy val jsonParser: EditorParser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression)
+  protected lazy val jsonParser: EditorParser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression, "value")
 
   test("test whether correct inputs always return a ready in one go") {
     val input = """{ "VpcId" : {

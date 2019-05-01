@@ -132,11 +132,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
 
 //    // Detect incorrect ordering.
-//    def results: List[LazyParseResult[Result]] = head :: (tail match {
-//      case SREmpty => List.empty
-//      case cons: SRCons[Result] => cons.results
-//    })
-//
 //    val score = head.score
 //    for(result <- results.drop(0)) {
 //      if (result.score > score) {
@@ -282,8 +277,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
 
-    def withDefault[Other >: Result](_default: Other): EditorParser[Other] =
-      this | Fail(Some(_default), "a default")
+    def withDefault[Other >: Result](_default: Other, name: String): EditorParser[Other] =
+      this | Fail(Some(_default), s"expected a $name")
 
     def parseWholeInput(input: Input): ParseWholeResult[Result] = {
       CorrectingParserWriter.this.parseWholeInput(parser, input)

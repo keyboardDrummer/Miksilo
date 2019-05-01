@@ -91,7 +91,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
 
   test("only recursive with sequence indirection and default, " +
     "does not apply the default after failing the recursion") {
-    lazy val first: EditorParser[Any] = (new EditorLazy(first) ~ "a").withDefault("yes")
+    lazy val first: EditorParser[Any] = (new EditorLazy(first) ~ "a").withDefault("yes", "a's")
     val input = "aaa"
     val parseResult = first.parseWholeInput(new StringReader(input))
     assert(!parseResult.successful)
@@ -101,7 +101,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
 
   test("recursive with sequence indirection and default, " +
     "applies the default after failing the recursion") {
-    lazy val first: EditorParser[Any] = (new EditorLazy(first) ~ "a" | "a").withDefault("yes")
+    lazy val first: EditorParser[Any] = (new EditorLazy(first) ~ "a" | "a").withDefault("yes", "a's")
     val input = "notavailable"
     val parseResult = first.parseWholeInput(new StringReader(input))
     assert(!parseResult.successful)
