@@ -170,7 +170,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   While input (2) still parses to {x}
    */
   test("virtual left recursion through error correction") {
-    val input = """doesNotMatch"""
+    val input = """doesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatch"""
     lazy val parser: EditorParser[Any] = "{" ~ parser | "x"
     val result = parser.parseWholeInput(new StringReader(input))
     assertResult(2)(result.errors.size)
@@ -185,9 +185,8 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   private def parseJson(input: String, expectation: Any, errorCount: Int) = {
     val result = jsonParser.parseWholeInput(new StringReader(input))
     System.out.append(result.errors.toString())
-    assertResult(errorCount)(result.errors.size)
-    assert(result.resultOption.nonEmpty)
     assertResult(expectation)(result.resultOption.get)
+    assertResult(errorCount)(result.errors.size)
   }
 
   private def getSuccessValue(result: ParseWholeResult[Any]) = {

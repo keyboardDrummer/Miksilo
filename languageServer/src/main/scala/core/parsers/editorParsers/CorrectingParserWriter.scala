@@ -185,7 +185,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     val score: Double =  {
       val result =
         // -errorSize // gives us the most correct result, but can be very slow
-        remainder.offsetScore - 5 * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
+        remainder.offsetScore - 6  * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
         // remainder.offset / (errorSize + 1) // compromise
       result // result + (if (errorSize == 0) 100 else 0) // This is so that for correct inputs, we only need a single iteration.
     }
@@ -233,19 +233,29 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         override def apply(input: Input, state: ParseState) = {
           val leftResults = parseLeft(input, state)
 
-          leftResults.flatMapReady[Result]((leftResult: ReadyParseResult[Left]) => {
+          def rightFromLeftReady(delayOnError: Boolean): ReadyParseResult[Left] => SortedParseResults[Result] =
+            (ready: ReadyParseResult[Left]) => {
+              def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
+                ready.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
+                rightResult.remainder,
+                rightResult.errors)
 
-            def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
-              leftResult.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
-              rightResult.remainder,
-              rightResult.errors)
+              if (delayOnError && ready.errors.nonEmpty)
+                singleResult(new DelayedParseResult(ready.remainder, ready.errors,
+                  () => parseRight(ready.remainder, state).mapWithErrors[Result](mapRightResult, ready.errors)))
+              else
+                parseRight(ready.remainder, state).mapWithErrors[Result](mapRightResult, ready.errors)
+            }
 
-            lazy val next = parseRight(leftResult.remainder, state).mapWithErrors[Result](mapRightResult, leftResult.errors)
+          leftResults.flatMap({
+            case ready: ReadyParseResult[Left] => rightFromLeftReady(true)(ready)
+            case delayed: DelayedParseResult[Left] =>
 
-            if (leftResult.errors.nonEmpty)
-              singleResult(new DelayedParseResult(leftResult.remainder, leftResult.errors, () => next))
-            else
-              next
+              singleResult(new DelayedParseResult[Result](delayed.remainder, delayed.errors,
+                () => {
+                  val intermediate = delayed.results
+                  intermediate.flatMapReady(rightFromLeftReady(false))
+                }))
           })
         }
       }
@@ -306,31 +316,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       val value: Option[First] = cache(first)
       value.orElse(cache(second))
     }
-  }
-
-  case class WithDefault[Result](original: Self[Result], _getDefault: DefaultCache => Option[Result])
-    extends EditorParserBase[Result] with ParserWrapper[Result] {
-
-    override def getParser(recursive: GetParse): Parse[Result] = {
-      val parseOriginal = recursive(original)
-
-      new Parse[Result] {
-        override def apply(input: Input, state: ParseState) = {
-          val result = parseOriginal(input, state)
-          result.mapReady(parseResult => {
-            val newResultOption =
-              if (parseResult.remainder.offset == input.offset)
-                default.orElse(parseResult.resultOption)
-              else
-                parseResult.resultOption.orElse(default)
-            ReadyParseResult(newResultOption, parseResult.remainder, parseResult.errors)
-          })
-        }
-      }
-    }
-
-    override def getDefault(cache: DefaultCache): Option[Result] =
-      _getDefault(cache)
   }
 
   case class Filter[Other, Result <: Other](original: EditorParser[Result],

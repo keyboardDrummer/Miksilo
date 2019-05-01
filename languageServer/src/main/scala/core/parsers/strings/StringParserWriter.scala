@@ -112,12 +112,13 @@ trait StringParserWriter extends SequenceParserWriter {
           while (index < value.length) {
             val arrayIndex = index + input.offset
             if (array.length <= arrayIndex) {
-              return newFailure(Some(value), input, s"expected '$value' but end of source found")
+              val message = s"expected '$value' but end of source found"
+              return singleResult(ReadyParseResult(Some(value), input, List(ParseError(input, message, 0.1))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               val message = s"expected '$value' but found '${array.subSequence(input.offset, arrayIndex + 1)}'"
 
               //return newFailure(Some(value), input, message)
-              return drop(Some(value), input, state, message, result)
+              return drop(Some(value), input, state, message, result, value)
             }
             index += 1
           }
@@ -167,15 +168,14 @@ trait StringParserWriter extends SequenceParserWriter {
 
   def drop[Result](resultOption: Option[Result],
                    input: Input, state: ParseState,
-                   errorMessage: String, parse: Parse[Result]): SortedParseResults[Result] = {
+                   errorMessage: String, parse: Parse[Result], expectation: String): SortedParseResults[Result] = {
 
     val errors = List(ParseError(input, errorMessage))
     val withoutDrop = ReadyParseResult(resultOption, input, errors)
-    val dropError = List(ParseError(input, s"Dropped '${input.head}'", 4))
-    val droppedInput = input.drop(1)
-    val dropped = new DelayedParseResult(droppedInput, dropError, () => {
-      parse.apply(droppedInput, state).addErrors(dropError)
+    val dropError = List(ParseError(input, s"Dropped '${input.head}' for '$expectation'", 1.5))
+    val dropped = new DelayedParseResult(input, dropError, () => {
+      parse.apply(input.drop(1), state).addErrors(dropError)
     })
-    new SRCons[Result](withoutDrop, singleResult(dropped))
+    new SRCons[Result](withoutDrop, 1, singleResult(dropped))
   }
 }
