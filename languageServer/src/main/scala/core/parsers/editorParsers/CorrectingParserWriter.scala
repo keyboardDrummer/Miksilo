@@ -34,7 +34,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     ParseWholeResult(bestResult.resultOption, bestResult.errors)
   }
 
-  def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons(parseResult, SREmpty)
+  def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons(parseResult, 0, SREmpty)
 
   type ParseResult[+Result] = SortedParseResults[Result]
 
@@ -60,6 +60,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
 
   sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
+    def depth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
 
     def addErrors(errors: List[ParseError]): SortedParseResults[Result] = {
@@ -116,12 +117,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     override def flatMap[NewResult](f: LazyParseResult[Nothing] => SortedParseResults[NewResult]) = this
 
     override def map[NewResult](f: Nothing => NewResult) = this
+
+    override def depth = 0
   }
 
-  final class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
+  final class SRCons[+Result](val head: LazyParseResult[Result], val depth: Int, _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
     def getTail = tail
-    val tail = _tail
+    lazy val tail = _tail
+
+    if (depth > 20) {
+      tail
+    }
 
 
 //    // Detect incorrect ordering.
@@ -159,14 +166,14 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         case SREmpty => tail.flatMap(f)
         case cons: SRCons[NewResult] => // Try not to evaluate tail, but if head's score gets worse, we have to otherwise the sorting may be incorrect.
           if (cons.head.score >= head.score)
-            new SRCons[NewResult](cons.head, cons.tail.merge(tail.flatMap(f)))
+            new SRCons[NewResult](cons.head, 2 + Math.max(cons.tail.depth, tail.depth), cons.tail.merge(tail.flatMap(f)))
           else
             cons.merge(tail.flatMap(f))
       }
     }
 
     override def map[NewResult](f: Result => NewResult): SRCons[NewResult] = {
-      new SRCons(head.map(f), tail.map(f))
+      new SRCons(head.map(f), tail.depth + 1, tail.map(f))
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], depth: Int): SortedParseResults[Other] = {
@@ -176,9 +183,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       other match {
         case SREmpty => this
         case other: SRCons[Other] => if (head.score >= other.head.score) {
-          new SRCons(head, tail.merge(other, depth + 1))
+          new SRCons(head, 1 + Math.max(tail.depth, other.depth), tail.merge(other, depth + 1))
         } else
-          new SRCons(other.head, this.merge(other.tail, depth + 1))
+          new SRCons(other.head, 1 + Math.max(depth, other.tail.depth), this.merge(other.tail, depth + 1))
       }
     }
   }

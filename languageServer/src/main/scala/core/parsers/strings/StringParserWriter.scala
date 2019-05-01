@@ -176,6 +176,6 @@ trait StringParserWriter extends SequenceParserWriter {
     val dropped = new DelayedParseResult(input, dropError, () => {
       parse.apply(input.drop(1), state).addErrors(dropError)
     })
-    new SRCons[Result](withoutDrop, singleResult(dropped))
+    new SRCons[Result](withoutDrop, 1, singleResult(dropped))
   }
 }
