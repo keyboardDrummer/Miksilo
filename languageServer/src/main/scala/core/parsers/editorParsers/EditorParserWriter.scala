@@ -1,16 +1,25 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{GraphAlgorithms, OptimizingParserWriter}
+import core.language.node.SourceRange
+import core.parsers.core.{GraphAlgorithms, OptimizingParserWriter, ParseInput}
+import langserver.types.Position
 
 import scala.language.higherKinds
 
+trait CorrectingInput extends ParseInput {
+  def offsetScore: Int
+  def position: Position
+}
+
 trait EditorParserWriter extends OptimizingParserWriter {
+
+  type Input <: CorrectingInput
 
   type Self[+Result] = EditorParser[Result]
 
   override def succeed[Result](result: Result): EditorParser[Result] = Succeed(result)
 
-  case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[ParseError]) {
+  case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[ParseErrorLike]) {
     def successful = errors.isEmpty
     def get: Result = resultOption.get
   }
@@ -53,7 +62,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]): ParseResult[Result]
+  def newFailure[Result](partial: Option[Result], input: Input, errors: Errors): ParseResult[Result]
 
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
@@ -66,7 +75,44 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class ParseError(location: Input, message: String, edits: Double = 1)
+  case class Errors(errors: List[ParseErrorLike]) {
+
+    def this() = this(List.empty)
+    def this(error: ParseErrorLike) = this(List(error))
+
+    def errorSize = errors.map(e => e.penalty).sum
+
+    def ++(others: Errors): Errors = errors.foldRight(others)((e, r) => r.add(e))
+    def isEmpty: Boolean = errors.isEmpty
+    def nonEmpty: Boolean = errors.nonEmpty
+
+    def add(error: ParseErrorLike): Errors = {
+      errors match {
+        case Nil => new Errors(error)
+        case head :: tail =>
+          val merged = head.append(error)
+          Errors(merged.fold(error :: errors)(m => m :: tail))
+      }
+    }
+  }
+
+  trait ParseErrorLike {
+    def penalty: Double
+    def append(other: ParseErrorLike): Option[ParseErrorLike] = None
+    def message: String
+    def range: SourceRange
+
+    override def toString = message
+  }
+
+  case class ParseError(location: Input, message: String, penalty: Double = 1) extends ParseErrorLike {
+    override def append(other: ParseErrorLike): Option[ParseErrorLike] = None
+
+    override def range = {
+      val position = location.position
+      SourceRange(position, Position(position.line, position.character + 1))
+    }
+  }
 
   class EditorLazy[Result](_inner: => EditorParser[Result]) extends Lazy[Result](_inner) with EditorParserBase[Result] {
 
@@ -80,7 +126,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getDefault(cache: DefaultCache) = None
 
     override def getParser(recursive: GetParse): Parse[Result] = {
-      (input, _) => newFailure(value, input, List(ParseError(input, message, 0.1)))
+      (input, _) => newFailure(value, input, new Errors(ParseError(input, message, 0.1)))
     }
 
     override def getMustConsume(cache: ConsumeCache) = false

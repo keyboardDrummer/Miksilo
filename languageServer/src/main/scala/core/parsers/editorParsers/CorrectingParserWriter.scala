@@ -1,19 +1,15 @@
 package core.parsers.editorParsers
 
 import core.parsers.core.{OptimizingParserWriter, ParseInput}
-
-trait CorrectingInput extends ParseInput {
-  def offsetScore: Int
-}
+import langserver.types.Position
 
 trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
 
-  type Input <: CorrectingInput
 
   def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
 
     var bestResult: ReadyParseResult[Result] =
-      ReadyParseResult(None, input, List(ParseError(input, "Grammar is always recursive", Int.MaxValue)))
+      ReadyParseResult(None, input, new Errors(ParseError(input, "Grammar is always recursive", Int.MaxValue)))
 
     var queue = parser.parseRoot(input)
     while(queue.isInstanceOf[SRCons[Result]]) {
@@ -31,19 +27,21 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
           cons.tail.merge(results)
       }
     }
-    ParseWholeResult(bestResult.resultOption, bestResult.errors)
+    ParseWholeResult(bestResult.resultOption, bestResult.errors.errors)
   }
 
   def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons(parseResult, 0, SREmpty)
 
   type ParseResult[+Result] = SortedParseResults[Result]
 
-  override def newFailure[Result](partial: Option[Result], input: Input, errors: List[ParseError]) =
+  override def newFailure[Result](partial: Option[Result], input: Input, errors: Errors) =
     singleResult(ReadyParseResult(partial, input, errors))
 
-  override def newSuccess[Result](result: Result, remainder: Input) = singleResult(ReadyParseResult(Some(result), remainder, List.empty))
+  override def newSuccess[Result](result: Result, remainder: Input): SRCons[Result] =
+    singleResult(ReadyParseResult(Some(result), remainder, new Errors()))
 
-  def newFailure[Result](input: Input, message: String) = singleResult(ReadyParseResult(None, input, List(ParseError(input, message))))
+  def newFailure[Result](input: Input, message: String): SRCons[Nothing] =
+    singleResult(ReadyParseResult(None, input, new Errors(ParseError(input, message))))
 
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
@@ -63,12 +61,12 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def depth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
 
-    def addErrors(errors: List[ParseError]): SortedParseResults[Result] = {
+    def addErrors(errors: Errors): SortedParseResults[Result] = {
       mapWithErrors(x => x, errors)
     }
 
     def mapWithErrors[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
-                                 oldErrors: List[ParseError]): SortedParseResults[NewResult] = {
+                                 oldErrors: Errors): SortedParseResults[NewResult] = {
       mapResult({
         case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.errors ++ oldErrors, () => {
           val intermediate = delayed.results
@@ -190,18 +188,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     val score: Double =  {
       val result =
         // -errorSize // gives us the most correct result, but can be very slow
-        remainder.offsetScore - 6  * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
+        remainder.offsetScore - 10  * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
         // remainder.offset / (errorSize + 1) // compromise
       result // result + (if (errorSize == 0) 100 else 0) // This is so that for correct inputs, we only need a single iteration.
     }
 
-    def errorSize = errors.map(e => e.edits).sum
-    def errors: List[ParseError]
+    def errorSize = errors.errorSize
+    def errors: Errors
     def remainder: Input
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
   }
 
-  class DelayedParseResult[Result](val remainder: Input, val errors: List[ParseError], _getResults: () => SortedParseResults[Result])
+  class DelayedParseResult[Result](val remainder: Input, val errors: Errors, _getResults: () => SortedParseResults[Result])
     extends LazyParseResult[Result] {
 
     if (errors.isEmpty) {
@@ -215,7 +213,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     lazy val results: SortedParseResults[Result] = _getResults()
   }
 
-  case class ReadyParseResult[+Result](resultOption: Option[Result], remainder: Input, errors: List[ParseError])
+  case class ReadyParseResult[+Result](resultOption: Option[Result], remainder: Input, errors: Errors)
     extends LazyParseResult[Result] {
 
     override def map[NewResult](f: Result => NewResult): ReadyParseResult[NewResult] = {
@@ -335,7 +333,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         originalResult.mapReady(s => {
           s.resultOption match {
             case Some(result) => if (predicate(result)) s else ReadyParseResult(default, s.remainder,
-              ParseError(s.remainder, getMessage(result)) :: s.errors)
+              s.errors.add(ParseError(s.remainder, getMessage(result))))
             case None => s
           }
         })

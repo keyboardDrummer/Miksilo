@@ -103,7 +103,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   test("garbage before key 2") {
     val input = """{g"person"hj:nh"remy"}"""
     val expectation = List("person" -> "remy")
-    parseJson(input, expectation, 5)
+    parseJson(input, expectation, 3)
   }
 
   // Partially Parse tests start
