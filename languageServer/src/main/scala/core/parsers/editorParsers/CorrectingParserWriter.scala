@@ -60,7 +60,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
 
   sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
-    def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults[Other]
+    def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
 
     def addErrors(errors: List[ParseError]): SortedParseResults[Result] = {
       mapWithErrors(x => x, errors)
@@ -109,7 +109,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   }
 
   object SREmpty extends SortedParseResults[Nothing] {
-    override def merge[Other >: Nothing](other: SortedParseResults[Other]) = other
+    override def merge[Other >: Nothing](other: SortedParseResults[Other], depth: Int) = other
 
     override def mapResult[NewResult](f: LazyParseResult[Nothing] => LazyParseResult[NewResult]): SREmpty.type = this
 
@@ -121,7 +121,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   final class SRCons[+Result](val head: LazyParseResult[Result], _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
     def getTail = tail
-    lazy val tail = _tail
+    val tail = _tail
 
 
 //    // Detect incorrect ordering.
@@ -169,13 +169,16 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       new SRCons(head.map(f), tail.map(f))
     }
 
-    override def merge[Other >: Result](other: SortedParseResults[Other]): SortedParseResults[Other] = {
+    override def merge[Other >: Result](other: SortedParseResults[Other], depth: Int): SortedParseResults[Other] = {
+      if (depth > 500)
+        return this
+
       other match {
         case SREmpty => this
         case other: SRCons[Other] => if (head.score >= other.head.score) {
-          new SRCons(head, tail.merge(other))
+          new SRCons(head, tail.merge(other, depth + 1))
         } else
-          new SRCons(other.head, this.merge(other.tail))
+          new SRCons(other.head, this.merge(other.tail, depth + 1))
       }
     }
   }
