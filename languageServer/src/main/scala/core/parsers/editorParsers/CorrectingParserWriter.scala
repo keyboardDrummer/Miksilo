@@ -1,24 +1,26 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{OptimizingParserWriter, ParseInput}
-import langserver.types.Position
+import core.parsers.core.OptimizingParserWriter
+import org.joda.time.DateTime
 
 trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
 
-
-  def parse[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
+  def parse[Result](parser: EditorParser[Result], input: Input, milliseconds: Int = 500): ParseWholeResult[Result] = {
 
     var bestResult: ReadyParseResult[Result] =
       ReadyParseResult(None, input, new Errors(ParseError(input, "Grammar is always recursive", Int.MaxValue)))
+
+    val endTime = DateTime.now().getMillis + milliseconds
 
     var queue = parser.parseRoot(input)
     while(queue.isInstanceOf[SRCons[Result]]) {
       val cons = queue.asInstanceOf[SRCons[Result]]
       val parseResult = cons.head
+
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
-          bestResult = if (bestResult != null && bestResult.score >= parseResult.score) bestResult else parseResult
-          if (bestResult.remainder.atEnd)
+          bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
+          if (DateTime.now().getMillis >= endTime)
             SREmpty
           else
             cons.tail
@@ -170,7 +172,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], depth: Int): SortedParseResults[Other] = {
-      if (depth > 500)
+      if (depth > 1000)
         return this
 
       other match {
@@ -185,15 +187,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   trait LazyParseResult[+Result] {
 
-    val score: Double =  {
-      val result =
-        // -errorSize // gives us the most correct result, but can be very slow
-        remainder.offsetScore - 10  * errorSize // gets us to the end the fastest. the 5 is because sometimes a single incorrect insertion can lead to some offset gain.
-        // remainder.offset / (errorSize + 1) // compromise
-      result // result + (if (errorSize == 0) 100 else 0) // This is so that for correct inputs, we only need a single iteration.
-    }
+    val score: Double = errors.score(remainder)
 
-    def errorSize = errors.errorSize
     def errors: Errors
     def remainder: Input
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]

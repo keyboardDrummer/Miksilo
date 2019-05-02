@@ -6,10 +6,14 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem
   type Input <: SequenceInput[Input, Elem]
 
+  trait SequenceInput[Input, Elem] extends CorrectingInput {
+    def head: Elem
+    def tail: Input
+  }
+
   def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
   case class ElemPredicate(predicate: Elem => Boolean, kind: String)
     extends EditorParserBase[Elem] with LeafParser[Elem] {
-
 
     override def getParser(recursive: GetParse): Parse[Elem] = {
 

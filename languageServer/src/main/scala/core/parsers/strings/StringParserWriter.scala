@@ -2,7 +2,7 @@ package core.parsers.strings
 
 import core.language.node.SourceRange
 import core.parsers.editorParsers.DefaultCache
-import core.parsers.sequences.{SequenceInput, SequenceParserWriter}
+import core.parsers.sequences.SequenceParserWriter
 import langserver.types.Position
 
 import scala.util.matching.Regex
@@ -16,6 +16,8 @@ case class ScoredPosition(score: Int, position: Position)
 trait StringParserWriter extends SequenceParserWriter {
   type Elem = Char
   type Input <: StringReaderLike
+
+  val consecutiveErrorPowerDiscount = 0.5
 
   abstract class StringReaderBase(val array: ArrayCharSequence, val offset: Int, val scoredPosition: ScoredPosition)
     extends StringReaderLike {
@@ -86,10 +88,9 @@ trait StringParserWriter extends SequenceParserWriter {
             if (remainder.atEnd)
               parseResult
             else {
-              val extra = remainder.array.subSequence(remainder.offset, remainder.array.length())
-              val remainderLength = extra.length()
-              val error = ParseError(remainder, s"Found '$extra' instead of end of input", 1.5 * Math.sqrt(remainderLength))
-              ReadyParseResult(parseResult.resultOption, remainder.drop(remainderLength), parseResult.errors.add(error))
+              val end = remainder.drop(remainder.array.length() - remainder.offset)
+              val error = DropError(remainder, end, "end of input")
+              ReadyParseResult(parseResult.resultOption, end, parseResult.errors.add(error))
             }
           })
         }
@@ -179,7 +180,7 @@ trait StringParserWriter extends SequenceParserWriter {
       }
     }
 
-    override def penalty = Math.sqrt(to.offset - from.offset) * 1.5
+    override def penalty = Math.pow(to.offset - from.offset, consecutiveErrorPowerDiscount) * 1.5
 
     override def message = {
       val found = from.array.subSequence(from.offset, to.offset)
@@ -196,8 +197,9 @@ trait StringParserWriter extends SequenceParserWriter {
     val errors = new Errors(ParseError(input, errorMessage))
     val withoutDrop = ReadyParseResult(resultOption, input, errors)
     val dropError = new Errors(new DropError(input, expectation))
-    val dropped = new DelayedParseResult(input, dropError, () => {
-      parse.apply(input.drop(1), state).addErrors(dropError)
+    val droppedInput = input.drop(1)
+    val dropped = new DelayedParseResult(droppedInput, dropError, () => {
+      parse.apply(droppedInput, state).addErrors(dropError)
     })
     new SRCons[Result](withoutDrop, 1, singleResult(dropped))
   }

@@ -6,12 +6,26 @@ import langserver.types.Position
 
 import scala.language.higherKinds
 
-trait CorrectingInput extends ParseInput {
-  def offsetScore: Int
-  def position: Position
-}
 
 trait EditorParserWriter extends OptimizingParserWriter {
+
+  case class ParseError(location: Input, message: String, penalty: Double = 1) extends ParseErrorLike {
+    override def append(other: ParseErrorLike): Option[ParseErrorLike] = None
+
+    override def range = {
+      val position = location.position
+      SourceRange(position, Position(position.line, position.character + 1))
+    }
+
+    override def from = location
+
+    override def to = from
+  }
+
+  trait CorrectingInput extends ParseInput {
+    def offsetScore: Int
+    def position: Position
+  }
 
   type Input <: CorrectingInput
 
@@ -67,7 +81,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
     override def getParser(recursive: GetParse): Parse[Input] = {
-      (input, state) => newSuccess(input, input)
+      (input, _) => newSuccess(input, input)
     }
 
     override def getDefault(cache: DefaultCache): Option[Input] = None
@@ -75,10 +89,24 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
+  val consecutiveSuccessPow = 1.5
   case class Errors(errors: List[ParseErrorLike]) {
 
     def this() = this(List.empty)
     def this(error: ParseErrorLike) = this(List(error))
+
+    def score(end: Input): Double = {
+      var result = 0.0
+      var right = end.offset
+      for(error <- errors) {
+        val middle = error.to.offset
+        result += Math.pow(right - middle, consecutiveSuccessPow)
+        result -= 6 * error.penalty
+        right = error.from.offset
+      }
+      result += Math.pow(right, consecutiveSuccessPow)
+      result
+    }
 
     def errorSize = errors.map(e => e.penalty).sum
 
@@ -100,18 +128,11 @@ trait EditorParserWriter extends OptimizingParserWriter {
     def penalty: Double
     def append(other: ParseErrorLike): Option[ParseErrorLike] = None
     def message: String
+    def from: Input
+    def to: Input
     def range: SourceRange
 
     override def toString = message
-  }
-
-  case class ParseError(location: Input, message: String, penalty: Double = 1) extends ParseErrorLike {
-    override def append(other: ParseErrorLike): Option[ParseErrorLike] = None
-
-    override def range = {
-      val position = location.position
-      SourceRange(position, Position(position.line, position.character + 1))
-    }
   }
 
   class EditorLazy[Result](_inner: => EditorParser[Result]) extends Lazy[Result](_inner) with EditorParserBase[Result] {
@@ -120,7 +141,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
   }
 
   override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
-
 
   case class Fail[Result](value: Option[Result], message: String) extends EditorParserBase[Result] with LeafParser[Result] {
     override def getDefault(cache: DefaultCache) = None
