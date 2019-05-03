@@ -2,10 +2,29 @@ package core.parsers
 
 import org.scalatest.FunSuite
 import strings.StringParserWriter
-import core.ParseInput
 
 class HistoryTest extends FunSuite with StringParserWriter {
   type Input = IndexInput
+
+  test("two consecutive drops combine and become cheaper") {
+    val splitDrops = new History().
+      addError(DropError(IndexInput(0),IndexInput(1), "")).
+      addSuccess(IndexInput(2)).
+      addError(DropError(IndexInput(2),IndexInput(3), ""))
+
+    val dropsLeft = new History().
+      addError(DropError(IndexInput(0),IndexInput(1), "")).
+      addError(DropError(IndexInput(1),IndexInput(2), "")).
+      addSuccess(IndexInput(3))
+
+    val dropsRight = new History().
+      addSuccess(IndexInput(1)).
+      addError(DropError(IndexInput(1),IndexInput(2), "")).
+      addError(DropError(IndexInput(2),IndexInput(3), ""))
+
+    assert(dropsRight.score == dropsLeft.score)
+    assert(splitDrops.score < dropsRight.score)
+  }
 
   test("very long drops have small differences") {
     val start = IndexInput(0)

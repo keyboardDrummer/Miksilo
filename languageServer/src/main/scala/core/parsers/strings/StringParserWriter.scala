@@ -120,7 +120,7 @@ trait StringParserWriter extends SequenceParserWriter {
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               val message = s"expected '$value' but found '${array.subSequence(input.offset, arrayIndex + 1)}'"
 
-              return drop(Some(value), input, state, message, result, value)
+              return drop(Some(value), input, state, message, result, s"'$value'")
             }
             index += 1
           }
@@ -187,7 +187,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def message = {
       val found = from.array.subSequence(from.offset, to.offset)
-      s"expected $expectation but found '$found'"
+      s"Skipped '$found' (while expecting $expectation)"
     }
 
     override def range = SourceRange(from.position, to.position)

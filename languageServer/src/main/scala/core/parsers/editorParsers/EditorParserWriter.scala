@@ -109,9 +109,9 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
     def addError(newHead: ParseError): History = {
       errors match {
-        case Nil => new History(newHead)
+        case Nil => History(score + newHead.score, List(newHead))
         case head :: tail =>
-          newHead.append(head) match {
+          head.append(newHead) match {
             case None => History(score + newHead.score, newHead :: errors)
             case Some(merged) => History(score - head.score + merged.score, merged :: tail)
           }
