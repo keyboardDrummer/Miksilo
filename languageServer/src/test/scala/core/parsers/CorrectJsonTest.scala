@@ -27,8 +27,6 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
 
   test("object with single member with string value") {
     val input = """{"person":"remy"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
-    val value = getSuccessValue(result)
     parseJson(input, List(("person","remy")), 0)
   }
 
@@ -194,5 +192,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
     result.resultOption.get
   }
 }
+
+
 
 

@@ -5,10 +5,11 @@ import org.joda.time.DateTime
 
 trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
 
-  def parse[Result](parser: EditorParser[Result], input: Input, milliseconds: Int = 500): ParseWholeResult[Result] = {
+  def parse[Result](parser: EditorParser[Result], input: Input, milliseconds: Int = 20): ParseWholeResult[Result] = {
 
+    val noResultFound = ReadyParseResult(None, input, new History(MissingInput(input, "Grammar is always recursive", Int.MaxValue)))
     var bestResult: ReadyParseResult[Result] =
-      ReadyParseResult(None, input, new Errors(ParseError(input, "Grammar is always recursive", Int.MaxValue)))
+      noResultFound
 
     val endTime = DateTime.now().getMillis + milliseconds
 
@@ -20,7 +21,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
-          if (DateTime.now().getMillis >= endTime)
+          if (noResultFound != bestResult && DateTime.now().getMillis >= endTime)
             SREmpty
           else
             cons.tail
@@ -29,21 +30,21 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
           cons.tail.merge(results)
       }
     }
-    ParseWholeResult(bestResult.resultOption, bestResult.errors.errors)
+    ParseWholeResult(bestResult.resultOption, bestResult.history.errors)
   }
 
   def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons(parseResult, 0, SREmpty)
 
   type ParseResult[+Result] = SortedParseResults[Result]
 
-  override def newFailure[Result](partial: Option[Result], input: Input, errors: Errors) =
+  override def newFailure[Result](partial: Option[Result], input: Input, errors: History) =
     singleResult(ReadyParseResult(partial, input, errors))
 
   override def newSuccess[Result](result: Result, remainder: Input): SRCons[Result] =
-    singleResult(ReadyParseResult(Some(result), remainder, new Errors()))
+    singleResult(ReadyParseResult(Some(result), remainder, new History()))
 
   def newFailure[Result](input: Input, message: String): SRCons[Nothing] =
-    singleResult(ReadyParseResult(None, input, new Errors(ParseError(input, message))))
+    singleResult(ReadyParseResult(None, input, new History(MissingInput(input, message))))
 
   override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
                                                  right: => EditorParser[Right],
@@ -63,26 +64,26 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def depth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
 
-    def addErrors(errors: Errors): SortedParseResults[Result] = {
+    def addErrors(errors: History): SortedParseResults[Result] = {
       mapWithErrors(x => x, errors)
     }
 
     def mapWithErrors[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
-                                 oldErrors: Errors): SortedParseResults[NewResult] = {
+                                 oldErrors: History): SortedParseResults[NewResult] = {
       mapResult({
-        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.errors ++ oldErrors, () => {
+        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.history ++ oldErrors, () => {
           val intermediate = delayed.results
           intermediate.mapWithErrors(f, oldErrors)
         })
         case ready: ReadyParseResult[Result] =>
           val newReady = f(ready)
-          ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.errors ++ oldErrors)
+          ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.history ++ oldErrors)
       })
     }
 
     def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): SortedParseResults[NewResult] = {
       mapResult({
-        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.errors, () => {
+        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.history, () => {
             val intermediate = delayed.results
             intermediate.mapReady(f)
           })
@@ -94,7 +95,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
       flatMap[NewResult] {
-        case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.remainder, delayed.errors, () => {
+        case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.remainder, delayed.history, () => {
           val intermediate = delayed.results
           intermediate.flatMapReady(f)
         }))
@@ -105,7 +106,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
 
     def updateRemainder(f: Input => Input) = {
-      mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.errors))
+      mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.history))
     }
   }
 
@@ -129,7 +130,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     if (depth > 20) {
       tail
     }
-
 
 //    // Detect incorrect ordering.
 //    val score = head.score
@@ -172,7 +172,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], depth: Int): SortedParseResults[Other] = {
-      if (depth > 1000)
+      if (depth > 500)
         return this
 
       other match {
@@ -187,32 +187,27 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   trait LazyParseResult[+Result] {
 
-    val score: Double = errors.score(remainder)
-
-    def errors: Errors
+    val score: Double = history.score
+    def history: History
     def remainder: Input
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
   }
 
-  class DelayedParseResult[Result](val remainder: Input, val errors: Errors, _getResults: () => SortedParseResults[Result])
+  class DelayedParseResult[Result](val remainder: Input, val history: History, _getResults: () => SortedParseResults[Result])
     extends LazyParseResult[Result] {
 
-    if (errors.isEmpty) {
-      System.out.append("")
-    }
-
     override def map[NewResult](f: Result => NewResult): DelayedParseResult[NewResult] = {
-      new DelayedParseResult(remainder, errors, () => results.map(f))
+      new DelayedParseResult(remainder, history, () => results.map(f))
     }
 
     lazy val results: SortedParseResults[Result] = _getResults()
   }
 
-  case class ReadyParseResult[+Result](resultOption: Option[Result], remainder: Input, errors: Errors)
+  case class ReadyParseResult[+Result](resultOption: Option[Result], remainder: Input, history: History)
     extends LazyParseResult[Result] {
 
     override def map[NewResult](f: Result => NewResult): ReadyParseResult[NewResult] = {
-      ReadyParseResult(resultOption.map(f), remainder, errors)
+      ReadyParseResult(resultOption.map(f), remainder, history)
     }
   }
 
@@ -236,20 +231,20 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
               def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
                 ready.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
                 rightResult.remainder,
-                rightResult.errors)
+                rightResult.history)
 
-              if (delayOnError && ready.errors.nonEmpty)
-                singleResult(new DelayedParseResult(ready.remainder, ready.errors,
-                  () => parseRight(ready.remainder, state).mapWithErrors[Result](mapRightResult, ready.errors)))
+              if (delayOnError && ready.history.errors.nonEmpty) // TODO maybe I can continue with everything that at or above the score of the root.
+                singleResult(new DelayedParseResult(ready.remainder, ready.history,
+                  () => parseRight(ready.remainder, state).mapWithErrors[Result](mapRightResult, ready.history)))
               else
-                parseRight(ready.remainder, state).mapWithErrors[Result](mapRightResult, ready.errors)
+                parseRight(ready.remainder, state).mapWithErrors[Result](mapRightResult, ready.history)
             }
 
           leftResults.flatMap({
             case ready: ReadyParseResult[Left] => rightFromLeftReady(true)(ready)
             case delayed: DelayedParseResult[Left] =>
 
-              singleResult(new DelayedParseResult[Result](delayed.remainder, delayed.errors,
+              singleResult(new DelayedParseResult[Result](delayed.remainder, delayed.history,
                 () => {
                   val intermediate = delayed.results
                   intermediate.flatMapReady(rightFromLeftReady(false))
@@ -328,7 +323,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         originalResult.mapReady(s => {
           s.resultOption match {
             case Some(result) => if (predicate(result)) s else ReadyParseResult(default, s.remainder,
-              s.errors.add(ParseError(s.remainder, getMessage(result))))
+              s.history.addError(MissingInput(s.remainder, getMessage(result))))
             case None => s
           }
         })
@@ -345,7 +340,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     override def getParser(recursive: GetParse): Parse[Success[Result]] = {
       val parseOriginal = recursive(original)
       (input, state) => parseOriginal(input, state).mapReady(r =>
-        ReadyParseResult(r.resultOption.map(v => Success(v, r.remainder)), r.remainder, r.errors))
+        ReadyParseResult(r.resultOption.map(v => Success(v, r.remainder)), r.remainder, r.history))
     }
 
     override def getDefault(cache: DefaultCache): Option[Success[Result]] = None

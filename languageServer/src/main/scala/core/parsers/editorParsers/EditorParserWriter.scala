@@ -9,8 +9,8 @@ import scala.language.higherKinds
 
 trait EditorParserWriter extends OptimizingParserWriter {
 
-  case class ParseError(location: Input, message: String, penalty: Double = 1) extends ParseErrorLike {
-    override def append(other: ParseErrorLike): Option[ParseErrorLike] = None
+  case class MissingInput(location: Input, message: String, penalty: Double = 1) extends ParseError {
+    override def append(other: ParseError): Option[ParseError] = None
 
     override def range = {
       val position = location.position
@@ -33,7 +33,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   override def succeed[Result](result: Result): EditorParser[Result] = Succeed(result)
 
-  case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[ParseErrorLike]) {
+  case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[ParseError]) {
     def successful = errors.isEmpty
     def get: Result = resultOption.get
   }
@@ -76,7 +76,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  def newFailure[Result](partial: Option[Result], input: Input, errors: Errors): ParseResult[Result]
+  def newFailure[Result](partial: Option[Result], input: Input, errors: History): ParseResult[Result]
 
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
@@ -89,44 +89,40 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  val consecutiveSuccessPow = 1.5
-  case class Errors(errors: List[ParseErrorLike]) {
+  case class History(score: Double, errors: List[ParseError]) {
+    def this() = this(0, List.empty)
+    def this(error: ParseError) = this(error.score, List(error))
 
-    def this() = this(List.empty)
-    def this(error: ParseErrorLike) = this(List(error))
+    def ++(right: History): History = {
+      if (errors.isEmpty)
+        return History(score + right.score, right.errors)
 
-    def score(end: Input): Double = {
-      var result = 0.0
-      var right = end.offset
-      for(error <- errors) {
-        val middle = error.to.offset
-        result += Math.pow(right - middle, consecutiveSuccessPow)
-        result -= 6 * error.penalty
-        right = error.from.offset
-      }
-      result += Math.pow(right, consecutiveSuccessPow)
-      result
+      val (withoutLast, last :: Nil) = errors.splitAt(errors.length - 1)
+      val newLeft = History(score - last.score, withoutLast)
+      val newRight = right.addError(last)
+      History(newLeft.score + newRight.score, newLeft.errors ++ newRight.errors)
     }
 
-    def errorSize = errors.map(e => e.penalty).sum
+    def addSuccess(end: Input): History = {
+      History(score + 1, errors)
+    }
 
-    def ++(others: Errors): Errors = errors.foldRight(others)((e, r) => r.add(e))
-    def isEmpty: Boolean = errors.isEmpty
-    def nonEmpty: Boolean = errors.nonEmpty
-
-    def add(error: ParseErrorLike): Errors = {
+    def addError(newHead: ParseError): History = {
       errors match {
-        case Nil => new Errors(error)
+        case Nil => new History(newHead)
         case head :: tail =>
-          val merged = head.append(error)
-          Errors(merged.fold(error :: errors)(m => m :: tail))
+          newHead.append(head) match {
+            case None => History(score + newHead.score, newHead :: errors)
+            case Some(merged) => History(score - head.score + merged.score, merged :: tail)
+          }
       }
     }
   }
 
-  trait ParseErrorLike {
+  trait ParseError {
     def penalty: Double
-    def append(other: ParseErrorLike): Option[ParseErrorLike] = None
+    def score: Double = -penalty * 2
+    def append(other: ParseError): Option[ParseError] = None
     def message: String
     def from: Input
     def to: Input
@@ -146,7 +142,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getDefault(cache: DefaultCache) = None
 
     override def getParser(recursive: GetParse): Parse[Result] = {
-      (input, _) => newFailure(value, input, new Errors(ParseError(input, message, 0.1)))
+      (input, _) => newFailure(value, input, new History(MissingInput(input, message, 0.1)))
     }
 
     override def getMustConsume(cache: ConsumeCache) = false

@@ -89,13 +89,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
             FixPointState(input, List(parser), Map(parser -> detector))
           }
           val result = parser(input, newState)
-          result.flatMapReady(ready => {
+          val grownResult =
             if (detector.foundRecursion)
-              growResult(input, newState, ready)
-            else
-              singleResult(ready)
-          })
-
+              result.flatMapReady(ready => growResult(input, newState, ready))
+            else result
+          grownResult
         case Some(result) =>
           result
       }
@@ -127,17 +125,17 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                 FixPointState(input, List(parser), Map(parser -> detector))
               }
               val result = parser(input, newState)
-              val grownResult = result.flatMapReady(ready => {
+
+              // I believe any left recursion will be detected immediately, if it exists, since the | operator always calls into both children.
+              val grownResult =
                 if (detector.foundRecursion)
-                  growResult(input, newState, ready)
-                else
-                  singleResult(ready)
-              })
-              grownResult.mapReady(ready => {
-                if (!detector.partOfCycle)
-                  cache.put(input, grownResult)
-                ready
-              })
+                  result.flatMapReady(ready => growResult(input, newState, ready))
+                else result
+
+              if (!detector.partOfCycle)
+                cache.put(input, grownResult)
+
+              grownResult
           }
       }
     }
