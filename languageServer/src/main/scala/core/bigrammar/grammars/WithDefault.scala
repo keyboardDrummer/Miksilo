@@ -11,7 +11,7 @@ class WithDefault(inner: BiGrammar, _default: Any, name: String) extends CustomG
 
   override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => EditorParser[Result]): EditorParser[Result] =
+  override def toParser(recursive: BiGrammar => Self[Result]): Self[Result] =
     recursive(inner).withDefault[Result](valueToResult(_default), name)
 
   override def children: Seq[BiGrammar] = Seq(inner)

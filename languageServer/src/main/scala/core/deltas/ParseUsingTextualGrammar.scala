@@ -29,12 +29,12 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
     }
   }
 
-  def parseStream[T](parser: EditorParser[T], input: InputStream): ParseWholeResult[T] = {
+  def parseStream[T](parser: Self[T], input: InputStream): ParseWholeResult[T] = {
     val reader = new Reader(SourceUtils.streamToString(input))
     parser.parseWholeInput(reader)
   }
 
-  val parserProp = new Property[EditorParser[Node]](null)
+  val parserProp = new Property[Self[Node]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

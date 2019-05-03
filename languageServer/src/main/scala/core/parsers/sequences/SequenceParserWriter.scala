@@ -1,6 +1,6 @@
 package core.parsers.sequences
 
-import core.parsers.editorParsers.{CorrectingParserWriter, DefaultCache}
+import core.parsers.editorParsers.{CorrectingParserWriter}
 
 trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem
@@ -32,8 +32,6 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
       apply
     }
-
-    override def getDefault(cache: DefaultCache): Option[Elem] = None
 
     override def getMustConsume(cache: ConsumeCache) = true
   }

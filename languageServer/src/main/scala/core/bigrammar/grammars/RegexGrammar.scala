@@ -8,7 +8,7 @@ import BiGrammarToParser._
 
 case class RegexGrammar(regex: Regex, name: String, verifyWhenPrinting: Boolean = false)
   extends StringGrammar(verifyWhenPrinting) {
-  override def getParser(keywords: scala.collection.Set[String]): EditorParser[Any] = BiGrammarToParser.regex(regex, name)
+  override def getParser(keywords: scala.collection.Set[String]): Self[Any] = BiGrammarToParser.regex(regex, name)
 
   override def hashCode(): Int = regex.toString().hashCode
 

@@ -16,7 +16,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     val keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = grammar.selfAndDescendants.toSet
 
-    val tokenParsers: Set[BiGrammarToParser.EditorParser[MyToken]] = reachables.collect({
+    val tokenParsers: Set[BiGrammarToParser.Self[MyToken]] = reachables.collect({
       case keyword: Keyword if keyword.reserved =>
         keywords.add(keyword.value)
         literal(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))

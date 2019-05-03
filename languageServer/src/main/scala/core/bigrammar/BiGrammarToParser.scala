@@ -48,7 +48,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   def toStringParser(grammar: BiGrammar): String => ParseWholeResult[Any] =
     input => toParser(grammar).parseWholeInput(new Reader(input))
 
-  def toParser(grammar: BiGrammar): EditorParser[Any] = {
+  def toParser(grammar: BiGrammar): Self[Any] = {
 
     var keywords: Set[String] = Set.empty
     val allGrammars: Set[BiGrammar] = grammar.selfAndDescendants.toSet
@@ -60,9 +60,9 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     toParser(grammar, keywords)
   }
 
-  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): EditorParser[Any] = {
-    val cache: mutable.Map[BiGrammar, EditorParser[Result]] = mutable.Map.empty
-    lazy val recursive: BiGrammar => EditorParser[Result] = grammar => {
+  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): Self[Any] = {
+    val cache: mutable.Map[BiGrammar, Self[Result]] = mutable.Map.empty
+    lazy val recursive: BiGrammar => Self[Result] = grammar => {
       cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
     }
     val resultParser = toParser(keywords, recursive, grammar)
@@ -74,7 +74,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     afterStateRun._2.value
   }
 
-  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => EditorParser[Result], grammar: BiGrammar): EditorParser[Result] = {
+  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Self[Result], grammar: BiGrammar): Self[Result] = {
     grammar match {
       case sequence: BiSequence =>
         val firstParser = recursive(sequence.first)

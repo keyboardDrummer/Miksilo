@@ -1,6 +1,5 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.DefaultCache
 
 trait IndentationSensitiveParserWriter extends StringParserWriter {
   type Input <: IndentationReaderLike
@@ -11,7 +10,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     def withIndentation(value: Int): Input
   }
 
-  case class WithIndentation[Result](original: EditorParser[Result])
+  case class WithIndentation[Result](original: Self[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result]{
 
     override def getParser(recursive: GetParse): Parse[Result] = {
@@ -28,24 +27,21 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
 
       apply
     }
-
-
-    override def getDefault(cache: DefaultCache): Option[Result] = original.getDefault(cache)
   }
 
-  def alignedList[Element](element: EditorParser[Element]): Self[List[Element]] = {
+  def alignedList[Element](element: Self[Element]): Self[List[Element]] = {
     aligned(element, List.empty, (a: Element, b: List[Element]) => a :: b)
   }
 
-  def aligned[Element, Sum](firstLine: EditorParser[Element], zero: Sum, reduce: (Element, Sum) => Sum): Self[Sum] = {
+  def aligned[Element, Sum](firstLine: Self[Element], zero: Sum, reduce: (Element, Sum) => Sum): Self[Sum] = {
     val remainingLines = equal(firstLine).many(zero, reduce)
     WithIndentation(leftRight(firstLine, remainingLines, reduce))
   }
 
-  def equal[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
-  def greaterThan[Result](inner: EditorParser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
+  def equal[Result](inner: Self[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
+  def greaterThan[Result](inner: Self[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
 
-  case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: EditorParser[Result])
+  case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: Self[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
     override def getParser(recursive: GetParse) = {
@@ -61,8 +57,6 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
       }
       apply
     }
-
-    override def getDefault(cache: DefaultCache): Option[Result] = original.getDefault(cache)
 
     override def leftChildren = List(original)
 

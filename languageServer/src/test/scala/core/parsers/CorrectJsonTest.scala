@@ -10,7 +10,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   object UnknownExpression {
     override def toString = "unknown"
   }
-  protected lazy val jsonParser: EditorParser[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression, "value")
+  protected lazy val jsonParser: Self[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression, "value")
 
   test("test whether correct inputs always return a ready in one go") {
     val input = """{ "VpcId" : {
@@ -71,7 +71,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   test("object with a single member and comma") {
     val input = """{"person":3,"""
     val expectation = List(("person", "3"))
-    parseJson(input, expectation, 2)
+    parseJson(input, expectation, 5)
   }
 
   test("object with a single member and half second member") {
@@ -169,7 +169,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
    */
   test("virtual left recursion through error correction") {
     val input = """doesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatch"""
-    lazy val parser: EditorParser[Any] = "{" ~ parser | "x"
+    lazy val parser: Self[Any] = "{" ~ parser | "x"
     val result = parser.parseWholeInput(new StringReader(input))
     assertResult(2)(result.errors.size)
     assert(result.resultOption.nonEmpty)

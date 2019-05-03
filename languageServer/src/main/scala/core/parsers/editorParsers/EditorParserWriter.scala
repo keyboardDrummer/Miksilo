@@ -1,11 +1,10 @@
 package core.parsers.editorParsers
 
 import core.language.node.SourceRange
-import core.parsers.core.{GraphAlgorithms, OptimizingParserWriter, ParseInput}
+import core.parsers.core.{OptimizingParserWriter, ParseInput}
 import langserver.types.Position
 
 import scala.language.higherKinds
-
 
 trait EditorParserWriter extends OptimizingParserWriter {
 
@@ -29,16 +28,16 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   type Input <: CorrectingInput
 
-  type Self[+Result] = EditorParser[Result]
+  type Self[+Result] = LRParser[Result]
 
-  override def succeed[Result](result: Result): EditorParser[Result] = Succeed(result)
+  override def succeed[Result](result: Result): Self[Result] = Succeed(result)
 
   case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[ParseError]) {
     def successful = errors.isEmpty
     def get: Result = resultOption.get
   }
 
-  def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result]
+  def parseWholeInput[Result](parser: Self[Result], input: Input): ParseWholeResult[Result]
 
   case class Succeed[Result](value: Result) extends EditorParserBase[Result] with LeafParser[Result] {
 
@@ -46,21 +45,13 @@ trait EditorParserWriter extends OptimizingParserWriter {
       (input: Input, state) => newSuccess(value, input)
     }
 
-    override def getDefault(cache: DefaultCache): Option[Result] = Some(value)
-
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  trait EditorParserBase[Result] extends ParserBase[Result] with EditorParser[Result] {
-    var default: Option[Result] = None
+  trait EditorParserBase[Result] extends ParserBase[Result] with Self[Result] {
   }
 
-  trait EditorParser[+Result] extends LRParser[Result] with HasGetDefault[Result] {
-    def default: Option[Result]
-    def getDefault(cache: DefaultCache): Option[Result]
-  }
-
-  class MapParser[Result, NewResult](val original: EditorParser[Result], f: Result => NewResult)
+  class MapParser[Result, NewResult](val original: Self[Result], f: Result => NewResult)
     extends EditorParserBase[NewResult] with ParserWrapper[NewResult] {
 
     override def getParser(recursive: GetParse): Parse[NewResult] = {
@@ -70,8 +61,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
         override def apply(input: Input, state: ParseState): ParseResult[NewResult] = parseOriginal(input, state).map(f)
       }
     }
-
-    override def getDefault(cache: DefaultCache): Option[NewResult] = cache(original).map(f)
 
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
@@ -83,8 +72,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getParser(recursive: GetParse): Parse[Input] = {
       (input, _) => newSuccess(input, input)
     }
-
-    override def getDefault(cache: DefaultCache): Option[Input] = None
 
     override def getMustConsume(cache: ConsumeCache) = false
   }
@@ -131,28 +118,17 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def toString = message
   }
 
-  class EditorLazy[Result](_inner: => EditorParser[Result]) extends Lazy[Result](_inner) with EditorParserBase[Result] {
-
-    override def getDefault(cache: DefaultCache): Option[Result] = cache(original.asInstanceOf[EditorParser[Result]])
+  class EditorLazy[Result](_inner: => Self[Result]) extends Lazy[Result](_inner) with EditorParserBase[Result] {
   }
 
-  override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
+  override def lazyParser[Result](inner: => Self[Result]) = new EditorLazy(inner)
 
   case class Fail[Result](value: Option[Result], message: String) extends EditorParserBase[Result] with LeafParser[Result] {
-    override def getDefault(cache: DefaultCache) = None
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       (input, _) => newFailure(value, input, new History(MissingInput(input, message, 0.1)))
     }
 
     override def getMustConsume(cache: ConsumeCache) = false
-  }
-
-  def setDefaults(root: Self[_]): Unit = {
-    val cache = new DefaultCache
-    GraphAlgorithms.depthFirst[LRParser[_]](root, parser => parser.children, (first, path) => if (first) {
-      val parser = path.head.asInstanceOf[EditorParserBase[Any]]
-      parser.default = parser.getDefault(cache)
-    }, _ => {})
   }
 }

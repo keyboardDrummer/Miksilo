@@ -6,7 +6,6 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
-import core.parsers.editorParsers.DefaultCache
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.StringLiteralDelta
 
@@ -26,7 +25,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
   object TagNode extends NodeField
 
   object ContextKey
-  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]])
+  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.Self[Result]])
     extends EditorParserBase[Result] {
 
     override def getParser(recursive: BiGrammarToParser.GetParse): Parse[Result] = {
@@ -40,10 +39,6 @@ object YamlCoreDelta extends DeltaWithGrammar {
       apply
     }
 
-    override def getDefault(cache: DefaultCache) = {
-      inners.values.flatMap(inner => inner.getDefault(cache)).headOption
-    }
-
     override def leftChildren = children
 
     override def getMustConsume(cache: BiGrammarToParser.ConsumeCache) = inners.values.forall(i => cache(i))
@@ -51,7 +46,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
     override def children = inners.values.toList
   }
 
-  class WithContextParser[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
+  class WithContextParser[Result](update: YamlContext => YamlContext, val original: Self[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
     override def getParser(recursive: BiGrammarToParser.GetParse) = {
@@ -65,8 +60,6 @@ object YamlCoreDelta extends DeltaWithGrammar {
 
       apply
     }
-
-    override def getDefault(cache: DefaultCache) = original.getDefault(cache)
   }
 
   object IndentationSensitiveExpression extends GrammarKey

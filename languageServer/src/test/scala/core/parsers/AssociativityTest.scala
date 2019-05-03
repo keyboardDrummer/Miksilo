@@ -6,7 +6,7 @@ import editorParsers.LeftRecursiveCorrectingParserWriter
 class AssociativityTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   test("binary operators are right associative by default") {
-    lazy val expr: EditorParser[Any] = new EditorLazy(expr) ~< "-" ~ expr | wholeNumber
+    lazy val expr: Self[Any] = new EditorLazy(expr) ~< "-" ~ expr | wholeNumber
     val input = "1-2-3"
     val result = expr.parseWholeInput(new StringReader(input))
     assert(result.successful)
@@ -14,7 +14,7 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
   }
 
   test("binary operators can be made left associative") {
-    lazy val expr: EditorParser[Any] = wholeNumber.addAlternative[Any]((before, after) => after ~< "-" ~ before)
+    lazy val expr: Self[Any] = wholeNumber.addAlternative[Any]((before, after) => after ~< "-" ~ before)
     val input = "1-2-3"
     val result = expr.parseWholeInput(new StringReader(input))
     assert(result.successful)
@@ -31,7 +31,7 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
 
   test("if-then-else can be made right-associative") {
     lazy val expr = wholeNumber
-    val stmt: EditorParser[Any] = expr.
+    val stmt: Self[Any] = expr.
       addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after ~ "else" ~ before).
       addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after)
     val input = "if1thenif2then3else4"
@@ -51,7 +51,7 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
 
   test("if-then-else is left-associative by default") {
     lazy val expr = wholeNumber
-    lazy val stmt: EditorParser[Any] = expr |
+    lazy val stmt: Self[Any] = expr |
       "if" ~> expr ~ "then" ~ stmt ~ "else" ~ stmt |
       "if" ~> expr ~ "then" ~ stmt
     val input = "if1thenif2then3else4"
@@ -64,7 +64,7 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
 
   test("if-then-else can be made left-associative") {
     lazy val expr = wholeNumber
-    val stmt: EditorParser[Any] = expr.
+    val stmt: Self[Any] = expr.
       addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after).
       addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after ~ "else" ~ after)
     val input = "if1thenif2then3else4"

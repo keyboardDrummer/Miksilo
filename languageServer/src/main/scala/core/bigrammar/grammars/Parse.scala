@@ -22,5 +22,5 @@ case class Parse(grammar: BiGrammar) extends CustomGrammar {
     override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = TryState.value(Empty)
   }
 
-  override def toParser(recursive: BiGrammar => EditorParser[Result]): EditorParser[Result] = recursive(grammar)
+  override def toParser(recursive: BiGrammar => Self[Result]): Self[Result] = recursive(grammar)
 }

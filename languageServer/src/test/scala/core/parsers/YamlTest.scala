@@ -2,7 +2,7 @@
 package core2.parsers
 
 import core.document.Empty
-import core.parsers.editorParsers.{DefaultCache, LeftRecursiveCorrectingParserWriter}
+import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, ScoredPosition}
 import core.responsiveDocument.ResponsiveDocument
 import org.scalatest.FunSuite
@@ -76,21 +76,18 @@ class YamlTest extends FunSuite
   }
 
   val whiteSpace = RegexParser("""\s*""".r, "whitespace")
-  override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
-                                                 right: => EditorParser[Right],
-                                                 combine: (Left, Right) => NewResult): EditorParser[NewResult] = {
+  override def leftRight[Left, Right, NewResult](left: Self[Left],
+                                                 right: => Self[Right],
+                                                 combine: (Left, Right) => NewResult): Self[NewResult] = {
     new Sequence(left, new Sequence(whiteSpace, right, (a: String, b: Right) => b), combine)
   }
 
-  class IfContext[Result](inners: Map[YamlContext, EditorParser[Result]]) extends EditorParserBase[Result] {
+  class IfContext[Result](inners: Map[YamlContext, Self[Result]]) extends EditorParserBase[Result] {
 
     override def getParser(recursive: GetParse) = {
       val innerParsers = inners.mapValues(p => recursive(p).asInstanceOf[Parse[Result]])
       (input, state) => innerParsers(input.context)(input, state)
     }
-
-    override def getDefault(cache: DefaultCache) =
-      inners.values.flatMap(inner => inner.getDefault(cache)).headOption
 
     override def leftChildren = inners.values.toList
 
@@ -99,7 +96,7 @@ class YamlTest extends FunSuite
     override def children = leftChildren
   }
 
-  class WithContext[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
+  class WithContext[Result](update: YamlContext => YamlContext, val original: Self[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
@@ -113,11 +110,9 @@ class YamlTest extends FunSuite
 
       apply
     }
-
-    override def getDefault(cache: DefaultCache) = original.getDefault(cache)
   }
 
-  val tag: EditorParser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
+  val tag: Self[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
   case class TaggedNode(tag: String, node: YamlExpression) extends YamlExpression {
     override def toDocument: ResponsiveDocument = ResponsiveDocument.text("!") ~ tag ~~ node.toDocument
   }
@@ -125,9 +120,9 @@ class YamlTest extends FunSuite
   lazy val parseUntaggedFlowValue = parseBracketArray | parseStringLiteral
   lazy val parseFlowValue = (tag.option ~ parseUntaggedFlowValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
   lazy val parseUntaggedValue = lazyParser(parseBracketArray | parseArray | parseNumber | parseStringLiteral | parseBlockMapping)
-  lazy val parseValue: EditorParser[YamlExpression] = (tag.option ~ parseUntaggedValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
+  lazy val parseValue: Self[YamlExpression] = (tag.option ~ parseUntaggedValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
 
-  lazy val parseBlockMapping: EditorParser[YamlExpression] = {
+  lazy val parseBlockMapping: Self[YamlExpression] = {
     val member = new WithContext(_ =>
       BlockKey, parseFlowValue) ~< literal(":") ~ greaterThan(parseValue)
     alignedList(member).map(values => {
@@ -135,22 +130,22 @@ class YamlTest extends FunSuite
     })
   }
 
-  lazy val parseBracketArray: EditorParser[YamlExpression] = {
+  lazy val parseBracketArray: Self[YamlExpression] = {
     val inner = "[" ~> parseFlowValue.manySeparated(",").map(elements => Array(elements)) ~< "]"
     new WithContext(_ => FlowIn, inner)
   }
 
-  lazy val parseArray: EditorParser[YamlExpression] = {
+  lazy val parseArray: Self[YamlExpression] = {
     val element = literal("- ") ~> greaterThan(parseValue)
     alignedList(element).map(elements => Array(elements))
   }
 
-  lazy val parseNumber: EditorParser[YamlExpression] =
+  lazy val parseNumber: Self[YamlExpression] =
     wholeNumber.map(n => Number(Integer.parseInt(n)))
 
-  lazy val parseStringLiteral: EditorParser[YamlExpression] =
+  lazy val parseStringLiteral: Self[YamlExpression] =
     parseStringLiteralInner.map(s => StringLiteral(s))
-  lazy val parseStringLiteralInner: EditorParser[String] =
+  lazy val parseStringLiteralInner: Self[String] =
     regex("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
 
 

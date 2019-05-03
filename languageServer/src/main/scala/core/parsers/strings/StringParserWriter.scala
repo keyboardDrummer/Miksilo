@@ -1,7 +1,6 @@
 package core.parsers.strings
 
 import core.language.node.SourceRange
-import core.parsers.editorParsers.DefaultCache
 import core.parsers.sequences.SequenceParserWriter
 import langserver.types.Position
 
@@ -70,7 +69,7 @@ trait StringParserWriter extends SequenceParserWriter {
     }
   }
 
-  override def parseWholeInput[Result](parser: EditorParser[Result], input: Input): ParseWholeResult[Result] = {
+  override def parseWholeInput[Result](parser: Self[Result], input: Input): ParseWholeResult[Result] = {
     parse(ParseWholeInput(parser), input)
   }
 
@@ -96,8 +95,6 @@ trait StringParserWriter extends SequenceParserWriter {
         }
       }
     }
-
-    override def getDefault(cache: DefaultCache) = cache(original)
   }
 
   implicit def literalToExtensions(value: String): ParserExtensions[String] = Literal(value)
@@ -132,9 +129,6 @@ trait StringParserWriter extends SequenceParserWriter {
       result
     }
 
-
-    override def getDefault(cache: DefaultCache): Option[String] = Some(value)
-
     override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
   }
 
@@ -163,8 +157,6 @@ trait StringParserWriter extends SequenceParserWriter {
 
       result
     }
-
-    override def getDefault(cache: DefaultCache): Option[String] = None
 
     override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
   }

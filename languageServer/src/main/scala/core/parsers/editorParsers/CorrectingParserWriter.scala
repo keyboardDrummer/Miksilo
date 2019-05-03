@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 
 trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
 
-  def parse[Result](parser: EditorParser[Result], input: Input, milliseconds: Int = 20): ParseWholeResult[Result] = {
+  def parse[Result](parser: Self[Result], input: Input, milliseconds: Int = 20): ParseWholeResult[Result] = {
 
     val noResultFound = ReadyParseResult(None, input, new History(MissingInput(input, "Grammar is always recursive", Int.MaxValue)))
     var bestResult: ReadyParseResult[Result] =
@@ -46,19 +46,22 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   def newFailure[Result](input: Input, message: String): SRCons[Nothing] =
     singleResult(ReadyParseResult(None, input, new History(MissingInput(input, message))))
 
-  override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
-                                                 right: => EditorParser[Right],
-                                                 combine: (Left, Right) => NewResult): EditorParser[NewResult] =
+  override def leftRight[Left, Right, NewResult](left: Self[Left],
+                                                 right: => Self[Right],
+                                                 combine: (Left, Right) => NewResult): Self[NewResult] =
     new Sequence(left, right, combine)
 
-  override def succeed[NR](result: NR): EditorParser[NR] = Succeed(result)
+  override def succeed[NR](result: NR): Self[NR] = Succeed(result)
 
-  override def choice[Result](first: EditorParser[Result], other: => EditorParser[Result], leftIsAlwaysBigger: Boolean): EditorParser[Result] =
-  /*if (leftIsAlwaysBigger) new OrElse(first, other) else*/ new BiggestOfTwo(first, other)
+  override def withDefault[Result](original: LRParser[Result], value: Result) = {
+    WithDefault(original, value) | succeed(value)
+  }
+
+  override def choice[Result](first: Self[Result], other: => Self[Result]): Self[Result] = new BiggestOfTwo(first, other)
 
   override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
 
-  override def lazyParser[Result](inner: => EditorParser[Result]) = new EditorLazy(inner)
+  override def lazyParser[Result](inner: => Self[Result]) = new EditorLazy(inner)
 
   sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
     def depth: Int
@@ -211,12 +214,12 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
   }
 
-  class Sequence[+Left, +Right, Result](val left: EditorParser[Left],
-                                         _right: => EditorParser[Right],
+  class Sequence[+Left, +Right, Result](val left: Self[Left],
+                                         _right: => Self[Right],
                                          combine: (Left, Right) => Result)
     extends EditorParserBase[Result] with SequenceLike[Result] {
 
-    lazy val right: EditorParser[Right] = _right
+    lazy val right: Self[Right] = _right
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseLeft = recursive(left)
@@ -253,19 +256,14 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         }
       }
     }
-
-    override def getDefault(cache: DefaultCache): Option[Result] = for {
-      leftDefault <- cache(left)
-      rightDefault <- cache(right)
-    } yield combine(leftDefault, rightDefault)
   }
 
 
-  implicit class EditorParserExtensions[Result](parser: EditorParser[Result]) extends ParserExtensions(parser) {
+  implicit class EditorParserExtensions[Result](parser: Self[Result]) extends ParserExtensions(parser) {
 
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
 
-    def withDefault[Other >: Result](_default: Other, name: String): EditorParser[Other] =
+    def withDefault[Other >: Result](_default: Other, name: String): Self[Other] =
       this | Fail(Some(_default), s"expected a $name")
 
     def parseWholeInput(input: Input): ParseWholeResult[Result] = {
@@ -273,12 +271,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def parseRoot(input: Input): ParseResult[Result] = {
-      setDefaults(parser)
       val analysis = compile(parser)
       analysis.getParse(parser)(input, newParseState(input))
     }
 
-    def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): EditorParser[Other] = {
+    def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Self[Other] = {
       val withPosition = leftRight(
         PositionParser,
         WithRemainderParser(parser),
@@ -287,7 +284,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
   }
 
-  class BiggestOfTwo[+First <: Result, +Second <: Result, Result](val first: EditorParser[First], _second: => EditorParser[Second])
+  class BiggestOfTwo[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
     extends EditorParserBase[Result] with ChoiceLike[Result] {
 
     lazy val second = _second
@@ -304,14 +301,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         }
       }
     }
-
-    override def getDefault(cache: DefaultCache): Option[Result] = {
-      val value: Option[First] = cache(first)
-      value.orElse(cache(second))
-    }
   }
 
-  case class Filter[Other, Result <: Other](original: EditorParser[Result],
+  case class Filter[Other, Result <: Other](original: Self[Result],
                                             predicate: Other => Boolean, getMessage: Other => String)
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
@@ -322,16 +314,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         val originalResult = parseOriginal(input, state)
         originalResult.mapReady(s => {
           s.resultOption match {
-            case Some(result) => if (predicate(result)) s else ReadyParseResult(default, s.remainder,
+            case Some(result) => if (predicate(result)) s else ReadyParseResult(None, s.remainder,
               s.history.addError(MissingInput(s.remainder, getMessage(result))))
             case None => s
           }
         })
       }
     }
-
-    override def getDefault(cache: DefaultCache): Option[Result] =
-      original.getDefault(cache).filter(predicate)
   }
 
   case class WithRemainderParser[Result](original: Self[Result])
@@ -342,8 +331,25 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       (input, state) => parseOriginal(input, state).mapReady(r =>
         ReadyParseResult(r.resultOption.map(v => Success(v, r.remainder)), r.remainder, r.history))
     }
-
-    override def getDefault(cache: DefaultCache): Option[Success[Result]] = None
   }
 
+
+  case class WithDefault[Result](original: Self[Result], _default: Result)
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+
+    override def getParser(recursive: GetParse): Parse[Result] = {
+      val parseOriginal = recursive(original)
+
+      def apply(input: Input, state: ParseState): ParseResult[Result] = {
+        val result = parseOriginal(input, state)
+        result.mapReady(ready => {
+          if (ready.resultOption.isEmpty) {
+            ReadyParseResult(Some(_default), ready.remainder, ready.history)
+          } else
+            ready
+        })
+      }
+      apply
+    }
+  }
 }

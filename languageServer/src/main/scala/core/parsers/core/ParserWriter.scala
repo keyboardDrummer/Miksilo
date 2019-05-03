@@ -12,13 +12,15 @@ trait ParserWriter {
   def succeed[Result](result: Result): Self[Result]
   def newSuccess[Result](result: Result, remainder: Input): ParseResult[Result]
 
-  def choice[Result](first: Self[Result], other: => Self[Result], leftIsAlwaysBigger: Boolean = false): Self[Result]
+  def choice[Result](first: Self[Result], other: => Self[Result]): Self[Result]
 
   def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult]
 
   def leftRight[Left, Right, NewResult](left: Self[Left],
                                         right: => Self[Right],
                                         combine: (Left, Right) => NewResult): Self[NewResult]
+
+  def withDefault[Result](original: Self[Result], value: Result): Self[Result] = original | succeed(value)
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
 
@@ -43,7 +45,7 @@ trait ParserWriter {
     }
 
     def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum): Self[Sum] = {
-      lazy val result: Self[Sum] = choice(leftRight(parser, result, reduce), succeed(zero), leftIsAlwaysBigger = true)
+      lazy val result: Self[Sum] = withDefault(leftRight(parser, result, reduce), zero)
       result
     }
 
