@@ -149,9 +149,9 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   }
 
   test("starting brace insertion") {
-    val input = """{"person""remy":"jeroen"}"""
+    val input = """{"person""remy":"jeroen"}}"""
     val expectation = List(("person",List(("remy","jeroen"))))
-    parseJson(input, expectation, 3)
+    parseJson(input, expectation, 2, 500)
   }
 
   /*
@@ -180,8 +180,8 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
 
-  private def parseJson(input: String, expectation: Any, errorCount: Int) = {
-    val result = jsonParser.parseWholeInput(new StringReader(input))
+  private def parseJson(input: String, expectation: Any, errorCount: Int, milliseconds: Int = 20) = {
+    val result = jsonParser.parseWholeInput(new StringReader(input), milliseconds)
     System.out.append(result.errors.toString())
     assertResult(expectation)(result.resultOption.get)
     assertResult(errorCount)(result.errors.size)

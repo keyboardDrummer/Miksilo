@@ -164,10 +164,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       f(head) match {
         case SREmpty => tail.flatMap(f)
         case cons: SRCons[NewResult] => // Try not to evaluate tail, but if head's score gets worse, we have to otherwise the sorting may be incorrect.
-          if (cons.head.score >= head.score)
-            new SRCons[NewResult](cons.head, 2 + Math.max(cons.tail.depth, tail.depth), cons.tail.merge(tail.flatMap(f)))
-          else
-            cons.merge(tail.flatMap(f))
+          cons.merge(tail.flatMap(f))
+//          if (cons.head.score >= head.score)
+//            new SRCons[NewResult](cons.head, 2 + Math.max(cons.tail.depth, tail.depth), cons.tail.merge(tail.flatMap(f)))
+//          else
       }
     }
 
@@ -230,44 +230,38 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         override def apply(input: Input, state: ParseState) = {
           val leftResults = parseLeft(input, state)
 
-          def rightFromLeftReady(delayOnError: Boolean): ReadyParseResult[Left] => SortedParseResults[Result] =
-            (leftReady: ReadyParseResult[Left]) => {
-              def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
-                leftReady.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
-                rightResult.remainder,
-                rightResult.history)
-
-              val withoutDrop = if (delayOnError && leftReady.history.errors.nonEmpty) // TODO maybe I can continue with everything that is at or above the score of the root.
-                singleResult(new DelayedParseResult(leftReady.remainder, leftReady.history,
-                  () => parseRight(leftReady.remainder, state).mapWithErrors[Result](mapRightResult, leftReady.history)))
+          val delayedLeftResults: SortedParseResults[Left] = leftResults.mapResult({
+            case ready: ReadyParseResult[Left] =>
+              if (ready.history.errors.nonEmpty)
+                new DelayedParseResult[Left](ready.remainder, ready.history, () => singleResult(ready))
               else
-                parseRight(leftReady.remainder, state).mapWithErrors[Result](mapRightResult, leftReady.history)
-
-              if (leftReady.remainder.atEnd) {
-                withoutDrop
-              }
-              else {
-                val droppedInput = leftReady.remainder.drop(1)
-                val dropError = DropError(leftReady.remainder, droppedInput)
-                val dropHistory = leftReady.history.addError(dropError)
-                val withDrop = singleResult(new DelayedParseResult(droppedInput, dropHistory , () => {
-                  rightFromLeftReady(false)(ReadyParseResult(leftReady.resultOption, droppedInput, dropHistory))
-                }))
-
-                withoutDrop.merge(withDrop)
-              }
-            }
-
-          leftResults.flatMap({
-            case ready: ReadyParseResult[Left] => rightFromLeftReady(true)(ready)
-            case delayed: DelayedParseResult[Left] =>
-
-              singleResult(new DelayedParseResult[Result](delayed.remainder, delayed.history,
-                () => {
-                  val intermediate = delayed.results
-                  intermediate.flatMapReady(rightFromLeftReady(false))
-                }))
+                ready
+            case delayed: DelayedParseResult[Left] => delayed
           })
+
+          def rightFromLeftReady(leftReady: ReadyParseResult[Left]): SortedParseResults[Result] = {
+            def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
+              leftReady.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
+              rightResult.remainder,
+              rightResult.history)
+
+            val withoutDrop = parseRight(leftReady.remainder, state).mapWithErrors[Result](mapRightResult, leftReady.history)
+
+            if (leftReady.remainder.atEnd) {
+              withoutDrop
+            }
+            else {
+              val droppedInput = leftReady.remainder.drop(1)
+              val dropError = DropError(leftReady.remainder, droppedInput)
+              val dropHistory = leftReady.history.addError(dropError)
+              val withDrop = singleResult(new DelayedParseResult(droppedInput, dropHistory , () => {
+                rightFromLeftReady(ReadyParseResult(leftReady.resultOption, droppedInput, dropHistory))
+              }))
+
+              withoutDrop.merge(withDrop)
+            }
+          }
+          delayedLeftResults.flatMapReady(rightFromLeftReady)
         }
       }
     }
@@ -281,8 +275,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def withDefault[Other >: Result](_default: Other, name: String): Self[Other] =
       this | Fail(Some(_default), s"expected a $name")
 
-    def parseWholeInput(input: Input): ParseWholeResult[Result] = {
-      CorrectingParserWriter.this.parseWholeInput(parser, input)
+    def parseWholeInput(input: Input, milliseconds: Int = 0): ParseWholeResult[Result] = {
+      parse(ParseWholeInput(parser), input, milliseconds)
     }
 
     override def parseRoot(input: Input): ParseResult[Result] = {
@@ -296,6 +290,29 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         WithRemainderParser(parser),
         (left: Input, resultRight: Success[Result]) => addRange(left, resultRight.remainder, resultRight.result))
       withPosition // WithDefault(withPosition, cache => parser.getDefault(cache))
+    }
+  }
+
+  case class ParseWholeInput[Result](original: Self[Result])
+    extends EditorParserBase[Result] with ParserWrapper[Result] {
+
+    override def getParser(recursive: GetParse): Parse[Result] = {
+      val parseOriginal = recursive(original)
+
+      new Parse[Result] {
+        override def apply(input: Input, state: ParseState) = {
+          val result = parseOriginal(input, state)
+          result.mapReady(parseResult => {
+            val remainder = parseResult.remainder
+            if (remainder.atEnd)
+              parseResult
+            else {
+              val error = DropError(remainder, remainder.end)
+              ReadyParseResult(parseResult.resultOption, remainder.end, parseResult.history.addError(error))
+            }
+          })
+        }
+      }
     }
   }
 
@@ -368,13 +385,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
   }
 
-  case class DropError(from: Input, to: Input, expectation: String = "") extends ParseError {
-    def this(from: Input, expectation: String) = this(from, from.drop(1), expectation)
+  case class DropError(from: Input, to: Input) extends ParseError {
+    def this(from: Input, expectation: String) = this(from, from.drop(1))
 
     override def append(next: ParseError): Option[ParseError] = {
       next match {
         case drop: DropError if drop.from == to =>
-          Some(DropError(from, drop.to, expectation))
+          Some(DropError(from, drop.to))
         case _ => None
       }
     }

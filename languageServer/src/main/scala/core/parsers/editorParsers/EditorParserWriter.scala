@@ -13,6 +13,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
   trait EditorParseInput extends ParseInput {
     def position: Position
     def drop(amount: Int): Input
+    def end: Input
     def printRange(end: Input): String
   }
 
@@ -37,8 +38,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
     def successful = errors.isEmpty
     def get: Result = resultOption.get
   }
-
-  def parseWholeInput[Result](parser: Self[Result], input: Input): ParseWholeResult[Result]
 
   case class Succeed[Result](value: Result) extends EditorParserBase[Result] with LeafParser[Result] {
 
@@ -77,7 +76,10 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class SuccessLog(start: Input, end: Input)
+  case class SuccessLog(start: Input, end: Input) {
+    override def toString = start.printRange(end)
+  }
+
   case class History(score: Double, errors: List[ParseError], successes: List[SuccessLog]) {
     def this() = this(0, List.empty, List.empty)
     def this(error: ParseError) = this(error.score, List(error), List.empty)

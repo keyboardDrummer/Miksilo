@@ -14,6 +14,8 @@ trait StringParserWriter extends SequenceParserWriter {
   abstract class StringReaderBase(val array: ArrayCharSequence, val offset: Int, val position: Position)
     extends StringReaderLike {
 
+    override def end = drop(array.length() - offset)
+
     val sequence: CharSequence = array
 
     override def printRange(end: Input) = array.subSequence(offset, end.offset).toString
@@ -56,34 +58,6 @@ trait StringParserWriter extends SequenceParserWriter {
         }
       }
       Position(row, column)
-    }
-  }
-
-  override def parseWholeInput[Result](parser: Self[Result], input: Input): ParseWholeResult[Result] = {
-    parse(ParseWholeInput(parser), input)
-  }
-
-  case class ParseWholeInput[Result](original: Self[Result])
-    extends EditorParserBase[Result] with ParserWrapper[Result] {
-
-    override def getParser(recursive: GetParse): Parse[Result] = {
-      val parseOriginal = recursive(original)
-
-      new Parse[Result] {
-        override def apply(input: Input, state: ParseState) = {
-          val result = parseOriginal(input, state)
-          result.mapReady(parseResult => {
-            val remainder = parseResult.remainder
-            if (remainder.atEnd)
-              parseResult
-            else {
-              val end = remainder.drop(remainder.array.length() - remainder.offset)
-              val error = DropError(remainder, end, "end of input")
-              ReadyParseResult(parseResult.resultOption, end, parseResult.history.addError(error))
-            }
-          })
-        }
-      }
     }
   }
 
