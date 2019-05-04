@@ -107,7 +107,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   trait ParseError {
     def penalty: Double
-    def score: Double = -penalty * 2
+    def score: Double = -penalty * 1
     def append(other: ParseError): Option[ParseError] = None
     def message: String
     def from: Input

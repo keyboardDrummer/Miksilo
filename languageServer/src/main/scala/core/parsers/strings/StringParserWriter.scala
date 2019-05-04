@@ -163,7 +163,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
     override def penalty = {
       val length = to.offset - from.offset
-      2.1 - 1.0 / length
+      1 - 0.1 / length
     }
 
     override def message = {

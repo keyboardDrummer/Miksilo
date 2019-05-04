@@ -8,13 +8,13 @@ class HistoryTest extends FunSuite with StringParserWriter {
 
   test("two consecutive drops combine and become cheaper") {
     val splitDrops = new History().
-      addError(DropError(IndexInput(0),IndexInput(1), "")).
+      addError(DropError(IndexInput(0),IndexInput(1))).
       addSuccess(IndexInput(2)).
-      addError(DropError(IndexInput(2),IndexInput(3), ""))
+      addError(DropError(IndexInput(2),IndexInput(3)))
 
     val dropsLeft = new History().
-      addError(DropError(IndexInput(0),IndexInput(1), "")).
-      addError(DropError(IndexInput(1),IndexInput(2), "")).
+      addError(DropError(IndexInput(0),IndexInput(1))).
+      addError(DropError(IndexInput(1),IndexInput(2))).
       addSuccess(IndexInput(3))
 
     val dropsRight = new History().
@@ -58,8 +58,8 @@ class HistoryTest extends FunSuite with StringParserWriter {
     val start = IndexInput(0)
     val far = IndexInput(40)
     var further = IndexInput(far.offset + 1)
-    val farWithoutSuccess = new History().addError(DropError(start, far, ""))
-    val furtherWithoutSuccess = new History().addError(DropError(start, further, ""))
+    val farWithoutSuccess = new History().addError(DropError(start, far))
+    val furtherWithoutSuccess = new History().addError(DropError(start, further))
     val furtherWithSuccess = furtherWithoutSuccess.addSuccess(IndexInput(further.offset + 1))
     assert(farWithoutSuccess.score > furtherWithoutSuccess.score)
     assert(farWithoutSuccess.score < furtherWithSuccess.score)
