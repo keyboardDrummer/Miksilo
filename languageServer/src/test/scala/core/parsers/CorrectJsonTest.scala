@@ -80,7 +80,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
     parseJson(input, expectation, 3)
   }
 
-  test("real life example") {
+  test("real life example missing :value") {
     val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subscription"}}}}"""
     val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription",UnknownExpression))))))))
     parseJson(input, expectation, 2)

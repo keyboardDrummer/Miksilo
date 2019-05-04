@@ -1,5 +1,6 @@
 package core.parsers.editorParsers
 
+import core.language.node.SourceRange
 import core.parsers.core.OptimizingParserWriter
 import org.joda.time.DateTime
 
@@ -67,7 +68,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def depth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
 
-    def addErrors(errors: History): SortedParseResults[Result] = {
+    def addHistory(errors: History): SortedParseResults[Result] = {
       mapWithErrors(x => x, errors)
     }
 
@@ -230,17 +231,31 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
           val leftResults = parseLeft(input, state)
 
           def rightFromLeftReady(delayOnError: Boolean): ReadyParseResult[Left] => SortedParseResults[Result] =
-            (ready: ReadyParseResult[Left]) => {
+            (leftReady: ReadyParseResult[Left]) => {
               def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
-                ready.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
+                leftReady.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
                 rightResult.remainder,
                 rightResult.history)
 
-              if (delayOnError && ready.history.errors.nonEmpty) // TODO maybe I can continue with everything that at or above the score of the root.
-                singleResult(new DelayedParseResult(ready.remainder, ready.history,
-                  () => parseRight(ready.remainder, state).mapWithErrors[Result](mapRightResult, ready.history)))
+              val withoutDrop = if (delayOnError && leftReady.history.errors.nonEmpty) // TODO maybe I can continue with everything that is at or above the score of the root.
+                singleResult(new DelayedParseResult(leftReady.remainder, leftReady.history,
+                  () => parseRight(leftReady.remainder, state).mapWithErrors[Result](mapRightResult, leftReady.history)))
               else
-                parseRight(ready.remainder, state).mapWithErrors[Result](mapRightResult, ready.history)
+                parseRight(leftReady.remainder, state).mapWithErrors[Result](mapRightResult, leftReady.history)
+
+              if (leftReady.remainder.atEnd) {
+                withoutDrop
+              }
+              else {
+                val droppedInput = leftReady.remainder.drop(1)
+                val dropError = DropError(leftReady.remainder, droppedInput)
+                val dropHistory = leftReady.history.addError(dropError)
+                val withDrop = singleResult(new DelayedParseResult(droppedInput, dropHistory , () => {
+                  rightFromLeftReady(false)(ReadyParseResult(leftReady.resultOption, droppedInput, dropHistory))
+                }))
+
+                withoutDrop.merge(withDrop)
+              }
             }
 
           leftResults.flatMap({
@@ -351,5 +366,29 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       }
       apply
     }
+  }
+
+  case class DropError(from: Input, to: Input, expectation: String = "") extends ParseError {
+    def this(from: Input, expectation: String) = this(from, from.drop(1), expectation)
+
+    override def append(next: ParseError): Option[ParseError] = {
+      next match {
+        case drop: DropError if drop.from == to =>
+          Some(DropError(from, drop.to, expectation))
+        case _ => None
+      }
+    }
+
+    override def penalty = {
+      val length = to.offset - from.offset
+      1 - 0.1 / length
+    }
+
+    override def message = {
+      val found = from.printRange(to)
+      s"Skipped '$found'"
+    }
+
+    override def range = SourceRange(from.position, to.position)
   }
 }

@@ -1,6 +1,5 @@
 package core.parsers.strings
 
-import core.language.node.SourceRange
 import core.parsers.sequences.SequenceParserWriter
 import langserver.types.Position
 
@@ -16,6 +15,8 @@ trait StringParserWriter extends SequenceParserWriter {
     extends StringReaderLike {
 
     val sequence: CharSequence = array
+
+    override def printRange(end: Input) = array.subSequence(offset, end.offset).toString
 
     override def atEnd: Boolean = offset == array.length
 
@@ -105,13 +106,12 @@ trait StringParserWriter extends SequenceParserWriter {
               return singleResult(ReadyParseResult(Some(value), input, new History(MissingInput(input, message, 0.1))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               val message = s"expected '$value' but found '${array.subSequence(input.offset, arrayIndex + 1)}'"
-
-              return drop(Some(value), input, state, message, result, s"'$value'")
+              return singleResult(ReadyParseResult(Some(value), input, new History(MissingInput(input, message))))
             }
             index += 1
           }
           val remainder = input.drop(value.length)
-          singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(remainder)))
+          singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(input, remainder)))
         }
       }
 
@@ -131,15 +131,15 @@ trait StringParserWriter extends SequenceParserWriter {
             case Some(matched) =>
               val value = input.array.subSequence(input.offset, input.offset + matched.end).toString
               val remainder = input.drop(matched.end)
-              singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(remainder)))
+              singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(input, remainder)))
             case None =>
               if (input.atEnd) {
                 val message = s"expected $regexName but found end of source"
-                return singleResult(ReadyParseResult(None, input, new History(MissingInput(input, message, 1))))
+                singleResult(ReadyParseResult(None, input, new History(MissingInput(input, message))))
+              } else {
+                val message = s"expected $regexName but found '${input.array.charAt(input.offset)}'"
+                singleResult(ReadyParseResult(None, input, new History(MissingInput(input, message))))
               }
-
-              val message = s"expected $regexName but found '${input.array.charAt(input.offset)}'"
-              drop(None, input, state, message, result, regexName)
           }
         }
       }
@@ -148,43 +148,5 @@ trait StringParserWriter extends SequenceParserWriter {
     }
 
     override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
-  }
-
-  case class DropError(from: Input, to: Input, expectation: String = "") extends ParseError {
-    def this(from: Input, expectation: String) = this(from, from.drop(1), expectation)
-
-    override def append(next: ParseError): Option[ParseError] = {
-      next match {
-        case drop: DropError if drop.from == to =>
-          Some(DropError(from, drop.to, expectation))
-        case _ => None
-      }
-    }
-
-    override def penalty = {
-      val length = to.offset - from.offset
-      1 - 0.1 / length
-    }
-
-    override def message = {
-      val found = from.array.subSequence(from.offset, to.offset)
-      s"Skipped '$found' (while expecting $expectation)"
-    }
-
-    override def range = SourceRange(from.position, to.position)
-  }
-
-  def drop[Result](resultOption: Option[Result],
-                   input: Input, state: ParseState,
-                   errorMessage: String, parse: Parse[Result], expectation: String): SortedParseResults[Result] = {
-
-    val errors = new History(MissingInput(input, errorMessage))
-    val withoutDrop = ReadyParseResult(resultOption, input, errors)
-    val dropError = new History(new DropError(input, expectation))
-    val droppedInput = input.drop(1)
-    val dropped = new DelayedParseResult(droppedInput, dropError, () => {
-      parse.apply(droppedInput, state).addErrors(dropError)
-    })
-    new SRCons[Result](withoutDrop, 1, singleResult(dropped))
   }
 }

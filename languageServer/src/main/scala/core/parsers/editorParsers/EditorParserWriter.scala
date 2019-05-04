@@ -12,9 +12,11 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   trait EditorParseInput extends ParseInput {
     def position: Position
+    def drop(amount: Int): Input
+    def printRange(end: Input): String
   }
 
-  case class MissingInput(location: Input, message: String, penalty: Double = 1) extends ParseError {
+  case class MissingInput(location: Input, message: String, penalty: Double = 0.9) extends ParseError {
     override def append(other: ParseError): Option[ParseError] = None
 
     override def range = {
@@ -75,31 +77,36 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class History(score: Double, errors: List[ParseError]) {
-    def this() = this(0, List.empty)
-    def this(error: ParseError) = this(error.score, List(error))
+  case class SuccessLog(start: Input, end: Input)
+  case class History(score: Double, errors: List[ParseError], successes: List[SuccessLog]) {
+    def this() = this(0, List.empty, List.empty)
+    def this(error: ParseError) = this(error.score, List(error), List.empty)
 
     def ++(right: History): History = {
       if (errors.isEmpty)
-        return History(score + right.score, right.errors)
+        return History(score + right.score, right.errors, successes ++ right.successes)
 
       val (withoutLast, last :: Nil) = errors.splitAt(errors.length - 1)
-      val newLeft = History(score - last.score, withoutLast)
+      val newLeft = History(score - last.score, withoutLast, List.empty)
       val newRight = right.addError(last)
-      History(newLeft.score + newRight.score, newLeft.errors ++ newRight.errors)
+      History(newLeft.score + newRight.score, newLeft.errors ++ newRight.errors, successes ++ right.successes)
     }
 
-    def addSuccess(end: Input): History = {
-      History(score + 1, errors)
+    def addTestSuccess(point: Input): History = {
+      History(score + 1, errors, successes)
+    }
+
+    def addSuccess(start: Input, end: Input): History = {
+      History(score + 1, errors, SuccessLog(start, end) :: successes)
     }
 
     def addError(newHead: ParseError): History = {
       errors match {
-        case Nil => History(score + newHead.score, List(newHead))
+        case Nil => History(score + newHead.score, List(newHead), successes)
         case head :: tail =>
           head.append(newHead) match {
-            case None => History(score + newHead.score, newHead :: errors)
-            case Some(merged) => History(score - head.score + merged.score, merged :: tail)
+            case None => History(score + newHead.score, newHead :: errors, successes)
+            case Some(merged) => History(score - head.score + merged.score, merged :: tail, successes)
           }
       }
     }
