@@ -69,7 +69,7 @@ class HistoryTest extends FunSuite with StringParserWriter {
 
     override def atEnd = ???
 
-    override def scoredPosition = ???
+    override def position = ???
 
     override def array = ???
 

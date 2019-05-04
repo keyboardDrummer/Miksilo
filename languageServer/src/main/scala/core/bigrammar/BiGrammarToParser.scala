@@ -2,8 +2,8 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers.editorParsers.{CorrectingParserWriter, LeftRecursiveCorrectingParserWriter}
-import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, ScoredPosition}
+import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter}
+import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import langserver.types.Position
 
 import scala.collection.mutable
@@ -19,14 +19,14 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   type Input = Reader
 
   object IndentationKey
-  class Reader(array: ArrayCharSequence, offset: Int, scoredPosition: ScoredPosition, val state: State)
+  class Reader(array: ArrayCharSequence, offset: Int, scoredPosition: Position, val state: State)
     extends StringReaderBase(array, offset, scoredPosition)
     with IndentationReaderLike {
 
     def withState(newState: State): Reader = new Reader(array, offset, scoredPosition, newState)
 
     def this(text: String) {
-      this(text.toCharArray, 0, ScoredPosition(0, Position(0, 0)), Map.empty)
+      this(text.toCharArray, 0, Position(0, 0), Map.empty)
     }
 
     override def drop(amount: Int) = new Reader(array, offset + amount, move(amount), state)

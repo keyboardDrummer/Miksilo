@@ -1,12 +1,13 @@
 package core.parsers.sequences
 
-import core.parsers.editorParsers.{CorrectingParserWriter}
+import core.parsers.core.ParseInput
+import core.parsers.editorParsers.CorrectingParserWriter
 
 trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem
   type Input <: SequenceInput[Input, Elem]
 
-  trait SequenceInput[Input, Elem] extends CorrectingInput {
+  trait SequenceInput[Input, Elem] extends EditorParseInput {
     def head: Elem
     def tail: Input
   }

@@ -8,6 +8,12 @@ import scala.language.higherKinds
 
 trait EditorParserWriter extends OptimizingParserWriter {
 
+  type Input <: EditorParseInput
+
+  trait EditorParseInput extends ParseInput {
+    def position: Position
+  }
+
   case class MissingInput(location: Input, message: String, penalty: Double = 1) extends ParseError {
     override def append(other: ParseError): Option[ParseError] = None
 
@@ -20,13 +26,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
     override def to = from
   }
-
-  trait CorrectingInput extends ParseInput {
-    def offsetScore: Int
-    def position: Position
-  }
-
-  type Input <: CorrectingInput
 
   type Self[+Result] = LRParser[Result]
 

@@ -6,19 +6,13 @@ import langserver.types.Position
 
 import scala.util.matching.Regex
 
-object ScoredPosition {
-  val zero = ScoredPosition(0, Position(0,0))
-}
-
-case class ScoredPosition(score: Int, position: Position)
-
 trait StringParserWriter extends SequenceParserWriter {
   type Elem = Char
   type Input <: StringReaderLike
 
   val consecutiveErrorPowerDiscount = 0.5
 
-  abstract class StringReaderBase(val array: ArrayCharSequence, val offset: Int, val scoredPosition: ScoredPosition)
+  abstract class StringReaderBase(val array: ArrayCharSequence, val offset: Int, val position: Position)
     extends StringReaderLike {
 
     val sequence: CharSequence = array
@@ -42,22 +36,17 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   trait StringReaderLike extends SequenceInput[Input, Char] {
-    def scoredPosition: ScoredPosition
-    def position: Position = scoredPosition.position
-    def offsetScore = scoredPosition.score
+    def position: Position
     def offset: Int
     def array: ArrayCharSequence
     def drop(amount: Int): Input
     def remaining = array.length() - offset
 
-    def move(increase: Int): ScoredPosition = {
+    def move(increase: Int): Position = {
       var column = position.character
       var row = position.line
-      var score = scoredPosition.score
       for(index <- offset.until(offset + increase)) {
         val character = array.charAt(index)
-        if (character != '\n' && character != ' ')
-          score += 1
         if (character == '\n') {
           row += 1
           column = 0
@@ -65,7 +54,7 @@ trait StringParserWriter extends SequenceParserWriter {
           column += 1
         }
       }
-      ScoredPosition(score, Position(row, column))
+      Position(row, column)
     }
   }
 
