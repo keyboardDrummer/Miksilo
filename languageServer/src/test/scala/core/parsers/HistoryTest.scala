@@ -19,11 +19,39 @@ class HistoryTest extends FunSuite with StringParserWriter {
 
     val dropsRight = new History().
       addSuccess(IndexInput(1)).
-      addError(DropError(IndexInput(1),IndexInput(2), "")).
-      addError(DropError(IndexInput(2),IndexInput(3), ""))
+      addError(DropError(IndexInput(1),IndexInput(2))).
+      addError(DropError(IndexInput(2),IndexInput(3)))
 
     assert(dropsRight.score == dropsLeft.score)
     assert(splitDrops.score < dropsRight.score)
+  }
+
+  test("splitting a long drop with a success is good") {
+    val start = IndexInput(0)
+    val middle = IndexInput(50)
+    val middlePlusOne = IndexInput(51)
+    val end = IndexInput(100)
+    val withoutSuccess = new History().addError(DropError(start, end))
+    val furtherWithoutSuccess = new History().
+      addError(DropError(start, middle)).
+      addSuccess(middlePlusOne).
+      addError(DropError(middlePlusOne, end))
+
+    assert(furtherWithoutSuccess.score > withoutSuccess.score)
+  }
+
+  test("splitting a short drop with a success is good") {
+    val start = IndexInput(0)
+    val middle = IndexInput(1)
+    val middlePlusOne = IndexInput(2)
+    val end = IndexInput(3)
+    val withoutSuccess = new History().addError(DropError(start, end))
+    val furtherWithoutSuccess = new History().
+      addError(DropError(start, middle)).
+      addSuccess(middlePlusOne).
+      addError(DropError(middlePlusOne, end))
+
+    assert(furtherWithoutSuccess.score > withoutSuccess.score)
   }
 
   test("very long drops have small differences") {

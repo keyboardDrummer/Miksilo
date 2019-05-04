@@ -161,7 +161,7 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
   }
 
-  case class DropError(from: Input, to: Input, expectation: String) extends ParseError {
+  case class DropError(from: Input, to: Input, expectation: String = "") extends ParseError {
     def this(from: Input, expectation: String) = this(from, from.drop(1), expectation)
 
     override def append(next: ParseError): Option[ParseError] = {
