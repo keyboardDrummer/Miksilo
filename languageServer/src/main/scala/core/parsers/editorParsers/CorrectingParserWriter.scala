@@ -17,7 +17,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       val cons = queue.asInstanceOf[SRCons[Result]]
       val parseResult = cons.head
 
-      queue = parseResult match {
+        queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           if (noResultFound != bestResult && mayStop())

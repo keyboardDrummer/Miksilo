@@ -4,8 +4,8 @@ object HistoryConstants {
   val successValue = 1.0
 
   val dropMaxPenalty = successValue * 10
-  val dropLength1Penalty = 1.0
-  val dropLength2Penalty = 1.9 * dropLength1Penalty
+  val dropLength2Penalty = successValue * 3
+  val dropLength1Penalty = dropLength2Penalty * 0.75
   val dropLengthShift = (dropMaxPenalty + dropLength1Penalty - 2 * dropLength2Penalty) / (dropLength2Penalty - dropLength1Penalty)
   val dropReduction: Double = (dropMaxPenalty - dropLength1Penalty) * (1 + dropLengthShift)
 
