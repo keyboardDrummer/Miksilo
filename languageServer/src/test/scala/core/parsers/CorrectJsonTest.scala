@@ -148,28 +148,16 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
     parseJson(input, expectation, 4)
   }
 
-  // "{" ~> memberParser.manySeparated(",", "object member") ~< "}"
-  // de : tussen remy en jeroen kan gedropped worden voor memberParser, maar ook voor } als memberParser leeg is.
-  // Wellicht een DropParser maken en die handmatig toevoegen om te kijken of het goed werkt,
-  // en dan later drops voor de literals plaatsen en proberen omhoog te trekken.
-  // Of is het prima om drops voor literals te hebben, zo lang ik ze maar uit elkaar kan houden?
   test("starting brace insertion") {
     val input = """{"person":"remy":"jeroen"}}"""
     val expectation = List(("person",List(("remy","jeroen"))))
     parseJson(input, expectation, 1)
   }
-  // I wanted long garbage to be easily dropped, so I made dropError's penalty an asymptote.
-  // but I also wanted long drops, when split with a success, to not be worse than a single long drop.
-  // Maybe I should ignore that desire? this was to get garbage before key 2 working well.
-  // However, now a drop is cheaper than a success
-  // It would be great if "remy" didn't provide 2 successes
-  // I should make it so a Drop is only valid if it found a symbol afterwards, and then it's OK if the total drop+success still has a positive value.
-  // But what if you can't find a valid symbol within X offset ?
 
-  ignore("starting brace insertion unambiguous") {
+  test("starting brace insertion unambiguous") {
     val input = """{"person":"remy":"jeroen","remy":"jeroen"}}"""
     val expectation = List(("person",List("remy" -> "jeroen", "remy" -> "jeroen")))
-    parseJson(input, expectation, 1, 5000)
+    parseJson(input, expectation, 1)
   }
 
   /*
