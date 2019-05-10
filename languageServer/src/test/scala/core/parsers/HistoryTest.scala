@@ -27,32 +27,32 @@ class HistoryTest extends FunSuite with StringParserWriter {
     assert(splitDrops.score < dropsRight.score)
   }
 
-  test("splitting a long drop with a success is good") {
+  test("splitting a long drop with a success is bad") {
     val start = new IndexInput(0)
     val middle = new IndexInput(50)
     val middlePlusOne = new IndexInput(51)
     val end = new IndexInput(100)
     val withoutSuccess = new History().addError(DropError(start, end))
-    val furtherWithoutSuccess = new History().
+    val withSuccess = new History().
       addError(DropError(start, middle)).
       addTestSuccess(middlePlusOne).
       addError(DropError(middlePlusOne, end))
 
-    assert(furtherWithoutSuccess.score > withoutSuccess.score)
+    assert(withSuccess.score < withoutSuccess.score)
   }
 
-  test("splitting a short drop with a success is good") {
+  test("splitting a 5 char drop with a success is good") {
     val start = new IndexInput(0)
-    val middle = new IndexInput(1)
-    val middlePlusOne = new IndexInput(2)
-    val end = new IndexInput(3)
+    val middle = new IndexInput(2)
+    val middlePlusOne = new IndexInput(3)
+    val end = new IndexInput(5)
     val withoutSuccess = new History().addError(DropError(start, end))
-    val furtherWithoutSuccess = new History().
+    val withSuccess = new History().
       addError(DropError(start, middle)).
       addTestSuccess(middlePlusOne).
       addError(DropError(middlePlusOne, end))
 
-    assert(furtherWithoutSuccess.score > withoutSuccess.score)
+    assert(withSuccess.score > withoutSuccess.score)
   }
 
   test("very long drops have small differences") {

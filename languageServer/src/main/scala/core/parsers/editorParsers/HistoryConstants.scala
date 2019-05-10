@@ -1,16 +1,19 @@
 package core.parsers.editorParsers
 
 object HistoryConstants {
-  val successValue = 1
-  val dropMaxPenalty = successValue // Has to be at or below successValue, otherwise splitting a long drop with a success will reduce the score.
-  val dropStartingPenalty = 0.9 // Let's try to keep it close to successValue
+  val successValue = 1.0
 
-  val genericErrorPenalty = dropStartingPenalty
-  val insertLiteralPenalty = dropStartingPenalty * 5
-  val insertRegexPenalty = dropStartingPenalty * 5
-  val failPenalty = 5
+  val dropMaxPenalty = successValue * 10
+  val dropLength1Penalty = 1.0
+  val dropLength2Penalty = 1.9 * dropLength1Penalty
+  val dropLengthShift = (dropMaxPenalty + dropLength1Penalty - 2 * dropLength2Penalty) / (dropLength2Penalty - dropLength1Penalty)
+  val dropReduction: Double = (dropMaxPenalty - dropLength1Penalty) * (1 + dropLengthShift)
 
-  val endOfSourceInsertion = 5 // Inserting at the end of the file should be cheap, since it's likely that you're missing input there.
+  val genericErrorPenalty = successValue
+  val insertLiteralPenalty = successValue * 2
+  val insertRegexPenalty = successValue * 2
+  val failPenalty = 2
 
-  val dropReduction = dropMaxPenalty - dropStartingPenalty
+  val endOfSourceInsertion = 2 // Inserting at the end of the file should be cheap, since it's likely that you're missing input there.
+
 }

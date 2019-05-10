@@ -442,7 +442,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     override def penalty = {
       val length = to.offset - from.offset
-      HistoryConstants.dropMaxPenalty - HistoryConstants.dropReduction / length
+      HistoryConstants.dropMaxPenalty - HistoryConstants.dropReduction / (HistoryConstants.dropLengthShift + length)
     }
 
     override def message = {
