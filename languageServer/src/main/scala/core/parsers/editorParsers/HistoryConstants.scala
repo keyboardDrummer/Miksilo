@@ -12,7 +12,7 @@ object HistoryConstants {
   val genericErrorPenalty = successValue
   val insertLiteralPenalty = successValue * 2
   val insertRegexPenalty = successValue * 2
-  val failPenalty = 2
+  val failPenalty = 1 // TODO settings this too high kills the tests. I think withDefault should work differently.
 
   val endOfSourceInsertion = 2 // Inserting at the end of the file should be cheap, since it's likely that you're missing input there.
 

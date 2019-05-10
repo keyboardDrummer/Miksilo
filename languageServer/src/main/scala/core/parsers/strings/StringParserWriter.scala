@@ -83,7 +83,7 @@ trait StringParserWriter extends SequenceParserWriter {
                 new History(new MissingInput(input, s"'$value'", HistoryConstants.endOfSourceInsertion))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               return singleResult(ReadyParseResult(Some(value), input,
-                new History(MissingInput(input, input.drop(index), s"'$value'", HistoryConstants.insertLiteralPenalty))))
+                new History(MissingInput(input, input.drop(index + 1), s"'$value'", HistoryConstants.insertLiteralPenalty))))
             }
             index += 1
           }

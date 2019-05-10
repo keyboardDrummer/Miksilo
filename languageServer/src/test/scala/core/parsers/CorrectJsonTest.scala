@@ -156,7 +156,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   test("starting brace insertion") {
     val input = """{"person":"remy":"jeroen"}}"""
     val expectation = List(("person",List(("remy","jeroen"))))
-    parseJson(input, expectation, 1, 50) // TODO 100 steps is too much. I got lots of repeated DelayedResults during debugging, why was that?
+    parseJson(input, expectation, 1)
   }
   // I wanted long garbage to be easily dropped, so I made dropError's penalty an asymptote.
   // but I also wanted long drops, when split with a success, to not be worse than a single long drop.
