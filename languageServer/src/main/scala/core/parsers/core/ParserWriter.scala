@@ -66,25 +66,10 @@ trait ParserWriter {
 
   trait ParseResultLike[+Result] {
     def map[NewResult](f: Result => NewResult): ParseResult[NewResult]
-
-//    = {
-//      flatMap(s => newSuccess(f(s.result), s.remainder))
-//    }
-
-    //def flatMap[NewResult](f: Success[Result] => ParseResult[NewResult]): ParseResult[NewResult]
-    //def successful: Boolean
-    //def resultOption: Option[Result]
-    //def get = resultOption.get
   }
 
 }
 
-object Processor {
-  def ignoreLeft[Left, Right](left: Left, right: Right): Right = right
-  def ignoreRight[Left, Right](left: Left, right: Right): Left = left
-}
 
-trait ParseInput {
-  def offset: Int
-  def atEnd: Boolean
-}
+
+

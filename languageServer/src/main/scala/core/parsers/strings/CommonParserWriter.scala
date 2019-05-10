@@ -24,7 +24,8 @@ trait CommonParserWriter extends StringParserWriter {
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
   def stringLiteral: Self[String] =
-    RegexParser(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*"""".r, "string literal").map(r => r.substring(1, r.length - 1))
+    RegexParser(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r, "string literal").
+      map(r => r.substring(1, r.length )) ~< "\""
 
   /** A number following the rules of `decimalNumber`, with the following
     *  optional additions:

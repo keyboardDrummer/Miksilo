@@ -103,10 +103,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
     def this() = this(0, List.empty, List.empty)
     def this(error: ParseError) = this(error.score, List(error), List.empty)
 
-    if (this.hashCode() == 642065833) {
-      System.out.append("")
-    }
-
     def ++(right: History): History = {
       if (errors.isEmpty)
         return History(score + right.score, right.errors, successes ++ right.successes)
@@ -154,10 +150,11 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   override def lazyParser[Result](inner: => Self[Result]) = new EditorLazy(inner)
 
-  case class Fail[Result](value: Option[Result], message: String) extends EditorParserBase[Result] with LeafParser[Result] {
+  case class Fail[Result](value: Option[Result], message: String, penalty: Double)
+    extends EditorParserBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
-      (input, _) => newFailure(value, input, new History(GenericError(input, message, HistoryConstants.failPenalty)))
+      (input, _) => newFailure(value, input, new History(GenericError(input, message, penalty)))
     }
 
     override def getMustConsume(cache: ConsumeCache) = false

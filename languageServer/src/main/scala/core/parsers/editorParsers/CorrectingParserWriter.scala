@@ -161,11 +161,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
       f(head) match {
         case SREmpty => tail.flatMap(f)
-        case cons: SRCons[NewResult] => // Try not to evaluate tail, but if head's score gets worse, we have to otherwise the sorting may be incorrect.
+        case cons: SRCons[NewResult] =>
           cons.merge(tail.flatMap(f))
-//          if (cons.head.score >= head.score)
-//            new SRCons[NewResult](cons.head, 2 + Math.max(cons.tail.depth, tail.depth), cons.tail.merge(tail.flatMap(f)))
-//          else
       }
     }
 
@@ -274,7 +271,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       val reduce = (h: Result, t: List[Result]) => h :: t
       val zero = List.empty[Result]
       lazy val result: Self[List[Result]] = separator ~>
-        (WithDefault(leftRight(DropParser(parser), DropParser(result), reduce), zero) | Fail(Some(zero), elementName)) |
+        (WithDefault(leftRight(DropParser(parser), DropParser(result), reduce), zero) |
+          Fail(Some(zero), elementName, HistoryConstants.insertDefaultPenalty)) |
         succeed(zero)
       leftRight(parser, DropParser(result), reduce)
     }
@@ -292,7 +290,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
 
     def withDefault[Other >: Result](_default: Other, name: String): Self[Other] =
-      this | Fail(Some(_default), name) //WithDefault(parser, _default, name)
+      this | Fail(Some(_default), name, HistoryConstants.insertDefaultPenalty)
 
     def parseWholeInput(input: Input, mayStop: () => Boolean = () => true): ParseWholeResult[Result] = {
       parse(ParseWholeInput(parser), input, mayStop)
