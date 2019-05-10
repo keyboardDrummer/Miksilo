@@ -86,7 +86,7 @@ class YamlTest extends FunSuite
   class IfContext[Result](inners: Map[YamlContext, Self[Result]]) extends EditorParserBase[Result] {
 
     override def getParser(recursive: GetParse) = {
-      val innerParsers = inners.mapValues(p => recursive(p).asInstanceOf[Parse[Result]])
+      val innerParsers = inners.mapValues(p => recursive(p))
       (input, state) => innerParsers(input.context)(input, state)
     }
 
@@ -101,7 +101,7 @@ class YamlTest extends FunSuite
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
-      val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
+      val parseOriginal = recursive(original)
 
       def apply(input: IndentationReader, state: ParseState): ParseResult[Result] = {
         val context: YamlContext = input.context
@@ -132,7 +132,7 @@ class YamlTest extends FunSuite
   }
 
   lazy val parseBracketArray: Self[YamlExpression] = {
-    val inner = "[" ~> parseFlowValue.manySeparated(",").map(elements => Array(elements)) ~< "]"
+    val inner = "[" ~> parseFlowValue.manySeparated(",", "array element").map(elements => Array(elements)) ~< "]"
     new WithContext(_ => FlowIn, inner)
   }
 
@@ -162,7 +162,7 @@ class YamlTest extends FunSuite
   def flowIndicatorChars = """,\[\]{}"""
 
   val plainSafeOutChars = s"""$nbChars#'"""
-  val plainSafeInChars = s"""$plainSafeOutChars${flowIndicatorChars}"""
+  val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
   val doubleColonPlainSafeIn =  RegexParser(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r, "plain scalar")
   val doubleColonPlainSafeOut =  RegexParser(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r, "plain scalar")
 
@@ -174,7 +174,7 @@ class YamlTest extends FunSuite
 
   lazy val plainStyleSingleLineString = nsPlainSafe
   lazy val plainStyleMultiLineString = new Sequence(new Sequence(nsPlainSafe, whiteSpace, (l: String, _: String) => l),
-    greaterThan(WithIndentation(equal(nsPlainSafe).manySeparated("\n"))),
+    greaterThan(WithIndentation(equal(nsPlainSafe).manySeparated("\n", "line"))),
     (firstLine: String, rest: List[String]) => {
       firstLine + rest.fold("")((a,b) => a + " " + b)
   })

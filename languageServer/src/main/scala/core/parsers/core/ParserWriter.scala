@@ -55,9 +55,6 @@ trait ParserWriter {
 
     def ^^[NewResult](f: Result => NewResult) = map(f)
 
-    def manySeparated(separator: Self[Any]): Self[List[Result]] =
-      leftRight(parser, (separator ~> parser).*, (h: Result, t: List[Result]) => h :: t) |
-        succeed(List.empty[Result])
   }
 
 

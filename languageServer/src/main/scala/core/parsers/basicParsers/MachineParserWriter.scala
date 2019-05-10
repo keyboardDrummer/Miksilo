@@ -88,6 +88,10 @@ trait MachineParserWriter extends ParserWriter {
 
   implicit class BasicParserExtensions[+Result](parser: Parser[Result]) {
 
+    def manySeparated(separator: Self[Any]): Self[List[Result]] = {
+      leftRight(parser, (separator ~> parser).*, (h: Result, t: List[Result]) => h :: t) | succeed(List.empty[Result])
+    }
+
     def parseWholeInput(input: Input): ParseResult[Result] = {
 
       val parseResult = parser.parse(input)

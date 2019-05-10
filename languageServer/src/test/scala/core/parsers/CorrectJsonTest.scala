@@ -5,12 +5,12 @@ import org.scalatest.FunSuite
 import editorParsers.LeftRecursiveCorrectingParserWriter
 
 class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
-  private lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
-  private lazy val objectParser = "{" ~> memberParser.manySeparated(",") ~< "}"
+  private lazy val memberParser = stringLiteral ~< DropParser(":") ~ jsonParser
+  private lazy val objectParser = "{" ~> memberParser.manySeparated(",", "object member") ~< "}"
   object UnknownExpression {
     override def toString = "unknown"
   }
-  protected lazy val jsonParser: Self[Any] = (stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression, "value")
+  protected lazy val jsonParser: Self[Any] = DropParser((stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression, "value"))
 
   test("test whether correct inputs always return a ready in one go") {
     val input = """{ "VpcId" : {
@@ -71,7 +71,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   test("object with a single member and comma") {
     val input = """{"person":3,"""
     val expectation = List(("person", "3"))
-    parseJson(input, expectation, 5)
+    parseJson(input, expectation, 2)
   }
 
   test("object with a single member and half second member") {
@@ -148,10 +148,28 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
     parseJson(input, expectation, 4)
   }
 
+  // "{" ~> memberParser.manySeparated(",", "object member") ~< "}"
+  // de : tussen remy en jeroen kan gedropped worden voor memberParser, maar ook voor } als memberParser leeg is.
+  // Wellicht een DropParser maken en die handmatig toevoegen om te kijken of het goed werkt,
+  // en dan later drops voor de literals plaatsen en proberen omhoog te trekken.
+  // Of is het prima om drops voor literals te hebben, zo lang ik ze maar uit elkaar kan houden?
   test("starting brace insertion") {
-    val input = """{"person""remy":"jeroen"}}"""
+    val input = """{"person":"remy":"jeroen"}}"""
     val expectation = List(("person",List(("remy","jeroen"))))
-    parseJson(input, expectation, 2, 500)
+    parseJson(input, expectation, 1, 50) // TODO 100 steps is too much. I got lots of repeated DelayedResults during debugging, why was that?
+  }
+  // I wanted long garbage to be easily dropped, so I made dropError's penalty an asymptote.
+  // but I also wanted long drops, when split with a success, to not be worse than a single long drop.
+  // Maybe I should ignore that desire? this was to get garbage before key 2 working well.
+  // However, now a drop is cheaper than a success
+  // It would be great if "remy" didn't provide 2 successes
+  // I should make it so a Drop is only valid if it found a symbol afterwards, and then it's OK if the total drop+success still has a positive value.
+  // But what if you can't find a valid symbol within X offset ?
+
+  ignore("starting brace insertion unambiguous") {
+    val input = """{"person":"remy":"jeroen","remy":"jeroen"}}"""
+    val expectation = List(("person",List("remy" -> "jeroen", "remy" -> "jeroen")))
+    parseJson(input, expectation, 1, 5000)
   }
 
   /*
@@ -180,8 +198,13 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
 
-  private def parseJson(input: String, expectation: Any, errorCount: Int, milliseconds: Int = 20) = {
-    val result = jsonParser.parseWholeInput(new StringReader(input), milliseconds)
+
+  private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
+    var stepsTaken = 0
+    val result = jsonParser.parseWholeInput(new StringReader(input), () => {
+      stepsTaken += 1
+      stepsTaken >= steps
+    })
     System.out.append(result.errors.toString())
     assertResult(expectation)(result.resultOption.get)
     assertResult(errorCount)(result.errors.size)

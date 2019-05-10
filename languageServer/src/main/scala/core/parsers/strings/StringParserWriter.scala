@@ -1,5 +1,8 @@
 package core.parsers.strings
 
+import java.util.regex.Matcher
+
+import core.parsers.editorParsers.HistoryConstants
 import core.parsers.sequences.SequenceParserWriter
 import langserver.types.Position
 
@@ -76,16 +79,16 @@ trait StringParserWriter extends SequenceParserWriter {
           while (index < value.length) {
             val arrayIndex = index + input.offset
             if (array.length <= arrayIndex) {
-              val message = s"expected '$value' but end of source found"
-              return singleResult(ReadyParseResult(Some(value), input, new History(MissingInput(input, message, 0.1))))
+              return singleResult(ReadyParseResult(Some(value), input,
+                new History(new MissingInput(input, s"'$value'", HistoryConstants.endOfSourceInsertion))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
-              val message = s"expected '$value' but found '${array.subSequence(input.offset, arrayIndex + 1)}'"
-              return singleResult(ReadyParseResult(Some(value), input, new History(MissingInput(input, message))))
+              return singleResult(ReadyParseResult(Some(value), input,
+                new History(MissingInput(input, input.drop(index), s"'$value'", HistoryConstants.insertLiteralPenalty))))
             }
             index += 1
           }
           val remainder = input.drop(value.length)
-          singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(input, remainder)))
+          singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(input, remainder, value)))
         }
       }
 
@@ -105,15 +108,9 @@ trait StringParserWriter extends SequenceParserWriter {
             case Some(matched) =>
               val value = input.array.subSequence(input.offset, input.offset + matched.end).toString
               val remainder = input.drop(matched.end)
-              singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(input, remainder)))
+              singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(input, remainder, value)))
             case None =>
-              if (input.atEnd) {
-                val message = s"expected $regexName but found end of source"
-                singleResult(ReadyParseResult(None, input, new History(MissingInput(input, message))))
-              } else {
-                val message = s"expected $regexName but found '${input.array.charAt(input.offset)}'"
-                singleResult(ReadyParseResult(None, input, new History(MissingInput(input, message))))
-              }
+              singleResult(ReadyParseResult(None, input, new History(new MissingInput(input, regexName, HistoryConstants.insertRegexPenalty))))
           }
         }
       }

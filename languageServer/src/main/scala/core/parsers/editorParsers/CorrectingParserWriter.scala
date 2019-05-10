@@ -6,13 +6,11 @@ import org.joda.time.DateTime
 
 trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
 
-  def parse[Result](parser: Self[Result], input: Input, milliseconds: Int = 20): ParseWholeResult[Result] = {
+  def parse[Result](parser: Self[Result], input: Input, mayStop: () => Boolean): ParseWholeResult[Result] = {
 
-    val noResultFound = ReadyParseResult(None, input, new History(MissingInput(input, "Grammar is always recursive", Int.MaxValue)))
+    val noResultFound = ReadyParseResult(None, input, new History(GenericError(input, "Grammar is always recursive", Int.MaxValue)))
     var bestResult: ReadyParseResult[Result] =
       noResultFound
-
-    val endTime = DateTime.now().getMillis + milliseconds
 
     var queue = parser.parseRoot(input)
     while(queue.isInstanceOf[SRCons[Result]]) {
@@ -22,7 +20,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
-          if (noResultFound != bestResult && DateTime.now().getMillis >= endTime)
+          if (noResultFound != bestResult && mayStop())
             SREmpty
           else
             cons.tail
@@ -42,10 +40,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     singleResult(ReadyParseResult(partial, input, errors))
 
   override def newSuccess[Result](result: Result, remainder: Input): SRCons[Result] =
-    singleResult(ReadyParseResult(Some(result), remainder, new History()))
+    singleResult(ReadyParseResult(Some(result), remainder, new History().addSuccess(remainder, remainder, result, 0)))
 
   def newFailure[Result](input: Input, message: String): SRCons[Nothing] =
-    singleResult(ReadyParseResult(None, input, new History(MissingInput(input, message))))
+    singleResult(ReadyParseResult(None, input, new History(GenericError(input, message, HistoryConstants.genericErrorPenalty))))
 
   override def leftRight[Left, Right, NewResult](left: Self[Left],
                                                  right: => Self[Right],
@@ -69,19 +67,19 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
 
     def addHistory(errors: History): SortedParseResults[Result] = {
-      mapWithErrors(x => x, errors)
+      mapWithHistory(x => x, errors)
     }
 
-    def mapWithErrors[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
-                                 oldErrors: History): SortedParseResults[NewResult] = {
+    def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
+                                  oldHistory: History): SortedParseResults[NewResult] = {
       mapResult({
-        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.history ++ oldErrors, () => {
+        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.history ++ oldHistory, () => {
           val intermediate = delayed.results
-          intermediate.mapWithErrors(f, oldErrors)
+          intermediate.mapWithHistory(f, oldHistory)
         })
         case ready: ReadyParseResult[Result] =>
           val newReady = f(ready)
-          ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.history ++ oldErrors)
+          ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.history ++ oldHistory)
       })
     }
 
@@ -217,7 +215,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   class Sequence[+Left, +Right, Result](val left: Self[Left],
                                          _right: => Self[Right],
-                                         combine: (Left, Right) => Result)
+                                         combine: (Left, Right) => Result,
+                                        mayDrop: Boolean = true)
     extends EditorParserBase[Result] with SequenceLike[Result] {
 
     lazy val right: Self[Right] = _right
@@ -245,21 +244,21 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
               rightResult.remainder,
               rightResult.history)
 
-            val withoutDrop = parseRight(leftReady.remainder, state).mapWithErrors[Result](mapRightResult, leftReady.history)
-
-            if (leftReady.remainder.atEnd) {
-              withoutDrop
-            }
-            else {
-              val droppedInput = leftReady.remainder.drop(1)
-              val dropError = DropError(leftReady.remainder, droppedInput)
-              val dropHistory = leftReady.history.addError(dropError)
-              val withDrop = singleResult(new DelayedParseResult(droppedInput, dropHistory , () => {
-                rightFromLeftReady(ReadyParseResult(leftReady.resultOption, droppedInput, dropHistory))
-              }))
-
-              withoutDrop.merge(withDrop)
-            }
+            val withoutDrop = parseRight(leftReady.remainder, state).mapWithHistory[Result](mapRightResult, leftReady.history)
+            withoutDrop
+//            if (!mayDrop || leftReady.remainder.atEnd) {
+//              withoutDrop
+//            }
+//            else {
+//              val droppedInput = leftReady.remainder.drop(1)
+//              val dropError = DropError(leftReady.remainder, droppedInput)
+//              val dropHistory = leftReady.history.addError(dropError)
+//              val withDrop = singleResult(new DelayedParseResult(droppedInput, dropHistory , () => {
+//                rightFromLeftReady(ReadyParseResult(leftReady.resultOption, droppedInput, dropHistory))
+//              }))
+//
+//              withoutDrop.merge(withDrop)
+//            }
           }
           delayedLeftResults.flatMapReady(rightFromLeftReady)
         }
@@ -270,13 +269,33 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   implicit class EditorParserExtensions[Result](parser: Self[Result]) extends ParserExtensions(parser) {
 
+    // Drops suffix. It's nice to drop before the next | nil OR, so that you don't get duplicate drops. And if you drop before the nil, you get a suffix drop.
+    def someSeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
+      val reduce = (h: Result, t: List[Result]) => h :: t
+      val zero = List.empty[Result]
+      lazy val result: Self[List[Result]] = separator ~>
+        (WithDefault(leftRight(DropParser(parser), DropParser(result), reduce), zero) | Fail(Some(zero), elementName)) |
+        succeed(zero)
+      leftRight(parser, DropParser(result), reduce)
+    }
+
+    //Drops prefix and suffix.
+    //Drop(succeed) creates a pre and suffix drop, and Drop(x) where x was already a suffix drop, also creates a pre and suffix drop.
+    //If I drop right before the symbol,
+    // I will be able to do a forward lookup to see how much I need to drop before the symbol succeeds,
+    // which could save quite a few cycles.
+    def manySeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
+      val zero = List.empty[Result]
+      DropParser(someSeparated(separator, elementName) | succeed(zero))
+    }
+
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
 
     def withDefault[Other >: Result](_default: Other, name: String): Self[Other] =
-      this | Fail(Some(_default), s"expected a $name")
+      this | Fail(Some(_default), name) //WithDefault(parser, _default, name)
 
-    def parseWholeInput(input: Input, milliseconds: Int = 0): ParseWholeResult[Result] = {
-      parse(ParseWholeInput(parser), input, milliseconds)
+    def parseWholeInput(input: Input, mayStop: () => Boolean = () => true): ParseWholeResult[Result] = {
+      parse(ParseWholeInput(parser), input, mayStop)
     }
 
     override def parseRoot(input: Input): ParseResult[Result] = {
@@ -347,7 +366,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         originalResult.mapReady(s => {
           s.resultOption match {
             case Some(result) => if (predicate(result)) s else ReadyParseResult(None, s.remainder,
-              s.history.addError(MissingInput(s.remainder, getMessage(result))))
+              s.history.addError(GenericError(s.remainder, getMessage(result), HistoryConstants.genericErrorPenalty)))
             case None => s
           }
         })
@@ -364,7 +383,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         ReadyParseResult(r.resultOption.map(v => Success(v, r.remainder)), r.remainder, r.history))
     }
   }
-
 
   case class WithDefault[Result](original: Self[Result], _default: Result)
     extends EditorParserBase[Result] with ParserWrapper[Result] {
@@ -385,6 +403,32 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
   }
 
+  case class DropParser[Result](original: Self[Result]) extends EditorParserBase[Result] with ParserWrapper[Result] {
+
+    override def getParser(recursive: GetParse): Parse[Result] = {
+      val parseOriginal = recursive(original)
+      lazy val result = new Parse[Result] {
+
+        override def apply(input: Input, state: ParseState): ParseResult[Result] = {
+          val originalResult = parseOriginal(input, state)
+
+          if (input.atEnd)
+            return originalResult
+
+          val droppedInput = input.drop(1)
+          val dropError = DropError(input, droppedInput)
+          val dropHistory = new History(dropError)
+          val withDrop = singleResult(new DelayedParseResult(droppedInput, dropHistory , () => {
+            apply(droppedInput, state).addHistory(dropHistory)
+          }))
+          originalResult.merge(withDrop)
+        }
+      }
+      result
+    }
+
+  }
+
   case class DropError(from: Input, to: Input) extends ParseError {
     def this(from: Input, expectation: String) = this(from, from.drop(1))
 
@@ -398,7 +442,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     override def penalty = {
       val length = to.offset - from.offset
-      1 - 0.1 / length
+      HistoryConstants.dropMaxPenalty - HistoryConstants.dropReduction / length
     }
 
     override def message = {
