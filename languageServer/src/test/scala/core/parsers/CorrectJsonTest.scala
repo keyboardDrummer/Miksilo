@@ -98,7 +98,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
     parseJson(input, expectation, 1)
   }
 
-  test("garbage before key 2") {
+  test("intertwined small garbage and success") {
     val input = """{g"person"hj:nh"remy"}"""
     val expectation = List("person" -> "remy")
     parseJson(input, expectation, 3)
@@ -185,7 +185,7 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
 
   While input (2) still parses to {x}
    */
-  test("virtual left recursion through error correction") {
+  test("mass garbage, and virtual left recursion through error correction") {
     val input = """doesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatch"""
     lazy val parser: Self[Any] = "{" ~ parser | "x"
     val result = parser.parseWholeInput(new StringReader(input))
