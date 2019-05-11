@@ -73,7 +73,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
                                   oldHistory: MyHistory): SortedParseResults[NewResult] = {
       mapResult({
-        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.history ++ oldHistory, () => {
+        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.history ++ oldHistory, () => {
           val intermediate = delayed.results
           intermediate.mapWithHistory(f, oldHistory)
         })
@@ -85,7 +85,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): SortedParseResults[NewResult] = {
       mapResult({
-        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.remainder, delayed.history, () => {
+        case delayed: DelayedParseResult[Result] => new DelayedParseResult(delayed.history, () => {
             val intermediate = delayed.results
             intermediate.mapReady(f)
           })
@@ -97,7 +97,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
       flatMap[NewResult] {
-        case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.remainder, delayed.history, () => {
+        case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.history, () => {
           val intermediate = delayed.results
           intermediate.flatMapReady(f)
         }))
@@ -124,13 +124,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     override def depth = 0
   }
 
-  final class SRCons[+Result](val head: LazyParseResult[Result], val depth: Int, _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
+  final class SRCons[+Result](val head: LazyParseResult[Result], var depth: Int, _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
     def getTail = tail
     lazy val tail = _tail
 
     if (depth > 20) {
+      throw new Error()
+    }
+
+    if (depth == 20) {
       tail
+      depth = 0
     }
 
 //    // Detect incorrect ordering.
@@ -154,8 +159,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 //      }
 //    }
 
-    override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]) = {
+    override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults[NewResult] = {
       flatMap(r => singleResult(f(r)))
+      //new SRCons(f(head), depth + 1, tail.mapResult(f))
     }
 
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
@@ -163,6 +169,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         case SREmpty => tail.flatMap(f)
         case cons: SRCons[NewResult] =>
           cons.merge(tail.flatMap(f))
+          //new SRCons(cons.head, cons.depth + 1, cons.tail.merge(tail.flatMap(f)))
       }
     }
 
@@ -170,16 +177,16 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       new SRCons(head.map(f), tail.depth + 1, tail.map(f))
     }
 
-    override def merge[Other >: Result](other: SortedParseResults[Other], depth: Int): SortedParseResults[Other] = {
-      if (depth > 500)
+    override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
+      if (mergeDepth > 500)
         return this
 
       other match {
         case SREmpty => this
         case other: SRCons[Other] => if (head.score >= other.head.score) {
-          new SRCons(head, 1 + Math.max(tail.depth, other.depth), tail.merge(other, depth + 1))
+          new SRCons(head, 1 + Math.max(tail.depth, other.depth), tail.merge(other, mergeDepth + 1))
         } else
-          new SRCons(other.head, 1 + Math.max(depth, other.tail.depth), this.merge(other.tail, depth + 1))
+          new SRCons(other.head, 1 + Math.max(this.depth, other.tail.depth), this.merge(other.tail, mergeDepth + 1))
       }
     }
   }
@@ -188,15 +195,14 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     val score: Double = history.score
     def history: MyHistory
-    def remainder: Input
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
   }
 
-  class DelayedParseResult[Result](val remainder: Input, val history: MyHistory, _getResults: () => SortedParseResults[Result])
+  class DelayedParseResult[Result](val history: MyHistory, _getResults: () => SortedParseResults[Result])
     extends LazyParseResult[Result] {
 
     override def map[NewResult](f: Result => NewResult): DelayedParseResult[NewResult] = {
-      new DelayedParseResult(remainder, history, () => results.map(f))
+      new DelayedParseResult(history, () => results.map(f))
     }
 
     lazy val results: SortedParseResults[Result] = _getResults()
@@ -229,7 +235,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
           val delayedLeftResults: SortedParseResults[Left] = leftResults.mapResult({
             case ready: ReadyParseResult[Left] =>
               if (ready.history.flawed)
-                new DelayedParseResult[Left](ready.remainder, ready.history, () => singleResult(ready))
+                new DelayedParseResult[Left](ready.history, () => singleResult(ready))
               else
                 ready
             case delayed: DelayedParseResult[Left] => delayed
@@ -416,7 +422,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
           val droppedInput = input.drop(1)
           val dropError = DropError(input, droppedInput)
           val dropHistory = History.error(dropError)
-          val withDrop = singleResult(new DelayedParseResult(droppedInput, dropHistory , () => {
+          val withDrop = singleResult(new DelayedParseResult(dropHistory , () => {
             apply(droppedInput, state).addHistory(dropHistory)
           }))
           originalResult.merge(withDrop)
