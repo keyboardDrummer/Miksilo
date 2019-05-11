@@ -1,8 +1,6 @@
 package core.parsers.strings
 
-import java.util.regex.Matcher
-
-import core.parsers.editorParsers.HistoryConstants
+import core.parsers.editorParsers.{FlawedHistory, History, SpotlessHistory}
 import core.parsers.sequences.SequenceParserWriter
 import langserver.types.Position
 
@@ -80,15 +78,15 @@ trait StringParserWriter extends SequenceParserWriter {
             val arrayIndex = index + input.offset
             if (array.length <= arrayIndex) {
               return singleResult(ReadyParseResult(Some(value), input,
-                new History(new MissingInput(input, s"'$value'", HistoryConstants.endOfSourceInsertion))))
+                History.error(new MissingInput(input, s"'$value'", History.endOfSourceInsertion))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               return singleResult(ReadyParseResult(Some(value), input,
-                new History(MissingInput(input, input.drop(index + 1), s"'$value'", HistoryConstants.insertLiteralPenalty))))
+                History.error(MissingInput(input, input.drop(index + 1), s"'$value'", History.insertLiteralPenalty))))
             }
             index += 1
           }
           val remainder = input.drop(value.length)
-          singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(input, remainder, value)))
+          singleResult(ReadyParseResult(Some(value), remainder, History.empty[Input].addSuccess(input, remainder, value)))
         }
       }
 
@@ -108,9 +106,9 @@ trait StringParserWriter extends SequenceParserWriter {
             case Some(matched) =>
               val value = input.array.subSequence(input.offset, input.offset + matched.end).toString
               val remainder = input.drop(matched.end)
-              singleResult(ReadyParseResult(Some(value), remainder, new History().addSuccess(input, remainder, value)))
+              singleResult(ReadyParseResult(Some(value), remainder, SpotlessHistory(0).addSuccess(input, remainder, value)))
             case None =>
-              singleResult(ReadyParseResult(None, input, new History(new MissingInput(input, regexName, HistoryConstants.insertRegexPenalty))))
+              singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, regexName, History.insertRegexPenalty))))
           }
         }
       }

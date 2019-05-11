@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers.editorParsers.{HistoryConstants, LeftRecursiveCorrectingParserWriter}
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import langserver.types.Position
 
@@ -109,7 +109,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
         val innerParser = recursive(mapGrammar.inner)
         innerParser.map(result => result.map(mapGrammar.construct))
 
-      case BiFailure(message) => Fail(None, message, HistoryConstants.failPenalty)
+      case BiFailure(message) => Fail(None, message, History.failPenalty)
       case Print(_) => succeed(Unit).map(valueToResult)
       case ValueGrammar(value) => succeed(value).map(valueToResult)
 

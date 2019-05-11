@@ -17,7 +17,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
     def printRange(end: Input): String
   }
 
-  case class MissingInput(from: Input, to: Input, expectation: String, penalty: Double) extends ParseError {
+  case class MissingInput(from: Input, to: Input, expectation: String, penalty: Double) extends MyParseError {
     def this(from: Input, expectation: String, penalty: Double) =
       this(from, if (from.atEnd) from else from.drop(1), expectation, penalty)
 
@@ -36,8 +36,8 @@ trait EditorParserWriter extends OptimizingParserWriter {
     }
   }
 
-  case class GenericError(location: Input, message: String, penalty: Double) extends ParseError {
-    override def append(other: ParseError): Option[ParseError] = None
+  case class GenericError(location: Input, message: String, penalty: Double) extends MyParseError {
+    override def append(other: MyParseError): Option[MyParseError] = None
 
     override def range = {
       val position = location.position
@@ -53,7 +53,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   override def succeed[Result](result: Result): Self[Result] = Succeed(result)
 
-  case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[ParseError]) {
+  case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[MyParseError]) {
     def successful = errors.isEmpty
     def get: Result = resultOption.get
   }
@@ -84,7 +84,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  def newFailure[Result](partial: Option[Result], input: Input, errors: History): ParseResult[Result]
+  def newFailure[Result](partial: Option[Result], input: Input, errors: MyHistory): ParseResult[Result]
 
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
@@ -99,51 +99,8 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def toString = start.printRange(end)
   }
 
-  case class History(score: Double, errors: List[ParseError], successes: List[SuccessLog]) {
-    def this() = this(0, List.empty, List.empty)
-    def this(error: ParseError) = this(error.score, List(error), List.empty)
-
-    def ++(right: History): History = {
-      if (errors.isEmpty)
-        return History(score + right.score, right.errors, successes ++ right.successes)
-
-      val (withoutLast, last :: Nil) = errors.splitAt(errors.length - 1)
-      val newLeft = History(score - last.score, withoutLast, List.empty)
-      val newRight = right.addError(last)
-      History(newLeft.score + newRight.score, newLeft.errors ++ newRight.errors, successes ++ right.successes)
-    }
-
-    def addTestSuccess(point: Input): History = {
-      History(score + HistoryConstants.successValue, errors, successes)
-    }
-
-    def addSuccess(start: Input, end: Input, value: Any, successScore: Double = HistoryConstants.successValue): History = {
-      History(score + successScore, errors, SuccessLog(start, end, value) :: successes)
-    }
-
-    def addError(newHead: ParseError): History = {
-      errors match {
-        case Nil => History(score + newHead.score, List(newHead), successes)
-        case head :: tail =>
-          head.append(newHead) match {
-            case None => History(score + newHead.score, newHead :: errors, successes)
-            case Some(merged) => History(score - head.score + merged.score, merged :: tail, successes)
-          }
-      }
-    }
-  }
-
-  trait ParseError {
-    def penalty: Double
-    def score: Double = -penalty * 1
-    def append(other: ParseError): Option[ParseError] = None
-    def message: String
-    def from: Input
-    def to: Input
-    def range: SourceRange
-
-    override def toString = message
-  }
+  type MyParseError = ParseError[Input]
+  type MyHistory = History[Input]
 
   class EditorLazy[Result](_inner: => Self[Result]) extends Lazy[Result](_inner) with EditorParserBase[Result] {
   }
@@ -154,7 +111,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
     extends EditorParserBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
-      (input, _) => newFailure(value, input, new History(GenericError(input, message, penalty)))
+      (input, _) => newFailure(value, input, History.error(GenericError(input, message, penalty)))
     }
 
     override def getMustConsume(cache: ConsumeCache) = false
