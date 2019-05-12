@@ -22,7 +22,7 @@ trait MachineParserWriter extends ParserWriter {
     }
   }
 
-  override def newSuccess[Result](result: Result, remainder: Input) = SimpleParseResult(Some(Success(result, remainder)))
+  def newSuccess[Result](result: Result, remainder: Input) = SimpleParseResult(Some(Success(result, remainder)))
 
   def fail[Result](message: String) = FailureParser
 

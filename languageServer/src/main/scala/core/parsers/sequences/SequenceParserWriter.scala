@@ -1,7 +1,7 @@
 package core.parsers.sequences
 
 import core.parsers.core.ParseInput
-import core.parsers.editorParsers.CorrectingParserWriter
+import core.parsers.editorParsers.{CorrectingParserWriter, History}
 
 trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem
@@ -25,7 +25,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
         val char = input.head
         if (predicate(char)) {
-          newSuccess(char, input.tail)
+          newSuccess(char, input.tail, History.successValue)
         }
         else
           newFailure(input, s"'$char' was not a $kind")

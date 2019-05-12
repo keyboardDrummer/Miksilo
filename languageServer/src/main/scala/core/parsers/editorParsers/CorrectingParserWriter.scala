@@ -39,8 +39,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   override def newFailure[Result](partial: Option[Result], input: Input, errors: MyHistory) =
     singleResult(ReadyParseResult(partial, input, errors))
 
-  override def newSuccess[Result](result: Result, remainder: Input): SRCons[Result] =
-    singleResult(ReadyParseResult(Some(result), remainder, SpotlessHistory(0).addSuccess(remainder, remainder, result, 0)))
+  def newSuccess[Result](result: Result, remainder: Input, score: Double): SRCons[Result] =
+    singleResult(ReadyParseResult(Some(result), remainder, SpotlessHistory().addSuccess(remainder, remainder, result, score)))
 
   def newFailure[Result](input: Input, message: String): SRCons[Nothing] =
     singleResult(ReadyParseResult(None, input, History.error(GenericError(input, message, History.genericErrorPenalty))))
@@ -161,15 +161,17 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults[NewResult] = {
       flatMap(r => singleResult(f(r)))
-      //new SRCons(f(head), depth + 1, tail.mapResult(f))
     }
 
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
       f(head) match {
         case SREmpty => tail.flatMap(f)
         case cons: SRCons[NewResult] =>
-          cons.merge(tail.flatMap(f))
-          //new SRCons(cons.head, cons.depth + 1, cons.tail.merge(tail.flatMap(f)))
+          //cons.merge(tail.flatMap(f))
+          if (cons.head.isInstanceOf[ReadyParseResult[_]])
+            cons.merge(tail.flatMap(f))
+          else
+            new SRCons(cons.head, 1 + Math.max(this.depth, cons.depth), cons.tail.merge(tail.flatMap(f)))
       }
     }
 

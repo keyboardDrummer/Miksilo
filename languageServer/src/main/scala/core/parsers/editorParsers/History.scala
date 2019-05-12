@@ -52,7 +52,7 @@ case class SingleError[Input](successScore: Double, error: ParseError[Input]) ex
   override def flawed = true
 
   override def addError(newHead: ParseError[Input]) = error.append(newHead) match {
-    case None => FlawedHistory(score + newHead.score, newHead, Iterable.empty, error)
+    case None => FlawedHistory(score + newHead.score, newHead, Rose.empty, error)
     case Some(merged) => SingleError(successScore, merged)
   }
 
@@ -65,26 +65,44 @@ case class SingleError[Input](successScore: Double, error: ParseError[Input]) ex
   override def score = successScore + error.score
 }
 
+object Rose {
+  val empty = Node[Nothing]()
+
+  def node[Value](children: Rose[Value]*) = Node[Value](children.filter(v => v != null).toArray:_*)
+}
+
+trait Rose[+Value] {
+  def values: Seq[Value]
+}
+
+case class Leaf[+Value](value: Value) extends Rose[Value] {
+  override def values = Seq(value)
+}
+
+case class Node[+Value](children: Rose[Value]*) extends Rose[Value] {
+  def values = children.flatMap(child => child.values)
+}
+
 case class FlawedHistory[Input](score: Double, firstError: ParseError[Input],
-                                middleErrors: Iterable[ParseError[Input]],
+                                middleErrors: Rose[ParseError[Input]],
                                 lastError: ParseError[Input])
   extends History[Input] {
 
   def addError(newHead: ParseError[Input]): History[Input] = {
     firstError.append(newHead) match {
-      case None => FlawedHistory(score + newHead.score, newHead, Iterable.concat(Iterable(firstError), middleErrors), lastError)
+      case None => FlawedHistory(score + newHead.score, newHead, Rose.node(Leaf(firstError), middleErrors), lastError)
       case Some(merged) => FlawedHistory(score - firstError.score + merged.score, merged, middleErrors, lastError)
     }
   }
 
   def ++(right: History[Input]): History[Input] = {
     val (rightScore, rightDropRight1, rightLast) = right.addError(lastError) match {
-      case single: SingleError[Input] => (single.score, Iterable.empty, single.error)
-      case flawed: FlawedHistory[Input] => (flawed.score, Iterable.concat(Iterable(flawed.firstError), flawed.middleErrors), flawed.lastError)
+      case single: SingleError[Input] => (single.score, null, single.error)
+      case flawed: FlawedHistory[Input] => (flawed.score, Rose.node(Leaf(flawed.firstError), flawed.middleErrors), flawed.lastError)
     }
     FlawedHistory(score - lastError.score + rightScore,
       firstError,
-      Iterable.concat(middleErrors, rightDropRight1),
+      if (rightDropRight1 == null) middleErrors else Rose.node(middleErrors, rightDropRight1),
       rightLast)
   }
 
@@ -94,5 +112,5 @@ case class FlawedHistory[Input](score: Double, firstError: ParseError[Input],
 
   override def flawed = true
 
-  override def errors = Iterable.concat(Iterable(firstError), middleErrors, Iterable(lastError))
+  override def errors = Seq.concat(Seq(firstError), middleErrors.values, Seq(lastError))
 }

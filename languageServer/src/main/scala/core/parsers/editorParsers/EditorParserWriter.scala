@@ -58,10 +58,11 @@ trait EditorParserWriter extends OptimizingParserWriter {
     def get: Result = resultOption.get
   }
 
+  def newSuccess[Result](result: Result, remainder: Input, score: Double): ParseResult[Result]
   case class Succeed[Result](value: Result) extends EditorParserBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
-      (input: Input, _) => newSuccess(value, input)
+      (input: Input, _) => newSuccess(value, input, 0)
     }
 
     override def getMustConsume(cache: ConsumeCache) = false
@@ -89,7 +90,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
   object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
 
     override def getParser(recursive: GetParse): Parse[Input] = {
-      (input, _) => newSuccess(input, input)
+      (input, _) => newSuccess(input, input, 0)
     }
 
     override def getMustConsume(cache: ConsumeCache) = false
