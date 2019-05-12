@@ -3,8 +3,9 @@ package core.parsers
 import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
 import util.SourceUtils
+import editorParsers.LeftRecursiveCorrectingParserWriter
 
-class PerformanceTest extends FunSuite {
+class PerformanceTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   test("test whether correct inputs always return a ready in one go") {
     val input = """{
@@ -24,20 +25,31 @@ class PerformanceTest extends FunSuite {
     val result = JsonLanguage.language.compileString(input)
   }
 
+  private lazy val arrayParser = "[" ~> jsonParser.manySeparated(",", "array element") ~< "]"
+  private lazy val memberParser = stringLiteral ~< DropParser(":") ~ jsonParser
+  private lazy val objectParser = "{" ~> memberParser.manySeparated(",", "object member") ~< "}"
+  object UnknownExpression {
+    override def toString = "unknown"
+  }
+  protected lazy val jsonParser: Self[Any] = DropParser((stringLiteral | objectParser | wholeNumber | arrayParser).
+    withDefault(UnknownExpression, "value"))
+
   test("correct JSON performance") {
-    val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
-    val json = JsonLanguage.language
+    val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
+      replaceAll("\\s", "")
+
+    //val json = JsonLanguage.language
     val multiplier = 1
     val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     val timeA = System.currentTimeMillis()
     for(_ <- 1.to(multiplier * 10)) {
-      json.compileString(source)
+      jsonParser.parseWholeInput(new StringReader(source))
     }
 
     val timeB = System.currentTimeMillis()
     for(_ <- 1.to(multiplier)) {
-      json.compileString(tenTimesSource)
+      jsonParser.parseWholeInput(new StringReader(tenTimesSource))
     }
 
     val timeC = System.currentTimeMillis()

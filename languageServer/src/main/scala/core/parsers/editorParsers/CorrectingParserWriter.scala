@@ -2,7 +2,6 @@ package core.parsers.editorParsers
 
 import core.language.node.SourceRange
 import core.parsers.core.OptimizingParserWriter
-import org.joda.time.DateTime
 
 trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
 
@@ -17,7 +16,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       val cons = queue.asInstanceOf[SRCons[Result]]
       val parseResult = cons.head
 
-        queue = parseResult match {
+      queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           if (noResultFound != bestResult && mayStop())
@@ -32,7 +31,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     ParseWholeResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 
-  def singleResult[Result](parseResult: LazyParseResult[Result]) = new SRCons(parseResult, 0, SREmpty)
+  def singleResult[Result](parseResult: LazyParseResult[Result]) =
+    new SRCons(parseResult, if (parseResult.isInstanceOf[ReadyParseResult[_]]) 0 else 1, 0, SREmpty)
 
   type ParseResult[+Result] = SortedParseResults[Result]
 
@@ -63,8 +63,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   override def lazyParser[Result](inner: => Self[Result]) = new EditorLazy(inner)
 
   sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
-    def depth: Int
+    def tailDepth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
+    def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults[NewResult]
+    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
 
     def addHistory(errors: MyHistory): SortedParseResults[Result] = {
       mapWithHistory(x => x, errors)
@@ -93,8 +95,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       })
     }
 
-    def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults[NewResult]
-
     def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
       flatMap[NewResult] {
         case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.history, () => {
@@ -104,8 +104,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         case ready: ReadyParseResult[Result] => f(ready)
       }
     }
-
-    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
 
     def updateRemainder(f: Input => Input) = {
       mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.history))
@@ -121,22 +119,23 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     override def map[NewResult](f: Nothing => NewResult) = this
 
-    override def depth = 0
+    override def tailDepth = 0
   }
 
-  final class SRCons[+Result](val head: LazyParseResult[Result], var depth: Int, _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
+  final class SRCons[+Result](val head: LazyParseResult[Result],
+                              val readyResults: Int, var tailDepth: Int, _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
-    def getTail = tail
     lazy val tail = _tail
+    //tail
 
-    if (depth > 20) {
-      throw new Error()
-    }
-
-    if (depth == 20) {
-      tail
-      depth = 0
-    }
+//    if (depth > 500) {
+//      throw new Error()
+//    }
+//
+//    if (depth == 500) {
+//      tail
+//      depth = 0
+//    }
 
 //    // Detect incorrect ordering.
 //    val score = head.score
@@ -167,28 +166,37 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       f(head) match {
         case SREmpty => tail.flatMap(f)
         case cons: SRCons[NewResult] =>
-          //cons.merge(tail.flatMap(f))
-          if (cons.head.isInstanceOf[ReadyParseResult[_]])
+
+          if (head.score != cons.head.score) //.isInstanceOf[ReadyParseResult[_]])
             cons.merge(tail.flatMap(f))
           else
-            new SRCons(cons.head, 1 + Math.max(this.depth, cons.depth), cons.tail.merge(tail.flatMap(f)))
+          {
+            val minus = if (head.isInstanceOf[ReadyParseResult[_]]) 1 else 0
+            new SRCons(
+              cons.head,
+              readyResults - minus + cons.readyResults,
+              1 + Math.max(this.tailDepth, cons.tailDepth),
+              cons.tail.merge(tail.flatMap(f)))
+          }
       }
     }
 
     override def map[NewResult](f: Result => NewResult): SRCons[NewResult] = {
-      new SRCons(head.map(f), tail.depth + 1, tail.map(f))
+      new SRCons(head.map(f), readyResults, tailDepth + 1, tail.map(f))
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
       if (mergeDepth > 500)
-        return this
+        return SREmpty
 
       other match {
         case SREmpty => this
-        case other: SRCons[Other] => if (head.score >= other.head.score) {
-          new SRCons(head, 1 + Math.max(tail.depth, other.depth), tail.merge(other, mergeDepth + 1))
-        } else
-          new SRCons(other.head, 1 + Math.max(this.depth, other.tail.depth), this.merge(other.tail, mergeDepth + 1))
+        case other: SRCons[Other] =>
+          val totalReadyResults = readyResults + other.readyResults
+          if (head.score >= other.head.score) {
+            new SRCons(head, totalReadyResults,1 + Math.max(tailDepth, other.tailDepth), tail.merge(other, mergeDepth + 1))
+          } else
+            new SRCons(other.head, totalReadyResults,1 + Math.max(tailDepth, other.tailDepth), this.merge(other.tail, mergeDepth + 1))
       }
     }
   }
