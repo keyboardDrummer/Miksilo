@@ -6,9 +6,13 @@ import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.Language
 import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
-import deltas.PrettyPrint
+import deltas.{HasNameDelta, PrettyPrint}
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
-import deltas.expression.{ExpressionDelta, IntLiteralDelta}
+import deltas.expression.logical.LogicalNotDelta
+import deltas.expression.relational.{AddRelationalPrecedenceDelta, EqualsComparisonDelta, GreaterThanDelta, LessThanDelta}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, ParenthesisInExpressionDelta, TernaryDelta, VariableDelta}
+import deltas.javac.expressions.equality.AddEqualityPrecedence
+import deltas.javac.expressions.literals.{BooleanLiteralDelta, LongLiteralDelta, NullDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.statement.{BlockDelta, StatementDelta}
 import util.{LanguageTest, SourceUtils, TestLanguageBuilder}
@@ -71,8 +75,10 @@ class JavaStyleCommentsTest
   }
 
   test("relational") {
-    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
-      JavaToByteCodeLanguage.javaCompilerDeltas))
+    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(SlashStarBlockCommentsDelta, ExpressionAsRoot, VariableDelta) ++
+      Seq(LessThanDelta, GreaterThanDelta,
+        AddRelationalPrecedenceDelta, IntLiteralDelta,
+        HasNameDelta, ExpressionDelta)))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionDelta.FirstPrecedenceGrammar)

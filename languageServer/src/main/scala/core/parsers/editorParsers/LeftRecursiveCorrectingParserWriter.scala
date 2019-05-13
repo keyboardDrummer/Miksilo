@@ -16,7 +16,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           val detector = new FindFixPoint()
           val newState = if (state.input == input) {
             if (state.parsers.contains(parser))
-              throw new Exception("")
+              throw new Exception("recursion should have been detected")
             FixPointState(input, parser :: state.callStack, state.parsers + (parser -> detector))
           } else {
             state
@@ -119,7 +119,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               val detector = new FindFixPoint()
               val newState = if (state.input == input) {
                 if (state.parsers.contains(parser))
-                  throw new Exception("")
+                  throw new Exception("recursion should have been detected.")
                 FixPointState(input, parser :: state.callStack, state.parsers + (parser -> detector))
               } else {
                 FixPointState(input, List(parser), Map(parser -> detector))

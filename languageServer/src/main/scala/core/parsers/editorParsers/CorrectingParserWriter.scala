@@ -133,7 +133,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 //      throw new Error()
 //    }
 //
-    if (tailDepth == 500) {
+    if (tailDepth == 50) {
       tail
       tailDepth = 0
     }
@@ -187,7 +187,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
-      if (mergeDepth > 500)
+      if (mergeDepth > 50)
         return SREmpty
 
       other match {
