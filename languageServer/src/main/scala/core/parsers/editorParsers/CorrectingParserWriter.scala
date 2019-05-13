@@ -307,7 +307,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
 
     def withDefault[Other >: Result](_default: Other, name: String): Self[Other] =
-      this | Fail(Some(_default), name, History.insertDefaultPenalty)
+      WithDefault(parser, _default)
 
     def parseWholeInput(input: Input, mayStop: () => Boolean = () => true): ParseWholeResult[Result] = {
       parse(ParseWholeInput(parser), input, mayStop)
@@ -408,7 +408,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       def apply(input: Input, state: ParseState): ParseResult[Result] = {
         val result = parseOriginal(input, state)
         result.mapReady(ready => {
-          if (ready.resultOption.isEmpty) {
+          if (ready.resultOption.isEmpty || ready.remainder == input) {
             ReadyParseResult(Some(_default), ready.remainder, ready.history)
           } else
             ready
