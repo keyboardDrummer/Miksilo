@@ -49,8 +49,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def to = from
   }
 
-  type Self[+Result] = LRParser[Result]
-
   override def succeed[Result](result: Result): Self[Result] = Succeed(result)
 
   case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[MyParseError]) {
@@ -102,11 +100,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   type MyParseError = ParseError[Input]
   type MyHistory = History[Input]
-
-  class EditorLazy[Result](_inner: => Self[Result]) extends Lazy[Result](_inner) with EditorParserBase[Result] {
-  }
-
-  override def lazyParser[Result](inner: => Self[Result]) = new EditorLazy(inner)
 
   case class Fail[Result](value: Option[Result], message: String, penalty: Double)
     extends EditorParserBase[Result] with LeafParser[Result] {

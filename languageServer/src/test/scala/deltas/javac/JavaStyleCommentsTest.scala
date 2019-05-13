@@ -9,7 +9,7 @@ import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import deltas.{HasNameDelta, PrettyPrint}
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.logical.LogicalNotDelta
-import deltas.expression.relational.{AddRelationalPrecedenceDelta, EqualsComparisonDelta, GreaterThanDelta, LessThanDelta}
+import deltas.expression.relational.{RelationalPrecedenceDelta, EqualsComparisonDelta, GreaterThanDelta, LessThanDelta}
 import deltas.expression.{ExpressionDelta, IntLiteralDelta, ParenthesisInExpressionDelta, TernaryDelta, VariableDelta}
 import deltas.javac.expressions.equality.AddEqualityPrecedence
 import deltas.javac.expressions.literals.{BooleanLiteralDelta, LongLiteralDelta, NullDelta}
@@ -18,6 +18,17 @@ import deltas.statement.{BlockDelta, StatementDelta}
 import util.{LanguageTest, SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
+
+object ExpressionAsRoot extends DeltaWithGrammar
+{
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    grammars.find(BodyGrammar).inner = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
+  }
+
+  override def description: String = ""
+
+  override def dependencies: Set[Contract] = Set.empty
+}
 
 class JavaStyleCommentsTest
   extends LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++ JavaToByteCodeLanguage.javaCompilerDeltas))
@@ -61,27 +72,6 @@ class JavaStyleCommentsTest
   test("BasicClass") {
     val input = "/* jooo */"
     TestGrammarUtils.parseAndPrintSame(input, None, SlashStarBlockCommentsDelta.commentGrammar)
-  }
-
-  object ExpressionAsRoot extends DeltaWithGrammar
-  {
-    override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-      grammars.find(BodyGrammar).inner = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
-    }
-
-    override def description: String = ""
-
-    override def dependencies: Set[Contract] = Set.empty
-  }
-
-  test("relational") {
-    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(SlashStarBlockCommentsDelta, ExpressionAsRoot, VariableDelta) ++
-      Seq(LessThanDelta, GreaterThanDelta,
-        AddRelationalPrecedenceDelta, IntLiteralDelta,
-        HasNameDelta, ExpressionDelta)))
-    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
-
-    grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionDelta.FirstPrecedenceGrammar)
   }
 
   test("addition") {

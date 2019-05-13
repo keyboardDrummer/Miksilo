@@ -7,7 +7,7 @@ import strings.DefaultIndentationSensitiveWriter
 class IndentationParserTest extends FunSuite with LeftRecursiveCorrectingParserWriter
   with DefaultIndentationSensitiveWriter {
 
-  lazy val expression = lazyParser(block | anA)
+  lazy val expression = new Lazy(block | anA)
   val whiteSpace = RegexParser("""\s*""".r, "whitespace")
   val anA: Self[Any] = "a" ~< whiteSpace
   val block: Self[Any] = WithIndentation("block:" ~< whiteSpace ~ greaterThan(alignedList(expression)))

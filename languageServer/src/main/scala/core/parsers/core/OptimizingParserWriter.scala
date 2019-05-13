@@ -5,9 +5,7 @@ import scala.language.higherKinds
 
 trait OptimizingParserWriter extends ParserWriter {
 
-  type Self[+Result] <: LRParser[Result]
-
-  def lazyParser[Result](inner: => Self[Result]): Self[Result]
+  type Self[+Result] = LRParser[Result]
 
   def wrapParse[Result](parser: Parse[Result],
                         shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result]
@@ -170,7 +168,7 @@ trait OptimizingParserWriter extends ParserWriter {
   implicit class ParserExtensions[+Result](parser: Self[Result]) extends super.ParserExtensions(parser) {
 
     def addAlternative[Other >: Result](getAlternative: (Self[Other], Self[Other]) => Self[Other]): Self[Other] = {
-      lazy val result: Self[Other] = lazyParser(parser | getAlternative(parser, result))
+      lazy val result: Self[Other] = new Lazy(parser | getAlternative(parser, result))
       result
     }
 

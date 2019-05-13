@@ -60,8 +60,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
 
-  override def lazyParser[Result](inner: => Self[Result]) = new EditorLazy(inner)
-
   sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
     def tailDepth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]

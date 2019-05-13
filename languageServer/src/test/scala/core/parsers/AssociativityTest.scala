@@ -6,7 +6,7 @@ import editorParsers.LeftRecursiveCorrectingParserWriter
 class AssociativityTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   test("binary operators are right associative by default") {
-    lazy val expr: Self[Any] = new EditorLazy(expr) ~< "-" ~ expr | wholeNumber
+    lazy val expr: Self[Any] = new Lazy(expr) ~< "-" ~ expr | wholeNumber
     val input = "1-2-3"
     val result = expr.parseWholeInput(new StringReader(input))
     assert(result.successful)

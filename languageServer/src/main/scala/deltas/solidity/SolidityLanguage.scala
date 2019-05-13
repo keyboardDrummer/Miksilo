@@ -53,7 +53,7 @@ object SolidityLanguage {
     AddAssignmentDelta, AdditionDelta, AdditivePrecedenceDelta,
     BitwiseShiftLeftDelta, BitwiseShiftRightDelta, BitwiseAndDelta, BitwiseXorDelta, BitwiseOrDelta,
     LessThanDelta, GreaterThanOrEqualDelta, GreaterThanDelta,
-    EqualsComparisonDelta, AddRelationalPrecedenceDelta,
+    EqualsComparisonDelta, RelationalPrecedenceDelta,
     LogicalAndDelta, LogicalOrDelta,
     TernaryDelta,
     AssignToMemberDelta, SelectFieldDelta, MemberSelectorDelta,

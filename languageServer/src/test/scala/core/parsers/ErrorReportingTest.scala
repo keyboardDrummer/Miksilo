@@ -6,7 +6,7 @@ import editorParsers.LeftRecursiveCorrectingParserWriter
 class ErrorReportingTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter  {
 
   test("left recursion with lazy indirection error") {
-    lazy val head: Self[Any] = new EditorLazy(head) ~ "c" | "a"
+    lazy val head: Self[Any] = new Lazy(head) ~ "c" | "a"
 
     val input = "bb"
     val parseResult = head.parseWholeInput(new StringReader(input))
@@ -15,7 +15,7 @@ class ErrorReportingTest extends FunSuite with CommonStringReaderParser with Lef
   }
 
   test("left recursion with lazy indirection error v2") {
-    lazy val head: Self[Any] = "a" | new EditorLazy(head) ~ "c"
+    lazy val head: Self[Any] = "a" | new Lazy(head) ~ "c"
 
     val input = "bb"
     val parseResult = head.parseWholeInput(new StringReader(input))
