@@ -4,13 +4,8 @@ import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
 import editorParsers.LeftRecursiveCorrectingParserWriter
 
-class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
-  private lazy val memberParser = stringLiteral ~< DropParser(":") ~ jsonParser
-  private lazy val objectParser = "{" ~> memberParser.manySeparated(",", "object member") ~< "}"
-  object UnknownExpression {
-    override def toString = "unknown"
-  }
-  protected lazy val jsonParser: Self[Any] = DropParser((stringLiteral | objectParser | wholeNumber).withDefault(UnknownExpression, "value"))
+class CorrectJsonTest extends FunSuite {
+  import ParseJson._
 
   test("test whether correct inputs always return a ready in one go") {
     val input = """{ "VpcId" : {
@@ -82,13 +77,13 @@ class CorrectJsonTest extends FunSuite with CommonStringReaderParser with LeftRe
 
   test("real life example missing :value") {
     val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subscription"}}}}"""
-    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription",UnknownExpression))))))))
+    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription", UnknownExpression))))))))
     parseJson(input, expectation, 2)
   }
 
   test("real life example 2") {
     val input = """{"Resources":{"NotificationTopic":{"Properties":{"Subsc"""
-    val expectation = List(("Resources",List(("NotificationTopic",List(("Properties",List(("Subsc",UnknownExpression))))))))
+    val expectation = List(("Resources",List(("NotificationTopic",List(("Properties",List(("Subsc", UnknownExpression))))))))
     parseJson(input, expectation, 7)
   }
 

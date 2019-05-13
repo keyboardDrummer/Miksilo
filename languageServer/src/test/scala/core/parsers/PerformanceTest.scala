@@ -3,9 +3,8 @@ package core.parsers
 import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
 import util.SourceUtils
-import editorParsers.LeftRecursiveCorrectingParserWriter
 
-class PerformanceTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
+class PerformanceTest extends FunSuite {
 
   test("test whether correct inputs always return a ready in one go") {
     val input = """{
@@ -25,31 +24,54 @@ class PerformanceTest extends FunSuite with CommonStringReaderParser with LeftRe
     val result = JsonLanguage.language.compileString(input)
   }
 
-  private lazy val arrayParser = "[" ~> jsonParser.manySeparated(",", "array element") ~< "]"
-  private lazy val memberParser = stringLiteral ~< DropParser(":") ~ jsonParser
-  private lazy val objectParser = "{" ~> memberParser.manySeparated(",", "object member") ~< "}"
-  object UnknownExpression {
-    override def toString = "unknown"
-  }
-  protected lazy val jsonParser: Self[Any] = DropParser((stringLiteral | objectParser | wholeNumber | arrayParser).
-    withDefault(UnknownExpression, "value"))
+  test("Errorless JSON performance") {
+    import ParseJson._
 
-  test("correct JSON performance") {
     val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
       replaceAll("\\s", "")
 
-    //val json = JsonLanguage.language
     val multiplier = 1
     val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     val timeA = System.currentTimeMillis()
     for(_ <- 1.to(multiplier * 10)) {
-      jsonParser.parseWholeInput(new StringReader(source))
+      val result = jsonParser.parseWholeInput(new StringReader(source))
+      assert(result.successful)
     }
 
     val timeB = System.currentTimeMillis()
     for(_ <- 1.to(multiplier)) {
-      jsonParser.parseWholeInput(new StringReader(tenTimesSource))
+      val result = jsonParser.parseWholeInput(new StringReader(tenTimesSource))
+      assert(result.successful)
+    }
+
+    val timeC = System.currentTimeMillis()
+
+    val singleSource = timeB - timeA
+    val sourceTimesTen = timeC - timeB
+    assert(singleSource < 300 * multiplier)
+    System.out.println(s"singleSource:$singleSource")
+    System.out.println(s"totalTime:${singleSource + sourceTimesTen}")
+  }
+
+  test("Errorless JSON performance BiGrammar") {
+    val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
+      replaceAll("\\s", "")
+
+    val json = JsonLanguage.language
+    val multiplier = 1
+    val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
+
+    val timeA = System.currentTimeMillis()
+    for(_ <- 1.to(multiplier * 10)) {
+      val result = json.compileString(source).diagnostics
+      assert(result.isEmpty)
+    }
+
+    val timeB = System.currentTimeMillis()
+    for(_ <- 1.to(multiplier)) {
+      val result = json.compileString(tenTimesSource).diagnostics
+      assert(result.isEmpty)
     }
 
     val timeC = System.currentTimeMillis()

@@ -123,7 +123,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   }
 
   final class SRCons[+Result](val head: LazyParseResult[Result],
-                              val readyResults: Int, var tailDepth: Int, _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
+                              val readyResults: Int, var tailDepth: Int,
+                              _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
     lazy val tail = _tail
     //tail
@@ -132,10 +133,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 //      throw new Error()
 //    }
 //
-//    if (depth == 500) {
-//      tail
-//      depth = 0
-//    }
+    if (tailDepth == 500) {
+      tail
+      tailDepth = 0
+    }
 
 //    // Detect incorrect ordering.
 //    val score = head.score
