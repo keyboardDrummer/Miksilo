@@ -32,7 +32,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
       } else
         from.printRange(to)
 
-      s"expected $expectation but found $found"
+      s"expected $expectation but found '$found'"
     }
   }
 
