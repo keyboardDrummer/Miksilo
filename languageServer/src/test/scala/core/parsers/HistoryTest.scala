@@ -43,16 +43,15 @@ class HistoryTest extends FunSuite with StringParserWriter {
     assert(withSuccess.score < withoutSuccess.score)
   }
 
-  test("splitting a 3 char drop with a success is good") {
+  test("splitting a 2 char drop with a success is good") {
     val start = new IndexInput(0)
     val middle = new IndexInput(1)
-    val middlePlusOne = new IndexInput(2)
-    val end = new IndexInput(3)
+    val end = new IndexInput(2)
     val withoutSuccess = SpotlessHistory().addError(DropError(start, end))
     val withSuccess = SpotlessHistory().
       addError(DropError(start, middle)).
       addSuccess(History.successValue).
-      addError(DropError(middlePlusOne, end))
+      addError(DropError(middle, end))
 
     assert(withSuccess.score > withoutSuccess.score)
   }
