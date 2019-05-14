@@ -6,10 +6,14 @@ import core.language.node.GrammarKey
 class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {
 
   def addAlternative(addition: BiGrammar, precedence: Boolean = false) {
-    if (precedence)
-      inner = addition | inner
-    else
-      inner = inner | addition
+    if (inner.isInstanceOf[BiFailure])
+      inner = addition
+    else {
+      if (precedence)
+        inner = addition | inner
+      else
+        inner = inner | addition
+    }
   }
 
   override def children = Seq(inner)

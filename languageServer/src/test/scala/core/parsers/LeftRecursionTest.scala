@@ -1,14 +1,15 @@
 package test.core.parsers
 
-import core.bigrammar.grammars.Labelled
+import core.bigrammar.BiGrammarWriter.leftRight
+import core.bigrammar.grammars.{BiFailure, BiSequence, Keyword, Labelled, ManyVertical, ParseWhiteSpace, WithTrivia}
 import core.bigrammar.{BiGrammar, BiGrammarToParser, BiGrammarWriter, TestLanguageGrammarUtils}
-import core.deltas.{Contract, DeltaWithGrammar}
-import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
+import core.deltas.{Contract, DeltaWithGrammar, GrammarForAst}
+import core.deltas.grammars.{BodyGrammar, LanguageGrammars, ProgramGrammar, TriviaGrammar, TriviasGrammar}
 import core.language.Language
 import core.parsers.CommonStringReaderParser
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import deltas.HasNameDelta
-import deltas.expression.{ExpressionDelta, IntLiteralDelta}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, LeftAssociativeBinaryOperatorDelta}
 import deltas.expression.relational.{GreaterThanDelta, LessThanDelta, RelationalPrecedenceDelta}
 import deltas.javac.ExpressionAsRoot
 import org.scalatest.FunSuite
@@ -132,15 +133,18 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
 
   test("relational bigrammar") {
     import core.bigrammar.DefaultBiGrammarWriter._
-    val innerExpression = new Labelled(ExpressionDelta.LastPrecedenceGrammar)
-    val expression: Labelled = new Labelled(ExpressionDelta.FirstPrecedenceGrammar, innerExpression)
+    implicit def toAstGrammar(grammar: BiGrammar): GrammarForAst = new GrammarForAst(grammar)
+
+    val expression: Labelled = new Labelled(ExpressionDelta.FirstPrecedenceGrammar)
     expression.addAlternative(BiGrammarWriter.integer)
     val relationalPrecedence = new Labelled(RelationalPrecedenceDelta.Grammar, expression.inner)
     expression.inner = relationalPrecedence
-    relationalPrecedence.addAlternative(relationalPrecedence ~ ">" ~ relationalPrecedence.inner)
-    relationalPrecedence.addAlternative(relationalPrecedence ~ "<" ~ relationalPrecedence.inner)
+    relationalPrecedence.addAlternative(relationalPrecedence.as(LeftAssociativeBinaryOperatorDelta.Left)
+      ~ Keyword(">") ~ relationalPrecedence.inner.as(LeftAssociativeBinaryOperatorDelta.Right) asNode GreaterThanDelta.Shape )
+    relationalPrecedence.addAlternative(relationalPrecedence ~ Keyword("<") ~ relationalPrecedence.inner)
 
-    BiGrammarToParser.toParser(expression).parseWholeInput(new BiGrammarToParser.Reader("3<3"))
+    val result = BiGrammarToParser.toParser(expression).parseWholeInput(new BiGrammarToParser.Reader("3<3"))
+    assert(result != null)
   }
 
   test("relational") {
