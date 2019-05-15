@@ -135,12 +135,13 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
     import core.bigrammar.DefaultBiGrammarWriter._
     implicit def toAstGrammar(grammar: BiGrammar): GrammarForAst = new GrammarForAst(grammar)
 
-    val expression: Labelled = new Labelled(ExpressionDelta.FirstPrecedenceGrammar)
+    val inner = new Labelled(ExpressionDelta.LastPrecedenceGrammar)
+    val expression: Labelled = new Labelled(ExpressionDelta.FirstPrecedenceGrammar, inner)
     expression.addAlternative(BiGrammarWriter.integer)
     val relationalPrecedence = new Labelled(RelationalPrecedenceDelta.Grammar, expression.inner)
     expression.inner = relationalPrecedence
     relationalPrecedence.addAlternative(relationalPrecedence.as(LeftAssociativeBinaryOperatorDelta.Left)
-      ~ Keyword(">") ~ relationalPrecedence.inner.as(LeftAssociativeBinaryOperatorDelta.Right) asNode GreaterThanDelta.Shape )
+      ~ Keyword(">") ~ relationalPrecedence.inner asNode GreaterThanDelta.Shape )
     relationalPrecedence.addAlternative(relationalPrecedence ~ Keyword("<") ~ relationalPrecedence.inner)
 
     val result = BiGrammarToParser.toParser(expression).parseWholeInput(new BiGrammarToParser.Reader("3<3"))
