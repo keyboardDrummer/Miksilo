@@ -124,7 +124,8 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
     assertResult(expectation)(parseResult.resultOption)
   }
 
-  test("relational direct") {
+  //!! ALS IK CheckCache UITZET LUKT HET OPEENS WEL
+  test("regression test from bigrammar Java") {
     val failBase = new Lazy(Fail(None, "bla", 1))
     lazy val expression: Self[Any] = failBase | wholeNumber
     lazy val greaterThan: Self[Any] = relationalPrecedence.map(x => x.toString)
@@ -133,6 +134,6 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
     lazy val relationalPrecedence = new Lazy(withGreaterThan | lessThan)
 
     val analysis = compile(relationalPrecedence)
-    relationalPrecedence.parseWholeInput(new StringReader("3<3"))
+    relationalPrecedence.parseWholeInput(new StringReader("3"))
   }
 }

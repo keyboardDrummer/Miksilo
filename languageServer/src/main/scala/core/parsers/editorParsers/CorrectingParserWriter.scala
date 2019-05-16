@@ -124,6 +124,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
                               val readyResults: Int, var tailDepth: Int,
                               _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
+    def getTail = tail
     lazy val tail = _tail
     //tail
 

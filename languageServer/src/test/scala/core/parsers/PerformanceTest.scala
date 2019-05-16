@@ -24,7 +24,7 @@ class PerformanceTest extends FunSuite {
     val result = JsonLanguage.language.compileString(input)
   }
 
-  ignore("Errorless JSON performance") {
+  test("Errorless JSON performance") {
     import ParseJson._
 
     val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
@@ -49,7 +49,7 @@ class PerformanceTest extends FunSuite {
 
     val singleSource = timeB - timeA
     val sourceTimesTen = timeC - timeB
-    assert(singleSource < 300 * multiplier)
+    assert(singleSource < 2500 * multiplier)
     System.out.println(s"singleSource:$singleSource")
     System.out.println(s"totalTime:${singleSource + sourceTimesTen}")
   }

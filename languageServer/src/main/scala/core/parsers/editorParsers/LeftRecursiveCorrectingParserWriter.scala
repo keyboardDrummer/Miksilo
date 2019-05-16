@@ -4,18 +4,16 @@ import scala.collection.mutable
 
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
-  var iterations = 0
   class CheckCache[Result](parser: Parse[Result]) extends Parse[Result] {
 
     val cache = mutable.HashMap[Input, ParseResult[Result]]()
 
+    val detector = new FindFixPoint()
     def apply(input: Input, state: ParseState): ParseResult[Result] = {
-      iterations += 1
       cache.get (input) match {
         case Some(value) =>
           value
         case _ =>
-          val detector = new FindFixPoint()
           val newState = if (state.input == input) {
             if (state.parsers.contains(parser))
               throw new Exception("recursion should have been detected")
@@ -25,7 +23,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           }
           val value: ParseResult[Result] = parser(input, newState)
           value.mapReady(ready => {
-            if (!detector.partOfCycle)
+            if (!detector.partOfCycle && !cache.contains(input))
               cache.put(input, value)
             ready
           })
@@ -59,6 +57,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
     }
 
+    //During the growing, the cache recursion detection fails???
     def growResult(input: Input, state: ParseState, previous: ReadyParseResult[Result]): ParseResult[Result] = {
       val newState = FixPointState(input, state.callStack, state.parsers + (parser -> FoundFixPoint(singleResult(previous))))
       val nextResult: ParseResult[Result] = parser(input, newState)
@@ -94,7 +93,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           val grownResult =
             if (detector.foundRecursion)
               result.flatMapReady(ready => growResult(input, newState, ready))
-            else result
+            else
+              result
           grownResult
         case Some(result) =>
           result
@@ -146,12 +146,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   override def wrapParse[Result](parser: Parse[Result],
                                  shouldCache: Boolean,
                                  shouldDetectLeftRecursion: Boolean): Parse[Result] = {
-    //return new DetectFixPointAndCache[Result](parser)
       if (!shouldCache && !shouldDetectLeftRecursion) {
         return parser
       }
       if (shouldCache && shouldDetectLeftRecursion) {
-        //return parser
         return new DetectFixPointAndCache[Result](parser)
       }
       if (shouldCache) {
