@@ -6,15 +6,11 @@ import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.Language
 import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
-import deltas.{HasNameDelta, PrettyPrint}
+import deltas.PrettyPrint
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
-import deltas.expression.logical.LogicalNotDelta
-import deltas.expression.relational.{RelationalPrecedenceDelta, EqualsComparisonDelta, GreaterThanDelta, LessThanDelta}
-import deltas.expression.{ExpressionDelta, IntLiteralDelta, ParenthesisInExpressionDelta, TernaryDelta, VariableDelta}
-import deltas.javac.expressions.equality.AddEqualityPrecedence
-import deltas.javac.expressions.literals.{BooleanLiteralDelta, LongLiteralDelta, NullDelta}
-import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta}
 import deltas.statement.{BlockDelta, StatementDelta}
+import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import util.{LanguageTest, SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path

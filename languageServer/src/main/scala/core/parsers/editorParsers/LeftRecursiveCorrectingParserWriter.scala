@@ -4,11 +4,13 @@ import scala.collection.mutable
 
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
+  var iterations = 0
   class CheckCache[Result](parser: Parse[Result]) extends Parse[Result] {
 
     val cache = mutable.HashMap[Input, ParseResult[Result]]()
 
     def apply(input: Input, state: ParseState): ParseResult[Result] = {
+      iterations += 1
       cache.get (input) match {
         case Some(value) =>
           value
@@ -132,8 +134,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                   result.flatMapReady(ready => growResult(input, newState, ready))
                 else result
 
-//              if (!detector.partOfCycle)
-//                cache.put(input, grownResult)
+              if (!detector.partOfCycle)
+                cache.put(input, grownResult)
 
               grownResult
           }
@@ -144,6 +146,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   override def wrapParse[Result](parser: Parse[Result],
                                  shouldCache: Boolean,
                                  shouldDetectLeftRecursion: Boolean): Parse[Result] = {
+    //return new DetectFixPointAndCache[Result](parser)
       if (!shouldCache && !shouldDetectLeftRecursion) {
         return parser
       }

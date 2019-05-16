@@ -71,6 +71,7 @@ trait OptimizingParserWriter extends ParserWriter {
 
   class Lazy[Result](_original: => Self[Result]) extends ParserBase[Result] with ParserWrapper[Result] {
     lazy val original: Self[Result] = _original
+    def getOriginal = original
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       lazy val parseOriginal = recursive(original)
@@ -95,10 +96,6 @@ trait OptimizingParserWriter extends ParserWriter {
       val parseOriginal = recursive(original)
       (input, state) => parseOriginal(input, state).map(f)
     }
-
-    override def leftChildren = List(original)
-
-    override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
   def compile[Result](root: Self[Result]): ParserAnalysis = {

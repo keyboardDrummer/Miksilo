@@ -1,19 +1,22 @@
 package test.core.parsers
 
-import core.bigrammar.BiGrammarWriter.leftRight
-import core.bigrammar.grammars.{BiFailure, BiSequence, Keyword, Labelled, ManyVertical, ParseWhiteSpace, WithTrivia}
-import core.bigrammar.{BiGrammar, BiGrammarToParser, BiGrammarWriter, TestLanguageGrammarUtils}
-import core.deltas.{Contract, DeltaWithGrammar, GrammarForAst}
-import core.deltas.grammars.{BodyGrammar, LanguageGrammars, ProgramGrammar, TriviaGrammar, TriviasGrammar}
-import core.language.Language
+import core.bigrammar.BiGrammar.State
+import core.bigrammar.BiGrammarToParser.{Result, Self}
+import core.bigrammar.grammars.{Keyword, Labelled}
+import core.bigrammar.{BiGrammar, BiGrammarToParser, BiGrammarWriter, PrintBiGrammar, TestLanguageGrammarUtils}
+import core.deltas.GrammarForAst
 import core.parsers.CommonStringReaderParser
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
+import core.parsers.strings.CommonParserWriter
 import deltas.HasNameDelta
-import deltas.expression.{ExpressionDelta, IntLiteralDelta, LeftAssociativeBinaryOperatorDelta}
 import deltas.expression.relational.{GreaterThanDelta, LessThanDelta, RelationalPrecedenceDelta}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, LeftAssociativeBinaryOperatorDelta}
 import deltas.javac.ExpressionAsRoot
+import langserver.types.Position
 import org.scalatest.FunSuite
 import util.{LanguageTest, TestLanguageBuilder}
+
+import scala.collection.mutable
 
 class LeftRecursionTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
@@ -122,39 +125,14 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
   }
 
   test("relational direct") {
-    lazy val expression: Self[Any] = new Lazy(wholeNumber)
+    val failBase = new Lazy(Fail(None, "bla", 1))
+    lazy val expression: Self[Any] = failBase | wholeNumber
+    lazy val greaterThan: Self[Any] = relationalPrecedence.map(x => x.toString)
     lazy val withGreaterThan = expression | greaterThan
-    lazy val greaterThan: Self[Any] = withGreaterThan ~ ">" ~ expression
+    lazy val lessThan: Self[Any] = relationalPrecedence ~ withGreaterThan
     lazy val relationalPrecedence = new Lazy(withGreaterThan | lessThan)
-    lazy val lessThan: Self[Any] = relationalPrecedence ~ "<" ~ withGreaterThan
 
-    expression.parseWholeInput(new StringReader("3<3"))
-  }
-
-  test("relational bigrammar") {
-    import core.bigrammar.DefaultBiGrammarWriter._
-    implicit def toAstGrammar(grammar: BiGrammar): GrammarForAst = new GrammarForAst(grammar)
-
-    val inner = new Labelled(ExpressionDelta.LastPrecedenceGrammar)
-    val expression: Labelled = new Labelled(ExpressionDelta.FirstPrecedenceGrammar, inner)
-    expression.addAlternative(BiGrammarWriter.integer)
-    val relationalPrecedence = new Labelled(RelationalPrecedenceDelta.Grammar, expression.inner)
-    expression.inner = relationalPrecedence
-    relationalPrecedence.addAlternative(relationalPrecedence.as(LeftAssociativeBinaryOperatorDelta.Left)
-      ~ Keyword(">") ~ relationalPrecedence.inner asNode GreaterThanDelta.Shape )
-    relationalPrecedence.addAlternative(relationalPrecedence ~ Keyword("<") ~ relationalPrecedence.inner)
-
-    val result = BiGrammarToParser.toParser(expression).parseWholeInput(new BiGrammarToParser.Reader("3<3"))
-    assert(result != null)
-  }
-
-  test("relational") {
-    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ExpressionAsRoot) ++
-      Seq(LessThanDelta, GreaterThanDelta,
-        RelationalPrecedenceDelta, IntLiteralDelta,
-        HasNameDelta, ExpressionDelta)))
-    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
-
-    grammarUtils.compareInputWithPrint("3 < 3", grammarTransformer = ExpressionDelta.FirstPrecedenceGrammar)
+    val analysis = compile(relationalPrecedence)
+    relationalPrecedence.parseWholeInput(new StringReader("3<3"))
   }
 }
