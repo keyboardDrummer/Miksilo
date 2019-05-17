@@ -11,7 +11,8 @@ import core.parsers.strings.CommonParserWriter
 import deltas.HasNameDelta
 import deltas.expression.relational.{GreaterThanDelta, LessThanDelta, RelationalPrecedenceDelta}
 import deltas.expression.{ExpressionDelta, IntLiteralDelta, LeftAssociativeBinaryOperatorDelta}
-import deltas.javac.ExpressionAsRoot
+import deltas.javac.{ExpressionAsRoot, JavaToByteCodeLanguage}
+import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import langserver.types.Position
 import org.scalatest.FunSuite
 import util.{LanguageTest, TestLanguageBuilder}
@@ -135,5 +136,16 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
 
     val analysis = compile(relationalPrecedence)
     relationalPrecedence.parseWholeInput(new StringReader("3"))
+  }
+
+  //Break this down into a normal parser.
+  test("addition4") {
+    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
+      JavaToByteCodeLanguage.javaCompilerDeltas))
+    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
+
+    grammarUtils.compareInputWithPrint("2 + 1")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2")
+    grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
   }
 }
