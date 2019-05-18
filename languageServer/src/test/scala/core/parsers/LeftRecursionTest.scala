@@ -171,14 +171,13 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
   }
 
   test("fibonacci regression") {
-    val input = "System.out.print(Fibonacci.fibonacci(5))"
+    val input = "System.out.print(Fibonacci.fibonacci(x))"
     val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++
       Seq(CallMemberDelta, SelectFieldDelta, MemberSelectorDelta) ++ Seq(
       CallVariableDelta, CallDelta) ++ Seq(
       SimpleAssignmentDelta,
       AssignmentPrecedence, VariableDelta) ++ Seq(EqualsComparisonDelta,
-      AddEqualityPrecedence,
-      RelationalPrecedenceDelta, AdditivePrecedenceDelta, IntLiteralDelta,ExpressionDelta) ++ JavaLanguage.types
+      RelationalPrecedenceDelta, ExpressionDelta) ++ JavaLanguage.types
     ))
 
     val result = language.compile(input)
