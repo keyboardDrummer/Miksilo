@@ -22,9 +22,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
             FixPointState(input, List(parser), Map.empty, Map(parser -> isCycle))
           }
           val value: ParseResult[Result] = parser(input, newState)
-          if (!isCycle.partOfCycle && !cache.contains(input)) {
-            cache.put(input, value)
-          }
+//          if (!isCycle.partOfCycle && !cache.contains(input)) {
+//            cache.put(input, value)
+//          }
 
           value
       }
@@ -65,6 +65,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         state.parsers + (parser -> FoundFixPoint(singleResult(previous))), state.isCycle)
 
       val nextResult: ParseResult[Result] = parser(input, newState)
+      if (previous.history.score == 36) {
+        System.out.append("")
+      }
       nextResult.flatMapReady(ready => {
         val result = if (!ready.history.flawed && // A faulty grow parsed some space so it was bigger, but it shouldn't have been accepted because it had an error. Need to add a testcase for this.
           ready.remainder.offset > previous.remainder.offset)
@@ -143,8 +146,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                   result.flatMapReady(ready => growResult(input, newState, ready))
                 else result
 
-              if (!isCycle.partOfCycle)
-                cache.put(input, grownResult)
+//              if (!isCycle.partOfCycle)
+//                cache.put(input, grownResult)
 
               grownResult
           }

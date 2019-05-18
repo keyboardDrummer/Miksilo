@@ -186,7 +186,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
-      if (mergeDepth > 500)
+      if (mergeDepth > 0)
         return SREmpty
 
       other match {
@@ -349,6 +349,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
   }
 
+  var biggestInput = 0
   class BiggestOfTwo[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
     extends EditorParserBase[Result] with ChoiceLike[Result] {
 
@@ -360,9 +361,16 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
       new Parse[Result] {
         override def apply(input: Input, state: ParseState) = {
+          biggestInput = Math.max(biggestInput, input.offset)
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
-          firstResult.merge(secondResult)
+          val merged = firstResult.merge(secondResult)
+          merged match {
+            case cons: SRCons[_] if cons.head.score == 4 && input.offset == 102 =>
+              System.out.append("")
+            case _ =>
+          }
+          merged
         }
       }
     }

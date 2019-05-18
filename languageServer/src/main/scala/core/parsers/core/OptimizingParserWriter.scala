@@ -73,13 +73,25 @@ trait OptimizingParserWriter extends ParserWriter {
     override def children = List(original)
   }
 
-  class Lazy[Result](_original: => Self[Result]) extends ParserBase[Result] with ParserWrapper[Result] {
+  class Lazy[Result](_original: => Self[Result], val debugName: Any = null) extends ParserBase[Result] with ParserWrapper[Result] {
     lazy val original: Self[Result] = _original
     def getOriginal = original
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       lazy val parseOriginal = recursive(original)
-      (input, state) => parseOriginal(input, state)
+      (input, state) => {
+        if (input.offset == 102 && debugName == CallDelta.Shape) {
+          System.out.append("")
+        }
+        if (input.offset == 102 && debugName == MemberSelectorDelta.Shape) {
+          System.out.append("")
+        }
+        if (input.offset == 102 && debugName == VariableDelta.Shape) {
+          System.out.append("")
+        }
+        val result = parseOriginal(input, state)
+        result
+      }
     }
 
     override def leftChildren = List(original)

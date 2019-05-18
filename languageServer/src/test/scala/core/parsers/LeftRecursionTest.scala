@@ -8,10 +8,15 @@ import core.deltas.GrammarForAst
 import core.parsers.CommonStringReaderParser
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import core.parsers.strings.CommonParserWriter
+import core.smarts.SolveConstraintsDelta
+import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
+import deltas.expression.logical.LogicalNotDelta
 import deltas.{ClearPhases, HasNameDelta}
-import deltas.expression.relational.{GreaterThanDelta, LessThanDelta, RelationalPrecedenceDelta}
-import deltas.expression.{ExpressionDelta, IntLiteralDelta, LeftAssociativeBinaryOperatorDelta, PostFixIncrementDelta, VariableDelta}
+import deltas.expression.relational.{EqualsComparisonDelta, GreaterThanDelta, LessThanDelta, RelationalPrecedenceDelta}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, LeftAssociativeBinaryOperatorDelta, ParenthesisInExpressionDelta, PostFixIncrementDelta, TernaryDelta, VariableDelta}
 import deltas.javac.classes.{AssignToMemberDelta, FieldDeclarationDelta, FieldDeclarationWithInitializer, SelectFieldDelta}
+import deltas.javac.expressions.equality.AddEqualityPrecedence
+import deltas.javac.expressions.literals.{BooleanLiteralDelta, LongLiteralDelta, NullDelta}
 import deltas.javac.methods.{AccessibilityFieldsDelta, ImplicitReturnAtEndOfMethod, MemberSelectorDelta, MethodDelta, ReturnExpressionDelta, ReturnVoidDelta}
 import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.{CallVariableDelta, ExpressionAsRoot, JavaLanguage, JavaToByteCodeLanguage}
@@ -171,7 +176,10 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
       Seq(CallMemberDelta, SelectFieldDelta, MemberSelectorDelta) ++ Seq(
       CallVariableDelta, CallDelta) ++ Seq(
       SimpleAssignmentDelta,
-      AssignmentPrecedence, VariableDelta) ++ JavaLanguage.simpleBlock))
+      AssignmentPrecedence, VariableDelta) ++ Seq(EqualsComparisonDelta,
+      AddEqualityPrecedence,
+      RelationalPrecedenceDelta, AdditivePrecedenceDelta, IntLiteralDelta,ExpressionDelta) ++ JavaLanguage.types
+    ))
 
     val result = language.compile(input)
     assert(result.diagnostics.isEmpty)
