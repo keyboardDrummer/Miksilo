@@ -8,10 +8,14 @@ import core.deltas.GrammarForAst
 import core.parsers.CommonStringReaderParser
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import core.parsers.strings.CommonParserWriter
-import deltas.HasNameDelta
+import deltas.{ClearPhases, HasNameDelta}
 import deltas.expression.relational.{GreaterThanDelta, LessThanDelta, RelationalPrecedenceDelta}
-import deltas.expression.{ExpressionDelta, IntLiteralDelta, LeftAssociativeBinaryOperatorDelta}
-import deltas.javac.{ExpressionAsRoot, JavaToByteCodeLanguage}
+import deltas.expression.{ExpressionDelta, IntLiteralDelta, LeftAssociativeBinaryOperatorDelta, PostFixIncrementDelta, VariableDelta}
+import deltas.javac.classes.{AssignToMemberDelta, FieldDeclarationDelta, FieldDeclarationWithInitializer, SelectFieldDelta}
+import deltas.javac.methods.{AccessibilityFieldsDelta, ImplicitReturnAtEndOfMethod, MemberSelectorDelta, MethodDelta, ReturnExpressionDelta, ReturnVoidDelta}
+import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
+import deltas.javac.{CallVariableDelta, ExpressionAsRoot, JavaLanguage, JavaToByteCodeLanguage}
+import deltas.statement.assignment.{AddAssignmentDelta, AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import langserver.types.Position
 import org.scalatest.FunSuite
@@ -139,7 +143,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
   }
 
   //Break this down into a normal parser.
-  test("addition4") {
+  test("recursion detector caching regression") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       JavaToByteCodeLanguage.javaCompilerDeltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
@@ -147,5 +151,29 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
     grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
+  }
+
+  test("fibonacci regression simplified") {
+    val input = "System.out.print(Fibonacci.fibonacci(x))"
+
+    val variable = new Lazy(identifier, "variable")
+    lazy val expression: Self[Any] = new Lazy(variable | memberSelector | call, "expression")
+    lazy val memberSelector = new Lazy(expression ~ literal(".") ~ identifier, "member selector")
+    lazy val call = new Lazy((variable | memberSelector) ~ "(" ~ expression.manySeparated(",", "parameter") ~ ")", "call")
+    //val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++ JavaLanguage.fields ++ JavaLanguage.method))
+    val result = expression.parseWholeInput(new StringReader(input))
+    assert(result.successful)
+  }
+
+  test("fibonacci regression") {
+    val input = "System.out.print(Fibonacci.fibonacci(5))"
+    val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++
+      Seq(CallMemberDelta, SelectFieldDelta, MemberSelectorDelta) ++ Seq(
+      CallVariableDelta, CallDelta) ++ Seq(
+      SimpleAssignmentDelta,
+      AssignmentPrecedence, VariableDelta) ++ JavaLanguage.simpleBlock))
+
+    val result = language.compile(input)
+    assert(result.diagnostics.isEmpty)
   }
 }

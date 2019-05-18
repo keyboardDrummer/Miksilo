@@ -115,7 +115,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
       case labelled: Labelled =>
         lazy val inner = recursive(labelled.inner)
-        new Lazy(inner) //Laziness to prevent infinite recursion
+        new Lazy(inner, labelled.name) //Laziness to prevent infinite recursion
     }
   }
 }

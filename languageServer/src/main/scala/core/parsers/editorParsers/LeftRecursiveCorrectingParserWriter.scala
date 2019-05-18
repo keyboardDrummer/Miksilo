@@ -66,10 +66,12 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
       val nextResult: ParseResult[Result] = parser(input, newState)
       nextResult.flatMapReady(ready => {
-        if (ready.remainder.offset > previous.remainder.offset)
+        val result = if (!ready.history.flawed && // A faulty grow parsed some space so it was bigger, but it shouldn't have been accepted because it had an error. Need to add a testcase for this.
+          ready.remainder.offset > previous.remainder.offset)
           growResult(input, newState, ready)
         else
           singleResult(previous)
+        result
       })
     }
   }

@@ -1,5 +1,9 @@
 package core.parsers.core
 
+import deltas.expression.VariableDelta
+import deltas.javac.methods.MemberSelectorDelta
+import deltas.javac.methods.call.CallDelta
+
 import scala.collection.mutable
 import scala.language.higherKinds
 
