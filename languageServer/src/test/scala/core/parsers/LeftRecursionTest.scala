@@ -13,6 +13,8 @@ import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsid
 import org.scalatest.FunSuite
 import util.{LanguageTest, TestLanguageBuilder}
 
+import scala.reflect.io.Path
+
 class LeftRecursionTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   val optional_a: EditorParserExtensions[Any] =  literal("a").*
@@ -173,5 +175,12 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
 
     val result = language.compile(input)
     assert(result.diagnostics.isEmpty)
+  }
+
+  test("postfix regression") {
+    val input = """System.out.print(x++)""".stripMargin
+    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++
+      JavaLanguage.deltas))
+    assert(utils.compile(input).diagnostics.isEmpty)
   }
 }
