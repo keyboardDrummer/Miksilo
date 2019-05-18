@@ -61,21 +61,19 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     //Loop detector -> input increase -> CheckCache -> Loop detector -> CheckCache (boem)
     //During the growing, the cache recursion detection fails???
     def growResult(input: Input, state: ParseState, previous: ReadyParseResult[Result]): ParseResult[Result] = {
+      val previousResults = singleResult(previous)
       val newState = FixPointState(input, state.callStack,
-        state.parsers + (parser -> FoundFixPoint(singleResult(previous))), state.isCycle)
+        state.parsers + (parser -> FoundFixPoint(previousResults)), state.isCycle)
 
       val nextResult: ParseResult[Result] = parser(input, newState)
-      if (previous.history.score == 36) {
-        System.out.append("")
-      }
-      nextResult.flatMapReady(ready => {
+      previousResults.merge(nextResult.flatMapReady(ready => {
         val result = if (!ready.history.flawed && // A faulty grow parsed some space so it was bigger, but it shouldn't have been accepted because it had an error. Need to add a testcase for this.
           ready.remainder.offset > previous.remainder.offset)
           growResult(input, newState, ready)
         else
-          singleResult(previous)
+          SREmpty
         result
-      })
+      }))
     }
   }
 

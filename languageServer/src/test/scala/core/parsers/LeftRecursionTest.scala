@@ -134,8 +134,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
     assertResult(expectation)(parseResult.resultOption)
   }
 
-  //!! ALS IK CheckCache UITZET LUKT HET OPEENS WEL
-  test("regression test from bigrammar Java") {
+  test("CheckCache inner vs outer detector regression") {
     val failBase = new Lazy(Fail(None, "bla", 1))
     lazy val expression: Self[Any] = failBase | wholeNumber
     lazy val greaterThan: Self[Any] = relationalPrecedence.map(x => x.toString)
@@ -158,14 +157,23 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
     grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
   }
 
-  test("fibonacci regression simplified") {
+  test("fibonacci regression simplified (doesn't regress yet)") {
     val input = "System.out.print(Fibonacci.fibonacci(x))"
 
-    val variable = new Lazy(identifier, "variable")
-    lazy val expression: Self[Any] = new Lazy(variable | memberSelector | call, "expression")
-    lazy val memberSelector = new Lazy(expression ~ literal(".") ~ identifier, "member selector")
-    lazy val call = new Lazy((variable | memberSelector) ~ "(" ~ expression.manySeparated(",", "parameter") ~ ")", "call")
+    val variable = new Lazy(identifier.map(x => x), "variable")
+    lazy val lastExpression = new Lazy(Fail(None, "last", 1) | variable | call, "lastExpression")
+    lazy val relationalInner: Self[Any] = new Lazy(lastExpression, "expression")
+    lazy val equality: Self[Any] = new Lazy(relational.map(x => x) ~ literal("==") ~ relationalInner.map(x => x), "equality")
+    lazy val relational: Self[Any] = new Lazy(relationalInner | equality, "relational")
+    lazy val assignmentTarget: Self[Any] = new Lazy(Fail(None, "fail", 1), "assignmentTarget")
+    lazy val simpleAssignment: Self[Any] = new Lazy(assignmentTarget.map(x => x) ~ literal("=") ~ expression.map(x => x), "equality")
+    lazy val assignment: Self[Any] = new Lazy(relational | simpleAssignment, "assignemnt")
+    lazy val memberSelector = new Lazy(expression.map(x => x) ~ literal(".") ~ identifier.map(x => x), "member selector")
+    lazy val callCallee = new Lazy(variable | memberSelector, "callCallee")
+    lazy val call = new Lazy(callCallee.map(x => x) ~ "(" ~ expression.manySeparated(",", "parameter").map(x => x) ~ ")", "call")
     //val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++ JavaLanguage.fields ++ JavaLanguage.method))
+
+    lazy val expression: Self[Any] = assignment | memberSelector
     val result = expression.parseWholeInput(new StringReader(input))
     assert(result.successful)
   }
