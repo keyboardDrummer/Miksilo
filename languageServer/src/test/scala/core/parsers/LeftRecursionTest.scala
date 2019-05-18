@@ -1,15 +1,13 @@
-package test.core.parsers
+package core.parsers
 
-import core.bigrammar.TestLanguageGrammarUtils
-import core.parsers.CommonStringReaderParser
-import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
+import editorParsers.LeftRecursiveCorrectingParserWriter
 import deltas.ClearPhases
 import deltas.expression.relational.{EqualsComparisonDelta, RelationalPrecedenceDelta}
 import deltas.expression.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.SelectFieldDelta
 import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
-import deltas.javac.{CallVariableDelta, ExpressionAsRoot, JavaLanguage, JavaToByteCodeLanguage}
+import deltas.javac.{CallVariableDelta, ExpressionAsRoot, JavaLanguage}
 import deltas.statement.assignment.{AssignmentPrecedence, SimpleAssignmentDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.FunSuite
@@ -135,13 +133,11 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
 
   //Break this down into a normal parser.
   test("recursion detector caching regression") {
-    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
+    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       JavaLanguage.deltas))
-    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
-
-    grammarUtils.compareInputWithPrint("2 + 1")
-    grammarUtils.compareInputWithPrint("/* Hello */ 2")
-    grammarUtils.compareInputWithPrint("/* Hello */ 2 + 1")
+    assert(utils.compile("2 + 1").diagnostics.isEmpty)
+    assert(utils.compile("/* Hello */ 2").diagnostics.isEmpty)
+    assert(utils.compile("/* Hello */ 2 + 1").diagnostics.isEmpty)
   }
 
   test("fibonacci regression simplified (doesn't regress yet)") {

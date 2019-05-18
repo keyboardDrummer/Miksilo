@@ -144,8 +144,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                   result.flatMapReady(ready => growResult(input, newState, ready))
                 else result
 
-//              if (!isCycle.partOfCycle)
-//                cache.put(input, grownResult)
+              if (!isCycle.partOfCycle)
+                cache.put(input, grownResult)
 
               grownResult
           }

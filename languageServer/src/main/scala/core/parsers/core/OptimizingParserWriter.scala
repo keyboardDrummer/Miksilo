@@ -1,9 +1,5 @@
 package core.parsers.core
 
-import deltas.expression.VariableDelta
-import deltas.javac.methods.MemberSelectorDelta
-import deltas.javac.methods.call.CallDelta
-
 import scala.collection.mutable
 import scala.language.higherKinds
 
@@ -80,17 +76,7 @@ trait OptimizingParserWriter extends ParserWriter {
     override def getParser(recursive: GetParse): Parse[Result] = {
       lazy val parseOriginal = recursive(original)
       (input, state) => {
-        if (input.offset == 102 && debugName == CallDelta.Shape) {
-          System.out.append("")
-        }
-        if (input.offset == 102 && debugName == MemberSelectorDelta.Shape) {
-          System.out.append("")
-        }
-        if (input.offset == 102 && debugName == VariableDelta.Shape) {
-          System.out.append("")
-        }
-        val result = parseOriginal(input, state)
-        result
+        parseOriginal(input, state)
       }
     }
 
