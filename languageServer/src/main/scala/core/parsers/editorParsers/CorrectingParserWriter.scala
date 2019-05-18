@@ -364,13 +364,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
           biggestInput = Math.max(biggestInput, input.offset)
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
-          val merged = firstResult.merge(secondResult)
-          merged match {
-            case cons: SRCons[_] if cons.head.score == 4 && input.offset == 102 =>
-              System.out.append("")
-            case _ =>
-          }
-          merged
+          firstResult.merge(secondResult)
         }
       }
     }
