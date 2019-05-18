@@ -22,9 +22,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
             FixPointState(input, List(parser), Map.empty, Map(parser -> isCycle))
           }
           val value: ParseResult[Result] = parser(input, newState)
-//          if (!isCycle.partOfCycle && !cache.contains(input)) {
-//            cache.put(input, value)
-//          }
+          if (!isCycle.partOfCycle && !cache.contains(input)) {
+            cache.put(input, value)
+          }
 
           value
       }
@@ -144,6 +144,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                   result.flatMapReady(ready => growResult(input, newState, ready))
                 else result
 
+              //Check because an inner fix can run into a recursion of another fix, and therefor stop and not reach the right result.
               if (!isCycle.partOfCycle)
                 cache.put(input, grownResult)
 

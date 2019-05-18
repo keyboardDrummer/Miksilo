@@ -3,17 +3,15 @@ package core.parsers
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import deltas.ClearPhases
 import deltas.expression.relational.{EqualsComparisonDelta, RelationalPrecedenceDelta}
-import deltas.expression.{ExpressionDelta, VariableDelta}
+import deltas.expression.{ExpressionDelta, PostFixIncrementDelta, VariableDelta}
 import deltas.javac.classes.SelectFieldDelta
 import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.{CallVariableDelta, ExpressionAsRoot, JavaLanguage}
-import deltas.statement.assignment.{AssignmentPrecedence, SimpleAssignmentDelta}
+import deltas.statement.assignment.{AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.FunSuite
 import util.{LanguageTest, TestLanguageBuilder}
-
-import scala.reflect.io.Path
 
 class LeftRecursionTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
@@ -51,7 +49,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
 
   test("left recursion inside left recursion") {
     lazy val head: Self[Any] = second ~ "a" | second
-    lazy val second: Self[Any] = new Lazy(second) ~ "b" | head | "c"
+    lazy val second: Self[Any] = new Lazy(second, "secondRef") ~ "b" | head | "c"
 
     val input = "caabb"
     val expectation = (((("c","a"),"a"),"b"),"b")
@@ -178,6 +176,19 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
   }
 
   test("postfix regression") {
+    val input = """System.out.print(x++)""".stripMargin
+    val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++
+      Seq(AssignToVariable, PostFixIncrementDelta, CallMemberDelta, SelectFieldDelta, MemberSelectorDelta) ++ Seq(
+      CallVariableDelta, CallDelta) ++ Seq(
+      SimpleAssignmentDelta,
+      AssignmentPrecedence, VariableDelta) ++ Seq(EqualsComparisonDelta,
+      RelationalPrecedenceDelta, ExpressionDelta) ++ JavaLanguage.types
+    ))
+    val result = language.compile(input)
+    assert(result.diagnostics.isEmpty)
+  }
+
+  test("postfix regression 2") {
     val input = """System.out.print(x++)""".stripMargin
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++
       JavaLanguage.deltas))
