@@ -1,32 +1,19 @@
 package test.core.parsers
 
-import core.bigrammar.BiGrammar.State
-import core.bigrammar.BiGrammarToParser.{Result, Self}
-import core.bigrammar.grammars.{Keyword, Labelled}
-import core.bigrammar.{BiGrammar, BiGrammarToParser, BiGrammarWriter, PrintBiGrammar, TestLanguageGrammarUtils}
-import core.deltas.GrammarForAst
+import core.bigrammar.TestLanguageGrammarUtils
 import core.parsers.CommonStringReaderParser
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
-import core.parsers.strings.CommonParserWriter
-import core.smarts.SolveConstraintsDelta
-import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
-import deltas.expression.logical.LogicalNotDelta
-import deltas.{ClearPhases, HasNameDelta}
-import deltas.expression.relational.{EqualsComparisonDelta, GreaterThanDelta, LessThanDelta, RelationalPrecedenceDelta}
-import deltas.expression.{ExpressionDelta, IntLiteralDelta, LeftAssociativeBinaryOperatorDelta, ParenthesisInExpressionDelta, PostFixIncrementDelta, TernaryDelta, VariableDelta}
-import deltas.javac.classes.{AssignToMemberDelta, FieldDeclarationDelta, FieldDeclarationWithInitializer, SelectFieldDelta}
-import deltas.javac.expressions.equality.AddEqualityPrecedence
-import deltas.javac.expressions.literals.{BooleanLiteralDelta, LongLiteralDelta, NullDelta}
-import deltas.javac.methods.{AccessibilityFieldsDelta, ImplicitReturnAtEndOfMethod, MemberSelectorDelta, MethodDelta, ReturnExpressionDelta, ReturnVoidDelta}
+import deltas.ClearPhases
+import deltas.expression.relational.{EqualsComparisonDelta, RelationalPrecedenceDelta}
+import deltas.expression.{ExpressionDelta, VariableDelta}
+import deltas.javac.classes.SelectFieldDelta
+import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.{CallVariableDelta, ExpressionAsRoot, JavaLanguage, JavaToByteCodeLanguage}
-import deltas.statement.assignment.{AddAssignmentDelta, AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
+import deltas.statement.assignment.{AssignmentPrecedence, SimpleAssignmentDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
-import langserver.types.Position
 import org.scalatest.FunSuite
 import util.{LanguageTest, TestLanguageBuilder}
-
-import scala.collection.mutable
 
 class LeftRecursionTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
@@ -149,7 +136,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
   //Break this down into a normal parser.
   test("recursion detector caching regression") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
-      JavaToByteCodeLanguage.javaCompilerDeltas))
+      JavaLanguage.deltas))
     val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
