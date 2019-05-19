@@ -37,6 +37,7 @@ trait History[Input] {
 }
 
 case class SpotlessHistory[Input](score: Double = 0) extends History[Input] {
+
   override def addError(newHead: ParseError[Input]) = SingleError(score, newHead)
 
   override def ++(right: History[Input]) = right.addSuccess(score)

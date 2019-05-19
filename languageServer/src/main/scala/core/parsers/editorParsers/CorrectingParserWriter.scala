@@ -186,7 +186,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
-      if (mergeDepth > 200) // 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
+      if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
         return SREmpty
 
       other match {
@@ -364,7 +364,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
           biggestInput = Math.max(biggestInput, input.offset)
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
-          firstResult.merge(secondResult)
+          val merged = firstResult.merge(secondResult)
+          merged
         }
       }
     }

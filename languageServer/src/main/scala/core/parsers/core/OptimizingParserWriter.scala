@@ -1,5 +1,7 @@
 package core.parsers.core
 
+import deltas.expression.additive.AdditionDelta
+
 import scala.collection.mutable
 import scala.language.higherKinds
 
@@ -69,6 +71,7 @@ trait OptimizingParserWriter extends ParserWriter {
     override def children = List(original)
   }
 
+  val hits: mutable.HashMap[Lazy[_], Int] = new mutable.HashMap()
   class Lazy[Result](_original: => Self[Result], val debugName: Any = null) extends ParserBase[Result] with ParserWrapper[Result] {
     lazy val original: Self[Result] = _original
     def getOriginal = original
@@ -76,9 +79,15 @@ trait OptimizingParserWriter extends ParserWriter {
     override def getParser(recursive: GetParse): Parse[Result] = {
       lazy val parseOriginal = recursive(original)
       (input, state) => {
+        val current = hits.getOrElseUpdate(this, 0)
+        hits.put(this, current + 1)
+        if (debugName == AdditionDelta.Shape)
+          System.out.append("")
         parseOriginal(input, state)
       }
     }
+
+    override def toString = if (debugName != null) debugName.toString else super.toString
 
     override def leftChildren = List(original)
 

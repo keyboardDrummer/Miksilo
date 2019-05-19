@@ -11,9 +11,17 @@ import deltas.javac.{CallVariableDelta, ExpressionAsRoot, JavaLanguage}
 import deltas.statement.assignment.{AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.FunSuite
+import org.scalatest.concurrent.{TimeLimitedTests, TimeLimits}
+import org.scalatest.time.{Millis, Span}
 import util.{LanguageTest, TestLanguageBuilder}
 
-class LeftRecursionTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
+class LeftRecursionTest extends FunSuite with CommonStringReaderParser
+  with LeftRecursiveCorrectingParserWriter
+  with TimeLimits
+  //with TimeLimitedTests
+{
+
+  //val timeLimit = Span(200, Millis)
 
   val optional_a: EditorParserExtensions[Any] =  literal("a").*
   val optionalCopy: EditorParserExtensions[Any] = literal("a").*
@@ -133,11 +141,14 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
 
   //Break this down into a normal parser.
   test("recursion detector caching regression") {
-    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
+    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases,
+      TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       JavaLanguage.deltas))
+    val start = System.currentTimeMillis()
     assert(utils.compile("2 + 1").diagnostics.isEmpty)
-    assert(utils.compile("/* Hello */ 2").diagnostics.isEmpty)
-    assert(utils.compile("/* Hello */ 2 + 1").diagnostics.isEmpty)
+    System.out.append(s"Took: ${System.currentTimeMillis() - start} ms")
+//    assert(utils.compile("/* Hello */ 2").diagnostics.isEmpty)
+//    assert(utils.compile("/* Hello */ 2 + 1").diagnostics.isEmpty)
   }
 
   test("fibonacci regression simplified (doesn't regress yet)") {
