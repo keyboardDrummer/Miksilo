@@ -23,7 +23,7 @@ object LongLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val longGrammar : BiGrammar = RegexGrammar("""-?\d+l""".r, "long literal").map[String, Long](
-      number => parseLong(number), l => s"${l}l") as ValueKey asNode Shape
+      number => parseLong(number), l => s"${l}l") as ValueKey asLabelledNode Shape
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     expressionGrammar.addAlternative(longGrammar)
   }

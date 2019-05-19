@@ -19,7 +19,7 @@ object IntLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     import grammars._
     val inner = integer
     val parseNumber = inner.as(Value).asLabelledNode(Shape)
-    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(parseNumber)
+    find(ExpressionDelta.LastPrecedenceGrammar).addAlternative(parseNumber)
   }
 
   def neww(value: Int) = new Node(Shape, Value -> value)

@@ -203,7 +203,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   trait LazyParseResult[+Result] {
 
-    val score: Double = if (history.flawed) history.score else Double.MaxValue
+    val score: Double = (if (history.flawed) 0 else 10000) + history.score
 
     def history: MyHistory
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
@@ -258,9 +258,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
               rightResult.remainder,
               rightResult.history)
 
-            val withoutDrop = parseRight(leftReady.remainder, state).mapWithHistory[Result](mapRightResult, leftReady.history)
-            withoutDrop
-//            if (!mayDrop || leftReady.remainder.atEnd) {
+            parseRight(leftReady.remainder, state).mapWithHistory[Result](mapRightResult, leftReady.history)
+            //            if (!mayDrop || leftReady.remainder.atEnd) {
 //              withoutDrop
 //            }
 //            else {
