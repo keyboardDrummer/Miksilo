@@ -161,8 +161,10 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser with Left
     assert(result.successful)
   }
 
-  test("fibonacci recursive call") {
-    val input = """index < 2 ? 1 : Fibonacci.fibonacci(index - 1) + Fibonacci.fibonacci(index - 2)"""
+  //De outer ternary heeft een seed nodig. Die seed krijgt < als root, die meelift op een andere fixpoint, relational ofzo.
+  //De seed wordt uiteindelijk iets waarbij 2?1:y de ternary wordt, maar daarvoor moet het gehaal wel in een assignment genest, zijn en die =<value> ontbreekt dan.
+  test("moving ternary") {
+    val input = """x<2?1:y"""
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(
       Seq(ClearPhases, ExpressionAsRoot) ++
       JavaLanguage.deltas))

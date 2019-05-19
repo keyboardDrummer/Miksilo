@@ -26,7 +26,7 @@ object TernaryDelta extends DeltaWithGrammar with ExpressionInstance {
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val parseTernary = (expressionGrammar.as(Condition) ~~< "?") ~~
       (expressionGrammar.as(TrueBranch) ~~< ":") ~~
-      expressionGrammar.as(FalseBranch) asNode Shape
+      expressionGrammar.as(FalseBranch) asLabelledNode Shape
     expressionGrammar.addAlternative(parseTernary)
   }
 
