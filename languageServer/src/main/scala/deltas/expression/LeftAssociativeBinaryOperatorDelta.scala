@@ -37,7 +37,7 @@ trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar with Expressio
     import grammars._
     val precedenceGrammar = find(precedenceGrammarKey)
     val withoutOperator = precedenceGrammar.inner
-    val operator = precedenceGrammar.as(Left) ~~< keyword ~~ withoutOperator.as(Right) asNode shape
+    val operator = precedenceGrammar.as(Left) ~~< keyword ~~ withoutOperator.as(Right) asLabelledNode shape
     precedenceGrammar.addAlternative(operator)
   }
 
