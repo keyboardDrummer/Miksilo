@@ -1,5 +1,6 @@
 package core.parsers.core
 
+import deltas.expression.TernaryDelta
 import deltas.expression.additive.AdditionDelta
 
 import scala.collection.mutable
@@ -18,6 +19,7 @@ trait OptimizingParserWriter extends ParserWriter {
 
   trait Parse[+Result] {
     def apply(input: Input, state: ParseState): ParseResult[Result]
+    def debugName: Any = null
   }
 
   trait GetParse {
@@ -78,12 +80,16 @@ trait OptimizingParserWriter extends ParserWriter {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       lazy val parseOriginal = recursive(original)
-      (input, state) => {
-        val current = hits.getOrElseUpdate(this, 0)
-        hits.put(this, current + 1)
-        if (debugName == AdditionDelta.Shape)
-          System.out.append("")
-        parseOriginal(input, state)
+      new Parse[Result] {
+        override def apply(input: Input, state: ParseState) = {
+          val current = hits.getOrElseUpdate(Lazy.this, 0)
+          hits.put(Lazy.this, current + 1)
+          if (debugName == TernaryDelta.Shape)
+            System.out.append("")
+          parseOriginal(input, state)
+        }
+
+        override def debugName = Lazy.this.debugName
       }
     }
 

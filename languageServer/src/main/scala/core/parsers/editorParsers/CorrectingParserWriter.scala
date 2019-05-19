@@ -11,6 +11,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     var bestResult: ReadyParseResult[Result] =
       noResultFound
 
+
+    val start = System.currentTimeMillis()
     var queue = parser.parseRoot(input)
     while(queue.isInstanceOf[SRCons[Result]]) {
       val cons = queue.asInstanceOf[SRCons[Result]]
@@ -26,8 +28,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         case delayedResult: DelayedParseResult[Result] =>
           val results = delayedResult.results
           cons.tail.merge(results)
+//        case _ =>
+//          cons.tail
       }
     }
+    System.out.append(s"Took: ${System.currentTimeMillis() - start} ms")
     ParseWholeResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 
@@ -147,7 +152,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         case SREmpty => tail.flatMap(f)
         case cons: SRCons[NewResult] =>
 
-          if (head.score != cons.head.score) //.isInstanceOf[ReadyParseResult[_]])
+          if (head.score != cons.head.score)
             cons.merge(tail.flatMap(f))
           else
           {
