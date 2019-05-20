@@ -11,6 +11,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                                           history: MyHistory,
                                           get: ParseResult[SeedResult] => ParseResult[Result]) extends LazyParseResult[Result] {
 
+
+    override def toString = "Recursive: " + state.callStack
+
     override def map[NewResult](f: Result => NewResult) = {
       RecursiveParseResult[SeedResult, NewResult](state, parser, history, r => get(r).map(f))
     }
@@ -63,82 +66,109 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                            isCycle: Map[Parse[Any], IsPartOfCycle])
   class FindFixPoint(val state: ParseState, var foundRecursion: Boolean = false)
 
-  case class DetectFixPointAndCache[Result](parser: Parse[Result]) extends Parse[Result] {
-
+  case class DetectFixPointAndCache[Result](parser: Parse[Result]) extends CheckCache[Result](parser) {
 
     override def apply(input: Input, state: ParseState): ParseResult[Result] = {
 
-      getPreviousResult(input, state) match {
-        case Some(intermediate) =>
-          intermediate
-
+      cache.get (input) match {
+        case Some(value) =>
+          value
         case None =>
+          getPreviousResult(input, state) match {
+            case Some(intermediate) =>
+              intermediate
 
-          val detector = new FindFixPoint(state)
-          val newState = if (state.input == input) {
-//                if (state.parsers.contains(parser))
-//                  throw new Exception("recursion should have been detected.")
-            FixPointState(input, parser :: state.callStack, state.parsers + (parser -> detector), state.isCycle)
-          } else {
-            FixPointState(input, List(parser), Map(parser -> detector), Map.empty)
+            case None =>
+
+              val detector = new FindFixPoint(state)
+              val newState = if (state.input == input) {
+                //                if (state.parsers.contains(parser))
+                //                  throw new Exception("recursion should have been detected.")
+                FixPointState(input, parser :: state.callStack, state.parsers + (parser -> detector), state.isCycle)
+              } else {
+                FixPointState(input, List(parser), Map(parser -> detector), Map.empty)
+              }
+              val initialResult = parser(input, newState)
+
+              //          val resolveRecursion: LazyParseResult[Result] => SortedParseResults[Result] = {
+              //            case recursive: RecursiveParseResult[Result] =>
+              //              if (recursive.parser == parser) {
+              //                recursive.get(endResult)
+              //              }
+              //              else {
+              //                singleResult(recursive)
+              //              }
+              //            case ready: ReadyParseResult[Result] => singleResult(ready)
+              //            case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.history, () => {
+              //              val intermediate = delayed.results
+              //              intermediate.flatMap(resolveRecursion)
+              //            }))
+              //          }
+              //          lazy val endResult = resultWithRecursion.flatMap(resolveRecursion)
+
+              val resultWithoutRecursion: ParseResult[Result] = initialResult.flatMap({
+                case recursive: RecursiveParseResult[Result, Result] if recursive.state == state =>
+                  SREmpty
+                case lazyResult => singleResult(lazyResult)
+              })
+
+              val result = grow(state, resultWithoutRecursion, initialResult).
+                mapResult({
+                case rec: RecursiveParseResult[Result, Result] if rec.state == state =>
+                  System.out.append("")
+                  ???
+                case lazyResult => lazyResult
+              })
+              cache.put(input, result)
+              result
           }
-          val initialResult = parser(input, newState)
-
-//          val resolveRecursion: LazyParseResult[Result] => SortedParseResults[Result] = {
-//            case recursive: RecursiveParseResult[Result] =>
-//              if (recursive.parser == parser) {
-//                recursive.get(endResult)
-//              }
-//              else {
-//                singleResult(recursive)
-//              }
-//            case ready: ReadyParseResult[Result] => singleResult(ready)
-//            case delayed: DelayedParseResult[Result] => singleResult(new DelayedParseResult(delayed.history, () => {
-//              val intermediate = delayed.results
-//              intermediate.flatMap(resolveRecursion)
-//            }))
-//          }
-//          lazy val endResult = resultWithRecursion.flatMap(resolveRecursion)
-
-          val resultWithoutRecursion: ParseResult[Result] = initialResult.flatMap({
-            case recursive: RecursiveParseResult[Result, Result] if recursive.state == state =>
-              SREmpty
-            case lazyResult => singleResult(lazyResult)
-          })
-
-          grow(state, resultWithoutRecursion, initialResult).mapResult({
-            case rec: RecursiveParseResult[Result, Result] if rec.state == state =>
-              System.out.append("")
-              ???
-            case lazyResult => lazyResult
-          })
       }
     }
 
     //it can keep trying to grow the same shit indefinitely if there is a recursive loop that doesn't parse anything.
+    /*
+    Previous bevat ook recursions van andere fixpoints, die kunnen dus als seed gebruikt worden,
+    echter zijn ze dan een soort delay.. wanneer gaan ze dan verder?
+     */
     def grow(state: ParseState, previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
-      val grown: ParseResult[Result] = initialResults.flatMap({
-        case recursive: RecursiveParseResult[Result, Result] if recursive.state == state =>
-          val results = recursive.get(previous)
-          if (state.callStack.lengthCompare(3) < 0 && parser.debugName == ExpressionDelta.FirstPrecedenceGrammar) {
-            results.mapResult({
-              case rec: RecursiveParseResult[Result, Result] =>
-                System.out.append("wth")
-                rec
-              case lazyResult => lazyResult
-            })
-          } else
-            results
-        case _ => SREmpty
-      })
-      if (parser.debugName == ExpressionDelta.FirstPrecedenceGrammar) {
-        System.out.append("")
-      }
-      grown match {
-        case SREmpty => previous
-        case cons: SRCons[Result] =>
-          previous.merge(singleResult(new DelayedParseResult(cons.head.history, () => grow(state, grown, initialResults))))
-      }
+      // This algorithm has about the same behavior as the one below, except that it's a bit slower.
+      // Unpacking the previous into ready's has the advantage that we can inspect the remainder and enforce that grown's results have progressed,
+      // This SHOULD allow grammars to contain recursion that doesn't parse anything. in practice it gives a weird side effect.
+      previous.merge(previous.flatMapReady(prev => {
+        if (prev.history.flawed)
+          SREmpty
+        else {
+          val grown: ParseResult[Result] = initialResults.flatMap({
+            case recursive: RecursiveParseResult[Result, Result] if recursive.state == state =>
+              val results = recursive.get(singleResult(prev))
+              results.flatMapReady(r => if (r.remainder.offset > prev.remainder.offset) singleResult(r) else SREmpty)
+            case _ => SREmpty
+          })
+          grow(state, grown, initialResults)
+        }
+      }))
+//      val grown: ParseResult[Result] = initialResults.flatMap({
+//        case recursive: RecursiveParseResult[Result, Result] if recursive.state == state =>
+//          val results = recursive.get(previous)
+//          if (state.callStack.lengthCompare(3) < 0 && parser.debugName == ExpressionDelta.FirstPrecedenceGrammar) {
+//            results.mapResult({
+//              case rec: RecursiveParseResult[Result, Result] =>
+//                System.out.append("wth")
+//                rec
+//              case lazyResult => lazyResult
+//            })
+//          } else
+//            results
+//        case _ => SREmpty
+//      })
+//      if (parser.debugName == ExpressionDelta.FirstPrecedenceGrammar) {
+//        System.out.append("")
+//      }
+//      grown match {
+//        case SREmpty => previous
+//        case cons: SRCons[Result] =>
+//          previous.merge(singleResult(new DelayedParseResult(cons.head.history, () => grow(state, grown, initialResults))))
+//      }
     }
 
     case class RecursionError(input: Input) extends ParseError[Input] {

@@ -55,15 +55,21 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
     assertResult(leftParseResult)(rightParseResult)
   }
 
+  //[head] second b second b second head a second head a second c
+  /*
+  De second initialResults is netjes: c | recurse(second) | recursive(head)
+  Als die gegrown worden dan krijgen we: c | grow(c) -> ded | grow(recursive(head) -> recursive' | recursive(head)
+  Voor head initialResults krijg ik twee paar results voor beide second recursions, en dan per paar..
+   */
   test("left recursion inside left recursion") {
-    lazy val head: Self[Any] = second ~ "a" // | second
+    lazy val head: Self[Any] = second ~ "a" | second
     lazy val second: Self[Any] = new Lazy(second, "secondRef") ~ "b" | head | "c"
 
     val input = "caabb"
     val expectation = (((("c","a"),"a"),"b"),"b")
-//    val headParseResult = head.parseWholeInput(new StringReader(input))
-//    assert(headParseResult.successful)
-//    assertResult(expectation)(headParseResult.get)
+    val headParseResult = head.parseWholeInput(new StringReader(input), attempts(1))
+    assert(headParseResult.successful)
+    assertResult(expectation)(headParseResult.get)
 
     val secondParseResult = second.parseWholeInput(new StringReader(input))
     assert(secondParseResult.successful)
@@ -212,5 +218,13 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++
       JavaLanguage.deltas))
     assert(utils.compile(input).diagnostics.isEmpty)
+  }
+
+  def attempts(steps: Int): () => Boolean = {
+    var stepsTaken = 0
+    () => {
+      stepsTaken += 1
+      stepsTaken >= steps
+    }
   }
 }
