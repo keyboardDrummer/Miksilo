@@ -112,13 +112,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                 case lazyResult => singleResult(lazyResult)
               })
 
-              val result = grow(state, resultWithoutRecursion, initialResult).
-                mapResult({
-                case rec: RecursiveParseResult[Result, Result] if rec.state == state =>
-                  System.out.append("")
-                  ???
-                case lazyResult => lazyResult
-              })
+              val result = if (detector.foundRecursion)
+                grow(state, resultWithoutRecursion, initialResult)
+              else
+                resultWithoutRecursion
+
               cache.put(input, result)
               result
           }

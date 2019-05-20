@@ -34,6 +34,8 @@ trait History[Input] {
                  successScore: Double = History.successValue): History[Input] = addSuccess(successScore)
 
   def errors: Iterable[ParseError[Input]]
+
+  override def toString = errors.toString()
 }
 
 case class SpotlessHistory[Input](score: Double = 0) extends History[Input] {
@@ -47,6 +49,8 @@ case class SpotlessHistory[Input](score: Double = 0) extends History[Input] {
   override def flawed = false
 
   override def errors = Iterable.empty
+
+  override def toString = "Spotless: " + score
 }
 
 case class SingleError[Input](successScore: Double, error: ParseError[Input]) extends History[Input] {
@@ -74,6 +78,7 @@ object Rose {
 
 trait Rose[+Value] {
   def values: Seq[Value]
+  override def toString = values.toString()
 }
 
 case class Leaf[+Value](value: Value) extends Rose[Value] {

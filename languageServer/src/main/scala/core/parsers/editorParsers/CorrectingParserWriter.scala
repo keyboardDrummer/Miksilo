@@ -107,6 +107,12 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
                               val readyResults: Int, var tailDepth: Int,
                               _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
+    // Used for debugging
+    def ancestors: List[LazyParseResult[Result]] = head :: (tail match {
+      case SREmpty => List.empty
+      case cons: SRCons[Result] => cons.ancestors
+    })
+
     def getTail = tail
     lazy val tail = _tail
     //tail
@@ -200,6 +206,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   class DelayedParseResult[Result](val history: MyHistory, _getResults: () => SortedParseResults[Result])
     extends LazyParseResult[Result] {
+
+
+    override def toString = score + " delayed: " + history
 
     override def map[NewResult](f: Result => NewResult): DelayedParseResult[NewResult] = {
       new DelayedParseResult(history, () => results.map(f))
