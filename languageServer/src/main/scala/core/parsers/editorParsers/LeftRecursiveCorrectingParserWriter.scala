@@ -131,9 +131,6 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     echter zijn ze dan een soort delay.. wanneer gaan ze dan verder?
      */
     def grow(state: ParseState, previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
-      // This algorithm has about the same behavior as the one below, except that it's a bit slower.
-      // Unpacking the previous into ready's has the advantage that we can inspect the remainder and enforce that grown's results have progressed,
-      // This SHOULD allow grammars to contain recursion that doesn't parse anything. in practice it gives a weird side effect.
       previous.merge(previous.flatMapReady(prev => {
         if (prev.history.flawed)
           SREmpty
@@ -147,28 +144,6 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           grow(state, grown, initialResults)
         }
       }))
-//      val grown: ParseResult[Result] = initialResults.flatMap({
-//        case recursive: RecursiveParseResult[Result, Result] if recursive.state == state =>
-//          val results = recursive.get(previous)
-//          if (state.callStack.lengthCompare(3) < 0 && parser.debugName == ExpressionDelta.FirstPrecedenceGrammar) {
-//            results.mapResult({
-//              case rec: RecursiveParseResult[Result, Result] =>
-//                System.out.append("wth")
-//                rec
-//              case lazyResult => lazyResult
-//            })
-//          } else
-//            results
-//        case _ => SREmpty
-//      })
-//      if (parser.debugName == ExpressionDelta.FirstPrecedenceGrammar) {
-//        System.out.append("")
-//      }
-//      grown match {
-//        case SREmpty => previous
-//        case cons: SRCons[Result] =>
-//          previous.merge(singleResult(new DelayedParseResult(cons.head.history, () => grow(state, grown, initialResults))))
-//      }
     }
 
     case class RecursionError(input: Input) extends ParseError[Input] {

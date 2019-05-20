@@ -28,8 +28,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         case delayedResult: DelayedParseResult[Result] =>
           val results = delayedResult.results
           cons.tail.merge(results)
-//        case _ =>
-//          cons.tail
       }
     }
     System.out.append(s"Took: ${System.currentTimeMillis() - start} ms")
