@@ -61,13 +61,14 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
   Als die gegrown worden dan krijgen we: c | grow(c) -> ded | grow(recursive(head) -> recursive' | recursive(head)
   Voor head initialResults krijg ik twee paar results voor beide second recursions, en dan per paar..
    */
+
   test("left recursion inside left recursion") {
     lazy val head: Self[Any] = second ~ "a" | second
     lazy val second: Self[Any] = new Lazy(second, "secondRef") ~ "b" | head | "c"
 
     val input = "caabb"
     val expectation = (((("c","a"),"a"),"b"),"b")
-    val headParseResult = head.parseWholeInput(new StringReader(input), attempts(1))
+    val headParseResult = head.parseWholeInput(new StringReader(input))
     assert(headParseResult.successful)
     assertResult(expectation)(headParseResult.get)
 

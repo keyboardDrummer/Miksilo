@@ -187,9 +187,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       state.parsers.get(parser) match {
         case Some(find) if state.input == input =>
           find.foundRecursion = true
-          val smallErrorHistory = SingleError(0, RecursionError(input))
-          //val smallErrorHistory = History.empty[Input] // SingleError(0, RecursionError(input))
-          Some(singleResult(RecursiveParseResult[Result, Result](find.state, parser, smallErrorHistory, x => x)))
+          Some(singleResult(RecursiveParseResult[Result, Result](find.state, parser, History.empty[Input], x => x)))
         case _ => None
       }
     }
