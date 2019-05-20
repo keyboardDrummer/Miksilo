@@ -129,9 +129,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     echter zijn ze dan een soort delay.. wanneer gaan ze dan verder?
      */
     def grow(state: ParseState, previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
+      // TODO Consider replacing the previous.merge by moving that inside the lambda.
       previous.merge(previous.flatMapReady(prev => {
         if (prev.history.flawed)
-          SREmpty
+          SREmpty // TODO consider growing this as well
         else {
           val grown: ParseResult[Result] = initialResults.flatMap({
             case recursive: RecursiveParseResult[Result, Result] if recursive.state == state =>
