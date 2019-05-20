@@ -146,14 +146,13 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
     relationalPrecedence.parseWholeInput(new StringReader("3"))
   }
 
-  //Break this down into a normal parser.
   test("recursion detector caching regression") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases,
       TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
-      JavaLanguage.deltas))
+      JavaLanguage.javaSimpleExpression))
     assert(utils.compile("2 + 1").diagnostics.isEmpty)
-//    assert(utils.compile("/* Hello */ 2").diagnostics.isEmpty)
-//    assert(utils.compile("/* Hello */ 2 + 1").diagnostics.isEmpty)
+    assert(utils.compile("/* Hello */ 2").diagnostics.isEmpty)
+    assert(utils.compile("/* Hello */ 2 + 1").diagnostics.isEmpty)
   }
 
   test("fibonacci regression simplified (doesn't regress yet)") {
