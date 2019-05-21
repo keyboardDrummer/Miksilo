@@ -287,7 +287,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
               rightResult.remainder,
               rightResult.history)
 
-            parseRight(leftReady.remainder, state).mapWithHistory[Result](mapRightResult, leftReady.history)
+            val rightResult = parseRight(leftReady.remainder, state)
+            rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
             //            if (!mayDrop || leftReady.remainder.atEnd) {
 //              withoutDrop
 //            }

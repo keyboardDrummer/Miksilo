@@ -26,14 +26,19 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       RecursiveParseResult[SeedResult, NewResult](state, parser, history, r => get(r).mapReady(f))
 
     override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) =
-      RecursiveParseResult[SeedResult, NewResult](state, parser, history ++ oldHistory, r => get(r).mapWithHistory(f, oldHistory))
+      if (oldHistory.flawed) {
+        new DelayedParseResult[NewResult](History.empty[Input], () => SREmpty)
+      } else if (history.score > 0) {
+        System.out.append("what?")
+        ???
+      } else
+        RecursiveParseResult[SeedResult, NewResult](state, parser, history ++ oldHistory, r => get(r).mapWithHistory(f, oldHistory))
   }
 
   class CheckCache[Result](parser: Parse[Result]) extends Parse[Result] {
 
     val cache = mutable.HashMap[Input, ParseResult[Result]]()
 
-    val isCycle = new IsPartOfCycle()
     def apply(input: Input, state: ParseState): ParseResult[Result] = {
       cache.get (input) match {
         case Some(value) =>
@@ -42,9 +47,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           val newState = if (state.input == input) {
 //            if (state.parsers.contains(parser))
 //              throw new Exception("recursion should have been detected")
-            FixPointState(input, parser :: state.callStack, state.parsers, state.isCycle + (parser -> isCycle))
+            FixPointState(input, parser :: state.callStack, state.parsers)
           } else {
-            FixPointState(input, List(parser), Map.empty, Map(parser -> isCycle))
+            FixPointState(input, List(parser), Map.empty)
           }
           val value: ParseResult[Result] = parser(input, newState)
           if (!cache.contains(input)) {
@@ -58,12 +63,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   type ParseState = FixPointState
 
-  override def newParseState(input: Input) = FixPointState(input, List.empty, Map.empty, Map.empty)
+  override def newParseState(input: Input) = FixPointState(input, List.empty, Map.empty)
 
-  class IsPartOfCycle(var partOfCycle: Boolean = false)
   case class FixPointState(input: Input, callStack: List[Parse[Any]],
-                           parsers: Map[Parse[Any], FindFixPoint],
-                           isCycle: Map[Parse[Any], IsPartOfCycle])
+                           parsers: Map[Parse[Any], FindFixPoint])
   class FindFixPoint(val state: ParseState, var foundRecursion: Boolean = false)
 
   case class DetectFixPointAndCache[Result](parser: Parse[Result]) extends CheckCache[Result](parser) {
@@ -91,9 +94,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               val newState = if (state.input == input) {
                 //                if (state.parsers.contains(parser))
                 //                  throw new Exception("recursion should have been detected.")
-                FixPointState(input, parser :: state.callStack, state.parsers + (parser -> detector), state.isCycle)
+                FixPointState(input, parser :: state.callStack, state.parsers + (parser -> detector))
               } else {
-                FixPointState(input, List(parser), Map(parser -> detector), Map.empty)
+                FixPointState(input, List(parser), Map(parser -> detector))
               }
               val initialResult = parser(input, newState)
 
