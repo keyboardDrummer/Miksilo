@@ -21,10 +21,14 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
-          if (noResultFound != bestResult && mayStop())
-            SREmpty
-          else
-            cons.tail
+          cons.tail match {
+            case tailCons: SRCons[Result] =>
+              if (bestResult.originalScore > tailCons.head.score && mayStop())
+                SREmpty
+              else
+                cons.tail
+            case _ => SREmpty
+          }
         case delayedResult: DelayedParseResult[Result] =>
           val results = delayedResult.results
           cons.tail.merge(results)
@@ -234,6 +238,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   case class ReadyParseResult[+Result](resultOption: Option[Result], remainder: Input, history: MyHistory)
     extends LazyParseResult[Result] {
+
+    val originalScore = (if (history.flawed) 0 else 10000) + history.score
+    override val score = 1000000 + originalScore
 
     override def map[NewResult](f: Result => NewResult): ReadyParseResult[NewResult] = {
       ReadyParseResult(resultOption.map(f), remainder, history)

@@ -25,6 +25,8 @@ class CorrectJsonTest extends FunSuite {
     parseJson(input, List(("person","remy")), 0)
   }
 
+  // Currently the correct result has quite a low score of -10, leading to a huge amount of crap results being tried,
+  // Even [ [ [ [ has a better score than -10.
   test("garbage after number") {
     val input = """3blaa"""
     parseJson(input, "3", 1)
