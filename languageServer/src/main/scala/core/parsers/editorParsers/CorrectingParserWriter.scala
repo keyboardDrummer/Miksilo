@@ -35,7 +35,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   }
 
   def singleResult[Result](parseResult: LazyParseResult[Result]) =
-    new SRCons(parseResult, if (parseResult.isInstanceOf[ReadyParseResult[_]]) 0 else 1, 0, SREmpty)
+    new SRCons(parseResult,0, SREmpty)
 
   type ParseResult[+Result] = SortedParseResults[Result]
 
@@ -104,7 +104,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   }
 
   final class SRCons[+Result](val head: LazyParseResult[Result],
-                              val readyResults: Int, var tailDepth: Int,
+                              var tailDepth: Int,
                               _tail: => SortedParseResults[Result]) extends SortedParseResults[Result] {
 
     // Used for debugging
@@ -160,10 +160,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
             cons.merge(tail.flatMap(f))
           else
           {
-            val minus = if (head.isInstanceOf[ReadyParseResult[_]]) 1 else 0
             new SRCons(
               cons.head,
-              readyResults - minus + cons.readyResults,
               1 + Math.max(this.tailDepth, cons.tailDepth),
               cons.tail.merge(tail.flatMap(f)))
           }
@@ -171,7 +169,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def map[NewResult](f: Result => NewResult): SRCons[NewResult] = {
-      new SRCons(head.map(f), readyResults, tailDepth + 1, tail.map(f))
+      new SRCons(head.map(f), tailDepth + 1, tail.map(f))
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
@@ -181,11 +179,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       other match {
         case SREmpty => this
         case other: SRCons[Other] =>
-          val totalReadyResults = readyResults + other.readyResults
           if (head.score >= other.head.score) {
-            new SRCons(head, totalReadyResults,1 + Math.max(tailDepth, other.tailDepth), tail.merge(other, mergeDepth + 1))
+            new SRCons(head,1 + Math.max(tailDepth, other.tailDepth), tail.merge(other, mergeDepth + 1))
           } else
-            new SRCons(other.head, totalReadyResults,1 + Math.max(tailDepth, other.tailDepth), this.merge(other.tail, mergeDepth + 1))
+            new SRCons(other.head,1 + Math.max(tailDepth, other.tailDepth), this.merge(other.tail, mergeDepth + 1))
       }
     }
   }

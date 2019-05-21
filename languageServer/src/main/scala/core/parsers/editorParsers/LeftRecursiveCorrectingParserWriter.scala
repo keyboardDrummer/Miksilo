@@ -80,6 +80,13 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
             case None =>
 
+              // the recursion detection moet gebeuren in een path die niet terugkomt bij de recursion fixpoint.
+              // misschien dat nested fixpoints van dezelfde parser er wat mee te maken hebben.
+              // heeft het zin om een history te hebben bij een recursiveResult? ik denk van niet
+              // het gebeurt toch voordat er input is.
+              // als er iets gedropped moet worden kan dan ook binnen de recursie in plaats van er voor
+              // kan de recursie genest worden in een delayed result, en dan later niet meer gevonden?
+              // stel je krijgt left een delayed, en rechts een recursie, dan is het resultaat een delayed die later een recursie oplevert.
               val detector = new FindFixPoint(state)
               val newState = if (state.input == input) {
                 //                if (state.parsers.contains(parser))

@@ -181,9 +181,15 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
   test("moving ternary") {
     val input = """x<2?1:y"""
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(
-      Seq(ClearPhases, ExpressionAsRoot) ++
-      JavaLanguage.deltas))
+      Seq(ClearPhases, ExpressionAsRoot) ++ JavaLanguage.deltas))
     assert(utils.compile(input).diagnostics.isEmpty)
+  }
+
+  test("moving ternary 2") {
+    val input = """index < 2 ? 1 : 2"""
+    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(
+      Seq(ClearPhases, ExpressionAsRoot) ++ JavaLanguage.deltas))
+    assert(utils.compile(input).diagnostics.isEmpty) //index < 2 ? 1 : 2
   }
 
   test("fibonacci regression") {
