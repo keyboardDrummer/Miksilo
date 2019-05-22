@@ -56,24 +56,15 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) =
       if (oldHistory.flawed) {
-        new DelayedParseResult[NewResult](History.error(new ParseError[Input] {
-          override def penalty = 1000000
-
-          override def message = "blerp"
-
-          override def from = ???
-
-          override def to = ???
-
-          override def range = ???
-        }), () => SREmpty)
+        SREmpty
       }
       else if (oldHistory.score > 0) {
         System.out.append("what?")
         ???
       }
       else
-        RecursiveParseResult[SeedResult, NewResult](input, detector, counter, state, parser, r => get(r).mapWithHistory(f, oldHistory))
+        singleResult(RecursiveParseResult[SeedResult, NewResult](input, detector, counter, state, parser,
+          r => get(r).mapWithHistory(f, oldHistory)))
   }
 
   class CheckCache[Result](parser: Parse[Result]) extends Parse[Result] {

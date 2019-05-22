@@ -80,7 +80,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
                                   oldHistory: MyHistory): SortedParseResults[NewResult] = {
-      mapResult(l => l.mapWithHistory(f, oldHistory))
+      flatMap(l => l.mapWithHistory(f, oldHistory))
     }
 
     def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): SortedParseResults[NewResult] = {
@@ -177,7 +177,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
-      if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
+      if (mergeDepth > 300) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
         return SREmpty
 
       other match {
@@ -202,7 +202,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
 
     def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
-                       oldHistory: MyHistory): LazyParseResult[NewResult]
+                       oldHistory: MyHistory): SortedParseResults[NewResult]
   }
 
   class DelayedParseResult[Result](val history: MyHistory, _getResults: () => SortedParseResults[Result])
@@ -218,10 +218,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     lazy val results: SortedParseResults[Result] = _getResults()
 
     override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) =
-      new DelayedParseResult(this.history ++ oldHistory, () => {
+      singleResult(new DelayedParseResult(this.history ++ oldHistory, () => {
         val intermediate = this.results
         intermediate.mapWithHistory(f, oldHistory)
-    })
+    }))
 
     override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): DelayedParseResult[NewResult] =
       new DelayedParseResult(this.history, () => {
@@ -248,7 +248,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) = {
       val newReady = f(this)
-      ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.history ++ oldHistory)
+      singleResult(ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.history ++ oldHistory))
     }
 
     override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): ReadyParseResult[NewResult] = f(this)
