@@ -13,6 +13,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     extends LazyParseResult[Result] {
 
     def history = History.empty[Input]
+    override val score = 1000000 + history.score
 
     override def toString = "Recursive: " + parser.debugName
 
@@ -106,10 +107,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                 } else {
                   val cons = left.asInstanceOf[SRCons[Result]]
                   cons.head match {
-                    case delayed: DelayedParseResult[Result] => continue = false
-                    case recursive: RecursiveParseResult[Result, Result] if recursive.parser == parser =>
-                      foundRecursion = true
+                    case recursive: RecursiveParseResult[Result, Result] =>
+                      if (recursive.parser == parser)
+                        foundRecursion = true
                     case _ =>
+                      continue = false
                   }
                   left = cons.tail
                 }

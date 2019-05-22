@@ -240,7 +240,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     extends LazyParseResult[Result] {
 
     val originalScore = (if (history.flawed) 0 else 10000) + history.score
-    override val score = 1000000 + originalScore
+    override val score = 10000 + originalScore
 
     override def map[NewResult](f: Result => NewResult): ReadyParseResult[NewResult] = {
       ReadyParseResult(resultOption.map(f), remainder, history)
