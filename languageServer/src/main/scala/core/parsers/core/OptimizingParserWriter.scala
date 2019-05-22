@@ -3,7 +3,7 @@ package core.parsers.core
 import deltas.expression.TernaryDelta
 import deltas.expression.additive.AdditionDelta
 
-import scala.collection.mutable
+import scala.collection.{immutable, mutable}
 import scala.language.higherKinds
 
 trait OptimizingParserWriter extends ParserWriter {
@@ -47,7 +47,7 @@ trait OptimizingParserWriter extends ParserWriter {
 
     override def children = List(left, right)
 
-    override def leftChildren = if (left.mustConsumeInput) List(left) else List(left, right)
+    override def leftChildren: List[LRParser[Any]] = if (left.mustConsumeInput) List(left) else List(left, right)
 
     override def getMustConsume(cache: ConsumeCache) = cache(left) || cache(right)
   }
@@ -84,12 +84,12 @@ trait OptimizingParserWriter extends ParserWriter {
         override def apply(input: Input, state: ParseState) = {
           val current = hits.getOrElseUpdate(Lazy.this, 0)
           hits.put(Lazy.this, current + 1)
-          if (debugName == TernaryDelta.Shape)
-            System.out.append("")
           parseOriginal(input, state)
         }
 
         override def debugName = Lazy.this.debugName
+
+        override def toString = if (debugName != null) debugName.toString else super.toString
       }
     }
 
@@ -132,8 +132,23 @@ trait OptimizingParserWriter extends ParserWriter {
         case _ =>
       },
       cycle => {
-        nodesThatShouldDetectLeftRecursion += cycle.head
+        if (cycle.zip(cycle.drop(1)).forall(p => p._2.leftChildren.contains(p._1))) {
+          nodesThatShouldDetectLeftRecursion += cycle.head
+        }
       })
+
+//    GraphAlgorithms.depthFirst[LRParser[_]](root,
+//      node => {
+//        val leftChildren = node.leftChildren
+//        if (leftChildren != node.children) {
+//          System.out.append("")
+//        }
+//        leftChildren
+//      },
+//      (_, path: List[LRParser[_]]) =>  {},
+//      cycle => {
+//        nodesThatShouldDetectLeftRecursion += cycle.head
+//      })
 
     val components = SCC.scc[LRParser[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
     val nodesInCycle: Set[LRParser[_]] = components.filter(c => c.size > 1).flatten.toSet
