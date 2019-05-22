@@ -177,7 +177,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
-      if (mergeDepth > 1000) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
+      if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
         return SREmpty
 
       other match {
@@ -208,10 +208,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   class DelayedParseResult[Result](val history: MyHistory, _getResults: () => SortedParseResults[Result])
     extends LazyParseResult[Result] {
 
-    if (!history.flawed) {
-      System.out.append("")
-      ???
-    }
 
     override def toString = score + " delayed: " + history
 
