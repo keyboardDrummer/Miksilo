@@ -1,5 +1,7 @@
 package core.parsers.strings
 
+import core.parsers.editorParsers.{History, ParseError}
+
 
 trait IndentationSensitiveParserWriter extends StringParserWriter {
   type Input <: IndentationReaderLike
@@ -41,6 +43,13 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   def equal[Result](inner: Self[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
   def greaterThan[Result](inner: Self[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
 
+  case class IndentationError(from: Input, property: String) extends NextCharError {
+    override def penalty = History.indentationErrorPenalty
+
+    override def message =
+      s"indentation ${from.position.character} of character '${from.head}' must be $property ${from.indentation}"
+  }
+
   case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: Self[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
@@ -52,7 +61,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
         if (input.atEnd || deltaPredicate(delta)) {
           parseOriginal(input, state)
         } else {
-          newFailure(input, s"indentation ${input.position.character} of character '${input.head}' must be $property ${input.indentation}")
+          newFailure(None, input, History.error(IndentationError(input, property)))
         }
       }
       apply

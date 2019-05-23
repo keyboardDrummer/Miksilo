@@ -1,6 +1,7 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.{FlawedHistory, History, SpotlessHistory}
+import core.language.node.SourceRange
+import core.parsers.editorParsers.{FlawedHistory, History, ParseError, SpotlessHistory}
 import core.parsers.sequences.SequenceParserWriter
 import langserver.types.Position
 
@@ -94,6 +95,11 @@ trait StringParserWriter extends SequenceParserWriter {
     }
 
     override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
+  }
+
+  trait NextCharError extends ParseError[Input] {
+    def to: Input = if (this.from.atEnd) this.from else this.from.drop(1)
+    def range = SourceRange(from.position, to.position)
   }
 
   case class RegexParser(regex: Regex, regexName: String) extends EditorParserBase[String] with LeafParser[String] {

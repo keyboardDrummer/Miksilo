@@ -8,7 +8,9 @@ object History {
 
   val errorMultiplier = successValue * 2
 
-  val genericErrorPenalty = successValue
+  val indentationErrorPenalty = successValue * errorMultiplier * 10
+
+  val genericErrorPenalty = successValue * errorMultiplier
   val insertLiteralPenalty = successValue * errorMultiplier
   val insertRegexPenalty = successValue * errorMultiplier
   val insertDefaultPenalty = 1

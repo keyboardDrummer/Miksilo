@@ -56,7 +56,7 @@ class YamlTest extends FunSuite {
     replaceDefaultWithDefaultString(compilation)
 
     assertResult(twoMemberObjectCompilation.program)(compilation.program)
-    assert(compilation.diagnostics.size == 1)
+    assert(compilation.diagnostics.size == 2)
   }
 
   private def replaceDefaultWithDefaultString(compilation: Compilation): Unit = {

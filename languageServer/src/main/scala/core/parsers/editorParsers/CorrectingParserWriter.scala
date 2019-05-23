@@ -469,7 +469,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   }
 
-  case class DropError(from: Input, to: Input) extends MyParseError {
+  case class DropError(from: Input, to: Input) extends ParseError[Input] {
     def this(from: Input, expectation: String) = this(from, from.drop(1))
 
     override def append(next: MyParseError): Option[MyParseError] = {
