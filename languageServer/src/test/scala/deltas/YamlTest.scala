@@ -28,7 +28,7 @@ class YamlTest extends FunSuite {
     """Missing: default
       |Key: Value
     """.stripMargin
-  val twoMemberObjectCompilation = language.compile(twoMemberObject)
+  lazy val twoMemberObjectCompilation = language.compile(twoMemberObject)
 
   test("two member object with no first value") {
     val program =
@@ -56,6 +56,30 @@ class YamlTest extends FunSuite {
     replaceDefaultWithDefaultString(compilation)
 
     assertResult(twoMemberObjectCompilation.program)(compilation.program)
+    assert(compilation.diagnostics.size == 2)
+  }
+
+
+  val twoObjectsSingleMemberEach =
+    """Parent1:
+      |  HasValue: Value
+      |  MissingValue: default
+      |Parent2:
+      |  HasValue2: Value2
+    """.stripMargin
+  lazy val twoObjectsSingleMemberEachCompilation = language.compile(twoObjectsSingleMemberEach)
+  test("complicated middle errors") {
+    val program =
+      """Parent1:
+        |  HasValue: Value
+        |  MissingValue
+        |Parent2:
+        |  HasValue2: Value2
+      """.stripMargin
+    val compilation = language.compile(program)
+
+    replaceDefaultWithDefaultString(compilation)
+    assertResult(twoObjectsSingleMemberEachCompilation.program)(compilation.program)
     assert(compilation.diagnostics.size == 2)
   }
 
