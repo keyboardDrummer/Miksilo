@@ -17,7 +17,7 @@ object MemberSelectorDelta extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
+    val expression = find(ExpressionDelta.LastPrecedenceGrammar)
     (expression.as(Target) ~< ".") ~ identifier.as(Member) asLabelledNode Shape
   }
 
