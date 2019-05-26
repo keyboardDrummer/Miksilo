@@ -63,13 +63,25 @@ trait StringParserWriter extends SequenceParserWriter {
     }
   }
 
+  val identifier: Self[String] = RegexParser("""[_a-zA-Z][_a-zA-Z0-9]*""".r, "identifier")
+
   implicit def literalToExtensions(value: String): ParserExtensions[String] = Literal(value)
-  implicit def literal(value: String): Literal = Literal(value)
+
+  val identifierRegex = """[_a-zA-Z][_a-zA-Z0-9]*""".r
+  implicit def literal(value: String): Self[String] = {
+    val isKeyword = identifierRegex.findFirstIn(value).contains(value)
+    if (isKeyword)
+      return identifier.filter(s => s == value, s => s"$s was not $value")
+
+    Literal(value)
+  }
+
   implicit def regex(value: Regex, regexName: String): RegexParser = RegexParser(value, regexName)
 
   case class Literal(value: String) extends EditorParserBase[String] with LeafParser[String] {
 
     override def getParser(recursive: GetParse): Parse[String] = {
+
 
       lazy val result: Parse[String] = new Parse[String] {
         def apply(input: Input, state: ParseState): ParseResult[String] = {

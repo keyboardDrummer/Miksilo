@@ -1,5 +1,6 @@
 package deltas.solidity
 
+import core.bigrammar.GrammarReference
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
@@ -13,7 +14,7 @@ object LocalDeclarationStorageLocationDelta extends DeltaWithGrammar {
     val declaration = find(LocalDeclarationDelta.Shape)
     val name = declaration.findAs(Name)
     val storageLocation = find(StorageLocationDelta.StorageLocation)
-    name.set(storageLocation ~ name.value)
+    name.previous.asInstanceOf[GrammarReference].set(storageLocation ~ name.value)
   }
 
   override def description = "Enables specifying a storage location for declarations"

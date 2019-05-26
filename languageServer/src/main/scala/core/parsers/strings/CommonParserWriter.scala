@@ -2,10 +2,9 @@ package core.parsers.strings
 
 trait CommonParserWriter extends StringParserWriter {
 
-  def identifier: Self[String] = RegexParser("""[_a-zA-Z][_a-zA-Z0-9]*""".r, "identifier")
 
   /** An integer, without sign or with a negative sign. */
-  def wholeNumber: Self[String] =
+  val wholeNumber: Self[String] =
     RegexParser("""-?\d+""".r, "whole number")
   /** Number following one of these rules:
     *
@@ -14,7 +13,7 @@ trait CommonParserWriter extends StringParserWriter {
     *  - An integer followed by a decimal point and fractional part. For example: `3.14`
     *  - A decimal point followed by a fractional part. For example: `.1`
     */
-  def decimalNumber: Self[String] =
+  val decimalNumber: Self[String] =
     RegexParser("""(\d+(\.\d*)?|\d*\.\d+)""".r, "decimal number")
   /** Double quotes (`"`) enclosing a sequence of:
     *
@@ -23,7 +22,7 @@ trait CommonParserWriter extends StringParserWriter {
     *    of the letters `b`, `f`, `n`, `r` or `t`
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
-  def stringLiteral: Self[String] =
+  val stringLiteral: Self[String] =
     RegexParser(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r, "string literal").
       map(r => r.substring(1, r.length )) ~< "\""
 
@@ -34,6 +33,6 @@ trait CommonParserWriter extends StringParserWriter {
     *  - Followed by `e` or `E` and an optionally signed integer
     *  - Followed by `f`, `f`, `d` or `D` (after the above rule, if both are used)
     */
-  def floatingPointNumber: Self[String] =
+  val floatingPointNumber: Self[String] =
     RegexParser("""-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r, "floating point number")
 }

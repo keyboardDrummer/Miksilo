@@ -69,6 +69,7 @@ class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
       """.stripMargin
     val result: Seq[Location] = gotoDefinition(yamlServer, program, new HumanPosition(8, 24))
     val expectation = Seq(Location(itemUri, Range(new HumanPosition(2, 3), new HumanPosition(2, 10))))
+    // TODO add extra assertion that check whether MemberWithOnlyKey was not deleted (it now is)
     assertResult(expectation)(result)
   }
 }

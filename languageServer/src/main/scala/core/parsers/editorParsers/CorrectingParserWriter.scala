@@ -287,12 +287,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
               rightResult.remainder,
               rightResult.history)
 
-            if (leftReady.remainder.offset == 2 && leftReady.history.score == 2) {
-              System.out.append("")
-            }
-            if (leftReady.remainder.offset == 241 && leftReady.history.score == 3) {
-              System.out.append("")
-            }
             val rightResult = parseRight(leftReady.remainder, state)
             rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
           }
