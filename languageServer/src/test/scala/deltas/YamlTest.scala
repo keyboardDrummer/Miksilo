@@ -62,7 +62,7 @@ class YamlTest extends FunSuite {
 
   val twoObjectsSingleMemberEach =
     """Parent1:
-      |  HasValue: Value
+      |  HasValue: Value Value Value
       |  MissingValue: default
       |Parent2:
       |  HasValue2: Value2
@@ -71,7 +71,7 @@ class YamlTest extends FunSuite {
   test("complicated middle errors") {
     val program =
       """Parent1:
-        |  HasValue: Value
+        |  HasValue: Value Value Value
         |  MissingValue
         |Parent2:
         |  HasValue2: Value2
