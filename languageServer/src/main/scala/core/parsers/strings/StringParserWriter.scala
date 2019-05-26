@@ -68,10 +68,10 @@ trait StringParserWriter extends SequenceParserWriter {
   implicit def literalToExtensions(value: String): ParserExtensions[String] = Literal(value)
 
   val identifierRegex = """[_a-zA-Z][_a-zA-Z0-9]*""".r
-  implicit def literal(value: String): Self[String] = {
+  implicit def literalOrKeyword(value: String): Self[String] = {
     val isKeyword = identifierRegex.findFirstIn(value).contains(value)
     if (isKeyword)
-      return identifier.filter(s => s == value, s => s"$s was not $value")
+      return WithDefault(identifier.filter(s => s == value, s => s"$s was not $value"), value)
 
     Literal(value)
   }
@@ -102,8 +102,8 @@ trait StringParserWriter extends SequenceParserWriter {
           singleResult(ReadyParseResult(Some(value), remainder, History.empty[Input].addSuccess(input, remainder, value)))
         }
       }
-
       result
+
     }
 
     override def getMustConsume(cache: ConsumeCache) = value.nonEmpty

@@ -22,7 +22,7 @@ object LeftAssociativeBinaryOperatorDelta {
   }
 }
 
-trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar with ExpressionInstance {
+trait BinaryOperatorDelta extends DeltaWithGrammar with ExpressionInstance {
   import LeftAssociativeBinaryOperatorDelta._
 
   override def dependencies = Set(ExpressionDelta)
@@ -36,8 +36,7 @@ trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar with Expressio
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val precedenceGrammar = find(precedenceGrammarKey)
-    val withoutOperator = precedenceGrammar.inner
-    val operator = precedenceGrammar.as(Left) ~~< keyword ~~ withoutOperator.as(Right) asLabelledNode shape
+    val operator = precedenceGrammar.as(Left) ~~< keyword ~~ precedenceGrammar.as(Right) asLabelledNode shape
     precedenceGrammar.addAlternative(operator)
   }
 
@@ -54,6 +53,18 @@ trait LeftAssociativeBinaryOperatorDelta extends DeltaWithGrammar with Expressio
     val secondType = ExpressionDelta.getType(compilation, builder, right, parentScope)
     builder.typesAreEqual(firstType, secondType)
     builder.typesAreEqual(_type, firstType)
+  }
+}
+
+trait LeftAssociativeBinaryOperatorDelta extends BinaryOperatorDelta {
+  import LeftAssociativeBinaryOperatorDelta._
+
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    import grammars._
+    val precedenceGrammar = find(precedenceGrammarKey)
+    val withoutOperator = precedenceGrammar.inner
+    val operator = precedenceGrammar.as(Left) ~~< keyword ~~ withoutOperator.as(Right) asLabelledNode shape
+    precedenceGrammar.addAlternative(operator)
   }
 }
 

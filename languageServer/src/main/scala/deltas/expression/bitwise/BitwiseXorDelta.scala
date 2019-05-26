@@ -1,9 +1,9 @@
 package deltas.expression.bitwise
 
 import core.language.node.NodeShape
-import deltas.expression.{ExpressionDelta, LeftAssociativeBinaryOperatorDelta}
+import deltas.expression.{BinaryOperatorDelta, ExpressionDelta, LeftAssociativeBinaryOperatorDelta}
 
-object BitwiseXorDelta extends LeftAssociativeBinaryOperatorDelta {
+object BitwiseXorDelta extends BinaryOperatorDelta {
   override def precedenceGrammarKey = ExpressionDelta.FirstPrecedenceGrammar
 
   override def keyword = "^"

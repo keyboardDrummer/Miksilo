@@ -125,7 +125,7 @@ class YamlTest extends FunSuite
 
   lazy val parseBlockMapping: Self[YamlExpression] = {
     val member = new WithContext(_ =>
-      BlockKey, parseFlowValue) ~< literal(":") ~ greaterThan(parseValue)
+      BlockKey, parseFlowValue) ~< literalOrKeyword(":") ~ greaterThan(parseValue)
     alignedList(member).map(values => {
       Object(values.toMap)
     })
@@ -137,7 +137,7 @@ class YamlTest extends FunSuite
   }
 
   lazy val parseArray: Self[YamlExpression] = {
-    val element = literal("- ") ~> greaterThan(parseValue)
+    val element = literalOrKeyword("- ") ~> greaterThan(parseValue)
     alignedList(element).map(elements => Array(elements))
   }
 

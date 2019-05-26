@@ -32,19 +32,19 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
   test("if-then-else can be made right-associative") {
     lazy val expr = wholeNumber
     val stmt: Self[Any] = expr.
-      addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after ~ "else" ~ before).
-      addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after)
-    val input = "if1thenif2then3else4"
+      addAlternative[Any]((before, after) => "if{" ~> expr ~ "then{" ~ after ~ "else{" ~ before).
+      addAlternative[Any]((before, after) => "if{" ~> expr ~ "then{" ~ after)
+    val input = "if{1then{if{2then{3else{4"
     val result = stmt.parseWholeInput(new StringReader(input))
     assert(result.successful)
-    val nestedIf = (((("2", "then"), "3"), "else"), "4")
-    assertResult((("1","then"),nestedIf))(result.get)
+    val nestedIf = (((("2", "then{"), "3"), "else{"), "4")
+    assertResult((("1","then{"),nestedIf))(result.get)
 
-    val input2 = "if1thenif2then3else4else5"
+    val input2 = "if{1then{if{2then{3else{4else{5"
     val result2 = stmt.parseWholeInput(new StringReader(input2))
     assert(result2.successful)
 
-    val input3 = "if1thenif2then3"
+    val input3 = "if{1then{if{2then{3"
     val result3 = stmt.parseWholeInput(new StringReader(input3))
     assert(result3.successful)
   }
@@ -52,28 +52,28 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
   test("if-then-else is left-associative by default") {
     lazy val expr = wholeNumber
     lazy val stmt: Self[Any] = expr |
-      "if" ~> expr ~ "then" ~ stmt ~ "else" ~ stmt |
-      "if" ~> expr ~ "then" ~ stmt
-    val input = "if1thenif2then3else4"
+      "if{" ~> expr ~ "then{" ~ stmt ~ "else{" ~ stmt |
+      "if{" ~> expr ~ "then{" ~ stmt
+    val input = "if{1then{if{2then{3else{4"
     val result = stmt.parseWholeInput(new StringReader(input))
     assert(result.successful)
 
-    val nestedIf = (("2", "then"), "3")
-    assertResult((((("1","then"),nestedIf),"else"),"4"))(result.get)
+    val nestedIf = (("2", "then{"), "3")
+    assertResult((((("1","then{"),nestedIf),"else{"),"4"))(result.get)
   }
 
   test("if-then-else can be made left-associative") {
     lazy val expr = wholeNumber
     val stmt: Self[Any] = expr.
-      addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after).
-      addAlternative[Any]((before, after) => "if" ~> expr ~ "then" ~ after ~ "else" ~ after)
-    val input = "if1thenif2then3else4"
+      addAlternative[Any]((before, after) => "if{" ~> expr ~ "then{" ~ after).
+      addAlternative[Any]((before, after) => "if{" ~> expr ~ "then{" ~ after ~ "else{" ~ after)
+    val input = "if{1then{if{2then{3else{4"
     val result = stmt.parseWholeInput(new StringReader(input))
     assert(result.successful)
-    val nestedIf = (("2", "then"), "3")
-    assertResult((((("1","then"),nestedIf),"else"),"4"))(result.get)
+    val nestedIf = (("2", "then{"), "3")
+    assertResult((((("1","then{"),nestedIf),"else{"),"4"))(result.get)
 
-    val input2 = "if1thenif2then3else4else5"
+    val input2 = "if{1then{if{2then{3else{4else{5"
     val result2 = stmt.parseWholeInput(new StringReader(input2))
     assert(result2.successful)
   }

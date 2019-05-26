@@ -19,8 +19,8 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     val tokenParsers: Set[BiGrammarToParser.Self[MyToken]] = reachables.collect({
       case keyword: Keyword if keyword.reserved =>
         keywords.add(keyword.value)
-        literal(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
-      case delimiter: Delimiter => literal(delimiter.value) ^^ (s => MyToken(TokenTypes.SEPARATOR, s))
+        literalOrKeyword(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
+      case delimiter: Delimiter => literalOrKeyword(delimiter.value) ^^ (s => MyToken(TokenTypes.SEPARATOR, s))
       case identifier: Identifier => identifier.getParser(keywords) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
       case NumberGrammar => wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s)) //TODO should support other numbers as well.
       case StringLiteral =>

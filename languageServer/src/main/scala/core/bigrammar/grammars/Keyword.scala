@@ -7,5 +7,10 @@ case class Keyword(var value: String, reserved: Boolean = true, verifyWhenPrinti
   if (value.length == 0)
     throw new RuntimeException("value must have non-zero length")
 
-  override def getParser(keywords: scala.collection.Set[String]): Self[String] = literal(value)
+  override def getParser(keywords: scala.collection.Set[String]): Self[String] = {
+    if (reserved)
+      literalOrKeyword(value)
+    else
+      Literal(value)
+  }
 }

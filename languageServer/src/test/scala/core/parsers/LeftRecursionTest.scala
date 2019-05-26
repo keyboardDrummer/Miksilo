@@ -23,34 +23,34 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
 
   //val timeLimit = Span(200, Millis)
 
-  val optional_a: EditorParserExtensions[Any] =  literal("a").*
-  val optionalCopy: EditorParserExtensions[Any] = literal("a").*
-  def aesReader = new StringReader("aes")
+  val optional_a: EditorParserExtensions[Any] = Literal("!").*
+  val optionalCopy: EditorParserExtensions[Any] = Literal("!").*
+  def aesReader = new StringReader("!#@")
 
   test("left recursion with lazy indirection") {
-    lazy val head: Self[Any] = new Lazy(head) ~ "a" | "a"
+    lazy val head: Self[Any] = new Lazy(head) ~ "!" | "!"
 
-    val input = "aaa"
+    val input = "!!!"
     val parseResult = head.parseWholeInput(new StringReader(input))
     assert(parseResult.successful)
-    val expectation = (("a","a"),"a")
+    val expectation = (("!","!"),"!")
     assertResult(expectation)(parseResult.get)
   }
 
   test("handles recursion in complicated graph structures") {
-    lazy val leftMayNotCache = leftRec ~ "b"
+    lazy val leftMayNotCache = leftRec ~ "@"
     lazy val leftRec = leftPath.map(x => x)
-    lazy val leftPath: Self[Any] = new Lazy(leftMayNotCache | leftRec ~ "a" | "b")
+    lazy val leftPath: Self[Any] = new Lazy(leftMayNotCache | leftRec ~ "!" | "@")
 
-    val input = "bbb"
+    val input = "@@@"
     val leftParseResult = leftPath.parseWholeInput(new StringReader(input))
     assert(leftParseResult.successful)
-    val expectation = (("b","b"),"b")
+    val expectation = (("@","@"),"@")
     assertResult(expectation)(leftParseResult.get)
 
-    lazy val rightMayNotCache = rightRec ~ "b"
+    lazy val rightMayNotCache = rightRec ~ "@"
     lazy val rightRec = rightPath.map(x => x)
-    lazy val rightPath: Self[Any] = new Lazy(rightRec ~ "a" | rightMayNotCache | "b")
+    lazy val rightPath: Self[Any] = new Lazy(rightRec ~ "!" | rightMayNotCache | "@")
     val rightParseResult = rightPath.parseWholeInput(new StringReader(input))
     assertResult(leftParseResult)(rightParseResult)
   }
@@ -63,11 +63,11 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
    */
 
   test("left recursion inside left recursion") {
-    lazy val head: Self[Any] = second ~ "a" | second
-    lazy val second: Self[Any] = new Lazy(second, "secondRef") ~ "b" | head | "c"
+    lazy val head: Self[Any] = second ~ "!" | second
+    lazy val second: Self[Any] = new Lazy(second, "secondRef") ~ "@" | head | "#"
 
-    val input = "caabb"
-    val expectation = (((("c","a"),"a"),"b"),"b")
+    val input = "#!!@@"
+    val expectation = (((("#","!"),"!"),"@"),"@")
     val headParseResult = head.parseWholeInput(new StringReader(input))
     assert(headParseResult.successful)
     assertResult(expectation)(headParseResult.get)
@@ -78,7 +78,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
   }
 
   test("Optional before seed") {
-    lazy val expression: Self[Any] = new Lazy(expression) ~ "s" | optional_a ~ "e"
+    lazy val expression: Self[Any] = new Lazy(expression) ~ "@" | optional_a ~ "#"
     val result = expression.parseWholeInput(aesReader)
     assert(result.successful, result.toString)
   }
@@ -86,28 +86,28 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
   /**
    * This fails similarly to (a | ab) ~ bc.
    * The optional causes it to be something like:
-   *   expression1 = "a" ~ expression2 ~ "s" | "e"
+   *   expression1 = "!" ~ expression2 ~ "s" | "e"
    *   expression2 = expression2 ~ "s" | "e"
    * The expression2 will parse an "s", even though expression1 still needs to parse "s"
   */
   test("Optional before recursive") {
-    lazy val expression: Self[Any] = optional_a ~ expression ~ "s" | "e"
+    lazy val expression: Self[Any] = optional_a ~ expression ~ "@" | "#"
     val result = expression.parseWholeInput(aesReader)
     assert(result.successful, result.toString)
   }
 
   test("Recursive defaults") {
-    lazy val recursive: Self[Any] = new Lazy(recursive) ~ "b" | "b"
-    lazy val parser = "a" ~ recursive
+    lazy val recursive: Self[Any] = new Lazy(recursive) ~ "@" | "@"
+    lazy val parser = "!" ~ recursive
     val input = "c"
-    val expectation = ("a", "b")
+    val expectation = ("!", "@")
     val result = parser.parseWholeInput(new StringReader(input))
     assertResult(expectation)(result.resultOption.get)
   }
 
   // a cycle of lazy parsers causes a stack overflow, since they have no cycle check, but with a sequence in between it just fails.
   test("only recursive with sequence indirection") {
-    lazy val first: Self[Any] = new Lazy(first) ~ "a"
+    lazy val first: Self[Any] = new Lazy(first) ~ "!"
     val input = "aaa"
     val parseResult = first.parseWholeInput(new StringReader(input))
     val expectation = None
@@ -116,7 +116,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
 
   test("only recursive with sequence indirection and default, " +
     "does not apply the default after failing the recursion") {
-    lazy val first: Self[Any] = (new Lazy(first) ~ "a").withDefault("yes", "a's")
+    lazy val first: Self[Any] = (new Lazy(first) ~ "!").withDefault("yes", "a's")
     val input = "aaa"
     val parseResult = first.parseWholeInput(new StringReader(input))
     assert(!parseResult.successful)
@@ -126,11 +126,11 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
 
   test("recursive with sequence indirection and default, " +
     "applies the default after failing the recursion") {
-    lazy val first: Self[Any] = (new Lazy(first) ~ "a" | "a").withDefault("yes", "a's")
+    lazy val first: Self[Any] = (new Lazy(first) ~ "!" | "!").withDefault("yes", "a's")
     val input = "notavailable"
     val parseResult = first.parseWholeInput(new StringReader(input))
     assert(!parseResult.successful)
-    val expectation = Some("yes") //Could have been ("yes","a") with different implementation
+    val expectation = Some("yes") //Could have been ("yes","!") with different implementation
     assertResult(expectation)(parseResult.resultOption)
   }
 
@@ -161,12 +161,12 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
     val variable = new Lazy(identifier.map(x => x), "variable")
     lazy val lastExpression = new Lazy(Fail(None, "last", 1) | variable | call, "lastExpression")
     lazy val relationalInner: Self[Any] = new Lazy(lastExpression, "expression")
-    lazy val equality: Self[Any] = new Lazy(relational.map(x => x) ~ literal("==") ~ relationalInner.map(x => x), "equality")
+    lazy val equality: Self[Any] = new Lazy(relational.map(x => x) ~ literalOrKeyword("==") ~ relationalInner.map(x => x), "equality")
     lazy val relational: Self[Any] = new Lazy(relationalInner | equality, "relational")
     lazy val assignmentTarget: Self[Any] = new Lazy(Fail(None, "fail", 1), "assignmentTarget")
-    lazy val simpleAssignment: Self[Any] = new Lazy(assignmentTarget.map(x => x) ~ literal("=") ~ expression.map(x => x), "equality")
+    lazy val simpleAssignment: Self[Any] = new Lazy(assignmentTarget.map(x => x) ~ literalOrKeyword("=") ~ expression.map(x => x), "equality")
     lazy val assignment: Self[Any] = new Lazy(relational | simpleAssignment, "assignemnt")
-    lazy val memberSelector = new Lazy(expression.map(x => x) ~ literal(".") ~ identifier.map(x => x), "member selector")
+    lazy val memberSelector = new Lazy(expression.map(x => x) ~ literalOrKeyword(".") ~ identifier.map(x => x), "member selector")
     lazy val callCallee = new Lazy(variable | memberSelector, "callCallee")
     lazy val call = new Lazy(callCallee.map(x => x) ~ "(" ~ expression.manySeparated(",", "parameter").map(x => x) ~ ")", "call")
     //val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++ JavaLanguage.fields ++ JavaLanguage.method))

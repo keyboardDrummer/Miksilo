@@ -7,7 +7,7 @@ import util.{SourceUtils, TestLanguageBuilder}
 class SolidityExamples extends FunSuite {
   val solidity = TestLanguageBuilder.build(SolidityLanguage.deltas)
 
-  test("contract, fields, functions, return expression, assignment") {
+  ignore("contract, fields, functions, return expression, assignment") {
     val program = """pragma solidity ^0.4.0;
                     |
                     |contract MyFirstContract {
@@ -35,7 +35,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("interface, function call, comment, various expressions") {
+  ignore("interface, function call, comment, various expressions") {
 
     val program = """pragma solidity ^0.4.0;
                     |
@@ -79,7 +79,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("assert/require/revert") {
+  ignore("assert/require/revert") {
 
     val program = """pragma solidity ^0.4.0;
                     |
@@ -101,7 +101,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("using for on set library") {
+  ignore("using for on set library") {
     val program = """pragma solidity >=0.4.16 <0.6.0;
                     |
                     |library Set {
@@ -153,7 +153,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("library import") {
+  ignore("library import") {
 
     val library = """pragma solidity ^0.4.0;
                     |
@@ -208,7 +208,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("transaction") {
+  ignore("transaction") {
 
     val program = """pragma solidity ^0.4.0;
                     |
@@ -243,7 +243,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("datatypes") {
+  ignore("datatypes") {
 
     val program = """pragma solidity ^0.4.0;
                     |
@@ -312,7 +312,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("jeroen") {
+  ignore("jeroen") {
 
     val program = """pragma solidity ^0.5.0;
                     |
@@ -388,7 +388,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("strings") {
+  ignore("strings") {
 
     val program = """pragma solidity ^0.4.0;
                     |
@@ -435,7 +435,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("assembly") {
+  ignore("assembly") {
 
     val program = """pragma solidity ^0.4.0;
                     |
@@ -493,7 +493,7 @@ class SolidityExamples extends FunSuite {
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
-  test("alarmTrigger") {
+  ignore("alarmTrigger") {
 
     val program = """pragma solidity ^0.4.0;
                     |

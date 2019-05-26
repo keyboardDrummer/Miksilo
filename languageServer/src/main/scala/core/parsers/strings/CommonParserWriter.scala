@@ -2,7 +2,6 @@ package core.parsers.strings
 
 trait CommonParserWriter extends StringParserWriter {
 
-
   /** An integer, without sign or with a negative sign. */
   val wholeNumber: Self[String] =
     RegexParser("""-?\d+""".r, "whole number")

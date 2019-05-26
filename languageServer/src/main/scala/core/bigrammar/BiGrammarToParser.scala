@@ -65,7 +65,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     lazy val recursive: BiGrammar => Self[Result] = grammar => {
       cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
     }
-    val resultParser = toParser(keywords, recursive, grammar)
+    val resultParser = recursive(grammar)
     resultParser.map(executeResult)
   }
 
