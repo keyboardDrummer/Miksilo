@@ -421,16 +421,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
   }
 
-  case class WithRemainderParser[Result](original: Self[Result])
-    extends EditorParserBase[Success[Result]] with ParserWrapper[Success[Result]] {
-
-    override def getParser(recursive: GetParse): Parse[Success[Result]] = {
-      val parseOriginal = recursive(original)
-      (input, state) => parseOriginal(input, state).mapReady(r =>
-        ReadyParseResult(r.resultOption.map(v => Success(v, r.remainder)), r.remainder, r.history))
-    }
-  }
-
   case class WithDefault[Result](original: Self[Result], _default: Result)
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 

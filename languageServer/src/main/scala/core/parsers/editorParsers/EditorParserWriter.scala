@@ -89,15 +89,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   def newFailure[Result](partial: Option[Result], input: Input, errors: MyHistory): ParseResult[Result]
 
-  object PositionParser extends EditorParserBase[Input] with LeafParser[Input] {
-
-    override def getParser(recursive: GetParse): Parse[Input] = {
-      (input, _) => newSuccess(input, input, 0)
-    }
-
-    override def getMustConsume(cache: ConsumeCache) = false
-  }
-
   case class SuccessLog(start: Input, end: Input, value: Any) {
     override def toString = start.printRange(end)
   }

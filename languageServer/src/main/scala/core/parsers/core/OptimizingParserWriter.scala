@@ -81,8 +81,7 @@ trait OptimizingParserWriter extends ParserWriter {
       lazy val parseOriginal = recursive(original)
       new Parse[Result] {
         override def apply(input: Input, state: ParseState) = {
-          val value = parseOriginal(input, state)
-          value
+          parseOriginal(input, state)
         }
 
         override def debugName = Lazy.this.debugName
