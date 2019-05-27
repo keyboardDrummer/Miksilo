@@ -71,10 +71,10 @@ object YamlCoreDelta extends DeltaWithGrammar {
       TagName, "!") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
     val blockValue = create(IndentationSensitiveExpression)
-    blockValue.addAlternative(tag ~ blockValue.as(TagNode) asNode TaggedNode)
+    blockValue.addAlternative(tag ~ blockValue.as(TagNode) asLabelledNode TaggedNode)
 
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val taggedFlowValue = tag ~ flowValue.as(TagNode) asNode TaggedNode
+    val taggedFlowValue = tag ~ flowValue.as(TagNode) asLabelledNode TaggedNode
     flowValue.addAlternative(taggedFlowValue)
 
     val originalBracketArray = find(ArrayLiteralDelta.Shape).inner

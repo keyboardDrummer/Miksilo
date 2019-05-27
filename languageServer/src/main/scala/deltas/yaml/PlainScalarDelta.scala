@@ -28,11 +28,14 @@ object PlainScalarDelta extends DeltaWithGrammar {
       FlowKey -> doubleColonPlainSafeIn), doubleColonPlainSafeOut)
 
     val plainStyleSingleLineString: BiGrammar = nsPlainSafe
-    val plainStyleMultiLineString: BiGrammar = new BiSequence(new BiSequence(nsPlainSafe, _grammars.trivia, BiSequence.ignoreRight, false),
-      CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(CheckIndentationGrammar.equal(nsPlainSafe).manySeparated("\n"))),
-      SequenceBijective((firstLine: Any, rest: Any) => {
-        firstLine.asInstanceOf[String] + rest.asInstanceOf[List[String]].fold("")((a,b) => a + " " + b)
-      }, (value: Any) => Some(value, List.empty)), false)
+    val plainStyleMultiLineString: BiGrammar = {
+      val firstLine = new BiSequence(nsPlainSafe, _grammars.trivia, BiSequence.ignoreRight, false)
+      new BiSequence(firstLine,
+        CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(CheckIndentationGrammar.equal(nsPlainSafe).someSeparated("\n"))),
+        SequenceBijective((firstLine: Any, rest: Any) => {
+          firstLine.asInstanceOf[String] + rest.asInstanceOf[List[String]].fold("")((a, b) => a + " " + b)
+        }, (value: Any) => Some(value, List.empty)), false)
+    }
 
     val plainScalar: BiGrammar = new WithContext({
       case FlowIn => FlowIn
@@ -40,7 +43,7 @@ object PlainScalarDelta extends DeltaWithGrammar {
       case FlowKey => FlowKey
       case _ => FlowOut
     }, plainStyleMultiLineString | plainStyleSingleLineString).
-      as(StringLiteralDelta.Value).asNode(StringLiteralDelta.Shape)
+      as(StringLiteralDelta.Value).asLabelledNode(StringLiteralDelta.Shape)
 
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(plainScalar)
 

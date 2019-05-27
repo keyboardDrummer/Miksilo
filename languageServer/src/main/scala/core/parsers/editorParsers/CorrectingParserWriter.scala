@@ -335,11 +335,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Self[Other] = {
-      val withPosition = leftRight(
-        PositionParser,
-        WithRemainderParser(parser),
-        (left: Input, resultRight: Success[Result]) => addRange(left, resultRight.remainder, resultRight.result))
-      withPosition // WithDefault(withPosition, cache => parser.getDefault(cache))
+      WithRangeParser(parser, addRange)
     }
   }
 
@@ -397,12 +393,29 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       val parseOriginal = recursive(original)
       (input, state) => {
         val originalResult = parseOriginal(input, state)
-        originalResult.mapReady(s => {
-          s.resultOption match {
-            case Some(result) => if (predicate(result)) s else ReadyParseResult(None, s.remainder,
-              s.history.addError(GenericError(s.remainder, getMessage(result), History.genericErrorPenalty)))
-            case None => s
+        originalResult.mapReady(ready => {
+          ready.resultOption match {
+            case Some(result) =>
+              if (predicate(result))
+                ready
+              else ReadyParseResult(None, ready.remainder,
+                ready.history.addError(GenericError(ready.remainder, getMessage(result), History.genericErrorPenalty)))
+            case None => ready
           }
+        })
+      }
+    }
+  }
+
+  case class WithRangeParser[Result, NewResult](original: Self[Result], addRange: (Input, Input, Result) => NewResult)
+    extends EditorParserBase[NewResult] with ParserWrapper[NewResult] {
+
+    override def getParser(recursive: GetParse): Parse[NewResult] = {
+      val parseOriginal = recursive(original)
+      (input, state) => {
+        parseOriginal(input, state).mapReady(ready => {
+          val newValue = ready.resultOption.map(v => addRange(input, ready.remainder, v))
+          ReadyParseResult(newValue, ready.remainder, ready.history)
         })
       }
     }

@@ -21,9 +21,9 @@ object YamlObjectDelta extends DeltaWithGrammar {
 
     lazy val blockMap: BiGrammar = {
       val member = new WithContext(_ => BlockKey, flowValue).as(MemberKey) ~< ":" ~
-        greaterThan(blockValue.as(MemberValue)) asNode MemberShape
+        greaterThan(blockValue.as(MemberValue)) asLabelledNode MemberShape
 
-      aligned(_grammars, member).as(Members).asNode(Shape)
+      aligned(_grammars, member).as(Members).asLabelledNode(Shape)
     }
     blockValue.addAlternative(blockMap)
   }

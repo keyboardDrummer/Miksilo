@@ -73,7 +73,6 @@ trait OptimizingParserWriter extends ParserWriter {
     override def children = List(original)
   }
 
-  val hits: mutable.HashMap[Lazy[_], Int] = new mutable.HashMap()
   class Lazy[Result](_original: => Self[Result], val debugName: Any = null) extends ParserBase[Result] with ParserWrapper[Result] {
     lazy val original: Self[Result] = _original
     def getOriginal = original
@@ -82,9 +81,8 @@ trait OptimizingParserWriter extends ParserWriter {
       lazy val parseOriginal = recursive(original)
       new Parse[Result] {
         override def apply(input: Input, state: ParseState) = {
-          val current = hits.getOrElseUpdate(Lazy.this, 0)
-          hits.put(Lazy.this, current + 1)
-          parseOriginal(input, state)
+          val value = parseOriginal(input, state)
+          value
         }
 
         override def debugName = Lazy.this.debugName

@@ -23,7 +23,10 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   var currentDocumentId: TextDocumentIdentifier = _
   var compilation: Option[Compilation] = None
 
-  override def didOpen(parameters: TextDocumentItem): Unit = documentManager.onOpenTextDocument(parameters)
+  override def didOpen(parameters: TextDocumentItem): Unit = {
+    compilation = None
+    documentManager.onOpenTextDocument(parameters)
+  }
 
   override def didClose(parameters: TextDocumentIdentifier): Unit = documentManager.onCloseTextDocument(parameters)
 
