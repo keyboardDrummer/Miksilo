@@ -114,7 +114,7 @@ trait StringParserWriter extends SequenceParserWriter {
     def range = SourceRange(from.position, to.position)
   }
 
-  case class RegexParser(regex: Regex, regexName: String) extends EditorParserBase[String] with LeafParser[String] {
+  case class RegexParser(regex: Regex, regexName: String, score: Double = History.successValue) extends EditorParserBase[String] with LeafParser[String] {
 
     override def getParser(recursive: GetParse): Parse[String] = {
 
@@ -124,7 +124,7 @@ trait StringParserWriter extends SequenceParserWriter {
             case Some(matched) =>
               val value = input.array.subSequence(input.offset, input.offset + matched.end).toString
               val remainder = input.drop(matched.end)
-              singleResult(ReadyParseResult(Some(value), remainder, SpotlessHistory(0).addSuccess(input, remainder, value)))
+              singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
               singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, regexName, History.insertRegexPenalty))))
           }

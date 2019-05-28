@@ -3,6 +3,8 @@ package core.parsers.editorParsers
 object History {
   def empty[Input] = SpotlessHistory[Input](0)
   def error[Input](error: ParseError[Input]) = SingleError(0, error)
+  def success[Input](start: Input, end: Input, value: Any,
+              successScore: Double = History.successValue): History[Input] = SpotlessHistory(successScore)
 
   val successValue = 1.0
 

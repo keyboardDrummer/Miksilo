@@ -76,7 +76,7 @@ class YamlTest extends FunSuite
     }
   }
 
-  val whiteSpace = RegexParser("""\s*""".r, "whitespace")
+  val whiteSpace = RegexParser("""\s*""".r, "whitespace", 0)
   override def leftRight[Left, Right, NewResult](left: Self[Left],
                                                  right: => Self[Right],
                                                  combine: (Left, Right) => NewResult): Self[NewResult] = {
@@ -120,7 +120,7 @@ class YamlTest extends FunSuite
 
   lazy val parseUntaggedFlowValue = parseBracketArray | parseStringLiteral
   lazy val parseFlowValue = (tag.option ~ parseUntaggedFlowValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
-  lazy val parseUntaggedValue = new Lazy(parseBracketArray | parseArray | parseNumber | parseStringLiteral | parseBlockMapping)
+  lazy val parseUntaggedValue = new Lazy(parseBracketArray | parseArray | parseNumber | parseStringLiteral | parseBlockMapping, "untagged value")
   lazy val parseValue: Self[YamlExpression] = (tag.option ~ parseUntaggedValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
 
   lazy val parseBlockMapping: Self[YamlExpression] = {

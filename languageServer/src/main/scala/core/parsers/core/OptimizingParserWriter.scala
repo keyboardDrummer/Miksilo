@@ -198,8 +198,8 @@ trait OptimizingParserWriter extends ParserWriter {
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) extends super.ParserExtensions(parser) {
 
-    def addAlternative[Other >: Result](getAlternative: (Self[Other], Self[Other]) => Self[Other]): Self[Other] = {
-      lazy val result: Self[Other] = new Lazy(parser | getAlternative(parser, result))
+    def addAlternative[Other >: Result](getAlternative: (Self[Other], Self[Other]) => Self[Other], debugName: Any = null): Self[Other] = {
+      lazy val result: Self[Other] = new Lazy(parser | getAlternative(parser, result), debugName)
       result
     }
 
