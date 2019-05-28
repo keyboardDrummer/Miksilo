@@ -5,39 +5,6 @@ import scala.collection.mutable
 
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
-  case class RecursiveParseResult[SeedResult, Result](input: Input,
-                                                      parser: Parse[SeedResult],
-                                                      get: ParseResult[SeedResult] => ParseResult[Result])
-    extends LazyParseResult[Result] {
-
-    def history = History.empty[Input]
-    override val score = 1000000 + history.score
-
-    override def toString = "Recursive: " + parser.debugName
-
-    override def map[NewResult](f: Result => NewResult) = {
-      RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).map(f))
-    }
-
-    override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean) = {
-      singleResult(RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).flatMapReady(f, uniform)))
-    }
-
-    override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean) =
-      RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).mapReady(f, uniform))
-
-    override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) =
-      if (oldHistory.flawed) {
-        SREmpty
-      }
-      else if (oldHistory.score > 0) {
-        System.out.append("what?")
-        ???
-      }
-      else
-        singleResult(RecursiveParseResult[SeedResult, NewResult](input, parser,
-          r => get(r).mapWithHistory(f, oldHistory)))
-  }
 
   class CheckCache[Result](parser: Parse[Result]) extends Parse[Result] {
 // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
@@ -78,15 +45,6 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
             case None =>
 
-              // the recursion detection moet gebeuren in een path die niet terugkomt bij de recursion fixpoint.
-              // misschien dat nested fixpoints van dezelfde parser er wat mee te maken hebben.
-              // heeft het zin om een history te hebben bij een recursiveResult? ik denk van niet
-              // het gebeurt toch voordat er input is.
-              // als er iets gedropped moet worden kan dan ook binnen de recursie in plaats van er voor
-              // kan de recursie genest worden in een delayed result, en dan later niet meer gevonden?
-              // stel je krijgt left een delayed, en rechts een recursie, dan is het resultaat een delayed die later een recursie oplevert.
-
-              //kan een recursie schuilen in een andere recursie???
               val newState = if (state.input == input) {
                   if (state.parsers.contains(parser))
                     throw new Exception("recursion should have been detected.")
@@ -96,44 +54,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               }
               val initialResult = parser(input, newState)
 
-              var foundRecursion = false //true
-              var left = initialResult
-              var continue = true
-              while(continue) {
-                if (!left.isInstanceOf[SRCons[Result]]) {
-                  continue = false
-                } else {
-                  val cons = left.asInstanceOf[SRCons[Result]]
-                  cons.head match {
-                    case recursive: RecursiveParseResult[Result, Result] =>
-                      if (recursive.parser == parser)
-                        foundRecursion = true
-                    case _ =>
-                      continue = false
-                  }
-                  left = cons.tail
-                }
-              }
-
-              val resultWithoutRecursion: ParseResult[Result] = initialResult.flatMap({
-                case recursive: RecursiveParseResult[Result, Result] =>
-                  if (recursive.parser == parser) {
-                    //foundRecursion = true
-                    SREmpty
-                  }
-                  else {
-                    if (!newState.parsers.contains(recursive.parser)) {
-                      System.out.append("bug")
-                      ???
-                    }
-                    else
-                      singleResult(recursive)
-                  }
-                case lazyResult => singleResult(lazyResult)
-              }, false) // TODO move RecursionResults into a separate list.
+              val RecursionsList(recursions, resultWithoutRecursion) = initialResult.recursionsFor(parser)
+              var foundRecursion = recursions.nonEmpty
 
               val result = if (foundRecursion)
-                grow(resultWithoutRecursion, initialResult)
+                grow(recursions, resultWithoutRecursion, initialResult)
               else
                 resultWithoutRecursion
 
@@ -148,22 +73,21 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     Previous bevat ook recursions van andere fixpoints, die kunnen dus als seed gebruikt worden,
     echter zijn ze dan een soort delay.. wanneer gaan ze dan verder?
      */
-    def grow(previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
+    def grow(recursions: List[RecursiveParseResult[Result, Result]], previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
       // TODO Consider replacing the previous.merge by moving that inside the lambda.
       previous.merge(previous.flatMapReady(prev => {
         if (prev.history.flawed)
           SREmpty // TODO consider growing this as well
         else {
-          val grown: ParseResult[Result] = initialResults.flatMap({
-            case recursive: RecursiveParseResult[Result, Result] if recursive.parser == parser =>
-              val results = recursive.get(singleResult(prev))
-              results.flatMapReady(r => if (r.remainder.offset > prev.remainder.offset) singleResult(r) else SREmpty,
-                uniform = false) // TODO switch to a list of RecursiveResults
-            case _ => SREmpty
-          }, false)
-          grow(grown, initialResults)
+          val grown: ParseResult[Result] = recursions.map((recursive: RecursiveParseResult[Result, Result]) => {
+            val results = recursive.get(singleResult(prev))
+            results.flatMapReady(
+              ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else SREmpty,
+              uniform = false) // TODO maybe set this to uniform = true
+          }).reduce((a,b) => a.merge(b))
+          grow(recursions, grown, initialResults)
         }
-      }, uniform = false)) // The false here is because applying recursion is similar to a Sequence
+      }, uniform = false)) // The uniform = false here is because applying recursion is similar to a Sequence
     }
 
     case class RecursionError(input: Input) extends ParseError[Input] {

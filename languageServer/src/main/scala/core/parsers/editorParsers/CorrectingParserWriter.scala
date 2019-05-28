@@ -67,12 +67,16 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
 
+  case class RecursionsList[SeedResult, +Result](recursions: List[RecursiveParseResult[SeedResult, Result]], rest: SortedParseResults[Result])
+
   sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
     def toList: List[LazyParseResult[Result]]
     def tailDepth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
     def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult]
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean): SortedParseResults[NewResult]
+
+    def recursionsFor[SeedResult](parse: Parse[SeedResult]): RecursionsList[SeedResult, Result]
 
     def addHistory(errors: MyHistory): SortedParseResults[Result] = {
       mapWithHistory(x => x, errors)
@@ -184,10 +188,21 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         case SREmpty => this
         case other: SRCons[Other] =>
           if (head.score >= other.head.score) {
-            new SRCons(head,1 + Math.max(tailDepth, other.tailDepth), tail.merge(other, mergeDepth + 1))
+            new SRCons(head,1 + tailDepth, tail.merge(other, mergeDepth + 1))
           } else
-            new SRCons(other.head,1 + Math.max(tailDepth, other.tailDepth), this.merge(other.tail, mergeDepth + 1))
+            new SRCons(other.head,1 + other.tailDepth, this.merge(other.tail, mergeDepth + 1))
       }
+    }
+
+    override def recursionsFor[SeedResult](parse: Parse[SeedResult]): RecursionsList[SeedResult, Result] = head match {
+      case recursive: RecursiveParseResult[_, Result] =>
+        val tailResult = tail.recursionsFor(parse)
+        if (recursive.parser == parse)
+          RecursionsList(recursive.asInstanceOf[RecursiveParseResult[SeedResult, Result]] :: tailResult.recursions, tailResult.rest)
+        else
+          RecursionsList(tailResult.recursions, new SRCons[Result](recursive, 0, tailResult.rest))
+      case _ =>
+        RecursionsList(List.empty, this)
     }
   }
 
@@ -203,6 +218,41 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
                        oldHistory: MyHistory): SortedParseResults[NewResult]
+  }
+
+
+  case class RecursiveParseResult[SeedResult, +Result](input: Input,
+                                                      parser: Parse[SeedResult],
+                                                      get: ParseResult[SeedResult] => ParseResult[Result])
+    extends LazyParseResult[Result] {
+
+    def history = History.empty[Input]
+    override val score = 1000000 + history.score
+
+    override def toString = "Recursive: " + parser.debugName
+
+    override def map[NewResult](f: Result => NewResult) = {
+      RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).map(f))
+    }
+
+    override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean) = {
+      singleResult(RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).flatMapReady(f, uniform)))
+    }
+
+    override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean) =
+      RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).mapReady(f, uniform))
+
+    override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) =
+      if (oldHistory.flawed) {
+        SREmpty
+      }
+      else if (oldHistory.score > 0) {
+        System.out.append("what?")
+        ???
+      }
+      else
+        singleResult(RecursiveParseResult[SeedResult, NewResult](input, parser,
+          r => get(r).mapWithHistory(f, oldHistory)))
   }
 
   class DelayedParseResult[Result](val history: MyHistory, _getResults: () => SortedParseResults[Result])
