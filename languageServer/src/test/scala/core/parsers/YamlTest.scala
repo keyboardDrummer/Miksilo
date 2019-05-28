@@ -174,7 +174,7 @@ class YamlTest extends FunSuite
 
   lazy val plainStyleSingleLineString = nsPlainSafe
   lazy val plainStyleMultiLineString = new Sequence(new Sequence(nsPlainSafe, whiteSpace, (l: String, _: String) => l),
-    greaterThan(WithIndentation(equal(nsPlainSafe).manySeparated("\n", "line"))),
+    greaterThan(WithIndentation(equal(nsPlainSafe).someSeparated("\n", "line"))),
     (firstLine: String, rest: List[String]) => {
       firstLine + rest.fold("")((a,b) => a + " " + b)
   })
