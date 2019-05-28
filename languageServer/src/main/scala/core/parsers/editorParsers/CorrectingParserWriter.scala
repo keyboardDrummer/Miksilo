@@ -112,6 +112,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     override def tailDepth = 0
 
     override def toList = List.empty
+
+    override def recursionsFor[SeedResult](parse: Parse[SeedResult]): RecursionsList[SeedResult, Nothing] = RecursionsList(List.empty, this)
   }
 
   final class SRCons[+Result](val head: LazyParseResult[Result],
