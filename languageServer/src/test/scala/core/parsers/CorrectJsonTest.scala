@@ -134,7 +134,6 @@ class CorrectJsonTest extends FunSuite {
 
   test("two members, no colons or comma") {
     val input = """{"person""remy""friend""jeroen"}"""
-    val result = jsonParser.parseWholeInput(new StringReader(input))
     val expectation = List(("person", "remy"), ("friend", "jeroen"))
     parseJson(input, expectation, 3)
   }

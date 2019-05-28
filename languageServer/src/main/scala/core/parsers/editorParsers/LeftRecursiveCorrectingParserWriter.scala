@@ -1,8 +1,6 @@
 package core.parsers.editorParsers
 
 import core.language.node.SourceRange
-import deltas.expression.ExpressionDelta
-
 import scala.collection.mutable
 
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
@@ -21,12 +19,12 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).map(f))
     }
 
-    override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]) = {
-      singleResult(RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).flatMapReady(f)))
+    override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean) = {
+      singleResult(RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).flatMapReady(f, uniform)))
     }
 
-    override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]) =
-      RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).mapReady(f))
+    override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean) =
+      RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).mapReady(f, uniform))
 
     override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) =
       if (oldHistory.flawed) {
@@ -132,7 +130,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                       singleResult(recursive)
                   }
                 case lazyResult => singleResult(lazyResult)
-              })
+              }, false) // TODO move RecursionResults into a separate list.
 
               val result = if (foundRecursion)
                 grow(resultWithoutRecursion, initialResult)
@@ -159,12 +157,13 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           val grown: ParseResult[Result] = initialResults.flatMap({
             case recursive: RecursiveParseResult[Result, Result] if recursive.parser == parser =>
               val results = recursive.get(singleResult(prev))
-              results.flatMapReady(r => if (r.remainder.offset > prev.remainder.offset) singleResult(r) else SREmpty)
+              results.flatMapReady(r => if (r.remainder.offset > prev.remainder.offset) singleResult(r) else SREmpty,
+                uniform = false) // TODO switch to a list of RecursiveResults
             case _ => SREmpty
-          })
+          }, false)
           grow(grown, initialResults)
         }
-      }))
+      }, uniform = false)) // The false here is because applying recursion is similar to a Sequence
     }
 
     case class RecursionError(input: Input) extends ParseError[Input] {

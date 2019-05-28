@@ -71,8 +71,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     def toList: List[LazyParseResult[Result]]
     def tailDepth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
-    def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults[NewResult]
-    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
+    def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult]
+    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean): SortedParseResults[NewResult]
 
     def addHistory(errors: MyHistory): SortedParseResults[Result] = {
       mapWithHistory(x => x, errors)
@@ -80,28 +80,28 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
     def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
                                   oldHistory: MyHistory): SortedParseResults[NewResult] = {
-      flatMap(l => l.mapWithHistory(f, oldHistory))
+      flatMap(l => l.mapWithHistory(f, oldHistory), uniform = !oldHistory.canMerge)
     }
 
-    def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): SortedParseResults[NewResult] = {
-      mapResult(l => l.mapReady(f))
+    def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult] = {
+      mapResult(l => l.mapReady(f, uniform), uniform)
     }
 
-    def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
-      flatMap[NewResult](l => l.flatMapReady(f))
+    def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean): SortedParseResults[NewResult] = {
+      flatMap[NewResult](l => l.flatMapReady(f, uniform), uniform)
     }
 
     def updateRemainder(f: Input => Input) = {
-      mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.history))
+      mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.history), true)
     }
   }
 
   object SREmpty extends SortedParseResults[Nothing] {
     override def merge[Other >: Nothing](other: SortedParseResults[Other], depth: Int) = other
 
-    override def mapResult[NewResult](f: LazyParseResult[Nothing] => LazyParseResult[NewResult]): SREmpty.type = this
+    override def mapResult[NewResult](f: LazyParseResult[Nothing] => LazyParseResult[NewResult], uniform: Boolean): SREmpty.type = this
 
-    override def flatMap[NewResult](f: LazyParseResult[Nothing] => SortedParseResults[NewResult]) = this
+    override def flatMap[NewResult](f: LazyParseResult[Nothing] => SortedParseResults[NewResult], uniform: Boolean) = this
 
     override def map[NewResult](f: Nothing => NewResult) = this
 
@@ -151,23 +151,23 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 //      }
 //    }
 
-    override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult]): SortedParseResults[NewResult] = {
-      flatMap(r => singleResult(f(r)))
+    override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult] = {
+      flatMap(r => singleResult(f(r)), uniform)
     }
 
-    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult] = {
+    def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean): SortedParseResults[NewResult] = {
       f(head) match {
-        case SREmpty => tail.flatMap(f)
+        case SREmpty => tail.flatMap(f, uniform)
         case cons: SRCons[NewResult] =>
 
-          if (head.score != cons.head.score)
-            cons.merge(tail.flatMap(f))
+          if (!uniform && head.score != cons.head.score)
+            cons.merge(tail.flatMap(f, uniform))
           else
           {
             new SRCons(
               cons.head,
               1 + Math.max(this.tailDepth, cons.tailDepth),
-              cons.tail.merge(tail.flatMap(f)))
+              cons.tail.merge(tail.flatMap(f, uniform)))
           }
       }
     }
@@ -192,9 +192,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   }
 
   trait LazyParseResult[+Result] {
-    def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]): SortedParseResults[NewResult]
+    def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean): SortedParseResults[NewResult]
 
-    def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): LazyParseResult[NewResult]
+    def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean): LazyParseResult[NewResult]
 
     val score: Double = (if (history.flawed) 0 else 10000) + history.score
 
@@ -223,16 +223,16 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         intermediate.mapWithHistory(f, oldHistory)
     }))
 
-    override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): DelayedParseResult[NewResult] =
+    override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean): DelayedParseResult[NewResult] =
       new DelayedParseResult(this.history, () => {
         val intermediate = this.results
-        intermediate.mapReady(f)
+        intermediate.mapReady(f, uniform)
       })
 
-    override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]) =
+    override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean) =
       singleResult(new DelayedParseResult(this.history, () => {
         val intermediate = this.results
-        intermediate.flatMapReady(f)
+        intermediate.flatMapReady(f, uniform)
       }))
   }
 
@@ -251,9 +251,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       singleResult(ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.history ++ oldHistory))
     }
 
-    override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult]): ReadyParseResult[NewResult] = f(this)
+    override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean): ReadyParseResult[NewResult] = f(this)
 
-    override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult]) = f(this)
+    override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean) = f(this)
   }
 
   class Sequence[+Left, +Right, Result](val left: Self[Left],
@@ -279,7 +279,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
               else
                 ready
             case lazyResult => lazyResult
-          })
+          }, false) // TODO set to true?
 
           def rightFromLeftReady(leftReady: ReadyParseResult[Left]): SortedParseResults[Result] = {
             def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
@@ -290,7 +290,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
             val rightResult = parseRight(leftReady.remainder, state)
             rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
           }
-          delayedLeftResults.flatMapReady(rightFromLeftReady)
+          delayedLeftResults.flatMapReady(rightFromLeftReady, false)
         }
       }
     }
@@ -356,7 +356,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
               val error = DropError(remainder, remainder.end)
               ReadyParseResult(parseResult.resultOption, remainder.end, parseResult.history.addError(error))
             }
-          })
+          }, uniform = false)
         }
       }
     }
@@ -402,7 +402,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
                 ready.history.addError(GenericError(ready.remainder, getMessage(result), History.genericErrorPenalty)))
             case None => ready
           }
-        })
+        }, uniform = false)
       }
     }
   }
@@ -416,7 +416,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
         parseOriginal(input, state).mapReady(ready => {
           val newValue = ready.resultOption.map(v => addRange(input, ready.remainder, v))
           ReadyParseResult(newValue, ready.remainder, ready.history)
-        })
+        }, uniform = true)
       }
     }
   }
@@ -434,7 +434,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
             ReadyParseResult(Some(_default), ready.remainder, ready.history)
           } else
             ready
-        })
+        }, uniform = true)
       }
       apply
     }
@@ -488,5 +488,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
 
     override def range = SourceRange(from.position, to.position)
+
+    override def canMerge = true
   }
 }

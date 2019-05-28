@@ -27,6 +27,7 @@ object History {
 }
 
 trait History[Input] {
+  def canMerge: Boolean
   def flawed: Boolean
   def addError(newHead: ParseError[Input]): History[Input]
   def ++(right: History[Input]): History[Input]
@@ -53,6 +54,8 @@ case class SpotlessHistory[Input](score: Double = 0) extends History[Input] {
   override def errors = Iterable.empty
 
   override def toString = "Spotless: " + score
+
+  override def canMerge = false
 }
 
 case class SingleError[Input](successScore: Double, error: ParseError[Input]) extends History[Input] {
@@ -70,6 +73,8 @@ case class SingleError[Input](successScore: Double, error: ParseError[Input]) ex
   override def errors = Iterable(error)
 
   override def score = successScore + error.score
+
+  override def canMerge = error.canMerge
 }
 
 object Rose {
@@ -121,4 +126,6 @@ case class FlawedHistory[Input](score: Double, firstError: ParseError[Input],
   override def flawed = true
 
   override def errors = Seq.concat(Seq(firstError), middleErrors.values, Seq(lastError))
+
+  override def canMerge = firstError.canMerge
 }
