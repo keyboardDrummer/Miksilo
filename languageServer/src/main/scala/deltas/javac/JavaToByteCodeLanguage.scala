@@ -59,9 +59,6 @@ object JavaToByteCodeLanguage {
     BooleanLiteralToByteCodeDelta, IntLiteralToByteCodeDelta,
     NullToByteCodeDelta, LogicalNotToByteCode) ++ JavaLanguage.deltas ++ ExtendedByteCode.allByteCodeDeltas
 
-  def getPrettyPrintJavaToByteCodeCompiler: Language = {
-    LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ spliceBeforeTransformations(byteCodeDeltas, Seq(new PrettyPrint)))
-  }
 
   def spliceBeforeTransformations(bottom: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
     Delta.spliceAndFilterTop(getJava.topToBottom, bottom, splice)

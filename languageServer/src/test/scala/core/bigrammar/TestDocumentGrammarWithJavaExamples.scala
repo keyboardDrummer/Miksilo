@@ -1,8 +1,11 @@
 package core.bigrammar
 
-import core.deltas.Delta
+import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
+import core.language.Language
 import core.smarts.SolveConstraintsDelta
 import deltas.expression.ExpressionDelta
+import deltas.javac.ByteCodeLanguage.byteCodeDeltas
+import deltas.javac.JavaToByteCodeLanguage.spliceBeforeTransformations
 import deltas.javac._
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
@@ -70,7 +73,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
       ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta)
     val newDeltas = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
-    val state = TestLanguageBuilder.buildWithParser(newDeltas).compile(input)
+    val state = TestLanguageBuilder.buildWithParser(newDeltas).compileStream(input)
     val output = state.output
 
     assertResult(expectation)(output)
@@ -80,37 +83,41 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val input = SourceUtils.getJavaTestFile("Fibonacci", Path(""))
     val expectation = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
 
-    val prettyPrintCompiler = JavaToByteCodeLanguage.getPrettyPrintJavaToByteCodeCompiler
+    val prettyPrintCompiler = getPrettyPrintJavaToByteCodeCompiler
 
     val state = prettyPrintCompiler.compileStream(input)
     assertResult(expectation)(state.output)
+  }
+
+  def getPrettyPrintJavaToByteCodeCompiler = {
+    TestLanguageBuilder.build(spliceBeforeTransformations(byteCodeDeltas, Seq(new PrettyPrint)))
   }
 
   test("PrettyPrintAndParseByteCode") {
     val input = SourceUtils.getJavaTestFile("Fibonacci.java", Path(""))
 
     val byteCodeTransformations = ByteCodeLanguage.byteCodeDeltas
-    val prettyPrintCompiler = JavaToByteCodeLanguage.getPrettyPrintJavaToByteCodeCompiler
+    val prettyPrintCompiler = getPrettyPrintJavaToByteCodeCompiler
 
     val state = prettyPrintCompiler.compileStream(input)
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
-    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compile(SourceUtils.stringToStream(byteCode)).output
+    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileStream(SourceUtils.stringToStream(byteCode)).output
     assertResult("8")(output)
   }
 
   test("prettyPrintByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(new PrettyPrint) ++ ByteCodeLanguage.byteCodeDeltas
-    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compile(SourceUtils.stringToStream(input)).output
+    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileStream(SourceUtils.stringToStream(input)).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
     val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val deltas = Seq(RunWithJVM) ++ ByteCodeLanguage.byteCodeDeltas
-    val output = TestLanguageBuilder.buildWithParser(deltas).compile(SourceUtils.stringToStream(input)).output
+    val output = TestLanguageBuilder.buildWithParser(deltas).compileStream(SourceUtils.stringToStream(input)).output
     assertResult("8")(output)
   }
 }

@@ -34,7 +34,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
           cons.tail.merge(results)
       }
     }
-    System.out.append(s"Took: ${System.currentTimeMillis() - start} ms")
+    System.out.println(s"Took: ${System.currentTimeMillis() - start} ms")
     ParseWholeResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 

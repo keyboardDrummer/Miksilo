@@ -63,7 +63,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
 
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
     val input: String = SourceUtils.getJavaTestFileContents(className, inputDirectory)
-    language.compile(SourceUtils.stringToStream(input)).program
+    language.compileStream(SourceUtils.stringToStream(input)).program
   }
 
     def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
@@ -87,7 +87,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
   }
 
   def compileAndPrettyPrint(input: InputStream): String = {
-    val compilation = language.compile(input)
+    val compilation = language.compileStream(input)
     compilation.output
   }
 
