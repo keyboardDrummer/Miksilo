@@ -1,10 +1,8 @@
 package core.parsers.editorParsers
 
-import core.language.node.SourceRange
 import scala.collection.mutable
 
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
-
 
   class CheckCache[Result](parser: Parse[Result]) extends Parse[Result] {
 // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.

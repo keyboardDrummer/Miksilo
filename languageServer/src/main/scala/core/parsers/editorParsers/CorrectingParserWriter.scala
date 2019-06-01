@@ -1,9 +1,8 @@
 package core.parsers.editorParsers
 
 import core.language.node.SourceRange
-import core.parsers.core.OptimizingParserWriter
 
-trait dCorrectingParserWriter extends EditorParserWriter {
+trait CorrectingParserWriter extends EditorParserWriter {
 
   def parse[Result](parser: Self[Result], input: Input, mayStop: () => Boolean): ParseWholeResult[Result] = {
 
@@ -102,7 +101,7 @@ trait dCorrectingParserWriter extends EditorParserWriter {
     }
 
     def updateRemainder(f: Input => Input) = {
-      mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.history), true)
+      mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.history), uniform = true)
     }
   }
 
@@ -131,37 +130,11 @@ trait dCorrectingParserWriter extends EditorParserWriter {
 
     def getTail = tail
     lazy val tail = _tail
-    //tail
 
-//    if (depth > 500) {
-//      throw new Error()
-//    }
-//
     if (tailDepth == 50) {
       tail
       tailDepth = 0
     }
-
-//    // Detect incorrect ordering.
-//    val score = head.score
-//    for(result <- results.drop(0)) {
-//      if (result.score > score) {
-//        throw new Exception("sorting was incorrect")
-//      }
-//    }
-
-    // Detect multiple access of tail
-//    var switch = true
-//    def tail = {
-//      if (switch) {
-//        switch = false
-//        val result = _tail
-//        result
-//      }
-//      else {
-//        ???
-//      }
-//    }
 
     override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult] = {
       flatMap(r => singleResult(f(r)), uniform)
@@ -228,7 +201,6 @@ trait dCorrectingParserWriter extends EditorParserWriter {
                        oldHistory: MyHistory): SortedParseResults[NewResult]
   }
 
-
   case class RecursiveParseResult[SeedResult, +Result](input: Input,
                                                       parser: Parse[SeedResult],
                                                       get: ParseResult[SeedResult] => ParseResult[Result])
@@ -253,10 +225,6 @@ trait dCorrectingParserWriter extends EditorParserWriter {
     override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) =
       if (oldHistory.flawed) {
         SREmpty
-      }
-      else if (oldHistory.score > 0) {
-        System.out.append("what?")
-        ???
       }
       else
         singleResult(RecursiveParseResult[SeedResult, NewResult](input, parser,
@@ -355,7 +323,6 @@ trait dCorrectingParserWriter extends EditorParserWriter {
 
   implicit class EditorParserExtensions[Result](parser: Self[Result]) extends ParserExtensions(parser) {
 
-    // Drops suffix. It's nice to drop before the next | nil OR, so that you don't get duplicate drops. And if you drop before the nil, you get a suffix drop.
     def someSeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
       val reduce = (h: Result, t: List[Result]) => h :: t
       val zero = List.empty[Result]
@@ -366,11 +333,6 @@ trait dCorrectingParserWriter extends EditorParserWriter {
       leftRight(parser, DropParser(result), reduce)
     }
 
-    //Drops prefix and suffix.
-    //Drop(succeed) creates a pre and suffix drop, and Drop(x) where x was already a suffix drop, also creates a pre and suffix drop.
-    //If I drop right before the symbol,
-    // I will be able to do a forward lookup to see how much I need to drop before the symbol succeeds,
-    // which could save quite a few cycles.
     def manySeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
       val zero = List.empty[Result]
       DropParser(choice(someSeparated(separator, elementName), succeed(zero), firstIsLonger = true))
@@ -461,9 +423,9 @@ trait dCorrectingParserWriter extends EditorParserWriter {
   }
 
   case class Filter[Other, Result <: Other](original: Self[Result],
-                                            predicate: Other => Boolean, getMessage: Other => String)
+                                            predicate: Other => Boolean,
+                                            getMessage: Other => String)
     extends EditorParserBase[Result] with ParserWrapper[Result] {
-
 
     override def getParser(recursive: GetParse): Parse[Result] = {
       val parseOriginal = recursive(original)
