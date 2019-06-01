@@ -10,6 +10,11 @@ trait MachineParserWriter extends ParserWriter {
     def parse(input: Input): ParseResult[Result]
   }
 
+  override def many[Result, Sum](original: MachineParser[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
+    lazy val result: Self[Sum] = choice(leftRight(original, result, reduce), succeed(zero))
+    result
+  }
+
   type ParseResult[+Result] = SimpleParseResult[Result]
   override type Self[+Result] = Parser[Result]
 

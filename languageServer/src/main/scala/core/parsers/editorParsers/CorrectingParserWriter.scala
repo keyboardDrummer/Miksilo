@@ -3,14 +3,12 @@ package core.parsers.editorParsers
 import core.language.node.SourceRange
 import core.parsers.core.OptimizingParserWriter
 
-trait CorrectingParserWriter extends EditorParserWriter {
+trait dCorrectingParserWriter extends EditorParserWriter {
 
   def parse[Result](parser: Self[Result], input: Input, mayStop: () => Boolean): ParseWholeResult[Result] = {
 
     val noResultFound = ReadyParseResult(None, input, History.error(GenericError(input, "Grammar is always recursive", Int.MaxValue)))
-    var bestResult: ReadyParseResult[Result] =
-      noResultFound
-
+    var bestResult: ReadyParseResult[Result] = noResultFound
 
     var resultsSeen = Set.empty[ReadyParseResult[Result]]
     val start = System.currentTimeMillis()
@@ -65,8 +63,9 @@ trait CorrectingParserWriter extends EditorParserWriter {
 
   override def succeed[NR](result: NR): Self[NR] = Succeed(result)
 
-  override def withDefault[Result](original: LRParser[Result], value: Result) = {
-    choice(WithDefault(original, value), succeed(value), firstIsLonger = true)
+  override def many[Result, Sum](original: OptimizingParser[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
+    lazy val result: Self[Sum] = choice(WithDefault(leftRight(original, result, reduce), zero), succeed(zero), firstIsLonger = true)
+    result
   }
 
   override def choice[Result](first: Self[Result], other: => Self[Result], firstIsLonger: Boolean = false): Self[Result] =

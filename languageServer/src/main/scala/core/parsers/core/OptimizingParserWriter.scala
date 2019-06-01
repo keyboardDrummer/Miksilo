@@ -1,18 +1,14 @@
 package core.parsers.core
 
-import deltas.expression.TernaryDelta
-import deltas.expression.additive.AdditionDelta
-
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.language.higherKinds
 
 trait OptimizingParserWriter extends ParserWriter {
 
-  type Self[+Result] = LRParser[Result]
+  type Self[+Result] = OptimizingParser[Result]
 
   def wrapParse[Result](parser: Parse[Result],
                         shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parse[Result]
-
 
   def newParseState(input: Input): ParseState
   type ParseState
@@ -23,36 +19,33 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait GetParse {
-    def apply[Result](parser: Parser[Result]): Parse[Result]
+    def apply[Result](parser: Self[Result]): Parse[Result]
   }
 
-  trait Parser[+Result] {
+  trait OptimizingParser[+Result] {
     def getParser(recursive: GetParse): Parse[Result]
-  }
-
-  trait LRParser[+Result] extends super.Parser[Result] {
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
-    def leftChildren: List[LRParser[_]]
-    def children: List[LRParser[_]]
+    def leftChildren: List[OptimizingParser[_]]
+    def children: List[OptimizingParser[_]]
   }
 
-  trait ParserBase[Result] extends LRParser[Result] {
+  trait ParserBase[Result] extends OptimizingParser[Result] {
     var mustConsumeInput: Boolean = false
   }
 
-  trait SequenceLike[+Result] extends LRParser[Result] {
+  trait SequenceLike[+Result] extends OptimizingParser[Result] {
     def left: Self[Any]
     def right: Self[Any]
 
     override def children = List(left, right)
 
-    override def leftChildren: List[LRParser[Any]] = if (left.mustConsumeInput) List(left) else List(left, right)
+    override def leftChildren: List[OptimizingParser[Any]] = if (left.mustConsumeInput) List(left) else List(left, right)
 
     override def getMustConsume(cache: ConsumeCache) = cache(left) || cache(right)
   }
 
-  trait ChoiceLike[+Result] extends LRParser[Result] {
+  trait ChoiceLike[+Result] extends OptimizingParser[Result] {
     def first: Self[Result]
     def second: Self[Result]
 
@@ -63,8 +56,8 @@ trait OptimizingParserWriter extends ParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(first) && cache(second)
   }
 
-  trait ParserWrapper[+Result] extends LRParser[Result] {
-    def original: LRParser[Any]
+  trait ParserWrapper[+Result] extends OptimizingParser[Result] {
+    def original: OptimizingParser[Any]
 
     override def getMustConsume(cache: ConsumeCache) = cache(original)
 
@@ -97,7 +90,7 @@ trait OptimizingParserWriter extends ParserWriter {
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }
 
-  trait LeafParser[+Result] extends LRParser[Result] {
+  trait LeafParser[+Result] extends OptimizingParser[Result] {
     override def leftChildren = List.empty
 
     override def children = List.empty
@@ -113,16 +106,16 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   def compile[Result](root: Self[Result]): ParserAnalysis = {
-    var nodesThatShouldDetectLeftRecursion: Set[LRParser[_]] = Set.empty
+    var nodesThatShouldDetectLeftRecursion: Set[OptimizingParser[_]] = Set.empty
     val mustConsumeCache = new ConsumeCache
 
-    val reverseGraph = mutable.HashMap.empty[LRParser[_], mutable.Set[LRParser[_]]]
-    GraphAlgorithms.depthFirst[LRParser[_]](root,
+    val reverseGraph = mutable.HashMap.empty[OptimizingParser[_], mutable.Set[OptimizingParser[_]]]
+    GraphAlgorithms.depthFirst[OptimizingParser[_]](root,
       node => {
         node.asInstanceOf[ParserBase[Any]].mustConsumeInput = mustConsumeCache(node)
         node.children
       },
-      (_, path: List[LRParser[_]]) => path match {
+      (_, path: List[OptimizingParser[_]]) => path match {
         case child :: parent :: _ =>
           val incoming = reverseGraph.getOrElseUpdate(child, mutable.HashSet.empty)
           incoming.add(parent)
@@ -139,38 +132,25 @@ trait OptimizingParserWriter extends ParserWriter {
           nodesThatShouldDetectLeftRecursion += cycle.head
       })
 
-//    GraphAlgorithms.depthFirst[LRParser[_]](root,
-//      node => {
-//        val leftChildren = node.leftChildren
-//        if (leftChildren != node.children) {
-//          System.out.append("")
-//        }
-//        leftChildren
-//      },
-//      (_, path: List[LRParser[_]]) =>  {},
-//      cycle => {
-//        nodesThatShouldDetectLeftRecursion += cycle.head
-//      })
+    val components = SCC.scc[OptimizingParser[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
+    val nodesInCycle: Set[OptimizingParser[_]] = components.filter(c => c.size > 1).flatten.toSet
 
-    val components = SCC.scc[LRParser[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
-    val nodesInCycle: Set[LRParser[_]] = components.filter(c => c.size > 1).flatten.toSet
-
-    val nodesWithMultipleIncomingEdges: Set[LRParser[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
-    val nodesWithIncomingCycleEdge: Set[LRParser[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
-    val nodesThatShouldCache: Set[LRParser[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
+    val nodesWithMultipleIncomingEdges: Set[OptimizingParser[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
+    val nodesWithIncomingCycleEdge: Set[OptimizingParser[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
+    val nodesThatShouldCache: Set[OptimizingParser[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
 
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
-  case class ParserAnalysis(nodesThatShouldCache: Set[LRParser[_]], nodesThatShouldDetectLeftRecursion: Set[LRParser[_]]) {
+  case class ParserAnalysis(nodesThatShouldCache: Set[OptimizingParser[_]], nodesThatShouldDetectLeftRecursion: Set[OptimizingParser[_]]) {
 
     def getParse[Result](root: Self[Result]): Parse[Result] = {
-      var cacheOfParses = new mutable.HashMap[Parser[Any], Parse[Any]]
+      var cacheOfParses = new mutable.HashMap[Self[Any], Parse[Any]]
 
       def recursive: GetParse = new GetParse {
-        override def apply[SomeResult](_parser: Parser[SomeResult]): Parse[SomeResult] = {
+        override def apply[SomeResult](_parser: Self[SomeResult]): Parse[SomeResult] = {
           cacheOfParses.getOrElseUpdate(_parser, {
-            val parser = _parser.asInstanceOf[LRParser[SomeResult]]
+            val parser = _parser.asInstanceOf[OptimizingParser[SomeResult]]
             val result = parser.getParser(recursive)
             wrapParse(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
           }).asInstanceOf[Parse[SomeResult]]
@@ -182,9 +162,9 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   class ConsumeCache {
-    var values = mutable.Map.empty[LRParser[Any], Boolean]
+    var values = mutable.Map.empty[OptimizingParser[Any], Boolean]
 
-    def apply[Result](parser: LRParser[Any]): Boolean = {
+    def apply[Result](parser: OptimizingParser[Any]): Boolean = {
       values.get(parser) match {
         case Some(v) => v
         case None =>
@@ -204,7 +184,7 @@ trait OptimizingParserWriter extends ParserWriter {
     }
 
     def parseRoot(input: Input): ParseResult[Result] = {
-      val analysis = compile(parser)
+      val analysis = compile(parser) // TODO don't compile all the time.
       analysis.getParse(parser)(input, newParseState(input))
     }
   }

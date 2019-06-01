@@ -90,18 +90,6 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }, uniform = false)) // The uniform = false here is because applying recursion is similar to a Sequence
     }
 
-    case class RecursionError(input: Input) extends ParseError[Input] {
-      override def penalty = 0.000001
-
-      override def message = "recursion"
-
-      override def from = input
-
-      override def to = input
-
-      override def range = SourceRange(from.position, to.position)
-    }
-
     def getPreviousResult(input: Input, state: ParseState): Option[ParseResult[Result]] = {
       if (state.input == input && state.parsers.contains(parser))
           Some(singleResult(RecursiveParseResult[Result, Result](input, parser, x => x)))

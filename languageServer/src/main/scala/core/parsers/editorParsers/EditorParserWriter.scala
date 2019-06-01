@@ -70,7 +70,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  trait EditorParserBase[Result] extends ParserBase[Result] with LRParser[Result] {
+  trait EditorParserBase[Result] extends ParserBase[Result] with OptimizingParser[Result] {
   }
 
   class MapParser[Result, NewResult](val original: Self[Result], f: Result => NewResult)

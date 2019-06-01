@@ -6,8 +6,7 @@ trait ParserWriter {
 
   type Input <: ParseInput
   type ParseResult[+Result] <: ParseResultLike[Result]
-  type Self[+R] <: Parser[R]
-  type ParseState
+  type Self[+R]
 
   def succeed[Result](result: Result): Self[Result]
 
@@ -19,8 +18,7 @@ trait ParserWriter {
                                         right: => Self[Right],
                                         combine: (Left, Right) => NewResult): Self[NewResult]
 
-  def withDefault[Result](original: Self[Result], value: Result): Self[Result] = // TODO remove this method from here
-    choice(original, succeed(value), firstIsLonger = true)
+  def many[Result, Sum](original: Self[Result], zero: Sum, reduce: (Result, Sum) => Sum): Self[Sum]
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
 
@@ -44,10 +42,7 @@ trait ParserWriter {
       }
     }
 
-    def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum): Self[Sum] = {
-      lazy val result: Self[Sum] = withDefault(leftRight(parser, result, reduce), zero)
-      result
-    }
+    def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum): Self[Sum] = ParserWriter.this.many(parser, zero, reduce)
 
     def * : Self[List[Result]] = {
       many(List.empty, (h: Result, t: List[Result]) => h :: t)
@@ -56,9 +51,6 @@ trait ParserWriter {
     def ^^[NewResult](f: Result => NewResult) = map(f)
 
   }
-
-
-  type Parser[+Result]
 
   case class Success[+Result](result: Result, remainder: Input) {
     def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)
