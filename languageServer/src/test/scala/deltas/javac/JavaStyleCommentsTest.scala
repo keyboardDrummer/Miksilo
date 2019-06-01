@@ -27,8 +27,9 @@ object ExpressionAsRoot extends DeltaWithGrammar
 }
 
 class JavaStyleCommentsTest
-  extends LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++ JavaToByteCodeLanguage.javaCompilerDeltas))
-  with NodeGrammarWriter
+  extends LanguageTest(TestLanguageBuilder.buildWithParser(
+    Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++
+    JavaToByteCodeLanguage.javaCompilerDeltas))
 {
   object ParentClass extends NodeShape
   object ChildClass extends NodeShape
@@ -113,21 +114,25 @@ class JavaStyleCommentsTest
   }
 
   test("block transformation") {
-    val java = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).buildLanguage
-    val statementGrammar = java.grammars.find(StatementDelta.Grammar)
-    statementGrammar.inner = new NodeGrammar("statement", ParentClass)
-    val blockGrammar = java.grammars.find(BlockDelta.BlockGrammar)
-    val language = LanguageFromDeltas(Seq.empty)
-    language.grammars.root.inner = blockGrammar
-    TriviaInsideNode.transformGrammars(language.grammars, language)
+    val (blockGrammar, statementGrammar, expectedStatementGrammar) = {
+      val java = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).buildLanguage
+      import java.grammars._
 
-    val expectedStatementGrammar: BiGrammar =
-      new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
+      val statementGrammar = java.grammars.find(StatementDelta.Grammar)
+      statementGrammar.inner = new NodeGrammar("statement", ParentClass)
+      val blockGrammar = java.grammars.find(BlockDelta.BlockGrammar)
+      val language = LanguageFromDeltas(Seq.empty)
+      language.grammars.root.inner = blockGrammar
+      TriviaInsideNode.transformGrammars(language.grammars, language)
+      val expectedStatementGrammar: BiGrammar =
+        new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
+      (blockGrammar, statementGrammar, expectedStatementGrammar)
+    }
 
     import DefaultBiGrammarWriter._
     val expectedBlockGrammar = "{" %>
-      new Labelled(StatementDelta.Grammar).manyVertical.as(BlockDelta.Statements).indent() %<
-      new WithTrivia(BiGrammarWriter.stringToGrammar("}"), language.grammars.trivia, false) asNode(BlockDelta.Shape)
+      As(new Labelled(StatementDelta.Grammar).manyVertical, BlockDelta.Statements).indent() %<
+      new NodeGrammar(new WithTrivia(BiGrammarWriter.stringToGrammar("}"), language.grammars.trivia, false), BlockDelta.Shape)
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }

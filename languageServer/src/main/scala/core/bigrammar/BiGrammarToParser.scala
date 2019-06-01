@@ -90,7 +90,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
           }
         })
         parser
-      case choice: Choice =>
+      case choice: BiChoice =>
         val firstParser = recursive(choice.left)
         val secondParser = recursive(choice.right)
         firstParser | secondParser

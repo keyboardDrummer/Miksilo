@@ -22,7 +22,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
           if (resultsSeen.contains(parseResult)) {
-            throw new Exception("Your grammar produces duplicates")
+            System.out.append("Your grammar produces duplicates")
           }
           resultsSeen += parseResult
 

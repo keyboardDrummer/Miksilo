@@ -49,7 +49,7 @@ object IncludeDelta extends DirectiveDelta {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
-    val grammar = "include" ~ ParseWhiteSpace ~~> StringLiteral.as(FileName).asNode(Shape)
+    val grammar = "include" ~~> StringLiteral.as(FileName).asNode(Shape)
     find(PreprocessorDelta.BodyGrammar).addAlternative(grammar)
   }
 

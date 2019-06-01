@@ -25,8 +25,10 @@ object StoreTriviaDelta extends DeltaWithGrammar {
   }
 
   private def resetCounterWhenEnteringNode(grammars: LanguageGrammars): Unit = {
+    import grammars._
+
     var visited = Set.empty[BiGrammar]
-    for (path <- grammars.root.descendants) {
+    for (path <- root.descendants) {
       if (!visited.contains(path.value)) { //TODO make sure the visited check isn't needed.
         visited += path.value
         path.value match {

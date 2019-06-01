@@ -8,7 +8,7 @@ trait WhitespaceTriviaSequenceCombinators extends BiGrammarWriter {
   val trivia = new Labelled(TriviasGrammar, new ManyHorizontal(ParseWhiteSpace))
 
   def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean) =
-    if (grammar.mustParse()) new WithTrivia(grammar, trivia, horizontal) else grammar
+    if (grammar.containsParser()) new WithTrivia(grammar, trivia, horizontal) else grammar
 
   implicit def stringAsGrammar(value: String): BiGrammarExtension = new BiGrammarExtension(value)
   implicit class BiGrammarExtension(val grammar: BiGrammar) extends BiGrammarSequenceCombinatorsExtension {
