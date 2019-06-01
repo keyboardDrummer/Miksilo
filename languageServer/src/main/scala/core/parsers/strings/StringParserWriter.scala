@@ -71,7 +71,7 @@ trait StringParserWriter extends SequenceParserWriter {
   implicit def literalOrKeyword(value: String): Self[String] = {
     val isKeyword = identifierRegex.findFirstIn(value).contains(value)
     if (isKeyword)
-      return WithDefault(identifier.filter(s => s == value, s => s"$s was not $value"), value)
+      return WithDefault(identifier.filter(s => s == value, s => s"$s was not $value"), value, Some(value))
 
     Literal(value)
   }

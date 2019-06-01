@@ -19,7 +19,8 @@ trait ParserWriter {
                                         right: => Self[Right],
                                         combine: (Left, Right) => NewResult): Self[NewResult]
 
-  def withDefault[Result](original: Self[Result], value: Result): Self[Result] = choice(original, succeed(value), firstIsLonger = true)
+  def withDefault[Result](original: Self[Result], value: Result): Self[Result] = // TODO remove this method from here
+    choice(original, succeed(value), firstIsLonger = true)
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
 

@@ -3,7 +3,7 @@ package deltas
 
 import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
-import deltas.expression.DefaultExpressionDelta
+import deltas.expression.ExpressionDelta
 import deltas.json.StringLiteralDelta
 import deltas.yaml.YamlLanguage
 import org.scalatest.FunSuite
@@ -84,7 +84,7 @@ class YamlTest extends FunSuite {
   }
 
   private def replaceDefaultWithDefaultString(compilation: Compilation): Unit = {
-    PathRoot(compilation.program).visitShape(DefaultExpressionDelta.Shape,
+    PathRoot(compilation.program).visitShape(ExpressionDelta.DefaultShape,
       p => p.asInstanceOf[ChildPath].replaceWith(StringLiteralDelta.neww("default")))
   }
 

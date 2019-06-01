@@ -267,7 +267,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   class DelayedParseResult[Result](val history: MyHistory, _getResults: () => SortedParseResults[Result])
     extends LazyParseResult[Result] {
 
-
     override def toString = score + " delayed: " + history
 
     override def map[NewResult](f: Result => NewResult): DelayedParseResult[NewResult] = {
@@ -375,13 +374,12 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     // which could save quite a few cycles.
     def manySeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
       val zero = List.empty[Result]
-      DropParser(someSeparated(separator, elementName) | succeed(zero))
+      DropParser(choice(someSeparated(separator, elementName), succeed(zero), firstIsLonger = true))
     }
 
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
 
-    def withDefault[Other >: Result](_default: Other, name: String): Self[Other] =
-      WithDefault(parser, _default)
+    def withDefault[Other >: Result](_default: Other): Self[Other] = WithDefault(parser, _default)
 
     def parseWholeInput(input: Input, mayStop: () => Boolean = () => true): ParseWholeResult[Result] = {
       parse(ParseWholeInput(parser), input, mayStop)
@@ -500,7 +498,19 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
   }
 
-  case class WithDefault[Result](original: Self[Result], _default: Result)
+  case class Fallback[Result](value: Result, name: String) extends EditorParserBase[Result] with LeafParser[Result] { // TODO combine with failure?
+    override def getParser(recursive: GetParse): Parse[Result] = {
+      (input, _) => {
+        val result = ReadyParseResult(Some(value), input, History.error(new MissingInput(input, name, History.insertFallbackPenalty)))
+        singleResult(result)
+      }
+    }
+
+    override def getMustConsume(cache: ConsumeCache) = false
+  }
+
+  case class WithDefault[Result](original: Self[Result], _default: Result,
+                                 name: Option[String] = None) // TODO last parameter is only used by keywords using filter, can we replace that usage?
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
@@ -509,8 +519,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       def apply(input: Input, state: ParseState): ParseResult[Result] = {
         val result = parseOriginal(input, state)
         result.mapReady(ready => {
+          val newHistory = name.fold(ready.history)(name => ready.history match {
+            case SingleError(score, MissingInput(from, to, _, penalty)) =>
+              SingleError(score, MissingInput(from, to, name, penalty))
+            case history => history
+          })
           if (ready.resultOption.isEmpty || ready.remainder == input) {
-            ReadyParseResult(Some(_default), ready.remainder, ready.history)
+            ReadyParseResult(Some(_default), ready.remainder, newHistory)
           } else
             ready
         }, uniform = true)

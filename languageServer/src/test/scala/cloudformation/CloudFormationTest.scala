@@ -77,7 +77,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
         |      "Type": "AWS::SNS::Topic",
         |      "Properties": {
         |        "Subsc"
-      """.stripMargin
+        """.stripMargin
     val server = new MiksiloLanguageServer(CloudFormationLanguage.jsonLanguage)
     val document = openDocument(server, program)
     val start = new HumanPosition(6, 14)

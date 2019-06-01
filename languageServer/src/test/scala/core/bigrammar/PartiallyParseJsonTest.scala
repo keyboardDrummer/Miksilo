@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.grammars.{Labelled, NumberGrammar, StringLiteral}
+import core.bigrammar.grammars.{BiFallback, Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
 import org.scalatest.FunSuite
 
@@ -9,13 +9,13 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
   import BiGrammarToParser._
 
   object Json extends GrammarKey
-  val jsonGrammar = new Labelled(Json)
+  val jsonGrammar = new Labelled(Json, new BiFallback(UnknownExpression, "value"))
   private val memberParser: BiGrammar = StringLiteral ~< ":" ~ jsonGrammar
   private val objectParser: BiGrammar = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression {
     override def toString = "<unknown>"
   }
-  jsonGrammar.inner = new core.bigrammar.grammars.WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression, "value")
+  jsonGrammar.addAlternative(StringLiteral | objectParser | NumberGrammar)
   val jsonParser = toParser(jsonGrammar)
 
   test("object with single member with number value") {

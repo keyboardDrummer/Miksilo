@@ -15,6 +15,7 @@ object History {
   val genericErrorPenalty = successValue * errorMultiplier
   val insertLiteralPenalty = successValue * errorMultiplier
   val insertRegexPenalty = successValue * errorMultiplier
+  val insertFallbackPenalty = insertRegexPenalty * 0.9
   val insertDefaultPenalty = 1
   val failPenalty = 1 // TODO settings this too high kills the tests. I think withDefault should work differently.
 

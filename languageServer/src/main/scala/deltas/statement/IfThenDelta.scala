@@ -43,7 +43,7 @@ object IfThenDelta extends DeltaWithGrammar with StatementInstance {
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val ifThen: IfThen[NodePath] = statement
     ConstraintSkeleton.constraints(compilation, builder, ifThen.thenStatement, parentScope)
-    ExpressionDelta.constraints(compilation, builder, ifThen.condition, BooleanTypeDelta.constraintType, parentScope)
+    ExpressionDelta.constraints2(compilation, builder, ifThen.condition, BooleanTypeDelta.constraintType, parentScope)
   }
 
   override def shape: NodeShape = Shape

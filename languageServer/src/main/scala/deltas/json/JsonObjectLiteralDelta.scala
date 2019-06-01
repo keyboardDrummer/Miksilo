@@ -27,7 +27,8 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     val keyGrammar = dropPrefix(grammars,
       grammars.regexGrammar(stringInnerRegex, "string literal"), MemberKey, "\"") ~< "\""
     val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
-    val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | valueGrammar(Unit))).indent() %< "}"
+    val optionalTrailingComma = Parse(Keyword(",") | valueGrammar(Unit))
+    val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< optionalTrailingComma).indent() %< "}"
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
   }
