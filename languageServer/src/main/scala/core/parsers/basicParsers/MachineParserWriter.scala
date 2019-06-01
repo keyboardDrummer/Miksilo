@@ -29,7 +29,7 @@ trait MachineParserWriter extends ParserWriter {
   override def leftRight[Left, Right, NewResult](left: Parser[Left], right: => Parser[Right], combine: (Left, Right) => NewResult) =
     Sequence(left, right, combine)
 
-  override def choice[Result](first: Parser[Result], other: => Parser[Result]) = new BiggestOfTwo(first, other)
+  override def choice[Result](first: Parser[Result], other: => Parser[Result], firstIsLonger: Boolean = false) = new BiggestOfTwo(first, other)
 
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult) = MapParser(original, f)
 

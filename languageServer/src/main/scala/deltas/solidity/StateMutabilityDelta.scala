@@ -9,7 +9,8 @@ object StateMutabilityDelta extends DeltaWithGrammar {
   object Grammar extends GrammarKey
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    grammars.create(Grammar, "pure" | "view" | "payable" | "constant")
+    import grammars._
+    create(Grammar, "pure" | "view" | "payable" | "constant")
   }
 
   override def description = "Defines the state mutability modifiers"

@@ -14,7 +14,7 @@ object YamlArrayDelta extends DeltaWithGrammar {
 
     val blockValue = find(YamlCoreDelta.IndentationSensitiveExpression)
     val blockArray: BiGrammar = {
-      val element = keyword("- ") ~> CheckIndentationGrammar.greaterThan(blockValue)
+      val element = keywordGrammar("- ") ~> CheckIndentationGrammar.greaterThan(blockValue)
       CheckIndentationGrammar.aligned(_grammars, element).as(M2).asNode(ArrayLiteralDelta.Shape)
     }
     blockValue.addAlternative(blockArray)

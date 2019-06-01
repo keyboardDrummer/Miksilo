@@ -1,6 +1,7 @@
 package deltas.javac.classes.skeleton
 
 import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.BiChoice
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodeChildPath, NodePath, PathRoot}
@@ -70,7 +71,8 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
     val classMember: BiGrammar = find(MethodDelta.Shape) | find(FieldDeclarationDelta.Shape)
     val importGrammar = create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical as ClassImports
-    val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
+    val packageGrammar = new BiChoice(keywordGrammar("package") ~~>
+      identifier.someSeparated(".") ~< ";", valueGrammar(Seq.empty), true) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> find(Name)
     val membersGrammar = "{".%((classMember.manySeparatedVertical(BlankLine) as Members).indent(BlockDelta.indentAmount)) % "}"

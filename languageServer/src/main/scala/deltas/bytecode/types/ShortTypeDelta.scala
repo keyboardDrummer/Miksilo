@@ -17,12 +17,12 @@ object ShortTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    new Keyword("S",false) ~> value(shortType)
+    Keyword("S", false) ~> valueGrammar(shortType)
   }
 
   override def getJavaGrammar(grammars: LanguageGrammars) = {
     import grammars._
-    "short" ~> value(shortType)
+    "short" ~> valueGrammar(shortType)
   }
 
   def shortType = new Node(Shape)

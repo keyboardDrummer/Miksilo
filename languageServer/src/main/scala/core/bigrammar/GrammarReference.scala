@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.grammars.{Choice, ValueGrammar}
+import core.bigrammar.grammars.{BiChoice, ValueGrammar}
 import core.bigrammar.printer.UndefinedDestructuringValue
 import util.Property
 
@@ -45,7 +45,7 @@ class GrammarReference(val previous: GrammarPath, val property: Property[BiGramm
   }
 
   def removeMeFromOption(): Unit = {
-    val choiceParent = parent.asInstanceOf[Choice]
+    val choiceParent = parent.asInstanceOf[BiChoice]
     val me = value
     val sibling = Set(choiceParent.left,choiceParent.right).filter(grammar => grammar != me).head
     previous.asInstanceOf[GrammarReference].set(sibling)

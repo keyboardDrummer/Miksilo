@@ -76,7 +76,7 @@ trait StringParserWriter extends SequenceParserWriter {
     Literal(value)
   }
 
-  implicit def regex(value: Regex, regexName: String): RegexParser = RegexParser(value, regexName)
+  implicit def regex(value: Regex, regexName: String, score: Double = History.successValue): RegexParser = RegexParser(value, regexName, score)
 
   case class Literal(value: String) extends EditorParserBase[String] with LeafParser[String] {
 

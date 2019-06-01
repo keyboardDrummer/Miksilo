@@ -1,5 +1,6 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
 import core.bigrammar.BiGrammarToParser._
 
 case class Identifier(verifyWhenPrinting: Boolean = false) extends StringGrammar(verifyWhenPrinting) {

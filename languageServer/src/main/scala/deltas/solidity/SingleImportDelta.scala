@@ -18,7 +18,7 @@ object SingleImportDelta extends DeltaWithGrammar {
     val _grammars = grammars
     import grammars._
     val newName = find(FileImportDelta.NewName)
-    val wildCard = "*" ~> value(Wildcard)
+    val wildCard = "*" ~> valueGrammar(Wildcard)
     val singleImport = importPattern(_grammars, Shape, (identifier.as(ElementName) | wildCard) ~~ newName)
     find(FileWithMembersDelta.Members).addAlternative(singleImport)
   }

@@ -21,8 +21,8 @@ trait BiGrammar {
 
   lazy val height = 1
 
-  def |(other: BiGrammar) = new Choice(this, other)
-  def option: BiGrammar = this.mapSome[Any, Option[Any]](x => Some(x), x => x) | value(None)
+  def |(other: BiGrammar) = new BiChoice(this, other, !other.containsParser())
+  def option: BiGrammar = new BiChoice(this.mapSome[Any, Option[Any]](x => Some(x), x => x), valueGrammar(None), true)
 
   def indent(width: Int = 2): BiGrammar =
     leftRight(WhiteSpace(width, 0), this, BiSequence.ignoreLeft)

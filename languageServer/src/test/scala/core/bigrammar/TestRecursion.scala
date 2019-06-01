@@ -13,7 +13,7 @@ class TestRecursion extends FunSuite with DefaultBiGrammarWriter {
   test("RightRecursion") {
     val grammar: Labelled = new Labelled(StringKey("leftRec"))
     grammar.addAlternative("!" ~ grammar)
-    grammar.addAlternative(value(null))
+    grammar.addAlternative(valueGrammar(null))
 
     testUsingGrammar(grammar)
   }
@@ -22,7 +22,7 @@ class TestRecursion extends FunSuite with DefaultBiGrammarWriter {
     val grammar: Labelled = new Labelled(StringKey("leftRec"))
     grammar.addAlternative("!" ~ grammar)
     grammar.addAlternative(grammar)
-    grammar.addAlternative(value(null))
+    grammar.addAlternative(valueGrammar(null))
 
     testUsingGrammar(grammar)
   }
@@ -37,7 +37,7 @@ class TestRecursion extends FunSuite with DefaultBiGrammarWriter {
 
   ignore("LeftRecursion") {
     val grammar: Labelled = new Labelled(StringKey("leftRec"))
-    grammar.addAlternative(value(null))
+    grammar.addAlternative(valueGrammar(null))
     grammar.addAlternative(grammar ~ "!")
 
     testUsingGrammar(grammar)
@@ -46,7 +46,7 @@ class TestRecursion extends FunSuite with DefaultBiGrammarWriter {
   test("LeftRecursionPrintOnly") {
     val grammarDocument: Labelled = new Labelled(StringKey("leftRec"))
     grammarDocument.addAlternative(grammarDocument ~ "!")
-    grammarDocument.addAlternative(value(null))
+    grammarDocument.addAlternative(valueGrammar(null))
 
     val result = getExpectedLeftRecursiveResult
 
@@ -63,7 +63,7 @@ class TestRecursion extends FunSuite with DefaultBiGrammarWriter {
     val inner = new Labelled(StringKey("boep"))
     val outer = new Labelled(StringKey("woep"), inner)
     inner.addAlternative(outer ~ "!")
-    inner.addAlternative(value(null))
+    inner.addAlternative(valueGrammar(null))
 
     val document = BiGrammarToPrinter.toDocument(getExpectedLeftRecursiveResult, outer)
     val documentResult = document.renderString()

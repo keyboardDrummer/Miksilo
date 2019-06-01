@@ -17,7 +17,7 @@ object NullDelta extends DeltaWithGrammar with ExpressionInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val parseNull = "null" ~> value(_null)
+    val parseNull = "null" ~> valueGrammar(_null)
     expressionGrammar.addAlternative(parseNull)
   }
 

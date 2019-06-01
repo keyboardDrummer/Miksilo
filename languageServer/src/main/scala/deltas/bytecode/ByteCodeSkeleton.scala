@@ -1,6 +1,7 @@
 package deltas.bytecode
 
 import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.Print
 import core.document.Empty
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
@@ -96,6 +97,7 @@ object ByteCodeSkeleton extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val constantPool: BiGrammar = getConstantPoolGrammar(grammars)
     import grammars._
+
     val constantIndexGrammar = create(ConstantPoolIndexGrammar, integer)
     val attributeGrammar: BiGrammar = create(AttributeGrammar)
     val interfacesGrammar: BiGrammar = "with" ~ ":" ~~> (constantIndexGrammar *).inParenthesis

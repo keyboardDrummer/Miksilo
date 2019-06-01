@@ -35,11 +35,12 @@ object LabelDelta extends InstructionInstance {
 
   override def getInstructionSize(compilation: Compilation): Int = 0
 
-  def getNameGrammar: BiGrammar = RegexGrammar("""[\w<>\-]+""".r, "label name")
-  override def getGrammarForThisInstruction(grammars: LanguageGrammars): BiGrammar = {
+  def getNameGrammar(grammars: LanguageGrammars): BiGrammar = grammars.regexGrammar("""[\w<>\-]+""".r, "label name")
+  override def getGrammarForThisInstruction(_grammars: LanguageGrammars): BiGrammar = {
+    val grammars = _grammars
     import grammars._
     val stackMapFrameGrammar = find(StackMapFrameGrammar)
-    grammarName ~~> getNameGrammar.as(Name) %
+    grammarName ~~> getNameGrammar(grammars).as(Name) %
       stackMapFrameGrammar.indent().as(StackFrame) asNode Shape
   }
 

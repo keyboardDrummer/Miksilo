@@ -22,7 +22,7 @@ object ReturnVoidDelta extends StatementInstance with DeltaWithGrammar  {
     import grammars._
     val statement = find(StatementDelta.Grammar)
 
-    val returnExpression = ("return" ~ ";") ~> value(_return)
+    val returnExpression = ("return" ~ ";") ~> valueGrammar(_return)
     statement.inner = statement.inner | returnExpression
   }
 

@@ -43,4 +43,6 @@ class ConstantPool(items: Seq[Any] = Seq.empty) {
   def storeUtf8(value: String) = {
     store(value)
   }
+
+  override def toString = "ConstantPool: " + items.toString()
 }

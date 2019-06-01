@@ -39,16 +39,16 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
       identifier.spacedOption.as(Name) asNode MethodParameters.Shape
     val returnParameterList = returnParameter.toParameterList
 
-    val name = (identifier | value("<default>")).as(Name)
+    val name = (identifier | valueGrammar("<default>")).as(Name)
 
     val modifierInvocation = find(Name) ~
-      (find(CallDelta.CallArgumentsGrammar) | value(Seq.empty)).as(CallDelta.Arguments) asNode CallDelta.Shape
+      (find(CallDelta.CallArgumentsGrammar) | valueGrammar(Seq.empty)).as(CallDelta.Arguments) asNode CallDelta.Shape
 
     val stateMutability = find(StateMutabilityDelta.Grammar)
     val modifiers = create(Modifiers, (printSpace ~> (modifierInvocation | stateMutability | "external" | "public" | "internal" | "private")).many.as(Modifiers))
-    val returnValues = (printSpace ~ "returns" ~~> returnParameterList | value(Seq.empty)).as(ReturnValues)
+    val returnValues = (printSpace ~ "returns" ~~> returnParameterList | valueGrammar(Seq.empty)).as(ReturnValues)
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGrammar)
-    val body = (";" ~> value(BlockDelta.neww(Seq.empty)) | blockGrammar).as(MethodDelta.Body)
+    val body = (";" ~> valueGrammar(BlockDelta.neww(Seq.empty)) | blockGrammar).as(MethodDelta.Body)
     val grammar = "function" ~~ name ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~ returnValues ~~ body asLabelledNode MethodDelta.Shape
     find(JavaClassDelta.Members).addAlternative(grammar)
   }

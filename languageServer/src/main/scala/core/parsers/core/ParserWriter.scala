@@ -11,7 +11,7 @@ trait ParserWriter {
 
   def succeed[Result](result: Result): Self[Result]
 
-  def choice[Result](first: Self[Result], other: => Self[Result]): Self[Result]
+  def choice[Result](first: Self[Result], other: => Self[Result], firstIsLonger: Boolean = false): Self[Result]
 
   def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult]
 
@@ -19,7 +19,7 @@ trait ParserWriter {
                                         right: => Self[Right],
                                         combine: (Left, Right) => NewResult): Self[NewResult]
 
-  def withDefault[Result](original: Self[Result], value: Result): Self[Result] = original | succeed(value)
+  def withDefault[Result](original: Self[Result], value: Result): Self[Result] = choice(original, succeed(value), firstIsLonger = true)
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
 
@@ -33,7 +33,7 @@ trait ParserWriter {
 
     def map[NewResult](f: Result => NewResult): Self[NewResult] = ParserWriter.this.map(parser, f)
 
-    def option: Self[Option[Result]] = choice(this.map(x => Some(x)), succeed[Option[Result]](None))
+    def option: Self[Option[Result]] = choice(this.map(x => Some(x)), succeed[Option[Result]](None), firstIsLonger = true)
 
     def repN(amount: Int): Self[List[Result]] = {
       if (amount == 0) {

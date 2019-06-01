@@ -17,14 +17,14 @@ object VoidTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    Keyword("V", false) ~> value(voidType)
+    Keyword("V", false) ~> valueGrammar(voidType)
   }
 
   override def getStackSize: Int = 0
 
   override def getJavaGrammar(grammars: LanguageGrammars) = {
     import grammars._
-    "void" ~> value(voidType)
+    "void" ~> valueGrammar(voidType)
   }
 
   def voidType = new Node(Shape)

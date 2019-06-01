@@ -47,10 +47,10 @@ object IncludeDelta extends DirectiveDelta {
   override def shape: NodeShape = Shape
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    import core.bigrammar.DefaultBiGrammarWriter._
+    import grammars._
 
     val grammar = "include" ~ ParseWhiteSpace ~~> StringLiteral.as(FileName).asNode(Shape)
-    grammars.find(PreprocessorDelta.BodyGrammar).addAlternative(grammar)
+    find(PreprocessorDelta.BodyGrammar).addAlternative(grammar)
   }
 
   object Shape extends NodeShape

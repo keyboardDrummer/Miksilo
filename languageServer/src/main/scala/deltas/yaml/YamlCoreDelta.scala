@@ -67,7 +67,8 @@ object YamlCoreDelta extends DeltaWithGrammar {
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     val grammars = _grammars
     import _grammars._
-    val tag: BiGrammar = StringLiteralDelta.dropPrefix(RegexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name"),
+    val tag: BiGrammar = StringLiteralDelta.dropPrefix(grammars,
+      grammars.regexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name"),
       TagName, "!") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
     val blockValue = create(IndentationSensitiveExpression)

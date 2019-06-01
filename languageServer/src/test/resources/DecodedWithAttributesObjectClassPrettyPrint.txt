@@ -5,18 +5,18 @@ ConstantPool:
   String 17
   String 39
   String 43
-  Utf8 "()I"
-  Utf8 "()Ljava/lang/Object;"
-  Utf8 "()Ljava/lang/String;"
-  Utf8 "()V"
-  Utf8 "(I)Ljava/lang/String;"
-  Utf8 "(J)V"
-  Utf8 "(JI)V"
-  Utf8 "(Ljava/lang/Object;)Z"
-  Utf8 "(Ljava/lang/String;)V"
+  Utf8 ()I
+  Utf8 ()Ljava/lang/Object;
+  Utf8 ()Ljava/lang/String;
+  Utf8 ()V
+  Utf8 (I)Ljava/lang/String;
+  Utf8 (J)V
+  Utf8 (JI)V
+  Utf8 (Ljava/lang/Object;)Z
+  Utf8 (Ljava/lang/String;)V
   Utf8 <clinit>
   Utf8 <init>
-  Utf8 "@"
+  Utf8 @
   Utf8 Code
   Utf8 Exceptions
   Utf8 LineNumberTable
@@ -30,19 +30,19 @@ ConstantPool:
   Utf8 getClass
   Utf8 getName
   Utf8 hashCode
-  Utf8 "java/lang/Class"
-  Utf8 "java/lang/CloneNotSupportedException"
-  Utf8 "java/lang/IllegalArgumentException"
-  Utf8 "java/lang/Integer"
-  Utf8 "java/lang/InterruptedException"
-  Utf8 "java/lang/Object"
-  Utf8 "java/lang/StringBuilder"
-  Utf8 "java/lang/Throwable"
-  Utf8 "nanosecond timeout value out of range"
+  Utf8 java/lang/Class
+  Utf8 java/lang/CloneNotSupportedException
+  Utf8 java/lang/IllegalArgumentException
+  Utf8 java/lang/Integer
+  Utf8 java/lang/InterruptedException
+  Utf8 java/lang/Object
+  Utf8 java/lang/StringBuilder
+  Utf8 java/lang/Throwable
+  Utf8 nanosecond timeout value out of range
   Utf8 notify
   Utf8 notifyAll
   Utf8 registerNatives
-  Utf8 "timeout value is negative"
+  Utf8 timeout value is negative
   Utf8 toHexString
   Utf8 toString
   Utf8 wait
@@ -54,9 +54,9 @@ ConstantPool:
   Class 36
   Class 37
   Class 38
-  Utf8 "()Ljava/lang/Class;"
-  Utf8 "()Ljava/lang/Class<*>;"
-  Utf8 "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+  Utf8 ()Ljava/lang/Class;
+  Utf8 ()Ljava/lang/Class<*>;
+  Utf8 (Ljava/lang/String;)Ljava/lang/StringBuilder;
   NameAndType 30 6
   NameAndType 16 9
   NameAndType 42 9
@@ -77,7 +77,7 @@ ConstantPool:
   Methodref 53.59
   Methodref 53.64
   Methodref 53.67
-  Utf8 "Object.java"
+  Utf8 Object.java
 {
   Method;
     name: 16

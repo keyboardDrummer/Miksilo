@@ -19,12 +19,12 @@ object CharTypeDelta extends ByteCodeTypeInstance
 
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    "char" ~> value(me)
+    "char" ~> valueGrammar(me)
   }
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    Keyword("C", reserved = false) ~> value(me)
+    Keyword("C", reserved = false) ~> valueGrammar(me)
   }
 
   override def description: String = "Adds the char type."

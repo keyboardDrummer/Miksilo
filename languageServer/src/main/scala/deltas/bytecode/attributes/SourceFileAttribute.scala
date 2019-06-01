@@ -33,6 +33,7 @@ object SourceFileAttribute extends ByteCodeAttribute {
   override def shape = SourceFileAttributeKey
 
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
     ("NotImplemented" : BiGrammar).asNode(shape)
   } // TODO implement.
 

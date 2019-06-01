@@ -1,5 +1,6 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
 import core.bigrammar.BiGrammarToParser._
 
 case class Keyword(var value: String, reserved: Boolean = true, verifyWhenPrinting: Boolean = false)

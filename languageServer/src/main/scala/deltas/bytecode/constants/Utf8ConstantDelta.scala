@@ -6,6 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.Compilation
 import core.language.node._
 import deltas.bytecode.PrintByteCode
+import deltas.javac.classes.skeleton.QualifiedClassName
 
 object Utf8ConstantDelta extends ConstantPoolEntry {
   override def shape = Utf8ConstantKey
@@ -20,14 +21,21 @@ object Utf8ConstantDelta extends ConstantPoolEntry {
     def value_=(value: String): Unit = node(Value) = value
   }
 
+  def fromQualifiedClassName(name: QualifiedClassName): Node = create(name.parts.mkString("/"))
+  def toQualifiedClassName(node: Node): QualifiedClassName = QualifiedClassName(node(Value).asInstanceOf[String].split("/"))
+
   override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] =
     PrintByteCode.toUTF8ConstantEntry(constant(Value).asInstanceOf[String])
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
-    (new Identifier(verifyWhenPrinting = true) |
-      keywordClass("<init>") |
-      keywordClass("<clinit>") |
-      StringLiteral
+    import grammars._
+    val regex = """[^\s,.]+""".r
+    // Cases like java/lang/Object are handled by QualifiedClassNameConstantDelta
+    ( regexGrammar(regex, "utf8 constant string")
+      /*getIdentifier(verifyWhenPrinting = true) |*/
+//      keywordClass("<init>") |
+//      keywordClass("<clinit>") |
+//      stringLiteral
       //TODO misschien een aparte constant maken voor 'Names'
       ).as(Value)
   }

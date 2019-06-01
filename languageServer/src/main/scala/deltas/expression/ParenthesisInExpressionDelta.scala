@@ -12,7 +12,7 @@ object ParenthesisInExpressionDelta extends DeltaWithGrammar {
     import grammars._
     val core = find(ExpressionDelta.LastPrecedenceGrammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val parseParenthesis = ("(" ~> value("(" )) ~> expression ~< ")" //TODO: the produce("(") here is a hack to make sure no () show up when printing. Nicer option would be to have a BiGrammar that specifies parsing/printing behavior.
+    val parseParenthesis = ("(" ~> valueGrammar("(" )) ~> expression ~< ")" //TODO: the produce("(") here is a hack to make sure no () show up when printing. Nicer option would be to have a BiGrammar that specifies parsing/printing behavior.
     core.addAlternative(parseParenthesis)
   }
 

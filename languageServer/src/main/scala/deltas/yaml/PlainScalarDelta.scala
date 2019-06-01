@@ -11,15 +11,15 @@ import deltas.json.StringLiteralDelta
 object PlainScalarDelta extends DeltaWithGrammar {
   def flowIndicatorChars = """,\[\]{}"""
 
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    val _grammars = grammars
+  override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
+    val grammars = _grammars
     import grammars._
 
     val nonBreakChars = """\n"""
     val plainSafeOutChars = s"""$nonBreakChars#'"""
     val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
-    val doubleColonPlainSafeIn =  RegexGrammar(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r, "plain scalar")
-    val doubleColonPlainSafeOut =  RegexGrammar(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r, "plain scalar")
+    val doubleColonPlainSafeIn = grammars.regexGrammar(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r, "plain scalar")
+    val doubleColonPlainSafeOut = grammars.regexGrammar(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r, "plain scalar")
 
     val nsPlainSafe: BiGrammar = new IfContext(Map(
       FlowIn -> doubleColonPlainSafeIn,

@@ -18,14 +18,15 @@ object InlineAssemblyStatementDelta extends DeltaWithGrammar with HasConstraints
   object Shape extends NodeShape
   object AssemblyItem extends GrammarKey
   object AssemblyExpression extends GrammarKey
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
+  override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
+    val grammars = _grammars
     import grammars._
     val assemblyIdentifierOrList: BiGrammar = identifier | identifier.toParameterList
     val assemblyExpression = create(AssemblyExpression)
     val assemblyCall: BiGrammar = (identifier | "return" | Keyword("address", reserved = false) | "byte") ~
       assemblyExpression.toParameterList.option
     assemblyExpression.addAlternative(assemblyCall)
-    val hexCharacter = RegexGrammar("""[0-9A-Fa-f]""".r, "hex character")
+    val hexCharacter = grammars.regexGrammar("""[0-9A-Fa-f]""".r, "hex character")
     val hexPair = hexCharacter ~ hexCharacter
     val hexLiteral: BiGrammar = "hex" ~~ ("\"" ~~ hexPair.many ~~ "\"" | "'" ~~ hexPair.many ~~ "'")
 

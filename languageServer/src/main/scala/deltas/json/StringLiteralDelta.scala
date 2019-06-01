@@ -1,5 +1,6 @@
 package deltas.json
 
+import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.RegexGrammar
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
@@ -24,14 +25,17 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   val stringInnerRegex: Regex = """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r
 
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+  override def transformGrammars(_grammars: LanguageGrammars, state: Language): Unit = {
+    val grammars = _grammars
     import grammars._
-    val innerGrammar = dropPrefix(RegexGrammar(stringInnerRegex, "string literal"), Value, "\"") ~< "\""
+    val innerGrammar = dropPrefix(grammars,
+      grammars.regexGrammar(stringInnerRegex, "string literal"), Value, "\"") ~< "\""
     val grammar = innerGrammar.asLabelledNode(Shape)
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar)
   }
 
-  def dropPrefix(regex: RegexGrammar, field: NodeField, prefix: String) = {
+  def dropPrefix(grammars: LanguageGrammars, regex: BiGrammar, field: NodeField, prefix: String) = {
+    import grammars._
     regex.map[String, String](r => r.substring(prefix.length), s => { prefix + s }).
       as(field, p => SourceRange(Position(p.start.line, p.start.character + prefix.length), p.end))
   }

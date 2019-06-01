@@ -12,6 +12,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
       noResultFound
 
 
+    var resultsSeen = Set.empty[ReadyParseResult[Result]]
     val start = System.currentTimeMillis()
     var queue = parser.parseRoot(input)
     while(queue.isInstanceOf[SRCons[Result]]) {
@@ -20,6 +21,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
+          if (resultsSeen.contains(parseResult)) {
+            throw new Exception("Your grammar produces duplicates")
+          }
+          resultsSeen += parseResult
+
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           cons.tail match {
             case tailCons: SRCons[Result] =>
@@ -60,10 +66,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
   override def succeed[NR](result: NR): Self[NR] = Succeed(result)
 
   override def withDefault[Result](original: LRParser[Result], value: Result) = {
-    WithDefault(original, value) | succeed(value)
+    choice(WithDefault(original, value), succeed(value), firstIsLonger = true)
   }
 
-  override def choice[Result](first: Self[Result], other: => Self[Result]): Self[Result] = new BiggestOfTwo(first, other)
+  override def choice[Result](first: Self[Result], other: => Self[Result], firstIsLonger: Boolean = false): Self[Result] =
+    if (firstIsLonger) new FirstIsLonger(first, other) else new Choice(first, other)
 
   override def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult] = new MapParser(original, f)
 
@@ -310,8 +317,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
   class Sequence[+Left, +Right, Result](val left: Self[Left],
                                          _right: => Self[Right],
-                                         combine: (Left, Right) => Result,
-                                        mayDrop: Boolean = true)
+                                         combine: (Left, Right) => Result)
     extends EditorParserBase[Result] with SequenceLike[Result] {
 
     lazy val right: Self[Right] = _right
@@ -342,7 +348,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
             val rightResult = parseRight(leftReady.remainder, state)
             rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
           }
-          delayedLeftResults.flatMapReady(rightFromLeftReady, false)
+          delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false)
         }
       }
     }
@@ -414,8 +420,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
     }
   }
 
-  var biggestInput = 0
-  class BiggestOfTwo[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
+  class FirstIsLonger[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
     extends EditorParserBase[Result] with ChoiceLike[Result] {
 
     lazy val second = _second
@@ -426,7 +431,29 @@ trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWri
 
       new Parse[Result] {
         override def apply(input: Input, state: ParseState) = {
-          biggestInput = Math.max(biggestInput, input.offset)
+          val firstResult = parseFirst(input, state)
+          val secondResult = parseSecond(input, state)
+          firstResult match {
+            case cons: SRCons[Result] if !cons.head.history.flawed => firstResult
+            case _ =>
+              firstResult.merge(secondResult)
+          }
+        }
+      }
+    }
+  }
+
+  class Choice[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
+    extends EditorParserBase[Result] with ChoiceLike[Result] {
+
+    lazy val second = _second
+
+    override def getParser(recursive: GetParse): Parse[Result] = {
+      val parseFirst = recursive(first)
+      lazy val parseSecond = recursive(second)
+
+      new Parse[Result] {
+        override def apply(input: Input, state: ParseState) = {
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
           val merged = firstResult.merge(secondResult)

@@ -19,13 +19,15 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
   override def description: String = "Adds the JSON object literal to expressions"
 
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
+  override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
+    val grammars = _grammars
     import grammars._
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val keyGrammar = dropPrefix(RegexGrammar(stringInnerRegex, "string literal"), MemberKey, "\"") ~< "\""
+    val keyGrammar = dropPrefix(grammars,
+      grammars.regexGrammar(stringInnerRegex, "string literal"), MemberKey, "\"") ~< "\""
     val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
-    val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | value(Unit))).indent() %< "}"
+    val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | valueGrammar(Unit))).indent() %< "}"
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
   }

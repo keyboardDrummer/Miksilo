@@ -1,6 +1,6 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.BiGrammarToParser
+import core.bigrammar.{BiGrammar, BiGrammarToParser}
 
 case class Delimiter(value: String) extends StringGrammar {
   if (value.length == 0)

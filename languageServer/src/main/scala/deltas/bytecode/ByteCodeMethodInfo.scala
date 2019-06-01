@@ -74,7 +74,7 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags with HasByte
     import grammars._
     val methods = create(MethodsGrammar, methodInfoGrammar.manySeparatedVertical(BlankLine).as(Methods))
     val membersGrammar = find(ByteCodeSkeleton.MembersGrammar)
-    membersGrammar.inner = membersGrammar.inner % methods
+    membersGrammar.inner = membersGrammar.inner %> methods
   }
 
   object AccessFlagGrammar extends GrammarKey
@@ -82,9 +82,9 @@ object ByteCodeMethodInfo extends DeltaWithGrammar with AccessFlags with HasByte
     import grammars._
     val attributesGrammar = find(AttributesGrammar)
     val parseAccessFlag = create(AccessFlagGrammar,
-        "ACC_PUBLIC" ~> value(PublicAccess) |
-        "ACC_STATIC" ~> value(StaticAccess) |
-        "ACC_PRIVATE" ~> value(PrivateAccess))
+        "ACC_PUBLIC" ~> valueGrammar(PublicAccess) |
+        "ACC_STATIC" ~> valueGrammar(StaticAccess) |
+        "ACC_PRIVATE" ~> valueGrammar(PrivateAccess))
 
     val methodInfoGrammar: BiGrammar = "Method" ~ ";"  %>
       ("name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(MethodNameIndex) %

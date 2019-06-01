@@ -7,7 +7,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.node._
 import deltas.verilog.AlwaysDelta.SensitivityVariables
 
-object SensitivityVariableDelta extends NodeGrammarWriter {
+object SensitivityVariableDelta {
   object Shape extends NodeShape
   object Edge extends NodeField
   object Name extends NodeField
@@ -22,7 +22,7 @@ object SensitivityVariableDelta extends NodeGrammarWriter {
   def getListGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
 
-    val edge: BiGrammar = "posedge" | "negedge" | ValueGrammar("")
+    val edge: BiGrammar = stringToGrammar("posedge") | "negedge" | ValueGrammar("")
     val element: BiGrammar = edge.as(Edge) ~~ identifier.as(Name) asNode Shape
     val sensitivityList: BiGrammar = "@" ~ element.manySeparated("," | "or").as(SensitivityVariables).inParenthesis
     sensitivityList

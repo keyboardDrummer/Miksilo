@@ -11,7 +11,6 @@ import core.smarts.objects.NamedDeclaration
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.bytecode.constants.ClassInfoConstant
-import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
 import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 
@@ -41,10 +40,15 @@ object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDe
 
   object ByteCodeGrammarInner extends GrammarKey
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
-    val qualifiedClassNameParser = QualifiedClassNameConstantDelta.getQualifiedClassNameParser(grammars)
+    val qualifiedClassNameParser = getQualifiedClassNameParser(grammars)
     import grammars._
     val inner: Labelled = create(ByteCodeGrammarInner, qualifiedClassNameParser.as(Name).asNode(Shape))
-    Keyword("L", reserved = false) ~> inner ~< ";"
+    stringToGrammar("L", reserved = false) ~> inner ~< ";"
+  }
+
+  def getQualifiedClassNameParser(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    identifier.someSeparated("/").map[Seq[String], QualifiedClassName](QualifiedClassName, qualifiedClassName => qualifiedClassName.parts)
   }
 
   def getName(objectType: NodeLike): QualifiedClassName = objectType.getValue(Name).asInstanceOf[QualifiedClassName]

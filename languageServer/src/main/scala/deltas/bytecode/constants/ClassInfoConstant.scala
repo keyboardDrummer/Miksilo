@@ -6,9 +6,8 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
+import deltas.bytecode.constants.Utf8ConstantDelta.Utf8Constant
 import deltas.bytecode.coreInstructions.ConstantPoolIndexGrammar
-import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta
-import deltas.bytecode.extraConstants.QualifiedClassNameConstantDelta.QualifiedClassNameConstant
 import deltas.javac.classes.skeleton.QualifiedClassName
 
 object ClassInfoConstant extends ConstantPoolEntry {
@@ -17,15 +16,15 @@ object ClassInfoConstant extends ConstantPoolEntry {
 
   object Name extends NodeField
 
-  def classRef(name: QualifiedClassName): Node = new Node(Shape, Name -> QualifiedClassNameConstantDelta.create(name))
+  def classRef(name: QualifiedClassName): Node = new Node(Shape, Name -> Utf8ConstantDelta.fromQualifiedClassName(name))
   def classRef(classRefNameIndex: Int): Node = new Node(Shape, Name -> classRefNameIndex)
 
   implicit class ClassInfoConstantWrapper[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def nameIndex: Int = node(Name).asInstanceOf[Int]
     def nameIndex_=(value: Int): Unit = node(Name) = value
 
-    def name: QualifiedClassNameConstant[T] = node(Name).asInstanceOf[T]
-    def name_=(value: QualifiedClassNameConstant[T]): Unit = node(Name) = value
+    def name: Utf8Constant[T] = node(Name).asInstanceOf[T]
+    def name_=(value: Utf8Constant[T]): Unit = node(Name) = value
   }
 
   override def shape = Shape
@@ -36,7 +35,7 @@ object ClassInfoConstant extends ConstantPoolEntry {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    ByteCodeSkeleton.constantReferences.add(language, shape, Map(Name -> QualifiedClassNameConstantDelta.shape))
+    ByteCodeSkeleton.constantReferences.add(language, shape, Map(Name -> Utf8ConstantDelta.shape))
   }
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {

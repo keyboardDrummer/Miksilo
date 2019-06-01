@@ -1,6 +1,7 @@
 package deltas.bytecode.constants
 
 import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.Keyword
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
@@ -19,10 +20,10 @@ trait ConstantPoolEntry extends DeltaWithGrammar with HasShape with HasBytes {
     val constantEntryGrammar = getConstantEntryGrammar(grammars)
     import grammars._
     val itemContent = find(ConstantPoolItemContentGrammar)
-    itemContent.addAlternative(create(shape, (getName ~~> constantEntryGrammar).asNode(shape)))
+    itemContent.addAlternative(create(shape, (Keyword(getName, reserved = false) ~~> constantEntryGrammar).asNode(shape)))
   }
 
-  val getName: BiGrammar
+  val getName: String
   def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar
 
   override def dependencies: Set[Contract] = Set(ByteCodeSkeleton)

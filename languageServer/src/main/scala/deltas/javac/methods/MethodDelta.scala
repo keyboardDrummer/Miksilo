@@ -89,7 +89,7 @@ object MethodDelta extends DeltaWithGrammar
     val block = find(BlockDelta.BlockGrammar)
 
     val parseType = find(TypeSkeleton.JavaTypeGrammar)
-    val parseReturnType = create(ReturnTypeGrammar, "void" ~> value(VoidTypeDelta.voidType) | parseType)
+    val parseReturnType = create(ReturnTypeGrammar, parseType)
 
     val parseParameter = MethodParameters.getGrammar(_grammars)
     val parseParameters = create(Parameters, "(" ~> parseParameter.manySeparated(",") ~< ")")

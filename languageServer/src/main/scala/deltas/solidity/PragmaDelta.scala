@@ -17,10 +17,12 @@ object PragmaDelta extends DeltaWithGrammar with HasConstraintsDelta {
   object Name extends NodeField
   object Values extends NodeField
 
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
+  override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
+    val grammars = _grammars
     import grammars._
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val grammar: BiGrammar = "pragma" ~~ identifier.as(Name) ~~ (RegexGrammar("""[^;]+""".r, "pragma value") | expression).as(Values) ~ ";" asNode Shape
+    val grammar: BiGrammar = "pragma" ~~ identifier.as(Name) ~~
+      (grammars.regexGrammar("""[^;]+""".r, "pragma value") | expression).as(Values) ~ ";" asNode Shape
     find(FileWithMembersDelta.Members).addAlternative(grammar)
   }
 

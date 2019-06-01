@@ -57,8 +57,8 @@ object JavaToByteCodeLanguage {
     SubtractionToByteCodeDelta,
     LongLiteralToByteCodeDelta,
     BooleanLiteralToByteCodeDelta, IntLiteralToByteCodeDelta,
-    NullToByteCodeDelta, LogicalNotToByteCode) ++ JavaLanguage.deltas ++ ExtendedByteCode.allByteCodeDeltas
-
+    NullToByteCodeDelta, LogicalNotToByteCode) ++
+    Delta.spliceAndFilterTop(JavaLanguage.deltas, ExtendedByteCode.allByteCodeDeltas) // Removes the duplicate type deltas
 
   def spliceBeforeTransformations(bottom: Seq[Delta], splice: Seq[Delta]): Seq[Delta] =
     Delta.spliceAndFilterTop(getJava.topToBottom, bottom, splice)
