@@ -24,13 +24,13 @@ object AccessibilityFieldsDelta extends DeltaWithGrammar {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    create(Static, ("static" ~~> valueGrammar(true) | valueGrammar(false)) as Static)
+    create(Static, ("static" ~~> value(true) | value(false)) as Static)
 
     create(VisibilityField,
-      "public" ~~> valueGrammar(PublicVisibility) |
-        "protected" ~~> valueGrammar(ProtectedVisibility) |
-        "private" ~~> valueGrammar(PrivateVisibility) |
-        valueGrammar(DefaultVisibility) as VisibilityField)
+      "public" ~~> value(PublicVisibility) |
+        "protected" ~~> value(ProtectedVisibility) |
+        "private" ~~> value(PrivateVisibility) |
+        value(DefaultVisibility) as VisibilityField)
   }
 
   override def description: String = "Define static and visibility"

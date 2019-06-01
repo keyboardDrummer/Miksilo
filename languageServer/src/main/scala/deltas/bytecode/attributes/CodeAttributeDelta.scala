@@ -126,7 +126,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with HasBytes with HasShape 
     val maxLocalGrammar = "locals" ~ ":" ~> integer.as(CodeMaxLocalsKey)
     val nameGrammar = "name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val instructionsGrammar = instructionGrammar.manyVertical.indent().as(Instructions)
-    val exceptionTableGrammar = "Exceptions" ~ ":" %> valueGrammar(Seq.empty[Any])
+    val exceptionTableGrammar = "Exceptions" ~ ":" %> value(Seq.empty[Any])
     val body = (nameGrammar ~ ("," ~~ maxStackGrammar ~ maxLocalGrammar) %
       instructionsGrammar %
       attributesGrammar %

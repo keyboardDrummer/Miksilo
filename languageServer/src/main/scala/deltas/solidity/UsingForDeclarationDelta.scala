@@ -36,7 +36,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
     import grammars._
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val grammar = "using" ~~ identifier.as(LibraryName) ~~ "for" ~~
-      ("*" ~> valueGrammar(Wildcard) | typeGrammar).as(Type) ~ ";" asNode Shape
+      ("*" ~> value(Wildcard) | typeGrammar).as(Type) ~ ";" asNode Shape
     find(JavaClassDelta.Members).addAlternative(grammar)
   }
 

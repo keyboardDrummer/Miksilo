@@ -17,10 +17,10 @@ object WildcardTypeArgument extends DeltaWithGrammar with HasTypeDelta with HasS
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val byteCodeArgumentGrammar = find(TypeApplicationDelta.ByteCodeTypeArgumentGrammar)
-    byteCodeArgumentGrammar.addAlternative("*" ~> valueGrammar(new Node(Shape)))
+    byteCodeArgumentGrammar.addAlternative("*" ~> value(new Node(Shape)))
 
     val javaArgumentGrammar = find(TypeApplicationDelta.JavaTypeArgumentGrammar)
-    javaArgumentGrammar.addAlternative("?" ~> valueGrammar(new Node(Shape)))
+    javaArgumentGrammar.addAlternative("?" ~> value(new Node(Shape)))
   }
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {

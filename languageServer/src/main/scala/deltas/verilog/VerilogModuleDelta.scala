@@ -39,7 +39,7 @@ object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
     val member = create(MemberShape)
     val variable = find(VariableDelta.Shape)
-    val parameterList: BiGrammar = (variable.manySeparatedVertical(",").inParenthesis | valueGrammar(Seq.empty)).as(Ports)
+    val parameterList: BiGrammar = (variable.manySeparatedVertical(",").inParenthesis | value(Seq.empty)).as(Ports)
     val body: BiGrammar = member.manyVertical.as(Body)
     val moduleGrammar: BiGrammar = "module" ~~ find(Name) ~~ parameterList ~ ";" % body.indent() % "endmodule" asNode Shape
     find(VerilogFileDelta.Members).addAlternative(moduleGrammar)

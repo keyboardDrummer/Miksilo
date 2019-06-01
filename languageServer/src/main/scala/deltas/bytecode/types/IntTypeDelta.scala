@@ -17,12 +17,12 @@ object IntTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    new Keyword("I", false) ~> valueGrammar(intType)
+    new Keyword("I", false) ~> value(intType)
   }
 
   override def getJavaGrammar(grammars: LanguageGrammars) = {
     import grammars._
-    "int" ~> valueGrammar(intType)
+    "int" ~> value(intType)
   }
 
   val intType = new Node(Shape)

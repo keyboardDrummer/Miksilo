@@ -3,7 +3,7 @@ package core.parsers.editorParsers
 import core.language.node.SourceRange
 import core.parsers.core.OptimizingParserWriter
 
-trait CorrectingParserWriter extends OptimizingParserWriter with EditorParserWriter {
+trait CorrectingParserWriter extends EditorParserWriter {
 
   def parse[Result](parser: Self[Result], input: Input, mayStop: () => Boolean): ParseWholeResult[Result] = {
 

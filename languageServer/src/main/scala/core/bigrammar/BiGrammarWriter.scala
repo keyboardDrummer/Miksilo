@@ -32,7 +32,7 @@ trait BiGrammarWriter {
 
   def failure: BiGrammar = BiFailure()
 
-  def valueGrammar(value: Any): BiGrammar = ValueGrammar(value)
+  def value(value: Any): BiGrammar = ValueGrammar(value)
 
   def keywordClass(value: String): BiGrammar = Keyword(value, reserved = false, verifyWhenPrinting = true)
 

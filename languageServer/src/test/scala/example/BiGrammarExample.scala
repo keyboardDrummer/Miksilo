@@ -84,9 +84,9 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with WhitespaceTr
     case class Or(left: Any, right: Any, strict: Boolean)
     object Or extends NodeShape
 
-    val expression: BiGrammar = "true" ~> valueGrammar(true) | "false" ~> valueGrammar(false)
+    val expression: BiGrammar = "true" ~> value(true) | "false" ~> value(false)
 
-    val orGrammar = expression ~< "|" ~ ("|" ~> valueGrammar(false) | valueGrammar(true)) ~ expression.map[((Any, Boolean), Any), Or](
+    val orGrammar = expression ~< "|" ~ ("|" ~> value(false) | value(true)) ~ expression.map[((Any, Boolean), Any), Or](
       t => Or(t._1._1, t._2, t._1._2),
       or => ((or.left, or.strict), or.right))
 
@@ -94,7 +94,7 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with WhitespaceTr
     object Right extends NodeField
     object Strict extends NodeField
 
-    val strict = ("|" ~> valueGrammar(false) | valueGrammar(true)).as(Strict)
+    val strict = ("|" ~> value(false) | value(true)).as(Strict)
     val strictOrGrammarWithAs = expression.as(Left) ~< "|" ~ strict ~ expression.as(Right) asNode Or
   }
 }

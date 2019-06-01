@@ -48,8 +48,8 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val objectType = find(UnqualifiedObjectTypeDelta.AnyObjectTypeGrammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val inheritanceSpecifier: BiGrammar = objectType.as(SuperName) ~
-      (expression.someSeparated("," ~ printSpace).inParenthesis | valueGrammar(Seq.empty)).as(SuperArguments) asNode SuperShape
-    val inheritance = (printSpace ~ "is" ~~ inheritanceSpecifier.someSeparated("," ~ printSpace) | valueGrammar(Seq.empty)).as(SuperContracts)
+      (expression.someSeparated("," ~ printSpace).inParenthesis | value(Seq.empty)).as(SuperArguments) asNode SuperShape
+    val inheritance = (printSpace ~ "is" ~~ inheritanceSpecifier.someSeparated("," ~ printSpace) | value(Seq.empty)).as(SuperContracts)
     val member = create(JavaClassDelta.Members)
     val members = member.manySeparatedVertical(BlankLine).as(JavaClassDelta.Members)
     val contract = contractType ~~ identifier.as(Name) ~ inheritance ~ "{" % members % "}" asNode JavaClassDelta.Shape

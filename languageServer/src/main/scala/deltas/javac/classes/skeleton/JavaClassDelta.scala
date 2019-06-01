@@ -72,7 +72,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
     val importGrammar = create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical as ClassImports
     val packageGrammar = new BiChoice(keywordGrammar("package") ~~>
-      identifier.someSeparated(".") ~< ";", valueGrammar(Seq.empty), true) as ClassPackage
+      identifier.someSeparated(".") ~< ";", value(Seq.empty), true) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> find(Name)
     val membersGrammar = "{".%((classMember.manySeparatedVertical(BlankLine) as Members).indent(BlockDelta.indentAmount)) % "}"

@@ -21,12 +21,12 @@ object ByteTypeDelta extends ByteCodeTypeInstance {
 
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    "byte" ~> valueGrammar(me)
+    "byte" ~> value(me)
   }
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    Keyword("B", false) ~> valueGrammar(me)
+    Keyword("B", false) ~> value(me)
   }
 
   val constraintType = PrimitiveType("Byte")

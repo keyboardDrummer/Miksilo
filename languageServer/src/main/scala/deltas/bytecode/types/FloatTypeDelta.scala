@@ -19,12 +19,12 @@ object FloatTypeDelta extends ByteCodeTypeInstance
 
   override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    "float" ~> valueGrammar(floatType)
+    "float" ~> value(floatType)
   }
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    Keyword("F", false) ~> valueGrammar(floatType)
+    Keyword("F", false) ~> value(floatType)
   }
 
   override def description: String = "Adds the float type."

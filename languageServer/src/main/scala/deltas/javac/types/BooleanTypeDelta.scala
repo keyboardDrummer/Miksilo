@@ -21,14 +21,14 @@ object BooleanTypeDelta extends ByteCodeTypeInstance
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    Keyword("Z", reserved = false) ~> valueGrammar(booleanType)
+    Keyword("Z", reserved = false) ~> value(booleanType)
   }
 
   override def getStackType(_type: Node, language: Language): Node = IntTypeDelta.intType
 
   override def getJavaGrammar(grammars: LanguageGrammars) = {
     import grammars._
-    "boolean" ~> valueGrammar(booleanType)
+    "boolean" ~> value(booleanType)
   }
 
   val booleanType = new Node(Shape)
