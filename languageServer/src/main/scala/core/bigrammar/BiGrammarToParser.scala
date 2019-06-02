@@ -45,10 +45,12 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
   def valueToResult(value: Any): Result = (state: State) => (state, WithMap(value, Map.empty))
 
-  def toStringParser(grammar: BiGrammar): String => ParseWholeResult[Any] =
-    input => toParser(grammar).parseWholeInput(new Reader(input))
+  def toStringParser(grammar: BiGrammar): String => ParseWholeResult[Any] = {
+    val parser = toParserBuilder(grammar).getWholeInputParser()
+    input => parser(new Reader(input))
+  }
 
-  def toParser(grammar: BiGrammar): Self[Any] = {
+  def toParserBuilder(grammar: BiGrammar): Self[Any] = {
 
     var keywords: Set[String] = Set.empty
     val allGrammars: Set[BiGrammar] = grammar.selfAndDescendants.toSet
@@ -95,7 +97,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
         val secondParser = recursive(choice.right)
         firstParser | secondParser
 
-      case custom: CustomGrammarWithoutChildren => custom.getParser(keywords).map(valueToResult)
+      case custom: CustomGrammarWithoutChildren => custom.getParserBuilder(keywords).map(valueToResult)
       case custom: CustomGrammar => custom.toParser(recursive)
 
       case many: core.bigrammar.grammars.Many =>

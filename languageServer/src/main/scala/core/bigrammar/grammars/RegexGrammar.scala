@@ -8,7 +8,7 @@ import core.parsers.editorParsers.History
 
 case class RegexGrammar(regex: Regex, name: String, verifyWhenPrinting: Boolean = false, score: Double = History.successValue)
   extends StringGrammar(verifyWhenPrinting) {
-  override def getParser(keywords: scala.collection.Set[String]): Self[Any] = BiGrammarToParser.regex(regex, name)
+  override def getParserBuilder(keywords: scala.collection.Set[String]): Self[Any] = BiGrammarToParser.regex(regex, name)
 
   override def hashCode(): Int = regex.toString().hashCode
 

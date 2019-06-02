@@ -80,10 +80,10 @@ trait StringParserWriter extends SequenceParserWriter {
 
   case class Literal(value: String) extends EditorParserBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: GetParse): Parse[String] = {
+    override def getParser(recursive: GetParse): Parser[String] = {
 
 
-      lazy val result: Parse[String] = new Parse[String] {
+      lazy val result: Parser[String] = new Parser[String] {
         def apply(input: Input, state: ParseState): ParseResult[String] = {
           var index = 0
           val array = input.array
@@ -116,9 +116,9 @@ trait StringParserWriter extends SequenceParserWriter {
 
   case class RegexParser(regex: Regex, regexName: String, score: Double = History.successValue) extends EditorParserBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: GetParse): Parse[String] = {
+    override def getParser(recursive: GetParse): Parser[String] = {
 
-      lazy val result: Parse[String] = new Parse[String] {
+      lazy val result: Parser[String] = new Parser[String] {
         def apply(input: Input, state: ParseState): ParseResult[String] = {
           regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
             case Some(matched) =>

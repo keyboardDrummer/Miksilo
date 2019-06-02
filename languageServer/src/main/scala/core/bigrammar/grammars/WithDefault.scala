@@ -23,7 +23,7 @@ class WithDefault(inner: BiGrammar, _default: Any) extends CustomGrammar {
 }
 
 class BiFallback(value: Any, name: String) extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
-  override def getParser(keywords: collection.Set[String]) = Fallback(value, name)
+  override def getParserBuilder(keywords: collection.Set[String]) = Fallback(value, name)
 
   override def containsParser(recursive: BiGrammar => Boolean) = false
 

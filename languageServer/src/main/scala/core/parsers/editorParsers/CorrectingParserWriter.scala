@@ -4,14 +4,13 @@ import core.language.node.SourceRange
 
 trait CorrectingParserWriter extends EditorParserWriter {
 
-  def parse[Result](parser: Self[Result], input: Input, mayStop: () => Boolean): ParseWholeResult[Result] = {
+  private def parse[Result](parse: Parser[Result], input: Input, mayStop: () => Boolean): ParseWholeResult[Result] = {
 
     val noResultFound = ReadyParseResult(None, input, History.error(GenericError(input, "Grammar is always recursive", Int.MaxValue)))
     var bestResult: ReadyParseResult[Result] = noResultFound
 
     var resultsSeen = Set.empty[ReadyParseResult[Result]]
-    val start = System.currentTimeMillis()
-    var queue = parser.parseRoot(input)
+    var queue = parse(input, newParseState(input))
     while(queue.isInstanceOf[SRCons[Result]]) {
       val cons = queue.asInstanceOf[SRCons[Result]]
       val parseResult = cons.head
@@ -37,7 +36,6 @@ trait CorrectingParserWriter extends EditorParserWriter {
           cons.tail.merge(results)
       }
     }
-    System.out.println(s"Took: ${System.currentTimeMillis() - start} ms")
     ParseWholeResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 
@@ -62,7 +60,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
 
   override def succeed[NR](result: NR): Self[NR] = Succeed(result)
 
-  override def many[Result, Sum](original: OptimizingParser[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
+  override def many[Result, Sum](original: ParserBuilder[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
     lazy val result: Self[Sum] = choice(WithDefault(leftRight(original, result, reduce), zero), succeed(zero), firstIsLonger = true)
     result
   }
@@ -81,7 +79,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
     def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult]
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean): SortedParseResults[NewResult]
 
-    def recursionsFor[SeedResult](parse: Parse[SeedResult]): RecursionsList[SeedResult, Result]
+    def recursionsFor[SeedResult](parse: Parser[SeedResult]): RecursionsList[SeedResult, Result]
 
     def addHistory(errors: MyHistory): SortedParseResults[Result] = {
       mapWithHistory(x => x, errors)
@@ -118,7 +116,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
 
     override def toList = List.empty
 
-    override def recursionsFor[SeedResult](parse: Parse[SeedResult]): RecursionsList[SeedResult, Nothing] = RecursionsList(List.empty, this)
+    override def recursionsFor[SeedResult](parse: Parser[SeedResult]): RecursionsList[SeedResult, Nothing] = RecursionsList(List.empty, this)
   }
 
   final class SRCons[+Result](val head: LazyParseResult[Result],
@@ -175,7 +173,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
       }
     }
 
-    override def recursionsFor[SeedResult](parse: Parse[SeedResult]): RecursionsList[SeedResult, Result] = head match {
+    override def recursionsFor[SeedResult](parse: Parser[SeedResult]): RecursionsList[SeedResult, Result] = head match {
       case recursive: RecursiveParseResult[_, Result] =>
         val tailResult = tail.recursionsFor(parse)
         if (recursive.parser == parse)
@@ -202,8 +200,8 @@ trait CorrectingParserWriter extends EditorParserWriter {
   }
 
   case class RecursiveParseResult[SeedResult, +Result](input: Input,
-                                                      parser: Parse[SeedResult],
-                                                      get: ParseResult[SeedResult] => ParseResult[Result])
+                                                       parser: Parser[SeedResult],
+                                                       get: ParseResult[SeedResult] => ParseResult[Result])
     extends LazyParseResult[Result] {
 
     def history = History.empty[Input]
@@ -288,11 +286,11 @@ trait CorrectingParserWriter extends EditorParserWriter {
 
     lazy val right: Self[Right] = _right
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       val parseLeft = recursive(left)
       lazy val parseRight = recursive(right)
 
-      new Parse[Result] {
+      new Parser[Result] {
         override def apply(input: Input, state: ParseState) = {
           val leftResults = parseLeft(input, state)
 
@@ -342,13 +340,13 @@ trait CorrectingParserWriter extends EditorParserWriter {
 
     def withDefault[Other >: Result](_default: Other): Self[Other] = WithDefault(parser, _default)
 
-    def parseWholeInput(input: Input, mayStop: () => Boolean = () => true): ParseWholeResult[Result] = {
-      parse(ParseWholeInput(parser), input, mayStop)
+    def getParse(mayStop: () => Boolean): Input => ParseWholeResult[Result] = {
+      val analysis = compile(this.parser)
+      input => parse(analysis.getParse(this.parser), input, mayStop)
     }
 
-    override def parseRoot(input: Input): ParseResult[Result] = {
-      val analysis = compile(parser)
-      analysis.getParse(parser)(input, newParseState(input))
+    def getWholeInputParser(mayStop: () => Boolean = () => true): Input => ParseWholeResult[Result] = {
+      ParseWholeInput(parser).getParse(mayStop)
     }
 
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Self[Other] = {
@@ -359,10 +357,10 @@ trait CorrectingParserWriter extends EditorParserWriter {
   case class ParseWholeInput[Result](original: Self[Result])
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       val parseOriginal = recursive(original)
 
-      new Parse[Result] {
+      new Parser[Result] {
         override def apply(input: Input, state: ParseState) = {
           val result = parseOriginal(input, state)
           result.mapReady(parseResult => {
@@ -384,11 +382,11 @@ trait CorrectingParserWriter extends EditorParserWriter {
 
     lazy val second = _second
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      new Parse[Result] {
+      new Parser[Result] {
         override def apply(input: Input, state: ParseState) = {
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
@@ -407,11 +405,11 @@ trait CorrectingParserWriter extends EditorParserWriter {
 
     lazy val second = _second
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      new Parse[Result] {
+      new Parser[Result] {
         override def apply(input: Input, state: ParseState) = {
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
@@ -427,7 +425,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
                                             getMessage: Other => String)
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         val originalResult = parseOriginal(input, state)
@@ -448,7 +446,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
   case class WithRangeParser[Result, NewResult](original: Self[Result], addRange: (Input, Input, Result) => NewResult)
     extends EditorParserBase[NewResult] with ParserWrapper[NewResult] {
 
-    override def getParser(recursive: GetParse): Parse[NewResult] = {
+    override def getParser(recursive: GetParse): Parser[NewResult] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         parseOriginal(input, state).mapReady(ready => {
@@ -460,7 +458,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
   }
 
   case class Fallback[Result](value: Result, name: String) extends EditorParserBase[Result] with LeafParser[Result] { // TODO combine with failure?
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       (input, _) => {
         val result = ReadyParseResult(Some(value), input, History.error(new MissingInput(input, name, History.insertFallbackPenalty)))
         singleResult(result)
@@ -474,7 +472,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
                                  name: Option[String] = None) // TODO last parameter is only used by keywords using filter, can we replace that usage?
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       val parseOriginal = recursive(original)
 
       def apply(input: Input, state: ParseState): ParseResult[Result] = {
@@ -497,9 +495,9 @@ trait CorrectingParserWriter extends EditorParserWriter {
 
   case class DropParser[Result](original: Self[Result]) extends EditorParserBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       val parseOriginal = recursive(original)
-      lazy val result = new Parse[Result] {
+      lazy val result = new Parser[Result] {
 
         override def apply(input: Input, state: ParseState): ParseResult[Result] = {
           val originalResult = parseOriginal(input, state)

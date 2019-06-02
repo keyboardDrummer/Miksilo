@@ -13,7 +13,7 @@ import core.responsiveDocument.ResponsiveDocument
 abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
   extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren
 {
-  lazy val parser = getParser(Set.empty) //TODO hacky Set.empty
+  lazy val parser = getParserBuilder(Set.empty).getWholeInputParser() //TODO hacky Set.empty
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 
@@ -21,7 +21,7 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
     from.value match {
       case string: String =>
         if (verifyWhenPrinting) {
-          val parseResult = parser.parseWholeInput(new Reader(string))
+          val parseResult = parser(new Reader(string))
           parseResult.resultOption match {
             case Some(result) if parseResult.successful && result.equals(from.value) => TryState.value(string)
             case _ => Printer.fail("StringGrammar could not parse string")

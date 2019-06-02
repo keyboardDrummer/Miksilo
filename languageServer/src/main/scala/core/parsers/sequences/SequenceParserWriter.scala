@@ -16,7 +16,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class ElemPredicate(predicate: Elem => Boolean, kind: String)
     extends EditorParserBase[Elem] with LeafParser[Elem] {
 
-    override def getParser(recursive: GetParse): Parse[Elem] = {
+    override def getParser(recursive: GetParse): Parser[Elem] = {
 
       def apply(input: Input, state: ParseState): ParseResult[Elem] = {
         if (input.atEnd) {

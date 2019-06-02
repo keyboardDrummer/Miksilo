@@ -35,11 +35,11 @@ object IncludeDelta extends DirectiveDelta {
     }
   }
 
-  val parserProp = new Property[Self[Any]](null)
+  val parserProp = new Property[Input => ParseWholeResult[Any]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    parserProp.add(language, toParser(language.grammars.root))
+    parserProp.add(language, toParserBuilder(language.grammars.root).getWholeInputParser())
   }
 
   override def dependencies: Set[Contract] = Set(PreprocessorDelta)

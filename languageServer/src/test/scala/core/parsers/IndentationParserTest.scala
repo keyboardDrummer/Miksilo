@@ -22,7 +22,7 @@ class IndentationParserTest extends FunSuite with LeftRecursiveCorrectingParserW
         | a
       """.stripMargin
 
-    val result = expression.parseWholeInput(new IndentationReader(program))
+    val result = expression.getWholeInputParser()(new IndentationReader(program))
     assert(result.successful)
   }
 }

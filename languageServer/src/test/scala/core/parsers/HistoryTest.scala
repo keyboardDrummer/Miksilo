@@ -73,7 +73,7 @@ class HistoryTest extends FunSuite with StringParserWriter {
     override def drop(amount: Int) = new IndexInput(offset + amount)
   }
 
-  override def wrapParse[Result](parser: Parse[Result], shouldCache: Boolean, shouldDetectLeftRecursion: Boolean) = ???
+  override def wrapParse[Result](parser: Parser[Result], shouldCache: Boolean, shouldDetectLeftRecursion: Boolean) = ???
 
   override def newParseState(input: IndexInput) = ???
 

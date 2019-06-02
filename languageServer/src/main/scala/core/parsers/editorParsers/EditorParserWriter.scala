@@ -63,23 +63,23 @@ trait EditorParserWriter extends OptimizingParserWriter {
   def newSuccess[Result](result: Result, remainder: Input, score: Double): ParseResult[Result]
   case class Succeed[Result](value: Result) extends EditorParserBase[Result] with LeafParser[Result] {
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       (input: Input, _) => newSuccess(value, input, 0)
     }
 
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  trait EditorParserBase[Result] extends ParserBase[Result] with OptimizingParser[Result] {
+  trait EditorParserBase[Result] extends ParserBuilderBase[Result] with ParserBuilder[Result] {
   }
 
   class MapParser[Result, NewResult](val original: Self[Result], f: Result => NewResult)
     extends EditorParserBase[NewResult] with ParserWrapper[NewResult] {
 
-    override def getParser(recursive: GetParse): Parse[NewResult] = {
+    override def getParser(recursive: GetParse): Parser[NewResult] = {
       val parseOriginal = recursive(original)
 
-      new Parse[NewResult] {
+      new Parser[NewResult] {
         override def apply(input: Input, state: ParseState): ParseResult[NewResult] = parseOriginal(input, state).map(f)
       }
     }
@@ -99,7 +99,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
   case class Fail[Result](value: Option[Result], message: String, penalty: Double)
     extends EditorParserBase[Result] with LeafParser[Result] {
 
-    override def getParser(recursive: GetParse): Parse[Result] = {
+    override def getParser(recursive: GetParse): Parser[Result] = {
       (input, _) => newFailure(value, input, History.error(GenericError(input, message, penalty)))
     }
 

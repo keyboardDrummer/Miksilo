@@ -9,7 +9,7 @@ class ErrorReportingTest extends FunSuite with CommonStringReaderParser with Lef
     lazy val head: Self[Any] = new Lazy(head) ~ "#" | "!"
 
     val input = "@@"
-    val parseResult = head.parseWholeInput(new StringReader(input))
+    val parseResult = head.getWholeInputParser()(new StringReader(input))
     assert(!parseResult.successful)
     assertResult("expected '!' but found '@'")(parseResult.errors.last.message)
   }
@@ -18,7 +18,7 @@ class ErrorReportingTest extends FunSuite with CommonStringReaderParser with Lef
     lazy val head: Self[Any] = "!" | new Lazy(head) ~ "#"
 
     val input = "@@"
-    val parseResult = head.parseWholeInput(new StringReader(input))
+    val parseResult = head.getWholeInputParser()(new StringReader(input))
     assert(!parseResult.successful)
     assertResult("expected '!' but found '@'")(parseResult.errors.last.message)
   }

@@ -21,7 +21,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
         keywords.add(keyword.value)
         literalOrKeyword(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
       case delimiter: Delimiter => literalOrKeyword(delimiter.value) ^^ (s => MyToken(TokenTypes.SEPARATOR, s))
-      case identifier: Identifier => identifier.getParser(keywords) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
+      case identifier: Identifier => identifier.getParserBuilder(keywords) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
       case NumberGrammar => wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s)) //TODO should support other numbers as well.
       case StringLiteral =>
         stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
@@ -35,6 +35,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     val errorToken = regex(new Regex("."), "anything") ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
     (allTokenParsers.reduce((a, b) => a | b) | errorToken).*
   }
+  lazy val optimizedParser = parser.getWholeInputParser()
 
   override def getWordsToHighlight: TokenMap = new TokenMap()
 
@@ -42,7 +43,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
     resetTokenList()
 
-    val resultOption: ParseWholeResult[Seq[MyToken]] = parser.parseWholeInput(new Reader(text.toString))
+    val resultOption: ParseWholeResult[Seq[MyToken]] = optimizedParser(new Reader(text.toString))
     var start = text.offset
     if (resultOption.successful) {
       val tokens = resultOption.get

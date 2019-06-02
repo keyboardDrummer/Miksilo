@@ -29,16 +29,15 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
     }
   }
 
-  def parseStream[T](parser: Self[T], input: InputStream): ParseWholeResult[T] = {
-    val reader = new Reader(SourceUtils.streamToString(input))
-    parser.parseWholeInput(reader)
+  def parseStream[T](parser: Input => ParseWholeResult[T], input: InputStream): ParseWholeResult[T] = {
+    parser(new Reader(SourceUtils.streamToString(input)))
   }
 
-  val parserProp = new Property[Self[Node]](null)
+  val parserProp = new Property[Input => ParseWholeResult[Node]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    parserProp.add(language, toParser(language.grammars.root).map(r => r.asInstanceOf[Node]))
+    parserProp.add(language, toParserBuilder(language.grammars.root).map(r => r.asInstanceOf[Node]).getWholeInputParser())
   }
 
   override def description: String = "Parses the input file using a textual grammar."

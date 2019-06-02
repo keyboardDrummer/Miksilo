@@ -33,7 +33,7 @@ object InlineAssemblyStatementDelta extends DeltaWithGrammar with HasConstraints
     val hexNumber: BiGrammar = "0" ~ ("x" | "X") ~ hexCharacter.some
 
     val decimalLiteral: BiGrammar = new StringGrammar {
-      override def getParser(keywords: collection.Set[String]) = BiGrammarToParser.floatingPointNumber
+      override def getParserBuilder(keywords: collection.Set[String]) = BiGrammarToParser.floatingPointNumber
     }
     val assemblyLiteral: BiGrammar = StringLiteral | hexLiteral | decimalLiteral | hexNumber
     assemblyExpression.addAlternative(assemblyLiteral)

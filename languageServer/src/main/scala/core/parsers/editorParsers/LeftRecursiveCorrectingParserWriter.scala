@@ -4,7 +4,7 @@ import scala.collection.mutable
 
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
-  class CheckCache[Result](parser: Parse[Result]) extends Parse[Result] {
+  class CheckCache[Result](parser: Parser[Result]) extends Parser[Result] {
 // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
     val cache = mutable.HashMap[(Input, ParseState), ParseResult[Result]]()
 
@@ -25,11 +25,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   override def newParseState(input: Input) = FixPointState(input, Set.empty)
 
-  case class FixPointState(input: Input, parsers: Set[Parse[Any]]) {
+  case class FixPointState(input: Input, parsers: Set[Parser[Any]]) {
     def key = this
   }
 
-  case class DetectFixPointAndCache[Result](parser: Parse[Result]) extends CheckCache[Result](parser) {
+  case class DetectFixPointAndCache[Result](parser: Parser[Result]) extends CheckCache[Result](parser) {
 
     override def apply(input: Input, state: ParseState): ParseResult[Result] = {
       val key = (input, state.key)
@@ -96,9 +96,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  override def wrapParse[Result](parser: Parse[Result],
+  override def wrapParse[Result](parser: Parser[Result],
                                  shouldCache: Boolean,
-                                 shouldDetectLeftRecursion: Boolean): Parse[Result] = {
+                                 shouldDetectLeftRecursion: Boolean): Parser[Result] = {
       if (!shouldCache && !shouldDetectLeftRecursion) {
         return parser
       }
