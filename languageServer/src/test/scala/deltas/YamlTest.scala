@@ -30,7 +30,7 @@ class YamlTest extends FunSuite {
     """.stripMargin
   lazy val twoMemberObjectCompilation = language.compile(twoMemberObject)
 
-  test("two member object with no first value") {
+  ignore("two member object with no first value") {
     val program =
       """Missing:
         |Key: Value
@@ -47,7 +47,7 @@ class YamlTest extends FunSuite {
     assert(compilation.diagnostics.size == 1)
   }
 
-  test("two member object with no first value and colon") {
+  ignore("two member object with no first value and colon") {
     val program =
       """Missing
         |Key: Value
@@ -68,7 +68,7 @@ class YamlTest extends FunSuite {
       |  HasValue2: Value2
     """.stripMargin
   lazy val twoObjectsSingleMemberEachCompilation = language.compile(twoObjectsSingleMemberEach)
-  test("complicated middle errors") {
+  ignore("complicated middle errors") {
     val program =
       """Parent1:
         |  HasValue: Value Value Value
