@@ -6,7 +6,7 @@ import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.ConcreteScope
 import core.smarts.types.objects.PrimitiveType
-import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, ObjectLiteral}
+import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, ObjectLiteral, ObjectLiteralMember}
 import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
 import play.api.libs.json.{JsObject, Json}
 import util.SourceUtils
@@ -39,8 +39,9 @@ object CloudFormationTemplate extends Delta {
   }
 
   private def handleResources(builder: ConstraintBuilder, rootScope: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
-    val resources: ObjectLiteral[NodePath] = program.getValue("Resources")
-    for (resource <- resources.members) {
+    val resources: Option[ObjectLiteral[NodePath]] = program.get("Resources").map(v => ObjectLiteral(v))
+    val members = resources.fold(Seq.empty[ObjectLiteralMember[NodePath]])(o => o.members)
+    for (resource <- members) {
       builder.declareSourceElement(resource.getSourceElement(MemberKey), rootScope, Some(valueType))
 
       val resourceMembers: ObjectLiteral[NodePath] = resource.value
