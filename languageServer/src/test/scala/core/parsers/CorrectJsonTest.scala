@@ -194,7 +194,7 @@ class CorrectJsonTest extends FunSuite {
     assertResult(errorCount)(result.errors.size)
   }
 
-  private def getSuccessValue(result: ParseWholeResult[Any]) = {
+  private def getSuccessValue(result: SingleParseResult[Any]) = {
     assert(result.successful)
     result.resultOption.get
   }

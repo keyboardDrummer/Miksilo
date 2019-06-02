@@ -55,7 +55,7 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   override def succeed[Result](result: Result): Self[Result] = Succeed(result)
 
-  case class ParseWholeResult[Result](resultOption: Option[Result], errors: List[MyParseError]) {
+  case class SingleParseResult[Result](resultOption: Option[Result], errors: List[MyParseError]) {
     def successful = errors.isEmpty
     def get: Result = resultOption.get
   }

@@ -15,7 +15,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
 
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
-    val parseResult: ParseWholeResult[Node] = parseStream(parser, inputStream)
+    val parseResult: SingleParseResult[Node] = parseStream(parser, inputStream)
     parseResult.resultOption.foreach(program => {
       compilation.program = program
       compilation.program.startOfUri = Some(uri)
@@ -29,11 +29,11 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
     }
   }
 
-  def parseStream[T](parser: Input => ParseWholeResult[T], input: InputStream): ParseWholeResult[T] = {
+  def parseStream[T](parser: Input => SingleParseResult[T], input: InputStream): SingleParseResult[T] = {
     parser(new Reader(SourceUtils.streamToString(input)))
   }
 
-  val parserProp = new Property[Input => ParseWholeResult[Node]](null)
+  val parserProp = new Property[Input => SingleParseResult[Node]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

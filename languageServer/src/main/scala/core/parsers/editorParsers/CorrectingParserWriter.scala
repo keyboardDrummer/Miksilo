@@ -4,13 +4,13 @@ import core.language.node.SourceRange
 
 trait CorrectingParserWriter extends EditorParserWriter {
 
-  private def parse[Result](parse: Parser[Result], input: Input, mayStop: () => Boolean): ParseWholeResult[Result] = {
+  private def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: () => Boolean): SingleParseResult[Result] = {
 
     val noResultFound = ReadyParseResult(None, input, History.error(GenericError(input, "Grammar is always recursive", Int.MaxValue)))
     var bestResult: ReadyParseResult[Result] = noResultFound
 
     var resultsSeen = Set.empty[ReadyParseResult[Result]]
-    var queue = parse(input, newParseState(input))
+    var queue = parser(input, newParseState(input))
     while(queue.isInstanceOf[SRCons[Result]]) {
       val cons = queue.asInstanceOf[SRCons[Result]]
       val parseResult = cons.head
@@ -36,7 +36,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
           cons.tail.merge(results)
       }
     }
-    ParseWholeResult(bestResult.resultOption, bestResult.history.errors.toList)
+    SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 
   def singleResult[Result](parseResult: LazyParseResult[Result]) =
@@ -340,13 +340,13 @@ trait CorrectingParserWriter extends EditorParserWriter {
 
     def withDefault[Other >: Result](_default: Other): Self[Other] = WithDefault(parser, _default)
 
-    def getParse(mayStop: () => Boolean): Input => ParseWholeResult[Result] = {
-      val analysis = compile(this.parser)
-      input => parse(analysis.getParse(this.parser), input, mayStop)
+    def getParser(mayStop: () => Boolean): Input => SingleParseResult[Result] = {
+      val parser = compile(this.parser).buildParser(this.parser)
+      input => findBestParseResult(parser, input, mayStop)
     }
 
-    def getWholeInputParser(mayStop: () => Boolean = () => true): Input => ParseWholeResult[Result] = {
-      ParseWholeInput(parser).getParse(mayStop)
+    def getWholeInputParser(mayStop: () => Boolean = () => true): Input => SingleParseResult[Result] = {
+      ParseWholeInput(parser).getParser(mayStop)
     }
 
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Self[Other] = {
