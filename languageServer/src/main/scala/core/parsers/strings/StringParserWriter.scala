@@ -71,9 +71,32 @@ trait StringParserWriter extends SequenceParserWriter {
   implicit def literalOrKeyword(value: String): Self[String] = {
     val isKeyword = identifierRegex.findFirstIn(value).contains(value)
     if (isKeyword)
-      return WithDefault(identifier.filter(s => s == value, s => s"$s was not $value"), value, Some(value))
+      return KeywordParser(value)
 
     Literal(value)
+  }
+
+  case class KeywordParser(value: String) extends ParserBase[String] with ParserWrapper[String] {
+    override def getParser(recursive: GetParse) = {
+      val parseIdentifier = recursive(identifier)
+      (input, state) => {
+        parseIdentifier(input, state).mapReady(ready => {
+          if (ready.resultOption.contains(value)) {
+            ready
+          } else {
+            val error =
+              if (ready.remainder == input)
+                new MissingInput(input, value, History.missingInputPenalty)
+              else
+                MissingInput(input, ready.remainder, value, History.missingInputPenalty)
+
+            ReadyParseResult(Some(value), ready.remainder, History.error(error))
+          }
+        }, uniform = false)
+      }
+    }
+
+    override def original: OptimizingParser[String] = identifier
   }
 
   implicit def regex(value: Regex, regexName: String, score: Double = History.successValue): RegexParser = RegexParser(value, regexName, score)
@@ -94,7 +117,7 @@ trait StringParserWriter extends SequenceParserWriter {
                 History.error(new MissingInput(input, s"'$value'", History.endOfSourceInsertion))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               return singleResult(ReadyParseResult(Some(value), input,
-                History.error(MissingInput(input, input.drop(index + 1), s"'$value'", History.insertLiteralPenalty))))
+                History.error(MissingInput(input, input.drop(index + 1), s"'$value'", History.missingInputPenalty))))
             }
             index += 1
           }
@@ -126,7 +149,7 @@ trait StringParserWriter extends SequenceParserWriter {
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
-              singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, regexName, History.insertRegexPenalty))))
+              singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, regexName, History.missingInputPenalty))))
           }
         }
       }

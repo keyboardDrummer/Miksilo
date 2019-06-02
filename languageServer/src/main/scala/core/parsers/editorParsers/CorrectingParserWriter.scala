@@ -10,7 +10,6 @@ trait CorrectingParserWriter extends EditorParserWriter {
     var bestResult: ReadyParseResult[Result] = noResultFound
 
     var resultsSeen = Set.empty[ReadyParseResult[Result]]
-    val start = System.currentTimeMillis()
     var queue = parser.parseRoot(input)
     while(queue.isInstanceOf[SRCons[Result]]) {
       val cons = queue.asInstanceOf[SRCons[Result]]
@@ -37,7 +36,6 @@ trait CorrectingParserWriter extends EditorParserWriter {
           cons.tail.merge(results)
       }
     }
-    System.out.println(s"Took: ${System.currentTimeMillis() - start} ms")
     ParseWholeResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 
@@ -437,7 +435,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
               if (predicate(result))
                 ready
               else ReadyParseResult(None, ready.remainder,
-                ready.history.addError(GenericError(ready.remainder, getMessage(result), History.genericErrorPenalty)))
+                ready.history.addError(GenericError(ready.remainder, getMessage(result), History.missingInputPenalty)))
             case None => ready
           }
         }, uniform = false)
@@ -470,8 +468,7 @@ trait CorrectingParserWriter extends EditorParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class WithDefault[Result](original: Self[Result], _default: Result,
-                                 name: Option[String] = None) // TODO last parameter is only used by keywords using filter, can we replace that usage?
+  case class WithDefault[Result](original: Self[Result], _default: Result)
     extends EditorParserBase[Result] with ParserWrapper[Result] {
 
     override def getParser(recursive: GetParse): Parse[Result] = {
@@ -480,13 +477,8 @@ trait CorrectingParserWriter extends EditorParserWriter {
       def apply(input: Input, state: ParseState): ParseResult[Result] = {
         val result = parseOriginal(input, state)
         result.mapReady(ready => {
-          val newHistory = name.fold(ready.history)(name => ready.history match {
-            case SingleError(score, MissingInput(from, to, _, penalty)) =>
-              SingleError(score, MissingInput(from, to, name, penalty))
-            case history => history
-          })
           if (ready.resultOption.isEmpty || ready.remainder == input) {
-            ReadyParseResult(Some(_default), ready.remainder, newHistory)
+            ReadyParseResult(Some(_default), ready.remainder, ready.history)
           } else
             ready
         }, uniform = true)

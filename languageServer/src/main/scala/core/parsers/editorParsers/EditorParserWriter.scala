@@ -19,9 +19,6 @@ trait EditorParserWriter extends OptimizingParserWriter {
 
   case class MissingInput(from: Input, to: Input, expectation: String, penalty: Double) extends ParseError[Input] {
 
-    if (this.toString == "expected '.' but found ')'") {
-      System.out.append("")
-    }
     def this(from: Input, expectation: String, penalty: Double) =
       this(from, if (from.atEnd) from else from.drop(1), expectation, penalty)
 
