@@ -210,7 +210,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     }
 
     override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
-      if (mergeDepth > 300) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
+      if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
         return SREmpty
 
       other match {

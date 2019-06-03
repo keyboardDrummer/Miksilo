@@ -47,11 +47,6 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
     }
 
-    //it can keep trying to grow the same shit indefinitely if there is a recursive loop that doesn't parse anything.
-    /*
-    Previous bevat ook recursions van andere fixpoints, die kunnen dus als seed gebruikt worden,
-    echter zijn ze dan een soort delay.. wanneer gaan ze dan verder?
-     */
     def grow(recursions: List[RecursiveParseResult[Result, Result]], previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
       // TODO Consider replacing the previous.merge by moving that inside the lambda.
       previous.merge(previous.flatMapReady(prev => {

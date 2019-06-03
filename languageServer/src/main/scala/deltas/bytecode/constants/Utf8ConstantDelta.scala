@@ -29,15 +29,7 @@ object Utf8ConstantDelta extends ConstantPoolEntry {
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    val regex = """[^\s,.]+""".r
-    // Cases like java/lang/Object are handled by QualifiedClassNameConstantDelta
-    ( regexGrammar(regex, "utf8 constant string")
-      /*getIdentifier(verifyWhenPrinting = true) |*/
-//      keywordClass("<init>") |
-//      keywordClass("<clinit>") |
-//      stringLiteral
-      //TODO misschien een aparte constant maken voor 'Names'
-      ).as(Value)
+    regexGrammar("""[^\s,.]+""".r, "utf8 constant string").as(Value)
   }
 
   override def description: String = "A string constant"

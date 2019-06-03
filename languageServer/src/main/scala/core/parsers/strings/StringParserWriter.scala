@@ -11,8 +11,6 @@ trait StringParserWriter extends SequenceParserWriter {
   type Elem = Char
   type Input <: StringReaderLike
 
-  val consecutiveErrorPowerDiscount = 0.5
-
   abstract class StringReaderBase(val array: ArrayCharSequence, val offset: Int, val position: Position)
     extends StringReaderLike {
 

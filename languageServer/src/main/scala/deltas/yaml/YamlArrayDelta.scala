@@ -15,12 +15,10 @@ object YamlArrayDelta extends DeltaWithGrammar {
     val blockValue = find(YamlCoreDelta.IndentationSensitiveExpression)
     val blockArray: BiGrammar = {
       val element = keywordGrammar("- ") ~> CheckIndentationGrammar.greaterThan(blockValue)
-      CheckIndentationGrammar.aligned(_grammars, element).as(M2).asNode(ArrayLiteralDelta.Shape)
+      CheckIndentationGrammar.aligned(_grammars, element).as(ArrayLiteralDelta.Members).asNode(ArrayLiteralDelta.Shape)
     }
     blockValue.addAlternative(blockArray)
   }
-
-  object M2 extends NodeField
 
   override def description = "Adds the indentation sensitive literal array"
 

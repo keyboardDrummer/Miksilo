@@ -24,7 +24,7 @@ object ExpressionDelta extends DeltaWithGrammar with ExpressionInstance {
   val constraintType = new TypedNodeField[Type]("constraintType")
   val nodeType = new TypedNodeField[Node]("nodeType")
 
-  def constraints2(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
+  def getConstraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     constraintType(expression) = _type
     getInstance(compilation)(expression).constraints(compilation, builder, expression, _type, parentScope)
   }
@@ -45,7 +45,7 @@ object ExpressionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   def getType(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, parentScope: Scope): Type = {
     val result = builder.typeVariable(Some(expression))
-    constraints2(compilation, builder, expression, result, parentScope)
+    getConstraints(compilation, builder, expression, result, parentScope)
     result
   }
 

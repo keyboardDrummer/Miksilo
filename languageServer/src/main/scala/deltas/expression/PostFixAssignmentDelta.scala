@@ -33,7 +33,7 @@ trait PostFixAssignmentDelta extends DeltaWithGrammar with ExpressionInstance {
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, plusPlus: NodePath, _type: Type, parentScope: Scope): Unit = {
     builder.typesAreEqual(IntTypeDelta.constraintType, _type)
     val target = plusPlus(SimpleAssignmentDelta.Target).asInstanceOf[NodePath]
-    ExpressionDelta.constraints2(compilation, builder, target, _type, parentScope)
+    ExpressionDelta.getConstraints(compilation, builder, target, _type, parentScope)
   }
 }
 
