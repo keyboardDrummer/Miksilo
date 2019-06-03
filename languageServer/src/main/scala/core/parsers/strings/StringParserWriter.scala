@@ -71,7 +71,7 @@ trait StringParserWriter extends SequenceParserWriter {
   implicit def literalOrKeyword(value: String): Self[String] = {
     val isKeyword = identifierRegex.findFirstIn(value).contains(value)
     if (isKeyword)
-      return WithDefault(identifier.filter(s => s == value, s => s"$s was not $value"), value, Some(value))
+      return KeywordParser(value)
 
     Literal(value)
   }
@@ -80,8 +80,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
   case class Literal(value: String) extends ParserBuilderBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: GetParse): Parser[String] = {
-
+    override def getParser(recursive: GetParser): Parser[String] = {
 
       lazy val result: Parser[String] = new Parser[String] {
         def apply(input: Input, state: ParseState): ParseResult[String] = {
@@ -109,6 +108,30 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
   }
 
+  case class KeywordParser(value: String) extends ParserBuilderBase[String] with ParserWrapper[String] {
+    override def getParser(recursive: GetParser): Parser[String] = {
+      val parseIdentifier = recursive(identifier)
+      (input, state) => {
+        parseIdentifier(input, state).mapReady(ready => {
+          if (ready.resultOption.contains(value)) {
+            ready
+          } else {
+            val error =
+              if (ready.remainder == input)
+                new MissingInput(input, value, History.missingInputPenalty)
+              else
+                MissingInput(input, ready.remainder, value, History.missingInputPenalty)
+
+            ReadyParseResult(Some(value), ready.remainder, History.error(error))
+          }
+        }, uniform = false)
+      }
+    }
+
+    override def original: Self[String] = identifier
+  }
+
+  
   trait NextCharError extends ParseError[Input] {
     def to: Input = if (this.from.atEnd) this.from else this.from.drop(1)
     def range = SourceRange(from.position, to.position)
@@ -116,7 +139,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
   case class RegexParser(regex: Regex, regexName: String, score: Double = History.successValue) extends ParserBuilderBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: GetParse): Parser[String] = {
+    override def getParser(recursive: GetParser): Parser[String] = {
 
       lazy val result: Parser[String] = new Parser[String] {
         def apply(input: Input, state: ParseState): ParseResult[String] = {

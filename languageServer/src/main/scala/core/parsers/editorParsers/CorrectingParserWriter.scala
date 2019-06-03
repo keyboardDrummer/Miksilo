@@ -273,7 +273,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     lazy val right: Self[Right] = _right
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       val parseLeft = recursive(left)
       lazy val parseRight = recursive(right)
 
@@ -310,7 +310,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
@@ -333,7 +333,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
@@ -351,7 +351,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   case class WithRangeParser[Result, NewResult](original: Self[Result], addRange: (Input, Input, Result) => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
-    override def getParser(recursive: GetParse): Parser[NewResult] = {
+    override def getParser(recursive: GetParser): Parser[NewResult] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         parseOriginal(input, state).mapReady(ready => {
@@ -374,7 +374,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       (input: Input, _) => newSuccess(value, input, 0)
     }
 
@@ -384,7 +384,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   class MapParser[Result, NewResult](val original: Self[Result], f: Result => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
-    override def getParser(recursive: GetParse): Parser[NewResult] = {
+    override def getParser(recursive: GetParser): Parser[NewResult] = {
       val parseOriginal = recursive(original)
 
       new Parser[NewResult] {

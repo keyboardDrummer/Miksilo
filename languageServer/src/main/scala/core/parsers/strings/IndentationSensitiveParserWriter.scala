@@ -15,7 +15,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   case class WithIndentation[Result](original: Self[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result]{
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       val parseOriginal = recursive(original)
 
       def apply(input: Input, state: ParseState) = {
@@ -53,7 +53,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: Self[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse) = {
+    override def getParser(recursive: GetParser) = {
       val parseOriginal = recursive(original).asInstanceOf[Parser[Result]]
 
       def apply(input: Input, state: ParseState) = {

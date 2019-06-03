@@ -18,12 +18,12 @@ trait OptimizingParserWriter extends ParserWriter {
     def debugName: Any = null
   }
 
-  trait GetParse {
+  trait GetParser {
     def apply[Result](parser: Self[Result]): Parser[Result]
   }
 
   trait ParserBuilder[+Result] {
-    def getParser(recursive: GetParse): Parser[Result]
+    def getParser(recursive: GetParser): Parser[Result]
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[ParserBuilder[_]]
@@ -70,7 +70,7 @@ trait OptimizingParserWriter extends ParserWriter {
     lazy val original: Self[Result] = _original
     def getOriginal = original
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       lazy val parseOriginal = recursive(original)
       new Parser[Result] {
         override def apply(input: Input, state: ParseState) = {
@@ -99,7 +99,7 @@ trait OptimizingParserWriter extends ParserWriter {
   case class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
-    override def getParser(recursive: GetParse): Parser[NewResult] = {
+    override def getParser(recursive: GetParser): Parser[NewResult] = {
       val parseOriginal = recursive(original)
       (input, state) => parseOriginal(input, state).map(f)
     }
@@ -147,7 +147,7 @@ trait OptimizingParserWriter extends ParserWriter {
     def buildParser[Result](root: Self[Result]): Parser[Result] = {
       val cacheOfParses = new mutable.HashMap[Self[Any], Parser[Any]]
       var caches = List.empty[CheckCache[_]]
-      def recursive: GetParse = new GetParse {
+      def recursive: GetParser = new GetParser {
         override def apply[SomeResult](_parser: Self[SomeResult]): Parser[SomeResult] = {
           cacheOfParses.getOrElseUpdate(_parser, {
             val parser = _parser.asInstanceOf[ParserBuilder[SomeResult]]

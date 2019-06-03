@@ -21,7 +21,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class Fail[Result](value: Option[Result], message: String, penalty: Double)
     extends ParserBuilderBase[Result] with LeafParser[Result] {
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       (input, _) => newFailure(value, input, History.error(FatalError(input, message, penalty)))
     }
 
@@ -35,7 +35,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
   case class DropParser[Result](original: Self[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       val parseOriginal = recursive(original)
       lazy val result = new Parser[Result] {
 
@@ -84,7 +84,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 
   case class Fallback[Result](value: Result, name: String) extends ParserBuilderBase[Result] with LeafParser[Result] { // TODO combine with failure?
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       (input, _) => {
         val result = ReadyParseResult(Some(value), input, History.error(new MissingInput(input, name, History.insertFallbackPenalty)))
         singleResult(result)
@@ -94,23 +94,17 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class WithDefault[Result](original: Self[Result], _default: Result,
-                                 name: Option[String] = None) // TODO last parameter is only used by keywords using filter, can we replace that usage?
+  case class WithDefault[Result](original: Self[Result], _default: Result)
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       val parseOriginal = recursive(original)
 
       def apply(input: Input, state: ParseState): ParseResult[Result] = {
         val result = parseOriginal(input, state)
         result.mapReady(ready => {
-          val newHistory = name.fold(ready.history)(name => ready.history match {
-            case SingleError(score, MissingInput(from, to, _, penalty)) =>
-              SingleError(score, MissingInput(from, to, name, penalty))
-            case history => history
-          })
           if (ready.resultOption.isEmpty || ready.remainder == input) {
-            ReadyParseResult(Some(_default), ready.remainder, newHistory)
+            ReadyParseResult(Some(_default), ready.remainder, ready.history)
           } else
             ready
         }, uniform = true)
@@ -137,7 +131,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class ParseWholeInput[Result](original: Self[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       val parseOriginal = recursive(original)
 
       new Parser[Result] {
@@ -162,7 +156,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class ElemPredicate(predicate: Elem => Boolean, kind: String)
     extends ParserBuilderBase[Elem] with LeafParser[Elem] {
 
-    override def getParser(recursive: GetParse): Parser[Elem] = {
+    override def getParser(recursive: GetParser): Parser[Elem] = {
 
       def apply(input: Input, state: ParseState): ParseResult[Elem] = {
         if (input.atEnd) {
@@ -189,7 +183,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
                                             getMessage: Other => String)
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
+    override def getParser(recursive: GetParser): Parser[Result] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         val originalResult = parseOriginal(input, state)
