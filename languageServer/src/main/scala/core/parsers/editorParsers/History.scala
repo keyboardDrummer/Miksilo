@@ -17,7 +17,7 @@ object History {
   val insertRegexPenalty = successValue * errorMultiplier
   val insertFallbackPenalty = insertRegexPenalty * 0.9
   val insertDefaultPenalty = 1
-  val failPenalty = 1 // TODO settings this too high kills the tests. I think withDefault should work differently.
+  val failPenalty = 100
 
   val dropLength1Penalty = errorMultiplier * 3
   val dropLength2Penalty = dropLength1Penalty / 0.75
