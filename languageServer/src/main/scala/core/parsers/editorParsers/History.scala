@@ -12,7 +12,6 @@ object History {
 
   val indentationErrorPenalty = successValue * errorMultiplier * 10
 
-  val genericErrorPenalty = successValue * errorMultiplier
   val missingInputPenalty = successValue * errorMultiplier
   val insertFallbackPenalty = missingInputPenalty * 0.9
   val insertDefaultPenalty = 1
