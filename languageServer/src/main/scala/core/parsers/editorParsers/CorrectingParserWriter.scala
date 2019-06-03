@@ -11,9 +11,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     var resultsSeen = Set.empty[ReadyParseResult[Result]]
     var queue = parser(input, newParseState(input))
-    while(queue.isInstanceOf[SRCons[Result]]) {
-      val cons = queue.asInstanceOf[SRCons[Result]]
-      val parseResult = cons.head
+    while(queue.nonEmpty) {
+      val (parseResult, tail) = queue.pop()
 
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
@@ -23,17 +22,17 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           resultsSeen += parseResult
 
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
-          cons.tail match {
+          tail match {
             case tailCons: SRCons[Result] =>
               if (bestResult.originalScore > tailCons.head.score && mayStop())
                 SREmpty
               else
-                cons.tail
+                tail
             case _ => SREmpty
           }
         case delayedResult: DelayedParseResult[Result] =>
           val results = delayedResult.results
-          cons.tail.merge(results)
+          tail.merge(results)
       }
     }
     SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
@@ -60,6 +59,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   case class RecursionsList[SeedResult, +Result](recursions: List[RecursiveParseResult[SeedResult, Result]], rest: SortedParseResults[Result])
 
   sealed trait SortedParseResults[+Result] extends ParseResultLike[Result]  {
+    def nonEmpty: Boolean
+    def pop(): (LazyParseResult[Result], SortedParseResults[Result])
     def toList: List[LazyParseResult[Result]]
     def tailDepth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
@@ -104,6 +105,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     override def toList = List.empty
 
     override def recursionsFor[SeedResult](parse: Parser[SeedResult]): RecursionsList[SeedResult, Nothing] = RecursionsList(List.empty, this)
+
+    override def nonEmpty = false
+
+    override def pop() = throw new Exception("Can't pop empty results")
   }
 
   final class SRCons[+Result](val head: LazyParseResult[Result],
@@ -170,6 +175,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       case _ =>
         RecursionsList(List.empty, this)
     }
+
+    override def nonEmpty = true
+
+    override def pop(): (LazyParseResult[Result], SortedParseResults[Result]) = (head, tail)
   }
 
   trait LazyParseResult[+Result] {
