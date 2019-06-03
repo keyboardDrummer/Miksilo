@@ -24,7 +24,7 @@ class PerformanceTest extends FunSuite {
     val result = JsonLanguage.language.compileString(input)
   }
 
-  test("Errorless JSON performance") {
+  ignore("Errorless JSON performance") {
     import ParseJson._
 
     val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
@@ -54,7 +54,7 @@ class PerformanceTest extends FunSuite {
     System.out.println(s"totalTime:${singleSource + sourceTimesTen}")
   }
 
-  ignore("Errorless JSON performance BiGrammar") {
+  test("Errorless JSON performance BiGrammar") {
     val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
       replaceAll("\\s", "")
 
