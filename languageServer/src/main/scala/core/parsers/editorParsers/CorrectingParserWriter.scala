@@ -64,10 +64,19 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     def toList: List[LazyParseResult[Result]]
     def tailDepth: Int
     def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
-    def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult]
+
+    override def map[NewResult](f: Result => NewResult): SortedParseResults[NewResult] = {
+      flatMap(lazyParseResult => singleResult(lazyParseResult.map(f)), uniform = true)
+    }
+
+    def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult] = {
+      flatMap(r => singleResult(f(r)), uniform)
+    }
+
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean): SortedParseResults[NewResult]
 
-    def recursionsFor[SeedResult](parse: Parser[SeedResult]): RecursionsList[SeedResult, Result]
+    def recursionsFor[SeedResult](parse: Parser[SeedResult]): RecursionsList[SeedResult, Result] =
+      RecursionsList[SeedResult, Result](List.empty, this)
 
     def addHistory(errors: MyHistory): SortedParseResults[Result] = {
       mapWithHistory(x => x, errors)
@@ -75,7 +84,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
                                   oldHistory: MyHistory): SortedParseResults[NewResult] = {
-      flatMap(l => l.mapWithHistory(f, oldHistory), uniform = !oldHistory.canMerge)
+      mapResult(l => l.mapWithHistory(f, oldHistory), uniform = !oldHistory.canMerge)
     }
 
     def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult] = {
@@ -104,11 +113,63 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     override def toList = List.empty
 
-    override def recursionsFor[SeedResult](parse: Parser[SeedResult]): RecursionsList[SeedResult, Nothing] = RecursionsList(List.empty, this)
-
     override def nonEmpty = false
 
     override def pop() = throw new Exception("Can't pop empty results")
+  }
+
+  // TODO: replace List with something that has constant concat operation.
+  case class RecursiveResults[+Result](recursions: Map[Parser[Any], List[RecursiveParseResult[_, Result]]], tail: SortedParseResults[Result])
+    extends SortedParseResults[Result] {
+
+    override def nonEmpty = false
+
+    override def pop() = throw new Exception("Can't pop recursions")
+
+    override def toList = tail.toList
+
+    override def tailDepth = 0
+
+    override def merge[Other >: Result](other: SortedParseResults[Other], depth: Int): RecursiveResults[Other] = other match {
+      case otherRecursions: RecursiveResults[Result] =>
+        val merged = this.recursions.foldLeft(otherRecursions.recursions)((acc, entry) => {
+          val value = acc.get(entry._1) match {
+            case Some(existingValue) => existingValue ++ entry._2
+            case None => entry._2
+          }
+          acc + (entry._1 -> value)
+        })
+        RecursiveResults(merged, tail.merge(otherRecursions.tail))
+      case _ =>
+        RecursiveResults(this.recursions, tail.merge(other))
+    }
+
+    override def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean) = {
+      RecursiveResults(
+        recursions.mapValues(s => s.map(r => r.compose(pr => pr.flatMap(f, uniform)))),
+        tail.flatMap(f, uniform))
+    }
+
+    override def recursionsFor[SeedResult](parser: Parser[SeedResult]) = {
+      val remainder = recursions - parser
+      RecursionsList(
+        recursions(parser).asInstanceOf[List[RecursiveParseResult[SeedResult, Result]]],
+        if (remainder.isEmpty) tail else RecursiveResults(remainder, tail))
+    }
+
+    override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) = {
+      if (oldHistory.flawed)
+        tail.mapWithHistory(f, oldHistory)
+      else
+        super.mapWithHistory(f, oldHistory)
+    }
+  }
+
+  case class RecursiveParseResult[SeedResult, +Result](get: ParseResult[SeedResult] => ParseResult[Result]) {
+
+    def compose[NewResult](f: ParseResult[Result] => ParseResult[NewResult]): RecursiveParseResult[SeedResult, NewResult] = {
+      RecursiveParseResult[SeedResult, NewResult](r => f(get(r)))
+    }
   }
 
   final class SRCons[+Result](val head: LazyParseResult[Result],
@@ -126,10 +187,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       tailDepth = 0
     }
 
-    override def mapResult[NewResult](f: LazyParseResult[Result] => LazyParseResult[NewResult], uniform: Boolean): SortedParseResults[NewResult] = {
-      flatMap(r => singleResult(f(r)), uniform)
-    }
-
     def flatMap[NewResult](f: LazyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean): SortedParseResults[NewResult] = {
       f(head) match {
         case SREmpty => tail.flatMap(f, uniform)
@@ -144,6 +201,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
               1 + Math.max(this.tailDepth, cons.tailDepth),
               cons.tail.merge(tail.flatMap(f, uniform)))
           }
+        case other => other.merge(tail.flatMap(f, uniform))
       }
     }
 
@@ -157,23 +215,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
       other match {
         case SREmpty => this
-        case other: SRCons[Other] =>
-          if (head.score >= other.head.score) {
-            new SRCons(head,1 + tailDepth, tail.merge(other, mergeDepth + 1))
+        case cons: SRCons[Other] =>
+          if (head.score >= cons.head.score) {
+            new SRCons(head,1 + tailDepth, tail.merge(cons, mergeDepth + 1))
           } else
-            new SRCons(other.head,1 + other.tailDepth, this.merge(other.tail, mergeDepth + 1))
+            new SRCons(cons.head,1 + cons.tailDepth, this.merge(cons.tail, mergeDepth + 1))
+        case earlier => earlier.merge(this)
       }
-    }
-
-    override def recursionsFor[SeedResult](parse: Parser[SeedResult]): RecursionsList[SeedResult, Result] = head match {
-      case recursive: RecursiveParseResult[_, Result] =>
-        val tailResult = tail.recursionsFor(parse)
-        if (recursive.parser == parse)
-          RecursionsList(recursive.asInstanceOf[RecursiveParseResult[SeedResult, Result]] :: tailResult.recursions, tailResult.rest)
-        else
-          RecursionsList(tailResult.recursions, new SRCons[Result](recursive, 0, tailResult.rest))
-      case _ =>
-        RecursionsList(List.empty, this)
     }
 
     override def nonEmpty = true
@@ -192,37 +240,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     def map[NewResult](f: Result => NewResult): LazyParseResult[NewResult]
 
     def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult],
-                       oldHistory: MyHistory): SortedParseResults[NewResult]
-  }
-
-  case class RecursiveParseResult[SeedResult, +Result](input: Input,
-                                                       parser: Parser[SeedResult],
-                                                       get: ParseResult[SeedResult] => ParseResult[Result])
-    extends LazyParseResult[Result] {
-
-    def history = History.empty[Input]
-    override val score = 1000000 + history.score
-
-    override def toString = "Recursive: " + parser.debugName
-
-    override def map[NewResult](f: Result => NewResult) = {
-      RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).map(f))
-    }
-
-    override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean) = {
-      singleResult(RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).flatMapReady(f, uniform)))
-    }
-
-    override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean) =
-      RecursiveParseResult[SeedResult, NewResult](input, parser, r => get(r).mapReady(f, uniform))
-
-    override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) =
-      if (oldHistory.flawed) {
-        SREmpty
-      }
-      else
-        singleResult(RecursiveParseResult[SeedResult, NewResult](input, parser,
-          r => get(r).mapWithHistory(f, oldHistory)))
+                       oldHistory: MyHistory): LazyParseResult[NewResult]
   }
 
   class DelayedParseResult[Result](val history: MyHistory, _getResults: () => SortedParseResults[Result])
@@ -237,10 +255,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     lazy val results: SortedParseResults[Result] = _getResults()
 
     override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) =
-      singleResult(new DelayedParseResult(this.history ++ oldHistory, () => {
+      new DelayedParseResult(this.history ++ oldHistory, () => {
         val intermediate = this.results
         intermediate.mapWithHistory(f, oldHistory)
-    }))
+    })
 
     override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean): DelayedParseResult[NewResult] =
       new DelayedParseResult(this.history, () => {
@@ -267,7 +285,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     override def mapWithHistory[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], oldHistory: MyHistory) = {
       val newReady = f(this)
-      singleResult(ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.history ++ oldHistory))
+      ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.history ++ oldHistory)
     }
 
     override def mapReady[NewResult](f: ReadyParseResult[Result] => ReadyParseResult[NewResult], uniform: Boolean): ReadyParseResult[NewResult] = f(this)

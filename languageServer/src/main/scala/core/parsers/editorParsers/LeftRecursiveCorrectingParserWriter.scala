@@ -71,7 +71,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     def getPreviousResult(input: Input, state: ParseState): Option[ParseResult[Result]] = {
       if (state.input == input && state.parsers.contains(parser))
-          Some(singleResult(RecursiveParseResult[Result, Result](input, parser, x => x)))
+          Some(RecursiveResults(Map(parser -> List(RecursiveParseResult[Result, Result](x => x))), SREmpty))
       else
         None
     }

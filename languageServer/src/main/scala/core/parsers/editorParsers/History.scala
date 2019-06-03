@@ -87,15 +87,20 @@ object Rose {
 
 trait Rose[+Value] {
   def values: Seq[Value]
+  def map[NewValue](f: Value => NewValue): Rose[NewValue]
   override def toString = values.toString()
 }
 
 case class Leaf[+Value](value: Value) extends Rose[Value] {
   override def values = Seq(value)
+
+  override def map[NewValue](f: Value => NewValue) = Leaf(f(value))
 }
 
 case class Node[+Value](children: Rose[Value]*) extends Rose[Value] {
   def values = children.flatMap(child => child.values)
+
+  override def map[NewValue](f: Value => NewValue) = Node(children.map(r => r.map(f)):_*)
 }
 
 case class FlawedHistory[Input](score: Double, firstError: ParseError[Input],
