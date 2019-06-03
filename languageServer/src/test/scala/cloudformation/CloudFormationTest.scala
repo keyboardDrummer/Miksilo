@@ -77,6 +77,32 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
         |      "Type": "AWS::SNS::Topic",
         |      "Properties": {
         |        "Subsc"
+      """.stripMargin
+    val server = new MiksiloLanguageServer(CloudFormationLanguage.jsonLanguage)
+    val document = openDocument(server, program)
+    val start = new HumanPosition(6, 14)
+    val result = server.complete(DocumentPosition(document, start))
+
+    val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("Subscription"))
+    assertResult(CompletionList(isIncomplete = false, Seq(item))) (result)
+  }
+
+  test("Missing in the middle") {
+    val program =
+      """{
+        |  "Parameters" : {
+        |    "KeyName": "The EC2 Key Pair to allow SSH access to the instances",
+        |    "MemberWithOnlyKey":
+        |  },
+        |  "Resources" : {
+        |    "LaunchConfig": {
+        |      "Type": "AWS::AutoScaling::LaunchConfiguration",
+        |      "Properties": {
+        |        "KeyName": { "Ref": "KeyName" }
+        |      }
+        |    }
+        |  }
+        |}
         """.stripMargin
     val server = new MiksiloLanguageServer(CloudFormationLanguage.jsonLanguage)
     val document = openDocument(server, program)

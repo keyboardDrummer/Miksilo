@@ -53,7 +53,7 @@ trait ByteParserWriter extends MonadicMachineParserWriter {
         succeed(())
       }
       else {
-        FailureParser // parsed bytes '$parsedBytes' were not equal to expected bytes $bytes
+        fail("parsed bytes '$parsedBytes' were not equal to expected bytes $bytes")
       }
       result
     })

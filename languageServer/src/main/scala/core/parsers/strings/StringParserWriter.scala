@@ -78,7 +78,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
   implicit def regex(value: Regex, regexName: String, score: Double = History.successValue): RegexParser = RegexParser(value, regexName, score)
 
-  case class Literal(value: String) extends EditorParserBase[String] with LeafParser[String] {
+  case class Literal(value: String) extends ParserBuilderBase[String] with LeafParser[String] {
 
     override def getParser(recursive: GetParse): Parser[String] = {
 
@@ -94,7 +94,7 @@ trait StringParserWriter extends SequenceParserWriter {
                 History.error(new MissingInput(input, s"'$value'", History.endOfSourceInsertion))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               return singleResult(ReadyParseResult(Some(value), input,
-                History.error(MissingInput(input, input.drop(index + 1), s"'$value'", History.insertLiteralPenalty))))
+                History.error(MissingInput(input, input.drop(index + 1), s"'$value'"))))
             }
             index += 1
           }
@@ -114,7 +114,7 @@ trait StringParserWriter extends SequenceParserWriter {
     def range = SourceRange(from.position, to.position)
   }
 
-  case class RegexParser(regex: Regex, regexName: String, score: Double = History.successValue) extends EditorParserBase[String] with LeafParser[String] {
+  case class RegexParser(regex: Regex, regexName: String, score: Double = History.successValue) extends ParserBuilderBase[String] with LeafParser[String] {
 
     override def getParser(recursive: GetParse): Parser[String] = {
 
@@ -126,7 +126,7 @@ trait StringParserWriter extends SequenceParserWriter {
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
-              singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, regexName, History.insertRegexPenalty))))
+              singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, regexName, History.missingInputPenalty))))
           }
         }
       }

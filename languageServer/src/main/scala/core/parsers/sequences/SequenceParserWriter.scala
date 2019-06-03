@@ -14,13 +14,13 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
   def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
   case class ElemPredicate(predicate: Elem => Boolean, kind: String)
-    extends EditorParserBase[Elem] with LeafParser[Elem] {
+    extends ParserBuilderBase[Elem] with LeafParser[Elem] {
 
     override def getParser(recursive: GetParse): Parser[Elem] = {
 
       def apply(input: Input, state: ParseState): ParseResult[Elem] = {
         if (input.atEnd) {
-          return newFailure(input, s"$kind expected but end of source found")
+          return newFailure(new MissingInput(input, kind, History.missingInputPenalty))
         }
 
         val char = input.head
@@ -28,7 +28,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           newSuccess(char, input.tail, History.successValue)
         }
         else
-          newFailure(input, s"'$char' was not a $kind")
+          newFailure(new MissingInput(input, kind, History.missingInputPenalty))
       }
 
       apply

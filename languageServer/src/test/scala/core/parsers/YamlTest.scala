@@ -83,7 +83,7 @@ class YamlTest extends FunSuite
     new Sequence(left, new Sequence(whiteSpace, right, (a: String, b: Right) => b), combine)
   }
 
-  class IfContext[Result](inners: Map[YamlContext, Self[Result]]) extends EditorParserBase[Result] {
+  class IfContext[Result](inners: Map[YamlContext, Self[Result]]) extends ParserBuilderBase[Result] {
 
     override def getParser(recursive: GetParse) = {
       val innerParsers = inners.mapValues(p => recursive(p))
@@ -98,7 +98,7 @@ class YamlTest extends FunSuite
   }
 
   class WithContext[Result](update: YamlContext => YamlContext, val original: Self[Result])
-    extends EditorParserBase[Result] with ParserWrapper[Result] {
+    extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
     override def getParser(recursive: GetParse): Parser[Result] = {
       val parseOriginal = recursive(original)

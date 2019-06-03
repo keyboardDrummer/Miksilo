@@ -1,6 +1,6 @@
 package core.document
 
-case class  LeftRight(left: Document, right: Document) extends Document {
+case class LeftRight(left: Document, right: Document) extends Document {
   val difference = left.height - right.height
   val newLeft = extendBottom(-difference, left)
   val newRight = extendBottom(difference, right)
