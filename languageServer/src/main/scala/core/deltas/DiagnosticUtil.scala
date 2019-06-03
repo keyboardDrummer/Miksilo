@@ -8,6 +8,7 @@ import core.bigrammar.BiGrammarToParser._
 object DiagnosticUtil {
 
   def getDiagnosticFromParseFailure(errors: List[MyParseError]): List[Diagnostic] = errors.map(error => {
-    Diagnostic(error.range, Some(DiagnosticSeverity.Error), None, None, error.message)
+    val range = SourceRange(error.from.position, error.to.position)
+    Diagnostic(range, Some(DiagnosticSeverity.Error), None, None, error.message)
   })
 }

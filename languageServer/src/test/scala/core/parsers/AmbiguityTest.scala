@@ -5,8 +5,8 @@ import editorParsers.LeftRecursiveCorrectingParserWriter
 
 class AmbiguityTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
-  val optional_a: EditorParserExtensions[Any] =  Literal("!").*
-  val optionalCopy: EditorParserExtensions[Any] = Literal("!").*
+  val optional_a: SequenceParserExtensions[Any] =  Literal("!").*
+  val optionalCopy: SequenceParserExtensions[Any] = Literal("!").*
   def aesReader = new StringReader("!#@")
 
   test("Basic ambiguity test") {

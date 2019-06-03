@@ -1,10 +1,9 @@
 package core.parsers
 
-import editorParsers.EditorParserWriter
 import strings.CommonParserWriter
 import langserver.types.Position
 
-trait CommonStringReaderParser extends CommonParserWriter with EditorParserWriter {
+trait CommonStringReaderParser extends CommonParserWriter {
   type Input = StringReader
 
   class StringReader(array: ArrayCharSequence, offset: Int, position: Position)

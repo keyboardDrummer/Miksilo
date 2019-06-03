@@ -22,7 +22,7 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
   }
 
   test("binary operators can be explicitly right associative") {
-    lazy val expr: EditorParserExtensions[Any] = wholeNumber.addAlternative[Any]((before, after) => before ~< "-" ~ after)
+    lazy val expr: SequenceParserExtensions[Any] = wholeNumber.addAlternative[Any]((before, after) => before ~< "-" ~ after)
     val input = "1-2-3"
     val result = expr.getWholeInputParser()(new StringReader(input))
     assert(result.successful)

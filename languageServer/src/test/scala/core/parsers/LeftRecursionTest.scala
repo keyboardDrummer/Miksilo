@@ -23,8 +23,8 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
 
   //val timeLimit = Span(200, Millis)
 
-  val optional_a: EditorParserExtensions[Any] = Literal("!").*
-  val optionalCopy: EditorParserExtensions[Any] = Literal("!").*
+  val optional_a: SequenceParserExtensions[Any] = Literal("!").*
+  val optionalCopy: SequenceParserExtensions[Any] = Literal("!").*
   def aesReader = new StringReader("!#@")
 
   test("left recursion with lazy indirection") {

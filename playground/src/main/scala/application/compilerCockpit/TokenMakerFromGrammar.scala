@@ -12,7 +12,7 @@ import scala.util.matching.Regex
 case class MyToken(tokenType: Int, text: String)
 class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
-  val parser: EditorParserExtensions[Seq[MyToken]] = {
+  val parser: SequenceParserExtensions[Seq[MyToken]] = {
     val keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = grammar.selfAndDescendants.toSet
 

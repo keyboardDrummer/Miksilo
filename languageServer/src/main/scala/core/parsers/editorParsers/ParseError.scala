@@ -10,7 +10,6 @@ trait ParseError[Input] {
   def message: String
   def from: Input
   def to: Input
-  def range: SourceRange
 
   override def toString = message
 }

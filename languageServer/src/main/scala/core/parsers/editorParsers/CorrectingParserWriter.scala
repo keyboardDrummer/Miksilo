@@ -1,12 +1,10 @@
 package core.parsers.editorParsers
 
-import core.language.node.SourceRange
-import core.parsers.core.{OptimizingParserWriter, ParseInput}
-import langserver.types.Position
+import core.parsers.core.OptimizingParserWriter
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
-  private def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: () => Boolean): SingleParseResult[Result] = {
+  def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: () => Boolean): SingleParseResult[Result] = {
 
     val noResultFound = ReadyParseResult(None, input, History.error(FatalError(input, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Result] = noResultFound
@@ -46,9 +44,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   type ParseResult[+Result] = SortedParseResults[Result]
 
-  def newSuccess[Result](result: Result, remainder: Input, score: Double): SRCons[Result] =
-    singleResult(ReadyParseResult(Some(result), remainder, SpotlessHistory().addSuccess(remainder, remainder, result, score)))
-
   def newFailure[Result](error: MyParseError): SRCons[Result] =
     singleResult(ReadyParseResult(None, error.from, History.error(error)))
 
@@ -56,11 +51,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                                                  right: => Self[Right],
                                                  combine: (Left, Right) => NewResult): Self[NewResult] =
     new Sequence(left, right, combine)
-
-  override def many[Result, Sum](original: ParserBuilder[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
-    lazy val result: Self[Sum] = choice(WithDefault(leftRight(original, result, reduce), zero), succeed(zero), firstIsLonger = true)
-    result
-  }
 
   override def choice[Result](first: Self[Result], other: => Self[Result], firstIsLonger: Boolean = false): Self[Result] =
     if (firstIsLonger) new FirstIsLonger(first, other) else new Choice(first, other)
@@ -315,65 +305,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     }
   }
 
-
-  implicit class EditorParserExtensions[Result](parser: Self[Result]) extends ParserExtensions(parser) {
-
-    def someSeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
-      val reduce = (h: Result, t: List[Result]) => h :: t
-      val zero = List.empty[Result]
-      lazy val result: Self[List[Result]] = separator ~>
-        (WithDefault(leftRight(DropParser(parser), DropParser(result), reduce), zero) |
-          Fail(Some(zero), elementName, History.insertDefaultPenalty)) |
-        succeed(zero)
-      leftRight(parser, DropParser(result), reduce)
-    }
-
-    def manySeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
-      val zero = List.empty[Result]
-      DropParser(choice(someSeparated(separator, elementName), succeed(zero), firstIsLonger = true))
-    }
-
-    def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
-
-    def withDefault[Other >: Result](_default: Other): Self[Other] = WithDefault(parser, _default)
-
-    def getParser(mayStop: () => Boolean): Input => SingleParseResult[Result] = {
-      val parser = compile(this.parser).buildParser(this.parser)
-      input => findBestParseResult(parser, input, mayStop)
-    }
-
-    def getWholeInputParser(mayStop: () => Boolean = () => true): Input => SingleParseResult[Result] = {
-      ParseWholeInput(parser).getParser(mayStop)
-    }
-
-    def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Self[Other] = {
-      WithRangeParser(parser, addRange)
-    }
-  }
-
-  case class ParseWholeInput[Result](original: Self[Result])
-    extends ParserBuilderBase[Result] with ParserWrapper[Result] {
-
-    override def getParser(recursive: GetParse): Parser[Result] = {
-      val parseOriginal = recursive(original)
-
-      new Parser[Result] {
-        override def apply(input: Input, state: ParseState) = {
-          val result = parseOriginal(input, state)
-          result.mapReady(parseResult => {
-            val remainder = parseResult.remainder
-            if (remainder.atEnd)
-              parseResult
-            else {
-              val error = DropError(remainder, remainder.end)
-              ReadyParseResult(parseResult.resultOption, remainder.end, parseResult.history.addError(error))
-            }
-          }, uniform = false)
-        }
-      }
-    }
-  }
-
   class FirstIsLonger[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
     extends ParserBuilderBase[Result] with ChoiceLike[Result] {
 
@@ -417,29 +348,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     }
   }
 
-  case class Filter[Other, Result <: Other](original: Self[Result],
-                                            predicate: Other => Boolean,
-                                            getMessage: Other => String)
-    extends ParserBuilderBase[Result] with ParserWrapper[Result] {
-
-    override def getParser(recursive: GetParse): Parser[Result] = {
-      val parseOriginal = recursive(original)
-      (input, state) => {
-        val originalResult = parseOriginal(input, state)
-        originalResult.mapReady(ready => {
-          ready.resultOption match {
-            case Some(result) =>
-              if (predicate(result))
-                ready
-              else ReadyParseResult(None, ready.remainder,
-                ready.history.addError(MissingInput(input, ready.remainder, getMessage(result), History.missingInputPenalty)))
-            case None => ready
-          }
-        }, uniform = false)
-      }
-    }
-  }
-
   case class WithRangeParser[Result, NewResult](original: Self[Result], addRange: (Input, Input, Result) => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
@@ -454,136 +362,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     }
   }
 
-  case class Fallback[Result](value: Result, name: String) extends ParserBuilderBase[Result] with LeafParser[Result] { // TODO combine with failure?
-    override def getParser(recursive: GetParse): Parser[Result] = {
-      (input, _) => {
-        val result = ReadyParseResult(Some(value), input, History.error(new MissingInput(input, name, History.insertFallbackPenalty)))
-        singleResult(result)
-      }
-    }
-
-    override def getMustConsume(cache: ConsumeCache) = false
-  }
-
-  case class WithDefault[Result](original: Self[Result], _default: Result,
-                                 name: Option[String] = None) // TODO last parameter is only used by keywords using filter, can we replace that usage?
-    extends ParserBuilderBase[Result] with ParserWrapper[Result] {
-
-    override def getParser(recursive: GetParse): Parser[Result] = {
-      val parseOriginal = recursive(original)
-
-      def apply(input: Input, state: ParseState): ParseResult[Result] = {
-        val result = parseOriginal(input, state)
-        result.mapReady(ready => {
-          val newHistory = name.fold(ready.history)(name => ready.history match {
-            case SingleError(score, MissingInput(from, to, _, penalty)) =>
-              SingleError(score, MissingInput(from, to, name, penalty))
-            case history => history
-          })
-          if (ready.resultOption.isEmpty || ready.remainder == input) {
-            ReadyParseResult(Some(_default), ready.remainder, newHistory)
-          } else
-            ready
-        }, uniform = true)
-      }
-      apply
-    }
-  }
-
-  case class DropParser[Result](original: Self[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
-
-    override def getParser(recursive: GetParse): Parser[Result] = {
-      val parseOriginal = recursive(original)
-      lazy val result = new Parser[Result] {
-
-        override def apply(input: Input, state: ParseState): ParseResult[Result] = {
-          val originalResult = parseOriginal(input, state)
-
-          if (input.atEnd)
-            return originalResult
-
-          val droppedInput = input.drop(1)
-          val dropError = DropError(input, droppedInput)
-          val dropHistory = History.error(dropError)
-          val withDrop = singleResult(new DelayedParseResult(dropHistory , () => {
-            apply(droppedInput, state).addHistory(dropHistory)
-          }))
-          originalResult.merge(withDrop)
-        }
-      }
-      result
-    }
-
-  }
-
-  case class DropError(from: Input, to: Input) extends ParseError[Input] {
-    def this(from: Input, expectation: String) = this(from, from.drop(1))
-
-    override def append(next: MyParseError): Option[MyParseError] = {
-      next match {
-        case drop: DropError if drop.from == to =>
-          Some(DropError(from, drop.to))
-        case _ => None
-      }
-    }
-
-    override def penalty = {
-      val length = to.offset - from.offset
-      History.dropMaxPenalty - History.dropReduction / (History.dropLengthShift + length)
-    }
-
-    override def message = {
-      val found = from.printRange(to)
-      s"Skipped '$found'"
-    }
-
-    override def range = SourceRange(from.position, to.position)
-
-    override def canMerge = true
-  }
-
-  type Input <: EditorParseInput
-
-  trait EditorParseInput extends ParseInput {
-    def position: Position
-    def drop(amount: Int): Input
-    def end: Input
-    def printRange(end: Input): String
-  }
-
-  case class MissingInput(from: Input, to: Input, expectation: String, penalty: Double = History.missingInputPenalty) extends ParseError[Input] {
-
-    def this(from: Input, expectation: String, penalty: Double) =
-      this(from, if (from.atEnd) from else from.drop(1), expectation, penalty)
-
-    override def range: SourceRange = {
-      val position = from.position
-      SourceRange(position, Position(position.line, position.character + 1))
-    }
-
-    override def message: String = {
-      val found = if (from.atEnd) {
-        "end of source"
-      } else
-        from.printRange(to)
-
-      s"expected $expectation but found '$found'"
-    }
-  }
-
-  case class FatalError(location: Input, message: String, penalty: Double = History.failPenalty) extends MyParseError {
-    override def append(other: MyParseError): Option[MyParseError] = None
-
-    override def range = {
-      val position = location.position
-      SourceRange(position, Position(position.line, position.character + 1))
-    }
-
-    override def from = location
-
-    override def to = from
-  }
-
   override def succeed[Result](result: Result): Self[Result] = Succeed(result)
 
   case class SingleParseResult[Result](resultOption: Option[Result], errors: List[MyParseError]) {
@@ -591,7 +369,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     def get: Result = resultOption.get
   }
 
-  def newSuccess[Result](result: Result, remainder: Input, score: Double): ParseResult[Result]
+  def newSuccess[Result](result: Result, remainder: Input, score: Double): SRCons[Result] =
+    singleResult(ReadyParseResult(Some(result), remainder, SpotlessHistory().addSuccess(remainder, remainder, result, score)))
+
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParse): Parser[Result] = {
@@ -619,13 +399,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   type MyParseError = ParseError[Input]
   type MyHistory = History[Input]
 
-  case class Fail[Result](value: Option[Result], message: String, penalty: Double)
-    extends ParserBuilderBase[Result] with LeafParser[Result] {
+  case class FatalError(location: Input, message: String, penalty: Double = History.failPenalty) extends MyParseError {
+    override def append(other: MyParseError): Option[MyParseError] = None
 
-    override def getParser(recursive: GetParse): Parser[Result] = {
-      (input, _) => newFailure(value, input, History.error(FatalError(input, message, penalty)))
-    }
+    override def from = location
 
-    override def getMustConsume(cache: ConsumeCache) = false
+    override def to = from
   }
 }
