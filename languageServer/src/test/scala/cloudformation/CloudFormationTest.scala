@@ -124,6 +124,12 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
     assert(result.isEmpty)
   }
 
+  test("file has literal parameters") {
+    val program = """{"Parameters" : "Bar"}"""
+    val result = getDiagnostic(jsonServer, program)
+    assert(result.isEmpty)
+  }
+
   test("file only has a single member object") {
     val program = """{"Foo" : "Bar"}"""
     val result = getDiagnostic(jsonServer, program)

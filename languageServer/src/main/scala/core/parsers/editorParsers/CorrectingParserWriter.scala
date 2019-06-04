@@ -4,7 +4,8 @@ import core.parsers.core.OptimizingParserWriter
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
-  def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: () => Boolean): SingleParseResult[Result] = {
+  def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: () => Boolean,
+                                  stopOnDuplicates: Boolean = false): SingleParseResult[Result] = {
 
     val noResultFound = ReadyParseResult(None, input, History.error(FatalError(input, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Result] = noResultFound
@@ -16,10 +17,12 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
-          if (resultsSeen.contains(parseResult)) {
-            System.out.append("Your grammar produces duplicates")
+          if (stopOnDuplicates) {
+            if (resultsSeen.contains(parseResult))
+              throw new Exception("Your grammar produces duplicates")
+            else
+              resultsSeen += parseResult
           }
-          resultsSeen += parseResult
 
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
