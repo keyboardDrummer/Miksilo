@@ -111,4 +111,22 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
 
     assertResult(Seq(Location(itemUri, Range(new HumanPosition(3,6), new HumanPosition(3,13)))))(result)
   }
+
+  test("file only has a string literal") {
+    val program = "\"Foo\""
+    val result = getDiagnostic(jsonServer, program)
+    assert(result.isEmpty)
+  }
+
+  test("file has literal resources") {
+    val program = """{"Resources" : "Bar"}"""
+    val result = getDiagnostic(jsonServer, program)
+    assert(result.isEmpty)
+  }
+
+  test("file only has a single member object") {
+    val program = """{"Foo" : "Bar"}"""
+    val result = getDiagnostic(jsonServer, program)
+    assert(result.isEmpty)
+  }
 }
