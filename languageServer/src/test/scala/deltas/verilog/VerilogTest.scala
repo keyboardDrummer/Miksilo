@@ -2,7 +2,7 @@ package deltas.verilog
 
 import core.language.{Compilation, InMemoryFileSystem}
 import core.language.node.NodeComparer
-import deltas.ClearPhases
+import deltas.{ClearPhases, FileWithMembersDelta}
 import deltas.expression.{IntLiteralDelta, VariableDelta}
 import deltas.expression.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
@@ -78,7 +78,7 @@ class VerilogTest extends FunSuite with LanguageServerTest {
     )
     val ports = Seq(clock, reset, requestZero, requestOne, grantZero, grantOne)
     val module = VerilogModuleDelta.neww("arbiter", ports, moduleMembers)
-    val expectation = VerilogFileDelta.Shape.create(VerilogFileDelta.Members -> Seq(module))
+    val expectation = FileWithMembersDelta.Shape.create(FileWithMembersDelta.Members -> Seq(module))
     expectation.startOfUri = Some(Compilation.singleFileDefaultName)
     assert(NodeComparer().deepEquality(expectation, actual))
   }

@@ -52,6 +52,7 @@ trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
   def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> grammar) *))
 
   def inParenthesis: BiGrammar = ("(": BiGrammar) ~> grammar ~< ")"
+  def inBraces: BiGrammar = ("{": BiGrammar) ~> grammar ~< "}"
 
   def ~~>(right: BiGrammar): BiGrammar = leftRight(grammar, printSpace, BiSequence.ignoreRight) ~> right
 

@@ -1,4 +1,4 @@
-package deltas.verilog
+package deltas
 
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodePath, PathRoot}
@@ -6,15 +6,14 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.document.BlankLine
 import core.language.Language
 import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
-import deltas.ConstraintSkeleton
 
-object VerilogFileDelta extends DeltaWithGrammar {
-  override def description: String = "Defines a Verilog file"
+object FileWithMembersDelta extends DeltaWithGrammar {
+  override def description: String = "Defines a file with members"
 
   object Shape extends NodeShape
   object Members extends NodeField
 
-  implicit class VerilogFile[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  implicit class FileWithMembers[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def members: Seq[T] = node(Members).asInstanceOf[Seq[T]]
   }
 
