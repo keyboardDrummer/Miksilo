@@ -27,6 +27,10 @@ trait BiGrammar {
   def indent(width: Int = 2): BiGrammar =
     leftRight(WhiteSpace(width, 0), this, BiSequence.ignoreLeft)
 
+  def flattenOptionSeq: BiGrammar = this.map[Option[Seq[Any]], Seq[Any]](
+    option => option.fold[Seq[Any]](Seq.empty)(v => v),
+    seq => if (seq.isEmpty) None else Some(seq))
+
   def optionToSeq: BiGrammar = this.map[Option[Any], Seq[Any]](
     option => option.fold[Seq[Any]](Seq.empty)(v => Seq(v)),
     seq => if (seq.isEmpty) None else Some(seq))

@@ -4,10 +4,13 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.document.BlankLine
-import core.language.Language
+import core.language.{Compilation, Language}
 import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
-object FileWithMembersDelta extends DeltaWithGrammar {
+object FileWithMembersDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def description: String = "Defines a file with members"
 
   object Shape extends NodeShape
@@ -31,10 +34,16 @@ object FileWithMembersDelta extends DeltaWithGrammar {
 
     language.collectConstraints = (compilation, builder) => {
       val fileScope = builder.newScope(None, "fileScope")
-      val members: Seq[NodePath] = PathRoot(compilation.program)(Members).asInstanceOf[Seq[NodePath]]
-      for(member <- members) {
-        ConstraintSkeleton.constraints(compilation, builder, member, fileScope)
-      }
+      ConstraintSkeleton.constraints(compilation, builder, PathRoot(compilation.program), fileScope)
+    }
+  }
+
+  override def shape = Shape
+
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
+    val members: Seq[NodePath] = path(Members).asInstanceOf[Seq[NodePath]]
+    for(member <- members) {
+      ConstraintSkeleton.constraints(compilation, builder, member, parentScope)
     }
   }
 }

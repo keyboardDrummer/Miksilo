@@ -3,15 +3,25 @@ package deltas.smithy
 import core.bigrammar.BiGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.Language
+import core.deltas.path.NodePath
 import core.language.node.{NodeField, NodeShape}
+import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import core.smarts.types.objects.PrimitiveType
 import deltas.expression.ExpressionDelta
+import deltas.javac.classes.skeleton.HasConstraints
 import deltas.json.JsonObjectLiteralDelta
-import deltas.{FileWithMembersDelta, HasNameDelta}
+import deltas.{ConstraintSkeleton, FileWithMembersDelta, HasNameDelta}
 
 object TraitDelta extends DeltaWithGrammar {
 
   object TraitValueShape extends NodeShape
+  object TraitReference extends NodeField
+
+  val traitType = PrimitiveType("trait")
+
+  object TraitStatement extends NodeShape
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
@@ -22,12 +32,12 @@ object TraitDelta extends DeltaWithGrammar {
     val members = find(FileWithMembersDelta.Members)
     members.addAlternative(traitStatement)
 
-    val shapeIdentifier = find(GenericSmithyDelta.ShapeIdentifierGrammar)
+    val shapeIdentifier = find(RelativeShapeIdentifierDelta.ShapeIdentifierGrammar)
     val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
     val text = find(GenericSmithyDelta.TextGrammar)
     val traitStructure = (text ~ ":" ~~ expression).manySeparatedVertical(",")
     val traitBody: BiGrammar = expression | traitStructure
-    val traitValue = create(TraitValueShape, "@" ~ shapeIdentifier ~ traitBody.inParenthesis.option)
+    val traitValue = "@" ~ shapeIdentifier.as(TraitReference) ~ traitBody.inParenthesis.option asLabelledNode TraitValueShape
     create(Traits, traitValue.manyVertical.as(Traits))
   }
 
@@ -36,4 +46,22 @@ object TraitDelta extends DeltaWithGrammar {
   override def description = "Adds trait statements and trait values"
 
   override def dependencies = Set(FileWithMembersDelta)
+
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+
+    ConstraintSkeleton.hasConstraints.add(language, TraitValueShape, new HasConstraints {
+      override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder,
+                                      path: NodePath, parentScope: Scope): Unit = {
+        RelativeShapeIdentifierDelta.getConstraints(builder, path(TraitReference).asInstanceOf[NodePath], parentScope, traitType)
+      }
+    })
+
+    ConstraintSkeleton.hasConstraints.add(language, TraitStatement, new HasConstraints {
+      override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder,
+                                      path: NodePath, parentScope: Scope): Unit = {
+        builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope, Some(traitType))
+      }
+    })
+  }
 }

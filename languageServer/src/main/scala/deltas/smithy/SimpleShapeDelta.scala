@@ -3,11 +3,15 @@ package deltas.smithy
 import core.bigrammar.BiGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.Language
+import core.deltas.path.NodePath
+import core.language.{Compilation, Language}
 import core.language.node.{NodeField, NodeShape}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.HasNameDelta
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
-object SimpleShapeDelta extends DeltaWithGrammar {
+object SimpleShapeDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   object Shape extends NodeShape
   object Type extends NodeField
@@ -25,4 +29,11 @@ object SimpleShapeDelta extends DeltaWithGrammar {
   override def description = "Adds simple shapes"
 
   override def dependencies = Set(ShapeStatementDelta)
+
+  override def shape = Shape
+
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
+    builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope,
+      Some(RelativeShapeIdentifierDelta.shapeType))
+  }
 }

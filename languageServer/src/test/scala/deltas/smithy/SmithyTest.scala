@@ -10,6 +10,13 @@ class SmithyTest extends FunSuite with LanguageServerTest {
     val server = new MiksiloLanguageServer(SmithyLanguage.language)
     val program = SourceUtils.getTestFileContents("smithy/model.smithy")
     val diagnostics = getDiagnostic(server, program)
-    assert(diagnostics.isEmpty)
+    assert(diagnostics.size == 1)
   }
+
+//  test("goto definition") {
+//    val server = new MiksiloLanguageServer(SmithyLanguage.language)
+//    val program = SourceUtils.getTestFileContents("smithy/model.smithy")
+//    val diagnostics = getDiagnostic(server, program)
+//    assert(diagnostics.size == 1)
+//  }
 }

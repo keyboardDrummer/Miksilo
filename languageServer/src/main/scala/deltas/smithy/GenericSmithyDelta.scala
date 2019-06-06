@@ -1,23 +1,22 @@
 package deltas.smithy
 
-import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
-import core.language.Language
+import core.deltas.path.NodePath
+import core.deltas.{Delta, DeltaWithGrammar}
 import core.language.node.GrammarKey
-import deltas.HasNameDelta
+import core.language.{Compilation, Language}
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
 import deltas.expression.ExpressionDelta
+import deltas.javac.classes.skeleton.HasConstraints
 import deltas.json.JsonObjectLiteralDelta.MemberKey
 import deltas.json.{JsonObjectLiteralDelta, SingleQuotedStringLiteralDelta, StringLiteralDelta}
+import deltas.{ConstraintSkeleton, FileWithMembersDelta}
 
 object GenericSmithyDelta extends DeltaWithGrammar {
 
-  object ShapeIdentifierGrammar extends GrammarKey
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val relativeShapeId = identifier ~ ("$" ~ identifier).option
-    val namespaceIdentifier = find(NamespaceDelta.Shape)
-    val absoluteShapeId = namespaceIdentifier ~ "#" ~ relativeShapeId
-    create(ShapeIdentifierGrammar, relativeShapeId | absoluteShapeId)
 
     find(JsonObjectLiteralDelta.MemberKey).addAlternative(identifier.as(MemberKey))
 
@@ -31,7 +30,30 @@ object GenericSmithyDelta extends DeltaWithGrammar {
 
   override def description = ""
 
-  override def dependencies = Set(NamespaceDelta, SingleQuotedStringLiteralDelta, StringLiteralDelta)
+  override def dependencies = Set(SingleQuotedStringLiteralDelta, StringLiteralDelta)
+}
+
+object SmithyStandardLibrary extends Delta {
+
+  override def inject(language: Language): Unit = {
+    super.inject(language)
+    ConstraintSkeleton.hasConstraints.change(language, FileWithMembersDelta.Shape, original => {
+      new HasConstraints(){
+        override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder,
+                                        path: NodePath, parentScope: Scope): Unit = {
+          val traits = Seq("pattern","readonly","error","paginated","references")
+          for(_trait <- traits) {
+            builder.declare(_trait, parentScope, null, Some(TraitDelta.traitType))
+          }
+          original.collectConstraints(compilation, builder, path, parentScope)
+        }
+      }
+    })
+  }
+
+  override def description = ""
+
+  override def dependencies = Set(FileWithMembersDelta)
 }
 
 
