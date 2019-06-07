@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.json.JsonObjectLiteralDelta.ObjectLiteral
-import deltas.smithy.ServiceOrResourceDelta.{Body, Kind}
+import deltas.smithy.ServiceDelta.{Body}
 import deltas.{ConstraintSkeleton, FileWithMembersDelta, HasNameDelta}
 
 object StructureStatementDelta extends DeltaWithGrammar with HasConstraintsDelta {

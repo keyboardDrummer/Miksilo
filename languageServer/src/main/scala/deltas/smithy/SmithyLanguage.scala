@@ -9,7 +9,7 @@ import deltas.{FileWithMembersDelta, HasNameDelta}
 
 object SmithyLanguage {
   val deltas: Seq[Delta] = Seq(SmithyStandardLibrary, SmithyListDelta, StructureStatementDelta,
-    OperationDelta, SimpleShapeDelta, ShapeStatementDelta, TraitDelta, ServiceOrResourceDelta,
+    OperationDelta, SimpleShapeDelta, ShapeStatementDelta, TraitDelta, ResourceDelta, ServiceDelta,
     GenericSmithyDelta, AbsoluteShapeIdentifierDelta, RelativeShapeIdentifierDelta,
     NamespaceDelta, FileWithMembersDelta, HasNameDelta, SlashSlashLineCommentsDelta, SolveConstraintsDelta) ++
     JsonLanguage.deltas

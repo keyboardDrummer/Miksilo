@@ -2,11 +2,11 @@ namespace example.weather
 
 service Weather {
   version: "2006-03-01",
-  resources: [City2],
+  resources: [City],
   operations: [GetCurrentTime]
 }
 
-resource City2 {
+resource City {
   identifiers: { cityId: CityId },
   read: GetCity,
   list: ListCities,
