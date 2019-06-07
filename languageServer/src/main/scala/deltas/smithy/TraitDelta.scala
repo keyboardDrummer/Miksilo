@@ -53,7 +53,7 @@ object TraitDelta extends DeltaWithGrammar {
     ConstraintSkeleton.hasConstraints.add(language, TraitValueShape, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder,
                                       path: NodePath, parentScope: Scope): Unit = {
-        RelativeShapeIdentifierDelta.getConstraints(builder, path(TraitReference).asInstanceOf[NodePath], parentScope, traitType)
+        RelativeShapeIdentifierDelta.getDeclaration(builder, path(TraitReference).asInstanceOf[NodePath], parentScope, traitType)
       }
     })
 

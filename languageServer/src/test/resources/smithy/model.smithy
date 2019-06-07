@@ -73,7 +73,7 @@ structure ListCitiesInput {
 }
 
 structure ListCitiesOutput {
-  nextToken: smithy.api#String,
+  nextToken: ListCitiesInput$nextToken,
 
   @required
   items: CitySummaries,

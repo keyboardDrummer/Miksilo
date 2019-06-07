@@ -9,8 +9,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.json.JsonObjectLiteralDelta.ObjectLiteral
-import deltas.smithy.ServiceDelta.{Body}
+import deltas.smithy.RelativeShapeIdentifierDelta.shapeType
 import deltas.{ConstraintSkeleton, FileWithMembersDelta, HasNameDelta}
 
 object StructureStatementDelta extends DeltaWithGrammar with HasConstraintsDelta {
@@ -51,12 +50,13 @@ object StructureStatementDelta extends DeltaWithGrammar with HasConstraintsDelta
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder,
                                   path: NodePath, parentScope: Scope): Unit = {
-    builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope,
+    val structureDeclaration = builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope,
       Some(RelativeShapeIdentifierDelta.shapeType))
+    val structureScope = builder.declareScope(structureDeclaration)
 
     val structure: Structure[NodePath] = path
     structure.members.foreach(member => {
-      // TODO get the resolved declaration from the type, and use it to build a scope for the structure.
+      builder.declareSourceElement(member.getSourceElement(HasNameDelta.Name), structureScope, Some(shapeType))
       ConstraintSkeleton.constraints(compilation, builder, member._type, parentScope)
     })
   }

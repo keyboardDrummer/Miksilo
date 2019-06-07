@@ -72,8 +72,10 @@ structure ListCitiesInput {
   pageSize: smithy.api#Integer
 }
 
+string nextToken // Introduce some garbage into the scope
+
 structure ListCitiesOutput {
-  nextToken: smithy.api#String,
+  nextToken: ListCitiesInput$nextToken,
 
   @required
   items: CitySummaries,
