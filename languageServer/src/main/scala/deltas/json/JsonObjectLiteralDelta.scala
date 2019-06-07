@@ -1,5 +1,6 @@
 package deltas.json
 
+import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.{Keyword, Parse, RegexGrammar}
 import core.deltas.{Delta, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
@@ -18,15 +19,27 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
   override def description: String = "Adds the JSON object literal to expressions"
 
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    import grammars._
+  def neww(entries: Map[String, Node]): Node = Shape.create(Members -> entries.map(entry =>
+    MemberShape.create(MemberKey -> entry._1, MemberValue -> entry._2)))
+
+  override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
+    val grammars = _grammars
+    import _grammars._
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val keyGrammar = create(MemberKey, "\"" ~> RegexGrammar(StringLiteralDelta.stringInnerRegex).as(MemberKey) ~< "\"")
     val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
-    val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | value(Unit))).indent() %< "}"
+    val inner = "{" %> commaSeparatedVertical(grammars, member).as(Members).indent() %< "}"
+
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
+  }
+
+  def commaSeparatedVertical(grammars: LanguageGrammars, member: BiGrammar) = {
+    import grammars._
+    ((member ~< "," ~< printSpace).manyVertical % member.option).map[(Seq[Any], Option[Any]), Seq[Any]](t => {
+      t._2.fold(t._1)(last => t._1 ++ Seq(last))
+    }, r => if (r.nonEmpty) (r.dropRight(1), Some(r.last)) else (Seq.empty, None))
   }
 
   object MemberShape extends NodeShape
