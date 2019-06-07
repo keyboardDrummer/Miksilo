@@ -13,12 +13,9 @@ object BiGrammarToTextMate {
   def toTextMate(grammar: BiGrammar): String = {
     val textMate: Node = createTextMateAstFromBiGrammar(grammar)
     printJson(textMate)
-//    val textMateDeltas = JsonLanguage.deltas
-//    val createTextMateLanguage = LanguageFromDeltas(Seq(PrettyPrint()) ++ textMateDeltas)
-//    val compilation = createTextMateLanguage.compileAst(textMate)
-//    compilation.output
   }
 
+  // TODO replace this with a JsonLanguage printer that actually works.
   def printJson(root: Node): String = {
     val builder = new StringBuilder
     var indentation = 0
@@ -81,6 +78,7 @@ object BiGrammarToTextMate {
       case _: Identifier => TextMateDelta.singleMatch("variable", """\b[A-Za-z][A-Za-z0-9_]*\b""".r)
       case NumberGrammar => TextMateDelta.singleMatch("constant.numeric", """-?\d+""".r)
       case StringLiteral => TextMateDelta.singleMatch("string.quoted", """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*"""".r)
+      // TODO Instead of only on immediate regex, create a method that generates an Option[Regex] from a BiGrammar. This generator would stop where it detects line breaks or recursion.
       case Colorize(RegexGrammar(regex, _), _, textMateScope) =>
         TextMateDelta.singleMatch(textMateScope, regex)
     })
