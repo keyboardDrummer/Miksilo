@@ -1,6 +1,7 @@
 package deltas.json
 
-import core.bigrammar.grammars.RegexGrammar
+import core.bigrammar.BiGrammarWriter
+import core.bigrammar.grammars.{BiSequence, Colorize, RegexGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
@@ -23,10 +24,15 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   val stringInnerRegex: Regex = """([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r
 
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+      val inner = {
+        import core.bigrammar.DefaultBiGrammarWriter._
+        "\"" ~> RegexGrammar(stringInnerRegex).as(Value) ~< BiGrammarWriter.stringToGrammar("\"")
+      }
     import grammars._
-    val grammar = ("\"" ~> RegexGrammar(stringInnerRegex).as(Value) ~< "\"").asLabelledNode(Shape)
-    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar)
+    val grammar = inner.asLabelledNode(Shape)
+    val colored = Colorize(grammar, 0, "string.quoted")
+    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(colored)
   }
 
   def literal(value: String) = new Node(Shape, Value -> value)

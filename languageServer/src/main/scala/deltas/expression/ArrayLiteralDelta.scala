@@ -10,12 +10,17 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.json.JsonObjectLiteralDelta
+import deltas.json.JsonObjectLiteralDelta.{Members, ObjectLiteralMember}
 
 object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the array literal to expressions"
 
   def create(elements: Seq[Node]) = Shape.create(Members -> elements)
+
+  implicit class ArrayLiteral[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def members: Seq[T] = node(Members).asInstanceOf[Seq[T]]
+  }
 
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     val grammars = _grammars

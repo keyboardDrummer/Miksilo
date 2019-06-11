@@ -2,17 +2,57 @@ package core.bigrammar.textMate
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars._
-import core.language.node.Node
+import core.language.node.{Node, NodeGrammar}
 import deltas.expression.ArrayLiteralDelta
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.json.JsonObjectLiteralDelta.{ObjectLiteral, ObjectLiteralMember}
 import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
+import _root_.core.bigrammar.grammars.ParseWhiteSpace
 
 object BiGrammarToTextMate {
 
   def toTextMate(grammar: BiGrammar): String = {
     val textMate: Node = createTextMateAstFromBiGrammar(grammar)
     printJson(textMate)
+  }
+
+  // TODO let this operate on parsers.
+  def grammarToRegex(root: BiGrammar): Option[String] = {
+    var callStack = List.empty[BiGrammar]
+
+    def recurse(grammar: BiGrammar): Option[String] = {
+      if (callStack.contains(grammar))
+        return None
+
+      callStack ::= grammar
+
+      val result: Option[String] = grammar match {
+        case sequence: BiSequence =>
+          for {
+            left <- recurse(sequence.first)
+            right <- recurse(sequence.second)
+          } yield left + right
+        case regex: RegexGrammar => Some(regex.regex.regex)
+        case many: Many => recurse(many.inner).map(r => r + "*") // TODO add parenthesis
+        case map: MapGrammar => recurse(map.inner)
+        case labelled: Labelled => recurse(labelled.inner)
+        case delimiter: Delimiter => Some(escapeRegex(delimiter.value))
+        case ParseWhiteSpace => Some(ParseWhiteSpace.regex.regex)
+        case keyword: Keyword => Some(escapeRegex(keyword.value))
+        case choice: Choice =>
+          for {
+            left <- recurse(choice.left)
+            right <- recurse(choice.right)
+          } yield left + "|" + right
+        case as: As => recurse(as.inner)
+        case nodeGrammar: NodeGrammar => recurse(nodeGrammar.inner)
+      }
+
+      callStack = callStack.tail
+      result
+    }
+
+    recurse(root)
   }
 
   // TODO replace this with a JsonLanguage printer that actually works.
@@ -72,15 +112,26 @@ object BiGrammarToTextMate {
     val reachables = grammar.selfAndDescendants.toSet
 
     val patterns: Set[Node] = reachables.collect({
-      case delimiter: Delimiter => TextMateDelta.singleMatch("keyword.operator", escapeRegex(delimiter.value).r)
+      case delimiter: Delimiter =>
+        TextMateDelta.singleMatch("keyword.operator", escapeRegex(delimiter.value).r)
       case keyword: Keyword /*if keyword.reserved*/ =>
         TextMateDelta.singleMatch("keyword.control", ("\\b" + escapeRegex(keyword.value) + "\\b").r)
-      case _: Identifier => TextMateDelta.singleMatch("variable", """\b[A-Za-z][A-Za-z0-9_]*\b""".r)
-      case NumberGrammar => TextMateDelta.singleMatch("constant.numeric", """-?\d+""".r)
-      case StringLiteral => TextMateDelta.singleMatch("string.quoted", """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*"""".r)
-      // TODO Instead of only on immediate regex, create a method that generates an Option[Regex] from a BiGrammar. This generator would stop where it detects line breaks or recursion.
-      case Colorize(RegexGrammar(regex, _), _, textMateScope) =>
-        TextMateDelta.singleMatch(textMateScope, regex)
+      case _: Identifier =>
+        TextMateDelta.singleMatch("variable", """\b[A-Za-z][A-Za-z0-9_]*\b""".r)
+      case NumberGrammar =>
+        TextMateDelta.singleMatch("constant.numeric", """-?\d+""".r)
+      case StringLiteral =>
+        TextMateDelta.singleMatch("string.quoted", """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*"""".r)
+      case Colorize(inner, _, textMateScope) =>
+        val maybeRegex = grammarToRegex(inner)
+        maybeRegex match {
+          case None => throw new Exception("Colorize did not contain a regex")
+          case Some(regex) =>
+            if (regex.contains("\\n") || regex.contains("\\s"))
+              throw new Exception(s"Colorize regex $regex contained a newline")
+
+            TextMateDelta.singleMatch(textMateScope, regex.r)
+        }
     })
 
     JsonObjectLiteralDelta.neww(Map(
