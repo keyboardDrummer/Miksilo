@@ -4,8 +4,13 @@ import scala.collection.mutable
 
 object GraphBasics {
 
+  trait NodeAction
+  object Continue extends NodeAction
+  object Halt extends NodeAction
+  object SkipChildren extends NodeAction
+
   def traverseBreadth[Node](roots: Seq[Node], getChildren: Node => Seq[Node],
-                            shouldContinue: Node => Boolean = (n: Node) => true): Seq[Node] = {
+                            shouldContinue: Node => NodeAction = (_: Node) => Continue): Seq[Node] = {
     val visited = mutable.Set.empty[Node]
     val queue = mutable.Queue.empty[Node]
     var result = List.empty[Node]
@@ -18,13 +23,16 @@ object GraphBasics {
 
       if (visited.add(value))
       {
-        if (!shouldContinue(value))
-          return result
-
-        result ::= value
-        for(child <- getChildren(value))
-        {
-          queue.enqueue(child)
+        shouldContinue(value) match {
+          case Halt => return result
+          case SkipChildren =>
+            result ::= value
+          case Continue =>
+            result ::= value
+            for(child <- getChildren(value))
+            {
+              queue.enqueue(child)
+            }
         }
       }
     }

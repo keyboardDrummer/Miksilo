@@ -12,6 +12,12 @@ import scala.util.matching.Regex
 case class MyToken(tokenType: Int, text: String)
 class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
+  val textMateScopeToToken: Map[String, Int] = Map(
+    "string.quoted.single" -> TokenTypes.LITERAL_STRING_DOUBLE_QUOTE,
+    "string.quoted.double" -> TokenTypes.LITERAL_STRING_DOUBLE_QUOTE,
+    "comment.line.double-slash" -> TokenTypes.COMMENT_EOL,
+    "comment.block" -> TokenTypes.COMMENT_MULTILINE)
+
   val parser: EditorParserExtensions[Seq[MyToken]] = {
     val keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = grammar.selfAndDescendants.toSet
@@ -25,8 +31,8 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
       case NumberGrammar => wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s)) //TODO should support other numbers as well.
       case StringLiteral =>
         stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
-      case Colorize(inner, _type) =>
-        BiGrammarToParser.toParser(inner, keywords) ^^ (s => MyToken(_type, s.asInstanceOf[String]))
+      case Colorize(inner, textMateScope) =>
+        BiGrammarToParser.toParser(inner, keywords) ^^ (s => MyToken(textMateScopeToToken(textMateScope), s.asInstanceOf[String]))
     })
 
     val whiteSpaceToken = regex(new Regex("\\s+")) ^^ (s => MyToken(TokenTypes.WHITESPACE, s))

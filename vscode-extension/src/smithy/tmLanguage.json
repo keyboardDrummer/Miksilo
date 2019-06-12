@@ -1,0 +1,168 @@
+{
+  "information_for_contributors": [],
+  "version": "",
+  "name": "Smithy",
+  "scopeName": "source.smithy",
+  "patterns": [
+    {
+      "name": "keyword.control",
+      "match": "\\blong\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\."
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\["
+    },
+    {
+      "name": "keyword.operator",
+      "match": "#"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\)"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\boperation\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": ","
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bbyte\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\blist\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bbigDecimal\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bstructure\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bdouble\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\("
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\$"
+    },
+    {
+      "name": "constant.numeric",
+      "match": "-?\\d+"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\berrors\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bshort\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\]"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bblob\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bnamespace\\b"
+    },
+    {
+      "name": "variable",
+      "match": "\\b[A-Za-z][A-Za-z0-9_]*\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\{"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bbigInteger\\b"
+    },
+    {
+      "name": "comment.line.double-slash",
+      "match": "//[^\\n]*\\n"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\-\\>"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\b'\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bfloat\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\btrue\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bfalse\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bservice\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\btrait\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bboolean\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "@"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bresource\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": "\\}"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\btimestamp\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\binteger\\b"
+    },
+    {
+      "name": "keyword.operator",
+      "match": ":"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bstring\\b"
+    },
+    {
+      "name": "keyword.control",
+      "match": "\\bmember\\b"
+    }
+  ]
+}

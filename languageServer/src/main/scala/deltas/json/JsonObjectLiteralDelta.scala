@@ -1,5 +1,6 @@
 package deltas.json
 
+import core.bigrammar.{BiGrammar, BiGrammarWriter}
 import core.bigrammar.grammars.{Keyword, Parse, RegexGrammar}
 import core.deltas.{Delta, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
@@ -11,6 +12,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.json.JsonStringLiteralDelta.stringInnerRegex
 
 case class DuplicateObjectLiteralKeys(duplicates: Seq[String]) extends BadInputException
 
@@ -18,13 +20,20 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
   override def description: String = "Adds the JSON object literal to expressions"
 
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    import grammars._
+  def neww(entries: Map[String, Node]): Node = Shape.create(Members -> entries.map(entry =>
+    MemberShape.create(MemberKey -> entry._1, MemberValue -> entry._2)))
 
+  override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
+    import _grammars._
+
+    val keyGrammar = {
+      import core.bigrammar.DefaultBiGrammarWriter._
+      "\"" ~> RegexGrammar(stringInnerRegex).as(MemberKey) ~< BiGrammarWriter.stringToGrammar("\"")
+    }
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val keyGrammar = create(MemberKey, "\"" ~> RegexGrammar(StringLiteralDelta.stringInnerRegex).as(MemberKey) ~< "\"")
     val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | value(Unit))).indent() %< "}"
+
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
   }
