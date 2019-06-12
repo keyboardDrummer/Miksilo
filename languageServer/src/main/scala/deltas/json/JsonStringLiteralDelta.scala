@@ -14,7 +14,7 @@ import deltas.expression.{ExpressionDelta, ExpressionInstance}
 
 import scala.util.matching.Regex
 
-object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
+object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the double quoted string literal"
 
@@ -27,11 +27,11 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
       val inner = {
         import core.bigrammar.DefaultBiGrammarWriter._
-        "\"" ~> RegexGrammar(stringInnerRegex) ~< BiGrammarWriter.stringToGrammar("\"")
+        "\"" ~> RegexGrammar(stringInnerRegex).as(Value) ~< BiGrammarWriter.stringToGrammar("\"")
       }
     import grammars._
     val grammar = Colorize(inner, "string.quoted.double")
-    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar.as(Value).asLabelledNode(Shape))
+    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar.asLabelledNode(Shape))
   }
 
   def literal(value: String) = new Node(Shape, Value -> value)

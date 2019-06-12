@@ -6,7 +6,7 @@ import core.language.node.{Node, NodeGrammar}
 import deltas.expression.ArrayLiteralDelta
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.json.JsonObjectLiteralDelta.{ObjectLiteral, ObjectLiteralMember}
-import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
+import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import _root_.core.bigrammar.grammars.ParseWhiteSpace
 import util.GraphBasics
 
@@ -103,8 +103,8 @@ object BiGrammarToTextMate {
           builder.append("\"" + member.key + "\"").append(": ")
           add(member.value)
 
-        case StringLiteralDelta.Shape =>
-          val regex = StringLiteralDelta.getValue(node)
+        case JsonStringLiteralDelta.Shape =>
+          val regex = JsonStringLiteralDelta.getValue(node)
           builder.append(stringToStringLiteral(regex))
       }
     }
@@ -144,7 +144,7 @@ object BiGrammarToTextMate {
 
             Match(textMateScope, regex.r)
         }
-    }).sortBy(n => n.scope)
+    }).sortBy(n => n.regex.regex)
 
     val patterns = typedPatterns.map(pattern => TextMateDelta.singleMatch(pattern.scope, pattern.regex))
     JsonObjectLiteralDelta.neww(Map(

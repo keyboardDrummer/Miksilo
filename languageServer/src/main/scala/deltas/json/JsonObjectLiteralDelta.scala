@@ -12,7 +12,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import deltas.json.StringLiteralDelta.stringInnerRegex
+import deltas.json.JsonStringLiteralDelta.stringInnerRegex
 
 case class DuplicateObjectLiteralKeys(duplicates: Seq[String]) extends BadInputException
 

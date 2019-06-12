@@ -6,7 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.Node
 import deltas.expression.ArrayLiteralDelta
-import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
+import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 
 import scala.util.matching.Regex
 
@@ -28,7 +28,7 @@ object TextMateDelta extends DeltaWithGrammar {
 
   def singleMatch(name: String, regex: Regex): Node = {
     JsonObjectLiteralDelta.neww(Map(
-      "name" -> StringLiteralDelta.literal(name),
-      "match" -> StringLiteralDelta.literal(regex.toString())))
+      "name" -> JsonStringLiteralDelta.literal(name),
+      "match" -> JsonStringLiteralDelta.literal(regex.toString())))
   }
 }
