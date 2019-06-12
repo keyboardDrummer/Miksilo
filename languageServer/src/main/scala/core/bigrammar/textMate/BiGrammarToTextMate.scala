@@ -17,7 +17,7 @@ object BiGrammarToTextMate {
     printJson(textMate)
   }
 
-  // TODO let this operate on parsers.
+  // TODO let this operate on parsers instead of BiGrammar, that way less cases have to be handled.
   def grammarToRegex(root: BiGrammar): Option[String] = {
     var callStack = List.empty[BiGrammar]
 
