@@ -27,11 +27,11 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
       val inner = {
         import core.bigrammar.DefaultBiGrammarWriter._
-        "\"" ~> RegexGrammar(stringInnerRegex).as(Value) ~< BiGrammarWriter.stringToGrammar("\"")
+        "\"" ~> RegexGrammar(stringInnerRegex) ~< BiGrammarWriter.stringToGrammar("\"")
       }
     import grammars._
     val grammar = create(DoubleQuotedGrammar, Colorize(inner, "string.quoted.double"))
-    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar.asLabelledNode(Shape))
+    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar.as(Value).asLabelledNode(Shape))
   }
 
   object DoubleQuotedGrammar extends GrammarKey
