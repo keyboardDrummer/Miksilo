@@ -1,6 +1,5 @@
 package deltas.json
 
-import core.bigrammar.DefaultBiGrammarWriter.keyword
 import core.bigrammar.grammars.{Colorize, Delimiter, RegexGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
