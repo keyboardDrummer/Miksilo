@@ -10,6 +10,8 @@ import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
 import _root_.core.bigrammar.grammars.ParseWhiteSpace
 import util.GraphBasics
 
+import scala.util.matching.Regex
+
 object BiGrammarToTextMate {
 
   def toTextMate(grammar: BiGrammar): String = {
@@ -116,21 +118,22 @@ object BiGrammarToTextMate {
       replace("\\", "\\\\") + "\""
   }
 
+  case class Match(scope: String, regex: Regex)
   def createTextMateAstFromBiGrammar(grammar: BiGrammar): Node = {
     val reachables = GraphBasics.traverseBreadth[BiGrammar](Seq(grammar), grammar => grammar.children,
       node => if (node.isInstanceOf[Colorize]) GraphBasics.SkipChildren else GraphBasics.Continue )
 
-    val patterns: Seq[Node] = reachables.collect({
+    val typedPatterns: Seq[Match] = reachables.collect({
       case delimiter: Delimiter =>
-        TextMateDelta.singleMatch("keyword.operator", escapeRegex(delimiter.value).r)
+        Match("keyword.operator", escapeRegex(delimiter.value).r)
       case keyword: Keyword /*if keyword.reserved*/ =>
-        TextMateDelta.singleMatch("keyword.control", ("\\b" + escapeRegex(keyword.value) + "\\b").r)
+        Match("keyword.control", ("\\b" + escapeRegex(keyword.value) + "\\b").r)
       case _: Identifier =>
-        TextMateDelta.singleMatch("variable", """\b[A-Za-z][A-Za-z0-9_]*\b""".r)
+        Match("variable", """\b[A-Za-z][A-Za-z0-9_]*\b""".r)
       case NumberGrammar =>
-        TextMateDelta.singleMatch("constant.numeric", """-?\d+""".r)
+        Match("constant.numeric", """-?\d+""".r)
       case StringLiteral =>
-        TextMateDelta.singleMatch("string.quoted", """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*"""".r)
+        Match("string.quoted", """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*"""".r)
       case Colorize(inner, textMateScope) =>
         val maybeRegex = grammarToRegex(inner)
         maybeRegex match {
@@ -139,12 +142,13 @@ object BiGrammarToTextMate {
             if (regex.contains("\\n") || regex.contains("\\s"))
               throw new Exception(s"Colorize regex $regex contained a newline")
 
-            TextMateDelta.singleMatch(textMateScope, regex.r)
+            Match(textMateScope, regex.r)
         }
-    })
+    }).sortBy(n => n.scope)
 
+    val patterns = typedPatterns.map(pattern => TextMateDelta.singleMatch(pattern.scope, pattern.regex))
     JsonObjectLiteralDelta.neww(Map(
-      "patterns" -> ArrayLiteralDelta.create(patterns.toSeq)
+      "patterns" -> ArrayLiteralDelta.create(patterns)
     ))
   }
 

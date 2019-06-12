@@ -12,12 +12,20 @@ class TextMateTest extends FunSuite {
     val expectation = """{
                         |  "patterns": [
                         |    {
+                        |      "name": "constant.numeric",
+                        |      "match": "-?\\d+"
+                        |    },
+                        |    {
                         |      "name": "keyword.control",
                         |      "match": "\\btrue\\b"
                         |    },
                         |    {
                         |      "name": "keyword.control",
                         |      "match": "\\bfalse\\b"
+                        |    },
+                        |    {
+                        |      "name": "keyword.control",
+                        |      "match": "\\b,\\b"
                         |    },
                         |    {
                         |      "name": "keyword.operator",
@@ -28,10 +36,6 @@ class TextMateTest extends FunSuite {
                         |      "match": "\\}"
                         |    },
                         |    {
-                        |      "name": "string.quoted.single",
-                        |      "match": "'[^']*'"
-                        |    },
-                        |    {
                         |      "name": "keyword.operator",
                         |      "match": "\\["
                         |    },
@@ -40,20 +44,20 @@ class TextMateTest extends FunSuite {
                         |      "match": "\\]"
                         |    },
                         |    {
-                        |      "name": "string.quoted.double",
-                        |      "match": "\\"([^\\"\\x00-\\x1F\\x7F\\\\]|\\\\[\\\\'\\"bfnrt]|\\\\u[a-fA-F0-9]{4})*\\""
-                        |    },
-                        |    {
-                        |      "name": "constant.numeric",
-                        |      "match": "-?\\d+"
-                        |    },
-                        |    {
                         |      "name": "keyword.operator",
                         |      "match": ","
                         |    },
                         |    {
                         |      "name": "keyword.operator",
                         |      "match": ":"
+                        |    },
+                        |    {
+                        |      "name": "string.quoted.double",
+                        |      "match": "\\"([^\\"\\x00-\\x1F\\x7F\\\\]|\\\\[\\\\'\\"bfnrt]|\\\\u[a-fA-F0-9]{4})*\\""
+                        |    },
+                        |    {
+                        |      "name": "string.quoted.single",
+                        |      "match": "'[^']*'"
                         |    }
                         |  ]
                         |}""".stripMargin
