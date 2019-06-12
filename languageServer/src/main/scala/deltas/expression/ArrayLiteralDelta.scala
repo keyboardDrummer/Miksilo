@@ -27,7 +27,7 @@ object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     import _grammars._
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val inner = "[" ~ JsonObjectLiteralDelta.commaSeparatedVertical(grammars, expressionGrammar).as(Members) % "]"
+    val inner = "[" ~ expressionGrammar.manySeparated(",").as(Members) ~ "]"
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
   }

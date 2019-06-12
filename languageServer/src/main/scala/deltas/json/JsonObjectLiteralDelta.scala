@@ -29,17 +29,10 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val keyGrammar = find(StringLiteralDelta.DoubleQuotedGrammar).as(MemberKey)
     val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
-    val inner = "{" %> commaSeparatedVertical(grammars, member).as(Members).indent() %< "}"
+    val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< Parse(Keyword(",") | value(Unit))).indent() %< "}"
 
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
-  }
-
-  def commaSeparatedVertical(grammars: LanguageGrammars, member: BiGrammar) = {
-    import grammars._
-    ((member ~< "," ~< printSpace).manyVertical % member.option).map[(Seq[Any], Option[Any]), Seq[Any]](t => {
-      t._2.fold(t._1)(last => t._1 ++ Seq(last))
-    }, r => if (r.nonEmpty) (r.dropRight(1), Some(r.last)) else (Seq.empty, None))
   }
 
   object MemberShape extends NodeShape

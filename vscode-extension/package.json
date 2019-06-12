@@ -85,11 +85,6 @@
             }
         ],
         "grammars": [
-			{
-				"language": "smithy",
-				"scopeName": "source.smithy",
-				"path": "./src/smithy/tmLanguage.json"
-			},
             {
               "language": "systemverilog",
               "scopeName": "text.systemverilog",
