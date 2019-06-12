@@ -1,7 +1,7 @@
 package deltas.json
 
 import core.bigrammar.DefaultBiGrammarWriter.keyword
-import core.bigrammar.grammars.{Delimiter, RegexGrammar}
+import core.bigrammar.grammars.{Colorize, Delimiter, RegexGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
@@ -17,7 +17,7 @@ object SingleQuotedStringLiteralDelta extends DeltaWithGrammar {
 
     val inner = {
       import core.bigrammar.DefaultBiGrammarWriter._
-      Delimiter("'") ~> RegexGrammar("""[^']*""".r).as(StringLiteralDelta.Value) ~< Delimiter("'")
+      Colorize(Delimiter("'") ~> RegexGrammar("""[^']*""".r).as(StringLiteralDelta.Value) ~< Delimiter("'"), 0, "string.quoted.single")
     }
     import grammars._
     find(StringLiteralDelta.Shape).addAlternative(inner.asNode(StringLiteralDelta.Shape))

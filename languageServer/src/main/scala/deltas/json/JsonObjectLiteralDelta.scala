@@ -27,7 +27,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     import _grammars._
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val keyGrammar = create(MemberKey, "\"" ~> RegexGrammar(StringLiteralDelta.stringInnerRegex).as(MemberKey) ~< "\"")
+    val keyGrammar = find(StringLiteralDelta.DoubleQuotedGrammar).as(MemberKey)
     val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val inner = "{" %> commaSeparatedVertical(grammars, member).as(Members).indent() %< "}"
 

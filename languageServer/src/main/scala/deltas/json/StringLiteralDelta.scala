@@ -5,7 +5,7 @@ import core.bigrammar.grammars.{BiSequence, Colorize, RegexGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.node.{Node, NodeField, NodeShape}
+import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -30,10 +30,11 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
         "\"" ~> RegexGrammar(stringInnerRegex).as(Value) ~< BiGrammarWriter.stringToGrammar("\"")
       }
     import grammars._
-    val grammar = inner.asLabelledNode(Shape)
-    val colored = Colorize(grammar, 0, "string.quoted")
-    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(colored)
+    val grammar = create(DoubleQuotedGrammar, Colorize(inner, 0, "string.quoted.double"))
+    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar.asLabelledNode(Shape))
   }
+
+  object DoubleQuotedGrammar extends GrammarKey
 
   def literal(value: String) = new Node(Shape, Value -> value)
 

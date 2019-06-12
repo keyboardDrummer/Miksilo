@@ -8,6 +8,7 @@ import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.json.JsonObjectLiteralDelta.{ObjectLiteral, ObjectLiteralMember}
 import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
 import _root_.core.bigrammar.grammars.ParseWhiteSpace
+import util.GraphBasics
 
 object BiGrammarToTextMate {
 
@@ -101,17 +102,25 @@ object BiGrammarToTextMate {
           add(member.value)
 
         case StringLiteralDelta.Shape =>
-          builder.append("\"" + StringLiteralDelta.getValue(node).replace("\\", "\\\\") + "\"")
+          val regex = StringLiteralDelta.getValue(node)
+          builder.append(stringToStringLiteral(regex))
       }
     }
     add(root)
     builder.toString()
   }
 
-  def createTextMateAstFromBiGrammar(grammar: BiGrammar): Node = {
-    val reachables = grammar.selfAndDescendants.toSet
+  private def stringToStringLiteral(value: String) = {
+    "\"" + value.
+      replace("\"", "\\\"").
+      replace("\\", "\\\\") + "\""
+  }
 
-    val patterns: Set[Node] = reachables.collect({
+  def createTextMateAstFromBiGrammar(grammar: BiGrammar): Node = {
+    val reachables = GraphBasics.traverseBreadth[BiGrammar](Seq(grammar), grammar => grammar.children,
+      node => if (node.isInstanceOf[Colorize]) GraphBasics.SkipChildren else GraphBasics.Continue )
+
+    val patterns: Seq[Node] = reachables.collect({
       case delimiter: Delimiter =>
         TextMateDelta.singleMatch("keyword.operator", escapeRegex(delimiter.value).r)
       case keyword: Keyword /*if keyword.reserved*/ =>

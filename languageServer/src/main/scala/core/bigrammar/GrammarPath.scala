@@ -2,6 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.grammars._
 import core.language.node.{Key, NodeField, NodeGrammar, NodeShape}
+import util.GraphBasics.{Continue, Halt}
 import util.{ExtendedType, GraphBasics, Property}
 
 import scala.collection.concurrent._
@@ -49,10 +50,10 @@ trait GrammarPath {
       path =>
         if (predicate(path)) {
           result = Some(path).collect({case x: GrammarReference => x})
-          false
+          Halt
         }
         else {
-          true
+          Continue
         }
     )
     result
