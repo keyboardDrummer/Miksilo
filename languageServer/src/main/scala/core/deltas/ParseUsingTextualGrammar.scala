@@ -25,15 +25,20 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
     }
     if (!parseResult.successful) {
       val diagnostics = DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.errors)
-      compilation.diagnostics ++= diagnostics.map(d => FileDiagnostic(uri, d))
+      compilation.diagnostics ++= diagnostics.map(d => FileDiagnostic(uri, d)).reverse
     }
   }
 
-  def parseStream[T](parser: Input => SingleParseResult[T], input: InputStream): SingleParseResult[T] = {
-    parser(new Reader(SourceUtils.streamToString(input)))
+  def parseStream[T](parser: SingleResultParser[T], input: InputStream): SingleParseResult[T] = {
+    var stepsTaken = 0
+    val mayStop = () => {
+      stepsTaken += 1
+      stepsTaken >= 0
+    }
+    parser.parse(new Reader(SourceUtils.streamToString(input)), mayStop)
   }
 
-  val parserProp = new Property[Input => SingleParseResult[Node]](null)
+  val parserProp = new Property[SingleResultParser[Node]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

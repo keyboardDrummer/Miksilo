@@ -89,7 +89,7 @@ object CloudFormationTemplate extends Delta {
         for (parameter <- parameters.members) {
           builder.declare(parameter.key, rootScope, parameter.node.getSourceElement(MemberKey), Some(valueType))
         }
-      case None =>
+      case _ =>
     }
   }
 

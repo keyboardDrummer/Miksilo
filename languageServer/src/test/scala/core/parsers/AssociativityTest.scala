@@ -8,7 +8,7 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
   test("binary operators are right associative by default") {
     lazy val expr: Self[Any] = new Lazy(expr) ~< "-" ~ expr | wholeNumber
     val input = "1-2-3"
-    val result = expr.getWholeInputParser()(new StringReader(input))
+    val result = expr.getWholeInputParser().parse(new StringReader(input))
     assert(result.successful)
     assertResult(("1",("2","3")))(result.get)
   }
@@ -16,7 +16,7 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
   test("binary operators can be made left associative") {
     lazy val expr: Self[Any] = wholeNumber.addAlternative[Any]((before, after) => after ~< "-" ~ before)
     val input = "1-2-3"
-    val result = expr.getWholeInputParser()(new StringReader(input))
+    val result = expr.getWholeInputParser().parse(new StringReader(input))
     assert(result.successful)
     assertResult((("1","2"),"3"))(result.get)
   }
@@ -24,7 +24,7 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
   test("binary operators can be explicitly right associative") {
     lazy val expr: SequenceParserExtensions[Any] = wholeNumber.addAlternative[Any]((before, after) => before ~< "-" ~ after)
     val input = "1-2-3"
-    val result = expr.getWholeInputParser()(new StringReader(input))
+    val result = expr.getWholeInputParser().parse(new StringReader(input))
     assert(result.successful)
     assertResult(("1",("2","3")))(result.get)
   }
@@ -35,17 +35,17 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
       addAlternative[Any]((before, after) => "if{" ~> expr ~ "then{" ~ after ~ "else{" ~ before).
       addAlternative[Any]((before, after) => "if{" ~> expr ~ "then{" ~ after)
     val input = "if{1then{if{2then{3else{4"
-    val result = stmt.getWholeInputParser()(new StringReader(input))
+    val result = stmt.getWholeInputParser().parse(new StringReader(input))
     assert(result.successful)
     val nestedIf = (((("2", "then{"), "3"), "else{"), "4")
     assertResult((("1","then{"),nestedIf))(result.get)
 
     val input2 = "if{1then{if{2then{3else{4else{5"
-    val result2 = stmt.getWholeInputParser()(new StringReader(input2))
+    val result2 = stmt.getWholeInputParser().parse(new StringReader(input2))
     assert(result2.successful)
 
     val input3 = "if{1then{if{2then{3"
-    val result3 = stmt.getWholeInputParser()(new StringReader(input3))
+    val result3 = stmt.getWholeInputParser().parse(new StringReader(input3))
     assert(result3.successful)
   }
 
@@ -55,7 +55,7 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
       "if{" ~> expr ~ "then{" ~ stmt ~ "else{" ~ stmt |
       "if{" ~> expr ~ "then{" ~ stmt
     val input = "if{1then{if{2then{3else{4"
-    val result = stmt.getWholeInputParser()(new StringReader(input))
+    val result = stmt.getWholeInputParser().parse(new StringReader(input))
     assert(result.successful)
 
     val nestedIf = (("2", "then{"), "3")
@@ -68,13 +68,13 @@ class AssociativityTest extends FunSuite with CommonStringReaderParser with Left
       addAlternative[Any]((before, after) => "if{" ~> expr ~ "then{" ~ after).
       addAlternative[Any]((before, after) => "if{" ~> expr ~ "then{" ~ after ~ "else{" ~ after)
     val input = "if{1then{if{2then{3else{4"
-    val result = stmt.getWholeInputParser()(new StringReader(input))
+    val result = stmt.getWholeInputParser().parse(new StringReader(input))
     assert(result.successful)
     val nestedIf = (("2", "then{"), "3")
     assertResult((((("1","then{"),nestedIf),"else{"),"4"))(result.get)
 
     val input2 = "if{1then{if{2then{3else{4else{5"
-    val result2 = stmt.getWholeInputParser()(new StringReader(input2))
+    val result2 = stmt.getWholeInputParser().parse(new StringReader(input2))
     assert(result2.successful)
   }
 }

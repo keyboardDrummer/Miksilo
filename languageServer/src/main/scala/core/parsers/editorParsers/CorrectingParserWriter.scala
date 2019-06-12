@@ -156,7 +156,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     override def recursionsFor[SeedResult](parser: Parser[SeedResult]) = {
       val remainder = recursions - parser
       RecursionsList(
-        recursions(parser).asInstanceOf[List[RecursiveParseResult[SeedResult, Result]]],
+        recursions.getOrElse(parser, List.empty).asInstanceOf[List[RecursiveParseResult[SeedResult, Result]]],
         if (remainder.isEmpty) tail else RecursiveResults(remainder, tail))
     }
 
@@ -394,7 +394,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   override def succeed[Result](result: Result): Self[Result] = Succeed(result)
 
-  case class SingleParseResult[Result](resultOption: Option[Result], errors: List[MyParseError]) {
+  case class SingleParseResult[+Result](resultOption: Option[Result], errors: List[MyParseError]) {
     def successful = errors.isEmpty
     def get: Result = resultOption.get
   }

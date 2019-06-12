@@ -21,7 +21,7 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
     from.value match {
       case string: String =>
         if (verifyWhenPrinting) {
-          val parseResult = parser(new Reader(string))
+          val parseResult = parser.parse(new Reader(string))
           parseResult.resultOption match {
             case Some(result) if parseResult.successful && result.equals(from.value) => TryState.value(string)
             case _ => Printer.fail("StringGrammar could not parse string")

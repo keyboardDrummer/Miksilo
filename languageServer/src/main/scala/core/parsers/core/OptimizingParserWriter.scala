@@ -122,13 +122,6 @@ trait OptimizingParserWriter extends ParserWriter {
         case _ =>
       },
       cycle => {
-        val cycleArray = cycle.toArray
-        val leftRecursive = cycleArray.indices.forall(index => {
-          val left = cycleArray(index)
-          val right = cycleArray((index + 1) % cycleArray.length)
-          right.leftChildren.contains(left)
-        })
-        if (leftRecursive)
           nodesThatShouldDetectLeftRecursion += cycle.head
       })
 

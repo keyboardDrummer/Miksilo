@@ -47,7 +47,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
   def toStringParser(grammar: BiGrammar): String => SingleParseResult[Any] = {
     val parser = toParserBuilder(grammar).getWholeInputParser()
-    input => parser(new Reader(input))
+    input => parser.parse(new Reader(input))
   }
 
   def toParserBuilder(grammar: BiGrammar): Self[Any] = {

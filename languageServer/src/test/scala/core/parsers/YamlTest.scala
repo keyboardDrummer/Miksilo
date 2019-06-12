@@ -183,7 +183,7 @@ class YamlTest extends FunSuite
     val input =
       """/cloudformation_graphic.png" alt="AWS CloudFormation
         |         Logo"/""".stripMargin
-    val result = plainStyleMultiLineString.getWholeInputParser()(new IndentationReader(input).withContext(FlowIn))
+    val result = plainStyleMultiLineString.getWholeInputParser().parse(new IndentationReader(input).withContext(FlowIn))
     assert(result.successful)
   }
 
@@ -192,7 +192,7 @@ class YamlTest extends FunSuite
                   |                                              Examples], /cloudformation_graphic.png" alt="AWS CloudFormation
                   |                                                           Logo"/>, '<h1>Congratulations, you have successfully launched
                   |                    the AWS CloudFormation sample.</h1>']""".stripMargin
-    val result = parseValue.getWholeInputParser()(new IndentationReader(input))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(input))
     assert(result.successful)
   }
 
@@ -214,7 +214,7 @@ class YamlTest extends FunSuite
                   |
                   |            ']
                   |""".stripMargin
-    val result = parseValue.getWholeInputParser()(new IndentationReader(input))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(input))
     assert(result.successful)
   }
 
@@ -222,14 +222,14 @@ class YamlTest extends FunSuite
   test("string") {
     val program = "'hello'"
 
-    val result = parseStringLiteral.getWholeInputParser()(new IndentationReader(program))
+    val result = parseStringLiteral.getWholeInputParser().parse(new IndentationReader(program))
     assertResult(StringLiteral("hello"))(result.get)
   }
 
   test("number") {
     val program = "3"
 
-    val result = parseNumber.getWholeInputParser()(new IndentationReader(program))
+    val result = parseNumber.getWholeInputParser().parse(new IndentationReader(program))
     assertResult(Number(3))(result.get)
   }
 
@@ -237,7 +237,7 @@ class YamlTest extends FunSuite
     val program =
       """minecraft: 2""".stripMargin
 
-    val result = parseValue.getWholeInputParser()(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Object(Map(StringLiteral("minecraft") -> Number(2)))
     assertResult(expectation)(result.get)
   }
@@ -247,7 +247,7 @@ class YamlTest extends FunSuite
       """minecraft: 2
         |cancelled: 3""".stripMargin
 
-    val result = parseValue.getWholeInputParser()(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Object(Map(StringLiteral("minecraft") -> Number(2), StringLiteral("cancelled") -> Number(3)))
     assertResult(expectation)(result.get)
   }
@@ -257,7 +257,7 @@ class YamlTest extends FunSuite
       """- 2
         |- 3""".stripMargin
 
-    val result = parseValue.getWholeInputParser()(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(Number(2), Number(3)))
     assertResult(expectation)(result.get)
   }
@@ -267,7 +267,7 @@ class YamlTest extends FunSuite
       """- x: 3
         |  y: 4""".stripMargin
 
-    val result = parseValue.getWholeInputParser()(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
@@ -278,7 +278,7 @@ class YamlTest extends FunSuite
         |  y: 4
         |- 2""".stripMargin
 
-    val result = parseValue.getWholeInputParser()(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4))), Number(2)))
     assertResult(expectation)(result.get)
   }
@@ -289,7 +289,7 @@ class YamlTest extends FunSuite
         |- x: 3
         |  y: 4""".stripMargin
 
-    val result = parseValue.getWholeInputParser()(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(Number(2), Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
@@ -299,7 +299,7 @@ class YamlTest extends FunSuite
       """- a: - 1
         |- b: - 2""".stripMargin
 
-    val result = parseValue.getWholeInputParser()(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(
       Object(Map(
         StringLiteral("a") -> Array(Seq(Number(1))))),
@@ -322,7 +322,7 @@ class YamlTest extends FunSuite
         |     - 8
         |  r: 9""".stripMargin
 
-    val result = parseValue.getWholeInputParser()(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation =
       Array(Seq(
         Number(2),
@@ -339,7 +339,7 @@ class YamlTest extends FunSuite
 
   test("big yaml file") {
     val contents = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
-    val result = parseValue.getWholeInputParser()(new IndentationReader(contents))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(contents))
     assert(result.successful, result.toString)
   }
 }

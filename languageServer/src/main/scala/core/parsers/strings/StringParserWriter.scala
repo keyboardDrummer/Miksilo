@@ -88,10 +88,10 @@ trait StringParserWriter extends SequenceParserWriter {
             val arrayIndex = index + input.offset
             if (array.length <= arrayIndex) {
               return singleResult(ReadyParseResult(Some(value), input,
-                History.error(new MissingInput(input, s"'$value'", History.endOfSourceInsertion))))
+                History.error(new MissingInput(input, value, History.endOfSourceInsertion))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               return singleResult(ReadyParseResult(Some(value), input,
-                History.error(MissingInput(input, input.drop(index + 1), s"'$value'"))))
+                History.error(MissingInput(input, input.drop(index + 1), value))))
             }
             index += 1
           }
@@ -147,7 +147,7 @@ trait StringParserWriter extends SequenceParserWriter {
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
-              singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, regexName, History.missingInputPenalty))))
+              singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, s"<$regexName>", History.missingInputPenalty))))
           }
         }
       }

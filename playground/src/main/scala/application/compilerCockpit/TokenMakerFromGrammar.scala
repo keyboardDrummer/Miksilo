@@ -12,7 +12,7 @@ import scala.util.matching.Regex
 case class MyToken(tokenType: Int, text: String)
 class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
-  val parser: SequenceParserExtensions[Seq[MyToken]] = {
+  val parserBuilder: SequenceParserExtensions[Seq[MyToken]] = {
     val keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = grammar.selfAndDescendants.toSet
 
@@ -35,7 +35,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     val errorToken = regex(new Regex("."), "anything") ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
     (allTokenParsers.reduce((a, b) => a | b) | errorToken).*
   }
-  lazy val optimizedParser = parser.getWholeInputParser()
+  lazy val parser = parserBuilder.getWholeInputParser()
 
   override def getWordsToHighlight: TokenMap = new TokenMap()
 
@@ -43,7 +43,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
     resetTokenList()
 
-    val resultOption: SingleParseResult[Seq[MyToken]] = optimizedParser(new Reader(text.toString))
+    val resultOption: SingleParseResult[Seq[MyToken]] = parser.parse(new Reader(text.toString))
     var start = text.offset
     if (resultOption.successful) {
       val tokens = resultOption.get

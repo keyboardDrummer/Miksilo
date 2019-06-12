@@ -86,7 +86,8 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class Fallback[Result](value: Result, name: String) extends ParserBuilderBase[Result] with LeafParser[Result] { // TODO combine with failure?
     override def getParser(recursive: GetParser): Parser[Result] = {
       (input, _) => {
-        val result = ReadyParseResult(Some(value), input, History.error(new MissingInput(input, name, History.insertFallbackPenalty)))
+        val history = History.error(new MissingInput(input, s"<$name>", History.insertFallbackPenalty))
+        val result = ReadyParseResult(Some(value), input, history)
         singleResult(result)
       }
     }
@@ -222,17 +223,21 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     def withDefault[Other >: Result](_default: Other): Self[Other] = WithDefault(parser, _default)
 
-    def getParser(mayStop: () => Boolean): Input => SingleParseResult[Result] = {
+    def getSingleResultParser: SingleResultParser[Result] = {
       val parser = compile(this.parser).buildParser(this.parser)
-      input => findBestParseResult(parser, input, mayStop)
+      (input, mayStop) => findBestParseResult(parser, input, mayStop)
     }
 
-    def getWholeInputParser(mayStop: () => Boolean = () => true): Input => SingleParseResult[Result] = {
-      ParseWholeInput(parser).getParser(mayStop)
+    def getWholeInputParser(): SingleResultParser[Result] = {
+      ParseWholeInput(parser).getSingleResultParser
     }
 
     def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Self[Other] = {
       WithRangeParser(parser, addRange)
     }
+  }
+
+  trait SingleResultParser[+Result] {
+    def parse(input: Input, mayStop: () => Boolean = () => true): SingleParseResult[Result]
   }
 }

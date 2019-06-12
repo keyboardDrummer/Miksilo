@@ -31,6 +31,6 @@ trait PrefixOperatorDelta extends DeltaWithGrammar with ExpressionInstance {
   override def description: String = s"Adds the prefix $keyword operator."
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
-    ExpressionDelta.getConstraints(compilation, builder, expression(Target).asInstanceOf[NodePath], _type, parentScope)
+    ExpressionDelta.addConstraints(compilation, builder, expression(Target).asInstanceOf[NodePath], _type, parentScope)
   }
 }

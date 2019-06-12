@@ -2,7 +2,6 @@ package core.parsers
 
 import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
-import editorParsers.LeftRecursiveCorrectingParserWriter
 
 class CorrectJsonTest extends FunSuite {
   import ParseJson._
@@ -172,10 +171,29 @@ class CorrectJsonTest extends FunSuite {
   test("mass garbage, and virtual left recursion through error correction") {
     val input = """doesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatch"""
     lazy val parser: Self[Any] = "{" ~ parser | "!"
-    val result = parser.getWholeInputParser()(new StringReader(input))
+    val detectValueParser = new DetectValueParser(("{",("{", ("{", "!"))), parser)
+    val result = detectValueParser.getWholeInputParser().parse(new StringReader(input))
+    assert(!detectValueParser.detected)
     assertResult(2)(result.errors.size)
     assert(result.resultOption.nonEmpty)
     assertResult("!")(result.resultOption.get)
+  }
+
+  class DetectValueParser[Result](valueToDetect: Result, val original: ParserBuilder[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
+    var detected = false
+
+    override def getParser(recursive: ParseJson.GetParser) = {
+      val parseOriginal = recursive(original)
+      (input, state) => {
+        val result = parseOriginal(input, state)
+        result.map(resultValue => {
+          if (resultValue == valueToDetect) {
+            detected = true
+          }
+          resultValue
+        })
+      }
+    }
   }
 
   // Add test for left recursion and errors
@@ -185,10 +203,11 @@ class CorrectJsonTest extends FunSuite {
 
   private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
     var stepsTaken = 0
-    val result = jsonParser.getWholeInputParser(() => {
+    val mayStop = () => {
       stepsTaken += 1
       stepsTaken >= steps
-    })(new StringReader(input))
+    }
+    val result = jsonParser.getWholeInputParser().parse(new StringReader(input), mayStop)
     System.out.append(result.errors.toString())
     assertResult(expectation)(result.resultOption.get)
     assertResult(errorCount)(result.errors.size)
