@@ -131,7 +131,7 @@ object BiGrammarToTextMate {
         TextMateDelta.singleMatch("constant.numeric", """-?\d+""".r)
       case StringLiteral =>
         TextMateDelta.singleMatch("string.quoted", """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*"""".r)
-      case Colorize(inner, _, textMateScope) =>
+      case Colorize(inner, textMateScope) =>
         val maybeRegex = grammarToRegex(inner)
         maybeRegex match {
           case None => throw new Exception("Colorize did not contain a regex")
