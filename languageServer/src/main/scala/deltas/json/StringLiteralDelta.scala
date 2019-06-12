@@ -30,7 +30,7 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
         "\"" ~> RegexGrammar(stringInnerRegex).as(Value) ~< BiGrammarWriter.stringToGrammar("\"")
       }
     import grammars._
-    val grammar = create(DoubleQuotedGrammar, Colorize(inner, 0, "string.quoted.double"))
+    val grammar = create(DoubleQuotedGrammar, Colorize(inner, "string.quoted.double"))
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar.asLabelledNode(Shape))
   }
 

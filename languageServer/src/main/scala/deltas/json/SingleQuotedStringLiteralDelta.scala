@@ -17,7 +17,7 @@ object SingleQuotedStringLiteralDelta extends DeltaWithGrammar {
 
     val inner = {
       import core.bigrammar.DefaultBiGrammarWriter._
-      Colorize(Delimiter("'") ~> RegexGrammar("""[^']*""".r).as(StringLiteralDelta.Value) ~< Delimiter("'"), 0, "string.quoted.single")
+      Colorize(Delimiter("'") ~> RegexGrammar("""[^']*""".r).as(StringLiteralDelta.Value) ~< Delimiter("'"), "string.quoted.single")
     }
     import grammars._
     find(StringLiteralDelta.Shape).addAlternative(inner.asNode(StringLiteralDelta.Shape))
