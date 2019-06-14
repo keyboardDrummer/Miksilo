@@ -5,6 +5,7 @@ import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import javax.swing.text.Segment
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
+import util.GraphBasics
 
 import scala.collection.mutable
 import scala.util.matching.Regex
@@ -20,7 +21,8 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
 
   val parserBuilder: SequenceParserExtensions[Seq[MyToken]] = {
     val keywords: mutable.Set[String] = mutable.Set.empty
-    val reachables = grammar.selfAndDescendants.toSet
+    val reachables = GraphBasics.traverseBreadth[BiGrammar](Seq(grammar), grammar => grammar.children,
+      node => if (node.isInstanceOf[Colorize]) GraphBasics.SkipChildren else GraphBasics.Continue ).toSet
 
     val tokenParsers: Set[BiGrammarToParser.Self[MyToken]] = reachables.collect({
       case keyword: Keyword if keyword.reserved =>
@@ -39,7 +41,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     val allTokenParsers = tokenParsers ++ Seq(whiteSpaceToken)
 
     val errorToken = regex(new Regex("."), "anything") ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
-    (allTokenParsers.reduce((a, b) => a | b) | errorToken).*
+    choice(allTokenParsers.reduce((a, b) => a | b), errorToken, firstIsLonger = true).*
   }
   lazy val parser = parserBuilder.getWholeInputParser()
 
