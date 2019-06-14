@@ -31,7 +31,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                 SREmpty
               else
                 tail
-            case _ => SREmpty
+            case _ =>
+              SREmpty
           }
         case delayedResult: DelayedParseResult[Result] =>
           val results = delayedResult.results

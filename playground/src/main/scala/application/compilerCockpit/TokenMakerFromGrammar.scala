@@ -26,7 +26,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
       case StringLiteral =>
         stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
       case Colorize(inner, _type) =>
-        BiGrammarToParser.toParser(inner, keywords) ^^ (s => MyToken(_type, s.asInstanceOf[String]))
+        BiGrammarToParser.toParserBuilder(inner, keywords) ^^ (s => MyToken(_type, s.asInstanceOf[String]))
     })
 
     val whiteSpaceToken = regex(new Regex("\\s+"), "whitespace") ^^ (s => MyToken(TokenTypes.WHITESPACE, s))

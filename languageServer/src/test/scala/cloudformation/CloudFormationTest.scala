@@ -18,12 +18,6 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
     assert(result.size == 1)
   }
 
-  test("starting brace insertion 2") {
-    val input = """{"person""remy":"jeroen"}}"""
-    val diagnostics = getDiagnostic(jsonServer, input)
-    assert(diagnostics.size == 2)
-  }
-
   test("Goto definition resource reference") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     val result: Seq[Location] = gotoDefinition(jsonServer, program, new HumanPosition(365, 37))

@@ -23,8 +23,8 @@ class TestClassFileDecompiler extends FunSuite {
     val language = compiler.language
 
     val grammar = language.grammars.find(TypeAbstraction.AbstractMethodTypeGrammar)
-    val parser = toStringParser(grammar)
-    val parseResult = parser(signature)
+    val parser = toParser(grammar)
+    val parseResult = parser.parse(new Reader(signature))
     val result = parseResult.get.asInstanceOf[Node]
   }
 
@@ -33,7 +33,8 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.language
 
-    val result = toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))(signature).get.asInstanceOf[Node]
+    val parser = toParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val result = parser.parse(new Reader(signature)).get.asInstanceOf[Node]
   }
 
   test("TypeVariable2") {
@@ -41,8 +42,8 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.language
 
-    val parser = toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
-    val result = parser(signature).get.asInstanceOf[Node]
+    val parser = toParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val result = parser.parse(new Reader(signature)).get.asInstanceOf[Node]
   }
 
   test("TypeVariable3") {
@@ -50,8 +51,8 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.language
 
-    val parser = toStringParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
-    val result = parser(signature).get.asInstanceOf[Node]
+    val parser = toParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val result = parser.parse(new Reader(signature)).get.asInstanceOf[Node]
   }
 
   ignore("decompileRuntimeJar") {
@@ -120,7 +121,7 @@ class TestClassFileDecompiler extends FunSuite {
   test("PrintStreamClassSignatureDeCompilation") {
     val compiler = TestLanguageBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
     val state = compiler.compileStream(SourceUtils.getTestFile("PrintStream.class"))
-    val output = TestLanguageBuilder.build(Seq(new PrettyPrint()) ++ JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(state.program).output
+    val output = TestLanguageBuilder.build(Seq(PrettyPrint()) ++ JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(state.program).output
 
     val expected = SourceUtils.getTestFileContents("DecompiledPrintStreamClassFileSignature.txt")
     assertResult(expected)(output)
