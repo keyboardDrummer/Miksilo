@@ -135,7 +135,7 @@ object StackMapTableAttributeDelta extends ByteCodeAttribute {
     val chopFrameGrammar = "chopFrame" ~> offsetGrammar ~> ("," ~~ "count" ~ ":" ~> integer.as(ChopFrameCount)) asNode ChopFrame
     val nameGrammar = "name" ~ ":" ~~> find(ConstantPoolIndexGrammar).as(AttributeNameKey)
     val stackMapGrammar: BiGrammar = create(StackMapFrameGrammar, sameFrameGrammar | appendFrameGrammar | sameLocals1StackItemGrammar | chopFrameGrammar)
-    val stackMapTableGrammar = (Keyword("StackMapTable", reserved = false) ~ ":" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(Maps)).
+    val stackMapTableGrammar = (stringToGrammar("StackMapTable", reserved = false) ~ ":" ~~> nameGrammar % stackMapGrammar.manyVertical.indent().as(Maps)).
       asNode(Shape)
 
     create(Shape, stackMapTableGrammar)

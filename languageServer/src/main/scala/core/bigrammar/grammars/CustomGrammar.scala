@@ -9,5 +9,5 @@ trait CustomGrammar extends BiGrammar {
 
   def print(toDocumentInner: BiGrammar => ResponsiveDocument): ResponsiveDocument
   def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter
-  def toParser(recursive: BiGrammar => EditorParser[Result]): EditorParser[Result]
+  def toParser(recursive: BiGrammar => Self[Result]): Self[Result]
 }

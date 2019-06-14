@@ -17,7 +17,7 @@ object DoubleTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 
   override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
-    new Keyword("D",false) ~> value(doubleType)
+    Keyword("D", false) ~> value(doubleType)
   }
 
   override def getStackSize: Int = 2

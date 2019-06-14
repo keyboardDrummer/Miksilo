@@ -63,6 +63,7 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
 
   private def simplifyConstantEntryGrammars(language: Language): Unit = {
     val grammars = language.grammars
+    import grammars._
     for (entry <- ByteCodeSkeleton.constantEntries.get(language).values) {
       val entryGrammar = grammars.find(entry.shape).find(g => g.value.isInstanceOf[NodeGrammar]).get.value.asInstanceOf[NodeGrammar]
       entryGrammar.inner = entry.getConstantEntryGrammar(grammars)
@@ -70,6 +71,7 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   private def removeConstantPoolGrammar(language: Language): Unit = {
+    import language.grammars._
     val root: Labelled = language.grammars.root
     val constantPoolGrammar: GrammarReference = root.findLabelled(ConstantPoolGrammar)
     constantPoolGrammar.removeMe()

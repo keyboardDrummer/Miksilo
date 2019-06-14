@@ -74,7 +74,8 @@ object InferredStackFrames extends DeltaWithPhase with DeltaWithGrammar {
     "Stack frames can be used to determine the stack and variable types at a particular instruction."
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-    grammars.find(LabelDelta.Shape).
+    import grammars._
+    find(LabelDelta.Shape).
       findAs(LabelDelta.StackFrame).
       asInstanceOf[GrammarReference].removeMe()
   }

@@ -9,15 +9,27 @@ import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import deltas.PrettyPrint
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.{ExpressionDelta, IntLiteralDelta}
-import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.statement.{BlockDelta, StatementDelta}
+import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import util.{LanguageTest, SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
+object ExpressionAsRoot extends DeltaWithGrammar
+{
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    grammars.find(BodyGrammar).inner = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
+  }
+
+  override def description: String = ""
+
+  override def dependencies: Set[Contract] = Set.empty
+}
+
 class JavaStyleCommentsTest
-  extends LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++ JavaToByteCodeLanguage.javaCompilerDeltas))
-  with NodeGrammarWriter
+  extends LanguageTest(TestLanguageBuilder.buildWithParser(
+    Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++
+    JavaToByteCodeLanguage.javaCompilerDeltas))
 {
   object ParentClass extends NodeShape
   object ChildClass extends NodeShape
@@ -57,25 +69,6 @@ class JavaStyleCommentsTest
   test("BasicClass") {
     val input = "/* jooo */"
     TestGrammarUtils.parseAndPrintSame(input, None, SlashStarBlockCommentsDelta.commentGrammar)
-  }
-
-  object ExpressionAsRoot extends DeltaWithGrammar
-  {
-    override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-      grammars.find(BodyGrammar).inner = grammars.find(ExpressionDelta.FirstPrecedenceGrammar)
-    }
-
-    override def description: String = ""
-
-    override def dependencies: Set[Contract] = Set.empty
-  }
-
-  test("relational") {
-    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
-      JavaToByteCodeLanguage.javaCompilerDeltas))
-    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
-
-    grammarUtils.compareInputWithPrint("i < 3", grammarTransformer = ExpressionDelta.FirstPrecedenceGrammar)
   }
 
   test("addition") {
@@ -121,21 +114,25 @@ class JavaStyleCommentsTest
   }
 
   test("block transformation") {
-    val java = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).buildLanguage
-    val statementGrammar = java.grammars.find(StatementDelta.Grammar)
-    statementGrammar.inner = new NodeGrammar("statement", ParentClass)
-    val blockGrammar = java.grammars.find(BlockDelta.BlockGramar)
-    val language = LanguageFromDeltas(Seq.empty)
-    language.grammars.root.inner = blockGrammar
-    TriviaInsideNode.transformGrammars(language.grammars, language)
+    val (blockGrammar, statementGrammar, expectedStatementGrammar) = {
+      val java = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).buildLanguage
+      import java.grammars._
 
-    val expectedStatementGrammar: BiGrammar =
-      new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
+      val statementGrammar = java.grammars.find(StatementDelta.Grammar)
+      statementGrammar.inner = new NodeGrammar("statement", ParentClass)
+      val blockGrammar = java.grammars.find(BlockDelta.BlockGrammar)
+      val language = LanguageFromDeltas(Seq.empty)
+      language.grammars.root.inner = blockGrammar
+      TriviaInsideNode.transformGrammars(language.grammars, language)
+      val expectedStatementGrammar: BiGrammar =
+        new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
+      (blockGrammar, statementGrammar, expectedStatementGrammar)
+    }
 
     import DefaultBiGrammarWriter._
     val expectedBlockGrammar = "{" %>
-      new Labelled(StatementDelta.Grammar).manyVertical.as(BlockDelta.Statements).indent() %<
-      new WithTrivia(BiGrammarWriter.stringToGrammar("}"), language.grammars.trivia, false) asNode(BlockDelta.Shape)
+      As(new Labelled(StatementDelta.Grammar).manyVertical, BlockDelta.Statements).indent() %<
+      new NodeGrammar(new WithTrivia(BiGrammarWriter.stringToGrammar("}"), language.grammars.trivia, false), BlockDelta.Shape)
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }

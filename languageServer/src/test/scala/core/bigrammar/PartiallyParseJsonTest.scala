@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.grammars.{Labelled, NumberGrammar, StringLiteral}
+import core.bigrammar.grammars.{BiFallback, Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
 import org.scalatest.FunSuite
 
@@ -9,23 +9,25 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
   import BiGrammarToParser._
 
   object Json extends GrammarKey
-  val jsonGrammar = new Labelled(Json)
+  val jsonGrammar = new Labelled(Json, new BiFallback(UnknownExpression, "value"))
   private val memberParser: BiGrammar = StringLiteral ~< ":" ~ jsonGrammar
   private val objectParser: BiGrammar = "{" ~> memberParser.manySeparated(",") ~< "}"
-  object UnknownExpression
-  jsonGrammar.inner = new core.bigrammar.grammars.WithDefault(StringLiteral | objectParser | NumberGrammar, UnknownExpression)
-  val jsonParser = toParser(jsonGrammar)
+  object UnknownExpression {
+    override def toString = "<unknown>"
+  }
+  jsonGrammar.addAlternative(StringLiteral | objectParser | NumberGrammar)
+  val jsonParser = toParserBuilder(jsonGrammar)
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    val result = jsonParser.parseWholeInput(new Reader(input))
+    val result = jsonParser.getWholeInputParser().parse(new Reader(input))
     val value = getSuccessValue(result)
     assertResult(List(("person","3")))(value)
   }
 
   test("object with single member with string value") {
     val input = """{"person":"remy"}"""
-    val result = jsonParser.parseWholeInput(new Reader(input))
+    val result = jsonParser.getWholeInputParser().parse(new Reader(input))
     val value = getSuccessValue(result)
     assertResult(List(("person","remy")))(value)
   }
@@ -81,8 +83,14 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
   }
 
   test("real life example") {
-    val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subsc"""
-    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subsc",UnknownExpression))))))))
+    val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subscription"}}}}"""
+    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription",UnknownExpression))))))))
+    assertInputGivesPartialFailureExpectation(input, expectation)
+  }
+
+  test("real life example 2") {
+    val input = """{"Resources":{"NotificationTopic":{"Properties":{"Subsc"""
+    val expectation = List(("Resources",List(("NotificationTopic",List(("Properties",List(("Subsc",UnknownExpression))))))))
     assertInputGivesPartialFailureExpectation(input, expectation)
   }
 
@@ -90,21 +98,23 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
 
   }
 
+  ignore("garbage before key") {
+    val input = """{g"person":3}"""
+    val expectation = List("person" -> "3")
+    assertInputGivesPartialFailureExpectation(input, expectation)
+  }
+
+
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
-    val result = jsonParser.parseWholeInput(new Reader(input))
-    val failure: ParseFailure[Any] = getFailure(result)
-    assert(failure.partialResult.nonEmpty)
-    assertResult(expectation)(failure.partialResult.get)
-  }
-
-  private def getFailure(result: ParseResult[Any]): ParseFailure[Any] = {
+    val result = jsonParser.getWholeInputParser().parseUntilBetterOrXSteps(new Reader(input))
     assert(!result.successful)
-    result.biggestRealFailure.get
+    assert(result.resultOption.nonEmpty)
+    assertResult(expectation)(result.resultOption.get)
   }
 
-  private def getSuccessValue(result: ParseResult[Any]) = {
+  private def getSuccessValue(result: SingleParseResult[Any]) = {
     assert(result.successful)
-    result.get
+    result.resultOption.get
   }
 }
 

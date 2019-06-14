@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers.editorParsers.UnambiguousEditorParserWriter
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import langserver.types.Position
 
@@ -11,7 +11,7 @@ import scala.collection.mutable
 case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 
 //noinspection ZeroIndexToHead
-object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParserWriter
+object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrectingParserWriter
   with IndentationSensitiveParserWriter {
 
   type AnyWithMap = WithMap[Any]
@@ -45,10 +45,11 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
 
   def valueToResult(value: Any): Result = (state: State) => (state, WithMap(value, Map.empty))
 
-  def toStringParser(grammar: BiGrammar): String => ParseResult[Any] =
-    input => toParser(grammar).parseWholeInput(new Reader(input))
+  def toParser(grammar: BiGrammar): SingleResultParser[Any] = {
+    toParserBuilder(grammar).getWholeInputParser()
+  }
 
-  def toParser(grammar: BiGrammar): EditorParser[Any] = {
+  def toParserBuilder(grammar: BiGrammar): Self[Any] = {
 
     var keywords: Set[String] = Set.empty
     val allGrammars: Set[BiGrammar] = grammar.selfAndDescendants.toSet
@@ -57,15 +58,15 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
       case _ => Set.empty[String]
     })
 
-    toParser(grammar, keywords)
+    toParserBuilder(grammar, keywords)
   }
 
-  def toParser(grammar: BiGrammar, keywords: scala.collection.Set[String]): EditorParser[Any] = {
-    val cache: mutable.Map[BiGrammar, EditorParser[Result]] = mutable.Map.empty
-    lazy val recursive: BiGrammar => EditorParser[Result] = grammar => {
+  def toParserBuilder(grammar: BiGrammar, keywords: scala.collection.Set[String]): Self[Any] = {
+    val cache: mutable.Map[BiGrammar, Self[Result]] = mutable.Map.empty
+    lazy val recursive: BiGrammar => Self[Result] = grammar => {
       cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
     }
-    val resultParser = toParser(keywords, recursive, grammar)
+    val resultParser = recursive(grammar)
     resultParser.map(executeResult)
   }
 
@@ -74,7 +75,7 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
     afterStateRun._2.value
   }
 
-  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => EditorParser[Result], grammar: BiGrammar): EditorParser[Result] = {
+  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Self[Result], grammar: BiGrammar): Self[Result] = {
     grammar match {
       case sequence: BiSequence =>
         val firstParser = recursive(sequence.first)
@@ -90,12 +91,12 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
           }
         })
         parser
-      case choice: Choice =>
+      case choice: BiChoice =>
         val firstParser = recursive(choice.left)
         val secondParser = recursive(choice.right)
         firstParser | secondParser
 
-      case custom: CustomGrammarWithoutChildren => custom.getParser(keywords).map(valueToResult)
+      case custom: CustomGrammarWithoutChildren => custom.getParserBuilder(keywords).map(valueToResult)
       case custom: CustomGrammar => custom.toParser(recursive)
 
       case many: core.bigrammar.grammars.Many =>
@@ -109,13 +110,13 @@ object BiGrammarToParser extends CommonParserWriter with UnambiguousEditorParser
         val innerParser = recursive(mapGrammar.inner)
         innerParser.map(result => result.map(mapGrammar.construct))
 
-      case BiFailure(message) => fail(message)
+      case BiFailure(message) => Fail(None, message, History.failPenalty)
       case Print(_) => succeed(Unit).map(valueToResult)
       case ValueGrammar(value) => succeed(value).map(valueToResult)
 
       case labelled: Labelled =>
         lazy val inner = recursive(labelled.inner)
-        new EditorLazy(inner) //Laziness to prevent infinite recursion
+        new Lazy(inner, labelled.name) //Laziness to prevent infinite recursion
     }
   }
 }

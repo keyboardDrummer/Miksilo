@@ -1,10 +1,10 @@
 package deltas.javac.classes.skeleton
 
-import deltas.javac.JavaLang
+import deltas.javac.JavaStandardLibrary
 import deltas.javac.classes.{MethodInfo, MethodQuery}
 
 class JavaCompiler {
-  val classPath: PackageSignature = JavaLang.classPath
+  val classPath: PackageSignature = JavaStandardLibrary.classPath
 
   def getPackage(parts: List[String]): PackageSignature = classPath.getPackage(parts)
 

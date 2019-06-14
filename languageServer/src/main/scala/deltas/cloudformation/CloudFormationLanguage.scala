@@ -7,7 +7,8 @@ import deltas.json.JsonLanguage
 import deltas.yaml.YamlLanguage
 
 object CloudFormationLanguage {
-  val jsonDeltas: Seq[Delta] = Seq(CloudFormationTemplate) ++ JsonLanguage.deltas ++ Seq(SolveConstraintsDelta)
+  val jsonDeltas: Seq[Delta] = Seq(CloudFormationTemplate) ++
+    JsonLanguage.deltas ++ Seq(SolveConstraintsDelta)
   val jsonLanguage: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ jsonDeltas)
 
   val yamlDeltas: Seq[Delta] = Seq(ConvertObjectMemberKeysToStrings, ConvertTagsToObjectDelta, CloudFormationTemplate) ++

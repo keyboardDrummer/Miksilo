@@ -20,10 +20,11 @@ object LongLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   private def parseLong(number: String) = java.lang.Long.parseLong(number.dropRight(1))
 
-  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+  override def transformGrammars(_grammars: LanguageGrammars, state: Language): Unit = {
+    val grammars = _grammars
     import grammars._
-    val longGrammar : BiGrammar = RegexGrammar("""-?\d+l""".r).map[String, Long](
-      number => parseLong(number), l => s"${l}l") as ValueKey asNode Shape
+    val longGrammar : BiGrammar = grammars.regexGrammar("""-?\d+l""".r, "long literal").map[String, Long](
+      number => parseLong(number), l => s"${l}l") as ValueKey asLabelledNode Shape
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     expressionGrammar.addAlternative(longGrammar)
   }

@@ -27,14 +27,14 @@ object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
     import grammars._
     val parameterList = find(MethodDelta.Parameters)
 
-    val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
+    val blockGrammar: BiGrammar = find(BlockDelta.BlockGrammar)
     val body = blockGrammar.as(MethodDelta.Body)
     val optionalParameters = (parameterList | value(Seq.empty)).as(MethodDelta.Parameters)
     val grammar = "modifier" ~~ find(Name) ~
       optionalParameters ~~ body asNode Shape
     find(JavaClassDelta.Members).addAlternative(grammar)
 
-    val underscoreGrammar = keyword("_") asNode UnderScoreShape
+    val underscoreGrammar = keywordGrammar("_") asNode UnderScoreShape
     find(ExpressionDelta.LastPrecedenceGrammar).addAlternative(underscoreGrammar)
   }
 

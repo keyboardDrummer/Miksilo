@@ -24,22 +24,22 @@ object IncludeDelta extends DirectiveDelta {
 
     val parser = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
-    parseResult.successOption match {
-      case Some(success) =>
-        val value: VerilogFile[Node] = success.result.asInstanceOf[Node]
+    parseResult.resultOption match {
+      case Some(result) =>
+        val value: VerilogFile[Node] = result.asInstanceOf[Node]
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[NodeSequenceElement].replaceWith(value.members)
       case None =>
-        val diagnostic = DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.biggestRealFailure.get)
-        compilation.diagnostics ++= List(FileDiagnostic(filePath.toString(), diagnostic))
+        val diagnostics = DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.errors)
+        compilation.diagnostics ++= diagnostics.map(d => FileDiagnostic(filePath.toString(), d))
     }
   }
 
-  val parserProp = new Property[EditorParser[Any]](null)
+  val parserProp = new Property[SingleResultParser[Any]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    parserProp.add(language, toParser(language.grammars.root))
+    parserProp.add(language, toParserBuilder(language.grammars.root).getWholeInputParser())
   }
 
   override def dependencies: Set[Contract] = Set(PreprocessorDelta)
@@ -47,10 +47,10 @@ object IncludeDelta extends DirectiveDelta {
   override def shape: NodeShape = Shape
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    import core.bigrammar.DefaultBiGrammarWriter._
+    import grammars._
 
-    val grammar = "include" ~ ParseWhiteSpace ~~> StringLiteral.as(FileName).asNode(Shape)
-    grammars.find(PreprocessorDelta.BodyGrammar).addAlternative(grammar)
+    val grammar = "include" ~~> StringLiteral.as(FileName).asNode(Shape)
+    find(PreprocessorDelta.BodyGrammar).addAlternative(grammar)
   }
 
   object Shape extends NodeShape

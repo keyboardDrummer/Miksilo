@@ -1,9 +1,9 @@
 package deltas.expression.multiplicative
 
 import core.language.node.NodeShape
-import deltas.expression.LeftAssociativeBinaryOperatorDelta
+import deltas.expression.{BinaryOperatorDelta, LeftAssociativeBinaryOperatorDelta}
 
-object MultiplyDelta extends LeftAssociativeBinaryOperatorDelta {
+object MultiplyDelta extends BinaryOperatorDelta {
   override def precedenceGrammarKey = MultiplicativePrecedenceDelta.Grammar
 
   override def keyword = "*"

@@ -131,7 +131,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with HasBytes with HasShape 
       instructionsGrammar %
       attributesGrammar %
       exceptionTableGrammar.as(CodeExceptionTableKey)).indent()
-    val codeGrammar: BiGrammar = (Keyword("Code", reserved = false) ~ ":" %> body).asNode(CodeKey)
+    val codeGrammar: BiGrammar = (stringToGrammar("Code", reserved = false) ~ ":" %> body).asNode(CodeKey)
     create(CodeKey, codeGrammar)
   }
 

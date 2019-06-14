@@ -86,10 +86,10 @@ object MethodDelta extends DeltaWithGrammar
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit =  {
     val _grammars = grammars
     import grammars._
-    val block = find(BlockDelta.BlockGramar)
+    val block = find(BlockDelta.BlockGrammar)
 
     val parseType = find(TypeSkeleton.JavaTypeGrammar)
-    val parseReturnType = create(ReturnTypeGrammar, "void" ~> value(VoidTypeDelta.voidType) | parseType)
+    val parseReturnType = create(ReturnTypeGrammar, parseType)
 
     val parseParameter = MethodParameters.getGrammar(_grammars)
     val parseParameters = create(Parameters, "(" ~> parseParameter.manySeparated(",") ~< ")")

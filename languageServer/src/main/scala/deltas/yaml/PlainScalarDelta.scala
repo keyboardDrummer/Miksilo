@@ -11,15 +11,15 @@ import deltas.json.JsonStringLiteralDelta
 object PlainScalarDelta extends DeltaWithGrammar {
   def flowIndicatorChars = """,\[\]{}"""
 
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    val _grammars = grammars
+  override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
+    val grammars = _grammars
     import grammars._
 
     val nonBreakChars = """\n"""
     val plainSafeOutChars = s"""$nonBreakChars#'"""
     val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
-    val doubleColonPlainSafeIn =  RegexGrammar(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r)
-    val doubleColonPlainSafeOut =  RegexGrammar(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r)
+    val doubleColonPlainSafeIn = grammars.regexGrammar(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r, "plain scalar")
+    val doubleColonPlainSafeOut = grammars.regexGrammar(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r, "plain scalar")
 
     val nsPlainSafe: BiGrammar = new IfContext(Map(
       FlowIn -> doubleColonPlainSafeIn,
@@ -28,11 +28,14 @@ object PlainScalarDelta extends DeltaWithGrammar {
       FlowKey -> doubleColonPlainSafeIn), doubleColonPlainSafeOut)
 
     val plainStyleSingleLineString: BiGrammar = nsPlainSafe
-    val plainStyleMultiLineString: BiGrammar = new BiSequence(new BiSequence(nsPlainSafe, _grammars.trivia, BiSequence.ignoreRight, false),
-      CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(CheckIndentationGrammar.equal(nsPlainSafe).manySeparated("\n"))),
-      SequenceBijective((firstLine: Any, rest: Any) => {
-        firstLine.asInstanceOf[String] + rest.asInstanceOf[List[String]].fold("")((a,b) => a + " " + b)
-      }, (value: Any) => Some(value, List.empty)), false)
+    val plainStyleMultiLineString: BiGrammar = {
+      val firstLine = new BiSequence(nsPlainSafe, _grammars.trivia, BiSequence.ignoreRight, false)
+      new BiSequence(firstLine,
+        CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(CheckIndentationGrammar.equal(nsPlainSafe).someSeparated("\n"))),
+        SequenceBijective((firstLine: Any, rest: Any) => {
+          firstLine.asInstanceOf[String] + rest.asInstanceOf[List[String]].fold("")((a, b) => a + " " + b)
+        }, (value: Any) => Some(value, List.empty)), false)
+    }
 
     val plainScalar: BiGrammar = new WithContext({
       case FlowIn => FlowIn
@@ -40,7 +43,7 @@ object PlainScalarDelta extends DeltaWithGrammar {
       case FlowKey => FlowKey
       case _ => FlowOut
     }, plainStyleMultiLineString | plainStyleSingleLineString).
-      as(JsonStringLiteralDelta.Value).asNode(JsonStringLiteralDelta.Shape)
+      as(JsonStringLiteralDelta.Value).asLabelledNode(JsonStringLiteralDelta.Shape)
 
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(plainScalar)
 

@@ -28,7 +28,7 @@ object TextMateDelta extends DeltaWithGrammar {
 
   def singleMatch(name: String, regex: Regex): Node = {
     JsonObjectLiteralDelta.neww(Map(
-      "name" -> JsonStringLiteralDelta.literal(name),
-      "match" -> JsonStringLiteralDelta.literal(regex.toString())))
+      "name" -> JsonStringLiteralDelta.neww(name),
+      "match" -> JsonStringLiteralDelta.neww(regex.toString())))
   }
 }

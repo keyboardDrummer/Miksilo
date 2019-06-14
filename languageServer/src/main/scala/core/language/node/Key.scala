@@ -30,7 +30,7 @@ trait Key extends AnyRef
     addition + getDirectClassName(shape)
   }
 
-  private def getDirectClassName(shape: Class[_]): String = {
+  protected def getDirectClassName(shape: Class[_]): String = {
     val simpleName: String = shape.getSimpleName
     if (simpleName.last == '$')
       simpleName.dropRight(1)
@@ -42,6 +42,20 @@ trait Key extends AnyRef
 /**
   * Defines a field for a Node
   */
-trait NodeField extends GrammarKey
+trait NodeField extends GrammarKey {
+  override def debugRepresentation: String = this match {
+    case anyRef: AnyRef =>
+      try
+      {
+        val shape = anyRef.getClass
+        getDirectClassName(shape)
+      }
+      catch
+        {
+          case e: java.lang.InternalError => e.toString
+        }
+    case _ => this.toString
+  }
+}
 
 trait GrammarKey extends Key

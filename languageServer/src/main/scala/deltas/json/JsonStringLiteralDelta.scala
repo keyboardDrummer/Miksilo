@@ -1,16 +1,17 @@
 package deltas.json
 
-import core.bigrammar.BiGrammarWriter
-import core.bigrammar.grammars.{BiSequence, Colorize, RegexGrammar}
-import core.deltas.{Contract, DeltaWithGrammar}
+import core.bigrammar.{BiGrammar, BiGrammarWriter}
+import core.bigrammar.grammars.{As, Colorize}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.node.{GrammarKey, Node, NodeField, NodeShape}
+import core.deltas.{Contract, DeltaWithGrammar}
+import core.language.node.{Node, NodeField, NodeShape, SourceRange}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import langserver.types.Position
 
 import scala.util.matching.Regex
 
@@ -22,19 +23,26 @@ object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
 
-  val stringInnerRegex: Regex = """([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r
+  val stringInnerRegex: Regex = """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r
 
-    override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
-      val inner = {
-        import core.bigrammar.DefaultBiGrammarWriter._
-        "\"" ~> RegexGrammar(stringInnerRegex).as(Value) ~< BiGrammarWriter.stringToGrammar("\"")
-      }
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    val inner = {
+      import core.bigrammar.DefaultBiGrammarWriter._
+      dropPrefix(grammars, grammars.regexGrammar(stringInnerRegex, "string literal"), Value, "\"") ~<
+        BiGrammarWriter.stringToGrammar("\"")
+    }
     import grammars._
     val grammar = Colorize(inner, "string.quoted.double")
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar.asLabelledNode(Shape))
   }
 
-  def literal(value: String) = new Node(Shape, Value -> value)
+  def dropPrefix(grammars: LanguageGrammars, regex: BiGrammar, field: NodeField, prefix: String) = {
+    import grammars._
+    regex.map[String, String](r => r.substring(prefix.length), s => { prefix + s }).
+      as(field, p => SourceRange(Position(p.start.line, p.start.character + prefix.length), p.end))
+  }
+
+  def neww(value: String) = new Node(Shape, Value -> value)
 
   def getValue(literal: Node): String = literal(Value).asInstanceOf[String]
 

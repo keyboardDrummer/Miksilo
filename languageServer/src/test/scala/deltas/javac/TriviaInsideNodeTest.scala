@@ -9,7 +9,7 @@ import core.language.node.{GrammarKey, NodeField, NodeShape}
 import deltas.trivia.TriviaInsideNode
 import org.scalatest.FunSuite
 
-class TriviaInsideNodeTest extends FunSuite with NodeGrammarWriter {
+class TriviaInsideNodeTest extends FunSuite {
 
   object ParentClass extends NodeShape
   object ChildClass extends NodeShape

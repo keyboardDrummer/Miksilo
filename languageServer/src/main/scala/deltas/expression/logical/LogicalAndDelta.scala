@@ -1,9 +1,9 @@
 package deltas.expression.logical
 
 import core.language.node.NodeShape
-import deltas.expression.{ExpressionDelta, LeftAssociativeBinaryOperatorDelta}
+import deltas.expression.{BinaryOperatorDelta, ExpressionDelta, LeftAssociativeBinaryOperatorDelta}
 
-object LogicalAndDelta extends LeftAssociativeBinaryOperatorDelta {
+object LogicalAndDelta extends BinaryOperatorDelta {
   override def precedenceGrammarKey = ExpressionDelta.FirstPrecedenceGrammar
 
   override def keyword = "&&"

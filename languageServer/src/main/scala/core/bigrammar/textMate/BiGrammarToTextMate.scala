@@ -42,7 +42,7 @@ object BiGrammarToTextMate {
         case delimiter: Delimiter => Some(escapeRegex(delimiter.value))
         case ParseWhiteSpace => Some(ParseWhiteSpace.regex.regex)
         case keyword: Keyword => Some(escapeRegex(keyword.value))
-        case choice: Choice =>
+        case choice: BiChoice =>
           for {
             left <- recurse(choice.left)
             right <- recurse(choice.right)

@@ -15,7 +15,7 @@ object SlashSlashLineCommentsDelta extends DeltaWithGrammar {
   }
 
   val commentGrammar: BiGrammar = {
-    val comment = RegexGrammar("""//[^\n]*\n""".r)
+    val comment = RegexGrammar("""//[^\n]*\n""".r, "line comment")
     Colorize(comment, "comment.line.double-slash")
   }
 

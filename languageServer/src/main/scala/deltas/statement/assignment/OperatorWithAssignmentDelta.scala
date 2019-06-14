@@ -6,7 +6,7 @@ import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithGrammar, DeltaWithPhase}
 import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
-import deltas.expression.LeftAssociativeBinaryOperatorDelta
+import deltas.expression.{BinaryOperatorDelta, LeftAssociativeBinaryOperatorDelta}
 
 trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -19,7 +19,7 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   def neww(target: Node, value: Node) =
     new Node(shape, SimpleAssignmentDelta.Target -> target, SimpleAssignmentDelta.Value -> value)
 
-  def operatorDelta: LeftAssociativeBinaryOperatorDelta
+  def operatorDelta: BinaryOperatorDelta
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
@@ -27,7 +27,7 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
     val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
     val assignmentTarget = find(SimpleAssignmentDelta.Target)
     val operatorGrammar = assignmentTarget ~~
-      (leftRight(operatorDelta.keyword, "=", BiSequence.identity) ~~> assignmentGrammar.as(SimpleAssignmentDelta.Value)) asNode shape
+      (leftRight(operatorDelta.keyword, "=", BiSequence.identity) ~~> assignmentGrammar.as(SimpleAssignmentDelta.Value)) asLabelledNode shape
     assignmentGrammar.addAlternative(operatorGrammar)
   }
 

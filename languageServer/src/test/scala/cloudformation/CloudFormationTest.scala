@@ -86,4 +86,53 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
     val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("Subscription"))
     assertResult(CompletionList(isIncomplete = false, Seq(item))) (result)
   }
+
+  test("Missing in the middle") {
+    val program =
+      """{
+        |  "Parameters" : {
+        |    "KeyName": "The EC2 Key Pair to allow SSH access to the instances",
+        |    "MemberWithOnlyKey":
+        |  },
+        |  "Resources" : {
+        |    "LaunchConfig": {
+        |      "Type": "AWS::AutoScaling::LaunchConfiguration",
+        |      "Properties": {
+        |        "KeyName": { "Ref": "KeyName" }
+        |      }
+        |    }
+        |  }
+        |}
+        """.stripMargin
+    val server = new MiksiloLanguageServer(CloudFormationLanguage.jsonLanguage)
+    val document = openDocument(server, program)
+    val start = new HumanPosition(10, 30)
+    val result = server.gotoDefinition(DocumentPosition(document, start))
+
+    assertResult(Seq(Location(itemUri, Range(new HumanPosition(3,6), new HumanPosition(3,13)))))(result)
+  }
+
+  test("file only has a string literal") {
+    val program = "\"Foo\""
+    val result = getDiagnostic(jsonServer, program)
+    assert(result.isEmpty)
+  }
+
+  test("file has literal resources") {
+    val program = """{"Resources" : "Bar"}"""
+    val result = getDiagnostic(jsonServer, program)
+    assert(result.isEmpty)
+  }
+
+  test("file has literal parameters") {
+    val program = """{"Parameters" : "Bar"}"""
+    val result = getDiagnostic(jsonServer, program)
+    assert(result.isEmpty)
+  }
+
+  test("file only has a single member object") {
+    val program = """{"Foo" : "Bar"}"""
+    val result = getDiagnostic(jsonServer, program)
+    assert(result.isEmpty)
+  }
 }

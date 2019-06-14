@@ -17,5 +17,5 @@ case class Colorize(var inner: BiGrammar, textMateScope: String) extends CustomG
 
   override def createPrinter(recursive: BiGrammar => NodePrinter) = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => EditorParser[Result]) = recursive(inner)
+  override def toParser(recursive: BiGrammar => Self[Result]) = recursive(inner)
 }

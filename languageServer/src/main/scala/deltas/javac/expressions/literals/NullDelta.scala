@@ -18,7 +18,7 @@ object NullDelta extends DeltaWithGrammar with ExpressionInstance {
     import grammars._
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     val parseNull = "null" ~> value(_null)
-    expressionGrammar.inner = expressionGrammar.inner | parseNull
+    expressionGrammar.addAlternative(parseNull)
   }
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)

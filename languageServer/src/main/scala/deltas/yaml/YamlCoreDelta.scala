@@ -6,8 +6,8 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
-import core.parsers.editorParsers.DefaultCache
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
+import deltas.json.JsonStringLiteralDelta
 
 trait YamlContext
 object FlowIn extends YamlContext
@@ -25,22 +25,18 @@ object YamlCoreDelta extends DeltaWithGrammar {
   object TagNode extends NodeField
 
   object ContextKey
-  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.EditorParser[Result]])
-    extends EditorParserBase[Result] {
+  class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.Self[Result]])
+    extends ParserBuilderBase[Result] {
 
-    override def getParser(recursive: BiGrammarToParser.GetParse): Parse[Result] = {
+    override def getParser(recursive: BiGrammarToParser.GetParser): Parser[Result] = {
       val innerParsers = inners.mapValues(p => recursive(p))
 
-      def apply(input: Reader) = {
+      def apply(input: Reader, state: ParseState) = {
         val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-        innerParsers(context)(input)
+        innerParsers(context)(input, state)
       }
 
       apply
-    }
-
-    override def getDefault(cache: DefaultCache) = {
-      inners.values.flatMap(inner => inner.getDefault(cache)).headOption
     }
 
     override def leftChildren = children
@@ -50,22 +46,20 @@ object YamlCoreDelta extends DeltaWithGrammar {
     override def children = inners.values.toList
   }
 
-  class WithContextParser[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
-    extends EditorParserBase[Result] with ParserWrapper[Result] {
+  class WithContextParser[Result](update: YamlContext => YamlContext, val original: Self[Result])
+    extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: BiGrammarToParser.GetParse) = {
-      val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
+    override def getParser(recursive: BiGrammarToParser.GetParser) = {
+      val parseOriginal = recursive(original)
 
-      def apply(input: Reader) = {
+      def apply(input: Reader, state: ParseState): ParseResult[Result] = {
         val context: YamlContext = input.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-        val result = parseOriginal(input.withState(input.state + (ContextKey -> update(context))))
+        val result = parseOriginal(input.withState(input.state + (ContextKey -> update(context))), state)
         result.updateRemainder(r => r.withState(r.state + (ContextKey -> context)))
       }
 
       apply
     }
-
-    override def getDefault(cache: DefaultCache) = original.getDefault(cache)
   }
 
   object IndentationSensitiveExpression extends GrammarKey
@@ -73,13 +67,15 @@ object YamlCoreDelta extends DeltaWithGrammar {
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     val grammars = _grammars
     import _grammars._
-    val tag: BiGrammar = "!" ~> RegexGrammar(s"""[^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator
+    val tag: BiGrammar = JsonStringLiteralDelta.dropPrefix(grammars,
+      grammars.regexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name"),
+      TagName, "!") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
     val blockValue = create(IndentationSensitiveExpression)
-    blockValue.addAlternative(tag.as(TagName) ~ blockValue.as(TagNode) asNode TaggedNode)
+    blockValue.addAlternative(tag ~ blockValue.as(TagNode) asLabelledNode TaggedNode)
 
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val taggedFlowValue = tag.as(TagName) ~ flowValue.as(TagNode) asNode TaggedNode
+    val taggedFlowValue = tag ~ flowValue.as(TagNode) asLabelledNode TaggedNode
     flowValue.addAlternative(taggedFlowValue)
 
     val originalBracketArray = find(ArrayLiteralDelta.Shape).inner

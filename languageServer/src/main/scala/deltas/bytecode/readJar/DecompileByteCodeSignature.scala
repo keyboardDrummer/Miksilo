@@ -30,10 +30,11 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
   override def inject(language: Language): Unit = {
     super.inject(language)
     val typeGrammar = language.grammars.find(ByteCodeTypeGrammar)
-    val parser = toStringParser(typeGrammar)
+    val parser = toParser(typeGrammar)
     val sourceLessParser = (input: String) => {
-      val result = parser(input)
-      result.map(r => r.asInstanceOf[Node].visit(node => {
+      val parseResult = parser.parse(new Reader(input))
+      val result = parseResult.resultOption
+      result.foreach(r => r.asInstanceOf[Node].visit(node => {
         node.sources.clear()
       }))
       result

@@ -2,12 +2,12 @@
 package core2.parsers
 
 import core.document.Empty
-import core.parsers.editorParsers.{DefaultCache, UnambiguousEditorParserWriter}
+import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.responsiveDocument.ResponsiveDocument
-import langserver.types.Position
 import org.scalatest.FunSuite
 import util.SourceUtils
+import langserver.types.Position
 
 trait YamlExpression {
   def toDocument: ResponsiveDocument
@@ -50,11 +50,10 @@ object BlockKey extends YamlContext
 object FlowKey extends YamlContext
 
 class YamlTest extends FunSuite
-  with UnambiguousEditorParserWriter
+  with LeftRecursiveCorrectingParserWriter
   with IndentationSensitiveParserWriter with CommonParserWriter {
 
   type Input = IndentationReader
-
 
   class IndentationReader(array: ArrayCharSequence, offset: Int, position: Position, val context: YamlContext, val indentation: Int)
     extends StringReaderBase(array, offset, position) with IndentationReaderLike {
@@ -64,7 +63,7 @@ class YamlTest extends FunSuite
     def withContext(newState: YamlContext): IndentationReader = new IndentationReader(array, offset, position, newState, indentation)
 
     def this(text: String) {
-      this(text.toCharArray, 0, Position(0, 0), BlockOut, 0)
+      this(text.toCharArray, 0, new Position(0,0), BlockOut, 0)
     }
 
     override def drop(amount: Int) = new IndentationReader(array, offset + amount, move(amount), context, indentation)
@@ -77,22 +76,19 @@ class YamlTest extends FunSuite
     }
   }
 
-  val whiteSpace = RegexParser("""\s*""".r)
-  override def leftRight[Left, Right, NewResult](left: EditorParser[Left],
-                                                 right: => EditorParser[Right],
-                                                 combine: (Left, Right) => NewResult): EditorParser[NewResult] = {
+  val whiteSpace = RegexParser("""\s*""".r, "whitespace", 0)
+  override def leftRight[Left, Right, NewResult](left: Self[Left],
+                                                 right: => Self[Right],
+                                                 combine: (Left, Right) => NewResult): Self[NewResult] = {
     new Sequence(left, new Sequence(whiteSpace, right, (a: String, b: Right) => b), combine)
   }
 
-  class IfContext[Result](inners: Map[YamlContext, EditorParser[Result]]) extends EditorParserBase[Result] {
+  class IfContext[Result](inners: Map[YamlContext, Self[Result]]) extends ParserBuilderBase[Result] {
 
-    override def getParser(recursive: GetParse) = {
-      val innerParsers = inners.mapValues(p => recursive(p).asInstanceOf[Parse[Result]])
-      input => innerParsers(input.context)(input)
+    override def getParser(recursive: GetParser) = {
+      val innerParsers = inners.mapValues(p => recursive(p))
+      (input, state) => innerParsers(input.context)(input, state)
     }
-
-    override def getDefault(cache: DefaultCache) =
-      inners.values.flatMap(inner => inner.getDefault(cache)).headOption
 
     override def leftChildren = inners.values.toList
 
@@ -101,59 +97,57 @@ class YamlTest extends FunSuite
     override def children = leftChildren
   }
 
-  class WithContext[Result](update: YamlContext => YamlContext, val original: EditorParser[Result])
-    extends EditorParserBase[Result] with ParserWrapper[Result] {
+  class WithContext[Result](update: YamlContext => YamlContext, val original: Self[Result])
+    extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParse) = {
-      val parseOriginal = recursive(original).asInstanceOf[Parse[Result]]
+    override def getParser(recursive: GetParser): Parser[Result] = {
+      val parseOriginal = recursive(original)
 
-      def apply(input: IndentationReader) = {
+      def apply(input: IndentationReader, state: ParseState): ParseResult[Result] = {
         val context: YamlContext = input.context
-        val result = parseOriginal(input.withContext(update(input.context)))
+        val result = parseOriginal(input.withContext(update(input.context)), state)
         result.updateRemainder(r => r.withContext(input.context))
       }
 
       apply
     }
-
-    override def getDefault(cache: DefaultCache) = original.getDefault(cache)
   }
 
-  val tag: EditorParser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r) //Should be 	ns-uri-char - “!” - c-flow-indicator
+  val tag: Self[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
   case class TaggedNode(tag: String, node: YamlExpression) extends YamlExpression {
     override def toDocument: ResponsiveDocument = ResponsiveDocument.text("!") ~ tag ~~ node.toDocument
   }
 
   lazy val parseUntaggedFlowValue = parseBracketArray | parseStringLiteral
   lazy val parseFlowValue = (tag.option ~ parseUntaggedFlowValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
-  lazy val parseUntaggedValue = lazyParser(parseBracketArray | parseArray | parseNumber | parseStringLiteral | parseBlockMapping)
-  lazy val parseValue: EditorParser[YamlExpression] = (tag.option ~ parseUntaggedValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
+  lazy val parseUntaggedValue = new Lazy(parseBracketArray | parseArray | parseNumber | parseStringLiteral | parseBlockMapping, "untagged value")
+  lazy val parseValue: Self[YamlExpression] = (tag.option ~ parseUntaggedValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
 
-  lazy val parseBlockMapping: EditorParser[YamlExpression] = {
+  lazy val parseBlockMapping: Self[YamlExpression] = {
     val member = new WithContext(_ =>
-      BlockKey, parseFlowValue) ~< literal(":") ~ greaterThan(parseValue)
+      BlockKey, parseFlowValue) ~< literalOrKeyword(":") ~ greaterThan(parseValue)
     alignedList(member).map(values => {
       Object(values.toMap)
     })
   }
 
-  lazy val parseBracketArray: EditorParser[YamlExpression] = {
-    val inner = "[" ~> parseFlowValue.manySeparated(",").map(elements => Array(elements)) ~< "]"
+  lazy val parseBracketArray: Self[YamlExpression] = {
+    val inner = "[" ~> parseFlowValue.manySeparated(",", "array element").map(elements => Array(elements)) ~< "]"
     new WithContext(_ => FlowIn, inner)
   }
 
-  lazy val parseArray: EditorParser[YamlExpression] = {
-    val element = literal("- ") ~> greaterThan(parseValue)
+  lazy val parseArray: Self[YamlExpression] = {
+    val element = literalOrKeyword("- ") ~> greaterThan(parseValue)
     alignedList(element).map(elements => Array(elements))
   }
 
-  lazy val parseNumber: EditorParser[YamlExpression] =
+  lazy val parseNumber: Self[YamlExpression] =
     wholeNumber.map(n => Number(Integer.parseInt(n)))
 
-  lazy val parseStringLiteral: EditorParser[YamlExpression] =
+  lazy val parseStringLiteral: Self[YamlExpression] =
     parseStringLiteralInner.map(s => StringLiteral(s))
-  lazy val parseStringLiteralInner: EditorParser[String] =
-    regex("""'[^']*'""".r).map(n => n.drop(1).dropRight(1)) | plainScalar
+  lazy val parseStringLiteralInner: Self[String] =
+    regex("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
 
 
   lazy val plainScalar = new WithContext({
@@ -168,9 +162,9 @@ class YamlTest extends FunSuite
   def flowIndicatorChars = """,\[\]{}"""
 
   val plainSafeOutChars = s"""$nbChars#'"""
-  val plainSafeInChars = s"""$plainSafeOutChars${flowIndicatorChars}"""
-  val doubleColonPlainSafeIn =  RegexParser(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r)
-  val doubleColonPlainSafeOut =  RegexParser(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r)
+  val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
+  val doubleColonPlainSafeIn =  RegexParser(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r, "plain scalar")
+  val doubleColonPlainSafeOut =  RegexParser(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r, "plain scalar")
 
   val nsPlainSafe = new IfContext(Map(
     FlowIn -> doubleColonPlainSafeIn,
@@ -180,7 +174,7 @@ class YamlTest extends FunSuite
 
   lazy val plainStyleSingleLineString = nsPlainSafe
   lazy val plainStyleMultiLineString = new Sequence(new Sequence(nsPlainSafe, whiteSpace, (l: String, _: String) => l),
-    greaterThan(WithIndentation(equal(nsPlainSafe).manySeparated("\n"))),
+    greaterThan(WithIndentation(equal(nsPlainSafe).someSeparated("\n", "line"))),
     (firstLine: String, rest: List[String]) => {
       firstLine + rest.fold("")((a,b) => a + " " + b)
   })
@@ -189,7 +183,7 @@ class YamlTest extends FunSuite
     val input =
       """/cloudformation_graphic.png" alt="AWS CloudFormation
         |         Logo"/""".stripMargin
-    val result = plainStyleMultiLineString.parseRoot(new IndentationReader(input).withContext(FlowIn))
+    val result = plainStyleMultiLineString.getWholeInputParser().parse(new IndentationReader(input).withContext(FlowIn))
     assert(result.successful)
   }
 
@@ -198,7 +192,7 @@ class YamlTest extends FunSuite
                   |                                              Examples], /cloudformation_graphic.png" alt="AWS CloudFormation
                   |                                                           Logo"/>, '<h1>Congratulations, you have successfully launched
                   |                    the AWS CloudFormation sample.</h1>']""".stripMargin
-    val result = parseValue.parseWholeInput(new IndentationReader(input))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(input))
     assert(result.successful)
   }
 
@@ -220,7 +214,7 @@ class YamlTest extends FunSuite
                   |
                   |            ']
                   |""".stripMargin
-    val result = parseValue.parseWholeInput(new IndentationReader(input))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(input))
     assert(result.successful)
   }
 
@@ -228,14 +222,14 @@ class YamlTest extends FunSuite
   test("string") {
     val program = "'hello'"
 
-    val result = parseStringLiteral.parseRoot(new IndentationReader(program))
+    val result = parseStringLiteral.getWholeInputParser().parse(new IndentationReader(program))
     assertResult(StringLiteral("hello"))(result.get)
   }
 
   test("number") {
     val program = "3"
 
-    val result = parseNumber.parseRoot(new IndentationReader(program))
+    val result = parseNumber.getWholeInputParser().parse(new IndentationReader(program))
     assertResult(Number(3))(result.get)
   }
 
@@ -243,7 +237,7 @@ class YamlTest extends FunSuite
     val program =
       """minecraft: 2""".stripMargin
 
-    val result = parseValue.parseRoot(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Object(Map(StringLiteral("minecraft") -> Number(2)))
     assertResult(expectation)(result.get)
   }
@@ -253,7 +247,7 @@ class YamlTest extends FunSuite
       """minecraft: 2
         |cancelled: 3""".stripMargin
 
-    val result = parseValue.parseRoot(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Object(Map(StringLiteral("minecraft") -> Number(2), StringLiteral("cancelled") -> Number(3)))
     assertResult(expectation)(result.get)
   }
@@ -263,7 +257,7 @@ class YamlTest extends FunSuite
       """- 2
         |- 3""".stripMargin
 
-    val result = parseValue.parseRoot(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(Number(2), Number(3)))
     assertResult(expectation)(result.get)
   }
@@ -273,7 +267,7 @@ class YamlTest extends FunSuite
       """- x: 3
         |  y: 4""".stripMargin
 
-    val result = parseValue.parseWholeInput(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
@@ -284,7 +278,7 @@ class YamlTest extends FunSuite
         |  y: 4
         |- 2""".stripMargin
 
-    val result = parseValue.parseWholeInput(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4))), Number(2)))
     assertResult(expectation)(result.get)
   }
@@ -295,7 +289,7 @@ class YamlTest extends FunSuite
         |- x: 3
         |  y: 4""".stripMargin
 
-    val result = parseValue.parseWholeInput(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(Number(2), Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
@@ -305,7 +299,7 @@ class YamlTest extends FunSuite
       """- a: - 1
         |- b: - 2""".stripMargin
 
-    val result = parseValue.parseRoot(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation = Array(Seq(
       Object(Map(
         StringLiteral("a") -> Array(Seq(Number(1))))),
@@ -328,7 +322,7 @@ class YamlTest extends FunSuite
         |     - 8
         |  r: 9""".stripMargin
 
-    val result = parseValue.parseRoot(new IndentationReader(program))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(program))
     val expectation =
       Array(Seq(
         Number(2),
@@ -345,7 +339,7 @@ class YamlTest extends FunSuite
 
   test("big yaml file") {
     val contents = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
-    val result = parseValue.parseWholeInput(new IndentationReader(contents))
+    val result = parseValue.getWholeInputParser().parse(new IndentationReader(contents))
     assert(result.successful, result.toString)
   }
 }

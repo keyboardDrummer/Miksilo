@@ -24,10 +24,11 @@ class TokenMakerFromGrammarTest extends FunSuite {
         |    public static int bar(int index)
         |    {
         |        return index < /* here comes two */ 2 ? 1 : 3;
-        |    }
+        |    }#
         |}""".stripMargin
 
-    val resultOption: BiGrammarToParser.ParseResult[Seq[MyToken]] = tokenMaker.parser.parseWholeInput(new BiGrammarToParser.Reader(text))
+    val resultOption: BiGrammarToParser.SingleParseResult[Seq[MyToken]] =
+      tokenMaker.parserBuilder.getWholeInputParser().parse(new BiGrammarToParser.Reader(text))
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
     val space = MyToken(TokenTypes.WHITESPACE, " ")
@@ -36,6 +37,7 @@ class TokenMakerFromGrammarTest extends FunSuite {
     def reserved(value: String) = MyToken(TokenTypes.RESERVED_WORD, value)
     def identifier(value: String) = MyToken(TokenTypes.IDENTIFIER, value)
     def delimiter(value: String) = MyToken(TokenTypes.SEPARATOR, value)
+    def error(value: String) = MyToken(TokenTypes.ERROR_CHAR, value)
     def integer(value: Int) = MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, value.toString)
     val expectedTokens = List(
       reserved("class"), space, identifier("Foo"), newLine(0),
@@ -47,7 +49,7 @@ class TokenMakerFromGrammarTest extends FunSuite {
       reserved("return"), space, identifier("index"), space, delimiter("<") /* this should be operator */,
         space, MyToken(TokenTypes.COMMENT_MULTILINE, "/* here comes two */"), space, integer(2), space, delimiter("?"),
         space, integer(1), space, delimiter(":"), space, integer(3), delimiter(";"), newLine(4),
-      delimiter("}"), newLine(0),
+      delimiter("}"), error("#"), newLine(0),
       delimiter("}")
     )
 
@@ -60,7 +62,7 @@ class TokenMakerFromGrammarTest extends FunSuite {
 
     val text = "^"
 
-    val resultOption = tokenMaker.parser.parseWholeInput(new Reader(text))
+    val resultOption = tokenMaker.parserBuilder.getWholeInputParser().parse(new Reader(text))
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
     val expectedTokens = List(MyToken(TokenTypes.ERROR_CHAR, "^"))
