@@ -5,7 +5,7 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import deltas.expression.ExpressionDelta
-import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
+import deltas.json.JsonObjectLiteralDelta
 
 object YamlObjectDelta extends DeltaWithGrammar {
 

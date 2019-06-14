@@ -4,7 +4,7 @@ import core.deltas.DeltaWithPhase
 import core.deltas.path._
 import core.language.Compilation
 import core.language.node.{FieldData, Node}
-import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
+import deltas.json.JsonObjectLiteralDelta
 import deltas.yaml.YamlCoreDelta
 
 object ConvertTagsToObjectDelta extends DeltaWithPhase {
