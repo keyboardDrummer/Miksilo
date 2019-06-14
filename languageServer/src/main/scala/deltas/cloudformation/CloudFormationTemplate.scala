@@ -7,7 +7,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.ConcreteScope
 import core.smarts.types.objects.PrimitiveType
 import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, ObjectLiteral, ObjectLiteralMember}
-import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
+import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import play.api.libs.json.{JsObject, Json}
 import util.SourceUtils
 
@@ -49,8 +49,8 @@ object CloudFormationTemplate extends Delta {
       if (resource.value.shape == JsonObjectLiteralDelta.Shape) {
         val resourceMembers: ObjectLiteral[NodePath] = resource.value
         val typeString = resourceMembers.getValue("Type")
-        val resourceType = StringLiteralDelta.getValue(typeString)
-        val typeDeclaration = builder.resolve(resourceType, typeString.getSourceElement(StringLiteralDelta.Value), rootScope)
+        val resourceType = JsonStringLiteralDelta.getValue(typeString)
+        val typeDeclaration = builder.resolve(resourceType, typeString.getSourceElement(JsonStringLiteralDelta.Value), rootScope)
         val typeScope = builder.getDeclaredScope(typeDeclaration)
         resourceMembers.get("Properties").foreach(_properties => {
           if (_properties.shape == JsonObjectLiteralDelta.Shape) {
@@ -68,9 +68,9 @@ object CloudFormationTemplate extends Delta {
   private def resolveRefs(builder: ConstraintBuilder, rootScope: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
     program.visitShape(MemberShape, (_member: NodePath) => {
       val member: JsonObjectLiteralDelta.ObjectLiteralMember[NodePath] = _member
-      if (member.key == "Ref" && member.value.shape == StringLiteralDelta.Shape) {
-        val value = StringLiteralDelta.getValue(member.value)
-        val refLocation = member.value.getSourceElement(StringLiteralDelta.Value)
+      if (member.key == "Ref" && member.value.shape == JsonStringLiteralDelta.Shape) {
+        val value = JsonStringLiteralDelta.getValue(member.value)
+        val refLocation = member.value.getSourceElement(JsonStringLiteralDelta.Value)
         builder.resolveToType(value, refLocation, rootScope, valueType)
       }
     })

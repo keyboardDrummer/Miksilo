@@ -15,10 +15,8 @@ object SlashStarBlockCommentsDelta extends DeltaWithGrammar with DefaultBiGramma
   }
 
   val commentGrammar: BiGrammar = {
-
     val comment = RegexGrammar("""/\*+[^*]*\*+(?:[^/*][^*]*\*+)*/""".r, "block comment")
-    val coloredComment = Colorize(comment, TokenTypes.COMMENT_MULTILINE)
-    coloredComment ~< printSpace
+    Colorize(comment, "comment.block") ~< printSpace
   }
 
   override def dependencies: Set[Contract] = Set.empty

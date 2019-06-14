@@ -1,10 +1,10 @@
 package deltas.json
 
-import core.bigrammar.BiGrammar
-import core.bigrammar.grammars.RegexGrammar
-import core.deltas.{Contract, DeltaWithGrammar}
+import core.bigrammar.{BiGrammar, BiGrammarWriter}
+import core.bigrammar.grammars.{As, Colorize}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.node.{Node, NodeField, NodeShape, SourceRange}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
@@ -15,7 +15,7 @@ import langserver.types.Position
 
 import scala.util.matching.Regex
 
-object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
+object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the double quoted string literal"
 
@@ -25,13 +25,15 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   val stringInnerRegex: Regex = """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r
 
-  override def transformGrammars(_grammars: LanguageGrammars, state: Language): Unit = {
-    val grammars = _grammars
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    val inner = {
+      import core.bigrammar.DefaultBiGrammarWriter._
+      dropPrefix(grammars, grammars.regexGrammar(stringInnerRegex, "string literal"), Value, "\"") ~<
+        BiGrammarWriter.stringToGrammar("\"")
+    }
     import grammars._
-    val innerGrammar = dropPrefix(grammars,
-      grammars.regexGrammar(stringInnerRegex, "string literal"), Value, "\"") ~< "\""
-    val grammar = innerGrammar.asLabelledNode(Shape)
-    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar)
+    val grammar = Colorize(inner, "string.quoted.double")
+    find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar.asLabelledNode(Shape))
   }
 
   def dropPrefix(grammars: LanguageGrammars, regex: BiGrammar, field: NodeField, prefix: String) = {

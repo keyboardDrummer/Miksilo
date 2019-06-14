@@ -7,7 +7,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
-import deltas.json.StringLiteralDelta
+import deltas.json.JsonStringLiteralDelta
 
 trait YamlContext
 object FlowIn extends YamlContext
@@ -67,7 +67,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     val grammars = _grammars
     import _grammars._
-    val tag: BiGrammar = StringLiteralDelta.dropPrefix(grammars,
+    val tag: BiGrammar = JsonStringLiteralDelta.dropPrefix(grammars,
       grammars.regexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name"),
       TagName, "!") //Should be 	ns-uri-char - “!” - c-flow-indicator
 

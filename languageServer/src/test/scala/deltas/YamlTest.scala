@@ -4,7 +4,7 @@ package deltas
 import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
 import deltas.expression.ExpressionDelta
-import deltas.json.StringLiteralDelta
+import deltas.json.JsonStringLiteralDelta
 import deltas.yaml.YamlLanguage
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
@@ -85,7 +85,7 @@ class YamlTest extends FunSuite {
 
   private def replaceDefaultWithDefaultString(compilation: Compilation): Unit = {
     PathRoot(compilation.program).visitShape(ExpressionDelta.DefaultShape,
-      p => p.asInstanceOf[ChildPath].replaceWith(StringLiteralDelta.neww("default")))
+      p => p.asInstanceOf[ChildPath].replaceWith(JsonStringLiteralDelta.neww("default")))
   }
 
   test("tagged block key") {
