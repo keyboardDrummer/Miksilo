@@ -82,4 +82,18 @@ class PerformanceTest extends FunSuite {
     System.out.println(s"singleSource:$singleSource")
     System.out.println(s"totalTime:${singleSource + sourceTimesTen}")
   }
+
+  test("Edited") {
+    val json = JsonLanguage.language
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
+    val timeA = System.currentTimeMillis()
+
+    val multiplier = 1
+    for(_ <- 1.to(5 * multiplier)) {
+      val result = json.compileString(program).diagnostics
+      assert(result.nonEmpty)
+    }
+    val timeB = System.currentTimeMillis()
+    assert(timeB - timeA < 4000)
+  }
 }

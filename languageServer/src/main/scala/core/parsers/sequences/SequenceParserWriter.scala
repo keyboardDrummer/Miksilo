@@ -238,6 +238,17 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 
   trait SingleResultParser[+Result] {
-    def parse(input: Input, mayStop: () => Boolean = () => true): SingleParseResult[Result]
+    def parse(input: Input, mayStop: (Double, Double) => Boolean = (_, _) => true): SingleParseResult[Result]
+    def parseUntilBetterThanNext(input: Input): SingleParseResult[Result] = {
+      parse(input, (best, second) => best > second)
+    }
+
+    def parseXSteps(input: Input, steps: Int): SingleParseResult[Result] = {
+      var counter = 0
+      parse(input, (_, _) => {
+        counter += 1
+        counter == steps
+      })
+    }
   }
 }
