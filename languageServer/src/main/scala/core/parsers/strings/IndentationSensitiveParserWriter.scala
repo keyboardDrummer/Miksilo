@@ -37,7 +37,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
 
   def aligned[Element, Sum](firstLine: Self[Element], zero: Sum, reduce: (Element, Sum) => Sum): Self[Sum] = {
     val remainingLines = equal(firstLine).many(zero, reduce)
-    WithIndentation(leftRight(firstLine, remainingLines, reduce))
+    WithIndentation(leftRight(firstLine, remainingLines, combineFold(zero, reduce)))
   }
 
   def equal[Result](inner: Self[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)

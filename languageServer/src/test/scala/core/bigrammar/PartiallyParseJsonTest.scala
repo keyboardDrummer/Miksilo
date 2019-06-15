@@ -20,14 +20,14 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    val result = jsonParser.getWholeInputParser().parse(new Reader(input))
+    val result = jsonParser.getWholeInputParser.parse(new Reader(input))
     val value = getSuccessValue(result)
     assertResult(List(("person","3")))(value)
   }
 
   test("object with single member with string value") {
     val input = """{"person":"remy"}"""
-    val result = jsonParser.getWholeInputParser().parse(new Reader(input))
+    val result = jsonParser.getWholeInputParser.parse(new Reader(input))
     val value = getSuccessValue(result)
     assertResult(List(("person","remy")))(value)
   }
@@ -106,7 +106,7 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
 
 
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
-    val result = jsonParser.getWholeInputParser().parseUntilBetterOrXSteps(new Reader(input))
+    val result = jsonParser.getWholeInputParser.parseUntilBetterOrXSteps(new Reader(input))
     assert(!result.successful)
     assert(result.resultOption.nonEmpty)
     assertResult(expectation)(result.resultOption.get)

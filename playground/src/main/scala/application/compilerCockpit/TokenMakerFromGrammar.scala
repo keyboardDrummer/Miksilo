@@ -43,7 +43,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
     val errorToken = regex(new Regex("."), "anything") ^^ (s => MyToken(TokenTypes.ERROR_CHAR, s))
     choice(allTokenParsers.reduce((a, b) => a | b), errorToken, firstIsLonger = true).*
   }
-  lazy val parser = parserBuilder.getWholeInputParser()
+  lazy val parser = parserBuilder.getWholeInputParser
 
   override def getWordsToHighlight: TokenMap = new TokenMap()
 

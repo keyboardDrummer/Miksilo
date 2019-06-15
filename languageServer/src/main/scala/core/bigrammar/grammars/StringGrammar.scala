@@ -13,7 +13,7 @@ import core.responsiveDocument.ResponsiveDocument
 abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
   extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren
 {
-  lazy val parser = getParserBuilder(Set.empty).getWholeInputParser() //TODO hacky Set.empty
+  lazy val parser = getParserBuilder(Set.empty).getWholeInputParser //TODO hacky Set.empty
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 
