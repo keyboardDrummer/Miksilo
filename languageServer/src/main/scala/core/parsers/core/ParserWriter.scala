@@ -14,33 +14,15 @@ trait ParserWriter {
 
   def map[Result, NewResult](original: Self[Result], f: Result => NewResult): Self[NewResult]
 
-  def leftRight[Left, Right, NewResult](left: Self[Left],
-                                        right: => Self[Right],
-                                        combine: (Left, Right) => NewResult): Self[NewResult]
-
   def many[Result, Sum](original: Self[Result], zero: Sum, reduce: (Result, Sum) => Sum): Self[Sum]
 
   implicit class ParserExtensions[+Result](parser: Self[Result]) {
 
     def |[Other >: Result](other: => Self[Other]) = choice(parser, other)
 
-    def ~[Right](right: => Self[Right]) = leftRight(parser, right, (a: Result, b: Right) => (a, b))
-
-    def ~<[Right](right: Self[Right]) = leftRight(parser, right, Processor.ignoreRight[Result, Right])
-
-    def ~>[Right](right: Self[Right]) = leftRight(parser, right, Processor.ignoreLeft[Result, Right])
-
     def map[NewResult](f: Result => NewResult): Self[NewResult] = ParserWriter.this.map(parser, f)
 
     def option: Self[Option[Result]] = choice(this.map(x => Some(x)), succeed[Option[Result]](None), firstIsLonger = true)
-
-    def repN(amount: Int): Self[List[Result]] = {
-      if (amount == 0) {
-        succeed(List.empty[Result])
-      } else {
-        leftRight[Result, List[Result], List[Result]](parser, repN(amount - 1), (a,b) => a :: b)
-      }
-    }
 
     def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum): Self[Sum] = ParserWriter.this.many(parser, zero, reduce)
 

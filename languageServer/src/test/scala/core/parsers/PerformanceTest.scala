@@ -35,13 +35,13 @@ class PerformanceTest extends FunSuite {
 
     val timeA = System.currentTimeMillis()
     for(_ <- 1.to(multiplier * 10)) {
-      val result = jsonParser.getWholeInputParser().parse(new StringReader(source))
+      val result = jsonParser.getWholeInputParser.parse(new StringReader(source))
       assert(result.successful)
     }
 
     val timeB = System.currentTimeMillis()
     for(_ <- 1.to(multiplier)) {
-      val result = jsonParser.getWholeInputParser().parse(new StringReader(tenTimesSource))
+      val result = jsonParser.getWholeInputParser.parse(new StringReader(tenTimesSource))
       assert(result.successful)
     }
 

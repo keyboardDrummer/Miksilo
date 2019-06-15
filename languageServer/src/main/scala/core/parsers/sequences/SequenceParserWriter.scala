@@ -1,7 +1,7 @@
 package core.parsers.sequences
 
-import core.parsers.core.ParseInput
-import core.parsers.editorParsers.{CorrectingParserWriter, History, ParseError, SingleError}
+import core.parsers.core.{ParseInput, Processor}
+import core.parsers.editorParsers.{CorrectingParserWriter, History, ParseError}
 import langserver.types.Position
 
 trait SequenceParserWriter extends CorrectingParserWriter {
@@ -29,7 +29,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 
   override def many[Result, Sum](original: ParserBuilder[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
-    lazy val result: Self[Sum] = choice(WithDefault(leftRight(original, result, reduce), zero), succeed(zero), firstIsLonger = true)
+    lazy val result: Self[Sum] = choice(leftRight(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = true)
     result
   }
 
@@ -202,16 +202,33 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
   }
 
+  protected def combineFold[Result, Sum](zero: Sum, reduce: (Result, Sum) => Sum):
+    (Option[Result], Option[Sum]) => Option[Sum] = {
+    case (Some(x), Some(xs)) => Some(reduce(x, xs))
+    case (None, xs) => xs
+    case (Some(x), None) => Some(reduce(x, zero))
+    case _ => None
+  }
+
+  private def combineMany[Result]: (Option[Result], Option[List[Result]]) => Option[List[Result]] = {
+    val zero = List.empty[Result]
+    val reduce = (x: Result, xs: List[Result]) => x :: xs
+    combineFold(zero, reduce)
+  }
+
   implicit class SequenceParserExtensions[Result](parser: Self[Result]) extends ParserExtensions(parser) {
 
+    def ~[Right](right: => Self[Right]): Self[(Result, Right)] = leftRightSimple(parser, right, (a: Result, b: Right) => (a,b))
+
+    def ~<[Right](right: Self[Right]): ParserBuilder[Result] = leftRight(parser, right, Processor.ignoreRight[Option[Result], Option[Right]])
+
+    def ~>[Right](right: Self[Right]): ParserBuilder[Right] = leftRight(parser, right, Processor.ignoreLeft[Option[Result], Option[Right]])
+
     def someSeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
-      val reduce = (h: Result, t: List[Result]) => h :: t
-      val zero = List.empty[Result]
       lazy val result: Self[List[Result]] = separator ~>
-        (WithDefault(leftRight(DropParser(parser), DropParser(result), reduce), zero) |
-          Fail(Some(zero), elementName, History.insertDefaultPenalty)) |
-        succeed(zero)
-      leftRight(parser, DropParser(result), reduce)
+        leftRight[Result, List[Result], List[Result]](DropParser(parser), DropParser(result), combineMany[Result]) |
+          Fail(Some(List.empty[Result]), elementName, History.insertDefaultPenalty) | succeed(List.empty[Result])
+      leftRight(parser, DropParser(result), combineMany[Result])
     }
 
     def manySeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
@@ -228,7 +245,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       (input, mayStop) => findBestParseResult(parser, input, mayStop)
     }
 
-    def getWholeInputParser(): SingleResultParser[Result] = {
+    def getWholeInputParser: SingleResultParser[Result] = {
       ParseWholeInput(parser).getSingleResultParser
     }
 

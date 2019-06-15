@@ -50,9 +50,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   def newFailure[Result](error: MyParseError): SRCons[Result] =
     singleResult(ReadyParseResult(None, error.from, History.error(error)))
 
-  override def leftRight[Left, Right, NewResult](left: Self[Left],
-                                                 right: => Self[Right],
-                                                 combine: (Left, Right) => NewResult): Self[NewResult] =
+  def leftRightSimple[Left, Right, Result](left: Self[Left],
+                                     right: => Self[Right],
+                                     combine: (Left, Right) => Result): Self[Result] = {
+    leftRight(left, right, combineSimple(combine))
+  }
+
+  def combineSimple[Left, Right, Result](f: (Left, Right) => Result): (Option[Left], Option[Right]) => Option[Result] =
+    (ao, bo) => ao.flatMap(a => bo.map(b => f(a, b)))
+
+  def leftRight[Left, Right, Result](left: Self[Left],
+                                     right: => Self[Right],
+                                     combine: (Option[Left], Option[Right]) => Option[Result]): Self[Result] =
     new Sequence(left, right, combine)
 
   override def choice[Result](first: Self[Result], other: => Self[Result], firstIsLonger: Boolean = false): Self[Result] =
@@ -299,7 +308,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   class Sequence[+Left, +Right, Result](val left: Self[Left],
                                          _right: => Self[Right],
-                                         combine: (Left, Right) => Result)
+                                         combine: (Option[Left], Option[Right]) => Option[Result])
     extends ParserBuilderBase[Result] with SequenceLike[Result] {
 
     lazy val right: Self[Right] = _right
@@ -323,7 +332,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
           def rightFromLeftReady(leftReady: ReadyParseResult[Left]): SortedParseResults[Result] = {
             def mapRightResult(rightResult: ReadyParseResult[Right]): ReadyParseResult[Result] = ReadyParseResult(
-              leftReady.resultOption.flatMap(l => rightResult.resultOption.map(r => combine(l, r))),
+              combine(leftReady.resultOption, rightResult.resultOption),
               rightResult.remainder,
               rightResult.history)
 

@@ -1,7 +1,5 @@
 package core.parsers.editorParsers
 
-import scala.collection.mutable
-
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   type ParseState = FixPointState

@@ -1,6 +1,6 @@
 package core.parsers.basicParsers
 
-import core.parsers.core.ParserWriter
+import core.parsers.core.{ParserWriter, Processor}
 
 trait MachineParserWriter extends ParserWriter {
 
@@ -31,7 +31,7 @@ trait MachineParserWriter extends ParserWriter {
 
   def fail[Result](message: String) = FailureParser
 
-  override def leftRight[Left, Right, NewResult](left: Parser[Left], right: => Parser[Right], combine: (Left, Right) => NewResult) =
+  def leftRight[Left, Right, NewResult](left: Parser[Left], right: => Parser[Right], combine: (Left, Right) => NewResult) =
     Sequence(left, right, combine)
 
   override def choice[Result](first: Parser[Result], other: => Parser[Result], firstIsLonger: Boolean = false) = new BiggestOfTwo(first, other)
@@ -96,6 +96,20 @@ trait MachineParserWriter extends ParserWriter {
     def manySeparated(separator: Self[Any]): Self[List[Result]] = {
       leftRight(parser, (separator ~> parser).*, (h: Result, t: List[Result]) => h :: t) | succeed(List.empty[Result])
     }
+
+    def repN(amount: Int): Self[List[Result]] = {
+      if (amount == 0) {
+        succeed(List.empty[Result])
+      } else {
+        leftRight[Result, List[Result], List[Result]](parser, repN(amount - 1), (a,b) => a :: b)
+      }
+    }
+
+    def ~[Right](right: => Self[Right]): Self[(Result, Right)] = leftRight(parser, right, (a: Result, b: Right) => (a, b))
+
+    def ~<[Right](right: Self[Right]): Self[Result] = leftRight(parser, right, Processor.ignoreRight[Result, Right])
+
+    def ~>[Right](right: Self[Right]): Self[Right] = leftRight(parser, right, Processor.ignoreLeft[Result, Right])
 
     def parseWholeInput(input: Input): ParseResult[Result] = {
 

@@ -37,7 +37,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    parserProp.add(language, toParserBuilder(language.grammars.root).map(r => r.asInstanceOf[Node]).getWholeInputParser())
+    parserProp.add(language, toParserBuilder(language.grammars.root).map(r => r.asInstanceOf[Node]).getWholeInputParser)
   }
 
   override def description: String = "Parses the input file using a textual grammar."
