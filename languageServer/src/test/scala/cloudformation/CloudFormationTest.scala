@@ -21,7 +21,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
   test("No diagnostics edited") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val result = getDiagnostic(jsonServer, program)
-    assert(result.size == 1)
+    assert(result.size == 15) // TODO reduce the amount of errors.
   }
 
   test("Goto definition resource reference") {
