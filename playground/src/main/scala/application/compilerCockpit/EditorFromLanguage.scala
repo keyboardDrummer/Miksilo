@@ -19,8 +19,6 @@ class EditorFromLanguage(language: LanguageFromDeltas) extends JPanel(new CardLa
   val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
   inputDocument.setTokenMakerFactory(factory)
 
-  private val rowColumnRegex = """\[(\d*)\.(\d*)\] failure: (.*)\n\n""".r
-
   val inputTextArea = new MiksiloTextEditor(inputDocument)
   val server = new MiksiloLanguageServer(language)
   inputTextArea.setServer(server)

@@ -1,6 +1,6 @@
 package deltas.json
 
-import core.bigrammar.grammars.{Keyword, Parse}
+import core.bigrammar.grammars.{Colorize, Keyword, Parse, WithDefault}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Delta, DeltaWithGrammar}
@@ -28,12 +28,14 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
     val keyGrammar = {
       import core.bigrammar.DefaultBiGrammarWriter._
+      val regexGrammar = grammars.regexGrammar(stringInnerRegex, "string literal")
+      val withDefaultGrammar = new WithDefault(regexGrammar, "\"") // TODO maybe replace this with a regex default sample generator
       dropPrefix(grammars,
-        grammars.regexGrammar(stringInnerRegex, "string literal"), MemberKey, "\"") ~< "\""
+        withDefaultGrammar, MemberKey, "\"") ~< "\""
     }
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
 
-    val member = (keyGrammar ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
+    val member = (Colorize(keyGrammar, "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val optionalTrailingComma = Parse(Keyword(",") | value(Unit))
     val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< optionalTrailingComma).indent() %< "}"
 

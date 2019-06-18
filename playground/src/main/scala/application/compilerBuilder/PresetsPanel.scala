@@ -18,6 +18,7 @@ import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.{BlockLanguageDelta, ImplicitReturnAtEndOfMethod}
 import deltas.javac.statements.ForLoopContinueDelta
+import deltas.json.JsonLanguage
 import deltas.statement.assignment.AddAssignmentDelta
 import deltas.statement.{ForLoopDelta, LocalDeclarationWithInitializerDelta}
 
@@ -88,6 +89,12 @@ object PresetsPanel
       "Replaces integer offsets by labels to indicate positions in instruction lists.")
   }
 
+  def getJsonFormatter = {
+    Preset("Json",
+      JsonLanguage.language.topToBottom,
+      "JSON")
+  }
+
   def createModel: DefaultListModel[Preset] = {
     val model = new DefaultListModel[Preset]()
     model.addElement(PresetsPanel.getJavaCompilerPreset)
@@ -101,6 +108,7 @@ object PresetsPanel
     model.addElement(PresetsPanel.getSimplifiedByteCodePreset)
     model.addElement(getByteCodePreset)
     model.addElement(getLabelledLocations)
+    model.addElement(getJsonFormatter)
     model
   }
 

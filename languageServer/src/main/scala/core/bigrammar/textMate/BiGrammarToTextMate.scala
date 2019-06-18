@@ -1,13 +1,14 @@
 package core.bigrammar.textMate
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.grammars._
-import core.language.node.{Node, NodeGrammar}
-import deltas.expression.ArrayLiteralDelta
+import _root_.core.bigrammar.grammars.{ParseWhiteSpace, _}
+import core.bigrammar.printer.BiGrammarToPrinter
+import core.language.node.Node
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
+import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
+import deltas.javac.expressions.literals.BooleanLiteralDelta
 import deltas.json.JsonObjectLiteralDelta.{ObjectLiteral, ObjectLiteralMember}
-import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
-import _root_.core.bigrammar.grammars.ParseWhiteSpace
+import deltas.json.{JsonLanguage, JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import util.GraphBasics
 
 import scala.util.matching.Regex
@@ -38,17 +39,18 @@ object BiGrammarToTextMate {
         case regex: RegexGrammar => Some(regex.regex.regex)
         case many: Many => recurse(many.inner).map(r => r + "*") // TODO add parenthesis
         case map: MapGrammar => recurse(map.inner)
+        case map: MapGrammarWithMap => recurse(map.inner)
         case labelled: Labelled => recurse(labelled.inner)
         case delimiter: Delimiter => Some(escapeRegex(delimiter.value))
         case ParseWhiteSpace => Some(ParseWhiteSpace.regex.regex)
         case keyword: Keyword => Some(escapeRegex(keyword.value))
+        case withDefault: WithDefault => recurse(withDefault.inner)
         case choice: BiChoice =>
           for {
             left <- recurse(choice.left)
             right <- recurse(choice.right)
           } yield left + "|" + right
         case as: As => recurse(as.inner)
-        case nodeGrammar: NodeGrammar => recurse(nodeGrammar.inner)
       }
 
       callStack = callStack.tail
@@ -57,6 +59,9 @@ object BiGrammarToTextMate {
 
     recurse(root)
   }
+
+  val jsonLanguage = JsonLanguage.language
+  lazy val jsonPrinter = BiGrammarToPrinter.toPrinter(jsonLanguage.grammars.root)
 
   // TODO replace this with a JsonLanguage printer that actually works.
   def printJson(root: Node): String = {
@@ -71,31 +76,35 @@ object BiGrammarToTextMate {
         case ArrayLiteralDelta.Shape =>
           val array: ArrayLiteral[Node] = node
           builder.append("[")
-          indent()
-          addNewLine()
-          for(element <- array.members.dropRight(1)) {
-            add(element)
-            builder.append(",")
+          if (array.members.nonEmpty) {
+            indent()
             addNewLine()
+            for(element <- array.members.dropRight(1)) {
+              add(element)
+              builder.append(",")
+              addNewLine()
+            }
+            add(array.members.last)
+            dedent()
           }
-          add(array.members.last)
-          dedent()
           addNewLine()
           builder.append("]")
 
         case JsonObjectLiteralDelta.Shape =>
           val obj: ObjectLiteral[Node] = node
           builder.append("{")
-          indent()
-          addNewLine()
-          for(member <- obj.members.dropRight(1)) {
-            add(member)
-            builder.append(",")
+          if (obj.members.nonEmpty) {
+            indent()
+            addNewLine()
+            for(member <- obj.members.dropRight(1)) {
+              add(member)
+              builder.append(",")
+              addNewLine()
+            }
+            add(obj.members.last)
+            dedent()
             addNewLine()
           }
-          add(obj.members.last)
-          dedent()
-          addNewLine()
           builder.append("}")
 
         case JsonObjectLiteralDelta.MemberShape =>
@@ -106,6 +115,11 @@ object BiGrammarToTextMate {
         case JsonStringLiteralDelta.Shape =>
           val regex = JsonStringLiteralDelta.getValue(node)
           builder.append(stringToStringLiteral(regex))
+
+        case ExpressionDelta.DefaultShape =>
+          // Print nothing
+        case _ =>
+          builder.append(jsonPrinter(node))
       }
     }
     add(root)
@@ -146,7 +160,7 @@ object BiGrammarToTextMate {
         }
     }).sortBy(n => n.regex.regex)
 
-    val patterns = typedPatterns.map(pattern => TextMateDelta.singleMatch(pattern.scope, pattern.regex))
+    val patterns = typedPatterns.map(pattern => TextMateDelta.singleMatch(pattern.scope, pattern.regex)).distinct
     JsonObjectLiteralDelta.neww(Map(
       "patterns" -> ArrayLiteralDelta.create(patterns)
     ))

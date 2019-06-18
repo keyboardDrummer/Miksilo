@@ -3,6 +3,7 @@ package application.compilerCockpit
 import core.bigrammar.BiGrammarToParser
 import core.bigrammar.BiGrammarToParser.Reader
 import deltas.javac.JavaToByteCodeLanguage
+import deltas.json.JsonLanguage
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.fife.ui.rsyntaxtextarea.TokenTypes
 import org.scalatest.FunSuite
@@ -12,6 +13,16 @@ class TokenMakerFromGrammarTest extends FunSuite {
 
   private val language = TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++
     JavaToByteCodeLanguage.javaCompilerDeltas)
+
+  val space = MyToken(TokenTypes.WHITESPACE, " ")
+  def spaces(number: Int) = MyToken(TokenTypes.WHITESPACE, new String(Array.fill(number)(' ')))
+  def newLine(spaces: Int) = MyToken(TokenTypes.WHITESPACE, "\n" + new String(Array.fill(spaces)(' ')))
+  def reserved(value: String) = MyToken(TokenTypes.RESERVED_WORD, value)
+  def identifier(value: String) = MyToken(TokenTypes.IDENTIFIER, value)
+  def delimiter(value: String) = MyToken(TokenTypes.SEPARATOR, value)
+  def error(value: String) = MyToken(TokenTypes.ERROR_CHAR, value)
+  def stringQuotes(value: String) = MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, value)
+  def integer(value: Int) = MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, value.toString)
 
   test("fibonacci") {
     val grammar = language.grammars.root
@@ -31,14 +42,6 @@ class TokenMakerFromGrammarTest extends FunSuite {
       tokenMaker.parserBuilder.getWholeInputParser.parse(new BiGrammarToParser.Reader(text))
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
-    val space = MyToken(TokenTypes.WHITESPACE, " ")
-    def spaces(number: Int) = MyToken(TokenTypes.WHITESPACE, new String(Array.fill(number)(' ')))
-    def newLine(spaces: Int) = MyToken(TokenTypes.WHITESPACE, "\n" + new String(Array.fill(spaces)(' ')))
-    def reserved(value: String) = MyToken(TokenTypes.RESERVED_WORD, value)
-    def identifier(value: String) = MyToken(TokenTypes.IDENTIFIER, value)
-    def delimiter(value: String) = MyToken(TokenTypes.SEPARATOR, value)
-    def error(value: String) = MyToken(TokenTypes.ERROR_CHAR, value)
-    def integer(value: Int) = MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, value.toString)
     val expectedTokens = List(
       reserved("class"), space, identifier("Foo"), newLine(0),
       delimiter("{"), newLine(4),
@@ -66,6 +69,25 @@ class TokenMakerFromGrammarTest extends FunSuite {
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
     val expectedTokens = List(MyToken(TokenTypes.ERROR_CHAR, "^"))
+
+    assertResult(expectedTokens)(tokens)
+  }
+
+  test("json") {
+    val grammar = TestLanguageBuilder.build(JsonLanguage.deltas).grammars.root
+    val tokenMaker = new TokenMakerFromGrammar(grammar)
+
+    val text = """{"hello":3}""".stripMargin
+
+    val resultOption: BiGrammarToParser.SingleParseResult[Seq[MyToken]] =
+      tokenMaker.parserBuilder.getWholeInputParser.parse(new BiGrammarToParser.Reader(text))
+    assert(resultOption.successful, resultOption.toString)
+    val tokens = resultOption.get
+    val expectedTokens = List(
+      delimiter("{"), stringQuotes("\"hello\""),
+      delimiter(":"), integer(3),
+      delimiter("}")
+    )
 
     assertResult(expectedTokens)(tokens)
   }

@@ -147,6 +147,7 @@ trait StringParserWriter extends SequenceParserWriter {
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
+              // TODO use the regex to generate a default case.
               singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, s"<$regexName>", History.missingInputPenalty))))
           }
         }
