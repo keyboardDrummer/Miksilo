@@ -12,10 +12,6 @@ class TextMateTest extends FunSuite {
     val expectation = """{
                         |  "patterns": [
                         |    {
-                        |      "name": "keyword.operator",
-                        |      "match": "\\""
-                        |    },
-                        |    {
                         |      "name": "string.quoted.double",
                         |      "match": "\\"([^\\"\\x00-\\x1F\\x7F\\\\]|\\\\[\\\\'\\"bfnrt]|\\\\u[a-fA-F0-9]{4})*\\""
                         |    },

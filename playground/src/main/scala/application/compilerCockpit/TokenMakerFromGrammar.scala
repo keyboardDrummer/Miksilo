@@ -2,6 +2,7 @@ package application.compilerCockpit
 
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.grammars._
+import core.bigrammar.textMate.BiGrammarToTextMate
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import javax.swing.text.Segment
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
@@ -22,19 +23,23 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker {
   val parserBuilder: SequenceParserExtensions[Seq[MyToken]] = {
     val keywords: mutable.Set[String] = mutable.Set.empty
     val reachables = GraphBasics.traverseBreadth[BiGrammar](Seq(grammar), grammar => grammar.children,
-      node => if (node.isInstanceOf[Colorize]) GraphBasics.SkipChildren else GraphBasics.Continue ).toSet
+      node => if (node.isInstanceOf[Colorize]) GraphBasics.SkipChildren else GraphBasics.Continue).toSet
 
     val tokenParsers: Set[BiGrammarToParser.Self[MyToken]] = reachables.collect({
       case keyword: Keyword if keyword.reserved =>
         keywords.add(keyword.value)
         literalOrKeyword(keyword.value) ^^ (s => MyToken(TokenTypes.RESERVED_WORD, s))
-      case delimiter: Delimiter => literalOrKeyword(delimiter.value) ^^ (s => MyToken(TokenTypes.SEPARATOR, s))
+      case delimiter: Delimiter =>
+        literalOrKeyword(delimiter.value) ^^ (s => MyToken(TokenTypes.SEPARATOR, s))
       case identifier: Identifier => identifier.getParserBuilder(keywords) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
       case NumberGrammar => wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s)) //TODO should support other numbers as well.
       case StringLiteral =>
         stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
       case Colorize(inner, textMateScope) =>
-        BiGrammarToParser.toParserBuilder(inner, keywords) ^^ (s => MyToken(textMateScopeToToken(textMateScope), s.asInstanceOf[String]))
+        val regex = BiGrammarToTextMate.grammarToRegex(inner).get.r
+        RegexParser(regex, regex.regex) ^^ (s => {
+          MyToken(textMateScopeToToken(textMateScope), s)
+        })
     })
 
     val whiteSpaceToken = regex(new Regex("\\s+"), "whitespace") ^^ (s => MyToken(TokenTypes.WHITESPACE, s))

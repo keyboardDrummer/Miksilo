@@ -9,10 +9,16 @@ import core.responsiveDocument.{ResponsiveDocument, ResponsiveLeftRight, Respons
 import scala.collection.mutable
 
 object BiGrammarToPrinter {
-  def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
+  def toPrinter(grammar: BiGrammar): Any => ResponsiveDocument = {
     val printer = new BiGrammarToPrinter().toPrinterCached(grammar)
-    val printResult = printer.write(WithMap(outerValue, Map.empty))
-    printResult.run(Map.empty).get._2
+    outerValue => {
+      val printResult = printer.write(WithMap(outerValue, Map.empty))
+      printResult.run(Map.empty).get._2
+    }
+  }
+
+  def toDocument(outerValue: Any, grammar: BiGrammar): ResponsiveDocument = {
+    toPrinter(grammar)(outerValue)
   }
 }
 

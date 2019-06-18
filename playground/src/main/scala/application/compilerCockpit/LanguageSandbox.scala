@@ -10,7 +10,7 @@ import core.deltas.{Delta, LanguageFromDeltas}
 import core.language.exceptions.CompileException
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}
 import javax.swing._
-import javax.swing.event.{ListDataEvent, ListDataListener}
+import javax.swing.event.{DocumentEvent, DocumentListener, ListDataEvent, ListDataListener}
 import javax.swing.text.DefaultCaret
 import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
@@ -40,7 +40,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
 
   def getCompileOptions: Seq[CompileOption] = {
     val byteCodeActions = Seq(CompileAndRunOption, EmitByteCode)
-    val result: Seq[CompileOption] = Seq(PrettyPrintOption) ++ byteCodeActions ++ Seq(FormatOption) //TODO enable these again. ++ language.extraCompileOptions
+    val result: Seq[CompileOption] = Seq(PrettyPrintOption) ++ byteCodeActions ++ Seq(FormatOption, FormatJsonOption) //TODO enable these again. ++ language.extraCompileOptions
     result.foreach(option => option.initialize(this))
     result
   }
@@ -85,7 +85,25 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
     inputPanel.inputDocument.replace(0, inputPanel.inputDocument.getLength, text, null)
   }
 
-  def execute(action: () => Unit) = {
+  private var executeOnChanged = false
+  def toggleExecuteOnChanged(): Unit = {
+    executeOnChanged = !executeOnChanged
+  }
+  inputPanel.inputDocument.addDocumentListener(new DocumentListener {
+    override def insertUpdate(e: DocumentEvent): Unit = if (executeOnChanged) executeClicked()
+
+    override def removeUpdate(e: DocumentEvent): Unit = if (executeOnChanged) executeClicked()
+
+    override def changedUpdate(e: DocumentEvent): Unit = if (executeOnChanged) executeClicked()
+  })
+
+  def executeClicked(): Unit = {
+    val input = inputOption.getInput
+    val output = compileOption.run(this, input)
+    outputOption.handleOutput(output)
+  }
+
+  def execute(action: () => Unit): Unit = {
     Try[Unit](action()).
       recover({ case e: CompileException => setOutputText(e.toString) }).
       recover({ case e: Throwable =>
@@ -131,12 +149,13 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
     val chooseOutput = equationLayout.addComponent(getChooseOutput)
     val choosePanels = equationLayout.addComponent(getChoosePanels)
     val executeButton = equationLayout.addComponent(new ExecuteButton(this))
+    val executeCheckBox = equationLayout.addComponent(new ExecuteCheckBox(this))
     val inputPanelComponent = equationLayout.addComponent(inputPanel)
     val outputPanel = equationLayout.addComponent(getOutputPanel)
     val showPhasesButton = equationLayout.addComponent(new ShowPhasesButton(this))
     val inputGrammarButton = equationLayout.addComponent(new ShowInputGrammarButton(this))
     val outputGrammarButton = equationLayout.addComponent(new ShowOutputGrammarButton(this))
-    val exampleDropdown = equationLayout.addComponent(new ExampleDropdown(this))
+    val exampleDropDown = equationLayout.addComponent(new ExampleDropdown(this))
 
     val innerLayout = equationLayout.equationLayout
 
@@ -147,13 +166,14 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
     equationLayout.makePreferredSize(showPhasesButton)
     equationLayout.makePreferredSize(inputGrammarButton)
     equationLayout.makePreferredSize(outputGrammarButton)
-    equationLayout.makePreferredSize(exampleDropdown)
+    equationLayout.makePreferredSize(exampleDropDown)
     equationLayout.makePreferredSize(executeButton)
+    equationLayout.makePreferredSize(executeCheckBox)
 
     def addHorizontalEquations() {
       innerLayout.addLeftToRight(innerLayout.container, inputPanelComponent, outputPanel, innerLayout.container)
-      innerLayout.addLeftToRight(exampleDropdown, showPhasesButton, inputGrammarButton, outputGrammarButton, innerLayout.container)
-      innerLayout.addLeftToRight(innerLayout.container, chooseInput, chooseCompile, chooseOutput, executeButton, choosePanels)
+      innerLayout.addLeftToRight(exampleDropDown, showPhasesButton, inputGrammarButton, outputGrammarButton, innerLayout.container)
+      innerLayout.addLeftToRight(innerLayout.container, chooseInput, chooseCompile, chooseOutput, executeButton, executeCheckBox, choosePanels)
     }
     addHorizontalEquations()
 
@@ -186,8 +206,9 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
         showPhasesButton.verticalCenter2,
         inputGrammarButton.verticalCenter2,
         outputGrammarButton.verticalCenter2,
-        exampleDropdown.verticalCenter2,
-        executeButton.verticalCenter2)
+        exampleDropDown.verticalCenter2,
+        executeButton.verticalCenter2,
+        executeCheckBox.verticalCenter2)
 
       innerLayout.addRow(inputPanelComponent, outputPanel)
       innerLayout.addTopToBottom(innerLayout.container, chooseCompile, inputPanelComponent, innerLayout.container)

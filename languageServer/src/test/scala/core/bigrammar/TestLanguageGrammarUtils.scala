@@ -42,7 +42,7 @@ object TestGrammarUtils extends FunSuite {
 
   def parse(example: String, grammarDocument: BiGrammar): SingleParseResult[Any] = {
     val parser = toParserBuilder(grammarDocument)
-    parser.getWholeInputParser.parse(new Reader(example))
+    parser.getWholeInputParser.parseUntilBetterThanNextOrXSteps(new Reader(example))
   }
 }
 

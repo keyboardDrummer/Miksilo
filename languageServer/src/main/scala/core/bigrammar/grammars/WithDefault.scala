@@ -7,7 +7,7 @@ import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 
-class WithDefault(inner: BiGrammar, _default: Any) extends CustomGrammar {
+class WithDefault(val inner: BiGrammar, _default: Any) extends CustomGrammar {
   override def print(toDocumentInner: BiGrammar => ResponsiveDocument): ResponsiveDocument = toDocumentInner(inner) ~ "withDefault: " ~ _default.toString
 
   override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = recursive(inner)
