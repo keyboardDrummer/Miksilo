@@ -13,6 +13,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def tail: Input
 
     def drop(amount: Int): Input
+    def safeDrop(amount: Int): Input = if (atEnd) this.asInstanceOf[Input] else drop(1)
     def end: Input
     def printRange(end: Input): String
     def position: Position
@@ -114,10 +115,28 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
   }
 
-  case class MissingInput(from: Input, to: Input, expectation: String, penalty: Double = History.missingInputPenalty) extends ParseError[Input] {
+//  def apply(input: Input, state: ParseState): ParseResult[Result] = {
+//    val result = parseOriginal(input, state)
+//    result.flatMapReady(ready => {
+//      val result: ParseResult[Result] = if (ready.remainder == input)
+//        SREmpty
+//      else if (ready.resultOption.isEmpty) {
+//        SREmpty
+//        // singleResult(ReadyParseResult(Some(_default), ready.remainder, ready.history))
+//      } else
+//        singleResult(ready)
+//      result
+//    }, uniform = true)
+//  }
+
+  case class MissingInput(from: Input, to: Input, expectation: String, penalty: Double = History.missingInputPenalty)
+    extends ParseError[Input] {
+
+    def this(from: Input, expectation: String) =
+      this(from, from.safeDrop(1), expectation, History.missingInputPenalty)
 
     def this(from: Input, expectation: String, penalty: Double) =
-      this(from, if (from.atEnd) from else from.drop(1), expectation, penalty)
+      this(from, from.safeDrop(1), expectation, penalty)
 
     override def message: String = {
       val found = if (from.atEnd) {
@@ -125,7 +144,20 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       } else
         from.printRange(to)
 
-      s"expected $expectation but found '$found'"
+      s"expected '$expectation' but found '$found'"
+    }
+
+    override def canMerge: Boolean = true
+
+    override def append(next: ParseError[Input]) = {
+      next match {
+        case next: MissingInput if next.from == from && next.to == to =>
+          val max = Math.max(penalty, next.penalty)
+          val min = Math.min(penalty, next.penalty)
+          val newPenalty = max + min * 0.1
+          Some(MissingInput(from, to, expectation + " " + next.expectation, newPenalty))
+        case _ => None
+      }
     }
   }
 
@@ -227,7 +259,8 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def someSeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
       lazy val result: Self[List[Result]] = separator ~>
         leftRight[Result, List[Result], List[Result]](DropParser(parser), DropParser(result), combineMany[Result]) |
-          Fail(Some(List.empty[Result]), elementName, History.insertDefaultPenalty) | succeed(List.empty[Result])
+          Fail(Some(List.empty[Result]), elementName, History.insertDefaultPenalty) | // TODO can we remove this Fail?
+          succeed(List.empty[Result])
       leftRight(parser, DropParser(result), combineMany[Result])
     }
 
@@ -254,34 +287,34 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
   }
 
+  val defaultSteps = 10
   trait SingleResultParser[+Result] {
     def parse(input: Input, mayStop: (Double, Double) => Boolean = (_, _) => true): SingleParseResult[Result]
-
-    def parseUntilBetterOrXSteps(input: Input, steps: Int = 100): SingleParseResult[Result] = {
-      var counter = 0
-      parse(input, (_, _) => {
-        counter += 1
-        counter == steps
-      })
-    }
 
     def parseUntilBestOption(input: Input): SingleParseResult[Result] = {
       parse(input, (_, _) => false)
     }
 
-    def parseUntilBetterThanNextOrXSteps(input: Input, steps: Int = 100): SingleParseResult[Result] = {
+    def parseUntilBetterThanNextOrXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
       var counter = 0
       parse(input, (best, second) => {
-        counter += 1
-        best > second || counter == steps
+        if (second > best)
+          false
+        else {
+          counter += 1
+          counter >= steps
+        }
       })
     }
 
-    def parseUntilBetterThanNextAndXSteps(input: Input, steps: Int): SingleParseResult[Result] = {
+    def parseUntilBetterThanNextAndXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
       var counter = 0
       parse(input, (best, second) => {
-        counter += 1
-        best > second && counter == steps
+        if (best > second) {
+          counter += 1
+          counter > steps
+        } else
+          false
       })
     }
 
@@ -289,7 +322,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       parse(input, (best, second) => best > second)
     }
 
-    def parseXSteps(input: Input, steps: Int): SingleParseResult[Result] = {
+    def parseXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
       var counter = 0
       parse(input, (_, _) => {
         counter += 1

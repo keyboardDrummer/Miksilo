@@ -1,12 +1,13 @@
 package deltas.json
 
-import core.bigrammar.grammars.{Colorize, Keyword, Parse, WithDefault}
+import core.bigrammar.grammars._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Delta, DeltaWithGrammar}
 import core.language.exceptions.BadInputException
 import core.language.node._
 import core.language.{Compilation, Language}
+import core.parsers.editorParsers.History
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
@@ -37,7 +38,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
     val member = (Colorize(keyGrammar, "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val optionalTrailingComma = Parse(Keyword(",") | value(Unit))
-    val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< optionalTrailingComma).indent() %< "}"
+    val inner = Delimiter("{", History.missingInputPenalty * 2) %> (member.manySeparatedVertical(",").as(Members) ~< optionalTrailingComma).indent() %< "}"
 
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)

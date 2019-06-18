@@ -27,7 +27,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
             case tailCons: SRCons[Result] =>
-              if (mayStop(bestResult.originalScore, tailCons.head.score))
+              if (tailCons.head.isInstanceOf[DelayedParseResult[_]] &&
+                mayStop(bestResult.originalScore, tailCons.head.score))
                 SREmpty
               else
                 tail
@@ -359,7 +360,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
           firstResult match {
-            case cons: SRCons[Result] if !cons.head.history.flawed => firstResult
+            case cons: SRCons[Result]
+              if !cons.head.history.flawed => firstResult
             case _ =>
               firstResult.merge(secondResult)
           }

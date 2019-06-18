@@ -11,7 +11,7 @@ class ErrorReportingTest extends FunSuite with CommonStringReaderParser with Lef
     val input = "@@"
     val parseResult = head.getWholeInputParser.parse(new StringReader(input))
     assert(!parseResult.successful)
-    assertResult("expected ! but found '@'")(parseResult.errors.last.message)
+    assertResult("expected '!' but found '@'")(parseResult.errors.last.message)
   }
 
   test("left recursion with lazy indirection error v2") {
@@ -20,6 +20,6 @@ class ErrorReportingTest extends FunSuite with CommonStringReaderParser with Lef
     val input = "@@"
     val parseResult = head.getWholeInputParser.parse(new StringReader(input))
     assert(!parseResult.successful)
-    assertResult("expected ! but found '@'")(parseResult.errors.last.message)
+    assertResult("expected '!' but found '@'")(parseResult.errors.last.message)
   }
 }

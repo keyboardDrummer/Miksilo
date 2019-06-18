@@ -9,6 +9,22 @@ import editorParsers.History
 class HistoryTest extends FunSuite with StringParserWriter {
   type Input = IndexInput
 
+  test("Missing ': <value> ,' is better than Missing ': {', Missing '}'") {
+    val first = new IndexInput(0)
+    val second = new IndexInput(1)
+    val noBracesInserted = SpotlessHistory().
+      addError(new MissingInput(first, ":")).
+      addError(new MissingInput(first, "<value>", History.insertFallbackPenalty)).
+      addError(new MissingInput(first, ","))
+
+    val insertedBraces = SpotlessHistory().
+      addError(new MissingInput(first, ":")).
+      addError(new MissingInput(first, "{")).
+      addError(new MissingInput(second, "}"))
+
+    assert(insertedBraces.score < noBracesInserted.score)
+  }
+
   test("two consecutive drops combine and become cheaper") {
     val splitDrops = SpotlessHistory().
       addError(DropError(new IndexInput(0),new IndexInput(1))).

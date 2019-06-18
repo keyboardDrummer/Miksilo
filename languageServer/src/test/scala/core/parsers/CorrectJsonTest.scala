@@ -44,24 +44,24 @@ class CorrectJsonTest extends FunSuite {
   test("object member with only the key") {
     val input = """{"person""""
     val expectation = List(("""person""", UnknownExpression))
-    parseJson(input, expectation, 3)
+    parseJson(input, expectation, 1)
   }
 
   test("object member with no expression") {
     val input = """{"person":"""
     val expectation = List(("person", UnknownExpression))
-    parseJson(input, expectation, 2)
+    parseJson(input, expectation, 1)
   }
 
   test("object member with only an unfinished key") {
     val input = """{"person"""
     val expectation = List(("person", UnknownExpression))
-    parseJson(input, expectation, 4)
+    parseJson(input, expectation, 1)
   }
 
   test("object member with an unfinished value") {
     val input = """{"person":"remy"""
-    parseJson(input, List(("person", "remy")), 2)
+    parseJson(input, List(("person", "remy")), 1)
   }
 
   test("object with a single member and comma") {
@@ -73,19 +73,19 @@ class CorrectJsonTest extends FunSuite {
   test("object with a single member and half second member") {
     val input = """{"person":3,"second""""
     val expectation = List(("person", "3"), ("second", UnknownExpression))
-    parseJson(input, expectation, 3)
+    parseJson(input, expectation, 1)
   }
 
   test("real life example missing :value") {
     val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subscription"}}}}"""
     val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription", UnknownExpression))))))))
-    parseJson(input, expectation, 2)
+    parseJson(input, expectation, 1)
   }
 
   test("real life example 2") {
     val input = """{"Resources":{"NotificationTopic":{"Properties":{"Subsc"""
     val expectation = List(("Resources",List(("NotificationTopic",List(("Properties",List(("Subsc", UnknownExpression))))))))
-    parseJson(input, expectation, 7)
+    parseJson(input, expectation, 1)
   }
 
   test("garbage before key") {
@@ -146,13 +146,25 @@ class CorrectJsonTest extends FunSuite {
   test("starting brace insertion") {
     val input = """{"person":"remy":"jeroen"}}"""
     val expectation = List(("person",List(("remy","jeroen"))))
-    parseJson(input, expectation, 1)
+    parseJson(input, expectation, 1, 100)
+  }
+
+  test("starting brace insertion 2") {
+    val input = """{"person""remy":"jeroen"}}"""
+    val expectation = List(("person",List(("remy","jeroen"))))
+    parseJson(input, expectation, 1, 100)
+  }
+
+  test("missing value") {
+    val input = """{"person""remy":"jeroen"}"""
+    val expectation = List("person" -> UnknownExpression, "remy" -> "jeroen")
+    parseJson(input, expectation, 1, 1)
   }
 
   test("starting brace insertion unambiguous") {
     val input = """{"person":"remy":"jeroen","remy":"jeroen"}}"""
     val expectation = List(("person",List("remy" -> "jeroen", "remy" -> "jeroen")))
-    parseJson(input, expectation, 1)
+    parseJson(input, expectation, 1, 100)
   }
 
   /*
@@ -201,7 +213,7 @@ class CorrectJsonTest extends FunSuite {
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
   private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
     val result = jsonParser.getWholeInputParser.parseUntilBetterThanNextAndXSteps(new StringReader(input), steps)
-    System.out.append(result.errors.toString())
+    System.out.println(result.errors.toString())
     assertResult(expectation)(result.resultOption.get)
     assertResult(errorCount)(result.errors.size)
   }

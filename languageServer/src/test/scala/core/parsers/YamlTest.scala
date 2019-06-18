@@ -148,7 +148,7 @@ class YamlTest extends FunSuite
   lazy val parseStringLiteral: Self[YamlExpression] =
     parseStringLiteralInner.map(s => StringLiteral(s))
   lazy val parseStringLiteralInner: Self[String] =
-    regex("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
+    RegexParser("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
 
 
   lazy val plainScalar = new WithContext({

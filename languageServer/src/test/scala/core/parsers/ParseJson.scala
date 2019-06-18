@@ -1,12 +1,15 @@
 package core.parsers
 
 import editorParsers.LeftRecursiveCorrectingParserWriter
+import editorParsers.History
 
 object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
-  lazy val arrayParser = "[" ~> jsonParser.manySeparated(",", "array element") ~< "]"
+  private val nestPenalty = History.missingInputPenalty + History.insertFallbackPenalty * 1.1
+  lazy val arrayParser = Literal("[", nestPenalty) ~> jsonParser.manySeparated(",", "array element") ~< "]"
   lazy val memberParser = stringLiteral ~< DropParser(":") ~ jsonParser
-  lazy val objectParser = "{" ~> memberParser.manySeparated(",", "object member") ~< "}"
+  lazy val objectParser = Literal("{", nestPenalty) ~>
+    memberParser.manySeparated(",", "object member") ~< "}"
   object UnknownExpression {
     override def toString = "unknown"
   }

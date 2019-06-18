@@ -8,26 +8,26 @@ interface LanguageConfiguration {
 	miksiloName?: string,
 }
 const languages: Array<LanguageConfiguration> = [
-	{ 
-		vscodeName: "systemverilog", 
-		miksiloName: "verilog"
-	},
-	{
-        vscodeName: "solidity",
-        miksiloName: "solidity"
-    },
-    {
-         vscodeName: "java",
-         miksiloName: "java"
-    },
+	// { 
+	// 	vscodeName: "systemverilog", 
+	// 	miksiloName: "verilog"
+	// },
+	// {
+    //     vscodeName: "solidity",
+    //     miksiloName: "solidity"
+    // },
+    // {
+    //      vscodeName: "java",
+    //      miksiloName: "java"
+    // },
     {
          vscodeName: "cloudFormation",
          miksiloName: "cloudFormation"
     },
-    {
-         vscodeName: "yamlCloudFormation",
-         miksiloName: "yamlCloudFormation"
-    }
+    // {
+    //      vscodeName: "yamlCloudFormation",
+    //      miksiloName: "yamlCloudFormation"
+    // }
 ]
 
 export function activate(context: ExtensionContext) {	
@@ -65,8 +65,9 @@ function activateLanguage(jar: string, language: LanguageConfiguration): Disposa
 	let serverOptions: ServerOptions = {
 		command: "java",
 		args: ["-jar",
-			//"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=6007",
-			jar, 
+			jar,
+			//"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=localhost:1044",
+			"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=6007",
 			language.miksiloName]
 	}
 	

@@ -89,11 +89,12 @@ class PerformanceTest extends FunSuite {
     val timeA = System.currentTimeMillis()
 
     val multiplier = 1
-    for(_ <- 1.to(2 * multiplier)) {
+    val baseAmount = 2
+    for(_ <- 1.to(baseAmount * multiplier)) {
       val result = json.compileString(program).diagnostics
       assert(result.nonEmpty)
     }
     val timeB = System.currentTimeMillis()
-    assert(timeB - timeA < 5000)
+    assert(timeB - timeA < baseAmount * 2500)
   }
 }

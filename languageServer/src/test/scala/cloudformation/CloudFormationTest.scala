@@ -21,7 +21,31 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
   test("No diagnostics edited") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val result = getDiagnostic(jsonServer, program)
-    assert(result.size == 15) // TODO reduce the amount of errors.
+    assert(result.size == 6) // TODO reduce the amount of errors.
+  }
+
+  test("missing : <value> ,") {
+    val input = """{
+                  |    "BrokenParameter"
+                  |    "VpcId" : {
+                  |      "Type" : "AWS::EC2::VPC::Id",
+                  |    }
+                  |}""".stripMargin
+    val diagnostics = getDiagnostic(jsonServer, input)
+    assert(diagnostics.size == 1)
+  }
+
+  test("missing \": <value>,") {
+    val input = """{
+                  |    "InstanceType" : "Foo",
+                  |    "
+                  |
+                  |    "VpcId" : {
+                  |      "Type" : "AWS::EC2::VPC::Id",
+                  |    }
+                  |}""".stripMargin
+    val diagnostics = getDiagnostic(jsonServer, input)
+    assert(diagnostics.size == 2)
   }
 
   test("Goto definition resource reference") {

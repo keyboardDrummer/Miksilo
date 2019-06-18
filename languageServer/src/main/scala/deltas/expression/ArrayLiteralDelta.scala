@@ -1,11 +1,13 @@
 package deltas.expression
 
+import core.bigrammar.grammars.Delimiter
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{NodeField, NodeShape}
 import core.language.node._
 import core.language.{Compilation, Language}
+import core.parsers.editorParsers.History
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
@@ -27,7 +29,7 @@ object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     import _grammars._
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val inner = "[" ~ expressionGrammar.manySeparated(",").as(Members) ~ "]"
+    val inner = Delimiter("[", History.missingInputPenalty * 2) ~ expressionGrammar.manySeparated(",").as(Members) ~ "]"
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
   }
