@@ -41,12 +41,12 @@ object RelativeShapeIdentifierDelta extends DeltaWithGrammar with HasConstraints
 
   def getDeclaration(builder: ConstraintBuilder, path: NodePath, parentScope: Scope, _type: Type): DeclarationVariable = {
     val relativeShape: RelativeShape[NodePath] = path
-    val outer = builder.resolveToType(path.getSourceElement(Value), parentScope, _type)
+    val outer = builder.resolveToType(path.getField(Value), parentScope, _type)
     relativeShape.get(Accessor) match {
       case None => outer
       case Some(_) =>
         val scope = builder.getDeclaredScope(outer)
-        builder.resolveToType(path.getSourceElement(Accessor), scope, _type)
+        builder.resolveToType(path.getField(Accessor), scope, _type)
     }
   }
 

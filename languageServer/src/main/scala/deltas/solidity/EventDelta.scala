@@ -52,7 +52,7 @@ object EventDelta extends DeltaWithGrammar with HasConstraintsDelta {
       TypeSkeleton.getType(compilation, builder, methodParameter._type, parentScope)
     })
     val eventType = TypeApplication(eventConstructor, parameterTypes, path)
-    builder.declareSourceElement(event.getSourceElement(HasNameDelta.Name), parentScope, Some(eventType))
+    builder.declare(event.getField(HasNameDelta.Name), parentScope, eventType)
   }
 
   override def shape = Shape

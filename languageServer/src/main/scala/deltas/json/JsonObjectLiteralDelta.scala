@@ -65,6 +65,9 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
   implicit class ObjectLiteral[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def getValue(key: String): T = get(key).get
+    def getObject(key: String): Option[ObjectLiteral[T]] = get(key).
+      flatMap(v => if (v.shape == Shape) Some(ObjectLiteral(v)) else None)
+
     def get(key: String): Option[T] = members.find(member => member.key == key).map(x => x.value)
     def members: Seq[ObjectLiteralMember[T]] = NodeWrapper.wrapList(node(Members).asInstanceOf[Seq[T]])
   }

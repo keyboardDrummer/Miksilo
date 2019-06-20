@@ -38,6 +38,6 @@ object SelectFieldDelta extends DeltaWithGrammar with ExpressionInstance with Re
     val declaration = builder.getDeclarationOfType(_type)
     val scope = builder.getDeclaredScope(declaration)
     val member = selector.member
-    builder.refer(member, scope, Some(selector.getSourceElement(Member)))
+    builder.refer(member, scope, Some(selector.getField(Member)))
   }
 }

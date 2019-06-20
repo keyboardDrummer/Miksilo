@@ -68,8 +68,12 @@ class ConstraintBuilder(val factory: Factory) {
     result
   }
 
-  def declareSourceElement(name: SourceElement, container: Scope, _type: Option[Type] = None): NamedDeclaration = {
-    declare(name.current.asInstanceOf[String], container, name, _type)
+  def declare(name: SourceElement, container: Scope, _type: Type): NamedDeclaration = {
+    declare(name.current.asInstanceOf[String], container, name, Some(_type))
+  }
+
+  def declare(name: SourceElement, container: Scope): NamedDeclaration = {
+    declare(name.current.asInstanceOf[String], container, name, None)
   }
 
   def declare(name: String, container: Scope, origin: SourceElement = null, _type: Option[Type] = None): NamedDeclaration = { //TODO the order here is inconsistent with resolve.

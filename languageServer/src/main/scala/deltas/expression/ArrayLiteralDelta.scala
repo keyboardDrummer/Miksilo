@@ -24,10 +24,10 @@ object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     val grammars = _grammars
     import _grammars._
 
-    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val inner = "[" ~ expressionGrammar.manySeparated(",").as(Members) % "]"
-    val grammar = inner.asLabelledNode(Shape)
-    expressionGrammar.addAlternative(grammar)
+    val expression = find(ExpressionDelta.FirstPrecedenceGrammar)
+    val array = "[" ~ expression.manySeparated(",").as(Members) ~ "]"
+    val grammar = array.asLabelledNode(Shape)
+    expression.addAlternative(grammar)
   }
 
   object Members extends NodeField

@@ -160,7 +160,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
     }
 
     //TODO here there should be an instance, a static, and a lexical scope.
-    val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getSourceElement(Name))
+    val clazzDeclaration = builder.declare(clazz.name, packageScope, path.getField(Name))
     val clazzType = TypeFromDeclaration(clazzDeclaration)
     builder.add(DeclarationHasType(clazzDeclaration, clazzType))
     builder.assignSubType(TypeSkeleton.typeKind, clazzType)

@@ -60,7 +60,7 @@ object TraitDelta extends DeltaWithGrammar {
     ConstraintSkeleton.hasConstraints.add(language, TraitStatement, new HasConstraints {
       override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder,
                                       path: NodePath, parentScope: Scope): Unit = {
-        builder.declareSourceElement(path.getSourceElement(HasNameDelta.Name), parentScope, Some(traitType))
+        builder.declare(path.getField(HasNameDelta.Name), parentScope, traitType)
       }
     })
   }

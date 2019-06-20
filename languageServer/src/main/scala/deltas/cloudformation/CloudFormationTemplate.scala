@@ -44,19 +44,19 @@ object CloudFormationTemplate extends Delta {
       filter(v => v.shape == JsonObjectLiteralDelta.Shape).map(v => ObjectLiteral(v))
     val members = resources.fold(Seq.empty[ObjectLiteralMember[NodePath]])(o => o.members)
     for (resource <- members) {
-      builder.declareSourceElement(resource.getSourceElement(MemberKey), rootScope, Some(valueType))
+      builder.declare(resource.getField(MemberKey), rootScope, valueType)
 
       if (resource.value.shape == JsonObjectLiteralDelta.Shape) {
         val resourceMembers: ObjectLiteral[NodePath] = resource.value
         val typeString = resourceMembers.getValue("Type")
         val resourceType = JsonStringLiteralDelta.getValue(typeString)
-        val typeDeclaration = builder.resolve(resourceType, typeString.getSourceElement(JsonStringLiteralDelta.Value), rootScope)
+        val typeDeclaration = builder.resolve(resourceType, typeString.getField(JsonStringLiteralDelta.Value), rootScope)
         val typeScope = builder.getDeclaredScope(typeDeclaration)
         resourceMembers.get("Properties").foreach(_properties => {
           if (_properties.shape == JsonObjectLiteralDelta.Shape) {
             val properties: ObjectLiteral[NodePath] = _properties
             for (property <- properties.members) {
-              builder.resolveToType(property.key, property.node.getSourceElement(MemberKey), typeScope, propertyType)
+              builder.resolveToType(property.key, property.node.getField(MemberKey), typeScope, propertyType)
             }
           }
         })
@@ -70,7 +70,7 @@ object CloudFormationTemplate extends Delta {
       val member: JsonObjectLiteralDelta.ObjectLiteralMember[NodePath] = _member
       if (member.key == "Ref" && member.value.shape == JsonStringLiteralDelta.Shape) {
         val value = JsonStringLiteralDelta.getValue(member.value)
-        val refLocation = member.value.getSourceElement(JsonStringLiteralDelta.Value)
+        val refLocation = member.value.getField(JsonStringLiteralDelta.Value)
         builder.resolveToType(value, refLocation, rootScope, valueType)
       }
     })
@@ -82,12 +82,13 @@ object CloudFormationTemplate extends Delta {
       builder.declare(pseudoParameter, rootScope, null, Some(valueType))
   }
 
-  private def addParameters(builder: ConstraintBuilder, rootScope: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
-    program.get("Parameters") match {
-      case Some(_parameters) if _parameters.shape == JsonObjectLiteralDelta.Shape =>
+  private def addParameters(builder: ConstraintBuilder, rootScope: ConcreteScope,
+                            program: ObjectLiteral[NodePath]): Unit = {
+    program.getObject("Parameters") match {
+      case Some(_parameters) =>
         val parameters: ObjectLiteral[NodePath] = _parameters
         for (parameter <- parameters.members) {
-          builder.declare(parameter.key, rootScope, parameter.node.getSourceElement(MemberKey), Some(valueType))
+          builder.declare(parameter.node.getField(MemberKey), rootScope, valueType)
         }
       case _ =>
     }
