@@ -29,6 +29,6 @@ object NamespaceDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def shape = Shape
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
-
+    // TODO implement
   }
 }

@@ -46,13 +46,6 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     expressionGrammar.addAlternative(grammar)
   }
 
-  def commaSeparatedVertical(grammars: LanguageGrammars, member: BiGrammar) = {
-    import grammars._
-    ((member ~< "," ~< printSpace).manyVertical % member.option).map[(Seq[Any], Option[Any]), Seq[Any]](t => {
-      t._2.fold(t._1)(last => t._1 ++ Seq(last))
-    }, r => if (r.nonEmpty) (r.dropRight(1), Some(r.last)) else (Seq.empty, None))
-  }
-
   object MemberShape extends NodeShape
   object MemberKey extends NodeField
   object MemberValue extends NodeField
