@@ -35,6 +35,10 @@ class ConstraintBuilder(val factory: Factory) {
 
   def importScope(into: Scope, source: Scope): Unit = add(ParentScope(into, source))
 
+  def resolveToType(origin: SourceElement, scope: Scope, _type: Type) : DeclarationVariable = {
+    resolveToType(origin.current.asInstanceOf[String], origin, scope, _type)
+  }
+
   def resolveToType(name: String, origin: SourceElement, scope: Scope, _type: Type) : DeclarationVariable = {
     val declaration = declarationVariable()
     val reference = new Reference(name, Option(origin))
@@ -52,6 +56,10 @@ class ConstraintBuilder(val factory: Factory) {
     val reference = refer(name, scope, origin)
     constraints ::= ResolvesTo(reference, declaration)
     declaration
+  }
+
+  def referSourceElement(name: SourceElement, scope: Scope): Reference = {
+    refer(name.current.asInstanceOf[String], scope, Some(name))
   }
 
   def refer(name: String, scope: Scope, origin: Option[SourceElement]): Reference = {

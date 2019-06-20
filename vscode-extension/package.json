@@ -20,7 +20,8 @@
 		"onLanguage:solidity",
         "onLanguage:cloudFormation",
         "onLanguage:java",
-		"onLanguage:yamlCloudFormation"
+		"onLanguage:yamlCloudFormation",
+		"onLanguage:smithy"
 	],
 	"main": "./out/extension",
 	"contributes": {
@@ -40,6 +41,16 @@
                 ],
                 "configuration": "./src/verilog/language-configuration.json"
             },
+			{
+				"id": "smithy",
+				"aliases": [
+					"Smithy",
+					"smithy"
+				],
+				"extensions": [
+					".smithy"
+				]
+			},
 			{
 				"id": "solidity",
 				"aliases": [
@@ -85,6 +96,11 @@
             }
         ],
         "grammars": [
+			{
+				"language": "smithy",
+				"scopeName": "source.smithy",
+				"path": "./src/smithy/tmLanguage.json"
+			},
             {
               "language": "systemverilog",
               "scopeName": "text.systemverilog",

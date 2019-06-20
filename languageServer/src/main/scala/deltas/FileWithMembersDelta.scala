@@ -1,20 +1,22 @@
-package deltas.verilog
+package deltas
 
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.document.BlankLine
-import core.language.Language
+import core.language.{Compilation, Language}
 import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
-import deltas.ConstraintSkeleton
+import core.smarts.ConstraintBuilder
+import core.smarts.scopes.objects.Scope
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
-object VerilogFileDelta extends DeltaWithGrammar {
-  override def description: String = "Defines a Verilog file"
+object FileWithMembersDelta extends DeltaWithGrammar with HasConstraintsDelta {
+  override def description: String = "Defines a file with members"
 
   object Shape extends NodeShape
   object Members extends NodeField
 
-  implicit class VerilogFile[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+  implicit class FileWithMembers[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def members: Seq[T] = node(Members).asInstanceOf[Seq[T]]
   }
 
@@ -32,10 +34,16 @@ object VerilogFileDelta extends DeltaWithGrammar {
 
     language.collectConstraints = (compilation, builder) => {
       val fileScope = builder.newScope(None, "fileScope")
-      val members: Seq[NodePath] = PathRoot(compilation.program)(Members).asInstanceOf[Seq[NodePath]]
-      for(member <- members) {
-        ConstraintSkeleton.constraints(compilation, builder, member, fileScope)
-      }
+      ConstraintSkeleton.constraints(compilation, builder, PathRoot(compilation.program), fileScope)
+    }
+  }
+
+  override def shape = Shape
+
+  override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
+    val members: Seq[NodePath] = path(Members).asInstanceOf[Seq[NodePath]]
+    for(member <- members) {
+      ConstraintSkeleton.constraints(compilation, builder, member, parentScope)
     }
   }
 }

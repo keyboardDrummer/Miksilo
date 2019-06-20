@@ -27,6 +27,10 @@ const languages: Array<LanguageConfiguration> = [
     {
          vscodeName: "yamlCloudFormation",
          miksiloName: "yamlCloudFormation"
+    },
+    {
+         vscodeName: "smithy",
+         miksiloName: "smithy"
     }
 ]
 

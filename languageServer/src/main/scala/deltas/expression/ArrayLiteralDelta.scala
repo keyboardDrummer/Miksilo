@@ -3,14 +3,12 @@ package deltas.expression
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.language.node.{NodeField, NodeShape}
-import core.language.node._
+import core.language.node.{NodeField, NodeShape, _}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.json.JsonObjectLiteralDelta
-import deltas.json.JsonObjectLiteralDelta.{Members, ObjectLiteralMember}
 
 object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
@@ -27,7 +25,7 @@ object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     import _grammars._
 
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    val inner = "[" ~ expressionGrammar.manySeparated(",").as(Members) ~ "]"
+    val inner = "[" ~ expressionGrammar.manySeparated(",").as(Members) % "]"
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)
   }

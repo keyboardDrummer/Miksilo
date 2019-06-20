@@ -19,6 +19,8 @@ object PrintJson extends Delta  {
       try
       {
         compilation.output = BiGrammarToTextMate.printJson(compilation.program)
+      } catch {
+        case _: Throwable =>
       }
     }))
   }

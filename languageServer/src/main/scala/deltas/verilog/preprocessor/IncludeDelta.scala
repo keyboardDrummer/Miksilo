@@ -8,7 +8,7 @@ import core.deltas.{Contract, DiagnosticUtil, ParseUsingTextualGrammar, Property
 import core.language.Language
 import core.language.node.{Node, NodeField, NodeShape}
 import core.smarts.FileDiagnostic
-import deltas.verilog.VerilogFileDelta.VerilogFile
+import deltas.FileWithMembersDelta.FileWithMembers
 
 import scala.reflect.io.Path
 
@@ -25,8 +25,8 @@ object IncludeDelta extends DirectiveDelta {
     val parser = parserProp.get(compilation)
     val parseResult = ParseUsingTextualGrammar.parseStream(parser, input)
     parseResult.resultOption match {
-      case Some(result) =>
-        val value: VerilogFile[Node] = result.asInstanceOf[Node]
+      case Some(success) =>
+        val value: FileWithMembers[Node] = success.asInstanceOf[Node]
         value.members.foreach(member => member.startOfUri = Some(filePath.toString()))
         path.asInstanceOf[NodeSequenceElement].replaceWith(value.members)
       case None =>

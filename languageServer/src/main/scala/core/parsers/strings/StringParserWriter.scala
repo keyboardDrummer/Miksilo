@@ -61,7 +61,7 @@ trait StringParserWriter extends SequenceParserWriter {
     }
   }
 
-  val identifier: Self[String] = RegexParser("""[_a-zA-Z][_a-zA-Z0-9]*""".r, "identifier")
+  val identifier: RegexParser = RegexParser("""[_a-zA-Z][_a-zA-Z0-9]*""".r, "identifier")
 
   implicit def literalToExtensions(value: String): SequenceParserExtensions[String] = Literal(value)
 

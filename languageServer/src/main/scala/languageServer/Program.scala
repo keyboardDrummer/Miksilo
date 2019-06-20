@@ -9,6 +9,7 @@ import com.typesafe.scalalogging.LazyLogging
 import core.language.Language
 import deltas.cloudformation.CloudFormationLanguage
 import deltas.javac.JavaLanguage
+import deltas.smithy.SmithyLanguage
 import deltas.solidity.SolidityLanguage
 import deltas.verilog.VerilogLanguage
 import languageServer.lsp.{JsonRpcConnection, LSPServer}
@@ -24,6 +25,7 @@ object Program extends LazyLogging {
     "verilog" -> VerilogLanguage.language,
     "java" -> JavaLanguage.java,
     "solidity" -> SolidityLanguage.language,
+    "smithy" -> SmithyLanguage.language
   )
 
   def main(args: Array[String]): Unit = {

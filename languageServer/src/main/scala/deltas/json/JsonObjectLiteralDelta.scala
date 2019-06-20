@@ -1,5 +1,8 @@
 package deltas.json
 
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.{Keyword, Parse, RegexGrammar}
+import core.deltas.{Delta, DeltaWithGrammar}
 import core.bigrammar.grammars.{Colorize, Keyword, Parse, WithDefault}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
@@ -35,7 +38,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     }
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
 
-    val member = (Colorize(keyGrammar, "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
+    val member = (Colorize(create(MemberKey, keyGrammar), "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val optionalTrailingComma = Parse(Keyword(",") | value(Unit))
     val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< optionalTrailingComma).indent() %< "}"
 
