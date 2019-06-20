@@ -19,6 +19,7 @@ object IntegerInfoConstant extends ConstantPoolEntry {
     PrintByteCode.intToBytes(constant(IntegerValue).asInstanceOf[Int])
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
     integer.as(IntegerValue)
   }
 

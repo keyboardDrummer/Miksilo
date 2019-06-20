@@ -37,7 +37,8 @@ trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
 
   def ~~<(right: BiGrammar): BiGrammar = this ~< leftRight(printSpace, right, BiSequence.ignoreLeft)
 
-  def manySeparated(separator: BiGrammar): BiGrammar = someSeparated(separator) | ValueGrammar(Seq.empty[Any])
+  def manySeparated(separator: BiGrammar): BiGrammar =
+    new BiChoice(someSeparated(separator), ValueGrammar(Seq.empty[Any]), true)
 
   def ~~(right: BiGrammar): BiGrammar = {
     leftRight(grammar, printSpace, BiSequence.ignoreRight) ~ right
@@ -46,7 +47,8 @@ trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
   def someSeparatedVertical(separator: BiGrammar): BiGrammar =
     someMap(this % (separator %> grammar).manyVertical)
 
-  def manySeparatedVertical(separator: BiGrammar): BiGrammar = someSeparatedVertical(separator) | ValueGrammar(Seq.empty[Node])
+  def manySeparatedVertical(separator: BiGrammar): BiGrammar = new BiChoice(someSeparatedVertical(separator),
+    ValueGrammar(Seq.empty[Node]), true)
 
   def some: BiGrammar = someMap(grammar ~ (grammar*))
   def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> grammar) *))

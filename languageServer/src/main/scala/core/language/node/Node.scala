@@ -76,8 +76,9 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   }
 
   override def toString: String = {
-    def inner(visited: mutable.Set[Node]): String = {
-      if (visited.add(this)) {
+    def inner(visited: mutable.Set[Int]): String = {
+      val hash = System.identityHashCode(this)
+      if (visited.add(hash)) {
         val className = shape.toString
         if (data.isEmpty)
           return className
@@ -125,7 +126,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 }
 
 object Node {
-  val visitedToString = new ThreadLocal[mutable.Set[Node]]()
+  val visitedToString = new ThreadLocal[mutable.Set[Int]]()
 
   implicit object PositionOrdering extends Ordering[Position] {
 

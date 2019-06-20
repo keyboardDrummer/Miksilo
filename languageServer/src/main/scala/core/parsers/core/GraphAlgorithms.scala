@@ -19,13 +19,10 @@ object GraphAlgorithms {
         todoStack = getChildren(element).map(c => c :: path) ++ todoStack
       } else {
         visit(false, path)
-        if (path.tail.contains(element)) {
-          val index = path.tail.indexOf(element)
-          if (index >= 0)
-            backEdgeFound(path.take(index + 2))
-        }
+        val index = path.tail.indexOf(element)
+        if (index >= 0)
+          backEdgeFound(path.take(index + 1))
       }
-
     }
   }
 }

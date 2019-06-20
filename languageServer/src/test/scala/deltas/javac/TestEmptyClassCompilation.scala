@@ -5,7 +5,7 @@ import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.constants._
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.coreInstructions.{InvokeSpecialDelta, VoidReturnInstructionDelta}
-import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
+import deltas.bytecode.extraConstants.{TypeConstant}
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.ConstantPool
@@ -41,8 +41,8 @@ class TestEmptyClassCompilation extends JavaLanguageTest {
       TypeConstant.constructor(MethodTypeDelta.neww(VoidTypeDelta.voidType, Seq())),
       CodeAttributeDelta.constantEntry,
       NameAndTypeConstant.nameAndType(4, 5),
-      QualifiedClassNameConstantDelta.create(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),
-      QualifiedClassNameConstantDelta.create(QualifiedClassName(Seq("java", "lang", "Object"))))
+      Utf8ConstantDelta.fromQualifiedClassName(QualifiedClassName(Seq("transformations", "java", "testing", "EmptyClass"))),
+      Utf8ConstantDelta.fromQualifiedClassName(QualifiedClassName(Seq("java", "lang", "Object"))))
     )
     val instructions = Seq(LoadAddressDelta.addressLoad(0), InvokeSpecialDelta.invokeSpecial(1), VoidReturnInstructionDelta.voidReturn)
     val codeAttribute = Seq(CodeAttributeDelta.codeAttribute(5, 1, 1, instructions, Seq(), Seq()))

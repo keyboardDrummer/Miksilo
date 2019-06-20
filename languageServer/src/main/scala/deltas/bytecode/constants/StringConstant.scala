@@ -27,5 +27,5 @@ object StringConstant extends ConstantPoolEntry {
 
   override def description: String = "Adds the string constant entry."
 
-  override val getName = Keyword("String", reserved = false) //TODO all die getNames moeten geen reserved keywords zijn. Misschien de default van keyword switchen.
+  override val getName = "String"
 }

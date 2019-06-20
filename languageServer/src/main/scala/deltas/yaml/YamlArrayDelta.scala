@@ -4,6 +4,7 @@ import core.bigrammar.BiGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
+import core.language.node.NodeField
 import deltas.expression.ArrayLiteralDelta
 
 object YamlArrayDelta extends DeltaWithGrammar {
@@ -13,7 +14,7 @@ object YamlArrayDelta extends DeltaWithGrammar {
 
     val blockValue = find(YamlCoreDelta.IndentationSensitiveExpression)
     val blockArray: BiGrammar = {
-      val element = keyword("- ") ~> CheckIndentationGrammar.greaterThan(blockValue)
+      val element = keywordGrammar("- ") ~> CheckIndentationGrammar.greaterThan(blockValue)
       CheckIndentationGrammar.aligned(_grammars, element).as(ArrayLiteralDelta.Members).asNode(ArrayLiteralDelta.Shape)
     }
     blockValue.addAlternative(blockArray)

@@ -14,8 +14,8 @@ object TriviasGrammar extends GrammarKey
 object TriviaGrammar extends GrammarKey
 object BodyGrammar extends GrammarKey
 object ProgramGrammar extends GrammarKey
-class LanguageGrammars extends GrammarCatalogue {
-  import BiGrammarWriter._
+
+class LanguageGrammars extends GrammarCatalogue with NodeGrammarWriter {
 
   val trivia: Labelled = create(TriviasGrammar, new ManyVertical(create(TriviaGrammar, ParseWhiteSpace)))
   val bodyGrammar = create(BodyGrammar, BiFailure())
@@ -24,23 +24,28 @@ class LanguageGrammars extends GrammarCatalogue {
   def root: Labelled = find(ProgramGrammar)
 
   implicit def stringToAstGrammar(value: String): BiGrammarExtension =
-    new BiGrammarExtension(BiGrammarWriter.stringToGrammar(value), this)
+    new BiGrammarExtension(stringToGrammar(value), this)
+
   implicit def grammarToAstGrammar(value: BiGrammar): BiGrammarExtension = new BiGrammarExtension(value, this)
+
+  def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean) =
+    if (grammar.containsParser())
+      new WithTrivia(grammar, trivia, horizontal)
+    else
+      grammar
 
   class BiGrammarExtension(val grammar: BiGrammar, grammars: LanguageGrammars) extends NodeGrammarWriter
     with BiGrammarSequenceCombinatorsExtension
   {
-    private def addTriviaIfUseful(grammar: BiGrammar, horizontal: Boolean) =
-      if (grammar.containsParser()) new WithTrivia(grammar, grammars.trivia, horizontal) else grammar
 
     def asLabelledNode(key: NodeShape): Labelled = grammars.create(key, new GrammarForAst(grammar).asNode(key))
 
-    def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, false))
+    def manyVertical = new ManyVertical(addTriviaIfUseful(grammar, horizontal = false))
 
     override def sequence(other: BiGrammar, bijective: SequenceBijective, horizontal: Boolean): BiGrammar =
       new BiSequence(grammar, addTriviaIfUseful(other, horizontal), bijective, horizontal)
 
-    def many = new ManyHorizontal(addTriviaIfUseful(grammar, true))
+    def many = new ManyHorizontal(addTriviaIfUseful(grammar, horizontal = true))
 
     override implicit def addSequenceMethods(grammar: BiGrammar): BiGrammarExtension = new BiGrammarExtension(grammar, grammars)
   }

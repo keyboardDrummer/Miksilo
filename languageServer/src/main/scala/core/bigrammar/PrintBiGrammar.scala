@@ -15,7 +15,7 @@ object PrintBiGrammar {
   def toTopLevelDocument(labelled: Labelled): ResponsiveDocument = {
 
     def getOrs(grammar: BiGrammar): Seq[BiGrammar] = grammar match {
-      case choice:Choice => getOrs(choice.left) ++ getOrs(choice.right)
+      case choice:BiChoice => getOrs(choice.left) ++ getOrs(choice.right)
       case _ => Seq(grammar)
     }
 
@@ -33,7 +33,7 @@ object PrintBiGrammar {
       val second = withChoiceParenthesis(sequence.second)
       if (sequence.horizontal) first ~~ second
       else first ~~ "%" ~~ second
-    case choice:Choice => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
+    case choice:BiChoice => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
     case many:ManyHorizontal => withParenthesis(many.inner) ~ "*"
     case many:ManyVertical => withParenthesis(many.inner) ~ "%*"
     case OptionGrammar(inner, _) => withParenthesis(inner) ~ "?"
@@ -54,7 +54,7 @@ object PrintBiGrammar {
   }
 
   private def withChoiceParenthesis(grammar: BiGrammar): ResponsiveDocument = grammar match {
-    case choice: Choice => toDocumentInner(choice).inParenthesis
+    case choice: BiChoice => toDocumentInner(choice).inParenthesis
     case _ => toDocumentInner(grammar)
   }
 
@@ -74,7 +74,7 @@ object PrintBiGrammar {
   case class OptionGrammar(inner: BiGrammar, value: Any) extends FakeBiGrammar
 
   def simplify(grammar: BiGrammar): BiGrammar = grammar.deepMap {
-    case choice: Choice =>
+    case choice: BiChoice =>
       val left = choice.left
       val right = choice.right
       if (left.isInstanceOf[BiFailure])
@@ -98,7 +98,7 @@ object PrintBiGrammar {
   }
 
   def contract(grammar: BiGrammar): BiGrammar = grammar.deepMap {
-    case choice: Choice =>
+    case choice: BiChoice =>
       val left = choice.left
       val right = choice.right
 

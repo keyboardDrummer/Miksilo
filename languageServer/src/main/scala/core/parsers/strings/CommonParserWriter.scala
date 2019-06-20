@@ -2,13 +2,9 @@ package core.parsers.strings
 
 trait CommonParserWriter extends StringParserWriter {
 
-  def identifier: EditorParser[String] =
-    elem(Character.isJavaIdentifierStart, "identifier start") ~
-      (elem(Character.isJavaIdentifierPart(_: Char), "identifier part")*) ^^ (t => (t._1 :: t._2).mkString)
-
   /** An integer, without sign or with a negative sign. */
-  def wholeNumber: EditorParser[String] =
-    """-?\d+""".r
+  val wholeNumber: Self[String] =
+    RegexParser("""-?\d+""".r, "whole number")
   /** Number following one of these rules:
     *
     *  - An integer. For example: `13`
@@ -16,8 +12,8 @@ trait CommonParserWriter extends StringParserWriter {
     *  - An integer followed by a decimal point and fractional part. For example: `3.14`
     *  - A decimal point followed by a fractional part. For example: `.1`
     */
-  def decimalNumber: EditorParser[String] =
-    """(\d+(\.\d*)?|\d*\.\d+)""".r
+  val decimalNumber: Self[String] =
+    RegexParser("""(\d+(\.\d*)?|\d*\.\d+)""".r, "decimal number")
   /** Double quotes (`"`) enclosing a sequence of:
     *
     *  - Any character except double quotes, control characters or backslash (`\`)
@@ -25,8 +21,9 @@ trait CommonParserWriter extends StringParserWriter {
     *    of the letters `b`, `f`, `n`, `r` or `t`
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
-  def stringLiteral: EditorParser[String] =
-    literal("\"") ~> """([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r ~< "\""
+  val stringLiteral: Self[String] =
+    RegexParser(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r, "string literal").
+      map(r => r.substring(1, r.length )) ~< "\""
 
   /** A number following the rules of `decimalNumber`, with the following
     *  optional additions:
@@ -35,6 +32,6 @@ trait CommonParserWriter extends StringParserWriter {
     *  - Followed by `e` or `E` and an optionally signed integer
     *  - Followed by `f`, `f`, `d` or `D` (after the above rule, if both are used)
     */
-  def floatingPointNumber: EditorParser[String] =
-    """-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r
+  val floatingPointNumber: Self[String] =
+    RegexParser("""-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r, "floating point number")
 }

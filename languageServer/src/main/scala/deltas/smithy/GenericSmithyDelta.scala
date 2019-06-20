@@ -10,7 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.HasConstraints
 import deltas.json.JsonObjectLiteralDelta.MemberKey
-import deltas.json.{JsonObjectLiteralDelta, SingleQuotedStringLiteralDelta, StringLiteralDelta}
+import deltas.json.{JsonObjectLiteralDelta, SingleQuotedStringLiteralDelta, JsonStringLiteralDelta}
 import deltas.{ConstraintSkeleton, FileWithMembersDelta}
 
 object GenericSmithyDelta extends DeltaWithGrammar {
@@ -20,17 +20,17 @@ object GenericSmithyDelta extends DeltaWithGrammar {
 
     find(JsonObjectLiteralDelta.MemberKey).addAlternative(identifier.as(MemberKey))
 
-    val plainString = identifier.as(StringLiteralDelta.Value) asNode StringLiteralDelta.Shape
+    val plainString = identifier.as(JsonStringLiteralDelta.Value) asNode JsonStringLiteralDelta.Shape
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(plainString)
 
-    create(TextGrammar, plainString | find(StringLiteralDelta.Shape) | find(SingleQuotedStringLiteralDelta.Grammar))
+    create(TextGrammar, plainString | find(JsonStringLiteralDelta.Shape) | find(SingleQuotedStringLiteralDelta.Grammar))
   }
 
   object TextGrammar extends GrammarKey
 
   override def description = ""
 
-  override def dependencies = Set(SingleQuotedStringLiteralDelta, StringLiteralDelta)
+  override def dependencies = Set(SingleQuotedStringLiteralDelta, JsonStringLiteralDelta)
 }
 
 object SmithyStandardLibrary extends Delta {

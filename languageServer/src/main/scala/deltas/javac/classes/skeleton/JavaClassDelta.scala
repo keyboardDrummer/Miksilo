@@ -1,6 +1,7 @@
 package deltas.javac.classes.skeleton
 
 import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.BiChoice
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodeChildPath, NodePath, PathRoot}
@@ -14,7 +15,7 @@ import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.TypeFromDeclaration
 import deltas.ConstraintSkeleton
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
-import deltas.javac.JavaLang
+import deltas.javac.JavaStandardLibrary
 import deltas.javac.classes.{ClassCompiler, FieldDeclarationDelta}
 import deltas.javac.methods.MethodDelta
 import deltas.statement.BlockDelta
@@ -70,7 +71,8 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
     val classMember: BiGrammar = find(MethodDelta.Shape) | find(FieldDeclarationDelta.Shape)
     val importGrammar = create(ImportGrammar)
     val importsGrammar: BiGrammar = importGrammar.manyVertical as ClassImports
-    val packageGrammar = (keyword("package") ~~> identifier.someSeparated(".") ~< ";") | value(Seq.empty) as ClassPackage
+    val packageGrammar = new BiChoice(keywordGrammar("package") ~~>
+      identifier.someSeparated(".") ~< ";", value(Seq.empty), true) as ClassPackage
     val classParentGrammar = ("extends" ~~> identifier).option
     val nameGrammar: BiGrammar = "class" ~~> find(Name)
     val membersGrammar = "{".%((classMember.manySeparatedVertical(BlankLine) as Members).indent(BlockDelta.indentAmount)) % "}"
@@ -114,7 +116,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
     language.collectConstraints = (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
-      val proofs = JavaLang.getProofs(compilation, builder.factory, defaultPackageScope)
+      val proofs = JavaStandardLibrary.getProofs(compilation, builder.factory, defaultPackageScope)
       builder.proofs = proofs
 
       ConstraintSkeleton.constraints(

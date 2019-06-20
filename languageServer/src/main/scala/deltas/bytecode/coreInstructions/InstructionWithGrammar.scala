@@ -22,7 +22,7 @@ trait InstructionWithGrammar extends DeltaWithGrammar with HasShape
   def argumentsGrammar(grammars: LanguageGrammars): BiGrammar = {
     import grammars._
     val constantPoolIndex: BiGrammar = find(ConstantPoolIndexGrammar)
-    (constantPoolIndex | integer).many.as(InstructionArgumentsKey)
+    constantPoolIndex.many.as(InstructionArgumentsKey)
   }
 
   def grammarName: String

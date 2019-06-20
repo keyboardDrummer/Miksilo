@@ -52,7 +52,7 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags with HasBytes
     val parseFields = (fieldGrammar %< BlankLine).manyVertical.as(ClassFields)
 
     val membersGrammar = find(ByteCodeSkeleton.MembersGrammar)
-    membersGrammar.inner = parseFields ~ membersGrammar.inner
+    membersGrammar.inner = parseFields ~< membersGrammar.inner
   }
   
   override def description: String = "Adds field members to bytecode."

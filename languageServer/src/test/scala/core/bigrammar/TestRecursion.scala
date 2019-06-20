@@ -6,7 +6,7 @@ import org.scalatest.FunSuite
 
 import scala.collection.immutable.StringOps
 
-class TestRecursion extends FunSuite with WhitespaceTriviaSequenceCombinators {
+class TestRecursion extends FunSuite with DefaultBiGrammarWriter {
 
   val input = "!!!!!"
 

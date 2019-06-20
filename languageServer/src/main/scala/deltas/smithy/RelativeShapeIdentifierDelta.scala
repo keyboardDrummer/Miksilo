@@ -22,7 +22,7 @@ object RelativeShapeIdentifierDelta extends DeltaWithGrammar with HasConstraints
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val myIdentifier = Colorize(RegexGrammar("[A-Za-z][A-Za-z0-9_]*".r), TokenTypes.IDENTIFIER, "variable")
+    val myIdentifier = Colorize(RegexGrammar("[A-Za-z][A-Za-z0-9_]*".r, "identifier"), "variable")
     val relativeShapeId = myIdentifier.as(Value) ~ ("$" ~> myIdentifier.as(Accessor)).option asLabelledNode Shape
     create(ShapeIdentifierGrammar, relativeShapeId)
   }

@@ -16,7 +16,7 @@ trait ComparisonOperatorDelta extends LeftAssociativeBinaryOperatorDelta with Ex
 
   val shape: NodeShape
 
-  override def precedenceGrammarKey = AddRelationalPrecedenceDelta.RelationalExpressionGrammar
+  override def precedenceGrammarKey = RelationalPrecedenceDelta.Grammar
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     val firstType = ExpressionDelta.getType(compilation, builder, expression.left, parentScope)
@@ -27,5 +27,5 @@ trait ComparisonOperatorDelta extends LeftAssociativeBinaryOperatorDelta with Ex
 
   def keyword: String
 
-  override def dependencies: Set[Contract] = Set(AddRelationalPrecedenceDelta)
+  override def dependencies: Set[Contract] = Set(RelationalPrecedenceDelta)
 }

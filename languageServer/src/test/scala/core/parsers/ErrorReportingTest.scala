@@ -1,27 +1,25 @@
 package core.parsers
 
-import editorParsers.EditorParserWriter
 import org.scalatest.FunSuite
+import editorParsers.LeftRecursiveCorrectingParserWriter
 
-trait ErrorReportingTest extends FunSuite with CommonStringReaderParser with EditorParserWriter  {
+class ErrorReportingTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter  {
 
   test("left recursion with lazy indirection error") {
-    lazy val head: EditorParser[Any] = new EditorLazy(head) ~ "c" | "a"
+    lazy val head: Self[Any] = new Lazy(head) ~ "#" | "!"
 
-    val input = "bb"
-    val parseResult = head.parseWholeInput(new StringReader(input))
+    val input = "@@"
+    val parseResult = head.getWholeInputParser.parse(new StringReader(input))
     assert(!parseResult.successful)
-    val failure = parseResult.biggestFailure.asInstanceOf[ParseFailure[_]]
-    assertResult("expected 'a' but found 'b'")(failure.message)
+    assertResult("expected ! but found '@'")(parseResult.errors.last.message)
   }
 
   test("left recursion with lazy indirection error v2") {
-    lazy val head: EditorParser[Any] = "a" | new EditorLazy(head) ~ "c"
+    lazy val head: Self[Any] = "!" | new Lazy(head) ~ "#"
 
-    val input = "bb"
-    val parseResult = head.parseWholeInput(new StringReader(input))
+    val input = "@@"
+    val parseResult = head.getWholeInputParser.parse(new StringReader(input))
     assert(!parseResult.successful)
-    val failure = parseResult.biggestFailure.asInstanceOf[ParseFailure[_]]
-    assertResult("expected 'a' but found 'b'")(failure.message)
+    assertResult("expected ! but found '@'")(parseResult.errors.last.message)
   }
 }

@@ -63,6 +63,7 @@ pip-log.txt
 out/
 
 nonEssentialFiles/*
+!nonEssentialFiles/papers/
 **target*
 
 resources/*

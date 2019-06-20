@@ -13,7 +13,7 @@ import deltas.expression.ArrayLiteralDelta
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.json.JsonObjectLiteralDelta.ObjectLiteral
-import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
+import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import deltas.smithy.ServiceDelta.Body
 import deltas.{FileWithMembersDelta, HasNameDelta}
 
@@ -51,8 +51,8 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
         identifiersObject.members.foreach(identifierMember => {
           identifierMember.value
           val shapeReference = identifierMember.value
-          if (shapeReference.shape == StringLiteralDelta.Shape) {
-            builder.resolveToType(shapeReference.getSourceElement(StringLiteralDelta.Value), parentScope,
+          if (shapeReference.shape == JsonStringLiteralDelta.Shape) {
+            builder.resolveToType(shapeReference.getSourceElement(JsonStringLiteralDelta.Value), parentScope,
               RelativeShapeIdentifierDelta.shapeType)
           }
         })
@@ -62,8 +62,8 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
     lifeCycleOperations.foreach(lifeCycleOperation => {
       val operationOption = resource.body.get(lifeCycleOperation)
       operationOption.foreach(operation => {
-        if (operation.shape == StringLiteralDelta.Shape) {
-          builder.resolveToType(operation.getSourceElement(StringLiteralDelta.Value), parentScope,
+        if (operation.shape == JsonStringLiteralDelta.Shape) {
+          builder.resolveToType(operation.getSourceElement(JsonStringLiteralDelta.Value), parentScope,
             OperationDelta.operationType)
         }
       })
@@ -76,8 +76,8 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
       if (resources.shape == ArrayLiteralDelta.Shape) {
         val resourcesArray: ArrayLiteral[NodePath] = resources
         resourcesArray.members.foreach(resource => {
-          if (resource.shape == StringLiteralDelta.Shape) {
-            builder.resolveToType(resource.getSourceElement(StringLiteralDelta.Value), parentScope, resourceType)
+          if (resource.shape == JsonStringLiteralDelta.Shape) {
+            builder.resolveToType(resource.getSourceElement(JsonStringLiteralDelta.Value), parentScope, resourceType)
           }
         })
       }

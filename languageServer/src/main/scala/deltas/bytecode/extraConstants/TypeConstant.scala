@@ -50,6 +50,7 @@ object TypeConstant extends ConstantPoolEntry {
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
     val typeGrammar = grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
+    import grammars._
     typeGrammar.as(Type)
   }
 

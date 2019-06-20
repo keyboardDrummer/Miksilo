@@ -40,6 +40,7 @@ object LineNumberTable extends ByteCodeAttribute {
   override def shape = LineNumberTableKey
 
   override def getGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
     ("NotImplemented" : BiGrammar).asNode(shape)
   } // TODO implement. Also figure out why I can't use failure here.
 

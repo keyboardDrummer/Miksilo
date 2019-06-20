@@ -12,7 +12,7 @@ class CheckIndentationGrammar(deltaPredicate: Int => Boolean, property: String, 
 
   override def createPrinter(recursive: BiGrammar => NodePrinter) = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => BiGrammarToParser.EditorParser[Result]) = {
+  override def toParser(recursive: BiGrammar => BiGrammarToParser.Self[Result]) = {
     BiGrammarToParser.CheckIndentation(deltaPredicate, property, recursive(inner))
   }
 

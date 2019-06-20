@@ -13,7 +13,7 @@ import deltas.expression.ArrayLiteralDelta
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.json.JsonObjectLiteralDelta.ObjectLiteral
-import deltas.json.{JsonObjectLiteralDelta, StringLiteralDelta}
+import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import deltas.{FileWithMembersDelta, HasNameDelta}
 
 object ServiceDelta extends DeltaWithGrammar with HasConstraintsDelta {
@@ -54,8 +54,8 @@ object ServiceDelta extends DeltaWithGrammar with HasConstraintsDelta {
       if (resources.shape == ArrayLiteralDelta.Shape) {
         val resourcesArray: ArrayLiteral[NodePath] = resources
         resourcesArray.members.foreach(resource => {
-          if (resource.shape == StringLiteralDelta.Shape) {
-            builder.resolveToType(resource.getSourceElement(StringLiteralDelta.Value), parentScope, OperationDelta.operationType)
+          if (resource.shape == JsonStringLiteralDelta.Shape) {
+            builder.resolveToType(resource.getSourceElement(JsonStringLiteralDelta.Value), parentScope, OperationDelta.operationType)
           }
         })
       }

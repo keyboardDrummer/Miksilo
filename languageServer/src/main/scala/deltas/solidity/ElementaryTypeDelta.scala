@@ -40,16 +40,17 @@ object ElementaryTypeDelta extends DeltaWithGrammar with TypeInstance {
 
   val Byte = Seq("bytes", "bytes1", "bytes2", "bytes3", "bytes4", "bytes5", "bytes6", "bytes7", "bytes8", "bytes9", "bytes10", "bytes11", "bytes12", "bytes13", "bytes14", "bytes15", "bytes16", "bytes17", "bytes18", "bytes19", "bytes20", "bytes21", "bytes22", "bytes23", "bytes24", "bytes25", "bytes26", "bytes27", "bytes28", "bytes29", "bytes30", "bytes31", "bytes32")
 
-  val fixed = Keyword("fixed", reserved = false) | RegexGrammar("""fixed[0-9]x[0-9]+""".r) ;
-  val unsignedFixed = Keyword("ufixed", reserved = false) | RegexGrammar("""ufixed[0-9]x[0-9]+""".r) ;
+  def getFixed(grammars: LanguageGrammars) = Keyword("fixed", reserved = false) | grammars.regexGrammar("""fixed[0-9]x[0-9]+""".r, "fixed") ;
+  def getUnsignedFixed(grammars: LanguageGrammars) = Keyword("ufixed", reserved = false) | grammars.regexGrammar("""ufixed[0-9]x[0-9]+""".r, "unsigned fixed") ;
   val elementaryTypeNames = Seq("address", "string", "var") ++ Int ++ unsignedInt ++ Seq("byte") ++ Byte
 
-  override def getJavaGrammar(grammars: LanguageGrammars) = {
+  override def getJavaGrammar(_grammars: LanguageGrammars) = {
+    val grammars = _grammars
     import grammars._
     find(BooleanTypeDelta.Shape).find(p => p.value.isInstanceOf[Keyword]).get.value.asInstanceOf[Keyword].value = "bool"
 
     val elementaryTypeName = elementaryTypeNames.map(name => Keyword(name, reserved = false).as(HasNameDelta.Name).asInstanceOf[BiGrammar]).
-        reduce((a,b) => a | b) | fixed | unsignedFixed asLabelledNode Shape
+        reduce((a,b) => a | b) | getFixed(grammars) | getUnsignedFixed(grammars) asLabelledNode Shape
     elementaryTypeName
   }
 

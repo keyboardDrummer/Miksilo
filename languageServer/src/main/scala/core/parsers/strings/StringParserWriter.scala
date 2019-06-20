@@ -1,17 +1,24 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.DefaultCache
-import core.parsers.sequences.{SequenceInput, SequenceParserWriter}
+import core.language.node.SourceRange
+import core.parsers.editorParsers.{FlawedHistory, History, ParseError, SpotlessHistory}
+import core.parsers.sequences.SequenceParserWriter
 import langserver.types.Position
+
 import scala.util.matching.Regex
 
 trait StringParserWriter extends SequenceParserWriter {
   type Elem = Char
   type Input <: StringReaderLike
 
-  abstract class StringReaderBase(val array: ArrayCharSequence, val offset: Int, val position: Position) extends StringReaderLike {
+  abstract class StringReaderBase(val array: ArrayCharSequence, val offset: Int, val position: Position)
+    extends StringReaderLike {
+
+    override def end = drop(array.length() - offset)
 
     val sequence: CharSequence = array
+
+    override def printRange(end: Input) = array.subSequence(offset, end.offset).toString
 
     override def atEnd: Boolean = offset == array.length
 
@@ -36,12 +43,14 @@ trait StringParserWriter extends SequenceParserWriter {
     def offset: Int
     def array: ArrayCharSequence
     def drop(amount: Int): Input
+    def remaining = array.length() - offset
 
     def move(increase: Int): Position = {
       var column = position.character
       var row = position.line
       for(index <- offset.until(offset + increase)) {
-        if (array.charAt(index) == '\n') {
+        val character = array.charAt(index)
+        if (character == '\n') {
           row += 1
           column = 0
         } else {
@@ -52,61 +61,100 @@ trait StringParserWriter extends SequenceParserWriter {
     }
   }
 
-  implicit def literalToExtensions(value: String): ParserExtensions[String] = Literal(value)
-  implicit def literal(value: String): Literal = Literal(value)
-  implicit def regex(value: Regex): RegexParser = RegexParser(value)
+  val identifier: RegexParser = RegexParser("""[_a-zA-Z][_a-zA-Z0-9]*""".r, "identifier")
 
-  case class Literal(value: String) extends EditorParserBase[String] with LeafParser[String] {
+  implicit def literalToExtensions(value: String): SequenceParserExtensions[String] = Literal(value)
 
+  val identifierRegex = """[_a-zA-Z][_a-zA-Z0-9]*""".r
+  implicit def literalOrKeyword(value: String): Self[String] = {
+    val isKeyword = identifierRegex.findFirstIn(value).contains(value)
+    if (isKeyword)
+      return KeywordParser(value)
 
-    override def getParser(recursive: GetParse) = {
+    Literal(value)
+  }
 
-      def apply(input: Input): ParseResult[String] = {
-        var index = 0
-        val array = input.array
-        while(index < value.length) {
-          val arrayIndex = index + input.offset
-          if (array.length <= arrayIndex) {
-            return newFailure(Some(value), input, s"expected '$value' but end of source found")
-          } else if (array.charAt(arrayIndex) != value.charAt(index)) {
-            return newFailure(Some(value), input.drop(index), s"expected '$value' but found '${array.subSequence(input.offset, arrayIndex + 1)}'")
+  implicit def regex(value: Regex, regexName: String, score: Double = History.successValue): RegexParser = RegexParser(value, regexName, score)
+
+  case class Literal(value: String) extends ParserBuilderBase[String] with LeafParser[String] {
+
+    override def getParser(recursive: GetParser): Parser[String] = {
+
+      lazy val result: Parser[String] = new Parser[String] {
+        def apply(input: Input, state: ParseState): ParseResult[String] = {
+          var index = 0
+          val array = input.array
+          while (index < value.length) {
+            val arrayIndex = index + input.offset
+            if (array.length <= arrayIndex) {
+              return singleResult(ReadyParseResult(Some(value), input,
+                History.error(new MissingInput(input, value, History.endOfSourceInsertion))))
+            } else if (array.charAt(arrayIndex) != value.charAt(index)) {
+              return singleResult(ReadyParseResult(Some(value), input,
+                History.error(MissingInput(input, input.drop(index + 1), value))))
+            }
+            index += 1
           }
-          index += 1
+          val remainder = input.drop(value.length)
+          singleResult(ReadyParseResult(Some(value), remainder, History.empty[Input].addSuccess(input, remainder, value)))
         }
-        newSuccess(value, input.drop(value.length))
       }
+      result
 
-      apply
     }
-
-
-    override def getDefault(cache: DefaultCache): Option[String] = Some(value)
 
     override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
   }
 
-  case class RegexParser(regex: Regex) extends EditorParserBase[String] with LeafParser[String] {
+  case class KeywordParser(value: String) extends ParserBuilderBase[String] with ParserWrapper[String] {
+    override def getParser(recursive: GetParser): Parser[String] = {
+      val parseIdentifier = recursive(identifier)
+      (input, state) => {
+        parseIdentifier(input, state).mapReady(ready => {
+          if (ready.resultOption.contains(value)) {
+            ready
+          } else {
+            val error =
+              if (ready.remainder == input)
+                new MissingInput(input, value, History.missingInputPenalty)
+              else
+                MissingInput(input, ready.remainder, value, History.missingInputPenalty)
 
-    override def getParser(recursive: GetParse) = {
+            ReadyParseResult(Some(value), ready.remainder, History.error(error))
+          }
+        }, uniform = false)
+      }
+    }
 
-      def apply(input: Input) = {
-        regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
-          case Some(matched) =>
-            newSuccess(
-              input.array.subSequence(input.offset, input.offset + matched.end).toString,
-              input.drop(matched.end))
-          case None =>
-            val nextCharacter =
-              if (input.array.length == input.offset) "end of source"
-              else input.array.charAt(input.offset)
-            newFailure(input, s"expected '$regex' but found '$nextCharacter'") // Partial regex matching toevoegen
+    override def original: Self[String] = identifier
+  }
+
+  
+  trait NextCharError extends ParseError[Input] {
+    def to: Input = if (this.from.atEnd) this.from else this.from.drop(1)
+    def range = SourceRange(from.position, to.position)
+  }
+
+  case class RegexParser(regex: Regex, regexName: String, score: Double = History.successValue) extends ParserBuilderBase[String] with LeafParser[String] {
+
+    override def getParser(recursive: GetParser): Parser[String] = {
+
+      lazy val result: Parser[String] = new Parser[String] {
+        def apply(input: Input, state: ParseState): ParseResult[String] = {
+          regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
+            case Some(matched) =>
+              val value = input.array.subSequence(input.offset, input.offset + matched.end).toString
+              val remainder = input.drop(matched.end)
+              singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
+            case None =>
+              // TODO use the regex to generate a default case.
+              singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, s"<$regexName>", History.missingInputPenalty))))
+          }
         }
       }
 
-      apply
+      result
     }
-
-    override def getDefault(cache: DefaultCache): Option[String] = None
 
     override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
   }

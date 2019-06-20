@@ -53,7 +53,7 @@ class ReorderMembersTest extends FunSuite {
     val compiler = TestLanguageBuilder.buildWithParser(Seq(ReorderMembersDelta.ActuallyReorderMembers) ++ JavaToByteCodeLanguage.prettyPrintJavaDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-    val state = compiler.compile(inputStream)
+    val state = compiler.compileStream(inputStream)
     assertResult(expectation)(state.output)
   }
 
@@ -86,7 +86,7 @@ class ReorderMembersTest extends FunSuite {
       JavaToByteCodeLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-    val state = compiler.compile(inputStream)
+    val state = compiler.compileStream(inputStream)
     assertResult(expectation)(state.output)
   }
 
@@ -119,7 +119,7 @@ class ReorderMembersTest extends FunSuite {
       JavaToByteCodeLanguage.javaCompilerDeltas)
 
     val inputStream = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-    val state = compiler.compile(inputStream)
+    val state = compiler.compileStream(inputStream)
     assertResult(expectation)(state.output)
   }
 }

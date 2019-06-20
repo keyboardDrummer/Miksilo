@@ -39,7 +39,7 @@ object Constant {
 class BiGrammarExample extends FunSuite with NodeGrammarWriter with WhitespaceTriviaSequenceCombinators {
 
   test("mapAndRegexExample") {
-    new RegexGrammar("""-?\d+""".r).map[String, Int](
+    new RegexGrammar("""-?\d+""".r, "whole number").map[String, Int](
       afterParsing = digits => Integer.parseInt(digits),
       beforePrinting = int => int.toString
     )

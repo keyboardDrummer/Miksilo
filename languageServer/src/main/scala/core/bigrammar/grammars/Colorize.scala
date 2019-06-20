@@ -5,11 +5,11 @@ import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.ResponsiveDocument
 
-case class Colorize(var inner: BiGrammar, _type: Int, textMateScope: String) extends CustomGrammar {
+case class Colorize(var inner: BiGrammar, textMateScope: String) extends CustomGrammar {
 
   override def children = Seq(inner)
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = Colorize(newChildren.head, _type, textMateScope)
+  override def withChildren(newChildren: Seq[BiGrammar]) = Colorize(newChildren.head, textMateScope)
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = inner.containsParser(recursive)
 
@@ -17,5 +17,5 @@ case class Colorize(var inner: BiGrammar, _type: Int, textMateScope: String) ext
 
   override def createPrinter(recursive: BiGrammar => NodePrinter) = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => EditorParser[Result]) = recursive(inner)
+  override def toParser(recursive: BiGrammar => Self[Result]) = recursive(inner)
 }

@@ -72,7 +72,7 @@ class LSPServerTest extends AsyncFunSpec {
     p.future
   }
 
-  it("can use goto definition") {
+  ignore("can use goto definition") {
     val document = TextDocumentItem("a","",0,"content")
     val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
     val definitionRange = Range(Position(0, 1), Position(1, 2))

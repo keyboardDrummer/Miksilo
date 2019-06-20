@@ -123,24 +123,27 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     replaceJumpIndicesWithLabels(grammars, language)
     removeOffsetFromStackMapFrameGrammars(grammars)
-    grammars.find(ByteCodeSkeleton.AttributeGrammar).findLabelled(StackMapTableAttributeDelta.Shape).removeMeFromOption()
+    import grammars._
+    find(ByteCodeSkeleton.AttributeGrammar).findLabelled(StackMapTableAttributeDelta.Shape).removeMeFromOption()
   }
 
   def removeOffsetFromStackMapFrameGrammars(grammars: LanguageGrammars): Unit = {
     val offsetGrammar = grammars.find(offsetGrammarKey)
-    val offsetGrammarPaths = grammars.find(StackMapFrameGrammar).descendants.filter(path => path.value == offsetGrammar)
+    import grammars._
+    val offsetGrammarPaths = find(StackMapFrameGrammar).descendants.filter(path => path.value == offsetGrammar)
     offsetGrammarPaths.foreach(delta => delta.removeMe())
   }
 
   object JumpName extends NodeField
-  def replaceJumpIndicesWithLabels(grammars: LanguageGrammars, language: Language): Unit = {
+  def replaceJumpIndicesWithLabels(_grammars: LanguageGrammars, language: Language): Unit = {
+    val grammars = _grammars
     import grammars._
     val instructionDeltas = CodeAttributeDelta.instructions.get(language).values
     val jumpInstructionDeltas = instructionDeltas.filter(v => v.jumpBehavior.hasJumpInFirstArgument)
     for(jump <- jumpInstructionDeltas)
     {
       val grammar = find(jump.shape)
-      grammar.inner = jump.grammarName ~~> LabelDelta.getNameGrammar.as(JumpName) asNode jump.shape
+      grammar.inner = jump.grammarName ~~> LabelDelta.getNameGrammar(grammars).as(JumpName) asNode jump.shape
     }
   }
 }

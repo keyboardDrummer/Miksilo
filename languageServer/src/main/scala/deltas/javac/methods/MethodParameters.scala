@@ -10,7 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 
-object MethodParameters extends NodeGrammarWriter {
+object MethodParameters {
 
   import deltas.HasNameDelta._
 

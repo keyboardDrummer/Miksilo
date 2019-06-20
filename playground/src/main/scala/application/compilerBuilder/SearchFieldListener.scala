@@ -19,7 +19,7 @@ class ContactRowFilter(val compare: String) extends RowFilter[ListModel[_], java
 
 class SearchFieldListener(val list: JXList) extends DocumentListener {
 
-  def updateFilter(doc: Document) = {
+  def updateFilter(doc: Document): Unit = {
     val text = doc.getText(0, doc.getLength)
     list.setRowFilter(if (text.length > 0) new ContactRowFilter(text) else null)
   }

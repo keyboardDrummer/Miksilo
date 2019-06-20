@@ -1,10 +1,11 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.BiGrammarToParser
+import core.bigrammar.{BiGrammar, BiGrammarToParser}
 
 case class Delimiter(value: String) extends StringGrammar {
   if (value.length == 0)
     throw new RuntimeException("value must have non-zero length")
 
-  override def getParser(keywords: scala.collection.Set[String]): BiGrammarToParser.EditorParser[String] = BiGrammarToParser.literal(value)
+  override def getParserBuilder(keywords: scala.collection.Set[String]): BiGrammarToParser.Self[String] =
+    BiGrammarToParser.literalOrKeyword(value)
 }

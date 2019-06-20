@@ -21,6 +21,7 @@ object LongInfoConstant extends ConstantPoolEntry {
   override def getBytes(compilation: Compilation, constant: Node): Seq[Byte] = PrintByteCode.byteToBytes(5) ++ PrintByteCode.longToBytes(constant.value)
 
   override def getConstantEntryGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
     number.as(LongEntryValue)
   }
 

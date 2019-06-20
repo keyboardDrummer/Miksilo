@@ -8,7 +8,7 @@ import deltas.bytecode.types._
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.logical.LogicalNotDelta
-import deltas.expression.relational.{AddRelationalPrecedenceDelta, EqualsComparisonDelta, GreaterThanDelta, LessThanDelta}
+import deltas.expression.relational.{RelationalPrecedenceDelta, EqualsComparisonDelta, GreaterThanDelta, LessThanDelta}
 import deltas.javac.classes._
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassDelta}
 import deltas.javac.constructor._
@@ -65,14 +65,10 @@ object JavaLanguage {
 
   def javaSimpleExpression: Seq[Delta] = Seq(TernaryDelta, EqualsComparisonDelta,
     AddEqualityPrecedence, LessThanDelta, GreaterThanDelta,
-    AddRelationalPrecedenceDelta, AdditionDelta,
+    RelationalPrecedenceDelta, AdditionDelta,
     SubtractionDelta, AdditivePrecedenceDelta,
     BooleanLiteralDelta, LongLiteralDelta, IntLiteralDelta,
     NullDelta, LogicalNotDelta, ParenthesisInExpressionDelta, ExpressionDelta, SolveConstraintsDelta) ++ types
 
-  def types: Seq[Delta] = Seq(TypeVariableDelta, TypeAbstraction, WildcardTypeArgument, ExtendsDelta,
-    SuperTypeArgument, TypeApplicationDelta, MethodTypeDelta) ++
-    Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta,
-      FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
-      ShortTypeDelta, TypeSkeleton) ++ Seq(HasNameDelta)
+  def types: Seq[Delta] = ByteCodeLanguage.types ++ Seq(HasNameDelta)
 }

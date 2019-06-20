@@ -1,8 +1,6 @@
 package deltas.javac
 
-import core.deltas.{Delta, DeltaWithGrammar, LanguageFromDeltas, ParseUsingTextualGrammar}
-import core.language.Language
-import deltas.PrettyPrint
+import core.deltas.{Delta, DeltaWithGrammar}
 import deltas.bytecode.attributes._
 import deltas.bytecode.constants._
 import deltas.bytecode.coreInstructions._
@@ -12,10 +10,9 @@ import deltas.bytecode.coreInstructions.integers._
 import deltas.bytecode.coreInstructions.integers.integerCompare._
 import deltas.bytecode.coreInstructions.longs._
 import deltas.bytecode.coreInstructions.objects._
-import deltas.bytecode.extraConstants.{QualifiedClassNameConstantDelta, TypeConstant}
+import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types._
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import deltas.javac.JavaToByteCodeLanguage.spliceBeforeTransformations
 import deltas.javac.types._
 
 object ByteCodeLanguage {
@@ -46,20 +43,21 @@ object ByteCodeLanguage {
 
   def byteCodeWithoutTextualParser: Seq[Delta] = bytecodeAttributes ++ constantEntryDeltas ++
     Seq(ByteCodeMethodInfo, ByteCodeFieldInfo) ++
-    typeTransformations ++ Seq(ByteCodeSkeleton)
+    types ++ Seq(ByteCodeSkeleton)
 
   val bytecodeAttributes: Seq[DeltaWithGrammar] = Seq(StackMapTableAttributeDelta, LineNumberTable, SourceFileAttribute,
     CodeAttributeDelta, //ExceptionsAttribute, InnerClassesAttribute,
     SignatureAttribute)
 
-  def constantEntryDeltas: Seq[Delta] = Seq(QualifiedClassNameConstantDelta, TypeConstant) ++
+  def constantEntryDeltas: Seq[Delta] = Seq(TypeConstant) ++
     Seq(MethodTypeConstant, Utf8ConstantDelta, DoubleInfoConstant, LongInfoConstant, FieldRefConstant,
       InterfaceMethodRefConstant, MethodRefConstant, NameAndTypeConstant,
-      ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant, MethodTypeDelta,
+      ClassInfoConstant, IntegerInfoConstant, StringConstant, MethodHandleConstant,
       InvokeDynamicConstant)
 
-  def typeTransformations: Seq[Delta] = Seq(SelectInnerClassDelta, TypeVariableDelta, TypeAbstraction, WildcardTypeArgument, ExtendsDelta,
+  def types: Seq[Delta] = Seq(SelectInnerClassDelta, TypeVariableDelta, TypeAbstraction, WildcardTypeArgument, ExtendsDelta,
     SuperTypeArgument, TypeApplicationDelta, MethodTypeDelta) ++
-    Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta, FloatTypeDelta, CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
+    Seq(UnqualifiedObjectTypeDelta, QualifiedObjectTypeDelta, ArrayTypeDelta, ByteTypeDelta, FloatTypeDelta,
+      CharTypeDelta, BooleanTypeDelta, DoubleTypeDelta, LongTypeDelta, VoidTypeDelta, IntTypeDelta,
       ShortTypeDelta, TypeSkeleton)
 }

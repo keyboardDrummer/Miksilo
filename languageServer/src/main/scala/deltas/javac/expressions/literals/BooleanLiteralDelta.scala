@@ -18,9 +18,9 @@ object BooleanLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val parseNumber = ("true" ~> value(true) | "false" ~> value(false)).as(Value).asNode(Shape)
+    val booleanLiteral = ("true" ~> value(true) | "false" ~> value(false)).as(Value).asLabelledNode(Shape)
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
-    expressionGrammar.inner = expressionGrammar.inner | parseNumber
+    expressionGrammar.addAlternative(booleanLiteral)
   }
 
   def literal(value: Boolean) = new Node(Shape, Value -> value)

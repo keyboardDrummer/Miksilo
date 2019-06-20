@@ -138,6 +138,6 @@ object ClassFileParser extends ByteParserWriter {
     case 15 => consumeOne(methodHandleParser)
     case 16 => consumeOne(methodTypeParser)
     case 18 => consumeOne(invokeDynamicParser)
-    case _ => fail("There is no constant starting here.")
+    case _ => FailureParser
   }
 }

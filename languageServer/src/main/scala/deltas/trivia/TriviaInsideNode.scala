@@ -12,9 +12,11 @@ object TriviaInsideNode extends DeltaWithGrammar {
 
   override def description: String = "Moves trivia grammars left of a node to the inside of the node"
 
-  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
+  override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
+    val grammars = _grammars
+    import grammars._
     var visited = Set.empty[BiGrammar]
-    val descendants = grammars.root.descendants
+    val descendants = root.descendants
     for(path <- descendants)
     {
       path.value match {
@@ -51,7 +53,7 @@ object TriviaInsideNode extends DeltaWithGrammar {
         if (!grammar.children.head.value.isLeftRecursive) {
           placeTrivia(grammars, grammar.children.head, horizontal)
         }
-      case _:Choice =>
+      case _:BiChoice =>
         injectTrivia(grammars, grammar.children(0), horizontal)
         injectTrivia(grammars, grammar.children(1), horizontal)
       case _:BiFailure =>

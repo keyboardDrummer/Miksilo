@@ -47,7 +47,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val stateMutability = find(StateMutabilityDelta.Grammar)
     val modifiers = create(Modifiers, (printSpace ~> (modifierInvocation | stateMutability | "external" | "public" | "internal" | "private")).many.as(Modifiers))
     val returnValues = (printSpace ~ "returns" ~~> returnParameterList | value(Seq.empty)).as(ReturnValues)
-    val blockGrammar: BiGrammar = find(BlockDelta.BlockGramar)
+    val blockGrammar: BiGrammar = find(BlockDelta.BlockGrammar)
     val body = (";" ~> value(BlockDelta.neww(Seq.empty)) | blockGrammar).as(MethodDelta.Body)
     val grammar = "function" ~~ name ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~ returnValues ~~ body asLabelledNode MethodDelta.Shape
     find(JavaClassDelta.Members).addAlternative(grammar)

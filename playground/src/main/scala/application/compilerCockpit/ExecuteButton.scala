@@ -1,17 +1,19 @@
 package application.compilerCockpit
 
 import java.awt.event.ActionEvent
-import javax.swing.JButton
+
+import javax.swing.{JButton, JCheckBox}
 
 class ExecuteButton(sandbox: LanguageSandbox) extends JButton("Execute") {
 
   addActionListener((e: ActionEvent) => {
-    sandbox.execute(() => executeClicked())
+    sandbox.execute(() => sandbox.executeClicked())
   })
+}
 
-  def executeClicked(): Unit = {
-    val input = sandbox.inputOption.getInput
-    val output = sandbox.compileOption.run(sandbox, input)
-    sandbox.outputOption.handleOutput(output)
-  }
+class ExecuteCheckBox(sandbox: LanguageSandbox) extends JCheckBox("Execute on keystroke") {
+
+  addActionListener((e: ActionEvent) => {
+    sandbox.toggleExecuteOnChanged()
+  })
 }

@@ -15,7 +15,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
 
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
-    val parseResult: ParseResult[Node] = parseStream(parser, inputStream)
+    val parseResult: SingleParseResult[Node] = parseStream(parser, inputStream)
     parseResult.resultOption.foreach(program => {
       compilation.program = program
       compilation.program.startOfUri = Some(uri)
@@ -24,20 +24,20 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
       compilation.stopped = true
     }
     if (!parseResult.successful) {
-      compilation.diagnostics ++= List(FileDiagnostic(uri, DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.biggestRealFailure.get)))
+      val diagnostics = DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.errors)
+      compilation.diagnostics ++= diagnostics.map(d => FileDiagnostic(uri, d)).reverse
     }
   }
 
-  def parseStream[T](parser: EditorParser[T], input: InputStream): ParseResult[T] = {
-    val reader = new Reader(SourceUtils.streamToString(input))
-    parser.parseWholeInput(reader)
+  def parseStream[T](parser: SingleResultParser[T], input: InputStream): SingleParseResult[T] = {
+    parser.parseUntilBetterThanNextOrXSteps(new Reader(SourceUtils.streamToString(input)))
   }
 
-  val parserProp = new Property[EditorParser[Node]](null)
+  val parserProp = new Property[SingleResultParser[Node]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    parserProp.add(language, toParser(language.grammars.root).map(r => r.asInstanceOf[Node]))
+    parserProp.add(language, toParserBuilder(language.grammars.root).map(r => r.asInstanceOf[Node]).getWholeInputParser)
   }
 
   override def description: String = "Parses the input file using a textual grammar."

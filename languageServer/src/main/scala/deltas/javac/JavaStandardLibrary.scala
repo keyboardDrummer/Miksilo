@@ -12,7 +12,7 @@ import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.PackageSignature
 import util.SourceUtils
 
-object JavaLang {
+object JavaStandardLibrary {
 
   val byteCodeDecompiler = LanguageFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
 
