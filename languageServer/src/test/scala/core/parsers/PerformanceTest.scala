@@ -96,6 +96,6 @@ class PerformanceTest extends FunSuite {
       assert(result.nonEmpty)
     }
     val timeB = System.currentTimeMillis()
-    assert(timeB - timeA < baseAmount * 2500)
+    assert(timeB - timeA < baseAmount * 3000)
   }
 }
