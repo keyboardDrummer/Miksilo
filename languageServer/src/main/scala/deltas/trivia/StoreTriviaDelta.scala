@@ -3,8 +3,7 @@ package deltas.trivia
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.BiGrammarToParser.{Result, _}
 import core.bigrammar.grammars._
-import core.bigrammar.printer.Printer.NodePrinter
-import core.bigrammar.printer.TryState
+import core.bigrammar.printer.Printer.{NodePrinter, TryState}
 import core.bigrammar.{BiGrammar, WithMap}
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
@@ -53,7 +52,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
   class StoreTrivia(var triviaGrammar: BiGrammar) extends CustomGrammar with BiGrammar {
 
-    def getFieldAndIncrementCounter: TryState[NodeField] = (state: State) => {
+    def getFieldAndIncrementCounter(state: State): TryState[NodeField] = {
       val counter: Int = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
       val field = Trivia(counter)
       val newState = state + (TriviaCounter -> (counter + 1))
@@ -72,10 +71,10 @@ object StoreTriviaDelta extends DeltaWithGrammar {
     override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = new NodePrinter {
       val triviaPrinter: NodePrinter = recursive(triviaGrammar)
 
-      override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = for {
-        key <- getFieldAndIncrementCounter
+      override def write(from: WithMap[Any], state: State): TryState[ResponsiveDocument] = for {
+        (state, key) <- getFieldAndIncrementCounter(state)
         value = from.namedValues.getOrElse(key, Seq.empty)
-        result <- triviaPrinter.write(WithMap[Any](value, from.namedValues))
+        result <- triviaPrinter.write(WithMap[Any](value, from.namedValues), state)
       } yield result
     }
 
@@ -91,15 +90,6 @@ object StoreTriviaDelta extends DeltaWithGrammar {
   case class NodeCounterReset(var node: NodeGrammar) extends CustomGrammar {
 
     override def children = Seq(node)
-
-    def resetAndRestoreCounter[T](inner: TryState[T]): TryState[T] = state => {
-      val initialCounter = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
-      val newState = state + (TriviaCounter -> 0)
-      inner.run(newState).map(p => {
-        val (resultState, value) = p
-        (resultState + (TriviaCounter -> initialCounter), value)
-      })
-    }
 
     // TODO move this transformation to the printing side.
     override def toParser(recursive: BiGrammar => Self[Result]): Self[Result] = {
@@ -124,8 +114,13 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
     override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = {
       val nodePrinter: NodePrinter = recursive(node)
-      from: WithMap[Any] => {
-        resetAndRestoreCounter(nodePrinter.write(from))
+      (from: WithMap[Any], state: State) => {
+        val initialCounter = state.getOrElse(TriviaCounter, 0).asInstanceOf[Int]
+        val newState = state + (TriviaCounter -> 0)
+        nodePrinter.write(from, newState).map(p => {
+          val (resultState, value) = p
+          (resultState + (TriviaCounter -> initialCounter), value)
+        })
       }
     }
 

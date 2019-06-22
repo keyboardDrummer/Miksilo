@@ -1,19 +1,21 @@
 package core.bigrammar.printer
 
+import core.bigrammar.BiGrammar.State
 import core.bigrammar.BiGrammarToParser.AnyWithMap
 import core.bigrammar._
 import core.bigrammar.grammars._
-import core.bigrammar.printer.Printer.NodePrinter
+import core.bigrammar.printer.Printer.{NodePrinter, TryState}
 import core.responsiveDocument.{ResponsiveDocument, ResponsiveLeftRight, ResponsiveTopBottom}
 
 import scala.collection.mutable
+import scala.util.Try
 
 object BiGrammarToPrinter {
   def toPrinter(grammar: BiGrammar): Any => ResponsiveDocument = {
     val printer = new BiGrammarToPrinter().toPrinterCached(grammar)
     outerValue => {
-      val printResult = printer.write(WithMap(outerValue, Map.empty))
-      printResult.run(Map.empty).get._2
+      val printResult = printer.write(WithMap(outerValue, Map.empty), Map.empty)
+      printResult.get._2
     }
   }
 
@@ -31,10 +33,10 @@ class BiGrammarToPrinter {
     printerCache.getOrElseUpdate(grammar, {
       val result: NodePrinter = grammar match {
         case choice: BiChoice => new OrPrinter(toPrinterCached(choice.left), toPrinterCached(choice.right))
-        case Delimiter(keyword, _) => _ => succeed(keyword)
-        case Keyword(keyword, _, verify) => value =>
+        case Delimiter(keyword, _) => (_, state) => succeed(keyword, state)
+        case Keyword(keyword, _, verify) => (value, state) =>
           if (!verify || value.value == keyword)
-            succeed(keyword)
+            succeed(keyword, state)
           else
             failureToGrammar("keyword didn't match", grammar)
         case custom: CustomGrammarWithoutChildren => custom
@@ -51,15 +53,15 @@ class BiGrammarToPrinter {
           val deconstruct = (withMap: AnyWithMap) => sequence.bijective.destruct(withMap.value).map(v => WithMap(v, withMap.namedValues))
           new MapGrammarWithMapPrinter(inner, deconstruct)
         case mapGrammar: MapGrammarWithMap => new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner), mapGrammar.deconstruct)
-        case BiFailure(message) => _ => failureToGrammar(message, grammar)
+        case BiFailure(message) => (_, _) => failureToGrammar(message, grammar)
         case valueGrammar: ValueGrammar => new ValuePrinter(valueGrammar.value)
-        case Print(document) => _ => TryState.value(document)
+        case Print(document) => (_, state) => succeed(document, state)
       }
       result
     })
   }
 
-  def succeed(value: ResponsiveDocument): TryState[ResponsiveDocument] = TryState.value(value)
+  def succeed(value: ResponsiveDocument, state: State): TryState[ResponsiveDocument] = Try(state -> value)
 
   def failureToGrammar(message: String, grammar: BiGrammar): TryState[ResponsiveDocument] = {
     Printer.fail("encountered failure", -10000)
@@ -68,7 +70,7 @@ class BiGrammarToPrinter {
   class RedirectingPrinter(labelled: Labelled) extends NodePrinter {
     var inner: NodePrinter = _
 
-    override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = inner.write(from)
+    override def write(from: WithMap[Any], state: State): TryState[ResponsiveDocument] = inner.write(from, state)
 
     override def toString: String = labelled.toString
   }
