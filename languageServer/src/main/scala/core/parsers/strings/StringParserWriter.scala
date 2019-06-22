@@ -34,7 +34,8 @@ trait StringParserWriter extends SequenceParserWriter {
     }
 
     override def toString: String = {
-      array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
+      s"(${position.line}, ${position.character})" +
+        array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
     }
   }
 

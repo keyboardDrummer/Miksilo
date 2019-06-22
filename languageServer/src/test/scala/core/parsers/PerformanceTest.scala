@@ -89,7 +89,7 @@ class PerformanceTest extends FunSuite {
     val timeA = System.currentTimeMillis()
 
     val multiplier = 1
-    val baseAmount = 1
+    val baseAmount = 2
     for(_ <- 1.to(baseAmount * multiplier)) {
       val result = json.compileString(program).diagnostics
       assert(result.nonEmpty)
