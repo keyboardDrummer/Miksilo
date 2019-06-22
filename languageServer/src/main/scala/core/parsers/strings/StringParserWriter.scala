@@ -140,11 +140,6 @@ trait StringParserWriter extends SequenceParserWriter {
                          penaltyOption: Option[Double] = Some(History.missingInputPenalty))
     extends ParserBuilderBase[String] with LeafParser[String] {
 
-    if (regexName == "object member key" && defaultValue.isEmpty)
-    {
-      System.out.append("")
-    }
-
     override def getParser(recursive: GetParser): Parser[String] = {
 
       lazy val result: Parser[String] = new Parser[String] {

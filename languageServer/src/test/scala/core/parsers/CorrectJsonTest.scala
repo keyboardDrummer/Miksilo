@@ -155,12 +155,6 @@ class CorrectJsonTest extends FunSuite {
     parseJson(input, expectation, 1, 100)
   }
 
-//  test("missing value") {
-//    val input = """{"person""remy":"jeroen"}"""
-//    val expectation = List("person" -> UnknownExpression, "remy" -> "jeroen")
-//    parseJson(input, expectation, 1, 1)
-//  }
-
   test("starting brace insertion unambiguous") {
     val input = """{"person":"remy":"jeroen","remy":"jeroen"}}"""
     val expectation = List(("person",List("remy" -> "jeroen", "remy" -> "jeroen")))
