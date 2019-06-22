@@ -34,7 +34,8 @@ trait StringParserWriter extends SequenceParserWriter {
     }
 
     override def toString: String = {
-      array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
+      s"(${position.line}, ${position.character})" +
+        array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
     }
   }
 
@@ -74,9 +75,7 @@ trait StringParserWriter extends SequenceParserWriter {
     Literal(value)
   }
 
-  implicit def regex(value: Regex, regexName: String, score: Double = History.successValue): RegexParser = RegexParser(value, regexName, score)
-
-  case class Literal(value: String) extends ParserBuilderBase[String] with LeafParser[String] {
+  case class Literal(value: String, penalty: Double = History.missingInputPenalty) extends ParserBuilderBase[String] with LeafParser[String] {
 
     override def getParser(recursive: GetParser): Parser[String] = {
 
@@ -88,10 +87,10 @@ trait StringParserWriter extends SequenceParserWriter {
             val arrayIndex = index + input.offset
             if (array.length <= arrayIndex) {
               return singleResult(ReadyParseResult(Some(value), input,
-                History.error(new MissingInput(input, value, History.endOfSourceInsertion))))
+                History.error(new MissingInput(input, value, penalty))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               return singleResult(ReadyParseResult(Some(value), input,
-                History.error(MissingInput(input, input.drop(index + 1), value))))
+                History.error(MissingInput(input, input.drop(index + 1), value, penalty))))
             }
             index += 1
           }
@@ -129,13 +128,17 @@ trait StringParserWriter extends SequenceParserWriter {
     override def original: Self[String] = identifier
   }
 
-  
   trait NextCharError extends ParseError[Input] {
     def to: Input = if (this.from.atEnd) this.from else this.from.drop(1)
     def range = SourceRange(from.position, to.position)
   }
 
-  case class RegexParser(regex: Regex, regexName: String, score: Double = History.successValue) extends ParserBuilderBase[String] with LeafParser[String] {
+  case class RegexParser(regex: Regex, regexName: String,
+                         // TODO use the regex to generate a default case.
+                         defaultValue: Option[String] = None,
+                         score: Double = History.successValue,
+                         penaltyOption: Option[Double] = Some(History.missingInputPenalty))
+    extends ParserBuilderBase[String] with LeafParser[String] {
 
     override def getParser(recursive: GetParser): Parser[String] = {
 
@@ -147,8 +150,10 @@ trait StringParserWriter extends SequenceParserWriter {
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
-              // TODO use the regex to generate a default case.
-              singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, s"<$regexName>", History.missingInputPenalty))))
+              penaltyOption.fold[ParseResult[String]](SREmpty)(penalty => {
+                singleResult(ReadyParseResult(defaultValue, input, History.error(new MissingInput(input, s"<$regexName>", penalty))))
+              })
+
           }
         }
       }

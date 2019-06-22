@@ -1,15 +1,13 @@
 package deltas.json
 
-import core.bigrammar.BiGrammar
-import core.bigrammar.grammars.{Keyword, Parse, RegexGrammar}
-import core.deltas.{Delta, DeltaWithGrammar}
-import core.bigrammar.grammars.{Colorize, Keyword, Parse, WithDefault}
+import core.bigrammar.grammars.{Colorize, Keyword, Parse, RegexGrammar, _}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Delta, DeltaWithGrammar}
 import core.language.exceptions.BadInputException
 import core.language.node._
 import core.language.{Compilation, Language}
+import core.parsers.editorParsers.History
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
@@ -31,16 +29,14 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
     val keyGrammar = {
       import core.bigrammar.DefaultBiGrammarWriter._
-      val regexGrammar = grammars.regexGrammar(stringInnerRegex, "string literal")
-      val withDefaultGrammar = new WithDefault(regexGrammar, "\"") // TODO maybe replace this with a regex default sample generator
-      dropPrefix(grammars,
-        withDefaultGrammar, MemberKey, "\"") ~< "\""
+      val regexGrammar = RegexGrammar(stringInnerRegex, "object member key", verifyWhenPrinting = false, Some("\""))
+      dropPrefix(grammars, regexGrammar, MemberKey, "\"") ~< "\""
     }
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
 
     val member = (Colorize(create(MemberKey, keyGrammar), "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val optionalTrailingComma = Parse(Keyword(",") | value(Unit))
-    val inner = "{" %> (member.manySeparatedVertical(",").as(Members) ~< optionalTrailingComma).indent() %< "}"
+    val inner = Delimiter("{", History.missingInputPenalty * 2) %> (member.manySeparatedVertical(",").as(Members) ~< optionalTrailingComma).indent() %< "}"
 
     val grammar = inner.asLabelledNode(Shape)
     expressionGrammar.addAlternative(grammar)

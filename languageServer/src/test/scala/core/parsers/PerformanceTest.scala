@@ -59,7 +59,7 @@ class PerformanceTest extends FunSuite {
       replaceAll("\\s", "")
 
     val json = JsonLanguage.language
-    val multiplier = 1
+    val multiplier = 10
     val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     val timeA = System.currentTimeMillis()
@@ -78,7 +78,8 @@ class PerformanceTest extends FunSuite {
 
     val singleSource = timeB - timeA
     val sourceTimesTen = timeC - timeB
-    assert(singleSource < 2000 * multiplier)
+    val baseRepetitions = 11
+    assert(singleSource < multiplier * baseRepetitions * 1000)
     System.out.println(s"singleSource:$singleSource")
     System.out.println(s"totalTime:${singleSource + sourceTimesTen}")
   }
@@ -89,11 +90,12 @@ class PerformanceTest extends FunSuite {
     val timeA = System.currentTimeMillis()
 
     val multiplier = 1
-    for(_ <- 1.to(2 * multiplier)) {
+    val baseAmount = 2
+    for(_ <- 1.to(baseAmount * multiplier)) {
       val result = json.compileString(program).diagnostics
       assert(result.nonEmpty)
     }
     val timeB = System.currentTimeMillis()
-    assert(timeB - timeA < 6000)
+    assert(timeB - timeA < baseAmount * 3000)
   }
 }
