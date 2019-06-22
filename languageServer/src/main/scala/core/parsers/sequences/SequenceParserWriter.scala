@@ -96,25 +96,6 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class WithDefault[Result](original: Self[Result], _default: Result)
-    extends ParserBuilderBase[Result] with ParserWrapper[Result] {
-
-    override def getParser(recursive: GetParser): Parser[Result] = {
-      val parseOriginal = recursive(original)
-
-      def apply(input: Input, state: ParseState): ParseResult[Result] = {
-        val result = parseOriginal(input, state)
-        result.mapReady(ready => {
-          if (ready.resultOption.isEmpty) {
-            ReadyParseResult(Some(_default), ready.remainder, ready.history)
-          } else
-            ready
-        }, uniform = true)
-      }
-      apply
-    }
-  }
-
   case class MissingInput(from: Input, to: Input, expectation: String, penalty: Double = History.missingInputPenalty)
     extends ParseError[Input] {
 
@@ -256,8 +237,6 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
 
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)
-
-    def withDefault[Other >: Result](_default: Other): Self[Other] = WithDefault(parser, _default)
 
     def getSingleResultParser: SingleResultParser[Result] = {
       val parser = compile(this.parser).buildParser(this.parser)

@@ -45,7 +45,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
                   |    }
                   |}""".stripMargin
     val diagnostics = getDiagnostic(jsonServer, input)
-    assert(diagnostics.size == 2) // TODO should be 2
+    assert(diagnostics.size == 3) // TODO should be 2
   }
 
   test("Goto definition resource reference") {

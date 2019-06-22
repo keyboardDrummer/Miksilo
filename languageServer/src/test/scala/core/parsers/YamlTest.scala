@@ -77,7 +77,7 @@ class YamlTest extends FunSuite
     }
   }
 
-  val whiteSpace = RegexParser("""\s*""".r, "whitespace", 0)
+  val whiteSpace = RegexParser("""\s*""".r, "whitespace", score = 0)
 
   override def leftRight[Left, Right, Result](left: ParserBuilder[Left], right: => ParserBuilder[Right],
                                               combine: (Option[Left], Option[Right]) => Option[Result]) =  {

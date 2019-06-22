@@ -29,10 +29,8 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
     val keyGrammar = {
       import core.bigrammar.DefaultBiGrammarWriter._
-      val regexGrammar = grammars.regexGrammar(stringInnerRegex, "string literal")
-      val withDefaultGrammar = new WithDefault(regexGrammar, "\"") // TODO maybe replace this with a regex default sample generator
-      dropPrefix(grammars,
-        withDefaultGrammar, MemberKey, "\"") ~< "\""
+      val regexGrammar = RegexGrammar(stringInnerRegex, "object member key", verifyWhenPrinting = false, Some("\""))
+      dropPrefix(grammars, regexGrammar, MemberKey, "\"") ~< "\""
     }
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
 

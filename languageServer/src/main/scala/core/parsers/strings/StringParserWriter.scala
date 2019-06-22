@@ -133,9 +133,16 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   case class RegexParser(regex: Regex, regexName: String,
+                         // TODO use the regex to generate a default case.
+                         defaultValue: Option[String] = None,
                          score: Double = History.successValue,
                          penaltyOption: Option[Double] = Some(History.missingInputPenalty))
     extends ParserBuilderBase[String] with LeafParser[String] {
+
+    if (regexName == "object member key" && defaultValue.isEmpty)
+    {
+      System.out.append("")
+    }
 
     override def getParser(recursive: GetParser): Parser[String] = {
 
@@ -148,8 +155,7 @@ trait StringParserWriter extends SequenceParserWriter {
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
               penaltyOption.fold[ParseResult[String]](SREmpty)(penalty => {
-                // TODO use the regex to generate a default case.
-                singleResult(ReadyParseResult(None, input, History.error(new MissingInput(input, s"<$regexName>", penalty))))
+                singleResult(ReadyParseResult(defaultValue, input, History.error(new MissingInput(input, s"<$regexName>", penalty))))
               })
 
           }
