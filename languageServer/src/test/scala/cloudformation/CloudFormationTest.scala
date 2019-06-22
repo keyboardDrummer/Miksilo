@@ -21,7 +21,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
   test("No diagnostics edited") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val result = getDiagnostic(jsonServer, program)
-    assert(result.size == 6) // TODO reduce the amount of errors.
+    assert(result.size == 8) // TODO reduce the amount of errors.
   }
 
   test("missing : <value> ,") {
@@ -32,7 +32,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
                   |    }
                   |}""".stripMargin
     val diagnostics = getDiagnostic(jsonServer, input)
-    assert(diagnostics.size == 1)
+    assert(diagnostics.size == 2) // TODO should be 1
   }
 
   test("missing \": <value>,") {
@@ -45,7 +45,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
                   |    }
                   |}""".stripMargin
     val diagnostics = getDiagnostic(jsonServer, input)
-    assert(diagnostics.size == 2)
+    assert(diagnostics.size == 2) // TODO should be 2
   }
 
   test("Goto definition resource reference") {

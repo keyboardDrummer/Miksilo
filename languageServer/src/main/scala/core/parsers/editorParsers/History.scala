@@ -8,16 +8,16 @@ object History {
 
   val successValue = 1.0
 
-  val errorMultiplier = successValue * 3
+  val errorMultiplier = successValue * 2 //3
 
   val indentationErrorPenalty = successValue * errorMultiplier * 10
 
   val missingInputPenalty = successValue * errorMultiplier
-  val insertFallbackPenalty = missingInputPenalty * 0.1
+  val insertFallbackPenalty = missingInputPenalty * 0.9
   val insertDefaultPenalty = 1
-  val failPenalty = 10000
+  val failPenalty = 100 // 10000
 
-  val dropLength1Penalty = missingInputPenalty * 1.5
+  val dropLength1Penalty = errorMultiplier * 3 // missingInputPenalty * 1.5
   val dropLength2Penalty = dropLength1Penalty / 0.75
   val dropMaxPenalty = dropLength1Penalty * 10
   val dropLengthShift = (dropMaxPenalty + dropLength1Penalty - 2 * dropLength2Penalty) / (dropLength2Penalty - dropLength1Penalty)

@@ -105,7 +105,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       def apply(input: Input, state: ParseState): ParseResult[Result] = {
         val result = parseOriginal(input, state)
         result.mapReady(ready => {
-          if (ready.resultOption.isEmpty || ready.remainder == input) {
+          if (ready.resultOption.isEmpty) {
             ReadyParseResult(Some(_default), ready.remainder, ready.history)
           } else
             ready
@@ -114,20 +114,6 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       apply
     }
   }
-
-//  def apply(input: Input, state: ParseState): ParseResult[Result] = {
-//    val result = parseOriginal(input, state)
-//    result.flatMapReady(ready => {
-//      val result: ParseResult[Result] = if (ready.remainder == input)
-//        SREmpty
-//      else if (ready.resultOption.isEmpty) {
-//        SREmpty
-//        // singleResult(ReadyParseResult(Some(_default), ready.remainder, ready.history))
-//      } else
-//        singleResult(ready)
-//      result
-//    }, uniform = true)
-//  }
 
   case class MissingInput(from: Input, to: Input, expectation: String, penalty: Double = History.missingInputPenalty)
     extends ParseError[Input] {
@@ -154,7 +140,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
         case next: MissingInput if next.from == from && next.to == to =>
           val max = Math.max(penalty, next.penalty)
           val min = Math.min(penalty, next.penalty)
-          val newPenalty = max + min * 0.1
+          val newPenalty = max + min * 0.9
           Some(MissingInput(from, to, expectation + " " + next.expectation, newPenalty))
         case _ => None
       }

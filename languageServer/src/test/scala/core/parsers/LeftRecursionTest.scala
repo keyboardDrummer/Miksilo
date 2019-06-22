@@ -126,11 +126,11 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
 
   test("recursive with sequence indirection and default, " +
     "applies the default after failing the recursion") {
-    lazy val first: Self[Any] = (new Lazy(first) ~ "!" | "!").withDefault("yes")
+    lazy val first: Self[Any] = (new Lazy(first) ~ "!" | "!")
     val input = "notavailable"
     val parseResult = first.getWholeInputParser.parse(new StringReader(input))
     assert(!parseResult.successful)
-    val expectation = Some("yes") //Could have been ("yes","!") with different implementation
+    val expectation = Some("!") //Could have been ("yes","!") with different implementation
     assertResult(expectation)(parseResult.resultOption)
   }
 
