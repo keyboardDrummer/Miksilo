@@ -19,7 +19,7 @@ object History {
 
   val dropLength1Penalty = errorMultiplier * 3
   val dropLength2Penalty = dropLength1Penalty / 0.75
-  val dropMaxPenalty = dropLength1Penalty P* 10
+  val dropMaxPenalty = dropLength1Penalty * 10
   val dropLengthShift = (dropMaxPenalty + dropLength1Penalty - 2 * dropLength2Penalty) / (dropLength2Penalty - dropLength1Penalty)
   val dropReduction: Double = (dropMaxPenalty - dropLength1Penalty) * (1 + dropLengthShift)
 }
