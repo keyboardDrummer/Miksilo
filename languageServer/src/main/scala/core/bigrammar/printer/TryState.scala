@@ -1,14 +1,12 @@
 package core.bigrammar.printer
 
 import core.bigrammar.BiGrammar.State
-import core.bigrammar.StateFull
 
 import scala.util.{Failure, Success, Try}
 
 object TryState {
   def value[T](value: T): TryState[T] = state => Success((state, value))
   def fail[T](t: Throwable): TryState[T] = (state: State) => Failure(t)
-  def fromStateM[T](stateM: StateFull[T]): TryState[T] = state => Success(stateM.run(state))
 }
 
 trait TryState[To] {

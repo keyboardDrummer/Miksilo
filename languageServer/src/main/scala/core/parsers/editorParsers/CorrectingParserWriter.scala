@@ -413,6 +413,17 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     }
   }
 
+  object PositionParser extends ParserBuilderBase[Input] with LeafParser[Input] {
+
+    override def getParser(recursive: GetParser): Parser[Input] = {
+      (input, _) => {
+        singleResult(ReadyParseResult(Some(input), input, History.empty))
+      }
+    }
+
+    override def getMustConsume(cache: ConsumeCache) = false
+  }
+
   case class WithRangeParser[Result, NewResult](original: Self[Result], addRange: (Input, Input, Result) => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
