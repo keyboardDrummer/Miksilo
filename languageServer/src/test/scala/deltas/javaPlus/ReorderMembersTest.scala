@@ -57,7 +57,7 @@ class ReorderMembersTest extends FunSuite {
     assertResult(expectation)(state.output)
   }
 
-  test("broken comment") {
+  test("comment without trivia inside node") {
     val input =
       """class Example
         |{
