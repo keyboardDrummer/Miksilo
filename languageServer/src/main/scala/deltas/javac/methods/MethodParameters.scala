@@ -20,7 +20,7 @@ object MethodParameters {
 
     val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
     val name = parameter.getValue(Name).asInstanceOf[String]
-    builder.declare(name, bodyScope, parameter.getSourceElement(Name), Some(parameterType))
+    builder.declare(name, bodyScope, parameter.getField(Name), Some(parameterType))
   }
 
   implicit class MethodParameter[T <: NodeLike](val node: T) extends NodeWrapper[T] with HasName[T] {

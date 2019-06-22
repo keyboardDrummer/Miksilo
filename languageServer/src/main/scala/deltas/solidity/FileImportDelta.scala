@@ -45,7 +45,7 @@ object FileImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val fileImport: FileImport[NodePath] = path
-    val fileDeclaration = builder.resolve(fileImport.fileName, fileImport.getSourceElement(FileName), parentScope, Some(FileWithMembersDelta.fileType))
+    val fileDeclaration = builder.resolve(fileImport.fileName, fileImport.getField(FileName), parentScope, Some(FileWithMembersDelta.fileType))
     val fileScope = builder.getDeclaredScope(fileDeclaration)
     builder.importScope(parentScope, fileScope)
   }

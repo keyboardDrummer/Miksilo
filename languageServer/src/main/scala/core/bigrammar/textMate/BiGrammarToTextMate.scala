@@ -1,12 +1,11 @@
 package core.bigrammar.textMate
 
-import core.bigrammar.BiGrammar
 import _root_.core.bigrammar.grammars.{ParseWhiteSpace, _}
+import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.language.node.Node
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
-import deltas.javac.expressions.literals.BooleanLiteralDelta
 import deltas.json.JsonObjectLiteralDelta.{ObjectLiteral, ObjectLiteralMember}
 import deltas.json.{JsonLanguage, JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import util.GraphBasics
@@ -42,6 +41,7 @@ object BiGrammarToTextMate {
         case map: MapGrammarWithMap => recurse(map.inner)
         case labelled: Labelled => recurse(labelled.inner)
         case delimiter: Delimiter => Some(escapeRegex(delimiter.value))
+        case _: Identifier => Some(escapeRegex(BiGrammarToParser.identifier.regex.regex))
         case ParseWhiteSpace => Some(ParseWhiteSpace.regex.regex)
         case keyword: Keyword => Some(escapeRegex(keyword.value))
         case choice: BiChoice =>
@@ -152,8 +152,9 @@ object BiGrammarToTextMate {
         maybeRegex match {
           case None => throw new Exception("Colorize did not contain a regex")
           case Some(regex) =>
-            if (regex.contains("\\n") || regex.contains("\\s"))
-              throw new Exception(s"Colorize regex $regex contained a newline")
+// TODO turn on validation, once we figure out how to filter out NOT \n, and ending in \n. For example the line comment regex currently incorrectly triggers this validation
+//            if (regex.contains("\\n") || regex.contains("\\s"))
+//              throw new Exception(s"Colorize regex $regex contained a newline")
 
             Match(textMateScope, regex.r)
         }

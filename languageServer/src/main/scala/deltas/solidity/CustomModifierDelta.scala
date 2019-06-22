@@ -61,7 +61,7 @@ object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
       TypeSkeleton.getType(compilation, builder, methodParameter._type, parentScope)
     })
     val methodType = FunctionType.curry(parameterTypes, VoidTypeDelta.constraintType)
-    builder.declareSourceElement(path.getSourceElement(Name), parentScope, Some(methodType))
+    builder.declare(path.getField(Name), parentScope, methodType)
 
     val bodyScope = builder.newScope(Some(parentScope), "methodBody")
     method.parameters.foreach(parameter => {

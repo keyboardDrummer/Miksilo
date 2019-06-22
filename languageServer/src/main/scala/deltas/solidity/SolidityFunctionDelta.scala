@@ -72,7 +72,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val returnTypes: Seq[Node] = returnParameters.map(returnParameter => returnParameter._type)
     val methodType = SolidityFunctionTypeDelta.createType(compilation, builder, parentScope, parameterTypes, returnTypes)
 
-    builder.declare(method.name, parentScope, path.getSourceElement(Name), Some(methodType))
+    builder.declare(method.name, parentScope, path.getField(Name), Some(methodType))
 
     val bodyScope = builder.newScope(Some(parentScope))
     method.parameters.foreach(parameter => {
@@ -84,7 +84,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
       val maybeName = parameter.getValue(Name).asInstanceOf[Option[String]]
       maybeName.foreach(name => {
         val parameterType = TypeSkeleton.getType(compilation, builder, parameter._type, parentScope)
-        builder.declare(name, bodyScope, parameter.getSourceElement(Name), Some(parameterType))
+        builder.declare(name, bodyScope, parameter.getField(Name), Some(parameterType))
       })
     })
     ConstraintSkeleton.constraints(compilation, builder, method.body, bodyScope)

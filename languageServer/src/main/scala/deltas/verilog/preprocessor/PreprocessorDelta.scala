@@ -6,7 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.{GrammarKey, Node}
 import core.language.{Compilation, Language}
-import deltas.verilog.VerilogFileDelta
+import deltas.FileWithMembersDelta
 
 object PreprocessorDelta extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -32,7 +32,7 @@ object PreprocessorDelta extends DeltaWithPhase with DeltaWithGrammar {
     import core.bigrammar.DefaultBiGrammarWriter._
 
     val directiveGrammar = Keyword("`") ~> grammars.create(BodyGrammar)
-    grammars.find(VerilogFileDelta.Members).addAlternative(grammars.create(Grammar, directiveGrammar))
+    grammars.find(FileWithMembersDelta.Members).addAlternative(grammars.create(Grammar, directiveGrammar))
   }
 }
 

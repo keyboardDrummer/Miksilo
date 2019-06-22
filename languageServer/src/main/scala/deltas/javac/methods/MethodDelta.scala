@@ -134,7 +134,7 @@ object MethodDelta extends DeltaWithGrammar
     val returnType = method.returnType
     val methodType = MethodTypeDelta.getType(compilation, builder, parentScope, parameterTypes, returnType)
 
-    builder.declare(method.name, parentScope, path.getSourceElement(Name), Some(methodType))
+    builder.declare(method.name, parentScope, path.getField(Name), Some(methodType))
   }
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {

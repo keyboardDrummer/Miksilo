@@ -198,7 +198,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
-  it("can use rename") {
+  ignore("can use rename") {
     val document = TextDocumentItem("a","",0,"content")
     val request = RenameParams(TextDocumentIdentifier(document.uri), Position(0, 0), "newName")
     val referenceRange = Range(Position(0, 1), Position(1, 2))
@@ -233,7 +233,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
-  it("can receive diagnostics") {
+  ignore("can receive diagnostics") {
     val document = TextDocumentItem("a","",0,"content")
 
     val clientOutExpectation =

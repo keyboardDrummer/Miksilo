@@ -8,7 +8,7 @@ import core.language.{Compilation, Language}
 import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.ConstraintSkeleton
+import deltas.{ConstraintSkeleton, FileWithMembersDelta}
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object PackageDelta extends DeltaWithGrammar with HasConstraintsDelta {
@@ -20,7 +20,7 @@ object PackageDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val fileMember = find(VerilogFileDelta.Members)
+    val fileMember = find(FileWithMembersDelta.Members)
 
     val packageMember = create(Members)
     val _package = "package" ~~ find(Name) ~ ";" %
@@ -39,13 +39,13 @@ object PackageDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def description: String = "Adds packages to Verilog"
 
-  override def dependencies: Set[Contract] = Set(VerilogFileDelta, VerilogClassDelta)
+  override def dependencies: Set[Contract] = Set(FileWithMembersDelta, VerilogClassDelta)
 
   override def shape: NodeShape = Shape
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val _package: Package[NodePath] = path
-    val packageDeclaration = builder.declare(_package.name, parentScope, path.getSourceElement(Name))
+    val packageDeclaration = builder.declare(_package.name, parentScope, path.getField(Name))
     val packageScope = builder.declareScope(packageDeclaration, debugName = "package")
 
     for(member <- _package.members) {

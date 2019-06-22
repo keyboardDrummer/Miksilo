@@ -8,7 +8,7 @@ import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.ConstraintSkeleton
+import deltas.{ConstraintSkeleton, FileWithMembersDelta}
 import deltas.HasNameDelta.HasName
 import deltas.expression.VariableDelta
 import deltas.expression.VariableDelta.Variable
@@ -42,7 +42,7 @@ object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val parameterList: BiGrammar = (variable.manySeparatedVertical(",").inParenthesis | value(Seq.empty)).as(Ports)
     val body: BiGrammar = member.manyVertical.as(Body)
     val moduleGrammar: BiGrammar = "module" ~~ find(Name) ~~ parameterList ~ ";" % body.indent() % "endmodule" asNode Shape
-    find(VerilogFileDelta.Members).addAlternative(moduleGrammar)
+    find(FileWithMembersDelta.Members).addAlternative(moduleGrammar)
   }
 
   override def description: String = "Adds the Verilog module"
@@ -60,7 +60,7 @@ object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
   }
 
   override def shape: NodeShape = Shape
-  override def dependencies: Set[Contract] = Set(VerilogFileDelta, VariableDelta)
+  override def dependencies: Set[Contract] = Set(FileWithMembersDelta, VariableDelta)
 }
 
 

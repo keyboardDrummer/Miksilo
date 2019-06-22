@@ -1,6 +1,6 @@
 package deltas.json
 
-import core.bigrammar.grammars._
+import core.bigrammar.grammars.{Colorize, Keyword, Parse, RegexGrammar, _}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Delta, DeltaWithGrammar}
@@ -34,7 +34,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     }
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
 
-    val member = (Colorize(keyGrammar, "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
+    val member = (Colorize(create(MemberKey, keyGrammar), "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
     val optionalTrailingComma = Parse(Keyword(",") | value(Unit))
     val inner = Delimiter("{", History.missingInputPenalty * 2) %> (member.manySeparatedVertical(",").as(Members) ~< optionalTrailingComma).indent() %< "}"
 
@@ -61,6 +61,9 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
   implicit class ObjectLiteral[T <: NodeLike](val node: T) extends NodeWrapper[T] {
     def getValue(key: String): T = get(key).get
+    def getObject(key: String): Option[ObjectLiteral[T]] = get(key).
+      flatMap(v => if (v.shape == Shape) Some(ObjectLiteral(v)) else None)
+
     def get(key: String): Option[T] = members.find(member => member.key == key).map(x => x.value)
     def members: Seq[ObjectLiteralMember[T]] = NodeWrapper.wrapList(node(Members).asInstanceOf[Seq[T]])
   }

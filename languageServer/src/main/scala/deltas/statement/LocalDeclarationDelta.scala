@@ -55,6 +55,6 @@ object LocalDeclarationDelta extends StatementInstance
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val declaration: LocalDeclaration[NodePath] = statement
     val _type = TypeSkeleton.getType(compilation, builder, declaration._type, parentScope)
-    builder.declare(declaration.name, parentScope, statement.getSourceElement(Name), Some(_type))
+    builder.declare(statement.getField(Name), parentScope, _type)
   }
 }

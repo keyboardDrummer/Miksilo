@@ -3,7 +3,7 @@ package deltas.verilog
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
 import core.smarts.SolveConstraintsDelta
-import deltas.HasNameDelta
+import deltas.{FileWithMembersDelta, HasNameDelta}
 import deltas.expression.{ExpressionDelta, IntLiteralDelta, VariableDelta}
 import deltas.trivia.{SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta}
 import deltas.statement.{ForLoopDelta, _}
@@ -25,6 +25,6 @@ object VerilogLanguage {
     PackageDelta,
     VerilogClassDelta,
     VerilogModuleDelta,
-    VerilogFileDelta) ++ genericDeltas
+    FileWithMembersDelta) ++ genericDeltas
   val language: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ deltas)
 }
