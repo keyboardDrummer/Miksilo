@@ -11,6 +11,7 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.{Key, NodeField, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
+import langserver.types.Position
 
 object StoreTriviaDelta extends DeltaWithGrammar {
 
@@ -43,8 +44,8 @@ object StoreTriviaDelta extends DeltaWithGrammar {
   }
 
   object TriviaCounter extends Key
-  case class ParseTriviaField(offset: Int) extends NodeField {
-    override lazy val toString = s"TriviaOffset$offset"
+  case class ParseTriviaField(input: Input) extends NodeField {
+    override lazy val toString = s"Trivia,${input.position.line},${input.position.character}"
   }
   case class Trivia(index: Int) extends NodeField {
     override lazy val toString = s"Trivia$index"
@@ -63,7 +64,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       val triviaParser = recursive(triviaGrammar)
       leftRightSimple[Input, Result, Result](PositionParser, triviaParser, (position, triviasWithMap) => {
         val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
-        val field = ParseTriviaField(position.offset)
+        val field = ParseTriviaField(position)
         WithMap[Any](Unit, Map(field -> trivias))
       })
     }
@@ -113,7 +114,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
           }
         }
 
-        val fixedTrivias = trivias.sortBy(t => t._1.offset).
+        val fixedTrivias = trivias.sortBy(t => t._1.input.offset).
           zipWithIndex.map(withIndex => (Trivia(withIndex._2), withIndex._1._2)).
           filter(v => v._2.asInstanceOf[Seq[_]].nonEmpty)
         WithMap(result.value, (rest ++ fixedTrivias).toMap)
