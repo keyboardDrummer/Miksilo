@@ -1,8 +1,10 @@
 package deltas.statement
 
+import core.bigrammar.grammars.Print
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
+import core.document.BlankLine
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
@@ -35,6 +37,7 @@ object BlockDelta extends DeltaWithGrammar with StatementInstance {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
 
+    //create(BlockGrammar, statementGrammar.manySeparatedVertical("").as(Statements) asNode Shape) //
     val blockGrammar = create(BlockGrammar, "{" %> statementGrammar.manyVertical.as(Statements).indent(indentAmount) %< "}" asNode Shape)
     val statementAsSequence = statementGrammar.map[Any, Seq[Any]](statement => Seq(statement), x => x.head)
     val statementAsBlockGrammar = create(StatementAsBlockGrammar, statementAsSequence.as(Statements).asNode(Shape))

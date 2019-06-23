@@ -11,4 +11,16 @@ object Utility {
     case v: T => Some(v)
     case _ => None
   }
+
+  def mergeMaps[Key, Value](first: Map[Key, Value], second: Map[Key, Value],
+                            combine: (Key, Value, Value) => Value): Map[Key, Value] = {
+    var result: Map[Key, Value] = first
+    for((secondKey, secondValue) <- second) {
+      result += (secondKey -> (first.get(secondKey) match {
+        case None => second(secondKey)
+        case Some(firstValue) => combine(secondKey, firstValue, secondValue)
+      }))
+    }
+    result
+  }
 }

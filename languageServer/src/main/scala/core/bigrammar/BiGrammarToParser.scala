@@ -5,6 +5,7 @@ import core.bigrammar.grammars._
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import langserver.types.Position
+import util.Utility
 
 import scala.collection.mutable
 
@@ -74,6 +75,18 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     result.value
   }
 
+  def mergeNamedValues(key: Any, first: Any, second: Any): Any = {
+    key match {
+      case canMerge: CanMerge =>
+        canMerge.merge(first, second)
+      case _ => first
+    }
+  }
+
+  trait CanMerge {
+    def merge(first: Any, second: Any): Any
+  }
+
   private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Self[Result], grammar: BiGrammar): Self[Result] = {
     grammar match {
       case sequence: BiSequence =>
@@ -81,7 +94,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
         val secondParser = recursive(sequence.second)
         val parser = leftRightSimple(firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
           val resultValue = sequence.bijective.construct(firstResult.value, secondResult.value)
-          val resultMap = firstResult.namedValues ++ secondResult.namedValues
+          val resultMap = Utility.mergeMaps(firstResult.namedValues, secondResult.namedValues, mergeNamedValues)
           WithMap[Any](resultValue, resultMap)
         })
         parser

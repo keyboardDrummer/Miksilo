@@ -43,9 +43,11 @@ object StoreTriviaDelta extends DeltaWithGrammar {
   }
 
   object TriviaCounter extends Key
-  case class ParseTriviaField(input: Input) extends NodeField {
+  class ParseTriviaField(val input: Input) extends NodeField with CanMerge {
     override lazy val toString = s"Trivia,${input.position.line},${input.position.character}"
+    override def merge(first: Any, second: Any) = first.asInstanceOf[Seq[_]] ++ second.asInstanceOf[Seq[_]]
   }
+
   case class Trivia(index: Int) extends NodeField {
     override lazy val toString = s"Trivia$index"
   }
@@ -63,8 +65,8 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       val triviaParser = recursive(triviaGrammar)
       leftRightSimple[Input, Result, Result](PositionParser, triviaParser, (position, triviasWithMap) => {
         val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
-        val field = ParseTriviaField(position)
-        WithMap[Any](Unit, Map(field -> trivias))
+        val field = new ParseTriviaField(position)
+        WithMap[Any](Unit, Map(field -> Seq(trivias)))
       })
     }
 
@@ -95,11 +97,11 @@ object StoreTriviaDelta extends DeltaWithGrammar {
     override def toParser(recursive: BiGrammar => Self[Result]): Self[Result] = {
       val oldInner = recursive(node.inner)
       val newInner: Self[Result] = oldInner.map((result: Result) => {
-        var trivias: List[(ParseTriviaField, Any)] = List.empty
+        var trivias: Seq[(ParseTriviaField, Any)] = List.empty
         var rest: List[(Any, Any)] = List.empty
         for(namedValue <- result.namedValues) {
           namedValue._1 match {
-            case parseTriviaField: ParseTriviaField => trivias ::= (parseTriviaField, namedValue._2)
+            case parseTriviaField: ParseTriviaField => trivias = namedValue._2.asInstanceOf[Seq[_]].map(value => (parseTriviaField, value)) ++ trivias
             case _ => rest ::= namedValue
           }
         }
