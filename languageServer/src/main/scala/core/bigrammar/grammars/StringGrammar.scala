@@ -1,9 +1,7 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.BiGrammar.State
 import core.bigrammar.BiGrammarToParser._
-import core.bigrammar.printer.Printer
-import core.bigrammar.printer.Printer.TryState
+import core.bigrammar.printer.{Printer, TryState}
 import core.bigrammar.{BiGrammar, WithMap}
 import core.responsiveDocument.ResponsiveDocument
 
@@ -19,18 +17,18 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 
-  override def write(from: WithMap[Any], state: State): TryState[ResponsiveDocument] = {
+  override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = {
     from.value match {
       case string: String =>
         if (verifyWhenPrinting) {
           val parseResult = parser.parse(new Reader(string))
           parseResult.resultOption match {
-            case Some(result) if parseResult.successful && result.equals(from.value) => scala.util.Success(state, string)
+            case Some(result) if parseResult.successful && result.equals(from.value) => TryState.value(string)
             case _ => Printer.fail("StringGrammar could not parse string")
           }
         }
         else
-          scala.util.Success(state, string)
+          TryState.value(string)
 
       case _ =>
         Printer.fail(s"StringGrammar expects a string value, and not a ${from.value}")
