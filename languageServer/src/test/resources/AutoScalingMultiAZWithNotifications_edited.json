@@ -5,7 +5,7 @@
 
   "Parameters" : {
 
-    "BrokenParameter"
+    "BrokenParameter",
     "VpcId" : {
       "Type" : "AWS::EC2::VPC::Id",
       "Description" : "VpcId of your existing Virtual Private Cloud (VPC)",
@@ -315,6 +315,7 @@
                                           { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] },
         "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
         "InstanceType" : { "Ref" : "InstanceType" },
+        "Sleutel": 3,
         "
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
              "#!/bin/bash -xe\n",

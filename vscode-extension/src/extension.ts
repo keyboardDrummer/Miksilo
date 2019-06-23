@@ -69,8 +69,9 @@ function activateLanguage(jar: string, language: LanguageConfiguration): Disposa
 	let serverOptions: ServerOptions = {
 		command: "java",
 		args: ["-jar",
+			jar,
+			//"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=localhost:1044",
 			//"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=6007",
-			jar, 
 			language.miksiloName]
 	}
 	

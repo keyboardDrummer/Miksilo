@@ -104,9 +104,8 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
     assertInputGivesPartialFailureExpectation(input, expectation)
   }
 
-
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
-    val result = jsonParser.getWholeInputParser.parseUntilBetterOrXSteps(new Reader(input))
+    val result = jsonParser.getWholeInputParser.parseUntilBetterThanNextOrXSteps(new Reader(input))
     assert(!result.successful)
     assert(result.resultOption.nonEmpty)
     assertResult(expectation)(result.resultOption.get)

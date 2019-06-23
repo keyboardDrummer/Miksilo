@@ -5,6 +5,7 @@ import core.bigrammar.grammars._
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import langserver.types.Position
+import util.Utility
 
 import scala.collection.mutable
 
@@ -15,7 +16,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   with IndentationSensitiveParserWriter {
 
   type AnyWithMap = WithMap[Any]
-  type Result = StateFull[AnyWithMap]
+  type Result = AnyWithMap
   type Input = Reader
 
   object IndentationKey
@@ -43,7 +44,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     override def withIndentation(value: Int) = withState(state + (IndentationKey -> value))
   }
 
-  def valueToResult(value: Any): Result = (state: State) => (state, WithMap(value, Map.empty))
+  def valueToResult(value: Any): Result = WithMap(value, Map.empty)
 
   def toParser(grammar: BiGrammar): SingleResultParser[Any] = {
     toParserBuilder(grammar).getWholeInputParser
@@ -71,8 +72,19 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   }
 
   private def executeResult(result: Result): Any = {
-    val afterStateRun = result(Map.empty[Any, Any])
-    afterStateRun._2.value
+    result.value
+  }
+
+  def mergeNamedValues(key: Any, first: Any, second: Any): Any = {
+    key match {
+      case canMerge: CanMerge =>
+        canMerge.merge(first, second)
+      case _ => first
+    }
+  }
+
+  trait CanMerge {
+    def merge(first: Any, second: Any): Any
   }
 
   private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Self[Result], grammar: BiGrammar): Self[Result] = {
@@ -81,14 +93,9 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
         val firstParser = recursive(sequence.first)
         val secondParser = recursive(sequence.second)
         val parser = leftRightSimple(firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
-          for {
-            first <- firstResult
-            second <- secondResult
-          } yield {
-            val resultValue = sequence.bijective.construct(first.value, second.value)
-            val resultMap = first.namedValues ++ second.namedValues
-            WithMap[Any](resultValue, resultMap)
-          }
+          val resultValue = sequence.bijective.construct(firstResult.value, secondResult.value)
+          val resultMap = Utility.mergeMaps(firstResult.namedValues, secondResult.namedValues, mergeNamedValues)
+          WithMap[Any](resultValue, resultMap)
         })
         parser
       case choice: BiChoice =>
@@ -101,14 +108,14 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
       case many: core.bigrammar.grammars.Many =>
         val innerParser = recursive(many.inner)
-        val parser = innerParser.many[StateFull[WithMap[List[Any]]]](
-          StateFull.value(WithMap(List.empty[Any], Map.empty[Any, Any])),
-          (element, result) => element.flatMap(w => result.map(w2 => WithMap(w.value :: w2.value, w.namedValues ++ w2.namedValues))))
+        val parser = innerParser.many[WithMap[List[Any]]](
+          WithMap(List.empty[Any], Map.empty[Any, Any]),
+          (element, result) => WithMap(element.value :: result.value, element.namedValues ++ result.namedValues))
 
         parser
       case mapGrammar: MapGrammarWithMap =>
         val innerParser = recursive(mapGrammar.inner)
-        innerParser.map(result => result.map(mapGrammar.construct))
+        innerParser.map(mapGrammar.construct)
 
       case BiFailure(message) => Fail(None, message, History.failPenalty)
       case Print(_) => succeed(Unit).map(valueToResult)

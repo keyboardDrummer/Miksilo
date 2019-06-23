@@ -44,7 +44,6 @@ object BiGrammarToTextMate {
         case _: Identifier => Some(escapeRegex(BiGrammarToParser.identifier.regex.regex))
         case ParseWhiteSpace => Some(ParseWhiteSpace.regex.regex)
         case keyword: Keyword => Some(escapeRegex(keyword.value))
-        case withDefault: WithDefault => recurse(withDefault.inner)
         case choice: BiChoice =>
           for {
             left <- recurse(choice.left)
