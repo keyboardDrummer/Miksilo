@@ -77,7 +77,7 @@ class YamlTest extends FunSuite
     }
   }
 
-  val whiteSpace = RegexParser("""\s*""".r, "whitespace", 0)
+  val whiteSpace = RegexParser("""\s*""".r, "whitespace", score = 0)
 
   override def leftRight[Left, Right, Result](left: ParserBuilder[Left], right: => ParserBuilder[Right],
                                               combine: (Option[Left], Option[Right]) => Option[Result]) =  {
@@ -148,7 +148,7 @@ class YamlTest extends FunSuite
   lazy val parseStringLiteral: Self[YamlExpression] =
     parseStringLiteralInner.map(s => StringLiteral(s))
   lazy val parseStringLiteralInner: Self[String] =
-    regex("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
+    RegexParser("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
 
 
   lazy val plainScalar = new WithContext({

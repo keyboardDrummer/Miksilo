@@ -3,7 +3,10 @@ package deltas.javaPlus
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
+import core.bigrammar.SelectorTransformation
 import deltas.javac.JavaToByteCodeLanguage
+import deltas.javac.methods.ReturnVoidDelta
+import deltas.statement.{BlockDelta, GotoStatementDelta, StatementDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.{ClearPhases, PrettyPrint}
 import org.scalatest.FunSuite
@@ -57,7 +60,7 @@ class ReorderMembersTest extends FunSuite {
     assertResult(expectation)(state.output)
   }
 
-  test("broken comment") {
+  test("comment without trivia inside node") {
     val input =
       """class Example
         |{

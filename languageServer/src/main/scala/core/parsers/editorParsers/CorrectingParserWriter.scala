@@ -76,7 +76,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     def pop(): (LazyParseResult[Result], SortedParseResults[Result])
     def toList: List[LazyParseResult[Result]]
     def tailDepth: Int
-    def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0): SortedParseResults[Other]
+
+    def merge[Other >: Result](other: SortedParseResults[Other], depth: Int = 0,
+                               bests: Map[Input, Double] = Map.empty): SortedParseResults[Other]
 
     override def map[NewResult](f: Result => NewResult): SortedParseResults[NewResult] = {
       flatMap(lazyParseResult => singleResult(lazyParseResult.map(f)), uniform = true)
@@ -114,7 +116,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 
   object SREmpty extends SortedParseResults[Nothing] {
-    override def merge[Other >: Nothing](other: SortedParseResults[Other], depth: Int) = other
+    override def merge[Other >: Nothing](other: SortedParseResults[Other], depth: Int,
+                                         bests: Map[Input, Double] = Map.empty) = other
 
     override def mapResult[NewResult](f: LazyParseResult[Nothing] => LazyParseResult[NewResult], uniform: Boolean): SREmpty.type = this
 
@@ -143,7 +146,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     override def tailDepth = 0
 
-    override def merge[Other >: Result](other: SortedParseResults[Other], depth: Int): RecursiveResults[Other] = other match {
+    override def merge[Other >: Result](other: SortedParseResults[Other], depth: Int,
+                                        bests: Map[Input, Double] = Map.empty): RecursiveResults[Other] = other match {
       case otherRecursions: RecursiveResults[Result] =>
         val merged = this.recursions.foldLeft(otherRecursions.recursions)((acc, entry) => {
           val value = acc.get(entry._1) match {
@@ -222,17 +226,37 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       new SRCons(head.map(f), tailDepth + 1, tail.map(f))
     }
 
-    override def merge[Other >: Result](other: SortedParseResults[Other], mergeDepth: Int): SortedParseResults[Other] = {
+    /*
+    We don't want multiple results in the list with the same remainder. Instead we can just have the one with the best score.
+    To accomplish this, we use the bests parameter.
+     */
+    override def merge[Other >: Result](other: SortedParseResults[Other],
+                                        mergeDepth: Int,
+                                        bests: Map[Input, Double] = Map.empty): SortedParseResults[Other] = {
       if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
         return SREmpty
+
+      def getResult(head: LazyParseResult[Other], tailDepth: Int, getTail: Map[Input, Double] => SortedParseResults[Other]) = {
+        head match {
+          case ready: ReadyParseResult[Other] =>
+            bests.get(ready.remainder) match {
+              case Some(previousBest) if previousBest >= ready.score =>
+                getTail(bests)
+              case None =>
+                new SRCons(head, tailDepth, getTail(bests + (ready.remainder -> ready.score)))
+            }
+          case _ =>
+            new SRCons(head, tailDepth, getTail(bests))
+        }
+      }
 
       other match {
         case SREmpty => this
         case cons: SRCons[Other] =>
           if (head.score >= cons.head.score) {
-            new SRCons(head,1 + tailDepth, tail.merge(cons, mergeDepth + 1))
+            getResult(head,1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
           } else
-            new SRCons(cons.head,1 + cons.tailDepth, this.merge(cons.tail, mergeDepth + 1))
+            getResult(cons.head,1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
         case earlier => earlier.merge(this)
       }
     }
@@ -359,7 +383,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
           firstResult match {
-            case cons: SRCons[Result] if !cons.head.history.flawed => firstResult
+            case cons: SRCons[Result]
+              if !cons.head.history.flawed => firstResult
             case _ =>
               firstResult.merge(secondResult)
           }
@@ -386,6 +411,17 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         }
       }
     }
+  }
+
+  object PositionParser extends ParserBuilderBase[Input] with LeafParser[Input] {
+
+    override def getParser(recursive: GetParser): Parser[Input] = {
+      (input, _) => {
+        singleResult(ReadyParseResult(Some(input), input, History.empty))
+      }
+    }
+
+    override def getMustConsume(cache: ConsumeCache) = false
   }
 
   case class WithRangeParser[Result, NewResult](original: Self[Result], addRange: (Input, Input, Result) => NewResult)

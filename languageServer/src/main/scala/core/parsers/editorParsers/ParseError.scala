@@ -11,5 +11,5 @@ trait ParseError[Input] {
   def from: Input
   def to: Input
 
-  override def toString = message
+  override def toString = s"$message AT $from"
 }

@@ -73,15 +73,15 @@ case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
     Seq(new SelectorTransformation(key)) ++ deltas
   }
 
-  class SelectorTransformation(key: GrammarKey) extends DeltaWithGrammar {
-    override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-      if (key != null)
-        grammars.root.inner = grammars.find(key)
-    }
+}
 
-    override def dependencies: Set[Contract] = Set.empty
-
-    override def description: String = "Sets the program grammar to a specific grammar from the grammar catalogue."
+class SelectorTransformation(key: GrammarKey) extends DeltaWithGrammar {
+  override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
+    if (key != null)
+      grammars.root.inner = grammars.find(key)
   }
 
+  override def dependencies: Set[Contract] = Set.empty
+
+  override def description: String = "Sets the program grammar to a specific grammar from the grammar catalogue."
 }

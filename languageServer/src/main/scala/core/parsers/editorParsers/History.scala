@@ -22,9 +22,6 @@ object History {
   val dropMaxPenalty = dropLength1Penalty * 10
   val dropLengthShift = (dropMaxPenalty + dropLength1Penalty - 2 * dropLength2Penalty) / (dropLength2Penalty - dropLength1Penalty)
   val dropReduction: Double = (dropMaxPenalty - dropLength1Penalty) * (1 + dropLengthShift)
-
-  val endOfSourceInsertion = 2 // Inserting at the end of the file should be cheap, since it's likely that you're missing input there.
-
 }
 
 trait History[Input] {
@@ -102,7 +99,8 @@ case class Node[+Value](children: Rose[Value]*) extends Rose[Value] {
   override def map[NewValue](f: Value => NewValue) = Node(children.map(r => r.map(f)):_*)
 }
 
-case class FlawedHistory[Input](score: Double, firstError: ParseError[Input],
+case class FlawedHistory[Input](score: Double,
+                                firstError: ParseError[Input],
                                 middleErrors: Rose[ParseError[Input]],
                                 lastError: ParseError[Input])
   extends History[Input] {
