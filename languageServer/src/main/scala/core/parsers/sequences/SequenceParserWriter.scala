@@ -107,13 +107,15 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def this(from: Input, expectation: String, penalty: Double) =
       this(from, from.safeDrop(1), expectation, penalty)
 
-    override def message: String = {
+    override def message: String = s"expected '$expectation'"
+
+    override def toString: String = {
       val found = if (from.atEnd) {
         "end of source"
       } else
         from.printRange(to)
 
-      s"expected '$expectation' but found '$found'"
+      s"$message but found '$found'"
     }
 
     override def canMerge: Boolean = true
