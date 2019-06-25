@@ -70,12 +70,6 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
     assertInputGivesPartialFailureExpectation(input, List(("person", "remy")))
   }
 
-  test("object with a single member and comma") {
-    val input = """{"person":3,"""
-    val expectation = List(("person", "3"))
-    assertInputGivesPartialFailureExpectation(input, expectation)
-  }
-
   test("object with a single member and half second member") {
     val input = """{"person":3,"second""""
     val expectation = List(("person", "3"), ("second", UnknownExpression))

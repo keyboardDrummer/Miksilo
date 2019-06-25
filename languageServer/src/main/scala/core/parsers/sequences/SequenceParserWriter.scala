@@ -30,7 +30,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 
   override def many[Result, Sum](original: ParserBuilder[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
-    lazy val result: Self[Sum] = choice(leftRight(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = true)
+    lazy val result: Self[Sum] = choice(leftRight(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = false)
     result
   }
 

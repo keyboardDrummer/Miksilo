@@ -66,8 +66,8 @@ class CorrectJsonTest extends FunSuite {
 
   test("object with a single member and comma") {
     val input = """{"person":3,"""
-    val expectation = List(("person", "3"))
-    parseJson(input, expectation, 2)
+    val expectation = List("person" -> "3", "" -> UnknownExpression)
+    parseJson(input, expectation, 1)
   }
 
   test("object with a single member and half second member") {

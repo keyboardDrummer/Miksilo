@@ -8,7 +8,7 @@ object History {
 
   val successValue = 1.0
 
-  val errorMultiplier = successValue * 3
+  val errorMultiplier = successValue * 4
 
   val indentationErrorPenalty = successValue * errorMultiplier * 10
 
