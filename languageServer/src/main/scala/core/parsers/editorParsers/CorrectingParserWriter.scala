@@ -242,7 +242,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             bests.get(ready.remainder) match {
               case Some(previousBest) if previousBest >= ready.score =>
                 getTail(bests)
-              case None =>
+              case _ =>
                 new SRCons(head, tailDepth, getTail(bests + (ready.remainder -> ready.score)))
             }
           case _ =>

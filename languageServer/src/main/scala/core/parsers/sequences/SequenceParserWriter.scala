@@ -121,7 +121,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
         case next: MissingInput if next.from == from && next.to == to =>
           val max = Math.max(penalty, next.penalty)
           val min = Math.min(penalty, next.penalty)
-          val newPenalty = max + min * 0.9
+          val newPenalty = max + min * 0.5
           Some(MissingInput(from, to, expectation + " " + next.expectation, newPenalty))
         case _ => None
       }
