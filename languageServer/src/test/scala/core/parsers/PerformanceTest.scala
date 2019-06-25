@@ -79,9 +79,10 @@ class PerformanceTest extends FunSuite {
 
     val singleSource = timeB - timeA
     val sourceTimesTen = timeC - timeB
-    System.out.println(s"average singleSource: ${singleSource / repetitions}")
+    val averageSingleSource = singleSource / repetitions
+    System.out.println(s"average singleSource: $averageSingleSource")
     System.out.println(s"totalTime: ${singleSource + sourceTimesTen}")
-    assert(singleSource < repetitions * 300)
+    assert(averageSingleSource < 300)
   }
 
   test("Edited") {
@@ -96,7 +97,8 @@ class PerformanceTest extends FunSuite {
     }
     val timeB = System.currentTimeMillis()
     val elapsedTime = timeB - timeA
-    System.out.println(s"average: ${elapsedTime / repetitions}")
-    assert(elapsedTime < repetitions * 1000)
+    val average = elapsedTime / repetitions
+    System.out.println(s"edited average: $average")
+    assert(average < 1000)
   }
 }

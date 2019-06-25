@@ -30,12 +30,15 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
    */
   test("missing : <value> ,") {
     val input = """{
-                  |    "BrokenParameter""VpcId" : {
+                  |    "BrokenParameter"
+                  |    "VpcId" : {
                   |      "Type" : "AWS::EC2::VPC::Id",
                   |    }
                   |}""".stripMargin
     val diagnostics = getDiagnostic(jsonServer, input)
     assert(diagnostics.size == 1)
+    val diagnostic = diagnostics.head
+    assertResult(Position(1, 21))(diagnostic.range.start)
   }
 
   test("missing \": <value>,") {
