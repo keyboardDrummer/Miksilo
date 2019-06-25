@@ -10,7 +10,7 @@ trait MachineParserWriter extends ParserWriter {
     def parse(input: Input): ParseResult[Result]
   }
 
-  override def many[Result, Sum](original: MachineParser[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
+  def many[Result, Sum](original: MachineParser[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
     lazy val result: Self[Sum] = choice(leftRight(original, result, reduce), succeed(zero))
     result
   }
@@ -92,6 +92,12 @@ trait MachineParserWriter extends ParserWriter {
   }
 
   implicit class BasicParserExtensions[+Result](parser: Parser[Result]) {
+
+    def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum): Self[Sum] = MachineParserWriter.this.many(parser, zero, reduce)
+
+    def * : Self[List[Result]] = {
+      many(List.empty, (h: Result, t: List[Result]) => h :: t)
+    }
 
     def manySeparated(separator: Self[Any]): Self[List[Result]] = {
       leftRight(parser, (separator ~> parser).*, (h: Result, t: List[Result]) => h :: t) | succeed(List.empty[Result])

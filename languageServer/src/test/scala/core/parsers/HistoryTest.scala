@@ -9,6 +9,20 @@ import editorParsers.History
 class HistoryTest extends FunSuite with StringParserWriter {
   type Input = IndexInput
 
+  test("Dropping , is worse than missing <object member key>:<value>") {
+    val commaSpot = new IndexInput(0)
+    val afterComma = new IndexInput(1)
+    val dropHistory = History.empty.
+      addError(DropError(commaSpot, afterComma))
+
+    val missingHistory = History.empty.
+      addError(new MissingInput(afterComma, "key")).
+      addError(new MissingInput(afterComma, ":")).
+      addError(new MissingInput(afterComma, "<value>", History.insertFallbackPenalty))
+
+    assert(dropHistory.score < missingHistory.score)
+  }
+
   test("Missing ': <value> ,' is better than Missing ': {', Missing '}'") {
     val first = new IndexInput(0)
     val second = new IndexInput(1)

@@ -63,8 +63,7 @@ class PerformanceTest extends FunSuite {
     val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     val timeA = System.currentTimeMillis()
-    val baseRepetitions = 10
-    val repetitions = multiplier * baseRepetitions
+    val repetitions = 10
     for(_ <- 1.to(repetitions)) {
       val result = json.compileString(source).diagnostics
       assert(result.isEmpty)
@@ -90,15 +89,14 @@ class PerformanceTest extends FunSuite {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val timeA = System.currentTimeMillis()
 
-    val multiplier = 1
-    val baseAmount = 2
-    for(_ <- 1.to(baseAmount * multiplier)) {
+    val repetitions = 5
+    for(_ <- 1.to(repetitions)) {
       val result = json.compileString(program).diagnostics
       assert(result.nonEmpty)
     }
     val timeB = System.currentTimeMillis()
     val elapsedTime = timeB - timeA
-    System.out.println(s"average: ${elapsedTime / baseAmount}")
-    assert(elapsedTime < baseAmount * 1000)
+    System.out.println(s"average: ${elapsedTime / repetitions}")
+    assert(elapsedTime < repetitions * 1000)
   }
 }

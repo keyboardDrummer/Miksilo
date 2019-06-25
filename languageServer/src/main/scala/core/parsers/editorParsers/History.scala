@@ -8,14 +8,14 @@ object History {
 
   val successValue = 1.0
 
-  val errorMultiplier = successValue * 2
+  val errorMultiplier = successValue * 4
 
   val indentationErrorPenalty = successValue * errorMultiplier * 10
 
   val missingInputPenalty = successValue * errorMultiplier
   val insertFallbackPenalty = missingInputPenalty * 0.9
   val insertDefaultPenalty = 1
-  val failPenalty = 100
+  val failPenalty = 1000000
 
   val dropLength1Penalty = errorMultiplier * 3
   val dropLength2Penalty = dropLength1Penalty / 0.75

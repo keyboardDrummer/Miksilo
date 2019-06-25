@@ -56,7 +56,8 @@ object CloudFormationTemplate extends Delta {
           if (_properties.shape == JsonObjectLiteralDelta.Shape) {
             val properties: ObjectLiteral[NodePath] = _properties
             for (property <- properties.members) {
-              builder.resolveToType(property.key, property.node.getField(MemberKey), typeScope, propertyType)
+              if (property.key.nonEmpty)
+                builder.resolveToType(property.key, property.node.getField(MemberKey), typeScope, propertyType)
             }
           }
         })

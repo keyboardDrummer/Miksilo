@@ -224,7 +224,7 @@
         "MinSize" : "1",
         "MaxSize" : "3",
         "TargetGroupARNs" : [ { "Ref" : "ALBTargetGroup" } ],
-        "NotificationConfiguration" : {
+        "NotificationConfigurations" : {
           "TopicARN" : { "Ref" : "NotificationTopic" },
           "NotificationTypes" : [ "autoscaling:EC2_INSTANCE_LAUNCH",
                                   "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
@@ -315,7 +315,6 @@
                                           { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] } ] },
         "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
         "InstanceType" : { "Ref" : "InstanceType" },
-        "Sleutel": 3,
         "
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
              "#!/bin/bash -xe\n",

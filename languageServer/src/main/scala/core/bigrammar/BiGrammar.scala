@@ -39,6 +39,8 @@ trait BiGrammar {
     seq => seq.toSet,
     set => set.toSeq)
 
+  def setValue[T: ClassTag](value: T): BiGrammar = new MapGrammar(this, _ => value, _ => Some(Unit))
+
   def map[T, U: ClassTag](afterParsing: T => U, beforePrinting: U => T): BiGrammar =
     mapSome(afterParsing, (u: U) => Some(beforePrinting(u)))
 
