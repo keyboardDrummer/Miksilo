@@ -176,7 +176,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation] = {
     currentDocumentId = params.textDocument
-    val declarations = getCompilation.proofs.scopeGraph.declarationsPerFile(params.textDocument.uri).toSeq
+    val declarations = getCompilation.proofs.scopeGraph.declarationsPerFile.getOrElse(params.textDocument.uri, Seq.empty).toSeq
     declarations.map(declaration => SymbolInformation(declaration.name, SymbolKind.Variable, fileRangeToLocation(declaration.origin.get.fileRange.get), None))
   }
 
