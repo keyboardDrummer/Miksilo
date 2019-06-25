@@ -1,6 +1,6 @@
 package core.parsers.sequences
 
-import core.parsers.core.{ParseInput, Processor}
+import core.parsers.core.{ParseInput, ParserWriter, Processor}
 import core.parsers.editorParsers.{CorrectingParserWriter, History, ParseError}
 import langserver.types.Position
 
@@ -29,8 +29,10 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  override def many[Result, Sum](original: ParserBuilder[Result], zero: Sum, reduce: (Result, Sum) => Sum) = {
-    lazy val result: Self[Sum] = choice(leftRight(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = false)
+  def many[Result, Sum](original: ParserBuilder[Result],
+                        zero: Sum, reduce: (Result, Sum) => Sum,
+                        parseGreedy: Boolean = true) = {
+    lazy val result: Self[Sum] = choice(leftRight(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
     result
   }
 
@@ -216,6 +218,13 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 
   implicit class SequenceParserExtensions[Result](parser: Self[Result]) extends ParserExtensions(parser) {
+
+    def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum,
+                  parseGreedy: Boolean = true): Self[Sum] = SequenceParserWriter.this.many(parser, zero, reduce, parseGreedy)
+
+    def * : Self[List[Result]] = {
+      many(List.empty, (h: Result, t: List[Result]) => h :: t)
+    }
 
     def ~[Right](right: => Self[Right]): Self[(Result, Right)] = leftRightSimple(parser, right, (a: Result, b: Right) => (a,b))
 

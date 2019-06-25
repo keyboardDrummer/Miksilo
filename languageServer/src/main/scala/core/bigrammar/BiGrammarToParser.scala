@@ -110,7 +110,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
         val innerParser = recursive(many.inner)
         val parser = innerParser.many[WithMap[List[Any]]](
           WithMap(List.empty[Any], Map.empty[Any, Any]),
-          (element, result) => WithMap(element.value :: result.value, element.namedValues ++ result.namedValues))
+          (element, result) => WithMap(element.value :: result.value, element.namedValues ++ result.namedValues), many.parseGreedy)
 
         parser
       case mapGrammar: MapGrammarWithMap =>
