@@ -80,7 +80,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     override def message = {
       val found = from.printRange(to)
-      s"Skipped '$found'"
+      s"Did not expect '$found'"
     }
 
     override def canMerge = true
