@@ -30,7 +30,7 @@ class YamlTest extends FunSuite {
     """.stripMargin
   lazy val twoMemberObjectCompilation = language.compile(twoMemberObject)
 
-  ignore("two member object with no first value") {
+  test("two member object with no first value") {
     val program =
       """Missing:
         |Key: Value
@@ -47,7 +47,7 @@ class YamlTest extends FunSuite {
     assert(compilation.diagnostics.size == 1)
   }
 
-  ignore("two member object with no first value and colon") {
+  test("two member object with no first value and colon") {
     val program =
       """Missing
         |Key: Value
@@ -56,7 +56,7 @@ class YamlTest extends FunSuite {
     replaceDefaultWithDefaultString(compilation)
 
     assertResult(twoMemberObjectCompilation.program)(compilation.program)
-    assert(compilation.diagnostics.size == 2)
+    assert(compilation.diagnostics.size == 1)
   }
 
 
@@ -68,7 +68,8 @@ class YamlTest extends FunSuite {
       |  HasValue2: Value2
     """.stripMargin
   lazy val twoObjectsSingleMemberEachCompilation = language.compile(twoObjectsSingleMemberEach)
-  ignore("complicated middle errors") {
+
+  test("complicated middle errors") {
     val program =
       """Parent1:
         |  HasValue: Value Value Value
@@ -80,7 +81,7 @@ class YamlTest extends FunSuite {
 
     replaceDefaultWithDefaultString(compilation)
     assertResult(twoObjectsSingleMemberEachCompilation.program)(compilation.program)
-    assert(compilation.diagnostics.size == 2)
+    assert(compilation.diagnostics.size == 1)
   }
 
   private def replaceDefaultWithDefaultString(compilation: Compilation): Unit = {

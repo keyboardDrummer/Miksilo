@@ -33,9 +33,10 @@ object PlainScalarDelta extends DeltaWithGrammar {
 
     val plainStyleSingleLineString: BiGrammar = nsPlainSafe
     val plainStyleMultiLineString: BiGrammar = {
-      val firstLine = new BiSequence(nsPlainSafe, _grammars.trivia, BiSequence.ignoreRight, false)
-      new BiSequence(firstLine,
-        CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(CheckIndentationGrammar.equal(nsPlainSafe).someSeparated("\n"))),
+      val lineSeparator = new BiSequence("\n", _grammars.trivia, BiSequence.ignoreLeft, true)
+      val firstLine = new BiSequence(nsPlainSafe, lineSeparator, BiSequence.ignoreRight, false)
+      val followingLine = CheckIndentationGrammar.equal(nsPlainSafe)
+      new BiSequence(firstLine, CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(followingLine.someSeparated(lineSeparator))),
         SequenceBijective((firstLine: Any, rest: Any) => {
           firstLine.asInstanceOf[String] + rest.asInstanceOf[List[String]].fold("")((a, b) => a + " " + b)
         }, (value: Any) => Some(value, List.empty)), false)
