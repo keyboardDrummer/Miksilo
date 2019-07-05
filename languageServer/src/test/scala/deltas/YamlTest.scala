@@ -84,6 +84,20 @@ class YamlTest extends FunSuite {
     assert(compilation.diagnostics.size == 1)
   }
 
+  test("Broken in the middle") {
+    val program =
+      """Parameters:
+        |  KeyName: EC2
+        |  MemberWithOnlyKeyAndColon:
+        |Resources:
+        |  MemberWithOnlyKey
+        |  LaunchConfig:
+        |    Type: AWS
+      """.stripMargin
+    val compilation = language.compile(program)
+    assert(compilation.diagnostics.size == 2)
+  }
+
   private def replaceDefaultWithDefaultString(compilation: Compilation): Unit = {
     PathRoot(compilation.program).visitShape(ExpressionDelta.DefaultShape,
       p => p.asInstanceOf[ChildPath].replaceWith(JsonStringLiteralDelta.neww("default")))

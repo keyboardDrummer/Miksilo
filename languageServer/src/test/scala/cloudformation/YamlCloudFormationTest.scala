@@ -19,7 +19,7 @@ class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
   test("Edited") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.yaml")
     val result = getDiagnostic(yamlServer, program)
-    assertResult(1)(result.size)
+    assertResult(2)(result.size)
   }
 
   test("Goto definition resource reference") {
@@ -74,10 +74,8 @@ class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
         |    Properties:
         |      KeyName: !Ref 'KeyName'
       """.stripMargin
-    val diagnostics = getDiagnostic(yamlServer, program)
-    val result: Seq[Location] = gotoDefinition(yamlServer, program, new HumanPosition(8, 24))
+    val result: Seq[Location] = gotoDefinition(yamlServer, program, new HumanPosition(9, 24))
     val expectation = Seq(Location(itemUri, Range(new HumanPosition(2, 3), new HumanPosition(2, 10))))
-    // TODO add extra assertion that check whether MemberWithOnlyKey was not deleted (it now is)
     assertResult(expectation)(result)
   }
 }
