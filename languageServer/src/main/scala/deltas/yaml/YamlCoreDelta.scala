@@ -88,6 +88,6 @@ object YamlCoreDelta extends DeltaWithGrammar {
 
   override def description = "Adds the YAML language"
 
-  override def dependencies = Set(ExpressionDelta)
+  override def dependencies = Set(ArrayLiteralDelta, ExpressionDelta)
 
 }

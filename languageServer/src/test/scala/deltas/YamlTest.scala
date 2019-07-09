@@ -1,11 +1,12 @@
 
 package deltas
 
+import core.bigrammar.SelectGrammar
 import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
-import deltas.expression.ExpressionDelta
+import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
-import deltas.yaml.YamlLanguage
+import deltas.yaml.{PlainScalarDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 
@@ -124,6 +125,31 @@ class YamlTest extends FunSuite {
 
     val compilation = language.compile(input)
     assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("plain scalar") {
+    val contents =
+      """Blaa
+        |Comment
+      """.stripMargin
+
+    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(ExpressionDelta.FirstPrecedenceGrammar),
+      PlainScalarDelta, ExpressionDelta))
+    val compilation = language.compile(contents)
+    assert(compilation.diagnostics.size == 1)
+  }
+
+  test("plain scalar 2") {
+    val contents =
+      """Metadata:
+        |  Blaa
+        |  Comment
+      """.stripMargin
+
+    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.IndentationSensitiveExpression),
+      YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
+    val compilation = language.compile(contents)
+    assert(compilation.diagnostics.size == 1)
   }
 
   test("big yaml file") {

@@ -3,7 +3,7 @@ package deltas.javaPlus
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
-import core.bigrammar.SelectorTransformation
+import core.bigrammar.SelectGrammar
 import deltas.javac.JavaToByteCodeLanguage
 import deltas.javac.methods.ReturnVoidDelta
 import deltas.statement.{BlockDelta, GotoStatementDelta, StatementDelta}

@@ -38,10 +38,12 @@ object PlainScalarDelta extends DeltaWithGrammar {
       val lineSeparator = new BiSequence("\n", _grammars.trivia, BiSequence.ignoreLeft, true)
       val firstLine = new BiSequence(nsPlainSafe, lineSeparator, BiSequence.ignoreRight, false)
       val followingLine = CheckIndentationGrammar.equal(nsPlainSafe)
-      new BiSequence(firstLine, CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(followingLine.someSeparated(lineSeparator))),
+      val otherLines = CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(followingLine.someSeparated(lineSeparator)))
+
+      new WithIndentationGrammar(new BiSequence(firstLine, otherLines,
         SequenceBijective((firstLine: Any, rest: Any) => {
           firstLine.asInstanceOf[String] + rest.asInstanceOf[List[String]].fold("")((a, b) => a + " " + b)
-        }, (value: Any) => Some(value, List.empty)), false)
+        }, (value: Any) => Some(value, List.empty)), false))
     }
 
     val plainScalar: BiGrammar = new WithContext({
