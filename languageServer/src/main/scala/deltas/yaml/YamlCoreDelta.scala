@@ -63,6 +63,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
   }
 
   object IndentationSensitiveExpression extends GrammarKey
+  object BlockValue extends GrammarKey
 
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     val grammars = _grammars
@@ -77,8 +78,9 @@ object YamlCoreDelta extends DeltaWithGrammar {
     val taggedFlowValue = tag ~ flowValue.as(TagNode) asLabelledNode TaggedNode
     flowValue.addAlternative(taggedFlowValue)
 
-    val blockValue = create(IndentationSensitiveExpression, flowValue)
-    blockValue.addAlternative(tag ~ CheckIndentationGrammar.greaterThan(blockValue.as(TagNode)) asLabelledNode TaggedNode)
+    val indentationSensitive = create(IndentationSensitiveExpression)
+    val indentationTag = tag ~ CheckIndentationGrammar.greaterThan(indentationSensitive.as(TagNode)) asLabelledNode TaggedNode
+    val blockValue = create(BlockValue, flowValue | indentationSensitive | indentationTag)
 
     val originalBracketArray = find(ArrayLiteralDelta.Shape).inner
     find(ArrayLiteralDelta.Shape).inner = new WithContext(_ => FlowIn, originalBracketArray)

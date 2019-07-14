@@ -367,8 +367,8 @@ Resources:
   LaunchConfig:
     Type: AWS::AutoScaling::LaunchConfiguration
     Metadata:
-      Blaa
       Comment: Install a simple application
+      Blaa
       AWS::CloudFormation::Init:
         config:
           packages:

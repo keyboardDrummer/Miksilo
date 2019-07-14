@@ -146,10 +146,24 @@ class YamlTest extends FunSuite {
         |  Comment
       """.stripMargin
 
-    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.IndentationSensitiveExpression),
+    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
       YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
     val compilation = language.compile(contents)
     assert(compilation.diagnostics.size == 1)
+  }
+
+  test("composite") {
+    val contents =
+      """Metadata:
+        |  Comment: Install a simple application
+        |  Blaa
+        |  AWS: Bar
+      """.stripMargin
+
+    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
+      YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
+    val compilation = language.compile(contents)
+    assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains(": <value>"))
   }
 
   test("big yaml file") {

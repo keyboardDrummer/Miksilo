@@ -42,7 +42,7 @@ object PlainScalarDelta extends DeltaWithGrammar {
 
       new WithIndentationGrammar(new BiSequence(firstLine, otherLines,
         SequenceBijective((firstLine: Any, rest: Any) => {
-          firstLine.asInstanceOf[String] + rest.asInstanceOf[List[String]].fold("")((a, b) => a + " " + b)
+           rest.asInstanceOf[List[String]].fold(firstLine.asInstanceOf[String])((a, b) => a + " " + b)
         }, (value: Any) => Some(value, List.empty)), false))
     }
 

@@ -22,6 +22,12 @@ class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
     assertResult(2)(result.size)
   }
 
+  test("Edited 2") {
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited2.yaml")
+    val result = getDiagnostic(yamlServer, program)
+    assertResult(1)(result.size)
+  }
+
   test("Goto definition resource reference") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result: Seq[Location] = gotoDefinition(yamlServer, program, new HumanPosition(467, 32))
