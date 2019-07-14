@@ -143,8 +143,7 @@ class YamlTest extends FunSuite {
     val contents =
       """Metadata:
         |  Blaa
-        |  Comment
-      """.stripMargin
+        |  Comment""".stripMargin
 
     val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
       YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
@@ -157,8 +156,7 @@ class YamlTest extends FunSuite {
       """Metadata:
         |  Comment: Install a simple application
         |  Blaa
-        |  AWS: Bar
-      """.stripMargin
+        |  AWS: Bar""".stripMargin
 
     val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
       YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
