@@ -63,31 +63,33 @@ object YamlCoreDelta extends DeltaWithGrammar {
   }
 
   object IndentationSensitiveExpression extends GrammarKey
+  object BlockValue extends GrammarKey
 
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     val grammars = _grammars
     import _grammars._
-    val tag: BiGrammar = JsonStringLiteralDelta.dropPrefix(grammars,
-      grammars.regexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name"),
-      TagName, "!") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
-    val blockValue = create(IndentationSensitiveExpression)
-    blockValue.addAlternative(tag ~ blockValue.as(TagNode) asLabelledNode TaggedNode)
+    //Should be 	ns-uri-char - “!” - c-flow-indicator
+    val tag: BiGrammar = JsonStringLiteralDelta.dropPrefix(grammars,
+        RegexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name",
+          defaultValue = Some("!")), TagName, "!")
 
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
     val taggedFlowValue = tag ~ flowValue.as(TagNode) asLabelledNode TaggedNode
     flowValue.addAlternative(taggedFlowValue)
 
+    val indentationSensitive = create(IndentationSensitiveExpression)
+    val indentationTag = tag ~ CheckIndentationGrammar.greaterThan(indentationSensitive.as(TagNode)) asLabelledNode TaggedNode
+    val blockValue = create(BlockValue, flowValue | indentationSensitive | indentationTag)
+
     val originalBracketArray = find(ArrayLiteralDelta.Shape).inner
     find(ArrayLiteralDelta.Shape).inner = new WithContext(_ => FlowIn, originalBracketArray)
-
-    blockValue.addAlternative(flowValue)
 
     grammars.bodyGrammar.inner = blockValue
   }
 
   override def description = "Adds the YAML language"
 
-  override def dependencies = Set(ExpressionDelta)
+  override def dependencies = Set(ArrayLiteralDelta, ExpressionDelta)
 
 }

@@ -26,12 +26,12 @@ class HistoryTest extends FunSuite with StringParserWriter {
   test("Missing ': <value> ,' is better than Missing ': {', Missing '}'") {
     val first = new IndexInput(0)
     val second = new IndexInput(1)
-    val noBracesInserted = SpotlessHistory().
+    val noBracesInserted = History.empty.
       addError(new MissingInput(first, ":")).
       addError(new MissingInput(first, "<value>", History.insertFallbackPenalty)).
       addError(new MissingInput(first, ","))
 
-    val insertedBraces = SpotlessHistory().
+    val insertedBraces = History.empty.
       addError(new MissingInput(first, ":")).
       addError(new MissingInput(first, "{")).
       addError(new MissingInput(second, "}"))
@@ -40,17 +40,17 @@ class HistoryTest extends FunSuite with StringParserWriter {
   }
 
   test("two consecutive drops combine and become cheaper") {
-    val splitDrops = SpotlessHistory().
+    val splitDrops = History.empty.
       addError(DropError(new IndexInput(0),new IndexInput(1))).
       addSuccess(History.successValue).
       addError(DropError(new IndexInput(2),new IndexInput(3)))
 
-    val dropsLeft = SpotlessHistory().
+    val dropsLeft = History.empty.
       addError(DropError(new IndexInput(0),new IndexInput(1))).
       addError(DropError(new IndexInput(1),new IndexInput(2))).
       addSuccess(History.successValue)
 
-    val dropsRight = SpotlessHistory().
+    val dropsRight = History.empty.
       addSuccess(History.successValue).
       addError(DropError(new IndexInput(1),new IndexInput(2))).
       addError(DropError(new IndexInput(2),new IndexInput(3)))
@@ -64,8 +64,8 @@ class HistoryTest extends FunSuite with StringParserWriter {
     val middle = new IndexInput(50)
     val middlePlusOne = new IndexInput(51)
     val end = new IndexInput(100)
-    val withoutSuccess = SpotlessHistory().addError(DropError(start, end))
-    val withSuccess = SpotlessHistory().
+    val withoutSuccess = History.empty.addError(DropError(start, end))
+    val withSuccess = History.empty.
       addError(DropError(start, middle)).
       addSuccess(History.successValue).
       addError(DropError(middlePlusOne, end))
@@ -77,8 +77,8 @@ class HistoryTest extends FunSuite with StringParserWriter {
     val start = new IndexInput(0)
     val middle = new IndexInput(1)
     val end = new IndexInput(2)
-    val withoutSuccess = SpotlessHistory().addError(DropError(start, end))
-    val withSuccess = SpotlessHistory().
+    val withoutSuccess = History.empty.addError(DropError(start, end))
+    val withSuccess = History.empty.
       addError(DropError(start, middle)).
       addSuccess(History.successValue).
       addError(DropError(middle, end))
@@ -90,8 +90,8 @@ class HistoryTest extends FunSuite with StringParserWriter {
     val start = new IndexInput(0)
     val far = new IndexInput(40)
     var further = new IndexInput(far.offset + 1)
-    val farWithoutSuccess = SpotlessHistory().addError(DropError(start, far))
-    val furtherWithoutSuccess = SpotlessHistory().addError(DropError(start, further))
+    val farWithoutSuccess = History.empty.addError(DropError(start, far))
+    val furtherWithoutSuccess = History.empty.addError(DropError(start, further))
     val furtherWithSuccess = furtherWithoutSuccess.addSuccess(History.successValue)
     assert(farWithoutSuccess.score > furtherWithoutSuccess.score)
     assert(farWithoutSuccess.score < furtherWithSuccess.score)

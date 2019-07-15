@@ -22,8 +22,10 @@ object PlainScalarDelta extends DeltaWithGrammar {
     val nonPlainFirstChars = (nonSpaceChars + indicatorChars).filter(c => !allowedInFirst.contains(c))
     val plainSafeOutChars = s"""$nonBreakChars#'"""
     val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
-    val doubleColonPlainSafeIn = grammars.regexGrammar(s"""[^$nonPlainFirstChars]([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r, "plain scalar")
-    val doubleColonPlainSafeOut = grammars.regexGrammar(s"""[^$nonPlainFirstChars]([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r, "plain scalar")
+    val doubleColonPlainSafeIn = RegexGrammar(s"""[^$nonPlainFirstChars]([^$plainSafeInChars:]|:[^$plainSafeInChars ])*""".r,
+      "plain scalar", defaultValue = Some(""))
+    val doubleColonPlainSafeOut = RegexGrammar(s"""[^$nonPlainFirstChars]([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])*""".r,
+      "plain scalar", defaultValue = Some(""))
 
     val nsPlainSafe: BiGrammar = new IfContext(Map(
       FlowIn -> doubleColonPlainSafeIn,
@@ -33,12 +35,15 @@ object PlainScalarDelta extends DeltaWithGrammar {
 
     val plainStyleSingleLineString: BiGrammar = nsPlainSafe
     val plainStyleMultiLineString: BiGrammar = {
-      val firstLine = new BiSequence(nsPlainSafe, _grammars.trivia, BiSequence.ignoreRight, false)
-      new BiSequence(firstLine,
-        CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(CheckIndentationGrammar.equal(nsPlainSafe).someSeparated("\n"))),
+      val lineSeparator = new BiSequence("\n", _grammars.trivia, BiSequence.ignoreLeft, true)
+      val firstLine = new BiSequence(nsPlainSafe, lineSeparator, BiSequence.ignoreRight, false)
+      val followingLine = CheckIndentationGrammar.equal(nsPlainSafe)
+      val otherLines = CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(followingLine.someSeparated(lineSeparator)))
+
+      new WithIndentationGrammar(new BiSequence(firstLine, otherLines,
         SequenceBijective((firstLine: Any, rest: Any) => {
-          firstLine.asInstanceOf[String] + rest.asInstanceOf[List[String]].fold("")((a, b) => a + " " + b)
-        }, (value: Any) => Some(value, List.empty)), false)
+           rest.asInstanceOf[List[String]].fold(firstLine.asInstanceOf[String])((a, b) => a + " " + b)
+        }, (value: Any) => Some(value, List.empty)), false))
     }
 
     val plainScalar: BiGrammar = new WithContext({

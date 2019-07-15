@@ -95,7 +95,7 @@ trait StringParserWriter extends SequenceParserWriter {
             index += 1
           }
           val remainder = input.drop(value.length)
-          singleResult(ReadyParseResult(Some(value), remainder, History.empty[Input].addSuccess(input, remainder, value)))
+          singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value)))
         }
       }
       result

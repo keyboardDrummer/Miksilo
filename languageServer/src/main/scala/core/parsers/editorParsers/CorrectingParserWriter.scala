@@ -447,7 +447,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 
   def newSuccess[Result](result: Result, remainder: Input, score: Double): SRCons[Result] =
-    singleResult(ReadyParseResult(Some(result), remainder, SpotlessHistory().addSuccess(remainder, remainder, result, score)))
+    singleResult(ReadyParseResult(Some(result), remainder, History.success(remainder, remainder, result, score)))
 
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {
 

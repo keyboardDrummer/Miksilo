@@ -16,7 +16,7 @@ object YamlObjectDelta extends DeltaWithGrammar {
     val _grammars = grammars
     import grammars._
 
-    val blockValue = find(YamlCoreDelta.IndentationSensitiveExpression)
+    val blockValue = find(YamlCoreDelta.BlockValue)
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
 
     lazy val blockMap: BiGrammar = {
@@ -25,7 +25,7 @@ object YamlObjectDelta extends DeltaWithGrammar {
 
       aligned(_grammars, member).as(Members).asLabelledNode(Shape)
     }
-    blockValue.addAlternative(blockMap)
+    find(YamlCoreDelta.IndentationSensitiveExpression).addAlternative(blockMap)
   }
 
   override def description = "Adds the indentation sensitive literal object"

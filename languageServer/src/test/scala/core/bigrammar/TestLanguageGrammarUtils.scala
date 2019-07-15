@@ -70,12 +70,12 @@ case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
   }
 
   def getDeltas(key: GrammarKey): Seq[Delta] = {
-    Seq(new SelectorTransformation(key)) ++ deltas
+    Seq(new SelectGrammar(key)) ++ deltas
   }
 
 }
 
-class SelectorTransformation(key: GrammarKey) extends DeltaWithGrammar {
+class SelectGrammar(key: GrammarKey) extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     if (key != null)
       grammars.root.inner = grammars.find(key)

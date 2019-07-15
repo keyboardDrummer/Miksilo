@@ -16,6 +16,18 @@ class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
     assert(result.isEmpty)
   }
 
+  test("Edited") {
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.yaml")
+    val result = getDiagnostic(yamlServer, program)
+    assertResult(2)(result.size)
+  }
+
+  test("Edited 2") {
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited2.yaml")
+    val result = getDiagnostic(yamlServer, program)
+    assertResult(1)(result.size)
+  }
+
   test("Goto definition resource reference") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result: Seq[Location] = gotoDefinition(yamlServer, program, new HumanPosition(467, 32))
@@ -60,16 +72,16 @@ class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
     val program =
       """Parameters:
         |  KeyName: The EC2 Key Pair to allow SSH access to the instances
-        |  MemberWithOnlyKey:
+        |  MemberWithOnlyKeyAndColon:
         |Resources:
+        |  MemberWithOnlyKey
         |  LaunchConfig:
         |    Type: AWS::AutoScaling::LaunchConfiguration
         |    Properties:
         |      KeyName: !Ref 'KeyName'
       """.stripMargin
-    val result: Seq[Location] = gotoDefinition(yamlServer, program, new HumanPosition(8, 24))
+    val result: Seq[Location] = gotoDefinition(yamlServer, program, new HumanPosition(9, 24))
     val expectation = Seq(Location(itemUri, Range(new HumanPosition(2, 3), new HumanPosition(2, 10))))
-    // TODO add extra assertion that check whether MemberWithOnlyKey was not deleted (it now is)
     assertResult(expectation)(result)
   }
 }

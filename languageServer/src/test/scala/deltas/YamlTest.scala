@@ -1,11 +1,12 @@
 
 package deltas
 
+import core.bigrammar.SelectGrammar
 import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
-import deltas.expression.ExpressionDelta
+import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
-import deltas.yaml.YamlLanguage
+import deltas.yaml.{PlainScalarDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 
@@ -30,7 +31,7 @@ class YamlTest extends FunSuite {
     """.stripMargin
   lazy val twoMemberObjectCompilation = language.compile(twoMemberObject)
 
-  ignore("two member object with no first value") {
+  test("two member object with no first value") {
     val program =
       """Missing:
         |Key: Value
@@ -47,7 +48,7 @@ class YamlTest extends FunSuite {
     assert(compilation.diagnostics.size == 1)
   }
 
-  ignore("two member object with no first value and colon") {
+  test("two member object with no first value and colon") {
     val program =
       """Missing
         |Key: Value
@@ -56,7 +57,7 @@ class YamlTest extends FunSuite {
     replaceDefaultWithDefaultString(compilation)
 
     assertResult(twoMemberObjectCompilation.program)(compilation.program)
-    assert(compilation.diagnostics.size == 2)
+    assert(compilation.diagnostics.size == 1)
   }
 
 
@@ -68,7 +69,8 @@ class YamlTest extends FunSuite {
       |  HasValue2: Value2
     """.stripMargin
   lazy val twoObjectsSingleMemberEachCompilation = language.compile(twoObjectsSingleMemberEach)
-  ignore("complicated middle errors") {
+
+  test("complicated middle errors") {
     val program =
       """Parent1:
         |  HasValue: Value Value Value
@@ -80,6 +82,20 @@ class YamlTest extends FunSuite {
 
     replaceDefaultWithDefaultString(compilation)
     assertResult(twoObjectsSingleMemberEachCompilation.program)(compilation.program)
+    assert(compilation.diagnostics.size == 1)
+  }
+
+  test("Broken in the middle") {
+    val program =
+      """Parameters:
+        |  KeyName: EC2
+        |  MemberWithOnlyKeyAndColon:
+        |Resources:
+        |  MemberWithOnlyKey
+        |  LaunchConfig:
+        |    Type: AWS
+      """.stripMargin
+    val compilation = language.compile(program)
     assert(compilation.diagnostics.size == 2)
   }
 
@@ -109,6 +125,43 @@ class YamlTest extends FunSuite {
 
     val compilation = language.compile(input)
     assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("plain scalar") {
+    val contents =
+      """Blaa
+        |Comment
+      """.stripMargin
+
+    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(ExpressionDelta.FirstPrecedenceGrammar),
+      PlainScalarDelta, ExpressionDelta))
+    val compilation = language.compile(contents)
+    assert(compilation.diagnostics.size == 1)
+  }
+
+  test("plain scalar 2") {
+    val contents =
+      """Metadata:
+        |  Blaa
+        |  Comment""".stripMargin
+
+    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
+      YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
+    val compilation = language.compile(contents)
+    assert(compilation.diagnostics.size == 1)
+  }
+
+  test("composite") {
+    val contents =
+      """Metadata:
+        |  Comment: Install a simple application
+        |  Blaa
+        |  AWS: Bar""".stripMargin
+
+    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
+      YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
+    val compilation = language.compile(contents)
+    assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains(": <value>"))
   }
 
   test("big yaml file") {
