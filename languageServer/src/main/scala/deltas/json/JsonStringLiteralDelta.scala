@@ -11,7 +11,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import langserver.types.Position
+import languageServer.Position
 
 import scala.util.matching.Regex
 

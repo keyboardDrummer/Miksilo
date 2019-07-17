@@ -34,8 +34,7 @@ class YamlTest extends FunSuite {
   test("two member object with no first value") {
     val program =
       """Missing:
-        |Key: Value
-      """.stripMargin
+        |Key: Value""".stripMargin
     val compilation = language.compile(program)
     replaceDefaultWithDefaultString(compilation)
 

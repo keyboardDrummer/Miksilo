@@ -2,7 +2,7 @@ package core.language.node
 
 import core.deltas.path.NodePath
 import core.language.node.Node._
-import langserver.types.Position
+import languageServer.Position
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing

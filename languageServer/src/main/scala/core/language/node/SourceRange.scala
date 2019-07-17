@@ -1,11 +1,12 @@
 package core.language.node
 
 import core.language.node.Node.PositionOrdering
-import langserver.types.Position
+import languageServer.Position
+import languageServer.Range
 
 object SourceRange {
-  implicit def toRange(sourceRange: SourceRange): langserver.types.Range = {
-    langserver.types.Range(sourceRange.start, sourceRange.end)
+  implicit def toRange(sourceRange: SourceRange): Range = {
+    Range(sourceRange.start, sourceRange.end)
   }
 }
 

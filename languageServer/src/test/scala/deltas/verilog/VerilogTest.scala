@@ -6,7 +6,7 @@ import deltas.{ClearPhases, FileWithMembersDelta}
 import deltas.expression.{IntLiteralDelta, VariableDelta}
 import deltas.expression.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
-import langserver.types.{Location, Range, TextDocumentIdentifier}
+import languageServer.{Location, Range, TextDocumentIdentifier}
 import languageServer.lsp.DocumentPosition
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite

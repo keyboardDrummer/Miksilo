@@ -7,7 +7,6 @@ import core.language.node.{FilePosition, FileRange, NodeLike, SourceRange}
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
-import langserver.types._
 import languageServer.lsp._
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
@@ -16,6 +15,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with CompletionProvider
   with DocumentSymbolProvider
   with RenameProvider
+  with CodeActionProvider
   with LazyLogging {
 
   var client: LanguageClient = _
@@ -167,7 +167,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   private def toLspRange(range: SourceRange): Range = {
-    new langserver.types.Range(range.start, range.end)
+    new Range(range.start, range.end)
   }
 
   override def setClient(client: LanguageClient): Unit = {
@@ -187,5 +187,14 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     WorkspaceEdit(locations.groupBy(l => l.uri).map(t => {
       (t._1, t._2.map(r => TextEdit(r.range, params.newName)))
     }))
+  }
+
+  override def getCodeActions(parameters: CodeActionParams): Seq[CodeAction] = {
+    currentDocumentId = parameters.textDocument
+
+    val diagnostics = parameters.context.diagnostics.map(d => d.identifier).toSet
+    val compilation = getCompilation
+    compilation.fixesPerDiagnostics.
+      filter(entry => diagnostics.contains(entry._1)).flatMap(entry => entry._2).toSeq
   }
 }

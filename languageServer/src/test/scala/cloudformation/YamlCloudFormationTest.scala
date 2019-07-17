@@ -1,8 +1,7 @@
 package cloudformation
 
 import deltas.cloudformation.CloudFormationLanguage
-import langserver.types.{TextEdit, _}
-import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
+import languageServer._
 import org.scalatest.FunSuite
 import util.SourceUtils
 

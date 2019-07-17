@@ -41,7 +41,7 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
         compilation.stopped = true
       }
       compilation.diagnostics ++= compilation.remainingConstraints.flatMap(
-        constraint => constraint.getDiagnostic.toSeq)
+        constraint => constraint.getDiagnostic)
     })
   }
 

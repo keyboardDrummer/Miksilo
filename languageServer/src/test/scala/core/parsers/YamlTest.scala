@@ -8,7 +8,7 @@ import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWrite
 import core.responsiveDocument.ResponsiveDocument
 import org.scalatest.FunSuite
 import util.SourceUtils
-import langserver.types.Position
+import languageServer.Position
 
 trait YamlExpression {
   def toDocument: ResponsiveDocument

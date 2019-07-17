@@ -2,7 +2,7 @@ package deltas.javac.expressions
 
 import core.language.node.SourceRange
 import deltas.javac.JavaToByteCodeLanguage
-import langserver.types.Diagnostic
+import languageServer.Diagnostic
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.SourceUtils

@@ -2,7 +2,7 @@ package deltas.javac.expressions
 
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
-import langserver.types.{Location, Range}
+import languageServer.{Location, Range}
 import languageServer.{HumanPosition, LanguageServerTest}
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}

@@ -4,8 +4,8 @@ import java.awt.event
 
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JMenuItem, JPopupMenu}
-import langserver.types
-import langserver.types.{Position, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
+import languageServer._
+import languageServer.{Position, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 import languageServer.{LanguageServer, MiksiloLanguageServer}
 import languageServer.lsp._
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea}
@@ -54,7 +54,7 @@ class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(docum
       def changeAll(e: DocumentEvent): Unit = {
         val text = e.getDocument.getText(0, e.getDocument.getLength)
         server.didChange(DidChangeTextDocumentParams(documentId,
-          Seq(types.TextDocumentContentChangeEvent(None, None, text))))
+          Seq(TextDocumentContentChangeEvent(None, None, text))))
       }
       override def removeUpdate(e: DocumentEvent): Unit = changeAll(e)
 

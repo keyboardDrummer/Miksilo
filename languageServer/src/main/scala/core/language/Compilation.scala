@@ -3,7 +3,7 @@ package core.language
 import core.deltas.path.PathRoot
 import core.language.node.Node
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
-import langserver.types.Diagnostic
+import languageServer.{CodeAction, Diagnostic}
 
 import scala.collection.mutable
 import scala.tools.nsc.interpreter.InputStream
@@ -13,7 +13,16 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
   def root: PathRoot = PathRoot(program)
   var proofs: Proofs = _
   var remainingConstraints: Seq[Constraint] = _
-  var diagnostics: List[FileDiagnostic] = List.empty
+  var diagnostics: Set[FileDiagnostic] = Set.empty
+  var fixesPerDiagnostics: Map[Diagnostic, Seq[CodeAction]] = Map.empty
+
+  def addDiagnosticsWithFixes(addition: Map[FileDiagnostic, Seq[CodeAction]]): Unit = {
+    diagnostics ++= addition.keys
+    fixesPerDiagnostics ++= addition.map(e => {
+      val diagnostic = e._1.diagnostic
+      (diagnostic.identifier, e._2)
+    })
+  }
 
   var output: String = _
   val state: mutable.Map[Any,Any] = mutable.Map.empty
@@ -30,7 +39,7 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
   def diagnosticsForFile(uri: String): Seq[Diagnostic] = {
     diagnostics.
       filter(p => p.uri == uri).
-      map(d => d.diagnostic)
+      map(d => d.diagnostic).toSeq
   }
 }
 

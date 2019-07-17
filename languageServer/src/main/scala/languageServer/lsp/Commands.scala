@@ -1,9 +1,7 @@
 package languageServer.lsp
 
-import com.dhpcs.jsonrpc._
-import langserver.messages.{DefinitionResult, TextDocumentSyncKind}
-import langserver.types._
-import langserver.utils.JsonRpcUtils
+import com.dhpcs.jsonrpc.{CommandCompanion, Message}
+import languageServer._
 import play.api.libs.json._
 
 sealed trait Message
@@ -226,4 +224,6 @@ object FileChangeType {
 }
 
 case class DocumentSymbolResult(params: Seq[SymbolInformation]) extends ResultResponse
+
+
 

@@ -82,8 +82,10 @@ function activateLanguage(jar: string, language: LanguageConfiguration): Disposa
 		}
 	}
 	
-	return new LanguageClient(
+	const languageClient = new LanguageClient(
 		'miksilo' + language.vscodeName, 
 		language.vscodeName + " Miksilo", 
-		serverOptions, clientOptions).start();
+		serverOptions, clientOptions);
+		
+	return languageClient.start();
 }

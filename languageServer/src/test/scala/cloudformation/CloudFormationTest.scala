@@ -2,7 +2,7 @@ package cloudformation
 
 import core.bigrammar.TestLanguageGrammarUtils
 import deltas.cloudformation.CloudFormationLanguage
-import langserver.types._
+import languageServer._
 import languageServer.lsp._
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
@@ -18,7 +18,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
     assert(result.size == 1)
   }
 
-  test("No diagnostics edited") {
+  test("Diagnostics edited") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val result = getDiagnostic(jsonServer, program)
     assert(result.size == 2)

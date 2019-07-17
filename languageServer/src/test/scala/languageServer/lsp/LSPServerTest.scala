@@ -2,7 +2,6 @@ package languageServer.lsp
 
 import java.io.ByteArrayOutputStream
 
-import langserver.types._
 import languageServer._
 import org.scalatest.{Assertion, AsyncFunSpec}
 
@@ -132,6 +131,45 @@ class LSPServerTest extends AsyncFunSpec {
     assertResult(Seq(CompletionItem("hello")))(result.items)
     assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
     assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
+  }
+
+  it("can use code action") {
+    val document = TextDocumentItem("a","",0,"content")
+    val someRange = Range(Position(0, 1), Position(1, 2))
+    val someOtherRange = Range(Position(0, 0), Position(0, 0))
+    val request = CodeActionParams(
+      TextDocumentIdentifier(document.uri),
+      someRange,
+      CodeActionContext(Seq.empty[Diagnostic], None))
+
+    val resultAction = CodeAction("bwoep", "bwap", Some(WorkspaceEdit(Map("a" -> Seq(TextEdit(someOtherRange, "jo"))))))
+    val languageServer: LanguageServer = new TestLanguageServer with CodeActionProvider {
+
+      override def getCodeActions(parameters: CodeActionParams): Seq[CodeAction] = {
+        if (parameters == request) {
+          return Seq(resultAction)
+        }
+        Seq.empty
+      }
+    }
+
+    val serverAndClient = setupServerAndClient(languageServer)
+    val client = serverAndClient.client
+    val codeActionPromise = client.codeAction(request)
+
+    val serverOutExpectation =
+      """Content-Length: 185
+        |
+        |{"jsonrpc":"2.0","result":[{"title":"bwoep","kind":"bwap","edit":{"changes":{"a":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"newText":"jo"}]}}}],"id":0}""".stripMargin
+    val clientOutExpectation =
+      """Content-Length: 200
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/codeAction","params":{"textDocument":{"uri":"a"},"range":{"start":{"line":0,"character":1},"end":{"line":1,"character":2}},"context":{"diagnostics":[]}},"id":0}""".stripMargin
+    codeActionPromise.future.map(result => {
+      assert(result == Seq(resultAction))
+      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
+    })
   }
 
   it("can use references") {
