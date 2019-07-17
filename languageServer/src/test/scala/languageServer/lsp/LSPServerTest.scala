@@ -2,7 +2,6 @@ package languageServer.lsp
 
 import java.io.ByteArrayOutputStream
 
-import langserver.types._
 import languageServer._
 import org.scalatest.{Assertion, AsyncFunSpec}
 
@@ -75,12 +74,12 @@ class LSPServerTest extends AsyncFunSpec {
   ignore("can use goto definition") {
     val document = TextDocumentItem("a","",0,"content")
     val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
-    val definitionRange = Range(Position(0, 1), Position(1, 2))
+    val definitionRange = SourceRange(Position(0, 1), Position(1, 2))
 
     val languageServer: LanguageServer = new TestLanguageServer with DefinitionProvider {
-      override def gotoDefinition(parameters: DocumentPosition): Seq[Location] = {
+      override def gotoDefinition(parameters: DocumentPosition): Seq[FileRange] = {
         if (parameters == request)
-          return Seq(Location(parameters.textDocument.uri, definitionRange))
+          return Seq(FileRange(parameters.textDocument.uri, definitionRange))
         Seq.empty
       }
     }
@@ -98,7 +97,7 @@ class LSPServerTest extends AsyncFunSpec {
         |
         |{"jsonrpc":"2.0","method":"textDocument/definition","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0}},"id":0}""".stripMargin
     gotoPromise.future.map(result => {
-      assert(result == Seq(Location(document.uri, definitionRange)))
+      assert(result == Seq(FileRange(document.uri, definitionRange)))
       assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
     })
@@ -134,15 +133,54 @@ class LSPServerTest extends AsyncFunSpec {
     assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
   }
 
+  it("can use code action") {
+    val document = TextDocumentItem("a","",0,"content")
+    val someRange = SourceRange(Position(0, 1), Position(1, 2))
+    val someOtherRange = SourceRange(Position(0, 0), Position(0, 0))
+    val request = CodeActionParams(
+      TextDocumentIdentifier(document.uri),
+      someRange,
+      CodeActionContext(Seq.empty[Diagnostic], None))
+
+    val resultAction = CodeAction("bwoep", "bwap", None, Some(WorkspaceEdit(Map("a" -> Seq(TextEdit(someOtherRange, "jo"))))))
+    val languageServer: LanguageServer = new TestLanguageServer with CodeActionProvider {
+
+      override def getCodeActions(parameters: CodeActionParams): Seq[CodeAction] = {
+        if (parameters == request) {
+          return Seq(resultAction)
+        }
+        Seq.empty
+      }
+    }
+
+    val serverAndClient = setupServerAndClient(languageServer)
+    val client = serverAndClient.client
+    val codeActionPromise = client.codeAction(request)
+
+    val serverOutExpectation =
+      """Content-Length: 185
+        |
+        |{"jsonrpc":"2.0","result":[{"title":"bwoep","kind":"bwap","edit":{"changes":{"a":[{"range":{"start":{"line":0,"character":0},"end":{"line":0,"character":0}},"newText":"jo"}]}}}],"id":0}""".stripMargin
+    val clientOutExpectation =
+      """Content-Length: 200
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/codeAction","params":{"textDocument":{"uri":"a"},"range":{"start":{"line":0,"character":1},"end":{"line":1,"character":2}},"context":{"diagnostics":[]}},"id":0}""".stripMargin
+    codeActionPromise.future.map(result => {
+      assert(result == Seq(resultAction))
+      assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
+      assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
+    })
+  }
+
   it("can use references") {
     val document = TextDocumentItem("a","",0,"content")
     val request = ReferencesParams(TextDocumentIdentifier(document.uri), Position(0, 0), ReferenceContext(false))
-    val referenceRange = Range(Position(0, 1), Position(1, 2))
+    val referenceRange = SourceRange(Position(0, 1), Position(1, 2))
 
     val languageServer: LanguageServer = new TestLanguageServer with ReferencesProvider {
-      override def references(parameters: ReferencesParams): Seq[Location] = {
+      override def references(parameters: ReferencesParams): Seq[FileRange] = {
         if (parameters == request)
-          return Seq(Location(parameters.textDocument.uri, referenceRange))
+          return Seq(FileRange(parameters.textDocument.uri, referenceRange))
         Seq.empty
       }
     }
@@ -160,7 +198,7 @@ class LSPServerTest extends AsyncFunSpec {
         |
         |{"jsonrpc":"2.0","method":"textDocument/references","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0},"context":{"includeDeclaration":false}},"id":0}""".stripMargin
     gotoPromise.future.map(result => {
-      assert(result == Seq(Location(document.uri, referenceRange)))
+      assert(result == Seq(FileRange(document.uri, referenceRange)))
       assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
     })
@@ -169,9 +207,9 @@ class LSPServerTest extends AsyncFunSpec {
   it("can use documentSymbol") {
     val document = TextDocumentItem("a","",0,"content")
     val request = DocumentSymbolParams(TextDocumentIdentifier(document.uri))
-    val symbolRange = Range(Position(0, 1), Position(1, 2))
+    val symbolRange = SourceRange(Position(0, 1), Position(1, 2))
     val symbolInformation = SymbolInformation("someSymbol", SymbolKind.Variable,
-      Location(request.textDocument.uri, symbolRange), None)
+      FileRange(request.textDocument.uri, symbolRange), None)
 
     val languageServer: LanguageServer = new TestLanguageServer with DocumentSymbolProvider {
       override def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation] = {
@@ -201,7 +239,7 @@ class LSPServerTest extends AsyncFunSpec {
   ignore("can use rename") {
     val document = TextDocumentItem("a","",0,"content")
     val request = RenameParams(TextDocumentIdentifier(document.uri), Position(0, 0), "newName")
-    val referenceRange = Range(Position(0, 1), Position(1, 2))
+    val referenceRange = SourceRange(Position(0, 1), Position(1, 2))
 
     val expectation = WorkspaceEdit(Map(document.uri -> Seq(
       TextEdit(referenceRange, "newName"),
@@ -241,7 +279,7 @@ class LSPServerTest extends AsyncFunSpec {
         |
         |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"a","languageId":"","version":0,"text":"content"}}}""".stripMargin
 
-    val diagnostics = Seq(Diagnostic(Range(HumanPosition(0,1), HumanPosition(0, 5)),Some(2), None, None, "Woeps"))
+    val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)),Some(2), None, None, "Woeps"))
     val p = Promise[Assertion]()
     val languageClient = new TestLanguageClient {
       override def sendDiagnostics(receivedDiagnostics: PublishDiagnostics): Unit = {

@@ -1,9 +1,8 @@
 package languageServer.lsp
 
-import com.dhpcs.jsonrpc._
-import langserver.messages.{DefinitionResult, TextDocumentSyncKind}
-import langserver.types._
-import langserver.utils.JsonRpcUtils
+import com.dhpcs.jsonrpc.Message._
+import com.dhpcs.jsonrpc.CommandCompanion
+import languageServer._
 import play.api.libs.json._
 
 sealed trait Message
@@ -176,14 +175,14 @@ case class DocumentPosition(textDocument: TextDocumentIdentifier, position: Posi
 
 case class TextDocumentHoverRequest(params: DocumentPosition) extends ServerCommand
 
-case class Hover(contents: Seq[MarkedString], range: Option[Range]) extends ResultResponse
+case class Hover(contents: Seq[MarkedString], range: Option[SourceRange]) extends ResultResponse
 object Hover {
   implicit val format = Json.format[Hover]
 }
 
 
 object ClientCommand extends CommandCompanion[ClientCommand] {
-  override val CommandFormats = Message.MessageFormats(
+  override val CommandFormats = MessageFormats(
     "window/showMessageRequest" -> Json.format[ShowMessageRequestParams])
 }
 
@@ -226,4 +225,3 @@ object FileChangeType {
 }
 
 case class DocumentSymbolResult(params: Seq[SymbolInformation]) extends ResultResponse
-

@@ -1,6 +1,5 @@
 package languageServer.lsp
 
-import langserver.types._
 import languageServer._
 import play.api.libs.json._
 
@@ -39,12 +38,16 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
     implicit val textDocumentPositionParams: OFormat[DocumentPosition] = Json.format
     implicit val referenceContext: OFormat[ReferenceContext] = Json.format
-    addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[Location]])
+    implicit val textEdit: OFormat[TextEdit] = Json.format[TextEdit]
+    implicit val workspaceEdit: OFormat[WorkspaceEdit] = Json.format
+    implicit val codeActioncontext: OFormat[CodeActionContext] = Json.format
+    implicit val codeAction: OFormat[CodeAction] = Json.format
+    addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[FileRange]])
     addProvider(LSPProtocol.documentSymbol, (provider: DocumentSymbolProvider) => provider.documentSymbols)(Json.format, Writes.of[Seq[SymbolInformation]])
-    addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[Seq[Location]])
+    addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[Seq[FileRange]])
+    addProvider(LSPProtocol.codeAction, (provider: CodeActionProvider) => provider.getCodeActions)(Json.format, Writes.of[Seq[CodeAction]])
     addProvider(LSPProtocol.completion, (provider: CompletionProvider) => provider.complete)(Json.format, Json.format)
     addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hoverRequest)(Json.format[TextDocumentHoverRequest], Json.format[Hover])
-    implicit val textEditContext: OFormat[TextEdit] = Json.format[TextEdit]
     addProvider(LSPProtocol.rename, (provider: RenameProvider) => provider.rename)(Json.format, Json.format[WorkspaceEdit])
   }
 
@@ -64,6 +67,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
   def getCapabilities(clientCapabilities: ClientCapabilities): ServerCapabilities = {
     ServerCapabilities(
+      codeActionProvider = languageServer.isInstanceOf[CodeActionProvider],
       documentSymbolProvider = languageServer.isInstanceOf[DocumentSymbolProvider],
       referencesProvider = languageServer.isInstanceOf[ReferencesProvider],
       hoverProvider = languageServer.isInstanceOf[HoverProvider],

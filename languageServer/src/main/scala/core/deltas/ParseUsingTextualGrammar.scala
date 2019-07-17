@@ -24,8 +24,8 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
       compilation.stopped = true
     }
     if (!parseResult.successful) {
-      val diagnostics = DiagnosticUtil.getDiagnosticFromParseFailure(parseResult.errors)
-      compilation.diagnostics ++= diagnostics.map(d => FileDiagnostic(uri, d)).reverse
+      val diagnostics = DiagnosticUtil.getDiagnosticsFromParseFailures(uri, parseResult.errors)
+      compilation.addDiagnosticsWithFixes(diagnostics)
     }
   }
 

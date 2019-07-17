@@ -10,7 +10,7 @@
 		"url": "https://github.com/Microsoft/vscode-extension-samples"
 	},
 	"engines": {
-		"vscode": "^1.16.0"
+		"vscode": "^1.30.x"
 	},
 	"categories": [
 		"Other"
@@ -18,29 +18,28 @@
 	"activationEvents": [
 		"onLanguage:systemverilog",
 		"onLanguage:solidity",
-        "onLanguage:cloudFormation",
-        "onLanguage:java",
+		"onLanguage:cloudFormation",
+		"onLanguage:java",
 		"onLanguage:yamlCloudFormation",
 		"onLanguage:smithy"
 	],
 	"main": "./out/extension",
 	"contributes": {
-		
-        "languages": [
-            {
-                "id": "systemverilog",
-                "aliases": [
-                    "SystemVerilog",
-                    "systemverilog",
-                    "System Verilog",
-                    "Systemverilog"
-                ],
-                "extensions": [
-                    ".sv",
-                    ".svh"
-                ],
-                "configuration": "./src/verilog/language-configuration.json"
-            },
+		"languages": [
+			{
+				"id": "systemverilog",
+				"aliases": [
+					"SystemVerilog",
+					"systemverilog",
+					"System Verilog",
+					"Systemverilog"
+				],
+				"extensions": [
+					".sv",
+					".svh"
+				],
+				"configuration": "./src/verilog/language-configuration.json"
+			},
 			{
 				"id": "smithy",
 				"aliases": [
@@ -63,9 +62,9 @@
 			},
 			{
 				"id": "java",
-                "aliases": [
-                  "java"
-                ],
+				"aliases": [
+					"java"
+				],
 				"extensions": [
 					".java"
 				]
@@ -88,46 +87,46 @@
 					".yclfm"
 				]
 			}
-        ],
-        "snippets": [
-            {
-                "language": "systemverilog",
-                "path": "./src/verilog/snippets.json"
-            }
-        ],
-        "grammars": [
+		],
+		"snippets": [
+			{
+				"language": "systemverilog",
+				"path": "./src/verilog/snippets.json"
+			}
+		],
+		"grammars": [
 			{
 				"language": "smithy",
 				"scopeName": "source.smithy",
 				"path": "./src/smithy/tmLanguage.json"
 			},
-            {
-              "language": "systemverilog",
-              "scopeName": "text.systemverilog",
-              "path": "./src/verilog/tmLanguage.json"
-            },
 			{
-			"language": "yamlCloudFormation",
-			"scopeName": "source.yaml",
-			"path": "./src/cloudFormation/yaml.tmLanguage.json"
+				"language": "systemverilog",
+				"scopeName": "text.systemverilog",
+				"path": "./src/verilog/tmLanguage.json"
 			},
-            {
-              "language": "cloudFormation",
-              "scopeName": "source.cloudFormation",
-              "path": "./src/cloudFormation/tmLanguage.json"
-            },
+			{
+				"language": "yamlCloudFormation",
+				"scopeName": "source.yaml",
+				"path": "./src/cloudFormation/yaml.tmLanguage.json"
+			},
+			{
+				"language": "cloudFormation",
+				"scopeName": "source.cloudFormation",
+				"path": "./src/cloudFormation/tmLanguage.json"
+			},
 			{
 				"language": "solidity",
 				"scopeName": "source.solidity",
 				"path": "./src/solidity/tmLanguage.json"
 			}
-        ],
-        "commands": [
-            {
-                "command": "systemverilog.build_index",
-                "title": "SystemVerilog: Build index of modules in workspace"
-            }
-        ],
+		],
+		"commands": [
+			{
+				"command": "systemverilog.build_index",
+				"title": "SystemVerilog: Build index of modules in workspace"
+			}
+		],
 		"configuration": {
 			"type": "object",
 			"title": "Example configuration",
@@ -159,8 +158,8 @@
 		"postinstall": "node ./node_modules/vscode/bin/install"
 	},
 	"dependencies": {
-		"vscode": "^1.1.5",
-		"vscode-languageclient": "^3.5.0"
+		"vscode": "1.1.35",
+		"vscode-languageclient": "^5.2.1"
 	},
 	"devDependencies": {
 		"@types/mocha": "^2.2.48",

@@ -1,6 +1,7 @@
 package core.parsers.strings
 
-import langserver.types.Position
+import languageServer.Position
+
 
 trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter {
   type Input = IndentationReader

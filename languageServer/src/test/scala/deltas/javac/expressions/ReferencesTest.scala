@@ -1,8 +1,7 @@
 package deltas.javac.expressions
 
 import deltas.javac.JavaLanguage
-import langserver.types.Range
-import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
+import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer, SourceRange}
 import org.scalatest.FunSuite
 import util.SourceUtils
 
@@ -10,11 +9,11 @@ class ReferencesTest extends FunSuite with LanguageServerTest {
 
   val server = new MiksiloLanguageServer(JavaLanguage.java)
 
-  val referenceRanges = Seq(Range(HumanPosition(10,16), HumanPosition(10,21)),
-    Range(HumanPosition(10,52), HumanPosition(10,57)),
-    Range(HumanPosition(10,85), HumanPosition(10,90)))
+  val referenceRanges = Seq(SourceRange(HumanPosition(10,16), HumanPosition(10,21)),
+    SourceRange(HumanPosition(10,52), HumanPosition(10,57)),
+    SourceRange(HumanPosition(10,85), HumanPosition(10,90)))
 
-  val definitionRange = Range(HumanPosition(8,37), HumanPosition(8,42))
+  val definitionRange = SourceRange(HumanPosition(8,37), HumanPosition(8,42))
 
   test("onDeclarationWithoutDefinition") {
     val program = SourceUtils.getJavaTestFileContents("Fibonacci")

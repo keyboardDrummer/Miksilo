@@ -1,6 +1,6 @@
 package core.parsers
 
-import langserver.types.Position
+import languageServer.Position
 import org.scalatest.FunSuite
 import strings.StringParserWriter
 import editorParsers.SpotlessHistory
@@ -18,7 +18,7 @@ class HistoryTest extends FunSuite with StringParserWriter {
     val missingHistory = History.empty.
       addError(new MissingInput(afterComma, "key")).
       addError(new MissingInput(afterComma, ":")).
-      addError(new MissingInput(afterComma, "<value>", History.insertFallbackPenalty))
+      addError(new MissingInput(afterComma, "<value>", penalty = History.insertFallbackPenalty))
 
     assert(dropHistory.score < missingHistory.score)
   }
@@ -28,7 +28,7 @@ class HistoryTest extends FunSuite with StringParserWriter {
     val second = new IndexInput(1)
     val noBracesInserted = History.empty.
       addError(new MissingInput(first, ":")).
-      addError(new MissingInput(first, "<value>", History.insertFallbackPenalty)).
+      addError(new MissingInput(first, "<value>", penalty = History.insertFallbackPenalty)).
       addError(new MissingInput(first, ","))
 
     val insertedBraces = History.empty.

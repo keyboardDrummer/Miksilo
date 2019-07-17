@@ -45,7 +45,8 @@ lazy val commonSettings = Seq(
   // https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
   libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
 
-  libraryDependencies += "com.github.dragos" %% "languageserver" % "0.2.1",
+  libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1",
+  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
 )
 
 lazy val assemblySettings = Seq(

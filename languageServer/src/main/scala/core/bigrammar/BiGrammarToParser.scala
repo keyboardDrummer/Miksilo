@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
-import langserver.types.Position
+import languageServer.Position
 import util.Utility
 
 import scala.collection.mutable

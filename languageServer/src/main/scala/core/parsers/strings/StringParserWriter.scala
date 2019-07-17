@@ -1,9 +1,8 @@
 package core.parsers.strings
 
-import core.language.node.SourceRange
 import core.parsers.editorParsers.{FlawedHistory, History, ParseError, SpotlessHistory}
 import core.parsers.sequences.SequenceParserWriter
-import langserver.types.Position
+import languageServer.{Position, SourceRange}
 
 import scala.util.matching.Regex
 
@@ -87,10 +86,10 @@ trait StringParserWriter extends SequenceParserWriter {
             val arrayIndex = index + input.offset
             if (array.length <= arrayIndex) {
               return singleResult(ReadyParseResult(Some(value), input,
-                History.error(new MissingInput(input, value, penalty))))
+                History.error(new MissingInput(input, value, value.substring(index), penalty))))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
               return singleResult(ReadyParseResult(Some(value), input,
-                History.error(MissingInput(input, input.drop(index + 1), value, penalty))))
+                History.error(MissingInput(input, input.drop(index + 1), value, value.substring(index), penalty))))
             }
             index += 1
           }
@@ -113,11 +112,13 @@ trait StringParserWriter extends SequenceParserWriter {
           if (ready.resultOption.contains(value)) {
             ready
           } else {
+            val insertFix = ready.resultOption.fold(value)(
+              parsedIdentifier => parsedIdentifier.zip(value).dropWhile(t => t._1 == t._2).map(t => t._2).mkString(""))
             val error =
               if (ready.remainder == input)
-                new MissingInput(input, value, History.missingInputPenalty)
+                new MissingInput(input, value, insertFix, History.missingInputPenalty)
               else
-                MissingInput(input, ready.remainder, value, History.missingInputPenalty)
+                MissingInput(input, ready.remainder, value, insertFix, History.missingInputPenalty)
 
             ReadyParseResult(Some(value), ready.remainder, History.error(error))
           }
@@ -151,7 +152,8 @@ trait StringParserWriter extends SequenceParserWriter {
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
               penaltyOption.fold[ParseResult[String]](SREmpty)(penalty => {
-                singleResult(ReadyParseResult(defaultValue, input, History.error(new MissingInput(input, s"<$regexName>", penalty))))
+                val history = History.error(new MissingInput(input, s"<$regexName>", defaultValue.getOrElse(""), penalty))
+                singleResult(ReadyParseResult(defaultValue, input, history))
               })
 
           }

@@ -3,11 +3,10 @@ package languageServer
 import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
-import core.language.node.{FilePosition, FileRange, NodeLike, SourceRange}
+import core.language.node.{FilePosition, NodeLike}
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
-import langserver.types._
 import languageServer.lsp._
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
@@ -16,6 +15,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with CompletionProvider
   with DocumentSymbolProvider
   with RenameProvider
+  with CodeActionProvider
   with LazyLogging {
 
   var client: LanguageClient = _
@@ -101,16 +101,16 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def initialized(): Unit = {}
 
-  override def gotoDefinition(parameters: DocumentPosition): Seq[Location] = {
+  override def gotoDefinition(parameters: DocumentPosition): Seq[FileRange] = {
     currentDocumentId = parameters.textDocument
     logger.debug("Went into gotoDefinition")
-    val location = for {
+    val fileRange = for {
       proofs <- getProofs
       element = getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- proofs.gotoDefinition(element)
       fileRange <- definition.origin.flatMap(o => o.fileRange)
-    } yield fileRangeToLocation(fileRange) //TODO misschien de Types file kopieren en Location vervangen door FileRange?
-    location.toSeq
+    } yield fileRange //TODO misschien de Types file kopieren en Location vervangen door FileRange?
+    fileRange.toSeq
   }
 
   override def complete(params: DocumentPosition): CompletionList = {
@@ -139,7 +139,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     proofs.scopeGraph.findDeclaration(element).orElse(proofs.gotoDefinition(element))
   }
 
-  override def references(parameters: ReferencesParams): Seq[Location] = {
+  override def references(parameters: ReferencesParams): Seq[FileRange] = {
     currentDocumentId = parameters.textDocument
     logger.debug("Went into references")
     val maybeResult = for {
@@ -157,17 +157,9 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       if (parameters.context.includeDeclaration)
         fileRanges = definition.origin.flatMap(o => o.fileRange).toSeq ++ fileRanges
 
-      fileRanges.map(fileRange => fileRangeToLocation(fileRange))
+      fileRanges
     }
     maybeResult.getOrElse(Seq.empty)
-  }
-
-  private def fileRangeToLocation(fileRange: FileRange) = {
-    Location(fileRange.uri, toLspRange(fileRange.range))
-  }
-
-  private def toLspRange(range: SourceRange): Range = {
-    new langserver.types.Range(range.start, range.end)
   }
 
   override def setClient(client: LanguageClient): Unit = {
@@ -179,7 +171,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     val declarations = getCompilation.proofs.scopeGraph.declarationsPerFile.getOrElse(params.textDocument.uri, Seq.empty).toSeq
     declarations.
       filter(declaration => declaration.name.nonEmpty).
-      map(declaration => SymbolInformation(declaration.name, SymbolKind.Variable, fileRangeToLocation(declaration.origin.get.fileRange.get), None))
+      map(declaration => SymbolInformation(declaration.name, SymbolKind.Variable, declaration.origin.get.fileRange.get, None))
   }
 
   override def rename(params: RenameParams): WorkspaceEdit = {
@@ -187,5 +179,14 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     WorkspaceEdit(locations.groupBy(l => l.uri).map(t => {
       (t._1, t._2.map(r => TextEdit(r.range, params.newName)))
     }))
+  }
+
+  override def getCodeActions(parameters: CodeActionParams): Seq[CodeAction] = {
+    currentDocumentId = parameters.textDocument
+
+    val diagnostics = parameters.context.diagnostics.map(d => d.identifier).toSet
+    val compilation = getCompilation
+    compilation.fixesPerDiagnostics.
+      filter(entry => diagnostics.contains(entry._1)).flatMap(entry => entry._2).toSeq
   }
 }

@@ -4,12 +4,11 @@ import java.io.BufferedInputStream
 
 import core.deltas._
 import core.language.Compilation
-import core.language.node.{Node, SourceRange}
+import core.language.node.Node
 import core.smarts.FileDiagnostic
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import langserver.types.{Diagnostic, DiagnosticSeverity}
-import languageServer.HumanPosition
+import languageServer.{Diagnostic, DiagnosticSeverity, HumanPosition, SourceRange}
 
 object DecodeByteCodeParser extends DeltaWithPhase {
 
@@ -29,7 +28,7 @@ object DecodeByteCodeParser extends DeltaWithPhase {
     } else {
       val diagnostic = Diagnostic(SourceRange(HumanPosition(0, 0), HumanPosition(0, 0)),
         Some(DiagnosticSeverity.Error), None, None, "File was not a JVM classfile")
-      compilation.diagnostics ++= List(FileDiagnostic(uri, diagnostic))
+      compilation.diagnostics += FileDiagnostic(uri, diagnostic)
     }
   }
 }

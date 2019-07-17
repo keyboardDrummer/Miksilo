@@ -1,6 +1,7 @@
 package core.deltas.path
 
-import core.language.node.{Node, SourceRange}
+import core.language.node.Node
+import languageServer.SourceRange
 
 trait NodeChildPath extends NodePath with ChildPath {
   def current: Node

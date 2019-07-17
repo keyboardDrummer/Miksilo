@@ -1,6 +1,6 @@
 package deltas.smithy
 
-import langserver.types
+import languageServer._
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.SourceUtils
@@ -17,13 +17,13 @@ class SmithyTest extends FunSuite with LanguageServerTest {
 
   test("goto definition") {
     val definition = gotoDefinition(server, program, HumanPosition(6,22)).head.range
-    val expectation = types.Range(HumanPosition(98, 11), HumanPosition(98, 25))
+    val expectation = SourceRange(HumanPosition(98, 11), HumanPosition(98, 25))
     assertResult(expectation)(definition)
   }
 
   test("goto definition $") {
     val definition = gotoDefinition(server, program, HumanPosition(76, 35)).head.range
-    val expectation = types.Range(HumanPosition(71, 3), HumanPosition(71, 12))
+    val expectation = SourceRange(HumanPosition(71, 3), HumanPosition(71, 12))
     assertResult(expectation)(definition)
   }
 }

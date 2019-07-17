@@ -1,11 +1,10 @@
 package deltas.json
 
-import core.bigrammar.TestGrammarUtils.parse
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.Node
 import deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
-import langserver.types.Position
+import languageServer.Position
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 

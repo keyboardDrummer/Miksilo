@@ -1,8 +1,8 @@
 package core.parsers.sequences
 
-import core.parsers.core.{ParseInput, ParserWriter, Processor}
+import core.parsers.core.{ParseInput, Processor}
 import core.parsers.editorParsers.{CorrectingParserWriter, History, ParseError}
-import langserver.types.Position
+import languageServer.Position
 
 trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem
@@ -89,7 +89,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class Fallback[Result](value: Result, name: String) extends ParserBuilderBase[Result] with LeafParser[Result] { // TODO combine with failure?
     override def getParser(recursive: GetParser): Parser[Result] = {
       (input, _) => {
-        val history = History.error(new MissingInput(input, s"<$name>", History.insertFallbackPenalty))
+        val history = History.error(new MissingInput(input, s"<$name>", " ", History.insertFallbackPenalty))
         val result = ReadyParseResult(Some(value), input, history)
         singleResult(result)
       }
@@ -98,14 +98,22 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class MissingInput(from: Input, to: Input, expectation: String, penalty: Double = History.missingInputPenalty)
+  case class MissingInput(from: Input, to: Input,
+                          expectation: String,
+                          insertFix: String = "", penalty: Double = History.missingInputPenalty)
     extends ParseError[Input] {
 
     def this(from: Input, expectation: String) =
-      this(from, from.safeDrop(1), expectation, History.missingInputPenalty)
+      this(from, from.safeDrop(1), expectation, "", History.missingInputPenalty)
+
+    def this(from: Input, expectation: String, insertFix: String) =
+      this(from, from.safeDrop(1), expectation, insertFix, History.missingInputPenalty)
 
     def this(from: Input, expectation: String, penalty: Double) =
-      this(from, from.safeDrop(1), expectation, penalty)
+      this(from, from.safeDrop(1), expectation, "", penalty)
+
+    def this(from: Input, expectation: String, insertFix: String, penalty: Double) =
+      this(from, from.safeDrop(1), expectation, insertFix, penalty)
 
     override def message: String = s"expected '$expectation'"
 
@@ -126,7 +134,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           val max = Math.max(penalty, next.penalty)
           val min = Math.min(penalty, next.penalty)
           val newPenalty = max + min * 0.5
-          Some(MissingInput(from, to, expectation + " " + next.expectation, newPenalty))
+          Some(MissingInput(from, to, expectation + " " + next.expectation, insertFix + next.insertFix, newPenalty))
         case _ => None
       }
     }
@@ -164,7 +172,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
       def apply(input: Input, state: ParseState): ParseResult[Elem] = {
         if (input.atEnd) {
-          return newFailure(new MissingInput(input, kind, History.missingInputPenalty))
+          return newFailure(new MissingInput(input, kind, "", History.missingInputPenalty))
         }
 
         val char = input.head
@@ -172,7 +180,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           newSuccess(char, input.tail, History.successValue)
         }
         else
-          newFailure(new MissingInput(input, kind, History.missingInputPenalty))
+          newFailure(new MissingInput(input, kind, "", History.missingInputPenalty))
       }
 
       apply
@@ -197,7 +205,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
               if (predicate(result))
                 ready
               else ReadyParseResult(None, ready.remainder,
-                ready.history.addError(MissingInput(input, ready.remainder, getMessage(result), History.missingInputPenalty)))
+                ready.history.addError(MissingInput(input, ready.remainder, getMessage(result), "", History.missingInputPenalty)))
             case None => ready
           }
         }, uniform = false)

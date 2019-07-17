@@ -11,7 +11,6 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.{Key, NodeField, NodeGrammar}
 import core.responsiveDocument.ResponsiveDocument
-import langserver.types.Position
 
 object StoreTriviaDelta extends DeltaWithGrammar {
 

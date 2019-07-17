@@ -6,7 +6,6 @@ import java.util.concurrent.Executors
 import com.dhpcs.jsonrpc.JsonRpcMessage._
 import com.dhpcs.jsonrpc._
 import com.typesafe.scalalogging.LazyLogging
-import langserver.core.{MessageReader, MessageWriter}
 import play.api.libs.json._
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
