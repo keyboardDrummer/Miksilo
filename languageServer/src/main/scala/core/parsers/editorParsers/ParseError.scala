@@ -1,7 +1,5 @@
 package core.parsers.editorParsers
 
-import core.language.node.SourceRange
-
 trait ParseError[Input] {
   def canMerge: Boolean = false
   def penalty: Double

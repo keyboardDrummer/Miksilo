@@ -1,6 +1,6 @@
 package core.language
 
-import core.language.node.{FileRange, SourceRange}
+import languageServer.{FileRange, SourceRange}
 
 trait SourceElement {
   def current: Any

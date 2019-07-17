@@ -1,5 +1,7 @@
 package languageServer
 
+import core.language.node.FilePosition
+import core.language.node.Node.PositionOrdering
 import languageServer.lsp._
 import play.api.libs.json._
 
@@ -25,17 +27,74 @@ trait CompletionProvider {
 }
 
 trait DefinitionProvider {
-  def gotoDefinition(parameters: DocumentPosition): Seq[Location]
+  def gotoDefinition(parameters: DocumentPosition): Seq[FileRange]
 }
 
 case class ReferencesParams(textDocument: TextDocumentIdentifier, position: Position, context: ReferenceContext)
 
 trait ReferencesProvider {
-  def references(location: ReferencesParams): Seq[Location]
+  def references(location: ReferencesParams): Seq[FileRange]
 }
 
+/**
+  * Position in a text document expressed as zero-based line and character offset.
+  */
+case class Position(line: Int, character: Int)
+object Position { implicit val format = Json.format[Position] }
+
+object SourceRange { implicit val format = Json.format[SourceRange] }
+/**
+  * A range in a text document.
+  */
+case class SourceRange(start: Position, end: Position) {
+
+  def contains(position: Position): Boolean = {
+    PositionOrdering.lteq(start, position) && PositionOrdering.lteq(position, end)
+  }
+
+  def contains(position: SourceRange): Boolean = {
+    PositionOrdering.lteq(start, position.start) && PositionOrdering.lteq(position.end, end)
+  }
+}
+
+object Diagnostic {
+  implicit val format = Json.format[Diagnostic]
+}
+case class Diagnostic(
+                       range: SourceRange, // the range at which this diagnostic applies
+                       severity: Option[Int], // severity of this diagnostics (see above)
+                       code: Option[String], // a code for this diagnostic
+                       source: Option[String], // the source of this diagnostic (like 'typescript' or 'scala')
+                       message: String // the diagnostic message
+                     ) {
+  def identifier = Diagnostic(range, None, None, None, message)
+}
+
+object TextEdit {
+  implicit val format = Json.format[TextEdit]
+}
+case class TextEdit(range: SourceRange, newText: String)
+
+object WorkspaceEdit {
+  implicit val format = Json.format[WorkspaceEdit]
+}
+/**
+  * A workspace edit represents changes to many resources managed
+  * in the workspace.
+  */
+case class WorkspaceEdit(
+                          changes: Map[String, Seq[TextEdit]] // uri -> changes
+                        )
+
+object CodeActionContext {
+  implicit val format = Json.format[CodeActionContext]
+}
 case class CodeActionContext(diagnostics: Seq[Diagnostic], only: Option[Seq[String]])
-case class CodeActionParams(textDocument: TextDocumentIdentifier, range: Range, context: CodeActionContext)
+case class CodeActionParams(textDocument: TextDocumentIdentifier, range: SourceRange, context: CodeActionContext)
+
+object CodeAction {
+  implicit val format = Json.format[CodeAction]
+}
 case class CodeAction(title: String, kind: String,
                       diagnostics: Option[Seq[Diagnostic]],
                       edit: Option[WorkspaceEdit])
@@ -59,24 +118,18 @@ trait LanguageServer {
   def initialized(): Unit
 }
 
-/**
-  * Position in a text document expressed as zero-based line and character offset.
-  */
-case class Position(line: Int, character: Int)
-object Position { implicit val format = Json.format[Position] }
+
 
 /**
-  * A range in a text document.
+  * Corresponds to an LSP Location
   */
-case class Range(start: Position, end: Position)
-object Range { implicit val format = Json.format[Range] }
+case class FileRange(uri: String, range: SourceRange) {
+  def contains(filePosition: FilePosition): Boolean = {
+    uri == filePosition.uri && range.contains(filePosition.position)
+  }
+}
 
-/**
-  * Represents a location inside a resource, such as a line
-  * inside a text file.
-  */
-case class Location(uri: String, range: Range)
-object Location { implicit val format = Json.format[Location] }
+object FileRange { implicit val format = Json.format[FileRange] }
 
 object DiagnosticSeverity {
   final val Error = 1
@@ -85,19 +138,7 @@ object DiagnosticSeverity {
   final val Hint = 4
 }
 
-case class Diagnostic(
-                       range: Range, // the range at which this diagnostic applies
-                       severity: Option[Int], // severity of this diagnostics (see above)
-                       code: Option[String], // a code for this diagnostic
-                       source: Option[String], // the source of this diagnostic (like 'typescript' or 'scala')
-                       message: String // the diagnostic message
-                     ) {
-  def identifier = Diagnostic(range, None, None, None, message)
-}
 
-object Diagnostic {
-  implicit val format = Json.format[Diagnostic]
-}
 
 /**
   * A reference to a command.
@@ -108,15 +149,6 @@ object Diagnostic {
   */
 case class Command(title: String, command: String, arguments: Seq[Any])
 
-case class TextEdit(range: Range, newText: String)
-
-/**
-  * A workspace edit represents changes to many resources managed
-  * in the workspace.
-  */
-case class WorkspaceEdit(
-                          changes: Map[String, Seq[TextEdit]] // uri -> changes
-                        )
 
 case class TextDocumentIdentifier(uri: String)
 object TextDocumentIdentifier { implicit val format = Json.format[TextDocumentIdentifier] }
@@ -220,6 +252,9 @@ case class SignatureHelp(
                           /** The active parameter of the active signature. */
                           activeParameter: Option[Int])
 
+object ReferenceContext {
+  implicit val referenceContext: OFormat[ReferenceContext] = Json.format
+}
 /**
   * Value-object that contains additional information when
   * requesting references.
@@ -252,7 +287,7 @@ object DocumentHighlightKind {
   */
 case class DocumentHighlight(
                               /** The range this highlight applies to. */
-                              range: Range,
+                              range: SourceRange,
 
                               /** The highlight kind, default is [text](#DocumentHighlightKind.Text). */
                               kind: Int = DocumentHighlightKind.Text)
@@ -278,7 +313,7 @@ object SymbolKind {
   final val Array = 18
 }
 
-case class SymbolInformation(name: String, kind: Int, location: Location, containerName: Option[String])
+case class SymbolInformation(name: String, kind: Int, location: FileRange, containerName: Option[String])
 object SymbolInformation {
   implicit val format = Json.format[SymbolInformation]
 }
@@ -299,7 +334,7 @@ case class CodeLens(
                      /**
                        * The range in which this code lens is valid. Should only span a single line.
                        */
-                     range: Range,
+                     range: SourceRange,
 
                      /**
                        * The command this code lens represents.
@@ -389,7 +424,7 @@ case class TextDocumentContentChangeEvent(
                                            /**
                                              * The range of the document that changed.
                                              */
-                                           range: Option[Range],
+                                           range: Option[SourceRange],
 
                                            /**
                                              * The length of the range that got replaced.

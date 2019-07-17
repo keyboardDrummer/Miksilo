@@ -6,9 +6,8 @@ import deltas.{ClearPhases, FileWithMembersDelta}
 import deltas.expression.{IntLiteralDelta, VariableDelta}
 import deltas.expression.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
-import languageServer.{Location, Range, TextDocumentIdentifier}
+import languageServer.{FileRange, HumanPosition, LanguageServerTest, MiksiloLanguageServer, SourceRange, TextDocumentIdentifier}
 import languageServer.lsp.DocumentPosition
-import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 
@@ -85,14 +84,14 @@ class VerilogTest extends FunSuite with LanguageServerTest {
 
   test("Goto definition") {
     val server = new MiksiloLanguageServer(VerilogLanguage.language)
-    val first: Seq[Location] = gotoDefinition(server, code, new HumanPosition(10, 10))
-    assertResult(Seq(Location(itemUri, Range(new HumanPosition(2,2), new HumanPosition(2, 7)))))(first)
+    val first: Seq[FileRange] = gotoDefinition(server, code, new HumanPosition(10, 10))
+    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(2,2), new HumanPosition(2, 7)))))(first)
 
-    val second: Seq[Location] = gotoDefinition(server, code, new HumanPosition(15, 21))
-    assertResult(Seq(Location(itemUri, Range(new HumanPosition(2,2), new HumanPosition(2, 7)))))(second)
+    val second: Seq[FileRange] = gotoDefinition(server, code, new HumanPosition(15, 21))
+    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(2,2), new HumanPosition(2, 7)))))(second)
 
-    val third: Seq[Location] = gotoDefinition(server, code, new HumanPosition(20, 6))
-    assertResult(Seq(Location(itemUri, Range(new HumanPosition(6,2), new HumanPosition(6, 7)))))(third)
+    val third: Seq[FileRange] = gotoDefinition(server, code, new HumanPosition(20, 6))
+    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(6,2), new HumanPosition(6, 7)))))(third)
   }
 
   test("can compile multiple files") {
@@ -113,8 +112,8 @@ class VerilogTest extends FunSuite with LanguageServerTest {
     val mainIdentifier = TextDocumentIdentifier(files(1).toString())
     val busIdentifier = TextDocumentIdentifier(files(0).toString())
 
-    val gotoPackageResult: Seq[Location] = server.gotoDefinition(DocumentPosition(mainIdentifier, new HumanPosition(5, 11)))
-    val gotoPackageExpectation = Seq(Location(busIdentifier.uri, Range(new HumanPosition(1, 9), new HumanPosition(1, 16))))
+    val gotoPackageResult: Seq[FileRange] = server.gotoDefinition(DocumentPosition(mainIdentifier, new HumanPosition(5, 11)))
+    val gotoPackageExpectation = Seq(FileRange(busIdentifier.uri, SourceRange(new HumanPosition(1, 9), new HumanPosition(1, 16))))
     assertResult(gotoPackageExpectation)(gotoPackageResult)
 
 //    val gotoBusResult: Seq[Location] = server.gotoDefinition(DocumentPosition(mainIdentifier, new HumanPosition(7, 5)))

@@ -4,11 +4,11 @@ import java.io.BufferedInputStream
 
 import core.deltas._
 import core.language.Compilation
-import core.language.node.{Node, SourceRange}
+import core.language.node.Node
 import core.smarts.FileDiagnostic
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import languageServer.{Diagnostic, DiagnosticSeverity, HumanPosition}
+import languageServer.{Diagnostic, DiagnosticSeverity, HumanPosition, SourceRange}
 
 object DecodeByteCodeParser extends DeltaWithPhase {
 

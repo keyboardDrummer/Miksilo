@@ -16,7 +16,7 @@ trait LanguageServerTest extends FunSuite {
     server.asInstanceOf[DocumentSymbolProvider].documentSymbols(DocumentSymbolParams(document))
   }
 
-  def gotoDefinition(language: Language, program: String, position: HumanPosition): Seq[Location] = {
+  def gotoDefinition(language: Language, program: String, position: HumanPosition): Seq[FileRange] = {
     val server = new MiksiloLanguageServer(language)
     gotoDefinition(server, program, position)
   }
@@ -26,12 +26,12 @@ trait LanguageServerTest extends FunSuite {
     server.asInstanceOf[RenameProvider].rename(RenameParams(document, position, newName))
   }
 
-  def gotoDefinition(server: LanguageServer, program: String, position: HumanPosition): Seq[Location] = {
+  def gotoDefinition(server: LanguageServer, program: String, position: HumanPosition): Seq[FileRange] = {
     val document = openDocument(server, program)
     server.asInstanceOf[DefinitionProvider].gotoDefinition(DocumentPosition(document, position))
   }
 
-  def references(server: LanguageServer, program: String, position: HumanPosition, includeDeclaration: Boolean): Seq[Location] = {
+  def references(server: LanguageServer, program: String, position: HumanPosition, includeDeclaration: Boolean): Seq[FileRange] = {
     val document = openDocument(server, program)
     server.asInstanceOf[ReferencesProvider].references(ReferencesParams(document, position, ReferenceContext(includeDeclaration)))
   }

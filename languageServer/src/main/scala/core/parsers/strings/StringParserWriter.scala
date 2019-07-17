@@ -1,9 +1,8 @@
 package core.parsers.strings
 
-import core.language.node.SourceRange
 import core.parsers.editorParsers.{FlawedHistory, History, ParseError, SpotlessHistory}
 import core.parsers.sequences.SequenceParserWriter
-import languageServer.Position
+import languageServer.{Position, SourceRange}
 
 import scala.util.matching.Regex
 

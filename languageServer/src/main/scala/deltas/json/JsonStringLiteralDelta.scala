@@ -5,13 +5,13 @@ import core.bigrammar.grammars.{As, Colorize}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
-import core.language.node.{Node, NodeField, NodeShape, SourceRange}
+import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import languageServer.Position
+import languageServer.{Position, SourceRange}
 
 import scala.util.matching.Regex
 
