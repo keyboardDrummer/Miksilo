@@ -7,7 +7,7 @@ object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingPa
 
   lazy val arrayParser = Literal("[") ~> jsonParser.manySeparated(",", "array element") ~< "]"
   lazy val memberParser = stringLiteral ~< DropParser(":") ~ jsonParser
-  lazy val objectParser = Literal("{") ~>
+  lazy val objectParser = Literal("{", 2 * History.missingInputPenalty) ~>
     memberParser.manySeparated(",", "object member") ~< "}"
   object UnknownExpression {
     override def toString = "unknown"

@@ -3,7 +3,7 @@ package core.parsers
 import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
 
-class CorrectJsonTest extends FunSuite {
+class ErrorCorrectionUsingJsonTest extends FunSuite {
   import ParseJson._
 
   test("test whether correct inputs always return a ready in one go") {
@@ -12,6 +12,11 @@ class CorrectJsonTest extends FunSuite {
                   |}}""".stripMargin
     val result = JsonLanguage.language.compileString(input)
     //parseJson(input, 3, 0)
+  }
+
+  test("removes incorrect b at start") {
+    val input = """b{"hello":3}"""
+    parseJson(input, List(("hello","3")), 1)
   }
 
   test("object with single member with number value") {

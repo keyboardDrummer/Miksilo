@@ -38,6 +38,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
   case class DropParser[Result](original: Self[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
+    System.out.append("")
     override def getParser(recursive: GetParser): Parser[Result] = {
       val parseOriginal = recursive(original)
       lazy val result = new Parser[Result] {

@@ -18,6 +18,7 @@ object ProgramGrammar extends GrammarKey
 class LanguageGrammars extends GrammarCatalogue with NodeGrammarWriter {
 
   val trivia: Labelled = create(TriviasGrammar, new ManyVertical(create(TriviaGrammar, ParseWhiteSpace), parseGreedy = false))
+  trivia.addAlternative()
   val bodyGrammar = create(BodyGrammar, BiFailure())
   create(ProgramGrammar, new WithTrivia(leftRight(bodyGrammar, trivia, BiSequence.ignoreRight), trivia)) //TODO Move this, bodyGrammar and trivia to a separate Delta.
 
