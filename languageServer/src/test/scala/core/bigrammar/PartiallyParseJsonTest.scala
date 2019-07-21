@@ -2,6 +2,8 @@ package core.bigrammar
 
 import core.bigrammar.grammars.{BiFallback, Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
+import deltas.expression.StringLiteralDelta
+import deltas.json.JsonObjectLiteralDelta
 import org.scalatest.FunSuite
 
 class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {

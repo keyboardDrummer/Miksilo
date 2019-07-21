@@ -12,6 +12,6 @@ case class Keyword(var value: String, reserved: Boolean = true, verifyWhenPrinti
     if (reserved)
       literalOrKeyword(value)
     else
-      Literal(value)
+      literal(value)
   }
 }

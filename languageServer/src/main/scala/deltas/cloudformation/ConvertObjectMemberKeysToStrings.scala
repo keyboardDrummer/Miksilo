@@ -4,6 +4,7 @@ import core.deltas.DeltaWithPhase
 import core.deltas.path.{NodeChildPath, PathRoot}
 import core.language.Compilation
 import core.language.node.Node
+import deltas.expression.StringLiteralDelta
 import deltas.json.JsonObjectLiteralDelta.MemberKey
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import deltas.yaml.YamlCoreDelta
@@ -14,7 +15,7 @@ object ConvertObjectMemberKeysToStrings extends DeltaWithPhase {
     PathRoot(program).visitShape(JsonObjectLiteralDelta.MemberShape, path => {
       val key = path(MemberKey).asInstanceOf[NodeChildPath]
       key.current.shape match {
-        case JsonStringLiteralDelta.Shape => key.replaceWith(key.current(JsonStringLiteralDelta.Value))
+        case StringLiteralDelta.Shape => key.replaceWith(key.current(JsonStringLiteralDelta.Value))
         case YamlCoreDelta.TaggedNode => key.replaceWith(key.current(YamlCoreDelta.TagNode).asInstanceOf[Node](JsonStringLiteralDelta.Value))
         case _ =>
           throw new Exception("Only string literals allowed")

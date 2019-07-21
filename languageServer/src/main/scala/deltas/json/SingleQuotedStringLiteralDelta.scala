@@ -5,7 +5,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.GrammarKey
-import deltas.expression.ExpressionDelta
+import deltas.expression.{ExpressionDelta, StringLiteralDelta}
 import deltas.json.JsonStringLiteralDelta.Value
 
 object SingleQuotedStringLiteralDelta extends DeltaWithGrammar {
@@ -23,6 +23,6 @@ object SingleQuotedStringLiteralDelta extends DeltaWithGrammar {
       Colorize(withoutColor, "string.quoted.single")
     }
     import grammars._
-    find(JsonStringLiteralDelta.Shape).addAlternative(create(Grammar, inner.asNode(JsonStringLiteralDelta.Shape)))
+    find(StringLiteralDelta.Shape).addAlternative(create(Grammar, inner.asNode(StringLiteralDelta.Shape)))
   }
 }

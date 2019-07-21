@@ -4,7 +4,7 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.GrammarKey
-import deltas.expression.ExpressionDelta
+import deltas.expression.{ExpressionDelta, StringLiteralDelta}
 import deltas.json.JsonObjectLiteralDelta.MemberKey
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta, SingleQuotedStringLiteralDelta}
 
@@ -15,10 +15,10 @@ object GenericSmithyDelta extends DeltaWithGrammar {
 
     find(JsonObjectLiteralDelta.MemberKey).addAlternative(identifier.as(MemberKey))
 
-    val plainString = identifier.as(JsonStringLiteralDelta.Value) asNode JsonStringLiteralDelta.Shape
+    val plainString = identifier.as(JsonStringLiteralDelta.Value) asNode StringLiteralDelta.Shape
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(plainString)
 
-    create(TextGrammar, plainString | find(JsonStringLiteralDelta.Shape) | find(SingleQuotedStringLiteralDelta.Grammar))
+    create(TextGrammar, plainString | find(StringLiteralDelta.Shape) | find(SingleQuotedStringLiteralDelta.Grammar))
   }
 
   object TextGrammar extends GrammarKey

@@ -5,13 +5,13 @@ import editorParsers.History
 
 object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
-  lazy val arrayParser = Literal("[") ~> jsonParser.manySeparated(",", "array element") ~< "]"
-  lazy val memberParser = stringLiteral ~< DropParser(":") ~ jsonParser
-  lazy val objectParser = Literal("{") ~>
+  lazy val arrayParser = literal("[") ~> jsonParser.manySeparated(",", "array element") ~< "]"
+  lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
+  lazy val objectParser = literal("{", 2 * History.missingInputPenalty) ~>
     memberParser.manySeparated(",", "object member") ~< "}"
   object UnknownExpression {
     override def toString = "unknown"
   }
-  lazy val jsonParser: Self[Any] = DropParser(stringLiteral | objectParser | wholeNumber | arrayParser |
-    Fallback(UnknownExpression, "value"))
+  lazy val jsonParser: Self[Any] = stringLiteral | objectParser | wholeNumber | arrayParser |
+    Fallback(UnknownExpression, "value")
 }

@@ -10,7 +10,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
-import deltas.expression.{ExpressionDelta, ExpressionInstance}
+import deltas.expression.{ExpressionDelta, ExpressionInstance, StringLiteralDelta}
 import languageServer.{Position, SourceRange}
 
 import scala.util.matching.Regex
@@ -19,6 +19,7 @@ object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def description: String = "Adds the double quoted string literal"
 
+  import StringLiteralDelta.Shape
   val shape = Shape
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)
@@ -45,8 +46,6 @@ object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   def neww(value: String) = new Node(Shape, Value -> value)
 
   def getValue(literal: Node): String = literal(Value).asInstanceOf[String]
-
-  object Shape extends NodeShape
 
   object Value extends NodeField
 
