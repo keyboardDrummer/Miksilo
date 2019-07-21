@@ -6,6 +6,7 @@ import core.language.Language
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.ConcreteScope
 import core.smarts.types.objects.PrimitiveType
+import deltas.expression.StringLiteralDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, ObjectLiteral, ObjectLiteralMember}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import play.api.libs.json.{JsObject, Json}
@@ -69,7 +70,7 @@ object CloudFormationTemplate extends Delta {
   private def resolveRefs(builder: ConstraintBuilder, rootScope: ConcreteScope, program: ObjectLiteral[NodePath]): Unit = {
     program.visitShape(MemberShape, (_member: NodePath) => {
       val member: JsonObjectLiteralDelta.ObjectLiteralMember[NodePath] = _member
-      if (member.key == "Ref" && member.value.shape == JsonStringLiteralDelta.Shape) {
+      if (member.key == "Ref" && member.value.shape == StringLiteralDelta.Shape) {
         val value = JsonStringLiteralDelta.getValue(member.value)
         val refLocation = member.value.getField(JsonStringLiteralDelta.Value)
         builder.resolveToType(value, refLocation, rootScope, valueType)

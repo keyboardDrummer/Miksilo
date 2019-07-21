@@ -127,15 +127,3 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     }
   }
 }
-
-object BiDropParser extends CustomGrammarWithoutChildren {
-  override def getParserBuilder(keywords: collection.Set[String]) = DropParser
-
-  override def children = ???
-
-  override def withChildren(newChildren: Seq[BiGrammar]) = ???
-
-  override def containsParser(recursive: BiGrammar => Boolean) = ???
-
-  override def write(from: WithMap[Any]) = ???
-}

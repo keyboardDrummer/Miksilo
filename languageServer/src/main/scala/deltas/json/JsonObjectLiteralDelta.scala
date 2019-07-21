@@ -22,7 +22,8 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
   def neww(entries: Map[String, Node]): Node = Shape.create(Members -> entries.map(entry =>
     MemberShape.create(MemberKey -> entry._1, MemberValue -> entry._2)))
-
+//JsonObjectLiteralDelta.Shape: Map(Members -> List(JsonObjectLiteralDelta.MemberShape: Map(MemberKey -> hello, MemberValue -> StringLiteralDelta.Shape: Map(Value -> jo)))),
+//JsonObjectLiteralDelta.Shape: Map(Members -> List(JsonObjectLiteralDelta.MemberShape: Map(MemberKey -> hello, MemberValue -> JsonStringLiteralDelta.Shape: Map(Value -> jo))))
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
     import _grammars._
     val grammars = _grammars

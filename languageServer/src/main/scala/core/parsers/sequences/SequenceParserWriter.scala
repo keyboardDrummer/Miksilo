@@ -13,7 +13,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def tail: Input
 
     def drop(amount: Int): Input
-    def safeDrop(amount: Int): Input = if (atEnd) this.asInstanceOf[Input] else drop(1)
+    def safeDrop(amount: Int): Input = if (atEnd) this.asInstanceOf[Input] else drop(Math.min(1, amount))
     def end: Input
     def printRange(end: Input): String
     def position: Position
@@ -38,27 +38,38 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
   case class DropParser[Result](original: Self[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    System.out.append("")
     override def getParser(recursive: GetParser): Parser[Result] = {
       val parseOriginal = recursive(original)
-      lazy val result = new Parser[Result] {
 
-        override def apply(input: Input, state: ParseState): ParseResult[Result] = {
-          val originalResult = parseOriginal(input, state)
+      class DroppingParser extends Parser[Result] {
 
+        def parse(input: Input, state: ParseState, mayFail: Boolean): ParseResult[Result] = {
+          var originalResult = parseOriginal(input, state)
           if (input.atEnd)
             return originalResult
+          if (!mayFail) {
+            originalResult = originalResult.flatMapReady(ready => {
+              if (ready.history.errors.nonEmpty)
+                SREmpty
+              else
+                singleResult(ready)
+            }, uniform = true)
+          }
 
           val droppedInput = input.drop(1)
           val dropError = DropError(input, droppedInput)
           val dropHistory = History.error(dropError)
           val withDrop = singleResult(new DelayedParseResult(dropHistory , () => {
-            apply(droppedInput, state).addHistory(dropHistory)
+            parse(droppedInput, state, mayFail = false).addHistory(dropHistory)
           }))
           originalResult.merge(withDrop)
         }
+
+        override def apply(input: Input, state: ParseState): ParseResult[Result] = {
+          parse(input, state, mayFail = true)
+        }
       }
-      result
+      new DroppingParser
     }
 
   }
@@ -245,15 +256,15 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     def someSeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
       lazy val result: Self[List[Result]] = separator ~>
-        leftRight[Result, List[Result], List[Result]](DropParser(parser), DropParser(result), combineMany[Result]) |
+        leftRight[Result, List[Result], List[Result]](parser, result, combineMany[Result]) |
           Fail(Some(List.empty[Result]), elementName, History.insertDefaultPenalty) | // TODO can we remove this Fail?
           succeed(List.empty[Result])
-      leftRight(parser, DropParser(result), combineMany[Result])
+      leftRight(parser, result, combineMany[Result])
     }
 
     def manySeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
       val zero = List.empty[Result]
-      DropParser(choice(someSeparated(separator, elementName), succeed(zero), firstIsLonger = true))
+      choice(someSeparated(separator, elementName), succeed(zero), firstIsLonger = true)
     }
 
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) = Filter(parser, predicate, getMessage)

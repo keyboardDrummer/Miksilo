@@ -4,7 +4,7 @@ trait CommonParserWriter extends StringParserWriter {
 
   /** An integer, without sign or with a negative sign. */
   val wholeNumber: Self[String] =
-    RegexParser("""-?\d+""".r, "whole number")
+    regex("""-?\d+""".r, "whole number")
   /** Number following one of these rules:
     *
     *  - An integer. For example: `13`
@@ -13,7 +13,7 @@ trait CommonParserWriter extends StringParserWriter {
     *  - A decimal point followed by a fractional part. For example: `.1`
     */
   val decimalNumber: Self[String] =
-    RegexParser("""(\d+(\.\d*)?|\d*\.\d+)""".r, "decimal number")
+    regex("""(\d+(\.\d*)?|\d*\.\d+)""".r, "decimal number")
   /** Double quotes (`"`) enclosing a sequence of:
     *
     *  - Any character except double quotes, control characters or backslash (`\`)
@@ -22,8 +22,8 @@ trait CommonParserWriter extends StringParserWriter {
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
   val stringLiteral: Self[String] =
-    RegexParser(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r, "string literal", Some("\"")).
-      map(r => r.substring(1, r.length )) ~< "\""
+    regex(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r, "string literal", Some("\"")).
+      map(r => r.substring(1, r.length )) ~< Literal("\"")
 
   /** A number following the rules of `decimalNumber`, with the following
     *  optional additions:
@@ -33,5 +33,5 @@ trait CommonParserWriter extends StringParserWriter {
     *  - Followed by `f`, `f`, `d` or `D` (after the above rule, if both are used)
     */
   val floatingPointNumber: Self[String] =
-    RegexParser("""-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r, "floating point number")
+    regex("""-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r, "floating point number")
 }

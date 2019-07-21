@@ -61,18 +61,21 @@ trait StringParserWriter extends SequenceParserWriter {
     }
   }
 
-  val identifier: RegexParser = RegexParser("""[_a-zA-Z][_a-zA-Z0-9]*""".r, "identifier")
+  val identifierRegex = """[_a-zA-Z][_a-zA-Z0-9]*""".r
+  val identifier = regex(identifierRegex, "identifier")
 
   implicit def literalToExtensions(value: String): SequenceParserExtensions[String] = Literal(value)
 
-  val identifierRegex = """[_a-zA-Z][_a-zA-Z0-9]*""".r
-  implicit def literalOrKeyword(value: String): Self[String] = {
-    val isKeyword = identifierRegex.findFirstIn(value).contains(value)
-    if (isKeyword)
-      return KeywordParser(value)
-
-    Literal(value)
+  implicit def stringToLiteralOrKeyword(value: String): Self[String] = {
+    literalOrKeyword(value)
   }
+
+  def literalOrKeyword(value: String, canDrop: Boolean = true): Self[String] = {
+    val isKeyword = identifierRegex.findFirstIn(value).contains(value)
+    if (isKeyword) KeywordParser(value) else if (canDrop) DropParser(Literal(value)) else Literal(value)
+  }
+
+  def literal(value: String, penalty: Double = History.missingInputPenalty) = DropParser(Literal(value, penalty))
 
   case class Literal(value: String, penalty: Double = History.missingInputPenalty) extends ParserBuilderBase[String] with LeafParser[String] {
 
@@ -104,6 +107,12 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
   }
 
+  /**
+    * Don't wrap KeywordParser in a Drop. Since it wraps identifier, it already has a drop.
+    * What's the point of letting KeywordParser use identifier instead of Literal?
+    * Using Literal would be much simpler.
+    * The situation is that identifier and keyword parser can overlap, but identifier has a filter on keywords
+    */
   case class KeywordParser(value: String) extends ParserBuilderBase[String] with ParserWrapper[String] {
     override def getParser(recursive: GetParser): Parser[String] = {
       val parseIdentifier = recursive(identifier)
@@ -112,15 +121,21 @@ trait StringParserWriter extends SequenceParserWriter {
           if (ready.resultOption.contains(value)) {
             ready
           } else {
-            val insertFix = ready.resultOption.fold(value)(
-              parsedIdentifier => parsedIdentifier.zip(value).dropWhile(t => t._1 == t._2).map(t => t._2).mkString(""))
+            var parsed = 0
+            val parsedIdentifier = ready.resultOption.getOrElse("")
+            while(parsed < parsedIdentifier.length &&  parsed < value.length &&
+              parsedIdentifier.charAt(parsed) == value.charAt(parsed)) {
+              parsed += 1
+            }
+            val insertFix = value.drop(parsed)
+            val reached = input.safeDrop(parsed)
             val error =
               if (ready.remainder == input)
                 new MissingInput(input, value, insertFix, History.missingInputPenalty)
               else
                 MissingInput(input, ready.remainder, value, insertFix, History.missingInputPenalty)
 
-            ReadyParseResult(Some(value), ready.remainder, History.error(error))
+            ReadyParseResult(Some(value), reached, History.error(error))
           }
         }, uniform = false)
       }
@@ -134,6 +149,13 @@ trait StringParserWriter extends SequenceParserWriter {
     def range = SourceRange(from.position, to.position)
   }
 
+  def regex(regex: Regex, regexName: String,
+            // TODO use the regex to generate a default case.
+            defaultValue: Option[String] = None,
+            score: Double = History.successValue,
+            penaltyOption: Option[Double] = Some(History.missingInputPenalty)) =
+    DropParser(RegexParser(regex, regexName, defaultValue, score, penaltyOption))
+
   case class RegexParser(regex: Regex, regexName: String,
                          // TODO use the regex to generate a default case.
                          defaultValue: Option[String] = None,
@@ -144,6 +166,7 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getParser(recursive: GetParser): Parser[String] = {
 
       lazy val result: Parser[String] = new Parser[String] {
+
         def apply(input: Input, state: ParseState): ParseResult[String] = {
           regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
             case Some(matched) =>

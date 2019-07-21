@@ -5,7 +5,7 @@ import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.language.node.Node
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
-import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
+import deltas.expression.{ArrayLiteralDelta, ExpressionDelta, StringLiteralDelta}
 import deltas.json.JsonObjectLiteralDelta.{ObjectLiteral, ObjectLiteralMember}
 import deltas.json.{JsonLanguage, JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import util.GraphBasics
@@ -41,7 +41,7 @@ object BiGrammarToTextMate {
         case map: MapGrammarWithMap => recurse(map.inner)
         case labelled: Labelled => recurse(labelled.inner)
         case delimiter: Delimiter => Some(escapeRegex(delimiter.value))
-        case _: Identifier => Some(escapeRegex(BiGrammarToParser.identifier.regex.regex))
+        case _: Identifier => Some(escapeRegex(BiGrammarToParser.identifierRegex.regex))
         case ParseWhiteSpace => Some(ParseWhiteSpace.regex.regex)
         case keyword: Keyword => Some(escapeRegex(keyword.value))
         case choice: BiChoice =>
@@ -111,7 +111,7 @@ object BiGrammarToTextMate {
           builder.append("\"" + member.key + "\"").append(": ")
           add(member.value)
 
-        case JsonStringLiteralDelta.Shape =>
+        case StringLiteralDelta.Shape =>
           val regex = JsonStringLiteralDelta.getValue(node)
           builder.append(stringToStringLiteral(regex))
 

@@ -9,7 +9,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.PrimitiveType
-import deltas.expression.ArrayLiteralDelta
+import deltas.expression.{ArrayLiteralDelta, StringLiteralDelta}
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.json.JsonObjectLiteralDelta.ObjectLiteral
@@ -54,7 +54,7 @@ object ServiceDelta extends DeltaWithGrammar with HasConstraintsDelta {
       if (resources.shape == ArrayLiteralDelta.Shape) {
         val resourcesArray: ArrayLiteral[NodePath] = resources
         resourcesArray.members.foreach(resource => {
-          if (resource.shape == JsonStringLiteralDelta.Shape) {
+          if (resource.shape == StringLiteralDelta.Shape) {
             builder.resolveToType(resource.getField(JsonStringLiteralDelta.Value), parentScope, OperationDelta.operationType)
           }
         })
