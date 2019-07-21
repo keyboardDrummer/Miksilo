@@ -62,7 +62,7 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   val identifierRegex = """[_a-zA-Z][_a-zA-Z0-9]*""".r
-  val identifier = regex(identifierRegex, "identifier")
+  val identifier = parseRegex(identifierRegex, "identifier")
 
   implicit def literalToExtensions(value: String): SequenceParserExtensions[String] = Literal(value)
 
@@ -70,12 +70,14 @@ trait StringParserWriter extends SequenceParserWriter {
     literalOrKeyword(value)
   }
 
-  def literalOrKeyword(value: String, canDrop: Boolean = true): Self[String] = {
+  def literalOrKeyword(value: String, allowDrop: Boolean = true): Self[String] = {
     val isKeyword = identifierRegex.findFirstIn(value).contains(value)
-    if (isKeyword) KeywordParser(value) else if (canDrop) DropParser(Literal(value)) else Literal(value)
+    if (isKeyword) KeywordParser(value) else literal(value, allowDrop = allowDrop)
   }
 
-  def literal(value: String, penalty: Double = History.missingInputPenalty) = DropParser(Literal(value, penalty))
+  def literal(value: String, penalty: Double = History.missingInputPenalty,
+              allowDrop: Boolean = true) =
+    if (allowDrop) DropParser(Literal(value, penalty)) else Literal(value, penalty)
 
   case class Literal(value: String, penalty: Double = History.missingInputPenalty) extends ParserBuilderBase[String] with LeafParser[String] {
 
@@ -149,12 +151,15 @@ trait StringParserWriter extends SequenceParserWriter {
     def range = SourceRange(from.position, to.position)
   }
 
-  def regex(regex: Regex, regexName: String,
-            // TODO use the regex to generate a default case.
-            defaultValue: Option[String] = None,
-            score: Double = History.successValue,
-            penaltyOption: Option[Double] = Some(History.missingInputPenalty)) =
-    DropParser(RegexParser(regex, regexName, defaultValue, score, penaltyOption))
+  def parseRegex(regex: Regex, regexName: String,
+                 // TODO use the regex to generate a default case.
+                 defaultValue: Option[String] = None,
+                 score: Double = History.successValue,
+                 penaltyOption: Option[Double] = Some(History.missingInputPenalty),
+                 allowDrop: Boolean = true) = {
+    val initial = RegexParser(regex, regexName, defaultValue, score, penaltyOption)
+    if (allowDrop) DropParser(initial) else initial
+  }
 
   case class RegexParser(regex: Regex, regexName: String,
                          // TODO use the regex to generate a default case.

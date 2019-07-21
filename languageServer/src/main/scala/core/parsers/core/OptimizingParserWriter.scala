@@ -125,7 +125,7 @@ trait OptimizingParserWriter extends ParserWriter {
           nodesThatShouldDetectLeftRecursion += cycle.head
       })
 
-    val components = SCC.scc[ParserBuilder[_]](reverseGraph.keys.toSet, node => node.children.toSet) // Due to dropping, we can have virtual left recursion.
+    val components = SCC.scc[ParserBuilder[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
     val nodesInCycle: Set[ParserBuilder[_]] = components.filter(c => c.size > 1).flatten.toSet
 
     val nodesWithMultipleIncomingEdges: Set[ParserBuilder[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet

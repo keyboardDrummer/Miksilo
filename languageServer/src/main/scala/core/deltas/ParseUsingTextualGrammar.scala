@@ -30,7 +30,6 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
   }
 
   def parseStream[T](parser: SingleResultParser[T], input: InputStream): SingleParseResult[T] = {
-    //parser.parseUntilBestOption(new Reader(SourceUtils.streamToString(input)))
     parser.parseUntilBetterThanNextOrXSteps(new Reader(SourceUtils.streamToString(input)))
   }
 

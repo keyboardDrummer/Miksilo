@@ -14,8 +14,5 @@ case class RegexGrammar(regex: Regex, name: String, verifyWhenPrinting: Boolean 
   extends StringGrammar(verifyWhenPrinting) {
 
   override def getParserBuilder(keywords: scala.collection.Set[String]): Self[Any] =
-    if (allowDrop)
-      BiGrammarToParser.regex(regex, name, defaultValue, score, penaltyOption)
-    else
-      BiGrammarToParser.RegexParser(regex, name, defaultValue, score, penaltyOption)
+      BiGrammarToParser.parseRegex(regex, name, defaultValue, score, penaltyOption, allowDrop = allowDrop)
 }

@@ -8,8 +8,5 @@ case class Delimiter(value: String, penalty: Double = History.missingInputPenalt
     throw new RuntimeException("value must have non-zero length")
 
   override def getParserBuilder(keywords: scala.collection.Set[String]): BiGrammarToParser.Self[String] =
-    if (allowDrop)
-      BiGrammarToParser.literal(value, penalty)
-  else
-      BiGrammarToParser.Literal(value, penalty)
+    BiGrammarToParser.literal(value, penalty, allowDrop)
 }
