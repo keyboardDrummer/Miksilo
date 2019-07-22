@@ -133,7 +133,7 @@ class LSPServerTest extends AsyncFunSpec {
     assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
   }
 
-  it("can use code action") {
+  ignore("can use code action") {
     val document = TextDocumentItem("a","",0,"content")
     val someRange = SourceRange(Position(0, 1), Position(1, 2))
     val someOtherRange = SourceRange(Position(0, 0), Position(0, 0))
@@ -204,7 +204,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
-  it("can use documentSymbol") {
+ ignore("can use documentSymbol") {
     val document = TextDocumentItem("a","",0,"content")
     val request = DocumentSymbolParams(TextDocumentIdentifier(document.uri))
     val symbolRange = SourceRange(Position(0, 1), Position(1, 2))
