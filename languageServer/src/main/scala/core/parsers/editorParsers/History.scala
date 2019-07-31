@@ -113,14 +113,19 @@ case class FlawedHistory[Input](score: Double,
   }
 
   def ++(right: History[Input]): History[Input] = {
-    val (rightScore, rightDropRight1, rightLast) = right.addError(lastError) match {
-      case single: SingleError[Input] => (single.score, null, single.error)
-      case flawed: FlawedHistory[Input] => (flawed.score, Rose.node(Leaf(flawed.firstError), flawed.middleErrors), flawed.lastError)
+    right match {
+      case withChoices: HistoryWithChoices[Input] => HistoryWithChoices(withChoices.choices, this ++ withChoices.inner)
+      case _ =>
+
+        val (rightWithLastScore, newMiddleErrors, newLast) = right.addError(lastError) match {
+          case single: SingleError[Input] => (single.score, middleErrors, single.error)
+          case flawed: FlawedHistory[Input] => (flawed.score, Rose.node(middleErrors, Leaf(flawed.firstError), flawed.middleErrors), flawed.lastError)
+        }
+        FlawedHistory(score - lastError.score + rightWithLastScore,
+          firstError,
+          newMiddleErrors,
+          newLast)
     }
-    FlawedHistory(score - lastError.score + rightScore,
-      firstError,
-      if (rightDropRight1 == null) middleErrors else Rose.node(middleErrors, rightDropRight1),
-      rightLast)
   }
 
   def addSuccess(successScore: Double): History[Input] = {
@@ -132,4 +137,25 @@ case class FlawedHistory[Input](score: Double,
   override def errors = Seq.concat(Seq(firstError), middleErrors.values, Seq(lastError))
 
   override def canMerge = firstError.canMerge
+}
+
+case class HistoryWithChoices[Input](choices: Seq[(Input, Any)], inner: History[Input] = History.empty[Input]) extends History[Input] {
+
+  override def canMerge = true
+
+  override def flawed = inner.flawed
+
+  override def addError(newHead: ParseError[Input]) = HistoryWithChoices(choices, inner.addError(newHead))
+
+  override def ++(right: History[Input]) = right match {
+    case withChoices: HistoryWithChoices[Input] =>
+      HistoryWithChoices(choices ++ withChoices.choices, inner ++ withChoices.inner)
+    case _ => HistoryWithChoices(choices, inner ++ right)
+  }
+
+  override def score = inner.score
+
+  override def addSuccess(successScore: Double) = HistoryWithChoices(choices, inner.addSuccess(successScore))
+
+  override def errors = inner.errors
 }
