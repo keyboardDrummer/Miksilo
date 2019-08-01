@@ -9,9 +9,6 @@ case class Keyword(var value: String, reserved: Boolean = true, verifyWhenPrinti
     throw new RuntimeException("value must have non-zero length")
 
   override def getParserBuilder(keywords: scala.collection.Set[String]): Self[String] = {
-    if (reserved)
-      literalOrKeyword(value)
-    else
-      literal(value)
+    literal(value)
   }
 }

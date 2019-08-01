@@ -3,7 +3,12 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammarToParser
 import core.parsers.editorParsers.History
 
-case class Delimiter(value: String, penalty: Double = History.missingInputPenalty, allowDrop: Boolean = true) extends StringGrammar {
+case class BiLiteral(value: String,
+                     penalty: Double = History.missingInputPenalty,
+                     allowDrop: Boolean = true,
+                     verifyWhenPrinting: Boolean = false)
+  extends StringGrammar(verifyWhenPrinting) {
+
   if (value.length == 0)
     throw new RuntimeException("value must have non-zero length")
 

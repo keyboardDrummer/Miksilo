@@ -1,6 +1,6 @@
 package core.bigrammar.textMate
 
-import core.bigrammar.grammars.Delimiter
+import core.bigrammar.grammars.BiLiteral
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
@@ -14,12 +14,12 @@ object TextMateDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val objectLiteral = find(JsonObjectLiteralDelta.Shape)
-    objectLiteral.find(p => p.value == Delimiter(":")).get.set(printSpace ~> Delimiter("="))
-    objectLiteral.find(p => p.value == Delimiter(",")).get.set(Delimiter(";"))
+    objectLiteral.find(p => p.value == BiLiteral(":")).get.set(printSpace ~> BiLiteral("="))
+    objectLiteral.find(p => p.value == BiLiteral(",")).get.set(BiLiteral(";"))
 
     val arrayLiteral = find(ArrayLiteralDelta.Shape)
-    arrayLiteral.find(p => p.value == Delimiter("[")).get.set(Delimiter("("))
-    arrayLiteral.find(p => p.value == Delimiter("]")).get.set(Delimiter(")"))
+    arrayLiteral.find(p => p.value == BiLiteral("[")).get.set(BiLiteral("("))
+    arrayLiteral.find(p => p.value == BiLiteral("]")).get.set(BiLiteral(")"))
   }
 
   override def description = "Introduces TextMate syntax"

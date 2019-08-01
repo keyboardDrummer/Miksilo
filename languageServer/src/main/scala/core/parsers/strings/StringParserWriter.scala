@@ -66,13 +66,8 @@ trait StringParserWriter extends SequenceParserWriter {
 
   implicit def literalToExtensions(value: String): SequenceParserExtensions[String] = Literal(value)
 
-  implicit def stringToLiteralOrKeyword(value: String): Self[String] = {
-    literalOrKeyword(value)
-  }
-
-  def literalOrKeyword(value: String, allowDrop: Boolean = true): Self[String] = {
-    val isKeyword = identifierRegex.findFirstIn(value).contains(value)
-    if (isKeyword) KeywordParser(value) else literal(value, allowDrop = allowDrop)
+  implicit def stringToLiteral(value: String): Self[String] = {
+    literal(value)
   }
 
   def literal(value: String, penalty: Double = History.missingInputPenalty,
@@ -107,43 +102,6 @@ trait StringParserWriter extends SequenceParserWriter {
     }
 
     override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
-  }
-
-  /**
-    * Don't wrap KeywordParser in a Drop. Since it wraps identifier, it already has a drop.
-    * What's the point of letting KeywordParser use identifier instead of Literal?
-    * Using Literal would be much simpler.
-    * The situation is that identifier and keyword parser can overlap, but identifier has a filter on keywords
-    */
-  case class KeywordParser(value: String) extends ParserBuilderBase[String] with ParserWrapper[String] {
-    override def getParser(recursive: GetParser): Parser[String] = {
-      val parseIdentifier = recursive(identifier)
-      (input, state) => {
-        parseIdentifier(input, state).mapReady(ready => {
-          if (ready.resultOption.contains(value)) {
-            ready
-          } else {
-            var parsed = 0
-            val parsedIdentifier = ready.resultOption.getOrElse("")
-            while(parsed < parsedIdentifier.length &&  parsed < value.length &&
-              parsedIdentifier.charAt(parsed) == value.charAt(parsed)) {
-              parsed += 1
-            }
-            val insertFix = value.drop(parsed)
-            val reached = input.safeDrop(parsed)
-            val error =
-              if (ready.remainder == input)
-                new MissingInput(input, value, insertFix, History.missingInputPenalty)
-              else
-                MissingInput(input, ready.remainder, value, insertFix, History.missingInputPenalty)
-
-            ReadyParseResult(Some(value), reached, History.error(error))
-          }
-        }, uniform = false)
-      }
-    }
-
-    override def original: Self[String] = identifier
   }
 
   trait NextCharError extends ParseError[Input] {

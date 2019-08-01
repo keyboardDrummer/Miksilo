@@ -1,6 +1,6 @@
 package deltas.json
 
-import core.bigrammar.grammars.{As, Colorize, Delimiter, RegexGrammar}
+import core.bigrammar.grammars.{As, Colorize, BiLiteral, RegexGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
@@ -19,7 +19,7 @@ object SingleQuotedStringLiteralDelta extends DeltaWithGrammar {
     val inner = {
       import core.bigrammar.DefaultBiGrammarWriter._
       val withoutColor = JsonStringLiteralDelta.dropPrefix(grammars,
-        grammars.regexGrammar("""'[^']*""".r, "single quote string literal"), JsonStringLiteralDelta.Value, "'") ~< Delimiter("'")
+        grammars.regexGrammar("""'[^']*""".r, "single quote string literal"), JsonStringLiteralDelta.Value, "'") ~< BiLiteral("'")
       Colorize(withoutColor, "string.quoted.single")
     }
     import grammars._
