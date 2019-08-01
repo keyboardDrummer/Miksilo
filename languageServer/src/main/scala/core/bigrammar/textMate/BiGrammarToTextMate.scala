@@ -40,7 +40,7 @@ object BiGrammarToTextMate {
         case map: MapGrammar => recurse(map.inner)
         case map: MapGrammarWithMap => recurse(map.inner)
         case labelled: Labelled => recurse(labelled.inner)
-        case delimiter: Delimiter => Some(escapeRegex(delimiter.value))
+        case delimiter: BiLiteral => Some(escapeRegex(delimiter.value))
         case _: Identifier => Some(escapeRegex(BiGrammarToParser.identifierRegex.regex))
         case ParseWhiteSpace => Some(ParseWhiteSpace.regex.regex)
         case keyword: Keyword => Some(escapeRegex(keyword.value))
@@ -137,7 +137,7 @@ object BiGrammarToTextMate {
       node => if (node.isInstanceOf[Colorize]) GraphBasics.SkipChildren else GraphBasics.Continue )
 
     val typedPatterns: Seq[Match] = reachables.collect({
-      case delimiter: Delimiter =>
+      case delimiter: BiLiteral =>
         Match("keyword.operator", escapeRegex(delimiter.value).r)
       case keyword: Keyword /*if keyword.reserved*/ =>
         Match("keyword.control", ("\\b" + escapeRegex(keyword.value) + "\\b").r)

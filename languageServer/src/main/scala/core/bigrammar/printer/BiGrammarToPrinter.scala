@@ -31,7 +31,7 @@ class BiGrammarToPrinter {
     printerCache.getOrElseUpdate(grammar, {
       val result: NodePrinter = grammar match {
         case choice: BiChoice => new OrPrinter(toPrinterCached(choice.left), toPrinterCached(choice.right))
-        case delimiter: Delimiter => _ => succeed(delimiter.value)
+        case delimiter: BiLiteral => _ => succeed(delimiter.value)
         case Keyword(keyword, _, verify) => value =>
           if (!verify || value.value == keyword)
             succeed(keyword)

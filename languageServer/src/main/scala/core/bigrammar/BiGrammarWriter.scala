@@ -54,7 +54,7 @@ trait BiGrammarWriter {
     if (count == value.length)
       Keyword(value, reserved)
     else if (count == 0)
-      Delimiter(value)
+      BiLiteral(value)
     else
       throw new RuntimeException(s"Can't implicitly convert $value to BiGrammar because of mixed character types")
   }

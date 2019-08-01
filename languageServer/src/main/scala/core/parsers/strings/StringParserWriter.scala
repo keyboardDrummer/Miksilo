@@ -66,12 +66,8 @@ trait StringParserWriter extends SequenceParserWriter {
 
   implicit def literalToExtensions(value: String): SequenceParserExtensions[String] = Literal(value)
 
-  implicit def stringToLiteralOrKeyword(value: String): Self[String] = {
-    literalOrKeyword(value)
-  }
-
-  def literalOrKeyword(value: String, allowDrop: Boolean = true): Self[String] = {
-    literal(value, allowDrop = allowDrop)
+  implicit def stringToLiteral(value: String): Self[String] = {
+    literal(value)
   }
 
   def literal(value: String, penalty: Double = History.missingInputPenalty,
