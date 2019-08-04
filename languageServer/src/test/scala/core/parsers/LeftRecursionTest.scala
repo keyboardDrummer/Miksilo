@@ -149,7 +149,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
   test("fibonacci regression simplified (doesn't regress yet)") {
     val input = "System.out.print(Fibonacci.fibonacci(x))"
 
-    val variable = new Lazy(identifier.map(x => x), "variable")
+    val variable = new Lazy(parseIdentifier.map(x => x), "variable")
     lazy val lastExpression = new Lazy(Fail(None, "last", 1) | variable | call, "lastExpression")
     lazy val relationalInner: Self[Any] = new Lazy(lastExpression, "expression")
     lazy val equality: Self[Any] = new Lazy(relational.map(x => x) ~ literalOrKeyword("==") ~ relationalInner.map(x => x), "equality")
@@ -157,7 +157,7 @@ class LeftRecursionTest extends FunSuite with CommonStringReaderParser
     lazy val assignmentTarget: Self[Any] = new Lazy(Fail(None, "fail", 1), "assignmentTarget")
     lazy val simpleAssignment: Self[Any] = new Lazy(assignmentTarget.map(x => x) ~ literalOrKeyword("=") ~ expression.map(x => x), "equality")
     lazy val assignment: Self[Any] = new Lazy(relational | simpleAssignment, "assignemnt")
-    lazy val memberSelector = new Lazy(expression.map(x => x) ~ literalOrKeyword(".") ~ identifier.map(x => x), "member selector")
+    lazy val memberSelector = new Lazy(expression.map(x => x) ~ literalOrKeyword(".") ~ parseIdentifier.map(x => x), "member selector")
     lazy val callCallee = new Lazy(variable | memberSelector, "callCallee")
     lazy val call = new Lazy(callCallee.map(x => x) ~ "(" ~ expression.manySeparated(",", "parameter").map(x => x) ~ ")", "call")
     //val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++ JavaLanguage.fields ++ JavaLanguage.method))

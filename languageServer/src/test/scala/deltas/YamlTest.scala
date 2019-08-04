@@ -160,7 +160,8 @@ class YamlTest extends FunSuite {
     val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
       YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
     val compilation = language.compile(contents)
-    assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains(": <value>"))
+    assert(compilation.diagnostics.size == 1)
+    assert(compilation.diagnostics.head.diagnostic.message.contains(":<value>"))
   }
 
   test("big yaml file") {

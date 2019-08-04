@@ -8,9 +8,9 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
     var bestResult: ReadyParseResult[Result] = noResultFound
 
     var resultsSeen = Map.empty[Any, ReadyParseResult[Result]]
-    var queue = parser(input, newParseState(input))
+    var queue: SortedParseResults[Result] = parser(input, newParseState(input))
     while(queue.nonEmpty) {
-      val (parseResult, tail) = queue.pop()
+      val (parseResult: LazyParseResult[Result], tail) = queue.pop()
 
       queue = parseResult match {
         case parseResult: ReadyParseResult[Result] =>
