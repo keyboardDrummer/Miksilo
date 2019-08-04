@@ -1,8 +1,8 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.{FlawedHistory, History, ParseError, SpotlessHistory}
+import core.parsers.editorParsers.{Fix, History, ParseError}
 import core.parsers.sequences.SequenceParserWriter
-import languageServer.{Position, SourceRange}
+import languageServer.{Position, SourceRange, TextEdit}
 
 import scala.util.matching.Regex
 
@@ -62,9 +62,10 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   val identifierRegex = """[_a-zA-Z][_a-zA-Z0-9]*""".r
-  val identifier = parseRegex(identifierRegex, "identifier")
+  val parseIdentifier = parseRegex(identifierRegex, "identifier")
 
-  implicit def literalToExtensions(value: String): SequenceParserExtensions[String] = Literal(value)
+  implicit def literalToExtensions(value: String): SequenceParserExtensions[String] =
+    literalOrKeyword(value)
 
   implicit def stringToLiteralOrKeyword(value: String): Self[String] = {
     literalOrKeyword(value)
@@ -72,7 +73,12 @@ trait StringParserWriter extends SequenceParserWriter {
 
   def literalOrKeyword(value: String, allowDrop: Boolean = true): Self[String] = {
     val isKeyword = identifierRegex.findFirstIn(value).contains(value)
-    if (isKeyword) KeywordParser(value) else literal(value, allowDrop = allowDrop)
+    if (isKeyword)
+      if (allowDrop)
+        KeywordParser(value)
+      else
+        ???
+    else literal(value, allowDrop = allowDrop)
   }
 
   def literal(value: String, penalty: Double = History.missingInputPenalty,
@@ -89,12 +95,12 @@ trait StringParserWriter extends SequenceParserWriter {
           val array = input.array
           while (index < value.length) {
             val arrayIndex = index + input.offset
+            val remainder = input.drop(index)
+            val errorHistory = History.error(MissingInput(remainder, value.substring(index), value.substring(index), penalty))
             if (array.length <= arrayIndex) {
-              return singleResult(ReadyParseResult(Some(value), input,
-                History.error(new MissingInput(input, value, value.substring(index), penalty))))
+              return singleResult(ReadyParseResult(Some(value), remainder, errorHistory))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
-              return singleResult(ReadyParseResult(Some(value), input,
-                History.error(MissingInput(input, input.drop(index + 1), value, value.substring(index), penalty))))
+              return singleResult(ReadyParseResult(Some(value), remainder, errorHistory))
             }
             index += 1
           }
@@ -110,40 +116,25 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   /**
+    * The purpose of KeywordParser is to parse keyword that is not a prefix of a longer identifier.
     * Don't wrap KeywordParser in a Drop. Since it wraps identifier, it already has a drop.
-    * What's the point of letting KeywordParser use identifier instead of Literal?
-    * Using Literal would be much simpler.
-    * The situation is that identifier and keyword parser can overlap, but identifier has a filter on keywords
     */
   case class KeywordParser(value: String) extends ParserBuilderBase[String] with ParserWrapper[String] {
     override def getParser(recursive: GetParser): Parser[String] = {
-      val parseIdentifier = recursive(identifier)
+      val identifierParser = recursive(parseIdentifier)
       (input, state) => {
-        parseIdentifier(input, state).mapReady(ready => {
+        identifierParser(input, state).mapReady(ready => {
           if (ready.resultOption.contains(value)) {
             ready
           } else {
-            var parsed = 0
-            val parsedIdentifier = ready.resultOption.getOrElse("")
-            while(parsed < parsedIdentifier.length &&  parsed < value.length &&
-              parsedIdentifier.charAt(parsed) == value.charAt(parsed)) {
-              parsed += 1
-            }
-            val insertFix = value.drop(parsed)
-            val reached = input.safeDrop(parsed)
-            val error =
-              if (ready.remainder == input)
-                new MissingInput(input, value, insertFix, History.missingInputPenalty)
-              else
-                MissingInput(input, ready.remainder, value, insertFix, History.missingInputPenalty)
-
-            ReadyParseResult(Some(value), reached, History.error(error))
+            val insertError = MissingInput(input, value, value + " ")
+            ReadyParseResult(Some(value), input, History.error(insertError))
           }
         }, uniform = false)
       }
     }
 
-    override def original: Self[String] = identifier
+    override def original: Self[String] = parseIdentifier
   }
 
   trait NextCharError extends ParseError[Input] {
