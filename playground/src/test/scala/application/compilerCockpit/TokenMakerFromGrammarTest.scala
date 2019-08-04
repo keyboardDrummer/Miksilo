@@ -1,13 +1,13 @@
 package application.compilerCockpit
 
-import core.bigrammar.BiGrammarToParser
-import core.bigrammar.BiGrammarToParser.Reader
 import deltas.javac.JavaToByteCodeLanguage
 import deltas.json.JsonLanguage
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.fife.ui.rsyntaxtextarea.TokenTypes
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
+
+import scala.util.parsing.input.CharArrayReader
 
 class TokenMakerFromGrammarTest extends FunSuite {
 
@@ -38,8 +38,7 @@ class TokenMakerFromGrammarTest extends FunSuite {
         |    }#
         |}""".stripMargin
 
-    val resultOption: BiGrammarToParser.SingleParseResult[Seq[MyToken]] =
-      tokenMaker.parserBuilder.getWholeInputParser.parse(new BiGrammarToParser.Reader(text))
+    val resultOption = tokenMaker.parser.apply(new CharArrayReader(text.toCharArray))
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
     val expectedTokens = List(
@@ -65,7 +64,7 @@ class TokenMakerFromGrammarTest extends FunSuite {
 
     val text = "^"
 
-    val resultOption = tokenMaker.parserBuilder.getWholeInputParser.parse(new Reader(text))
+    val resultOption = tokenMaker.parser.apply(new CharArrayReader(text.toCharArray))
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
     val expectedTokens = List(MyToken(TokenTypes.ERROR_CHAR, "^"))
@@ -79,8 +78,7 @@ class TokenMakerFromGrammarTest extends FunSuite {
 
     val text = """{"hello":3}""".stripMargin
 
-    val resultOption: BiGrammarToParser.SingleParseResult[Seq[MyToken]] =
-      tokenMaker.parserBuilder.getWholeInputParser.parse(new BiGrammarToParser.Reader(text))
+    val resultOption = tokenMaker.parser.apply(new CharArrayReader(text.toCharArray))
     assert(resultOption.successful, resultOption.toString)
     val tokens = resultOption.get
     val expectedTokens = List(
