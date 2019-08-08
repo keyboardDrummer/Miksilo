@@ -14,8 +14,7 @@ import util.TestLanguageBuilder
 
 class ReorderMembersTest extends FunSuite {
 
-  // TODO fix Java parser to re-enable this test
-  ignore("cannot parse comment") {
+  test("cannot parse comment") {
     val input =
       """class Example
         |{
