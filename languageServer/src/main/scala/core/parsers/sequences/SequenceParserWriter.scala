@@ -302,9 +302,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def parseUntilBetterThanNextOrXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
       var counter = 0
       parse(input, (best, second) => {
-        if (second > best)
-          false
-        else {
+        (best > second) || {
           counter += 1
           counter >= steps
         }
@@ -314,11 +312,10 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def parseUntilBetterThanNextAndXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
       var counter = 0
       parse(input, (best, second) => {
-        if (best > second) {
+        (best > second) & {
           counter += 1
           counter > steps
-        } else
-          false
+        }
       })
     }
 
