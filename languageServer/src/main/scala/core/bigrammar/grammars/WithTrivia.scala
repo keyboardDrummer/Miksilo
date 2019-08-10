@@ -9,7 +9,7 @@ import util.Utility
 case class WithTrivia(var inner: BiGrammar, var trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true) extends CustomGrammar {
   override def print(toDocumentInner: BiGrammar => ResponsiveDocument) = toDocumentInner(sequence)
 
-  val sequence = new BiSequence(trivia, inner, BiSequence.ignoreLeft, horizontal)
+  def sequence = new BiSequence(trivia, inner, BiSequence.ignoreLeft, horizontal)
   override def createPrinter(recursive: BiGrammar => NodePrinter) = {
     recursive(sequence)
   }
