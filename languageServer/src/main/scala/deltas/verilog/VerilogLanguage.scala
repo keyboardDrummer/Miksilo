@@ -26,5 +26,5 @@ object VerilogLanguage {
     VerilogClassDelta,
     VerilogModuleDelta,
     FileWithMembersDelta) ++ genericDeltas
-  val language: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ deltas)
+  val language: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar()) ++ deltas)
 }

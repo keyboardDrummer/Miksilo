@@ -48,9 +48,11 @@ class BiGrammarToPrinter {
             (first, second) =>
               if (sequence.horizontal) ResponsiveLeftRight(first, second)
               else ResponsiveTopBottom(first, second))
-          val deconstruct = (withMap: AnyWithMap) => sequence.bijective.destruct(withMap.value).map(v => WithMap(v, withMap.namedValues))
+          val deconstruct = (withMap: AnyWithMap) =>
+            sequence.bijective.destruct(withMap.value).map(v => WithMap(v, withMap.namedValues))
           new MapGrammarWithMapPrinter(inner, deconstruct)
-        case mapGrammar: MapGrammarWithMap => new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner), mapGrammar.deconstruct)
+        case mapGrammar: MapGrammar[AnyWithMap, AnyWithMap] =>
+          new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner), mapGrammar.deconstruct)
         case BiFailure(message) => _ => failureToGrammar(message, grammar)
         case valueGrammar: ValueGrammar => new ValuePrinter(valueGrammar.value)
         case Print(document) => _ => TryState.value(document)

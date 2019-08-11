@@ -79,7 +79,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
   }
 
   def compile(input: String): Compilation = {
-    language.compile(input)
+    language.compileString(input)
   }
 
   def compileAndPrettyPrint(input: String): String = {

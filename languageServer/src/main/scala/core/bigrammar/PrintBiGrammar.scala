@@ -47,7 +47,7 @@ object PrintBiGrammar {
     case NumberGrammar => "number"
     case StringLiteral => "string"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
-    case map: MapGrammarWithMap => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
+    case map: MapGrammar[_, _] => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
     case ParseWhiteSpace => ""
     case custom: CustomGrammar => custom.print(toDocumentInner)
     case _ => grammar.getClass.toString
@@ -130,7 +130,7 @@ object PrintBiGrammar {
 
       sequence
     case many: Many if many.inner.isInstanceOf[ValueGrammar] => many.inner
-    case map: MapGrammarWithMap => map.inner
+    case map: MapGrammar[_, _] => map.inner
     case x => x
   }
 

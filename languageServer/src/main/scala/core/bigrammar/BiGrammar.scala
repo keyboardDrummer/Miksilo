@@ -39,15 +39,15 @@ trait BiGrammar {
     seq => seq.toSet,
     set => set.toSeq)
 
-  def setValue[T: ClassTag](value: T): BiGrammar = new MapGrammar(this, _ => value,
+  def setValue[T: ClassTag](value: T): BiGrammar = new ValueMapGrammar[Any, T](this, _ => Right(value),
     aValue => if (aValue == value) Some(Unit) else None)
 
   def map[T, U: ClassTag](afterParsing: T => U, beforePrinting: U => T): BiGrammar =
     mapSome(afterParsing, (u: U) => Some(beforePrinting(u)))
 
   def mapSome[T, U: ClassTag](afterParsing: T => U, beforePrinting: U => Option[T]): BiGrammar =
-    new MapGrammar(this,
-      value => afterParsing(value.asInstanceOf[T]),
+    new ValueMapGrammar[T, U](this,
+      value => Right(afterParsing(value)),
       value => Utility.cast[U](value).flatMap(value => beforePrinting(value)))
 
   def children: Seq[BiGrammar]

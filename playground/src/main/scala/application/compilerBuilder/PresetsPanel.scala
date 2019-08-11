@@ -26,7 +26,7 @@ object PresetsPanel
 {
   def getSimplifiedByteCodePreset: Preset = {
     val deltas = Delta.spliceAndFilterTop(ExtendedByteCode.simpleByteCodeDeltas, ByteCodeLanguage.byteCodeDeltas, Seq(MarkOutputGrammar))
-    Preset("Simplified bytecode", Seq(ParseUsingTextualGrammar) ++ deltas, "Simplified JVM bytecode.")
+    Preset("Simplified bytecode", Seq(ParseUsingTextualGrammar()) ++ deltas, "Simplified JVM bytecode.")
   }
 
   def getJavaToSimplifiedByteCodePreset = {
@@ -50,33 +50,33 @@ object PresetsPanel
   }
 
   def getPrettyPrintPreset = {
-    Preset("Pretty Print Java", Seq(ParseUsingTextualGrammar, MarkOutputGrammar) ++ JavaToByteCodeLanguage.javaCompilerDeltas,
+    Preset("Pretty Print Java", Seq(ParseUsingTextualGrammar(), MarkOutputGrammar) ++ JavaToByteCodeLanguage.javaCompilerDeltas,
       "Performs no transformations. Just parses and prints the Java.")
   }
 
   def getFibonacciExpressionMethodPreset = {
-    Preset("Java with expression method", spliceAfterTransformations(Seq(ParseUsingTextualGrammar), Seq(ExpressionMethodDelta)),
+    Preset("Java with expression method", spliceAfterTransformations(Seq(ParseUsingTextualGrammar()), Seq(ExpressionMethodDelta)),
       "Allows you to use an expression as the body of a method.")
   }
 
   def getBlockCompilerPreset = {
-    Preset("Java statement block", spliceAfterTransformations(Seq(ParseUsingTextualGrammar), Seq(BlockLanguageDelta)),
+    Preset("Java statement block", spliceAfterTransformations(Seq(ParseUsingTextualGrammar()), Seq(BlockLanguageDelta)),
       "The program consists only of a single statement block.")
   }
 
   def getByteCodePreset = {
-    Preset("Basic bytecode", Seq(ParseUsingTextualGrammar) ++ ByteCodeLanguage.byteCodeDeltas, "Regular JVM bytecode.")
+    Preset("Basic bytecode", Seq(ParseUsingTextualGrammar()) ++ ByteCodeLanguage.byteCodeDeltas, "Regular JVM bytecode.")
   }
 
   def getAddImplicitsPreset: Preset = {
-    val implicits = Seq[Delta](ParseUsingTextualGrammar, ImplicitJavaLangImport, DefaultConstructorDelta, ImplicitSuperConstructorCall,
+    val implicits = Seq[Delta](ParseUsingTextualGrammar(), ImplicitJavaLangImport, DefaultConstructorDelta, ImplicitSuperConstructorCall,
       ImplicitObjectSuperClass, ImplicitReturnAtEndOfMethod, SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta)
 
     Preset("Reveal Java Implicits", spliceAfterTransformations(implicits, Seq(MarkOutputGrammar)))
   }
 
   def getRevealSyntaxSugar: Preset = {
-    val implicits = Seq[Delta](ParseUsingTextualGrammar, DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
+    val implicits = Seq[Delta](ParseUsingTextualGrammar(), DefaultConstructorDelta, ImplicitSuperConstructorCall, ImplicitObjectSuperClass, FieldDeclarationWithInitializer,
       ConstructorDelta, ImplicitReturnAtEndOfMethod, AddAssignmentDelta, ForLoopContinueDelta, ForLoopDelta, LocalDeclarationWithInitializerDelta,
       ImplicitJavaLangImport, SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta)
 
@@ -85,7 +85,7 @@ object PresetsPanel
   }
 
   def getLabelledLocations = {
-    Preset("Labelled JVM locations", Seq[Delta](ParseUsingTextualGrammar, LabelledLocations, MarkOutputGrammar) ++ ByteCodeLanguage.byteCodeDeltas,
+    Preset("Labelled JVM locations", Seq[Delta](ParseUsingTextualGrammar(), LabelledLocations, MarkOutputGrammar) ++ ByteCodeLanguage.byteCodeDeltas,
       "Replaces integer offsets by labels to indicate positions in instruction lists.")
   }
 

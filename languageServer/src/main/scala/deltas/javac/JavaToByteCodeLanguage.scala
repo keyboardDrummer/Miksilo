@@ -23,14 +23,14 @@ import deltas.javac.classes.skeleton.JavaClassToByteCodeDelta
 
 object JavaToByteCodeLanguage {
 
-  def getJava: LanguageFromDeltas = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ javaCompilerDeltas)
+  def getJava: LanguageFromDeltas = LanguageFromDeltas(Seq(ParseUsingTextualGrammar()) ++ javaCompilerDeltas)
 
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
     Set(ConstantPoolIndices, SlashStarBlockCommentsDelta, StoreTriviaDelta,
       TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, ReorderMembersDelta,
-      ParseUsingTextualGrammar)
+      ParseUsingTextualGrammar())
 
   def javaCompilerDeltas: Seq[Delta] = {
       Seq(NewToByteCodeDelta, ThisCallToByteCodeDelta, SuperCallToByteCodeExpression,

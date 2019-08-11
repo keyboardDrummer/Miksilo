@@ -1,8 +1,7 @@
 package core.parsers.sequences
 
-import core.bigrammar.BiGrammarToParser
 import core.parsers.core.{ParseInput, Processor}
-import core.parsers.editorParsers.{CorrectingParserWriter, Fix, History, ParseError}
+import core.parsers.editorParsers.{CorrectingParserWriter, Fix, History, ParseError, StopFunction}
 import languageServer.{Position, SourceRange, TextEdit}
 
 trait SequenceParserWriter extends CorrectingParserWriter {
@@ -209,6 +208,34 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def penalty = History.missingInputPenalty
   }
 
+  case class FilterMap[Other, Result <: Other, NewResult](
+      original: Self[Result],
+      map: Other => Either[String, NewResult])
+    extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
+
+    override def getParser(recursive: GetParser): Parser[NewResult] = {
+      val parseOriginal = recursive(original)
+      (input, state) => {
+        val originalResult = parseOriginal(input, state)
+        originalResult.mapReady(ready => {
+          ready.resultOption match {
+            case Some(result) =>
+              val newResultOption = map(result)
+              newResultOption match {
+                case Left(message) =>
+                  ReadyParseResult(None, ready.remainder,
+                    ready.history.addError(FilterError(input, ready.remainder, message)))
+                case Right(value) =>
+                  ReadyParseResult(Some(value), ready.remainder, ready.history)
+              }
+            case None =>
+              ready.asInstanceOf[ReadyParseResult[NewResult]]
+          }
+        }, uniform = false)
+      }
+    }
+  }
+
   case class Filter[Other, Result <: Other](original: Self[Result],
                                             predicate: Other => Boolean,
                                             getMessage: Other => String)
@@ -293,15 +320,15 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
   val defaultSteps = 10
   trait SingleResultParser[+Result] {
-    def parse(input: Input, mayStop: (Double, Double) => Boolean = (_, _) => true): SingleParseResult[Result]
+    def parse(input: Input, mayStop: StopFunction = (_, _, _) => true): SingleParseResult[Result]
 
     def parseUntilBestOption(input: Input): SingleParseResult[Result] = {
-      parse(input, (_, _) => false)
+      parse(input, (_, _: Double, _: Double) => false)
     }
 
     def parseUntilBetterThanNextOrXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
       var counter = 0
-      parse(input, (best, second) => {
+      parse(input, (_, best, second) => {
         (best > second) || {
           counter += 1
           counter >= steps
@@ -309,9 +336,17 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       })
     }
 
+    def parseUntilTime(input: Input, milliseconds: Double = 200): SingleParseResult[Result] = {
+      val start = System.currentTimeMillis()
+      parse(input, (_, best, second) => {
+        val passed = System.currentTimeMillis() - start
+        passed > milliseconds
+      })
+    }
+
     def parseUntilBetterThanNextAndXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
       var counter = 0
-      parse(input, (best, second) => {
+      parse(input, (_, best, second) => {
         (best > second) & {
           counter += 1
           counter > steps
@@ -320,15 +355,77 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
 
     def parseUntilBetterThanNext(input: Input): SingleParseResult[Result] = {
-      parse(input, (best, second) => best > second)
+      parse(input, (_, best, second) => best > second)
     }
 
     def parseXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
       var counter = 0
-      parse(input, (_, _) => {
+      parse(input, (_, _, _) => {
         counter += 1
         counter == steps
       })
     }
+  }
+}
+
+case class XStepsStopFunction(steps: Int = 2) extends StopFunction {
+  var counter = 0
+  override def apply(offset: Int, best: Double, second: Double) = {
+    counter += 1
+    counter > steps  }
+
+  override def reset(): Unit = {
+    counter = 0
+  }
+}
+
+case class UntilBestAndXStepsStopFunction(steps: Int = 10) extends StopFunction {
+  var counter = 0
+  override def apply(offset: Int, best: Double, second: Double) = {
+    (best > second) & {
+      counter += 1
+      counter > steps
+    }
+  }
+
+  override def reset(): Unit = {
+    counter = 0
+  }
+}
+
+object StopImmediatelyFunction extends StopFunction {
+  override def apply(offset: Int, best: Double, second: Double) = true
+}
+
+case class TimeRatioStopFunction(minimumCharsPerMillisecond: Long = 5) extends StopFunction {
+  var start: Long = 0
+
+  override def apply(offset: Int, best: Double, second: Double) = {
+    val passed = System.currentTimeMillis() - start
+    val offsetWithBase = offset + 1000
+    val charsPerMillisecond = offsetWithBase / (passed + 1.0)
+    val result = minimumCharsPerMillisecond > charsPerMillisecond
+    if (result) {
+      System.out.println(s"parsePerformance: $charsPerMillisecond, offset: $offset")
+      new Exception().printStackTrace()
+    }
+    result
+  }
+
+  override def reset(): Unit = {
+    start = System.currentTimeMillis()
+  }
+}
+
+case class UntilTimeStopFunction(milliseconds: Long) extends StopFunction {
+  var start: Long = 0
+
+  override def apply(offset: Int, best: Double, second: Double) = {
+    val passed = System.currentTimeMillis() - start
+    passed > milliseconds
+  }
+
+  override def reset(): Unit = {
+    start = System.currentTimeMillis()
   }
 }

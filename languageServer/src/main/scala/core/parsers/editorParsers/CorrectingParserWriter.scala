@@ -2,13 +2,19 @@ package core.parsers.editorParsers
 
 import core.parsers.core.OptimizingParserWriter
 
+trait StopFunction {
+  def reset(): Unit = {}
+  def apply(offset: Int, best: Double, second: Double): Boolean
+}
+
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
-  def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: (Double, Double) => Boolean): SingleParseResult[Result] = {
+  def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: StopFunction): SingleParseResult[Result] = {
 
     val noResultFound = ReadyParseResult(None, input, History.error(FatalError(input, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Result] = noResultFound
 
+    mayStop.reset()
     var queue = parser(input, newParseState(input))
     while(queue.nonEmpty) {
       val (parseResult, tail) = queue.pop()
@@ -19,7 +25,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
             case tailCons: SRCons[Result] =>
-              if (mayStop(bestResult.originalScore, tailCons.head.score))
+              if (mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty
               else
                 tail

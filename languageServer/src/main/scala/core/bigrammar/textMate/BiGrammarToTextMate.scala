@@ -1,6 +1,7 @@
 package core.bigrammar.textMate
 
 import _root_.core.bigrammar.grammars.{ParseWhiteSpace, _}
+import core.bigrammar.BiGrammarToParser.AnyWithMap
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.language.node.Node
@@ -37,8 +38,8 @@ object BiGrammarToTextMate {
           } yield left + right
         case regex: RegexGrammar => Some(regex.regex.regex)
         case many: Many => recurse(many.inner).map(r => r + "*") // TODO add parenthesis
-        case map: MapGrammar => recurse(map.inner)
-        case map: MapGrammarWithMap => recurse(map.inner)
+        case map: ValueMapGrammar[_, _] => recurse(map.inner)
+        case map: MapGrammar[AnyWithMap, AnyWithMap] => recurse(map.inner)
         case labelled: Labelled => recurse(labelled.inner)
         case delimiter: Delimiter => Some(escapeRegex(delimiter.value))
         case _: Identifier => Some(escapeRegex(BiGrammarToParser.identifierRegex.regex))

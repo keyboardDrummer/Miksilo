@@ -14,7 +14,7 @@ object SmithyLanguage {
     NamespaceDelta, FileWithMembersDelta, HasNameDelta, SlashSlashLineCommentsDelta, SolveConstraintsDelta) ++
     JsonLanguage.deltas
 
-  val language: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ deltas)
+  val language: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar()) ++ deltas)
 }
 
 

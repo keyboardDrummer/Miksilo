@@ -3,12 +3,13 @@ package core.deltas
 import core.bigrammar.BiGrammarToParser._
 import core.language.node.Node
 import core.language.{Compilation, Language}
-import core.smarts.FileDiagnostic
+import core.parsers.editorParsers.StopFunction
+import core.parsers.sequences.{TimeRatioStopFunction, UntilTimeStopFunction}
 import util.SourceUtils
 
 import scala.tools.nsc.interpreter.InputStream
 
-object ParseUsingTextualGrammar extends DeltaWithPhase {
+case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction) extends DeltaWithPhase {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val parser = parserProp.get(compilation)
@@ -30,7 +31,7 @@ object ParseUsingTextualGrammar extends DeltaWithPhase {
   }
 
   def parseStream[T](parser: SingleResultParser[T], input: InputStream): SingleParseResult[T] = {
-    parser.parseUntilBetterThanNextAndXSteps(new Reader(SourceUtils.streamToString(input)))
+    parser.parse(new Reader(SourceUtils.streamToString(input)), stopFunction)
   }
 
   val parserProp = new Property[SingleResultParser[Node]](null)

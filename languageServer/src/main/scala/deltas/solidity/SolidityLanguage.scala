@@ -68,7 +68,7 @@ object SolidityLanguage {
     HasNameDelta,
     SolveConstraintsDelta)
 
-  val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar,
+  val soliditySpecificDeltas = Seq(ParseUsingTextualGrammar(),
     MappingAccessDelta,
     SolidityLibraryDelta,
     AfterOrDeleteExpressionDelta,

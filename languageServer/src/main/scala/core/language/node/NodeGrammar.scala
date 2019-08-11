@@ -1,17 +1,18 @@
 package core.language.node
 
 import core.bigrammar.BiGrammarToParser.{AnyWithMap, Result}
-import core.bigrammar.grammars.{FieldPosition, MapGrammarWithMap}
+import core.bigrammar.grammars.{FieldPosition, MapGrammar}
 import core.bigrammar.printer.UndefinedDestructuringValue
 import core.bigrammar.{BiGrammar, WithMap}
 import languageServer.SourceRange
 
 class NodeGrammar(inner: BiGrammar, val shape: NodeShape)
-  extends MapGrammarWithMap(inner,
-    input => NodeGrammar.construct(input, shape),
+  extends MapGrammar[AnyWithMap, AnyWithMap](inner,
+    input => Right(NodeGrammar.construct(input, shape)),
     obj => NodeGrammar.destruct(obj, shape))
 {
-  override def withChildren(newChildren: Seq[BiGrammar]): MapGrammarWithMap = new NodeGrammar(newChildren(0), shape)
+  override def withChildren(newChildren: Seq[BiGrammar]): MapGrammar[AnyWithMap, AnyWithMap] =
+    new NodeGrammar(newChildren.head, shape)
 }
 
 object NodeGrammar {

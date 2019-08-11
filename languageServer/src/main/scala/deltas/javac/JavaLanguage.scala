@@ -23,7 +23,7 @@ import deltas.statement.assignment.{AddAssignmentDelta, AssignToVariable, Assign
 
 object JavaLanguage {
 
-  def java: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar) ++ deltas)
+  def java: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar()) ++ deltas)
 
   def deltas = javaClass
 

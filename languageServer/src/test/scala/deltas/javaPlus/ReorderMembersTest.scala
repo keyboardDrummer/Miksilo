@@ -29,7 +29,7 @@ class ReorderMembersTest extends FunSuite {
 
     val compiler = TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ReorderMembersDelta) ++ JavaToByteCodeLanguage.prettyPrintJavaDeltas)
 
-    val compilation = compiler.compile(input)
+    val compilation = compiler.compileString(input)
     assert(compilation.diagnostics.nonEmpty)
   }
 

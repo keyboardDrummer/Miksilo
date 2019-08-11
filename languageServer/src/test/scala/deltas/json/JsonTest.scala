@@ -10,7 +10,7 @@ import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 
 class JsonTest extends FunSuite {
-  val language = JsonLanguage.language
+  val language = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas)
 
   test("removes incorrect b at start") {
     val input = """b{"hello":"jo"}"""
@@ -84,8 +84,8 @@ class JsonTest extends FunSuite {
     val reference = """{"":3}""".stripMargin
 
     val jsonLanguage = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas)
-    val result = jsonLanguage.compile(program).program
-    val expectedProgram = jsonLanguage.compile(reference).program
+    val result = jsonLanguage.compileString(program).program
+    val expectedProgram = jsonLanguage.compileString(reference).program
     assertResult(expectedProgram)(result)
   }
 

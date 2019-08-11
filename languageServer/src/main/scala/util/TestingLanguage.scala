@@ -16,7 +16,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   lazy val language: Language = buildLanguage
   lazy val grammars: LanguageGrammars = language.grammars
 
-  def compile(input: String): Compilation = {
+  def compileString(input: String): Compilation = {
     compileStream(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
   }
 

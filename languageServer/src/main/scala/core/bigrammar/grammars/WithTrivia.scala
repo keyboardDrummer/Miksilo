@@ -65,7 +65,7 @@ class WithTriviaParser(original: BiGrammarToParser.Self[Result], triviasParserBu
 
   override def getMustConsume(cache: BiGrammarToParser.ConsumeCache) = cache(original)
 
-  override def leftChildren = List(original)
+  override def leftChildren = List(triviasParserBuilder, original)
 
-  override def children = List(original)
+  override def children = List(triviasParserBuilder, original)
 }

@@ -1,9 +1,12 @@
 package deltas.yaml
 
-import deltas.expression._
+import core.deltas.ParseUsingTextualGrammar
+import core.parsers.sequences.TimeRatioStopFunction
 import deltas.json.JsonLanguage
 
 object YamlLanguage {
-  val deltas = Seq(YamlObjectDelta, YamlArrayDelta, PlainScalarDelta, YamlCoreDelta) ++
-    JsonLanguage.deltas
+  val parserDelta = ParseUsingTextualGrammar(TimeRatioStopFunction(5))
+  val deltasWithoutParser = Seq(YamlObjectDelta, YamlArrayDelta, PlainScalarDelta, YamlCoreDelta) ++ JsonLanguage.deltas
+  val deltas = Seq(parserDelta) ++ deltasWithoutParser
+
 }
