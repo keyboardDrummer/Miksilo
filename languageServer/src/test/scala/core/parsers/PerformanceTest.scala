@@ -1,8 +1,6 @@
 package core.parsers
 
 import deltas.json.JsonLanguage
-import _root_.core.deltas.ParseUsingTextualGrammar
-import _root_.core.parsers.sequences.StopImmediatelyFunction
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 

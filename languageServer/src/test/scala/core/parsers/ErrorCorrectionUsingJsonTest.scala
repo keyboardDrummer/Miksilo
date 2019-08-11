@@ -3,6 +3,7 @@ package core.parsers
 import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
+import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
 class ErrorCorrectionUsingJsonTest extends FunSuite {
   import ParseJson._
@@ -212,7 +213,7 @@ class ErrorCorrectionUsingJsonTest extends FunSuite {
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
   private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
-    val result = jsonParser.getWholeInputParser.parseUntilBetterThanNextAndXSteps(new StringReader(input), steps)
+    val result = jsonParser.getWholeInputParser.parse(new StringReader(input), UntilBestAndXStepsStopFunction(steps))
     System.out.println(result.errors.toString())
     assertResult(expectation)(result.resultOption.get)
     assertResult(errorCount)(result.errors.size)

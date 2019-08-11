@@ -2,7 +2,7 @@ package deltas.cloudformation
 
 import core.deltas._
 import core.language.Language
-import core.parsers.sequences.TimeRatioStopFunction
+import core.parsers.editorParsers.TimeRatioStopFunction
 import core.smarts.SolveConstraintsDelta
 import deltas.json.JsonLanguage
 import deltas.yaml.YamlLanguage

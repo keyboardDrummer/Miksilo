@@ -2,10 +2,7 @@ package core.parsers.editorParsers
 
 import core.parsers.core.OptimizingParserWriter
 
-trait StopFunction {
-  def reset(): Unit = {}
-  def apply(offset: Int, best: Double, second: Double): Boolean
-}
+
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 

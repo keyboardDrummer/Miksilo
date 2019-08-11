@@ -1,7 +1,7 @@
 package cloudformation
 
 import core.bigrammar.TestLanguageGrammarUtils
-import core.parsers.sequences.{UntilBestAndXStepsStopFunction, XStepsStopFunction}
+import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.cloudformation.CloudFormationLanguage
 import languageServer._
 import languageServer.lsp._

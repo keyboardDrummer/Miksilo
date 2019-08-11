@@ -7,6 +7,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, Delta, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.GrammarKey
+import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.ClearPhases
 import deltas.javac.JavaToByteCodeLanguage
 import org.scalatest.FunSuite
@@ -42,7 +43,7 @@ object TestGrammarUtils extends FunSuite {
 
   def parse(example: String, grammarDocument: BiGrammar): SingleParseResult[Any] = {
     val parser = toParserBuilder(grammarDocument)
-    parser.getWholeInputParser.parseUntilBetterThanNextOrXSteps(new Reader(example))
+    parser.getWholeInputParser.parse(new Reader(example), UntilBestAndXStepsStopFunction())
   }
 }
 

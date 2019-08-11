@@ -4,7 +4,7 @@ package deltas
 import core.bigrammar.SelectGrammar
 import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
-import core.parsers.sequences.{UntilBestAndXStepsStopFunction, XStepsStopFunction}
+import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
 import deltas.yaml.{PlainScalarDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}

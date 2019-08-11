@@ -1,7 +1,7 @@
 package deltas.yaml
 
 import core.deltas.ParseUsingTextualGrammar
-import core.parsers.sequences.TimeRatioStopFunction
+import core.parsers.editorParsers.TimeRatioStopFunction
 import deltas.json.JsonLanguage
 
 object YamlLanguage {

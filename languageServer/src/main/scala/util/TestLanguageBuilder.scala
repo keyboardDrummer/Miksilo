@@ -2,8 +2,7 @@ package util
 
 import core.deltas._
 import core.language.Language
-import core.parsers.editorParsers.StopFunction
-import core.parsers.sequences.StopImmediatelyFunction
+import core.parsers.editorParsers.{StopFunction, StopImmediatelyFunction}
 
 object TestLanguageBuilder {
   val statistics = new Statistics()

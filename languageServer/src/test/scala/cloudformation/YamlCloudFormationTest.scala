@@ -5,7 +5,7 @@ import languageServer._
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 import TestLanguageBuilder._
-import core.parsers.sequences.{UntilBestAndXStepsStopFunction, XStepsStopFunction}
+import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
 class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
 

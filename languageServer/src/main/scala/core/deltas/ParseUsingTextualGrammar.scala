@@ -3,8 +3,7 @@ package core.deltas
 import core.bigrammar.BiGrammarToParser._
 import core.language.node.Node
 import core.language.{Compilation, Language}
-import core.parsers.editorParsers.StopFunction
-import core.parsers.sequences.{TimeRatioStopFunction, UntilTimeStopFunction}
+import core.parsers.editorParsers.{StopFunction, TimeRatioStopFunction}
 import util.SourceUtils
 
 import scala.tools.nsc.interpreter.InputStream

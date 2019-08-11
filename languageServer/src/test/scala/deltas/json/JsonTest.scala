@@ -3,7 +3,7 @@ package deltas.json
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.Node
-import core.parsers.sequences.UntilBestAndXStepsStopFunction
+import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.expression.ExpressionDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
 import languageServer.Position
