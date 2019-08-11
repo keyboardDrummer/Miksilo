@@ -14,8 +14,7 @@ import util.TestLanguageBuilder
 
 class ReorderMembersTest extends FunSuite {
 
-  // TODO fix Java parser to re-enable this test
-  ignore("cannot parse comment") {
+  test("cannot parse comment") {
     val input =
       """class Example
         |{
@@ -30,7 +29,7 @@ class ReorderMembersTest extends FunSuite {
 
     val compiler = TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ReorderMembersDelta) ++ JavaToByteCodeLanguage.prettyPrintJavaDeltas)
 
-    val compilation = compiler.compile(input)
+    val compilation = compiler.compileString(input)
     assert(compilation.diagnostics.nonEmpty)
   }
 

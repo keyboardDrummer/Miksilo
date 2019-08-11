@@ -11,6 +11,7 @@ import scala.collection.mutable
 
 case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 
+
 //noinspection ZeroIndexToHead
 object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrectingParserWriter
   with IndentationSensitiveParserWriter {
@@ -103,8 +104,10 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
         val secondParser = recursive(choice.right)
         firstParser | secondParser
 
-      case custom: CustomGrammarWithoutChildren => custom.getParserBuilder(keywords).map(valueToResult)
-      case custom: CustomGrammar => custom.toParser(recursive)
+      case custom: CustomGrammarWithoutChildren =>
+        custom.getParserBuilder(keywords).map(valueToResult)
+      case custom: CustomGrammar =>
+        custom.toParser(recursive)
 
       case many: core.bigrammar.grammars.Many =>
         val innerParser = recursive(many.inner)
@@ -113,9 +116,9 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
           (element, result) => WithMap(element.value :: result.value, element.namedValues ++ result.namedValues), many.parseGreedy)
 
         parser
-      case mapGrammar: MapGrammarWithMap =>
+      case mapGrammar: MapGrammar[AnyWithMap, AnyWithMap] =>
         val innerParser = recursive(mapGrammar.inner)
-        innerParser.map(mapGrammar.construct)
+        FilterMap(innerParser, mapGrammar.construct)
 
       case BiFailure(message) => Fail(None, message, History.failPenalty)
       case Print(_) => succeed(Unit).map(valueToResult)

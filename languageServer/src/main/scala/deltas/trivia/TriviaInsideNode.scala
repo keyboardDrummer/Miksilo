@@ -24,9 +24,9 @@ object TriviaInsideNode extends DeltaWithGrammar {
           if (!visited.contains(path.value)) {
             visited += path.value
 
-            val grammar = trivia.getGrammar
+            val grammar = trivia.inner
             if (hasLeftNode(new RootGrammar(grammar))) {
-              path.set(trivia.getGrammar)
+              path.set(trivia.inner)
               injectTrivia(grammars, path, trivia.horizontal)
             }
           }

@@ -1,13 +1,21 @@
 package util
 
 import core.deltas._
+import core.language.Language
+import core.parsers.editorParsers.{StopFunction, StopImmediatelyFunction}
 
 object TestLanguageBuilder {
   val statistics = new Statistics()
 
+  implicit def toLanguage(testingLanguage: TestingLanguage): Language = testingLanguage.language
+
   var compilers : Map[Seq[Delta], TestingLanguage] = Map.empty
-  def buildWithParser(deltas: Seq[Delta], description: String = "testing"): TestingLanguage = {
-    build(Seq(ParseUsingTextualGrammar) ++ deltas, description)
+
+  def buildWithParser(deltas: Seq[Delta],
+                      stopFunction: StopFunction = StopImmediatelyFunction,
+                      description: String = "testing"): TestingLanguage = {
+    val deltasWithoutParser = deltas.filter(delta => !delta.isInstanceOf[ParseUsingTextualGrammar])
+    build(Seq(ParseUsingTextualGrammar(stopFunction)) ++ deltasWithoutParser, description)
   }
 
   def build(deltas: Seq[Delta], description: String = "testing"): TestingLanguage = {

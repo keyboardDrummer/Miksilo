@@ -1,9 +1,14 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.{BiGrammar, WithMap}
+import core.bigrammar.BiGrammar
 
-class MapGrammar(inner: BiGrammar,
-                      construct: Any => Any,
-                      deconstruct: Any => Option[Any]) extends MapGrammarWithMap(inner,
-  withMap => WithMap(construct(withMap.value), withMap.namedValues),
-  withMap => deconstruct(withMap.value).map(v => WithMap(v, withMap.namedValues)))
+case class MapGrammar[Value, NewValue](var inner: BiGrammar,
+                      construct: Value => Either[String, NewValue],
+                      deconstruct: NewValue => Option[Value]) extends BiGrammar {
+
+  override def children = Seq(inner)
+
+  override def withChildren(newChildren: Seq[BiGrammar]) = MapGrammar(newChildren.head, construct, deconstruct)
+
+  override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(inner)
+}

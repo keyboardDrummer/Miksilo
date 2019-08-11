@@ -30,7 +30,7 @@ object FormatJsonOption extends CompileOption {
 
   var language: Language = _
   override def initialize(sandbox: LanguageSandbox): Unit = {
-    val startWithPrettyPrint = Delta.spliceAndFilterBottom(Seq(ParseUsingTextualGrammar), sandbox.deltas, Seq(PrintJson))
+    val startWithPrettyPrint = Delta.spliceAndFilterBottom(Seq(ParseUsingTextualGrammar()), sandbox.deltas, Seq(PrintJson))
     language = LanguageFromDeltas(startWithPrettyPrint)
   }
 

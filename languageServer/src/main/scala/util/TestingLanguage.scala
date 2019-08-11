@@ -10,13 +10,18 @@ import core.language.{Compilation, Language}
 
 import scala.reflect.io.File
 
+object TestingLanguage {
+  implicit def toLanguage(testingLanguage: TestingLanguage): Language = testingLanguage.language
+}
+
 class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   val statistics = new Statistics(TestLanguageBuilder.statistics)
+
 
   lazy val language: Language = buildLanguage
   lazy val grammars: LanguageGrammars = language.grammars
 
-  def compile(input: String): Compilation = {
+  def compileString(input: String): Compilation = {
     compileStream(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
   }
 

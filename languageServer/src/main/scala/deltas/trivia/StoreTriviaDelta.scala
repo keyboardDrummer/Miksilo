@@ -120,7 +120,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
           filter(v => v._2.asInstanceOf[Seq[_]].nonEmpty)
         WithMap(result.value, (rest ++ fixedTrivias).toMap)
       })
-      newInner.map(node.construct)
+      newInner.map(input => NodeGrammar.construct(input, node.shape))
     }
 
     override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = {

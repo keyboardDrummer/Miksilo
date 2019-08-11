@@ -1,8 +1,7 @@
 package core.parsers.sequences
 
-import core.bigrammar.BiGrammarToParser
 import core.parsers.core.{ParseInput, Processor}
-import core.parsers.editorParsers.{CorrectingParserWriter, Fix, History, ParseError}
+import core.parsers.editorParsers.{CorrectingParserWriter, Fix, History, ParseError, StopFunction}
 import languageServer.{Position, SourceRange, TextEdit}
 
 trait SequenceParserWriter extends CorrectingParserWriter {
@@ -209,6 +208,34 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def penalty = History.missingInputPenalty
   }
 
+  case class FilterMap[Other, Result <: Other, NewResult](
+      original: Self[Result],
+      map: Other => Either[String, NewResult])
+    extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
+
+    override def getParser(recursive: GetParser): Parser[NewResult] = {
+      val parseOriginal = recursive(original)
+      (input, state) => {
+        val originalResult = parseOriginal(input, state)
+        originalResult.mapReady(ready => {
+          ready.resultOption match {
+            case Some(result) =>
+              val newResultOption = map(result)
+              newResultOption match {
+                case Left(message) =>
+                  ReadyParseResult(None, ready.remainder,
+                    ready.history.addError(FilterError(input, ready.remainder, message)))
+                case Right(value) =>
+                  ReadyParseResult(Some(value), ready.remainder, ready.history)
+              }
+            case None =>
+              ready.asInstanceOf[ReadyParseResult[NewResult]]
+          }
+        }, uniform = false)
+      }
+    }
+  }
+
   case class Filter[Other, Result <: Other](original: Self[Result],
                                             predicate: Other => Boolean,
                                             getMessage: Other => String)
@@ -291,47 +318,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
   }
 
-  val defaultSteps = 10
   trait SingleResultParser[+Result] {
-    def parse(input: Input, mayStop: (Double, Double) => Boolean = (_, _) => true): SingleParseResult[Result]
-
-    def parseUntilBestOption(input: Input): SingleParseResult[Result] = {
-      parse(input, (_, _) => false)
-    }
-
-    def parseUntilBetterThanNextOrXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
-      var counter = 0
-      parse(input, (best, second) => {
-        if (second > best)
-          false
-        else {
-          counter += 1
-          counter >= steps
-        }
-      })
-    }
-
-    def parseUntilBetterThanNextAndXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
-      var counter = 0
-      parse(input, (best, second) => {
-        if (best > second) {
-          counter += 1
-          counter > steps
-        } else
-          false
-      })
-    }
-
-    def parseUntilBetterThanNext(input: Input): SingleParseResult[Result] = {
-      parse(input, (best, second) => best > second)
-    }
-
-    def parseXSteps(input: Input, steps: Int = defaultSteps): SingleParseResult[Result] = {
-      var counter = 0
-      parse(input, (_, _) => {
-        counter += 1
-        counter == steps
-      })
-    }
+    def parse(input: Input, mayStop: StopFunction = (_, _, _) => true): SingleParseResult[Result]
   }
 }

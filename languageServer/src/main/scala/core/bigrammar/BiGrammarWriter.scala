@@ -5,6 +5,7 @@ import core.document.{Document, WhiteSpace}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.language.implicitConversions
+import scala.util.Try
 import scala.util.matching.Regex
 
 object BiGrammarWriter extends BiGrammarWriter
@@ -19,8 +20,13 @@ trait BiGrammarWriter {
 
   def number: BiGrammar = NumberGrammar
 
-  def integer: BiGrammar = number.map[String, Int](
-    s => Integer.parseInt(s),
+  def integer: BiGrammar = new ValueMapGrammar[String, Int](number,
+    s => Try(Integer.parseInt(s)).fold(e => Left(e.toString), x => Right(x)),
+    i => Some(i.toString)
+  )
+
+  def long: BiGrammar = number.map[String, Long](
+    s => s.toLong,
     i => i.toString
   )
 

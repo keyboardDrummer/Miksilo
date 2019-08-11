@@ -2,8 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.grammars.{BiFallback, Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
-import deltas.expression.StringLiteralDelta
-import deltas.json.JsonObjectLiteralDelta
+import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import org.scalatest.FunSuite
 
 class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
@@ -101,7 +100,7 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
   }
 
   private def assertInputGivesPartialFailureExpectation(input: String, expectation: Any) = {
-    val result = jsonParser.getWholeInputParser.parseUntilBetterThanNextOrXSteps(new Reader(input))
+    val result = jsonParser.getWholeInputParser.parse(new Reader(input), UntilBestAndXStepsStopFunction())
     assert(!result.successful)
     assert(result.resultOption.nonEmpty)
     assertResult(expectation)(result.resultOption.get)

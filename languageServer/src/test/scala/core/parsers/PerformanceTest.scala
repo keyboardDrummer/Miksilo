@@ -2,9 +2,11 @@ package core.parsers
 
 import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
-import util.SourceUtils
+import util.{SourceUtils, TestLanguageBuilder}
 
 class PerformanceTest extends FunSuite {
+
+  val asapJson = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas)
 
   test("test whether correct inputs always return a ready in one go") {
     val input = """{
@@ -21,7 +23,7 @@ class PerformanceTest extends FunSuite {
                   |    },
                   |  }
                   |}""".stripMargin
-    val result = JsonLanguage.language.compileString(input)
+    val result = asapJson.compileString(input)
   }
 
   ignore("Errorless JSON performance") {
@@ -58,20 +60,19 @@ class PerformanceTest extends FunSuite {
     val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
       replaceAll("\\s", "")
 
-    val json = JsonLanguage.language
     val multiplier = 1
     val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     val timeA = System.currentTimeMillis()
-    val repetitions = 10
+    val repetitions = 10 * multiplier
     for(_ <- 1.to(repetitions)) {
-      val result = json.compileString(source).diagnostics
+      val result = asapJson.compileString(source).diagnostics
       assert(result.isEmpty)
     }
 
     val timeB = System.currentTimeMillis()
     for(_ <- 1.to(multiplier)) {
-      val result = json.compileString(tenTimesSource).diagnostics
+      val result = asapJson.compileString(tenTimesSource).diagnostics
       assert(result.isEmpty)
     }
 
@@ -82,17 +83,16 @@ class PerformanceTest extends FunSuite {
     val averageSingleSource = singleSource / repetitions
     System.out.println(s"average singleSource: $averageSingleSource")
     System.out.println(s"totalTime: ${singleSource + sourceTimesTen}")
-    assert(averageSingleSource < 360)
+    assert(averageSingleSource < 400)
   }
 
   test("Edited") {
-    val json = JsonLanguage.language
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val timeA = System.currentTimeMillis()
 
     val repetitions = 5
     for(_ <- 1.to(repetitions)) {
-      val result = json.compileString(program).diagnostics
+      val result = asapJson.compileString(program).diagnostics
       assert(result.nonEmpty)
     }
     val timeB = System.currentTimeMillis()

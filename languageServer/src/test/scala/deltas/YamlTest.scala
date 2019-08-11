@@ -4,6 +4,7 @@ package deltas
 import core.bigrammar.SelectGrammar
 import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
+import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
 import deltas.yaml.{PlainScalarDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}
@@ -12,15 +13,15 @@ import util.{SourceUtils, TestLanguageBuilder}
 
 class YamlTest extends FunSuite {
 
-  val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltas)
+  val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltas, stopFunction = UntilBestAndXStepsStopFunction())
 
   test("single member object without a value") {
     val program = "Key:"
-    val compilation = language.compile(program)
+    val compilation = language.compileString(program)
     replaceDefaultWithDefaultString(compilation)
 
     val reference = "Key:'default'"
-    val referenceCompilation = language.compile(reference)
+    val referenceCompilation = language.compileString(reference)
     assertResult(referenceCompilation.program)(compilation.program)
     assert(compilation.diagnostics.size == 1)
   }
@@ -29,20 +30,20 @@ class YamlTest extends FunSuite {
     """Missing: default
       |Key: Value
     """.stripMargin
-  lazy val twoMemberObjectCompilation = language.compile(twoMemberObject)
+  lazy val twoMemberObjectCompilation = language.compileString(twoMemberObject)
 
   test("two member object with no first value") {
     val program =
       """Missing:
         |Key: Value""".stripMargin
-    val compilation = language.compile(program)
+    val compilation = language.compileString(program)
     replaceDefaultWithDefaultString(compilation)
 
     val reference =
       """Missing: default
         |Key: Value
       """.stripMargin
-    val referenceCompilation = language.compile(reference)
+    val referenceCompilation = language.compileString(reference)
     assertResult(referenceCompilation.program)(compilation.program)
     assert(compilation.diagnostics.size == 1)
   }
@@ -52,7 +53,7 @@ class YamlTest extends FunSuite {
       """Missing
         |Key: Value
       """.stripMargin
-    val compilation = language.compile(program)
+    val compilation = language.compileString(program)
     replaceDefaultWithDefaultString(compilation)
 
     assertResult(twoMemberObjectCompilation.program)(compilation.program)
@@ -67,7 +68,7 @@ class YamlTest extends FunSuite {
       |Parent2:
       |  HasValue2: Value2
     """.stripMargin
-  lazy val twoObjectsSingleMemberEachCompilation = language.compile(twoObjectsSingleMemberEach)
+  lazy val twoObjectsSingleMemberEachCompilation = language.compileString(twoObjectsSingleMemberEach)
 
   test("complicated middle errors") {
     val program =
@@ -77,7 +78,7 @@ class YamlTest extends FunSuite {
         |Parent2:
         |  HasValue2: Value2
       """.stripMargin
-    val compilation = language.compile(program)
+    val compilation = language.compileString(program)
 
     replaceDefaultWithDefaultString(compilation)
     assertResult(twoObjectsSingleMemberEachCompilation.program)(compilation.program)
@@ -94,7 +95,7 @@ class YamlTest extends FunSuite {
         |  LaunchConfig:
         |    Type: AWS
       """.stripMargin
-    val compilation = language.compile(program)
+    val compilation = language.compileString(program)
     assert(compilation.diagnostics.size == 2)
   }
 
@@ -122,7 +123,7 @@ class YamlTest extends FunSuite {
                   |            ']
                   |""".stripMargin
 
-    val compilation = language.compile(input)
+    val compilation = language.compileString(input)
     assert(compilation.diagnostics.isEmpty)
   }
 
@@ -134,9 +135,13 @@ class YamlTest extends FunSuite {
 
     val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(ExpressionDelta.FirstPrecedenceGrammar),
       PlainScalarDelta, ExpressionDelta))
-    val compilation = language.compile(contents)
+    val compilation = language.compileString(contents)
     assert(compilation.diagnostics.size == 1)
   }
+
+  val deltas = Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
+    YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta)
+  val blockLanguage = TestLanguageBuilder.buildWithParser(deltas, stopFunction = UntilBestAndXStepsStopFunction())
 
   test("plain scalar 2") {
     val contents =
@@ -144,9 +149,7 @@ class YamlTest extends FunSuite {
         |  Blaa
         |  Comment""".stripMargin
 
-    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
-      YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
-    val compilation = language.compile(contents)
+    val compilation = blockLanguage.compileString(contents)
     assert(compilation.diagnostics.size == 1)
   }
 
@@ -157,17 +160,16 @@ class YamlTest extends FunSuite {
         |  Blaa
         |  AWS: Bar""".stripMargin
 
-    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
-      YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
-    val compilation = language.compile(contents)
+    val compilation = blockLanguage.compileString(contents)
     assert(compilation.diagnostics.size == 1)
     assert(compilation.diagnostics.head.diagnostic.message.contains(":<value>"))
   }
 
+  // TODO if this test parses too many steps it gets a stack overflow, fix.
   test("big yaml file") {
     val contents = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
 
-    val compilation = language.compile(contents)
+    val compilation = language.compileString(contents)
     assert(compilation.diagnostics.isEmpty)
   }
 }

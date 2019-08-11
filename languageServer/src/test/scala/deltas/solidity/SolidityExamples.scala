@@ -31,7 +31,7 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -75,7 +75,7 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -97,7 +97,7 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -149,7 +149,7 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -239,7 +239,7 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -308,7 +308,7 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -384,7 +384,7 @@ class SolidityExamples extends FunSuite {
                     |    //}
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -431,7 +431,7 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -489,7 +489,7 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -548,7 +548,7 @@ class SolidityExamples extends FunSuite {
                     |
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 
@@ -650,7 +650,7 @@ class SolidityExamples extends FunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = solidity.compile(program)
+    val compilation = solidity.compileString(program)
     assertResult(Seq.empty)(compilation.diagnostics)
   }
 }
