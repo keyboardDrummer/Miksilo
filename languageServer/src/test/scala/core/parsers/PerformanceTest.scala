@@ -8,7 +8,7 @@ import util.{SourceUtils, TestLanguageBuilder}
 
 class PerformanceTest extends FunSuite {
 
-  val asapJson = TestLanguageBuilder.build(Seq(ParseUsingTextualGrammar(StopImmediatelyFunction)) ++JsonLanguage.deltas)
+  val asapJson = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas)
 
   test("test whether correct inputs always return a ready in one go") {
     val input = """{
@@ -25,7 +25,7 @@ class PerformanceTest extends FunSuite {
                   |    },
                   |  }
                   |}""".stripMargin
-    val result = JsonLanguage.language.compileString(input)
+    val result = asapJson.compileString(input)
   }
 
   ignore("Errorless JSON performance") {

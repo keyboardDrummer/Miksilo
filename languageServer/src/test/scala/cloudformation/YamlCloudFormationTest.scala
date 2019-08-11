@@ -3,11 +3,14 @@ package cloudformation
 import deltas.cloudformation.CloudFormationLanguage
 import languageServer._
 import org.scalatest.FunSuite
-import util.SourceUtils
+import util.{SourceUtils, TestLanguageBuilder}
+import TestLanguageBuilder._
+import core.parsers.sequences.{UntilBestAndXStepsStopFunction, XStepsStopFunction}
 
 class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
 
-  val yamlServer = new MiksiloLanguageServer(CloudFormationLanguage.yamlLanguage)
+  val yamlLanguage = TestLanguageBuilder.buildWithParser(CloudFormationLanguage.yamlDeltas, UntilBestAndXStepsStopFunction(1))
+  val yamlServer = new MiksiloLanguageServer(yamlLanguage)
 
   test("No diagnostics") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")

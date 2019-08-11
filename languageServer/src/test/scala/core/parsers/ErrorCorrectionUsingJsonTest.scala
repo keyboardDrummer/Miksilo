@@ -2,6 +2,7 @@ package core.parsers
 
 import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
+import util.TestLanguageBuilder
 
 class ErrorCorrectionUsingJsonTest extends FunSuite {
   import ParseJson._
@@ -10,7 +11,7 @@ class ErrorCorrectionUsingJsonTest extends FunSuite {
     val input = """{ "VpcId" : {
                   |  "ConstraintDescription" : "must be the VPC Id of an existing Virtual Private Cloud."
                   |}}""".stripMargin
-    val result = JsonLanguage.language.compileString(input)
+    val result = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas).compileString(input)
     //parseJson(input, 3, 0)
   }
 

@@ -1,16 +1,19 @@
 package cloudformation
 
 import core.bigrammar.TestLanguageGrammarUtils
+import core.parsers.sequences.{UntilBestAndXStepsStopFunction, XStepsStopFunction}
 import deltas.cloudformation.CloudFormationLanguage
 import languageServer._
 import languageServer.lsp._
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
-import util.SourceUtils
+import util.{SourceUtils, TestLanguageBuilder}
 
-class CloudFormationTest extends FunSuite with LanguageServerTest {
+class JsonCloudFormationTest extends FunSuite with LanguageServerTest {
 
-  val jsonServer = new MiksiloLanguageServer(CloudFormationLanguage.jsonLanguage)
+  val jsonLanguage = TestLanguageBuilder.buildWithParser(CloudFormationLanguage.jsonDeltas,
+    UntilBestAndXStepsStopFunction(1))
+  val jsonServer = new MiksiloLanguageServer(jsonLanguage)
 
   test("No diagnostics") {
     val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
@@ -113,7 +116,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
         |      "Properties": {
         |        "Subsc"
       """.stripMargin
-    val server = new MiksiloLanguageServer(CloudFormationLanguage.jsonLanguage)
+    val server = new MiksiloLanguageServer(jsonLanguage)
     val document = openDocument(server, program)
     val start = new HumanPosition(6, 14)
     val result = server.complete(DocumentPosition(document, start))
@@ -139,7 +142,7 @@ class CloudFormationTest extends FunSuite with LanguageServerTest {
         |  }
         |}
         """.stripMargin
-    val server = new MiksiloLanguageServer(CloudFormationLanguage.jsonLanguage)
+    val server = new MiksiloLanguageServer(jsonLanguage)
     val document = openDocument(server, program)
     val start = new HumanPosition(10, 30)
     val result = server.gotoDefinition(DocumentPosition(document, start))

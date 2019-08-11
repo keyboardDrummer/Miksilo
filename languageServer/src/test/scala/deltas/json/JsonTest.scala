@@ -3,6 +3,7 @@ package deltas.json
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.Node
+import core.parsers.sequences.UntilBestAndXStepsStopFunction
 import deltas.expression.ExpressionDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
 import languageServer.Position
@@ -10,7 +11,7 @@ import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 
 class JsonTest extends FunSuite {
-  val language = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas)
+  val language = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas, UntilBestAndXStepsStopFunction())
 
   test("removes incorrect b at start") {
     val input = """b{"hello":"jo"}"""
@@ -83,9 +84,8 @@ class JsonTest extends FunSuite {
     val program = """{:3}""".stripMargin
     val reference = """{"":3}""".stripMargin
 
-    val jsonLanguage = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas)
-    val result = jsonLanguage.compileString(program).program
-    val expectedProgram = jsonLanguage.compileString(reference).program
+    val result = language.compileString(program).program
+    val expectedProgram = language.compileString(reference).program
     assertResult(expectedProgram)(result)
   }
 

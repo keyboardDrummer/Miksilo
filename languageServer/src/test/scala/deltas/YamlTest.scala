@@ -4,7 +4,7 @@ package deltas
 import core.bigrammar.SelectGrammar
 import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
-import core.parsers.sequences.XStepsStopFunction
+import core.parsers.sequences.{UntilBestAndXStepsStopFunction, XStepsStopFunction}
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
 import deltas.yaml.{PlainScalarDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}
@@ -13,7 +13,7 @@ import util.{SourceUtils, TestLanguageBuilder}
 
 class YamlTest extends FunSuite {
 
-  val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltas, stopFunction = XStepsStopFunction(4))
+  val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltas, stopFunction = UntilBestAndXStepsStopFunction())
 
   test("single member object without a value") {
     val program = "Key:"
@@ -139,15 +139,17 @@ class YamlTest extends FunSuite {
     assert(compilation.diagnostics.size == 1)
   }
 
+  val deltas = Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
+    YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta)
+  val blockLanguage = TestLanguageBuilder.buildWithParser(deltas, stopFunction = UntilBestAndXStepsStopFunction())
+
   test("plain scalar 2") {
     val contents =
       """Metadata:
         |  Blaa
         |  Comment""".stripMargin
 
-    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
-      YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
-    val compilation = language.compileString(contents)
+    val compilation = blockLanguage.compileString(contents)
     assert(compilation.diagnostics.size == 1)
   }
 
@@ -158,9 +160,7 @@ class YamlTest extends FunSuite {
         |  Blaa
         |  AWS: Bar""".stripMargin
 
-    val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
-      YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta))
-    val compilation = language.compileString(contents)
+    val compilation = blockLanguage.compileString(contents)
     assert(compilation.diagnostics.size == 1)
     assert(compilation.diagnostics.head.diagnostic.message.contains(":<value>"))
   }

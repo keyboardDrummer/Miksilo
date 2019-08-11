@@ -379,7 +379,7 @@ case class XStepsStopFunction(steps: Int = 2) extends StopFunction {
   }
 }
 
-case class UntilBestAndXStepsStopFunction(steps: Int = 10) extends StopFunction {
+case class UntilBestAndXStepsStopFunction(steps: Int = 1) extends StopFunction {
   var counter = 0
   override def apply(offset: Int, best: Double, second: Double) = {
     (best > second) & {
