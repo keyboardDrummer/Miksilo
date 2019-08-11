@@ -64,7 +64,7 @@ class PerformanceTest extends FunSuite {
     val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     val timeA = System.currentTimeMillis()
-    val repetitions = 10
+    val repetitions = 10 * multiplier
     for(_ <- 1.to(repetitions)) {
       val result = asapJson.compileString(source).diagnostics
       assert(result.isEmpty)
