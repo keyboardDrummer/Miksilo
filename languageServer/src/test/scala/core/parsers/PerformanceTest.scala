@@ -83,7 +83,7 @@ class PerformanceTest extends FunSuite {
     val averageSingleSource = singleSource / repetitions
     System.out.println(s"average singleSource: $averageSingleSource")
     System.out.println(s"totalTime: ${singleSource + sourceTimesTen}")
-    assert(averageSingleSource < 360)
+    assert(averageSingleSource < 400)
   }
 
   test("Edited") {
