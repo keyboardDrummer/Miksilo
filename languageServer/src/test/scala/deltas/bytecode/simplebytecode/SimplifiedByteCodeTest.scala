@@ -1,6 +1,6 @@
 package deltas.bytecode.simplebytecode
 
-import core.deltas.{Delta, ParseUsingTextualGrammar}
+import core.deltas.Delta
 import deltas.PrettyPrint
 import deltas.javac.{ByteCodeLanguage, ExtendedByteCode, JavaToByteCodeLanguage}
 import org.scalatest.FunSuite
@@ -18,7 +18,7 @@ class SimplifiedByteCodeTest extends FunSuite {
 
   test("simplifiedToByteCode") {
     val deltas = Delta.spliceAndFilterTop(ExtendedByteCode.simpleByteCodeDeltas, ByteCodeLanguage.byteCodeDeltas, Seq(PrettyPrint()))
-    val utils = new LanguageTest(TestLanguageBuilder.build(Seq(ParseUsingTextualGrammar()) ++ deltas))
+    val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(deltas))
     val result = utils.compileAndPrettyPrint(SourceUtils.getTestFileContents("FibonacciInSimplifiedByteCode.txt"))
     val expectedResult = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     assertResult(expectedResult)(result)
