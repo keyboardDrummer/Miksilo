@@ -21,7 +21,7 @@ object YamlObjectDelta extends DeltaWithGrammar {
 
     lazy val blockMap: BiGrammar = {
       val member = new WithContext(_ => BlockKey, flowValue).as(MemberKey) ~< ":" ~
-        greaterThan(blockValue.as(MemberValue)) asLabelledNode MemberShape
+        (greaterThan(blockValue.as(MemberValue)) | equal(find(YamlArrayDelta.Grammar).as(MemberValue))) asLabelledNode MemberShape
 
       aligned(_grammars, member).as(Members).asLabelledNode(Shape)
     }
@@ -30,5 +30,5 @@ object YamlObjectDelta extends DeltaWithGrammar {
 
   override def description = "Adds the indentation sensitive literal object"
 
-  override def dependencies = Set(YamlCoreDelta)
+  override def dependencies = Set(YamlArrayDelta, YamlCoreDelta)
 }
