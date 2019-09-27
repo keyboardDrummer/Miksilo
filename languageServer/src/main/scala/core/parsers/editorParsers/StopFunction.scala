@@ -48,12 +48,7 @@ case class TimeRatioStopFunction(minimumCharsPerMillisecond: Long = 5) extends S
     val passed = System.currentTimeMillis() - start
     val offsetWithBase = offset + 1000
     val charsPerMillisecond = offsetWithBase / (passed + 1.0)
-    val result = minimumCharsPerMillisecond > charsPerMillisecond
-    if (result) {
-      System.out.println(s"parsePerformance: $charsPerMillisecond, offset: $offset")
-      new Exception().printStackTrace()
-    }
-    result
+    minimumCharsPerMillisecond > charsPerMillisecond
   }
 
   override def reset(): Unit = {
