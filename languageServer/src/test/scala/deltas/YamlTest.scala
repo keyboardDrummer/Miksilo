@@ -6,14 +6,36 @@ import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
 import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
-import deltas.json.JsonStringLiteralDelta
-import deltas.yaml.{PlainScalarDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}
+import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
+import deltas.yaml.{PlainScalarDelta, YamlArrayDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 
 class YamlTest extends FunSuite {
 
   val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltas, stopFunction = UntilBestAndXStepsStopFunction())
+
+  test("compact array") {
+    val input = """SecurityGroupIngress:
+                  |- IpProtocol: tcp
+                  |  FromPort: 22""".stripMargin
+
+    val compilation = language.compileString(input)
+    assert(compilation.diagnostics.isEmpty)
+    val array = JsonObjectLiteralDelta.ObjectLiteral(compilation.program).members.head.value
+    val arrayMembers = ArrayLiteralDelta.ArrayLiteral(array).members
+    val nestedObject = JsonObjectLiteralDelta.ObjectLiteral(arrayMembers.head)
+    assert(nestedObject.members.length == 2)
+  }
+
+  test("compact array with negative indentation") {
+    val input = """ SecurityGroupIngress:
+                  |- IpProtocol: tcp
+                  |  FromPort: 22""".stripMargin
+
+    val compilation = language.compileString(input)
+    assert(compilation.diagnostics.nonEmpty)
+  }
 
   test("single member object without a value") {
     val program = "Key:"
@@ -140,7 +162,7 @@ class YamlTest extends FunSuite {
   }
 
   val deltas = Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
-    YamlObjectDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta)
+    YamlObjectDelta, YamlArrayDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta)
   val blockLanguage = TestLanguageBuilder.buildWithParser(deltas, stopFunction = UntilBestAndXStepsStopFunction())
 
   test("plain scalar 2") {

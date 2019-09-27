@@ -4,10 +4,13 @@ import core.bigrammar.BiGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
-import core.language.node.NodeField
+import core.language.node.{GrammarKey, NodeField}
 import deltas.expression.ArrayLiteralDelta
 
 object YamlArrayDelta extends DeltaWithGrammar {
+
+  object Grammar extends GrammarKey
+
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     val _grammars = grammars
     import grammars._
@@ -17,7 +20,7 @@ object YamlArrayDelta extends DeltaWithGrammar {
       val element = keywordGrammar("- ") ~> CheckIndentationGrammar.greaterThan(blockValue)
       CheckIndentationGrammar.aligned(_grammars, element).as(ArrayLiteralDelta.Members).asLabelledNode(ArrayLiteralDelta.Shape)
     }
-    find(YamlCoreDelta.IndentationSensitiveExpression).addAlternative(blockArray)
+    find(YamlCoreDelta.IndentationSensitiveExpression).addAlternative(create(Grammar, blockArray))
   }
 
   override def description = "Adds the indentation sensitive literal array"
