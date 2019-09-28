@@ -30,8 +30,7 @@ object SourceUtils {
   }
 
   def getTestFileContents(relativeFilePath: Path): String = {
-    val result = new BufferedReader(new InputStreamReader(getTestFile(relativeFilePath)))
-      .lines().collect(Collectors.joining("\n"))
-    result.replaceAll("\n", System.lineSeparator())
+    new BufferedReader(new InputStreamReader(getTestFile(relativeFilePath)))
+      .lines().collect(Collectors.joining(System.lineSeparator()))
   }
 }

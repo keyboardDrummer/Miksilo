@@ -2,6 +2,9 @@ package deltas.cloudformation
 
 import core.SolveConstraintsDelta
 import core.deltas.path.{NodePath, PathRoot}
+import java.io.InputStream
+import com.typesafe.scalalogging.LazyLogging
+import core.deltas.path.NodePath
 import core.deltas.{Contract, Delta}
 import core.language.Language
 import core.smarts.ConstraintBuilder
@@ -14,7 +17,14 @@ import play.api.libs.json.{JsObject, Json}
 import util.{JavaSourceUtils, SourceUtils}
 import core.deltas.path.ConstraintBuilderExtension._
 
-object CloudFormationTemplate extends Delta {
+class CloudFormationTemplate(resourceSpecificationOption: Option[InputStream]) extends Delta with LazyLogging {
+
+  val resourceTypes = resourceSpecificationOption.fold(JsObject.empty)(resourceSpecification => {
+    val resourceTypeSpecification = SourceUtils.streamToString(resourceSpecification)
+    val parsedFile = Json.parse(resourceTypeSpecification).as[JsObject]
+    parsedFile.value("ResourceTypes").as[JsObject]
+  })
+
   override def description: String = "Add cloudformation template semantics"
 
   val propertyType = PrimitiveType("PropertyKey")
@@ -22,11 +32,7 @@ object CloudFormationTemplate extends Delta {
   override def inject(language: Language): Unit = {
     super.inject(language)
 
-    val resourceTypeSpecification = SourceUtils.getTestFileContents("CloudFormationResourceSpecification.json")
-    val parsedFile = Json.parse(resourceTypeSpecification).as[JsObject]
-    val resourceTypes = parsedFile.value("ResourceTypes").as[JsObject]
-
-    SolveConstraintsDelta.constraintCollector.add(language, (compilation, builder) => {
+      SolveConstraintsDelta.constraintCollector.add(language, (compilation, builder) => {
       val rootScope = builder.newScope(debugName = "rootScope")
 
       addResourceTypesFromSchema(resourceTypes, builder, rootScope)

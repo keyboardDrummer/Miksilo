@@ -8,9 +8,14 @@ import lsp.HumanPosition
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 
+object CloudFormationTest {
+  val file = SourceUtils.getTestFile("CloudFormationResourceSpecification.json")
+  val language = new CloudFormationLanguage(Some(file))
+}
+
 class JsonCloudFormationTest extends FunSuite with LanguageServerTest {
 
-  val jsonLanguage = TestLanguageBuilder.buildWithParser(CloudFormationLanguage.jsonDeltas,
+  val jsonLanguage = TestLanguageBuilder.buildWithParser(CloudFormationTest.language.jsonDeltas,
     UntilBestAndXStepsStopFunction(1))
   val jsonServer = new MiksiloLanguageServer(jsonLanguage)
 
@@ -101,7 +106,7 @@ class JsonCloudFormationTest extends FunSuite with LanguageServerTest {
   }
 
   test("Parse example") {
-    val utils = new TestLanguageGrammarUtils(CloudFormationLanguage.jsonDeltas)
+    val utils = new TestLanguageGrammarUtils(CloudFormationTest.language.jsonDeltas)
     val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
     utils.parse(source)
   }
