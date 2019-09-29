@@ -69,7 +69,7 @@ lazy val languageServer = (project in file("languageServer")).
       val assemblyFile: String = assembly.value.getAbsolutePath
       val extensionDirectory: File = file("./vscode-extension").getAbsoluteFile
       val tsc = Process("tsc", file("./vscode-extension"))
-      val vscode = Process(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory"),
+      val vscode = Process(Seq("code", s"--inspect=5875 --extensionDevelopmentPath=$extensionDirectory"),
         None,
         "MIKSILO" -> assemblyFile)
 
