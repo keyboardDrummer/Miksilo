@@ -19,6 +19,7 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
     language.compilerPhases ::= Phase(this, compilation => {
       val factory = new Factory()
       val builder = new ConstraintBuilder(factory)
+      val start = System.currentTimeMillis()
       language.collectConstraints(compilation, builder)
 
       val solver = builder.toSolver
@@ -32,6 +33,7 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
           throw ConstraintException(e)
         case Failure(e) => throw e
       }
+      logger.info(s"Constraint solving took ${System.currentTimeMillis() - start}ms")
 
       for(refDecl <- solver.proofs.declarations) {
         refDecl._1.origin.foreach(ref => resolvesToDeclaration(ref.asInstanceOf[ChildPath]) = refDecl._2)

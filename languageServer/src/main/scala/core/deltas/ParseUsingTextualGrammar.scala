@@ -1,5 +1,6 @@
 package core.deltas
 
+import com.typesafe.scalalogging.LazyLogging
 import core.bigrammar.BiGrammarToParser._
 import core.language.node.Node
 import core.language.{Compilation, Language}
@@ -8,14 +9,18 @@ import util.SourceUtils
 
 import scala.tools.nsc.interpreter.InputStream
 
-case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction) extends DeltaWithPhase {
+case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction)
+  extends DeltaWithPhase with LazyLogging {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val parser = parserProp.get(compilation)
 
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
+    val time = System.currentTimeMillis()
     val parseResult: SingleParseResult[Node] = parseStream(parser, inputStream)
+    val parseTime = System.currentTimeMillis() - time
+    logger.info(s"Parsing took ${parseTime}ms")
     parseResult.resultOption.foreach(program => {
       compilation.program = program
       compilation.program.startOfUri = Some(uri)
