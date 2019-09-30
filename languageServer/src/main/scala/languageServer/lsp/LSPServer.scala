@@ -40,7 +40,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
     implicit val referenceContext: OFormat[ReferenceContext] = Json.format
     implicit val textEdit: OFormat[TextEdit] = Json.format[TextEdit]
     implicit val workspaceEdit: OFormat[WorkspaceEdit] = Json.format
-    implicit val codeActioncontext: OFormat[CodeActionContext] = Json.format
+    implicit val codeActionContext: OFormat[CodeActionContext] = Json.format
     implicit val codeAction: OFormat[CodeAction] = Json.format
     addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[FileRange]])
     addProvider(LSPProtocol.documentSymbol, (provider: DocumentSymbolProvider) => provider.documentSymbols)(Json.format, Writes.of[Seq[SymbolInformation]])

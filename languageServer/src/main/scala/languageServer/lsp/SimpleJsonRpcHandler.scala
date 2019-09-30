@@ -79,7 +79,7 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
         case JsSuccess(typedRequest, _) =>
           handler(typedRequest)
         case JsError(errors) =>
-          logger.error("Failed to parse notification message")
+          logger.error(s"Failed to parse notification message for $method, got errors: $errors")
       }
     }
     handlers.append(handle)
