@@ -4,10 +4,9 @@ import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
 import core.language.node.{FilePosition, NodeLike}
-import core.language.{Compilation, Language, SourceElement}
+import core.language.{Compilation, FileRange, Language, SourceElement}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
-import languageServer.lsp._
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider
@@ -39,7 +38,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     if (client != null) {
       currentDocumentId = TextDocumentIdentifier(parameters.textDocument.uri)
       val diagnostics = getCompilation.diagnosticsForFile(parameters.textDocument.uri)
-      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, diagnostics))
+      client.sendDiagnostics(PublishDiagnosticsParams(parameters.textDocument.uri, diagnostics))
     }
   }
 
@@ -101,7 +100,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def initialized(): Unit = {}
 
-  override def gotoDefinition(parameters: DocumentPosition): Seq[FileRange] = {
+  override def gotoDefinition(parameters: TextDocumentPositionParams): Seq[FileRange] = {
     currentDocumentId = parameters.textDocument
     logger.debug("Went into gotoDefinition")
     val fileRange = for {
@@ -113,7 +112,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     fileRange.toSeq
   }
 
-  override def complete(params: DocumentPosition): CompletionList = {
+  override def complete(params: TextDocumentPositionParams): CompletionList = {
     currentDocumentId = params.textDocument
     val position = params.position
     logger.debug("Went into complete")

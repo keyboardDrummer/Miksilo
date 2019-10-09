@@ -1,5 +1,6 @@
 package core.language
 
+import core.deltas.DiagnosticUtil
 import core.deltas.path.PathRoot
 import core.language.node.Node
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
@@ -48,11 +49,8 @@ object Compilation
   val singleFileDefaultName = "singleFileDefault"
   def singleFile(language: Language, inputStream: InputStream): Compilation = {
     val filePath = singleFileDefaultName
-    val result = new Compilation(language, new FileSystem {
-      override def getFile(path: String): InputStream =
-        if (path == filePath) inputStream
-        else throw new IllegalArgumentException(s"no file for path $path")
-    }, Some(filePath))
+    val result = new Compilation(language, (path: String) => if (path == filePath) inputStream
+    else throw new IllegalArgumentException(s"no file for path $path"), Some(filePath))
 
     result
   }

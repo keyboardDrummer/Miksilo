@@ -1,6 +1,6 @@
 package core.parsers.editorParsers
 
-import languageServer.TextEdit
+import core.parsers.strings.TextEdit
 
 case class Fix(title: String, edit: TextEdit)
 

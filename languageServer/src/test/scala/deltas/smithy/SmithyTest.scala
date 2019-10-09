@@ -1,6 +1,6 @@
 package deltas.smithy
 
-import languageServer._
+import core.parsers.strings.SourceRange
 import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.SourceUtils

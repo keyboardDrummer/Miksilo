@@ -1,8 +1,8 @@
 package languageServer
 
-import core.language.node.FilePosition
-import core.language.node.Node.PositionOrdering
-import languageServer.lsp._
+import core.language.FileRange
+import core.parsers.strings.{Position, SourceRange}
+import org.eclipse.lsp4j.{ClientCapabilities, DiagnosticSeverity}
 import play.api.libs.json._
 
 trait DocumentSymbolProvider {
@@ -17,17 +17,23 @@ case class RenameParams(textDocument: TextDocumentIdentifier, position: Position
 
 case class DocumentSymbolParams(textDocument: TextDocumentIdentifier)
 
-trait HoverProvider {
-  def hoverRequest(request: TextDocumentHoverRequest): Hover
-}
+//trait HoverProvider {
+//  def hoverRequest(request: TextDocumentPositionParams): Hover
+//}
 
 trait CompletionProvider {
   def getOptions: CompletionOptions
-  def complete(request: DocumentPosition): CompletionList
+  def complete(request: TextDocumentPositionParams): CompletionList
 }
 
+case class CompletionOptions(resolveProvider: Boolean, triggerCharacters: Seq[String])
+
+case class CompletionList(isIncomplete: Boolean, items: Seq[CompletionItem])
+
+case class TextDocumentPositionParams(textDocument: TextDocumentIdentifier, position: Position)
+
 trait DefinitionProvider {
-  def gotoDefinition(parameters: DocumentPosition): Seq[FileRange]
+  def gotoDefinition(parameters: TextDocumentPositionParams): Seq[FileRange]
 }
 
 case class ReferencesParams(textDocument: TextDocumentIdentifier, position: Position, context: ReferenceContext)
@@ -36,48 +42,18 @@ trait ReferencesProvider {
   def references(location: ReferencesParams): Seq[FileRange]
 }
 
-/**
-  * Position in a text document expressed as zero-based line and character offset.
-  */
-case class Position(line: Int, character: Int)
-object Position { implicit val format = Json.format[Position] }
-
-object SourceRange { implicit val format = Json.format[SourceRange] }
-/**
-  * A range in a text document.
-  */
-case class SourceRange(start: Position, end: Position) {
-
-  def contains(position: Position): Boolean = {
-    PositionOrdering.lteq(start, position) && PositionOrdering.lteq(position, end)
-  }
-
-  def contains(position: SourceRange): Boolean = {
-    PositionOrdering.lteq(start, position.start) && PositionOrdering.lteq(position.end, end)
-  }
-}
-
-object Diagnostic {
-  implicit val format = Json.format[Diagnostic]
-}
 case class Diagnostic(
                        range: SourceRange, // the range at which this diagnostic applies
-                       severity: Option[Int], // severity of this diagnostics (see above)
-                       code: Option[String], // a code for this diagnostic
-                       source: Option[String], // the source of this diagnostic (like 'typescript' or 'scala')
-                       message: String // the diagnostic message
+                       message: String, // the diagnostic message
+                       severity: Option[DiagnosticSeverity], // severity of this diagnostics (see above)
+                       code: Option[String] = None, // a code for this diagnostic
+                       source: Option[String] = None, // the source of this diagnostic (like 'typescript' or 'scala')
                      ) {
-  def identifier = Diagnostic(range, None, None, None, message)
+  def identifier = Diagnostic(range, message, None)
 }
 
-object TextEdit {
-  implicit val format = Json.format[TextEdit]
-}
 case class TextEdit(range: SourceRange, newText: String)
 
-object WorkspaceEdit {
-  implicit val format = Json.format[WorkspaceEdit]
-}
 /**
   * A workspace edit represents changes to many resources managed
   * in the workspace.
@@ -86,15 +62,9 @@ case class WorkspaceEdit(
                           changes: Map[String, Seq[TextEdit]] // uri -> changes
                         )
 
-object CodeActionContext {
-  implicit val format = Json.format[CodeActionContext]
-}
 case class CodeActionContext(diagnostics: Seq[Diagnostic], only: Option[Seq[String]])
 case class CodeActionParams(textDocument: TextDocumentIdentifier, range: SourceRange, context: CodeActionContext)
 
-object CodeAction {
-  implicit val format = Json.format[CodeAction]
-}
 case class CodeAction(title: String, kind: String,
                       diagnostics: Option[Seq[Diagnostic]],
                       edit: Option[WorkspaceEdit])
@@ -103,8 +73,9 @@ trait CodeActionProvider {
   def getCodeActions(parameters: CodeActionParams): Seq[CodeAction]
 }
 
+case class PublishDiagnosticsParams(uri: String, diagnostics: Seq[Diagnostic])
 trait LanguageClient {
-  def sendDiagnostics(diagnostics: PublishDiagnostics)
+  def sendDiagnostics(diagnostics: PublishDiagnosticsParams)
 }
 
 trait LanguageServer {
@@ -118,27 +89,19 @@ trait LanguageServer {
   def initialized(): Unit
 }
 
+case class InitializeParams(capabilities: ClientCapabilities)
 
+case class DidChangeTextDocumentParams(textDocument: VersionedTextDocumentIdentifier,
+                                       contentChanges: Seq[TextDocumentContentChangeEvent])
 
-/**
-  * Corresponds to an LSP Location
-  */
-case class FileRange(uri: String, range: SourceRange) {
-  def contains(filePosition: FilePosition): Boolean = {
-    uri == filePosition.uri && range.contains(filePosition.position)
-  }
-}
+case class DidSaveTextDocumentParams(document: TextDocumentIdentifier)
 
-object FileRange { implicit val format = Json.format[FileRange] }
-
-object DiagnosticSeverity {
-  final val Error = 1
-  final val Warning = 2
-  final val Information = 3
-  final val Hint = 4
-}
-
-
+//object DiagnosticSeverity {
+//  final val Error = 1
+//  final val Warning = 2
+//  final val Information = 3
+//  final val Hint = 4
+//}
 
 /**
   * A reference to a command.
@@ -149,12 +112,9 @@ object DiagnosticSeverity {
   */
 case class Command(title: String, command: String, arguments: Seq[Any])
 
-
 case class TextDocumentIdentifier(uri: String)
-object TextDocumentIdentifier { implicit val format = Json.format[TextDocumentIdentifier] }
 
-case class VersionedTextDocumentIdentifier(uri: String, version: Long)
-object VersionedTextDocumentIdentifier { implicit val format = Json.format[VersionedTextDocumentIdentifier] }
+case class VersionedTextDocumentIdentifier(uri: String, version: Integer)
 
 /**
   * An item to transfer a text document from the client to the
@@ -167,12 +127,8 @@ case class TextDocumentItem(
                                * The version number of this document (it will strictly increase after each
                                * change, including undo/redo).
                                */
-                             version: Long,
+                             version: Integer,
                              text: String)
-
-object TextDocumentItem {
-  implicit val format = Json.format[TextDocumentItem]
-}
 
 object CompletionItemKind {
   final val Text = 1
@@ -208,10 +164,6 @@ case class CompletionItem(
 // a [CompletionRequest](#CompletionRequest) and a [CompletionResolveRequest]
 //   (#CompletionResolveRequest)
 
-object CompletionItem {
-  implicit def format = Json.format[CompletionItem]
-}
-
 trait MarkedString
 
 case class RawMarkedString(language: String, value: String) extends MarkedString {
@@ -221,17 +173,6 @@ case class RawMarkedString(language: String, value: String) extends MarkedString
 }
 
 case class MarkdownString(contents: String) extends MarkedString
-
-object MarkedString {
-  implicit val reads: Reads[MarkedString] =
-    Json.reads[RawMarkedString].map(x => x: MarkedString).orElse(Json.reads[MarkdownString].map(x => x: MarkedString))
-
-  implicit val writes: Writes[MarkedString] = Writes[MarkedString] {
-    case raw: RawMarkedString => Json.writes[RawMarkedString].writes(raw)
-    case md: MarkdownString => Json.writes[MarkdownString].writes(md)
-  }
-}
-
 
 case class ParameterInformation(label: String, documentation: Option[String])
 
@@ -314,9 +255,6 @@ object SymbolKind {
 }
 
 case class SymbolInformation(name: String, kind: Int, location: FileRange, containerName: Option[String])
-object SymbolInformation {
-  implicit val format = Json.format[SymbolInformation]
-}
 
 /**
   * The parameters of a [WorkspaceSymbolRequest](#WorkspaceSymbolRequest).
@@ -368,75 +306,8 @@ case class FormattingOptions(
                               params: Map[String, Any] // [key: string]: boolean | number | string;
                             )
 
-trait TextDocument {
-  /**
-    * The associated URI for this document. Most documents have the __file__-scheme, indicating that they
-    * represent files on disk. However, some documents may have other schemes indicating that they are not
-    * available on disk.
-    */
-  val uri: String
-
-  /** The identifier of the language associated with this document. */
-  val languageId: String
-
-  /**
-    * The version number of this document (it will strictly increase after each
-    * change, including undo/redo).
-    */
-  def version: Long
-
-  /**
-    * Get the text of this document.
-    *
-    * @return The text of this document.
-    */
-  def getText(): String
-
-  /**
-    * Converts a zero-based offset to a position.
-    *
-    * @param offset A zero-based offset.
-    * @return A valid [position](#Position).
-    */
-  def positionAt(offset: Int): Position
-
-  /**
-    * Converts the position to a zero-based offset.
-    *
-    * The position will be [adjusted](#TextDocument.validatePosition).
-    *
-    * @param position A position.
-    * @return A valid zero-based offset.
-    */
-  def offsetAt(position: Position): Int;
-
-  /** The number of lines in this document. */
-  def lineCount: Int;
-}
-
-case class TextDocumentChangeEvent(document: TextDocument)
-
 /**
   * An event describing a change to a text document. If range and rangeLength are omitted
   * the new text is considered to be the full content of the document.
   */
-case class TextDocumentContentChangeEvent(
-                                           /**
-                                             * The range of the document that changed.
-                                             */
-                                           range: Option[SourceRange],
-
-                                           /**
-                                             * The length of the range that got replaced.
-                                             */
-                                           rangeLength: Option[Int],
-
-                                           /**
-                                             * The new text of the document.
-                                             */
-                                           text: String
-                                         )
-
-object TextDocumentContentChangeEvent {
-  implicit val format = Json.format[TextDocumentContentChangeEvent]
-}
+case class TextDocumentContentChangeEvent(range: Option[SourceRange], rangeLength: Option[Int], text: String)

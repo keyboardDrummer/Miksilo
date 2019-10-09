@@ -1,10 +1,10 @@
 package core.smarts.language.modules
 
 import core.language.SourceElement
+import core.parsers.strings.SourceRange
 import core.smarts.ConstraintBuilder
 import core.smarts.language.structs.TypeDefinition
 import core.smarts.scopes.objects.Scope
-import languageServer.SourceRange
 
 trait FakeSourceElement extends SourceElement {
   override def current: Any = ???

@@ -21,6 +21,8 @@ lazy val commonSettings = Seq(
   scalacOptions += "-language:implicitConversions",
   scalacOptions += "-language:postfixOps",
 
+  libraryDependencies += "org.eclipse.lsp4j" % "org.eclipse.lsp4j" % "0.8.1",
+
   libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.4" % "test",
 
   libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
@@ -37,15 +39,11 @@ lazy val commonSettings = Seq(
 
   libraryDependencies += "com.google.guava" % "guava" % "18.0",
 
-  libraryDependencies += "io.github.shogowada" %% "scala-json-rpc" % "0.9.3",
-
-  // https://mvnrepository.com/artifact/com.typesafe.play/play-json
   libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
 
   // https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
   libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
 
-  libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1",
   libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
 )
 

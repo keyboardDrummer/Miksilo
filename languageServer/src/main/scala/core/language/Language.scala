@@ -31,8 +31,6 @@ class Language extends LazyLogging {
     compilerPhases = left ++ (insert :: right)
   }
 
-  var extraCompileOptions: List[CustomCommand] = List.empty
-
   def compileString(input: String): Compilation = {
     compileStream(stringToInputStream(input))
   }

@@ -3,14 +3,12 @@ package core.bigrammar
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
-import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
-import languageServer.Position
+import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, Position}
 import util.Utility
 
 import scala.collection.mutable
 
 case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
-
 
 //noinspection ZeroIndexToHead
 object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrectingParserWriter
@@ -116,7 +114,8 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
           (element, result) => WithMap(element.value :: result.value, element.namedValues ++ result.namedValues), many.parseGreedy)
 
         parser
-      case mapGrammar: MapGrammar[AnyWithMap, AnyWithMap] =>
+      case _mapGrammar: MapGrammar[_, _] =>
+        val mapGrammar = _mapGrammar.asInstanceOf[MapGrammar[AnyWithMap, AnyWithMap]]
         val innerParser = recursive(mapGrammar.inner)
         FilterMap(innerParser, mapGrammar.construct)
 

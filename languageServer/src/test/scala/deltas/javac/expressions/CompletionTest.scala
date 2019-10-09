@@ -1,9 +1,7 @@
 package deltas.javac.expressions
 
 import deltas.javac.JavaLanguage
-import languageServer.{CompletionItem, CompletionItemKind}
-import languageServer.lsp.CompletionList
-import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
+import languageServer.{CompletionItem, CompletionItemKind, CompletionList, HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.SourceUtils
 

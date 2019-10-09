@@ -2,13 +2,16 @@ package deltas.bytecode.readJar
 
 import java.io.BufferedInputStream
 
+import core.deltas.DiagnosticUtil._
 import core.deltas._
 import core.language.Compilation
 import core.language.node.Node
+import core.parsers.strings.SourceRange
 import core.smarts.FileDiagnostic
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import languageServer.{Diagnostic, DiagnosticSeverity, HumanPosition, SourceRange}
+import languageServer.{Diagnostic, HumanPosition}
+import org.eclipse.lsp4j.DiagnosticSeverity
 
 object DecodeByteCodeParser extends DeltaWithPhase {
 
@@ -27,7 +30,7 @@ object DecodeByteCodeParser extends DeltaWithPhase {
       compilation.program.startOfUri = Some(uri)
     } else {
       val diagnostic = Diagnostic(SourceRange(HumanPosition(0, 0), HumanPosition(0, 0)),
-        Some(DiagnosticSeverity.Error), None, None, "File was not a JVM classfile")
+        "File was not a JVM classfile", Some(DiagnosticSeverity.Error))
       compilation.diagnostics += FileDiagnostic(uri, diagnostic)
     }
   }

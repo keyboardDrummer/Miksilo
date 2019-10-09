@@ -1,13 +1,13 @@
 package deltas.verilog
 
-import core.language.{Compilation, InMemoryFileSystem}
+import core.language.{Compilation, FileRange, InMemoryFileSystem}
 import core.language.node.NodeComparer
+import core.parsers.strings.SourceRange
 import deltas.{ClearPhases, FileWithMembersDelta}
 import deltas.expression.{IntLiteralDelta, VariableDelta}
 import deltas.expression.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
-import languageServer.{FileRange, HumanPosition, LanguageServerTest, MiksiloLanguageServer, SourceRange, TextDocumentIdentifier}
-import languageServer.lsp.DocumentPosition
+import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer, TextDocumentIdentifier, TextDocumentPositionParams}
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 
@@ -112,7 +112,7 @@ class VerilogTest extends FunSuite with LanguageServerTest {
     val mainIdentifier = TextDocumentIdentifier(files(1).toString())
     val busIdentifier = TextDocumentIdentifier(files(0).toString())
 
-    val gotoPackageResult: Seq[FileRange] = server.gotoDefinition(DocumentPosition(mainIdentifier, new HumanPosition(5, 11)))
+    val gotoPackageResult: Seq[FileRange] = server.gotoDefinition(TextDocumentPositionParams(mainIdentifier, new HumanPosition(5, 11)))
     val gotoPackageExpectation = Seq(FileRange(busIdentifier.uri, SourceRange(new HumanPosition(1, 9), new HumanPosition(1, 16))))
     assertResult(gotoPackageExpectation)(gotoPackageResult)
 

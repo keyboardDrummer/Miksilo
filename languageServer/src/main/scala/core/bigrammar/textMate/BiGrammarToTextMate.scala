@@ -39,7 +39,7 @@ object BiGrammarToTextMate {
         case regex: RegexGrammar => Some(regex.regex.regex)
         case many: Many => recurse(many.inner).map(r => r + "*") // TODO add parenthesis
         case map: ValueMapGrammar[_, _] => recurse(map.inner)
-        case map: MapGrammar[AnyWithMap, AnyWithMap] => recurse(map.inner)
+        case _map: MapGrammar[_, _] => recurse(_map.inner)
         case labelled: Labelled => recurse(labelled.inner)
         case delimiter: Delimiter => Some(escapeRegex(delimiter.value))
         case _: Identifier => Some(escapeRegex(BiGrammarToParser.identifierRegex.regex))

@@ -13,7 +13,8 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       val (parseResult: LazyParseResult[Result], tail) = queue.pop()
 
       queue = parseResult match {
-        case parseResult: ReadyParseResult[Result] =>
+        case _parseResult: ReadyParseResult[_] =>
+          val parseResult = _parseResult.asInstanceOf[ReadyParseResult[Result]]
           val parseResultKey = ReadyParseResult(parseResult.resultOption, parseResult.remainder, getHistoryWithoutChoices(parseResult.history))
           if (resultsSeen.contains(parseResultKey)) {
             val previousResult = resultsSeen(parseResultKey)
@@ -32,7 +33,8 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
-            case tailCons: SRCons[Result] =>
+            case _tailCons: SRCons[_] =>
+              val tailCons = _tailCons.asInstanceOf[SRCons[Result]]
               if (mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty
               else
@@ -40,7 +42,8 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
             case _ =>
               SREmpty
           }
-        case delayedResult: DelayedParseResult[Result] =>
+        case _delayedResult: DelayedParseResult[_] =>
+          val delayedResult = _delayedResult.asInstanceOf[DelayedParseResult[Result]]
           val results = delayedResult.results
           tail.merge(results)
       }

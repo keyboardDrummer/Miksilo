@@ -1,6 +1,13 @@
 package core.language
 
-import languageServer.{FileRange, SourceRange}
+import core.language.node.FilePosition
+import core.parsers.strings.SourceRange
+
+case class FileRange(uri: String, range: SourceRange) {
+  def contains(filePosition: FilePosition): Boolean = {
+    uri == filePosition.uri && range.contains(filePosition.position)
+  }
+}
 
 trait SourceElement {
   def current: Any
@@ -12,7 +19,7 @@ trait SourceElement {
   /*
   A None value means the element is not part of the source.
    */
-  def fileRange: Option[FileRange] = range.flatMap(p => uriOption.map(u => FileRange(u, p)))
+  def fileRange: Option[FileRange] = range.flatMap(r => uriOption.map(u => new FileRange(u, r)))
 
   def uriOption: Option[String]
 

@@ -2,7 +2,7 @@ package core.parsers.sequences
 
 import core.parsers.core.{ParseInput, Processor}
 import core.parsers.editorParsers.{CorrectingParserWriter, Fix, History, ParseError, StopFunction}
-import languageServer.{Position, SourceRange, TextEdit}
+import core.parsers.strings.{Position, SourceRange, TextEdit}
 
 trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem

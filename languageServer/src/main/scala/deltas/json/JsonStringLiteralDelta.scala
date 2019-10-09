@@ -1,17 +1,17 @@
 package deltas.json
 
+import core.bigrammar.grammars.Colorize
 import core.bigrammar.{BiGrammar, BiGrammarWriter}
-import core.bigrammar.grammars.{As, Colorize}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
-import core.language.node.{Node, NodeField, NodeShape}
+import core.language.node.{Node, NodeField}
 import core.language.{Compilation, Language}
+import core.parsers.strings.{Position, SourceRange}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 import deltas.expression.{ExpressionDelta, ExpressionInstance, StringLiteralDelta}
-import languageServer.{Position, SourceRange}
 
 import scala.util.matching.Regex
 

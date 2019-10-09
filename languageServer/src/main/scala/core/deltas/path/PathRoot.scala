@@ -1,7 +1,7 @@
 package core.deltas.path
 
 import core.language.node.{Key, Node}
-import languageServer.{Position, SourceRange}
+import core.parsers.strings.{Position, SourceRange}
 
 case class PathRoot(current: Node) extends NodePath with Key {
 

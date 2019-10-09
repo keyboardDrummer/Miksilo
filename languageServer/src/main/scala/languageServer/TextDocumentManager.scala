@@ -4,6 +4,7 @@ import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
 import com.typesafe.scalalogging.LazyLogging
 import core.language.FileSystem
+import core.parsers.strings.Position
 import util.SourceUtils
 
 import scala.collection.JavaConverters._
@@ -72,8 +73,8 @@ case class InMemoryTextDocument(uri: String, contents: Array[Char]) {
     * Return the corresponding position in this text document as 0-based line and column.
     */
   def offsetToPosition(offset: Int): Position = {
-    if (offset >= contents.size)
-      throw new IndexOutOfBoundsException(s"$uri: asked position at offset $offset, but contents is only ${contents.size} characters long.")
+    if (offset >= contents.length)
+      throw new IndexOutOfBoundsException(s"$uri: asked position at offset $offset, but contents is only ${contents.length} characters long.")
 
     var i, line, col = 0
 
@@ -104,7 +105,7 @@ case class InMemoryTextDocument(uri: String, contents: Array[Char]) {
     val Position(line, col) = pos
 
     var i, l, c = 0
-    while (i < contents.size && l < line) {
+    while (i < contents.length && l < line) {
       contents(i) match {
         case '\r' =>
           l += 1
@@ -120,7 +121,7 @@ case class InMemoryTextDocument(uri: String, contents: Array[Char]) {
 
     if (l < line)
       throw new IllegalArgumentException(s"$uri: Can't find position $pos in contents of only $l lines long.")
-    if (i + col < contents.size)
+    if (i + col < contents.length)
       i + col
     else
       throw new IllegalArgumentException(s"$uri: Invalid column. Position $pos in line '${contents.slice(i, contents.size).mkString}'")

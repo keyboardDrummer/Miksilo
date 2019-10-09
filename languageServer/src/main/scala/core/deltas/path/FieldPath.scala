@@ -1,7 +1,7 @@
 package core.deltas.path
 
 import core.language.node.{Node, NodeField}
-import languageServer.SourceRange
+import core.parsers.strings.SourceRange
 
 class NodeFieldPath(parent: NodePath, field: NodeField) extends FieldPath(parent, field) with NodeChildPath {
   override lazy val current: Node = super[FieldPath].current.asInstanceOf[Node]
@@ -22,7 +22,6 @@ case class FieldPath(parent: NodePath, field: NodeField) extends ChildPath {
   }
 
   override def replaceWith(replacement: Any): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
-
 
   override def range: Option[SourceRange] = parent.current.sources.get(field)
 

@@ -1,8 +1,10 @@
 package core.smarts
 
+import core.deltas.DiagnosticUtil
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.ResolutionConstraint
-import languageServer.{Diagnostic, DiagnosticSeverity}
+import languageServer.Diagnostic
+import org.eclipse.lsp4j.DiagnosticSeverity
 
 case class ResolvesTo(reference: Reference, var declaration: Declaration) extends ResolutionConstraint
 {
@@ -36,7 +38,8 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
     for {
       fileRange <- reference.origin.flatMap(e => e.fileRange)
     } yield {
-      val diagnostic = Diagnostic(fileRange.range, Some(DiagnosticSeverity.Error), None, None, s"Could not find definition of ${reference.name}")
+      val diagnostic = Diagnostic(fileRange.range,
+        s"Could not find definition of ${reference.name}", Some(DiagnosticSeverity.Error))
       FileDiagnostic(fileRange.uri, diagnostic)
     }
   }

@@ -1,9 +1,9 @@
 package core.smarts.scopes
 
-import core.language.SourceElement
+import core.language.{FileRange, SourceElement}
 import core.smarts.objects.{NamedDeclaration, Reference}
 import core.smarts.scopes.objects.ConcreteScope
-import languageServer.FileRange
+import org.eclipse.lsp4j.Location
 
 import scala.collection.mutable
 

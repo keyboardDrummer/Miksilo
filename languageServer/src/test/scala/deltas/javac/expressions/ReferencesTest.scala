@@ -1,7 +1,8 @@
 package deltas.javac.expressions
 
+import core.parsers.strings.SourceRange
 import deltas.javac.JavaLanguage
-import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer, SourceRange}
+import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.SourceUtils
 

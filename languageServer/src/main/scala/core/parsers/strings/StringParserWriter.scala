@@ -1,8 +1,28 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.{Fix, History, ParseError}
+import core.language.node.Node.PositionOrdering
+import core.parsers.editorParsers.{History, ParseError}
 import core.parsers.sequences.SequenceParserWriter
-import languageServer.{Position, SourceRange, TextEdit}
+
+case class Position(line: Int, character: Int) extends Ordered[Position] {
+
+  val ordering = Ordering.by[Position, Int](p => p.line).thenComparingInt(p => p.character)
+  override def compare(that: Position) = {
+    ordering.compare(this, that)
+  }
+}
+
+case class SourceRange(start: Position, end: Position) {
+  def contains(position: Position): Boolean = {
+    start <= position && position <= end
+  }
+
+  def contains(position: SourceRange): Boolean = {
+    start <= position.start && end <= position.end
+  }
+}
+
+case class TextEdit(range: SourceRange, newText: String)
 
 import scala.util.matching.Regex
 

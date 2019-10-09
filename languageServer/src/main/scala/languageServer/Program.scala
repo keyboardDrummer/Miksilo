@@ -12,10 +12,8 @@ import deltas.javac.JavaLanguage
 import deltas.smithy.SmithyLanguage
 import deltas.solidity.SolidityLanguage
 import deltas.verilog.VerilogLanguage
-import languageServer.lsp.{JsonRpcConnection, LSPServer}
+import org.eclipse.lsp4j.launch.LSPLauncher
 import org.slf4j.LoggerFactory
-
-import scala.util.Try
 
 object Program extends LazyLogging {
 
@@ -38,13 +36,13 @@ object Program extends LazyLogging {
 
     val languageNameOption = args.headOption
     val language = languageNameOption.flatMap(languageName => languages.get(languageName)).getOrElse(languages.values.head)
-    val connection = new JsonRpcConnection(System.in, System.out)
-    val lspServer = Try {
-      val languageServer = new MiksiloLanguageServer(language)
-      new LSPServer(languageServer, connection)
-    }
-    lspServer.recover{case e => logger.error(e.getMessage); e.printStackTrace() }
-    connection.listen()
+
+    val miksiloLanguageServer = new MiksiloLanguageServer(language)
+    val languageServer = new LanguageServerToLSP4JServer(miksiloLanguageServer)
+    val connection = LSPLauncher.createServerLauncher(languageServer, System.in, System.out)
+    val languageClient = connection.getRemoteProxy
+    languageServer.setClient(languageClient)
+    connection.startListening()
   }
 
   private def sendAllLoggingToStdErr(innerLogger: Logger): Unit = {

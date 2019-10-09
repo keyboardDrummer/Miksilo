@@ -1,7 +1,9 @@
 package cloudformation
 
 import core.bigrammar.TestLanguageGrammarUtils
+import core.language.FileRange
 import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
+import core.parsers.strings.{Position, SourceRange}
 import deltas.cloudformation.CloudFormationLanguage
 import languageServer._
 import languageServer.lsp._
@@ -119,7 +121,7 @@ class JsonCloudFormationTest extends FunSuite with LanguageServerTest {
     val server = new MiksiloLanguageServer(jsonLanguage)
     val document = openDocument(server, program)
     val start = new HumanPosition(6, 14)
-    val result = server.complete(DocumentPosition(document, start))
+    val result = server.complete(TextDocumentPositionParams(document, start))
 
     val item = CompletionItem("Subscription", kind = Some(CompletionItemKind.Text), insertText = Some("Subscription"))
     assertResult(CompletionList(isIncomplete = false, Seq(item))) (result)
@@ -145,7 +147,7 @@ class JsonCloudFormationTest extends FunSuite with LanguageServerTest {
     val server = new MiksiloLanguageServer(jsonLanguage)
     val document = openDocument(server, program)
     val start = new HumanPosition(10, 30)
-    val result = server.gotoDefinition(DocumentPosition(document, start))
+    val result = server.gotoDefinition(TextDocumentPositionParams(document, start))
 
     assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(3,6), new HumanPosition(3,13)))))(result)
   }

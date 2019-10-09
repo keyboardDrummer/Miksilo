@@ -1,8 +1,10 @@
 package deltas.javac.expressions
 
+import core.language.FileRange
+import core.parsers.strings.SourceRange
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
-import languageServer.{FileRange, HumanPosition, LanguageServerTest, SourceRange}
+import languageServer.{HumanPosition, LanguageServerTest}
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 

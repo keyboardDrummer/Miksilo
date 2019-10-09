@@ -6,8 +6,8 @@ import core.bigrammar.printer.AsPrinter
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.{BiGrammar, WithMap}
 import core.language.node.NodeField
+import core.parsers.strings.SourceRange
 import core.responsiveDocument.ResponsiveDocument
-import languageServer.SourceRange
 
 case class As(var inner: BiGrammar, field: NodeField, changePosition: SourceRange => SourceRange = null) extends CustomGrammar
 {
@@ -23,7 +23,7 @@ case class As(var inner: BiGrammar, field: NodeField, changePosition: SourceRang
 
   override def toParser(recursive: BiGrammar => Self[Result]): Self[Result] = {
     recursive(inner).withRange[Result]((left, right, result: Result) => {
-      var range = SourceRange(left.position, right.position)
+      var range = new SourceRange(left.position, right.position)
       if (changePosition != null)
         range = changePosition(range)
       WithMap[Any](Unit, result.namedValues + (field -> result.value) + (FieldPosition(field) -> range))
