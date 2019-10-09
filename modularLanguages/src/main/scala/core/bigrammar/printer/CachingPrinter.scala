@@ -1,5 +1,9 @@
 package core.bigrammar.printer
 
+import core.bigrammar.BiGrammar.State
+import core.bigrammar.BiGrammarToParser.Result
+import core.bigrammar.WithMap
+import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.collection.mutable

@@ -17,7 +17,6 @@ object TestingLanguage {
 class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   val statistics = new Statistics(TestLanguageBuilder.statistics)
 
-
   lazy val language: Language = buildLanguage
   lazy val grammars: LanguageGrammars = language.grammars
 

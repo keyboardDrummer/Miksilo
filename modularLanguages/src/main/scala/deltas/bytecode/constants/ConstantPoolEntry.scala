@@ -1,5 +1,7 @@
 package deltas.bytecode.constants
 
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.Keyword
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language

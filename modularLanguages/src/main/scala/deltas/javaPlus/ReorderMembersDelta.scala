@@ -18,7 +18,7 @@ object ReorderMembersDelta extends Delta {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    language.extraCompileOptions ::= ReorderOption
+    //language.extraCompileOptions ::= ReorderOption
   }
 
   trait CustomCommand {

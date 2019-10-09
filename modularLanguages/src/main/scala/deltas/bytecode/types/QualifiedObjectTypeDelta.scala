@@ -1,5 +1,7 @@
 package deltas.bytecode.types
 
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.Labelled
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.FieldPath
 import core.language.node._

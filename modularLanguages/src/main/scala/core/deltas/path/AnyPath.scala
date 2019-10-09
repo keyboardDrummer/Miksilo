@@ -5,6 +5,7 @@ import core.language.node.NodeShape
 
 trait AnyPath extends SourceElement {
 
+  def current: Any
   def uriOption: Option[String]
   def parentOption: Option[NodePath]
 

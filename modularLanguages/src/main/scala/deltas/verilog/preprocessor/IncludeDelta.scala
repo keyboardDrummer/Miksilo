@@ -1,13 +1,15 @@
 package deltas.verilog.preprocessor
 
+import core.bigrammar.grammars.StringLiteral
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, NodeSequenceElement}
 import core.deltas.{Contract, ParseUsingTextualGrammar, Property}
 import core.language.{DiagnosticUtil, Language}
 import core.language.node.{Node, NodeField, NodeShape}
+import core.parsers.sequences.SingleResultParser
 import core.smarts.FileDiagnostic
 import deltas.FileWithMembersDelta.FileWithMembers
-
+import core.bigrammar.BiGrammarToParser._
 import scala.reflect.io.Path
 
 object IncludeDelta extends DirectiveDelta {
@@ -33,7 +35,7 @@ object IncludeDelta extends DirectiveDelta {
     }
   }
 
-  val parserProp = new Property[SingleResultParser[Any]](null)
+  val parserProp = new Property[SingleResultParser[Any, Input]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

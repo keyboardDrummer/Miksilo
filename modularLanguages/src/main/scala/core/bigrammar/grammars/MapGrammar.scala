@@ -1,5 +1,7 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
+
 case class MapGrammar[Value, NewValue](var inner: BiGrammar,
                       construct: Value => Either[String, NewValue],
                       deconstruct: NewValue => Option[Value]) extends BiGrammar {

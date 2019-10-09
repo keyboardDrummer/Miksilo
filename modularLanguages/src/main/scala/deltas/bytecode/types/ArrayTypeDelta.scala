@@ -1,6 +1,7 @@
 package deltas.bytecode.types
 
 
+import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Compilation
 import core.language.node._

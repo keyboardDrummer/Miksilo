@@ -1,5 +1,6 @@
 package deltas.bytecode
 
+import core.bigrammar.BiGrammar
 import core.document.Empty
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}

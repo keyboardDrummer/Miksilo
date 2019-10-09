@@ -1,5 +1,6 @@
 package core.bigrammar.printer
 
+import core.bigrammar.{BiGrammar, PrintBiGrammar}
 import core.responsiveDocument.ResponsiveDocument
 
 case class NestedError(value: Any, grammar: BiGrammar, inner: PrintError) extends PrintError {

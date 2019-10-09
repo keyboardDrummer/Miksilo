@@ -1,5 +1,7 @@
 package deltas.javac.types
 
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.BiFailure
 import core.deltas.grammars.LanguageGrammars
 import core.language.Compilation
 import core.language.node._

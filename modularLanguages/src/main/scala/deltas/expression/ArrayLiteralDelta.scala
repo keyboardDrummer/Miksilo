@@ -1,5 +1,6 @@
 package deltas.expression
 
+import core.bigrammar.grammars.Delimiter
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath

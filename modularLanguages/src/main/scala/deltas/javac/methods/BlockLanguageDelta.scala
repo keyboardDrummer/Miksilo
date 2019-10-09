@@ -1,5 +1,6 @@
 package deltas.javac.methods
 
+import core.SolveConstraintsDelta
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.PathRoot
@@ -16,10 +17,10 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    language.collectConstraints = (compilation, builder) => {
-      val block = PathRoot(compilation.program)
+    SolveConstraintsDelta.constraintCollector.add(language, (compilation, builder) => {
+      val block = compilation.program.asInstanceOf[PathRoot]
       BlockDelta.collectConstraints(compilation, builder, block, builder.newScope(debugName = "programScope"))
-    }
+    })
   }
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {

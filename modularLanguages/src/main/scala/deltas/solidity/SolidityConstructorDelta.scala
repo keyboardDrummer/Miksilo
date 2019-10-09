@@ -1,5 +1,6 @@
 package deltas.solidity
 
+import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{DeltaWithGrammar, DeltaWithPhase}
 import core.language.node.Node

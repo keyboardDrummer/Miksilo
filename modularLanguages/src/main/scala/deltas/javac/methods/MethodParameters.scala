@@ -1,5 +1,6 @@
 package deltas.javac.methods
 
+import core.bigrammar.BiGrammar
 import core.deltas.NodeGrammarWriter
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath

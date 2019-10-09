@@ -1,5 +1,7 @@
 package deltas.trivia
 
+import core.bigrammar.{BiGrammar, GrammarPath, GrammarReference, RootGrammar}
+import core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, WithTrivia}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
@@ -51,10 +53,10 @@ object TriviaInsideNode extends DeltaWithGrammar {
         if (!grammar.children.head.value.isLeftRecursive) {
           placeTrivia(grammars, grammar.children.head, horizontal)
         }
-      case _:BiChoice =>
+      case _: BiChoice =>
         injectTrivia(grammars, grammar.children(0), horizontal)
         injectTrivia(grammars, grammar.children(1), horizontal)
-      case _:BiFailure =>
+      case _: BiFailure =>
       case _ =>
         if (grammar.children.length == 1)
           injectTrivia(grammars, grammar.children.head, horizontal)

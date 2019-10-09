@@ -1,5 +1,7 @@
 package deltas.javac.classes.skeleton
 
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.BiChoice
 import core.deltas._
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodeChildPath, NodePath, PathRoot}

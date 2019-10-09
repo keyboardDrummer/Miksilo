@@ -1,5 +1,6 @@
 package core.bigrammar.textMate
 
+import core.bigrammar.grammars.Delimiter
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language

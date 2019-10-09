@@ -1,5 +1,6 @@
 package deltas.solidity
 
+import core.bigrammar.GrammarReference
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language

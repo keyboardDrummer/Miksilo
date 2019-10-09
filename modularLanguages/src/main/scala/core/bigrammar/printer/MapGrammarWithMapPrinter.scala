@@ -1,5 +1,8 @@
 package core.bigrammar.printer
 
+import core.bigrammar.BiGrammarToParser.AnyWithMap
+import core.bigrammar.WithMap
+import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.ResponsiveDocument
 
 class MapGrammarWithMapPrinter(inner: NodePrinter, deconstruct: AnyWithMap => Option[AnyWithMap]) extends NodePrinter {

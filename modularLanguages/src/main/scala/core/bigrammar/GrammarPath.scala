@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.{As, Labelled}
 import core.language.node.{Key, NodeField, NodeGrammar, NodeShape}
 import util.GraphBasics.{Continue, Halt}
 import util.{ExtendedType, GraphBasics, Property}
@@ -35,11 +36,11 @@ trait GrammarPath {
   }
 
   def findAs(field: NodeField): GrammarReference = {
-    find(p => p.value match { case as:As => as.field == field; case _ => false}).get
+    find(p => p.value match { case as: As => as.field == field; case _ => false}).get
   }
 
   def findLabelled(label: Key): GrammarReference = {
-    find(p => p.value match { case as:Labelled => as.name == label; case _ => false}).get
+    find(p => p.value match { case as: Labelled => as.name == label; case _ => false}).get
   }
 
   def find(predicate: GrammarPath => Boolean): Option[GrammarReference] = {

@@ -2,6 +2,8 @@ package core.deltas.grammars
 
 import java.util.NoSuchElementException
 
+import core.bigrammar.{BiGrammar, GrammarReference, RootGrammar}
+import core.bigrammar.grammars.{BiFailure, Labelled}
 import core.language.node.GrammarKey
 
 class GrammarCatalogue {

@@ -1,5 +1,7 @@
 package deltas.bytecode
 
+import core.bigrammar.grammars.ManyVertical
+import core.bigrammar.{BiGrammar, GrammarReference, RootGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
 import core.deltas.{Contract, DeltaWithGrammar}

@@ -16,7 +16,7 @@ import deltas.javac.types.{MethodTypeDelta, TypeAbstraction}
 import deltas.statement.BlockDelta
 
 import scala.collection.mutable.ArrayBuffer
-import BiGrammarToParser._
+import core.bigrammar.BiGrammarToParser._
 
 object DecompileByteCodeSignature extends DeltaWithPhase {
 

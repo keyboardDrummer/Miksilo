@@ -1,5 +1,7 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
+
 class BiChoice(var left: BiGrammar, var right: BiGrammar, val firstIsLonger: Boolean) extends BiGrammar
 {
   override def children = Seq(left, right)

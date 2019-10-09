@@ -1,5 +1,6 @@
 package deltas.javac.types
 
+import core.bigrammar.BiGrammar
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
 import core.language.node.{GrammarKey, Node, NodeField, NodeShape}

@@ -1,5 +1,7 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
+
 class ManyHorizontal(inner: BiGrammar, parseGreedy: Boolean = true) extends Many(inner, parseGreedy) {
   override def horizontal = true
 

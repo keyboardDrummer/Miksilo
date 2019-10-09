@@ -1,5 +1,6 @@
 package deltas.expression
 
+import core.SolveConstraintsDelta
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.PathRoot
 import core.deltas.{Contract, DeltaWithGrammar}
@@ -12,10 +13,10 @@ object ExpressionLanguageDelta extends DeltaWithGrammar {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    language.collectConstraints = (compilation: Compilation, builder: ConstraintBuilder) => {
-      val _type = ExpressionDelta.getType(compilation, builder, PathRoot(compilation.program), builder.newScope(debugName = "programScope"))
+    SolveConstraintsDelta.constraintCollector.add(language, (compilation: Compilation, builder: ConstraintBuilder) => {
+      val _type = ExpressionDelta.getType(compilation, builder, compilation.program.asInstanceOf[PathRoot], builder.newScope(debugName = "programScope"))
       //TODO check that the type is printable.
-    }
+    })
   }
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {

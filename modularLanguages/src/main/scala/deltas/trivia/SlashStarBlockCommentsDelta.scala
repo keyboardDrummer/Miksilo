@@ -1,5 +1,7 @@
 package deltas.trivia
 
+import core.bigrammar.grammars.{Colorize, RegexGrammar}
+import core.bigrammar.{BiGrammar, DefaultBiGrammarWriter}
 import core.deltas.grammars.{LanguageGrammars, TriviaGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language

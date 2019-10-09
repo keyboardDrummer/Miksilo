@@ -1,7 +1,7 @@
 package deltas.javac
 
 import core.deltas.LanguageFromDeltas
-import core.deltas.path.PathRoot
+import core.deltas.path.{AnyPath, NodePath, PathRoot}
 import core.language.Compilation
 import core.language.node.Node
 import core.smarts._
@@ -16,10 +16,10 @@ object JavaStandardLibrary {
 
   val byteCodeDecompiler = LanguageFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
 
-  val systemClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("System.class")).program
-  val printStreamClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("PrintStream.class")).program
-  val objectClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("Object.class")).program
-  val stringClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("String2.class")).program
+  val systemClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("System.class")).program.asInstanceOf[NodePath].current
+  val printStreamClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("PrintStream.class")).program.asInstanceOf[NodePath].current
+  val objectClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("Object.class")).program.asInstanceOf[NodePath].current
+  val stringClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("String2.class")).program.asInstanceOf[NodePath].current
 
   def loadIntoClassPath(compilation: Compilation) {
     ClassCompiler(objectClass, compilation).bind()

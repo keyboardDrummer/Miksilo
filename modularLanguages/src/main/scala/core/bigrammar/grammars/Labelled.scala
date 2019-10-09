@@ -1,5 +1,6 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
 import core.language.node.GrammarKey
 
 class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {

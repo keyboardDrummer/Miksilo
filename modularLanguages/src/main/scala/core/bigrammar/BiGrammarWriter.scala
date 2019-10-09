@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.{BiFailure, BiSequence, Delimiter, Identifier, Keyword, NumberGrammar, Print, RegexGrammar, SequenceBijective, StringLiteral, ValueGrammar, ValueMapGrammar}
 import core.document.{Document, WhiteSpace}
 import core.responsiveDocument.ResponsiveDocument
 
@@ -29,7 +30,7 @@ trait BiGrammarWriter {
     i => i.toString
   )
 
-  def leftRight(left: BiGrammar, right: BiGrammar, bijective: SequenceBijective) =
+  def leftRight(left: BiGrammar, right: BiGrammar, bijective: SequenceBijective): BiSequence =
     new BiSequence(left, right, bijective, true)
 
   def topBottom(top: BiGrammar, bottom: BiGrammar, bijective: SequenceBijective) =

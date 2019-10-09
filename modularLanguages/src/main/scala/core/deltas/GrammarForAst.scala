@@ -1,5 +1,7 @@
 package core.deltas
 
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars.As
 import core.language.node.{NodeField, NodeGrammar, NodeShape}
 import languageServer.SourceRange
 

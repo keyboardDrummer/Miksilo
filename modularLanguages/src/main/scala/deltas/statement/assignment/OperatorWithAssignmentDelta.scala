@@ -1,5 +1,6 @@
 package deltas.statement.assignment
 
+import core.bigrammar.grammars.BiSequence
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithGrammar, DeltaWithPhase}

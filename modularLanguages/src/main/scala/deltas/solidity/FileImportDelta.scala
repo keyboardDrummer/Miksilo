@@ -1,5 +1,6 @@
 package deltas.solidity
 
+import core.bigrammar.grammars.StringLiteral
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath

@@ -1,5 +1,7 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.{BiSequence, ManyHorizontal, ManyVertical, SequenceBijective}
+
 object DefaultBiGrammarWriter extends DefaultBiGrammarWriter
 
 trait DefaultBiGrammarWriter extends BiGrammarWriter {

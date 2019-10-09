@@ -1,5 +1,9 @@
 package core.bigrammar.printer
 
+import core.bigrammar.{BiGrammar, WithMap}
+import core.bigrammar.BiGrammarToParser.AnyWithMap
+import core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, CustomGrammarWithoutChildren, Delimiter, Keyword, Labelled, ManyHorizontal, ManyVertical, MapGrammar, Print, ValueGrammar}
+import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.{ResponsiveDocument, ResponsiveLeftRight, ResponsiveTopBottom}
 
 import scala.collection.mutable

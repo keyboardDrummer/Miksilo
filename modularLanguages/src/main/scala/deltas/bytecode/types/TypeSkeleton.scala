@@ -1,5 +1,6 @@
 package deltas.bytecode.types
 
+import core.bigrammar.printer.BiGrammarToPrinter
 import core.deltas._
 import core.language.exceptions.BadInputException
 import core.deltas.grammars.LanguageGrammars

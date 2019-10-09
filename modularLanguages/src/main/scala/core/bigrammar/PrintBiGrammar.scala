@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, Delimiter, Identifier, Keyword, Labelled, Many, ManyHorizontal, ManyVertical, MapGrammar, NumberGrammar, ParseWhiteSpace, Print, RegexGrammar, StringLiteral, ValueGrammar}
 import core.document.Empty
 import core.language.node.GrammarKey
 import core.responsiveDocument.ResponsiveDocument
@@ -33,8 +34,8 @@ object PrintBiGrammar {
       if (sequence.horizontal) first ~~ second
       else first ~~ "%" ~~ second
     case choice:BiChoice => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
-    case many:ManyHorizontal => withParenthesis(many.inner) ~ "*"
-    case many:ManyVertical => withParenthesis(many.inner) ~ "%*"
+    case many: ManyHorizontal => withParenthesis(many.inner) ~ "*"
+    case many: ManyVertical => withParenthesis(many.inner) ~ "%*"
     case OptionGrammar(inner, _) => withParenthesis(inner) ~ "?"
     case regex: RegexGrammar => s"Regex(${regex.regex})"
     case keyword: Keyword => keyword.value

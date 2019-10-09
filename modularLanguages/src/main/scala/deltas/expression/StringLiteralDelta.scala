@@ -1,5 +1,6 @@
 package deltas.expression
 
+import core.bigrammar.grammars.StringLiteral
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath

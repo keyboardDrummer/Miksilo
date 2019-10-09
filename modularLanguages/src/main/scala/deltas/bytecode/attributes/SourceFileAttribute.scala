@@ -1,5 +1,6 @@
 package deltas.bytecode.attributes
 
+import core.bigrammar.BiGrammar
 import core.deltas.Contract
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}

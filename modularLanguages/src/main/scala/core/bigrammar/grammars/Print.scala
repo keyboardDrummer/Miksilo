@@ -1,5 +1,6 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
 import core.responsiveDocument.ResponsiveDocument
 
 /**

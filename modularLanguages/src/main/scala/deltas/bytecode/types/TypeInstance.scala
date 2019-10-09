@@ -1,5 +1,6 @@
 package deltas.bytecode.types
 
+import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.language.Language

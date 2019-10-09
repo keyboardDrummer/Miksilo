@@ -1,5 +1,6 @@
 package deltas.bytecode.simpleBytecode
 
+import core.bigrammar.{BiGrammar, GrammarReference}
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.node._

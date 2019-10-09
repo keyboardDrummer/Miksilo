@@ -1,7 +1,9 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammarToParser
+
 import scala.util.matching.Regex
-import BiGrammarToParser._
+import core.bigrammar.BiGrammarToParser._
 import core.parsers.editorParsers.History
 
 case class RegexGrammar(regex: Regex, name: String, verifyWhenPrinting: Boolean = false,

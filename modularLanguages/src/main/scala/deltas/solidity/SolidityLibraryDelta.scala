@@ -1,5 +1,6 @@
 package deltas.solidity
 
+import core.SolveConstraintsDelta
 import core.deltas.Delta
 import core.deltas.path.PathRoot
 import core.language.{CompilationState, Language}
@@ -14,7 +15,7 @@ object SolidityLibraryDelta extends Delta {
 
   val addressDeclaration = new CompilationState[NamedDeclaration]()
   override def inject(language: Language): Unit = {
-    language.collectConstraints = (compilation, builder) => {
+    SolveConstraintsDelta.constraintCollector.add(language, (compilation, builder) => {
       val rootScope = builder.newScope(debugName = "rootScope")
 
       val intTypeNode = ElementaryTypeDelta.neww("int")
@@ -72,8 +73,8 @@ object SolidityLibraryDelta extends Delta {
       builder.declare("revert", rootScope, _type = Some(revertType))
 
       builder.declare("now", rootScope, null, Some(uint256))
-      ConstraintSkeleton.constraints(compilation, builder, PathRoot(compilation.program), rootScope)
-    }
+      ConstraintSkeleton.constraints(compilation, builder, compilation.program.asInstanceOf[PathRoot], rootScope)
+    })
   }
 
   override def description = "Adds the solidity standard library"

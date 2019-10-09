@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.{BiSequence, Labelled, ManyHorizontal, ManyVertical, ParseWhiteSpace, SequenceBijective, WithTrivia}
 import core.deltas.grammars.TriviasGrammar
 
 trait WhitespaceTriviaSequenceCombinators extends BiGrammarWriter {

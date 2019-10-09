@@ -1,5 +1,7 @@
 package deltas.yaml
 
+import core.bigrammar.{BiGrammar, BiGrammarToParser}
+import core.bigrammar.grammars.RegexGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
@@ -16,7 +18,7 @@ object BlockKey extends YamlContext
 object FlowKey extends YamlContext
 
 object YamlCoreDelta extends DeltaWithGrammar {
-  import BiGrammarToParser._
+  import core.bigrammar.BiGrammarToParser._
 
   object TaggedNode extends NodeShape
   object TagName extends NodeField

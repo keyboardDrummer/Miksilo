@@ -1,5 +1,9 @@
 package core.language.node
 
+import core.bigrammar.{BiGrammar, WithMap}
+import core.bigrammar.BiGrammarToParser.AnyWithMap
+import core.bigrammar.grammars.MapGrammar
+import core.bigrammar.printer.UndefinedDestructuringValue
 import languageServer.SourceRange
 
 class NodeGrammar(inner: BiGrammar, val shape: NodeShape)

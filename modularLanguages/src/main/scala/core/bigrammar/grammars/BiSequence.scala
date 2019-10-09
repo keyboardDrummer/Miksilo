@@ -1,5 +1,8 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammar
+import core.bigrammar.printer.UndefinedDestructuringValue
+
 class BiSequence(var first: BiGrammar, var second: BiGrammar,
                  val bijective: SequenceBijective,
                  val horizontal: Boolean) extends BiGrammar with Layout {

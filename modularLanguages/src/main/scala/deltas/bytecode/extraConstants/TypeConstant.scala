@@ -1,10 +1,11 @@
 package deltas.bytecode.extraConstants
 
+import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeLike, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeFieldInfo.{DescriptorIndex, NameIndex}
-import deltas.bytecode.ByteCodeMethodInfo.{MethodDescriptor, Shape, MethodNameIndex}
+import deltas.bytecode.ByteCodeMethodInfo.{MethodDescriptor, MethodNameIndex, Shape}
 import deltas.bytecode.constants.MethodTypeConstant.MethodTypeDescriptorIndex
 import deltas.bytecode.constants.{ConstantPoolEntry, MethodTypeConstant, NameAndTypeConstant, Utf8ConstantDelta}
 import deltas.bytecode.types.TypeSkeleton

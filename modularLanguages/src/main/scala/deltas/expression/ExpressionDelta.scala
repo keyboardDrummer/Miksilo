@@ -1,5 +1,6 @@
 package deltas.expression
 
+import core.bigrammar.grammars.BiFallback
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar, ShapeProperty}

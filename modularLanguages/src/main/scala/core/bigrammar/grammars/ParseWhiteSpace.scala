@@ -1,8 +1,10 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
+import core.bigrammar.printer.{Printer, TryState}
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
-
+import BiGrammarToParser._
 import scala.util.matching.Regex
 
 object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {

@@ -1,5 +1,8 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.BiGrammarToParser.Reader
+import core.bigrammar.printer.{Printer, TryState}
+import core.bigrammar.{BiGrammar, WithMap}
 import core.responsiveDocument.ResponsiveDocument
 
 /**

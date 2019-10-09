@@ -1,5 +1,6 @@
 package deltas.json
 
+import core.bigrammar.textMate.BiGrammarToTextMate
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.{Language, Phase}
 import deltas.expression._

@@ -1,5 +1,7 @@
 package core.bigrammar.printer
 
+import core.bigrammar.BiGrammar.State
+
 import scala.util.{Failure, Success, Try}
 
 object TryState {

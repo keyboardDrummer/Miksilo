@@ -2,6 +2,8 @@ package core.bigrammar.printer
 
 import java.util.Objects
 
+import core.bigrammar.WithMap
+import core.bigrammar.printer.Printer.NodePrinter
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 

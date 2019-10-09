@@ -1,5 +1,7 @@
 package core.bigrammar.grammars
 
+import core.bigrammar.{BiGrammar, WithMap}
+
 class ValueMapGrammar[Value, NewValue](inner: BiGrammar,
                       construct: Value => Either[String, NewValue],
                       deconstruct: NewValue => Option[Value])

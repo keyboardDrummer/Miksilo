@@ -1,5 +1,6 @@
 package deltas.smithy
 
+import core.bigrammar.BiGrammar
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath

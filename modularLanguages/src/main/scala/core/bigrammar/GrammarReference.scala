@@ -1,5 +1,7 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.{BiChoice, ValueGrammar}
+import core.bigrammar.printer.UndefinedDestructuringValue
 import util.Property
 
 import scala.util.hashing.Hashing

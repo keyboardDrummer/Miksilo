@@ -1,5 +1,6 @@
 package core.bigrammar.printer
 
+import core.bigrammar.{BiGrammar, WithMap}
 import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try

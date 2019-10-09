@@ -1,5 +1,7 @@
 package core.deltas.grammars
 
+import core.bigrammar.{BiGrammar, BiGrammarSequenceCombinatorsExtension}
+import core.bigrammar.grammars.{BiFailure, BiSequence, Labelled, ManyHorizontal, ManyVertical, ParseWhiteSpace, SequenceBijective, WithTrivia}
 import core.deltas.{GrammarForAst, NodeGrammarWriter}
 import core.language.node.{GrammarKey, Key, NodeShape}
 
