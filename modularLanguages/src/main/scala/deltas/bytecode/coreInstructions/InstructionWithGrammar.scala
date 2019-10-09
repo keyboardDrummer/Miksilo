@@ -1,0 +1,34 @@
+package deltas.bytecode.coreInstructions
+
+import core.deltas.grammars.LanguageGrammars
+import core.language.node.{GrammarKey, NodeShape}
+import core.deltas.{DeltaWithGrammar, HasShape}
+import core.language.Language
+import deltas.bytecode.attributes.{CodeAttributeDelta, InstructionArgumentsKey}
+
+object ConstantPoolIndexGrammar extends GrammarKey
+trait InstructionWithGrammar extends DeltaWithGrammar with HasShape
+{
+  val shape: NodeShape
+
+  override def dependencies = Set(CodeAttributeDelta)
+
+  override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
+    val instructionGrammar = grammars.find(CodeAttributeDelta.InstructionGrammar)
+    instructionGrammar.addAlternative(grammars.create(shape, getGrammarForThisInstruction(grammars)))
+  }
+
+  def argumentsGrammar(grammars: LanguageGrammars): BiGrammar = {
+    import grammars._
+    val constantPoolIndex: BiGrammar = find(ConstantPoolIndexGrammar)
+    constantPoolIndex.many.as(InstructionArgumentsKey)
+  }
+
+  def grammarName: String
+
+  def getGrammarForThisInstruction(grammars: LanguageGrammars): BiGrammar = {
+    val arguments = argumentsGrammar(grammars)
+    import grammars._
+    (grammarName ~~> arguments).asNode(shape)
+  }
+}

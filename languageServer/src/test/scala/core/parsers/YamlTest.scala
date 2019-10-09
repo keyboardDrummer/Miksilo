@@ -7,8 +7,9 @@ import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.responsiveDocument.ResponsiveDocument
 import org.scalatest.FunSuite
-import util.SourceUtils
 import languageServer.Position
+import util.SourceUtils2
+import _root_.core.parsers.strings.StringReaderBase
 
 trait YamlExpression {
   def toDocument: ResponsiveDocument
@@ -57,7 +58,7 @@ class YamlTest extends FunSuite
   type Input = IndentationReader
 
   class IndentationReader(array: ArrayCharSequence, offset: Int, position: Position, val context: YamlContext, val indentation: Int)
-    extends StringReaderBase(array, offset, position) with IndentationReaderLike {
+    extends StringReaderBase[IndentationReader](array, offset, position) with IndentationReaderLike {
 
     override def withIndentation(value: Int) = new IndentationReader(array, offset, position, context, value)
 
@@ -341,7 +342,7 @@ class YamlTest extends FunSuite
   }
 
   test("big yaml file") {
-    val contents = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val contents = SourceUtils2.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result = parseValue.getWholeInputParser.parse(new IndentationReader(contents))
     assert(result.successful, result.toString)
   }

@@ -1,8 +1,5 @@
 package application.compilerCockpit
 
-import core.bigrammar.grammars._
-import core.bigrammar.textMate.BiGrammarToTextMate
-import core.bigrammar.BiGrammar
 import javax.swing.text.Segment
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
 import util.GraphBasics

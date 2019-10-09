@@ -8,8 +8,8 @@ import javax.swing.event.ListSelectionEvent
 import javax.swing.text.AbstractDocument
 import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
+import core.SolveConstraintsDelta
 import core.deltas.{Delta, ParseUsingTextualGrammar}
-import core.smarts.SolveConstraintsDelta
 import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac.JavaToByteCodeLanguage.getJava

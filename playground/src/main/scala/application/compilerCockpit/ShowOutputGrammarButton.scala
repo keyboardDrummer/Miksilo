@@ -2,7 +2,6 @@ package application.compilerCockpit
 
 import java.awt.event.ActionEvent
 
-import core.bigrammar.PrintBiGrammar
 import core.deltas.LanguageFromDeltas
 import javax.swing.JButton
 

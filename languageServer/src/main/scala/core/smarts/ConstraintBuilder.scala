@@ -1,6 +1,6 @@
 package core.smarts
 
-import core.language.SourceElement
+import core.language.{SourceElement, SourceElementWithName}
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.imports.DeclarationOfScope
 import core.smarts.scopes.objects.{ConcreteScope, _}
@@ -35,8 +35,8 @@ class ConstraintBuilder(val factory: Factory) {
 
   def importScope(into: Scope, source: Scope): Unit = add(ParentScope(into, source))
 
-  def resolveToType(origin: SourceElement, scope: Scope, _type: Type) : DeclarationVariable = {
-    resolveToType(origin.current.asInstanceOf[String], origin, scope, _type)
+  def resolveToType(origin: SourceElementWithName, scope: Scope, _type: Type) : DeclarationVariable = {
+    resolveToType(origin.name, origin, scope, _type)
   }
 
   def resolveToType(name: String, origin: SourceElement, scope: Scope, _type: Type) : DeclarationVariable = {
@@ -58,22 +58,22 @@ class ConstraintBuilder(val factory: Factory) {
     declaration
   }
 
-  def referSourceElement(name: SourceElement, scope: Scope): Reference = {
-    refer(name.current.asInstanceOf[String], scope, Some(name))
+  def referSourceElement(hasName: SourceElementWithName, scope: Scope): Reference = {
+    refer(hasName.name, scope, Some(hasName))
   }
 
-  def refer(name: String, scope: Scope, origin: Option[SourceElement]): Reference = {
-    val result = new Reference(name, origin)
+  def refer(hasName: String, scope: Scope, origin: Option[SourceElement]): Reference = {
+    val result = new Reference(hasName, origin)
     constraints ::= ReferenceInScope(result, scope)
     result
   }
 
-  def declare(name: SourceElement, container: Scope, _type: Type): NamedDeclaration = {
-    declare(name.current.asInstanceOf[String], container, name, Some(_type))
+  def declare(hasName: SourceElementWithName, container: Scope, _type: Type): NamedDeclaration = {
+    declare(hasName.name, container, hasName, Some(_type))
   }
 
-  def declare(name: SourceElement, container: Scope): NamedDeclaration = {
-    declare(name.current.asInstanceOf[String], container, name, None)
+  def declare(name: SourceElementWithName, container: Scope): NamedDeclaration = {
+    declare(name.name, container, name, None)
   }
 
   def declare(name: String, container: Scope, origin: SourceElement = null, _type: Option[Type] = None): NamedDeclaration = { //TODO the order here is inconsistent with resolve.

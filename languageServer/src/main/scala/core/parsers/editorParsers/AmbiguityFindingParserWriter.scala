@@ -2,7 +2,7 @@ package core.parsers.editorParsers
 
 trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
-  override def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: StopFunction): SingleParseResult[Result] = {
+  override def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: StopFunction): SingleParseResult[Result, Input] = {
 
     val noResultFound = ReadyParseResult(None, input, History.error(FatalError(input, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Result] = noResultFound

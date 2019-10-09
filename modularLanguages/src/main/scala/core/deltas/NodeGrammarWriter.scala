@@ -1,0 +1,8 @@
+package core.deltas
+
+object NodeGrammarWriter extends NodeGrammarWriter
+trait NodeGrammarWriter extends BiGrammarWriter {
+  implicit def grammarAsRoot(grammar: BiGrammar): RootGrammar = new RootGrammar(grammar)
+  implicit val postfixOps = language.postfixOps
+  implicit def toAstGrammar(grammar: BiGrammar): GrammarForAst = new GrammarForAst(grammar)
+}

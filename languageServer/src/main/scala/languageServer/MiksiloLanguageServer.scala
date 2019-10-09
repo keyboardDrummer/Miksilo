@@ -1,9 +1,9 @@
 package languageServer
 
 import com.typesafe.scalalogging.LazyLogging
-import core.deltas.path.NodePath
+//import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
-import core.language.node.{FilePosition, NodeLike}
+//import core.language.node.{FilePosition, NodeLike}
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
@@ -65,37 +65,42 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def getSourceElement(position: FilePosition): SourceElement = {
-    getSourceElementForNode(getCompilation.root, position).get
+    getSourceElementForNode(getCompilation.program, position).get
   }
 
-  def getSourceElementForNode(element: SourceElement, filePosition:FilePosition):Option[SourceElement]={
-    if (element.isOutsideFile(filePosition.uri))
+  def getSourceElementForNode(element: SourceElement, filePosition: FilePosition): Option[SourceElement] = {
+    if (element.isInAnotherFile(filePosition.uri))
       return None
 
     if(!element.range.exists(r => r.contains(filePosition.position)))
       return None
 
-    element match {
-      case path: NodePath =>
-        val childResults = path.dataView.values.flatMap((fieldValue: Any) => {
-          val childrenForField = getSourceElementsFromPath[NodePath](fieldValue)
-          childrenForField.flatMap(child => getSourceElementForNode(child,filePosition).toSeq)
-        })
+    val childResults = element.childElements.flatMap(child => getSourceElementForNode(child, filePosition))
+    Some(childResults.headOption.getOrElse({
+      element
+    }))
 
-        Some(childResults.headOption.getOrElse({
-          element
-        }))
-      case _ => Some(element)
-    }
+//    element match {
+//      case path: NodePath =>
+//        val childResults = path.dataView.values.flatMap((fieldValue: Any) => {
+//          val childrenForField = getSourceElementsFromPath[NodePath](fieldValue)
+//          childrenForField.flatMap(child => getSourceElementForNode(child,filePosition).toSeq)
+//        })
+//
+//        Some(childResults.headOption.getOrElse({
+//          element
+//        }))
+//      case _ => Some(element)
+//    }
   }
 
-  def getSourceElementsFromPath[Self <: NodeLike](value: Any): Seq[SourceElement] = value match {
-    case nodeLike: SourceElement =>
-      Seq(nodeLike)
-    case sequence: Seq[_] =>
-      sequence.collect({ case nodeLikeChild: SourceElement => nodeLikeChild })
-    case _ => Seq.empty
-  }
+//  def getSourceElementsFromPath[Self <: NodeLike](value: Any): Seq[SourceElement] = value match {
+//    case nodeLike: SourceElement =>
+//      Seq(nodeLike)
+//    case sequence: Seq[_] =>
+//      sequence.collect({ case nodeLikeChild: SourceElement => nodeLikeChild })
+//    case _ => Seq.empty
+//  }
 
   override def initialize(parameters: InitializeParams): Unit = {}
 

@@ -1,25 +1,25 @@
 package core.parsers.sequences
 
 import core.parsers.core.{ParseInput, Processor}
-import core.parsers.editorParsers.{CorrectingParserWriter, Fix, History, ParseError, StopFunction}
+import core.parsers.editorParsers.{CorrectingParserWriter, Fix, History, ParseError, SingleParseResult, StopFunction}
 import languageServer.{Position, SourceRange, TextEdit}
+
+trait SequenceInput[Input, Elem] extends ParseInput {
+  def head: Elem
+  def tail: Input
+
+  def drop(amount: Int): Input
+  def safeIncrement(): Input =
+    if (atEnd) this.asInstanceOf[Input]
+    else drop(1)
+  def end: Input
+  def printRange(end: Input): String
+  def position: Position
+}
 
 trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem
   type Input <: SequenceInput[Input, Elem]
-
-  trait SequenceInput[Input, Elem] extends ParseInput {
-    def head: Elem
-    def tail: Input
-
-    def drop(amount: Int): Input
-    def safeIncrement(): Input =
-      if (atEnd) this.asInstanceOf[Input]
-      else drop(1)
-    def end: Input
-    def printRange(end: Input): String
-    def position: Position
-  }
 
   case class Fail[Result](value: Option[Result], message: String, penalty: Double)
     extends ParserBuilderBase[Result] with LeafParser[Result] {
@@ -304,21 +304,21 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) =
       Filter(parser, predicate, getMessage)
 
-    def getSingleResultParser: SingleResultParser[Result] = {
+    def getSingleResultParser: SingleResultParser[Result, Input] = {
       val parser = compile(this.parser).buildParser(this.parser)
       (input, mayStop) => findBestParseResult(parser, input, mayStop)
     }
 
-    def getWholeInputParser: SingleResultParser[Result] = {
+    def getWholeInputParser: SingleResultParser[Result, Input] = {
       ParseWholeInput(parser).getSingleResultParser
     }
 
-    def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Self[Other] = {
+    def withRange[Other](addRange: (Input, Input, Result) => Other): Self[Other] = {
       WithRangeParser(parser, addRange)
     }
   }
+}
 
-  trait SingleResultParser[+Result] {
-    def parse(input: Input, mayStop: StopFunction = (_, _, _) => true): SingleParseResult[Result]
-  }
+trait SingleResultParser[+Result, Input] {
+  def parse(input: Input, mayStop: StopFunction = (_, _, _) => true): SingleParseResult[Result, Input]
 }

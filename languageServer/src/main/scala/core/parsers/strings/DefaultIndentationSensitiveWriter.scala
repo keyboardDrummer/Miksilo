@@ -7,7 +7,7 @@ trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter
   type Input = IndentationReader
 
   class IndentationReader(array: ArrayCharSequence, offset: Int, position: Position, val indentation: Int)
-    extends StringReaderBase(array, offset, position) with IndentationReaderLike {
+    extends StringReaderBase[Input](array, offset, position) with IndentationReaderLike {
 
     def this(value: String) {
       this(value.toCharArray, 0, Position(0, 0), 0)

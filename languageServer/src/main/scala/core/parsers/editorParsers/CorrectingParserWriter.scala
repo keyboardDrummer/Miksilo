@@ -2,11 +2,9 @@ package core.parsers.editorParsers
 
 import core.parsers.core.OptimizingParserWriter
 
-
-
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
-  def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: StopFunction): SingleParseResult[Result] = {
+  def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: StopFunction): SingleParseResult[Result, Input] = {
 
     val noResultFound = ReadyParseResult(None, input, History.error(FatalError(input, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Result] = noResultFound
@@ -436,10 +434,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   override def succeed[Result](result: Result): Self[Result] = Succeed(result)
 
-  case class SingleParseResult[+Result](resultOption: Option[Result], errors: List[MyParseError]) {
-    def successful = errors.isEmpty
-    def get: Result = resultOption.get
-  }
 
   def newSuccess[Result](result: Result, remainder: Input, score: Double): SRCons[Result] =
     singleResult(ReadyParseResult(Some(result), remainder, History.success(remainder, remainder, result, score)))
@@ -478,4 +472,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     override def to = from
   }
+}
+
+case class SingleParseResult[+Result, +Input](resultOption: Option[Result], errors: List[ExternalParseError[Input]]) {
+  def successful = errors.isEmpty
+  def get: Result = resultOption.get
 }

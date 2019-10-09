@@ -7,8 +7,6 @@ import core.smarts.scopes.objects.Scope
 import languageServer.SourceRange
 
 trait FakeSourceElement extends SourceElement {
-  override def current: Any = ???
-
   override def range: Option[SourceRange] = None
 
   override def uriOption: Option[String] = None

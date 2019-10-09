@@ -1,6 +1,5 @@
 package application.compilerCockpit
 
-import core.bigrammar.BiGrammar
 import org.fife.ui.rsyntaxtextarea.{TokenMaker, TokenMakerFactory}
 
 class TokenMakerFactoryFromGrammar(grammar: BiGrammar) extends TokenMakerFactory
