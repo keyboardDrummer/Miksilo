@@ -2,7 +2,7 @@ package core.deltas.grammars
 
 import core.bigrammar.{BiGrammar, BiGrammarSequenceCombinatorsExtension}
 import core.bigrammar.grammars.{BiFailure, BiSequence, Labelled, ManyHorizontal, ManyVertical, ParseWhiteSpace, SequenceBijective, WithTrivia}
-import core.deltas.{GrammarForAst, NodeGrammarWriter}
+import core.deltas.{GrammarForAst, NodeGrammarWriter, Property}
 import core.language.node.{GrammarKey, Key, NodeShape}
 
 case class KeyGrammar(key: Key) extends GrammarKey
@@ -14,6 +14,10 @@ object TriviasGrammar extends GrammarKey
 object TriviaGrammar extends GrammarKey
 object BodyGrammar extends GrammarKey
 object ProgramGrammar extends GrammarKey
+
+object LanguageGrammars {
+  val grammars = new Property[LanguageGrammars](new LanguageGrammars)
+}
 
 class LanguageGrammars extends GrammarCatalogue with NodeGrammarWriter {
 

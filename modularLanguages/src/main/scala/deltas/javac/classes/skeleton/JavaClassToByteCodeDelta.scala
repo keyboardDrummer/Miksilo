@@ -17,7 +17,7 @@ object JavaClassToByteCodeDelta extends Delta {
 
   override def inject(language: Language): Unit = {
     language.insertPhaseAfter(
-      Phase(this, compilation => transformProgram(compilation.program, compilation)),
+      Phase(this, compilation => transformProgram(compilation.program.asInstanceOf[PathRoot].current, compilation)),
       FullyQualifyTypeReferences)
     super.inject(language)
   }

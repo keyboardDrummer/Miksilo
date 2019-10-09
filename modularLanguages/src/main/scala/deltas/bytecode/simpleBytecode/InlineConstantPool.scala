@@ -42,7 +42,9 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   private def inlineConstantPoolReferences(language: Language): Unit = {
-    import language.grammars._
+    val grammars = LanguageGrammars.grammars.get(language)
+    import grammars._
+
     val constantReferences = ByteCodeSkeleton.constantReferences.get(language)
     val constantPoolIndexGrammar = find(ConstantPoolIndexGrammar)
     for (classWithConstantReferences <- constantReferences) {

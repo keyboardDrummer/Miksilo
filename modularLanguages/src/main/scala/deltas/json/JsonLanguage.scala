@@ -1,6 +1,7 @@
 package deltas.json
 
 import core.bigrammar.textMate.BiGrammarToTextMate
+import core.deltas.path.PathRoot
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.{Language, Phase}
 import deltas.expression._
@@ -18,7 +19,7 @@ object PrintJson extends Delta  {
     language.compilerPhases = List(Phase(this, compilation => {
       try
       {
-        compilation.output = BiGrammarToTextMate.printJson(compilation.program)
+        compilation.output = BiGrammarToTextMate.printJson(compilation.program.asInstanceOf[PathRoot].current)
       } catch {
         case _: Throwable =>
       }

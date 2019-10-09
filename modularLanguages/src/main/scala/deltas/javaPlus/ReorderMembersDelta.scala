@@ -2,7 +2,7 @@ package deltas.javaPlus
 
 import core.deltas.{Contract, Delta, DeltaWithPhase, LanguageFromDeltas}
 import core.language.node.Node
-import core.language.{Compilation, CustomCommand, Language}
+import core.language.{Compilation, Language}
 import deltas.PrettyPrint
 import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass

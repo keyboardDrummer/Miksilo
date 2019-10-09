@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets
 
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.PathRoot
 import core.language.node.Node
 import core.language.{Compilation, Language}
 
@@ -18,7 +19,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   val statistics = new Statistics(TestLanguageBuilder.statistics)
 
   lazy val language: Language = buildLanguage
-  lazy val grammars: LanguageGrammars = language.grammars
+  lazy val grammars: LanguageGrammars = LanguageGrammars.grammars.get(language)
 
   def compileString(input: String): Compilation = {
     compileStream(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
@@ -42,7 +43,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   }
 
   def compileAst(program: Node): Compilation = {
-    val compilation = Compilation.fromAst(language, program)
+    val compilation = Compilation.fromAst(language, PathRoot(program))
     runPhases(compilation)
     compilation
   }

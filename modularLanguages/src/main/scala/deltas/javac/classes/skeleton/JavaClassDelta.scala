@@ -66,7 +66,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
   override def dependencies: Set[Contract] = Set(BlockDelta, MethodDelta, FieldDeclarationDelta)
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
-    import language.grammars._
+    import grammars._
 
     val classMember: BiGrammar = find(MethodDelta.Shape) | find(FieldDeclarationDelta.Shape)
     val importGrammar = create(ImportGrammar)

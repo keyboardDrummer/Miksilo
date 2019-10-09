@@ -1,5 +1,6 @@
 package deltas.javac.expressions.literals
 
+import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
@@ -21,7 +22,7 @@ object LongLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   override def transformGrammars(_grammars: LanguageGrammars, state: Language): Unit = {
     val grammars = _grammars
     import grammars._
-    val longGrammar : BiGrammar = grammars.regexGrammar("""-?\d+l""".r, "long literal").map[String, Long](
+    val longGrammar: BiGrammar = grammars.regexGrammar("""-?\d+l""".r, "long literal").map[String, Long](
       number => parseLong(number), l => s"${l}l") as ValueKey asLabelledNode Shape
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
     expressionGrammar.addAlternative(longGrammar)

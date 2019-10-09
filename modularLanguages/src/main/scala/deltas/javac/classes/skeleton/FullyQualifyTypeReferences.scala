@@ -11,7 +11,7 @@ object FullyQualifyTypeReferences extends Delta {
   override def description: String = "Replaces unqualified type references with qualified ones."
 
   override def inject(language: Language): Unit = {
-    val phase = Phase(this, compilation => transformProgram(compilation.program, compilation))
+    val phase = Phase(this, compilation => transformProgram(compilation.program.asInstanceOf[PathRoot].current, compilation))
     language.insertPhaseAfter(phase, SolveConstraintsDelta)
     super.inject(language)
   }

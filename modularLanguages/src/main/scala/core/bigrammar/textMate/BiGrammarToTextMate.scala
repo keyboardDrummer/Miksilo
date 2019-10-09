@@ -4,6 +4,7 @@ import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.bigrammar.BiGrammarToParser.AnyWithMap
 import core.bigrammar.grammars.{As, BiChoice, BiSequence, Colorize, Delimiter, Identifier, Keyword, Labelled, Many, MapGrammar, NumberGrammar, ParseWhiteSpace, RegexGrammar, StringLiteral, ValueMapGrammar}
 import core.bigrammar.printer.BiGrammarToPrinter
+import core.deltas.grammars.LanguageGrammars
 import core.language.node.Node
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta, StringLiteralDelta}
@@ -61,7 +62,7 @@ object BiGrammarToTextMate {
   }
 
   val jsonLanguage = JsonLanguage.language
-  lazy val jsonPrinter = BiGrammarToPrinter.toPrinter(jsonLanguage.grammars.root)
+  lazy val jsonPrinter = BiGrammarToPrinter.toPrinter(LanguageGrammars.grammars.get(jsonLanguage).root)
 
   // TODO replace this with a JsonLanguage printer that actually works.
   def printJson(root: Node): String = {

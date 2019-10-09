@@ -37,8 +37,8 @@ object TypeSkeleton extends DeltaWithGrammar {
 
   def getTypeSize(_type: Node, language: Language): Int = hasStackSize(language, _type.shape)
 
-  def getByteCodeString(state: Language)(_type: Node): String = {
-      val grammar = state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar)
+  def getByteCodeString(language: Language)(_type: Node): String = {
+      val grammar = LanguageGrammars.grammars.get(language).find(TypeSkeleton.ByteCodeTypeGrammar)
       BiGrammarToPrinter.toDocument(_type, grammar).renderString()
   }
 

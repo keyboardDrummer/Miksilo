@@ -3,6 +3,7 @@ package deltas.bytecode.readJar
 import java.io.BufferedInputStream
 
 import core.deltas._
+import core.deltas.path.PathRoot
 import core.language.Compilation
 import core.language.node.Node
 import core.smarts.FileDiagnostic
@@ -23,8 +24,8 @@ object DecodeByteCodeParser extends DeltaWithPhase {
     val inputBytes: Array[Byte] = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray
     val parseResult: ClassFileParser.ParseResult[Node] = ClassFileParser.parse(inputBytes)
     if (parseResult.successful) {
-      compilation.program = parseResult.get
-      compilation.program.startOfUri = Some(uri)
+      compilation.program = PathRoot(parseResult.get)
+      parseResult.get.startOfUri = Some(uri)
     } else {
       val diagnostic = Diagnostic(SourceRange(HumanPosition(0, 0), HumanPosition(0, 0)),
         Some(DiagnosticSeverity.Error), None, None, "File was not a JVM classfile")

@@ -1,5 +1,6 @@
 package deltas
 
+import core.deltas.path.PathRoot
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
 import core.language.node.Node
@@ -12,7 +13,7 @@ import util.SourceUtils
 object RunWithJVM extends DeltaWithPhase
 {
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    val classFile: ClassFile[Node] = state.program
+    val classFile: ClassFile[Node] = state.program.asInstanceOf[PathRoot].current
     val classRefIndex = classFile.classInfoIndex
     val constantPool = classFile.constantPool
     val classNameIndex = new ClassInfoConstantWrapper(constantPool.getValue(classRefIndex).asInstanceOf[Node]).nameIndex

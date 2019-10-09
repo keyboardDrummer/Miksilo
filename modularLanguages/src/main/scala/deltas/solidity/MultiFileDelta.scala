@@ -1,6 +1,6 @@
 package deltas.solidity
 
-import core.deltas.path.NodePath
+import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{DeltaWithPhase, ShapeProperty}
 import core.language.Compilation
 import core.language.node._
@@ -24,7 +24,7 @@ object MultiFileDelta extends DeltaWithPhase with HasConstraintsDelta {
       for(phase <- phases) {
         phase.action(fileCompilation)
       }
-      fileCompilation.program // TODO correctly handle the diagnostics from this other file. Move them to the other compilation?
+      fileCompilation.program.asInstanceOf[PathRoot].current // TODO correctly handle the diagnostics from this other file. Move them to the other compilation?
     }
 
     var fileQueue = List[Node](program)
@@ -44,7 +44,7 @@ object MultiFileDelta extends DeltaWithPhase with HasConstraintsDelta {
       }
     }
 
-    compilation.program = Shape.create(Files -> files)
+    compilation.program = PathRoot(Shape.create(Files -> files))
   }
 
   trait HasFileReferences {

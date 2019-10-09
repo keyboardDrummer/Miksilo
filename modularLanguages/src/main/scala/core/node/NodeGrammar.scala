@@ -2,7 +2,7 @@ package core.language.node
 
 import core.bigrammar.{BiGrammar, WithMap}
 import core.bigrammar.BiGrammarToParser.AnyWithMap
-import core.bigrammar.grammars.MapGrammar
+import core.bigrammar.grammars.{FieldPosition, MapGrammar}
 import core.bigrammar.printer.UndefinedDestructuringValue
 import languageServer.SourceRange
 
