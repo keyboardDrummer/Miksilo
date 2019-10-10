@@ -15,6 +15,7 @@ import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.json.JsonObjectLiteralDelta.ObjectLiteral
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import deltas.{FileWithMembersDelta, HasNameDelta}
+import core.deltas.path.ConstraintBuilderExtension._
 
 object ServiceDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

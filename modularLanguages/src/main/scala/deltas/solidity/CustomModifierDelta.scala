@@ -18,6 +18,7 @@ import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.methods.{MethodDelta, MethodParameters}
 import deltas.statement.{BlockDelta, LabelStatementDelta}
+import core.deltas.path.ConstraintBuilderExtension._
 
 object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

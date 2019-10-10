@@ -17,8 +17,8 @@ case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioSt
   extends DeltaWithPhase with LazyLogging {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val phase = Language.getParsePhaseFromParser(stream => new Reader(SourceUtils.streamToString(stream)), (program, uri) => {
-      program.asInstanceOf[Node].startOfUri = Some(uri)
+    val phase = Language.getParsePhaseFromParser[Node, Input](stream => new Reader(SourceUtils.streamToString(stream)), (program, uri) => {
+      program.startOfUri = Some(uri)
       PathRoot(program)
     }, parserProp.get(compilation))
     phase.action(compilation)

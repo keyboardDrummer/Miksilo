@@ -1,6 +1,7 @@
 
 package deltas
 
+import core.bigrammar.SelectGrammar
 import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
 import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
@@ -21,7 +22,7 @@ class YamlTest extends FunSuite {
 
     val compilation = language.compileString(input)
     assert(compilation.diagnostics.isEmpty)
-    val array = JsonObjectLiteralDelta.ObjectLiteral(compilation.program).members.head.value
+    val array = JsonObjectLiteralDelta.ObjectLiteral(compilation.program.asInstanceOf[PathRoot].current).members.head.value
     val arrayMembers = ArrayLiteralDelta.ArrayLiteral(array).members
     val nestedObject = JsonObjectLiteralDelta.ObjectLiteral(arrayMembers.head)
     assert(nestedObject.members.length == 2)
@@ -121,7 +122,7 @@ class YamlTest extends FunSuite {
   }
 
   private def replaceDefaultWithDefaultString(compilation: Compilation): Unit = {
-    PathRoot(compilation.program).visitShape(ExpressionDelta.DefaultShape,
+    compilation.program.asInstanceOf[PathRoot].visitShape(ExpressionDelta.DefaultShape,
       p => p.asInstanceOf[ChildPath].replaceWith(JsonStringLiteralDelta.neww("default")))
   }
 

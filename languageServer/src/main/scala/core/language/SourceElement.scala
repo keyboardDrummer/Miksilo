@@ -2,10 +2,6 @@ package core.language
 
 import languageServer.{FileRange, SourceRange}
 
-trait SourceElementWithName extends SourceElement {
-  def name: String
-}
-
 trait FileSourceElement {
   def range: SourceRange
 

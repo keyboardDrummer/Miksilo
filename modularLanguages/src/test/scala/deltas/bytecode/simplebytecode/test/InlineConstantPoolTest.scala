@@ -1,5 +1,6 @@
 package deltas.bytecode.simplebytecode.test
 
+import core.bigrammar.TestLanguageGrammarUtils
 import deltas.PrettyPrint
 import deltas.bytecode.ConstantPoolIndices
 import deltas.bytecode.simpleBytecode.InlineConstantPool

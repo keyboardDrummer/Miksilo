@@ -1,5 +1,6 @@
 package deltas.javac.classes.skeleton
 
+import core.SolveConstraintsDelta
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.BiChoice
 import core.deltas._
@@ -49,6 +50,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
     javaClass.members.filter(member => member.shape == Shape)
   }
 
+  @scala.annotation.tailrec
   def fullyQualify(_type: NodePath, classCompiler: ClassCompiler): Unit =  _type.shape match {
     case ArrayTypeDelta.Shape => fullyQualify(ArrayTypeDelta.getElementType(_type), classCompiler)
     case UnqualifiedObjectTypeDelta.Shape =>
@@ -114,14 +116,14 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
   override def inject(language: Language): Unit = {
 
-    language.collectConstraints = (compilation, builder) => {
+    SolveConstraintsDelta.constraintCollector.add(language, (compilation, builder) => {
       val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
       val proofs = JavaStandardLibrary.getProofs(compilation, builder.factory, defaultPackageScope)
       builder.proofs = proofs
 
       ConstraintSkeleton.constraints(
-        compilation, builder, PathRoot(compilation.program), defaultPackageScope)
-    }
+        compilation, builder, compilation.program.asInstanceOf[PathRoot], defaultPackageScope)
+    })
     super.inject(language)
   }
 

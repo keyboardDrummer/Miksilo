@@ -2,6 +2,7 @@ package application.compilerCockpit
 
 import java.io.InputStream
 
+import core.deltas.path.PathRoot
 import deltas.bytecode.PrintByteCode
 
 object EmitByteCode extends CompileOption {
@@ -10,7 +11,7 @@ object EmitByteCode extends CompileOption {
 
   override def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar = {
     val compilation = sandbox.language.compileStream(input)
-    val bytes = PrintByteCode.getBytes(compilation, compilation.program).toArray
+    val bytes = PrintByteCode.getBytes(compilation, compilation.program.asInstanceOf[PathRoot].current).toArray
     TextWithGrammar(PrintByteCode.printBytes(bytes))
   }
 

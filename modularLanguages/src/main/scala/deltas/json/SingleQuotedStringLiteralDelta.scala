@@ -17,6 +17,7 @@ object SingleQuotedStringLiteralDelta extends DeltaWithGrammar {
   object Grammar extends GrammarKey
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val inner = {
+      import core.bigrammar.DefaultBiGrammarWriter._
       val withoutColor = JsonStringLiteralDelta.dropPrefix(grammars,
         grammars.regexGrammar("""'[^']*""".r, "single quote string literal"), JsonStringLiteralDelta.Value, "'") ~< Delimiter("'")
       Colorize(withoutColor, "string.quoted.single")

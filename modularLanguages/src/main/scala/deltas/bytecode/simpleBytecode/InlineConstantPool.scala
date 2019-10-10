@@ -1,5 +1,6 @@
 package deltas.bytecode.simpleBytecode
 
+import core.bigrammar.grammars.Labelled
 import core.bigrammar.{BiGrammar, GrammarReference}
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
@@ -63,7 +64,7 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   private def simplifyConstantEntryGrammars(language: Language): Unit = {
-    val grammars = language.grammars
+    val grammars = LanguageGrammars.grammars.get(language)
     import grammars._
     for (entry <- ByteCodeSkeleton.constantEntries.get(language).values) {
       val entryGrammar = grammars.find(entry.shape).find(g => g.value.isInstanceOf[NodeGrammar]).get.value.asInstanceOf[NodeGrammar]
@@ -72,8 +73,8 @@ object InlineConstantPool extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   private def removeConstantPoolGrammar(language: Language): Unit = {
-    import language.grammars._
-    val root: Labelled = language.grammars.root
+    val grammars = LanguageGrammars.grammars.get(language)
+    import grammars._
     val constantPoolGrammar: GrammarReference = root.findLabelled(ConstantPoolGrammar)
     constantPoolGrammar.removeMe()
   }

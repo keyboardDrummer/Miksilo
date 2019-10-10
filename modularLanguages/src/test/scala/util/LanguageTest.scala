@@ -4,6 +4,7 @@ import java.io.{BufferedInputStream, ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
+import core.deltas.path.PathRoot
 import core.language.Compilation
 import core.language.node.{Node, NodeComparer}
 import deltas.PrettyPrint
@@ -63,10 +64,10 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
 
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
     val input: String = SourceUtils.getJavaTestFileContents(className, inputDirectory)
-    language.compileStream(SourceUtils.stringToStream(input)).program
+    language.compileStream(SourceUtils.stringToStream(input)).program.asInstanceOf[PathRoot].current
   }
 
-    def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
+  def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
     val className: String = SourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     val input: InputStream = SourceUtils.getTestFile(relativeFilePath)

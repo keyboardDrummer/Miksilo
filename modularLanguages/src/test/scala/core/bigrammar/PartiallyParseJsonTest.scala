@@ -1,7 +1,8 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.{BiFallback, Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
-import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
+import core.parsers.editorParsers.{SingleParseResult, UntilBestAndXStepsStopFunction}
 import org.scalatest.FunSuite
 
 class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
@@ -105,7 +106,7 @@ class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
     assertResult(expectation)(result.resultOption.get)
   }
 
-  private def getSuccessValue(result: SingleParseResult[Any]) = {
+  private def getSuccessValue(result: SingleParseResult[Any, Input]) = {
     assert(result.successful)
     result.resultOption.get
   }

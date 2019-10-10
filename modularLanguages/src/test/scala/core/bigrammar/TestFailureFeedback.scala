@@ -1,5 +1,6 @@
 package core.bigrammar
 
+import core.bigrammar.printer.{BiGrammarToPrinter, PrintError}
 import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 

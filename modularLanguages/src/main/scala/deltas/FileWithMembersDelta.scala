@@ -35,7 +35,7 @@ object FileWithMembersDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
     SolveConstraintsDelta.constraintCollector.add(language, (compilation, builder) => {
       val fileScope = builder.newScope(None, "fileScope")
-      ConstraintSkeleton.constraints(compilation, builder, compilation.program, fileScope)
+      ConstraintSkeleton.constraints(compilation, builder, compilation.program.asInstanceOf[PathRoot], fileScope)
     })
   }
 

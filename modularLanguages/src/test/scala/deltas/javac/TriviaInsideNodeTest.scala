@@ -3,7 +3,7 @@ package deltas.javac
 import core.bigrammar._
 import core.bigrammar.grammars.{BiSequence, Labelled, WithTrivia}
 import core.deltas.NodeGrammarWriter
-import core.deltas.grammars.BodyGrammar
+import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
 import deltas.trivia.TriviaInsideNode
@@ -19,12 +19,12 @@ class TriviaInsideNodeTest extends FunSuite {
 
   test("Trivia is moved inside Child Node") {
     val language = new Language()
-    val grammars = language.grammars
+    val grammars = LanguageGrammars.grammars.get(language)
     import grammars._
 
     val grammar: BiGrammar = "ParentStart" ~ identifier.as(ParentName) ~
       ("ChildStart" ~ identifier.as(ChildName) ~ "ChildEnd" asLabelledNode ChildClass).as(ParentChild) ~ "ParentEnd" asLabelledNode ParentClass
-    language.grammars.root.inner = grammar
+    root.inner = grammar
     assert(grammars.find(ChildClass).inner != grammars.trivia)
     val input = """ChildStart judith ChildEnd""".stripMargin
     val inputWithSpace = " " + input
@@ -39,11 +39,11 @@ class TriviaInsideNodeTest extends FunSuite {
 
   test("No doubles") {
     val language = new Language()
-    val grammars = language.grammars
+    val grammars = LanguageGrammars.grammars.get(language)
     import grammars._
 
     val parentGrammar = identifier.as(ParentName).asLabelledNode(ParentClass)
-    language.grammars.root.inner = "Start" ~ (parentGrammar | parentGrammar)
+    root.inner = "Start" ~ (parentGrammar | parentGrammar)
     TriviaInsideNode.transformGrammars(grammars, new Language())
     val expectedParentGrammar = new WithTrivia(identifier.as(ParentName)).asLabelledNode(ParentClass)
     assertResult(expectedParentGrammar.toString)(parentGrammar.toString) //TODO use actual equality instead of toString
@@ -58,7 +58,7 @@ class TriviaInsideNodeTest extends FunSuite {
 
   test("Left Recursive") {
     val language = new Language()
-    val grammars = language.grammars
+    val grammars = LanguageGrammars.grammars.get(language)
     import grammars._
 
     val numberGrammar = (number : BiGrammar).as(Value).asLabelledNode(IntegerClass)

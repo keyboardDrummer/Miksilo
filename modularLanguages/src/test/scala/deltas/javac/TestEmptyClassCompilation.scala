@@ -1,11 +1,12 @@
 package deltas.javac
 
+import core.deltas.path.PathRoot
 import core.language.node.Node
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.constants._
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import deltas.bytecode.coreInstructions.{InvokeSpecialDelta, VoidReturnInstructionDelta}
-import deltas.bytecode.extraConstants.{TypeConstant}
+import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.ConstantPool
@@ -21,14 +22,16 @@ class TestEmptyClassCompilation extends JavaLanguageTest {
   test("EquivalentConstantPool") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode: Node = getEmptyClass
-    val compiledCode = TestLanguageBuilder.build(JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(javaCode).program
+    val java = TestLanguageBuilder.build(JavaToByteCodeLanguage.javaCompilerDeltas)
+    val compiledCode = java.compileAst(javaCode).program.asInstanceOf[PathRoot].current
     compareConstantPools(expectedByteCode, compiledCode)
   }
 
   test("EquivalentMethod") {
     val expectedByteCode = getEmptyClassByteCode
     val javaCode = getEmptyClass
-    val compiledCode = TestLanguageBuilder.build(JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(javaCode).program
+    val java = TestLanguageBuilder.build(JavaToByteCodeLanguage.javaCompilerDeltas)
+    val compiledCode = java.compileAst(javaCode).program.asInstanceOf[PathRoot].current
 
     LanguageTest.testInstructionEquivalence(expectedByteCode, compiledCode)
   }

@@ -5,6 +5,7 @@ import core.deltas.path.PathRoot
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.{Language, Phase}
 import deltas.expression._
+import deltas.javac.classes.skeleton.FullyQualifyTypeReferences.description
 import deltas.javac.expressions.literals.BooleanLiteralDelta
 
 object JsonLanguage {
@@ -16,7 +17,7 @@ object JsonLanguage {
 object PrintJson extends Delta  {
 
   override def inject(language: Language): Unit = {
-    language.compilerPhases = List(Phase(this, compilation => {
+    language.compilerPhases = List(Phase(this, description, compilation => {
       try
       {
         compilation.output = BiGrammarToTextMate.printJson(compilation.program.asInstanceOf[PathRoot].current)

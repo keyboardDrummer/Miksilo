@@ -1,5 +1,7 @@
 package core.bigrammar
 
+import core.bigrammar.grammars.Labelled
+import core.bigrammar.printer.PrintError
 import org.scalatest.FunSuite
 
 class TestSimpleExpressionLanguage extends FunSuite with WhitespaceTriviaSequenceCombinators {

@@ -1,16 +1,14 @@
 package core
 
+import _root_.deltas.ConstraintSkeleton
 import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.{AnyPath, ChildPath, NodePath, PathRoot}
-import deltas.{Contract, Delta, Property}
-import _root_.deltas.ConstraintSkeleton
+import core.deltas.{Contract, Delta, Property}
 import core.language.exceptions.BadInputException
 import core.language.node.TypedChildField
 import core.language.{Compilation, Language, Phase}
 import core.smarts.objects.NamedDeclaration
-import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
-
-import scala.util.{Failure, Success}
+import core.smarts.{ConstraintBuilder, SolveException}
 
 trait ConstraintCollector {
   def build(compilation: Compilation, builder: ConstraintBuilder): Unit
@@ -18,8 +16,8 @@ trait ConstraintCollector {
 
 object SolveConstraintsDelta extends Delta with LazyLogging {
 
-  def constraintCollector: Property[ConstraintCollector] = new Property[ConstraintCollector]((compilation, builder) => {
-    ConstraintSkeleton.constraints(compilation, builder, compilation.program,
+  val constraintCollector: Property[ConstraintCollector] = new Property[ConstraintCollector]((compilation, builder) => {
+    ConstraintSkeleton.constraints(compilation, builder, compilation.program.asInstanceOf[PathRoot],
       builder.newScope(debugName = "rootScope"))
   })
 
@@ -27,35 +25,17 @@ object SolveConstraintsDelta extends Delta with LazyLogging {
   val resolvesToDeclaration = new TypedChildField[NamedDeclaration]("resolvesToDeclaration")
   override def inject(language: Language): Unit = {
     super.inject(language)
-    language.compilerPhases ::= Phase(this, compilation => {
-      val factory = new Factory()
-      val builder = new ConstraintBuilder(factory)
-      val start = System.currentTimeMillis()
+    val phase = Language.getConstraintPhase((compilation, builder) => {
       constraintCollector.get(language).build(compilation, builder)
-
-      val solver = builder.toSolver
-
-      solver.run() match {
-        case Success(_) =>
-          compilation.remainingConstraints = Seq.empty
-        case Failure(e:CouldNotApplyConstraints) =>
-          compilation.remainingConstraints = e.constraints
-        case Failure(e:SolveException) =>
-          throw ConstraintException(e)
-        case Failure(e) => throw e
-      }
-      logger.info(s"Constraint solving took ${System.currentTimeMillis() - start}ms")
-
-      for(refDecl <- solver.proofs.references) {
-        refDecl._1.origin.foreach(ref => resolvesToDeclaration(ref.asInstanceOf[ChildPath]) = refDecl._2)
-      }
-      compilation.proofs = solver.proofs
-      if (compilation.remainingConstraints.nonEmpty) {
-        compilation.stopped = true
-      }
-      compilation.diagnostics ++= compilation.remainingConstraints.flatMap(
-        constraint => constraint.getDiagnostic)
     })
+
+    val withExtra = Phase(this, description, compilation => {
+      phase.action(compilation)
+      for(referenceWithDeclaration <- compilation.proofs.references) {
+        referenceWithDeclaration._1.origin.foreach(ref => resolvesToDeclaration(ref.asInstanceOf[ChildPath]) = referenceWithDeclaration._2)
+      }
+    })
+    language.compilerPhases ::= withExtra
   }
 
   case class ConstraintException(solveException: SolveException) extends BadInputException {

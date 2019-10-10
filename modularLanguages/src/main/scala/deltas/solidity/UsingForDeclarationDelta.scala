@@ -16,6 +16,7 @@ import deltas.javac.methods.MethodParameters
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.solidity.SolidityContractDelta.ContractLike
 import deltas.solidity.SolidityFunctionDelta.ReturnValues
+import core.deltas.path.ConstraintBuilderExtension._
 
 object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

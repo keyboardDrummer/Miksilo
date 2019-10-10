@@ -8,6 +8,7 @@ import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.javac.JavaStandardLibrary
+import deltas.javac.classes.skeleton.FullyQualifyTypeReferences.description
 import deltas.javac.classes.skeleton.JavaClassDelta.{JavaClass, Members, getFields, state}
 import deltas.javac.classes.{ClassCompiler, FieldToByteCode}
 import deltas.javac.methods.MethodDelta.getMethods
@@ -17,7 +18,7 @@ object JavaClassToByteCodeDelta extends Delta {
 
   override def inject(language: Language): Unit = {
     language.insertPhaseAfter(
-      Phase(this, compilation => transformProgram(compilation.program.asInstanceOf[PathRoot].current, compilation)),
+      Phase(this, description, compilation => transformProgram(compilation.program.asInstanceOf[PathRoot].current, compilation)),
       FullyQualifyTypeReferences)
     super.inject(language)
   }

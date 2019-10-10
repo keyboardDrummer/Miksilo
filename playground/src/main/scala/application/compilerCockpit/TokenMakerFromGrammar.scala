@@ -1,5 +1,8 @@
 package application.compilerCockpit
 
+import core.bigrammar.BiGrammar
+import core.bigrammar.grammars._
+import core.bigrammar.textMate.BiGrammarToTextMate
 import javax.swing.text.Segment
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
 import util.GraphBasics
@@ -7,7 +10,7 @@ import util.GraphBasics
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, Parsers, RegexParsers}
-import scala.util.parsing.input.{CharArrayReader, Reader}
+import scala.util.parsing.input.CharArrayReader
 
 case class MyToken(tokenType: Int, text: String)
 class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker

@@ -13,6 +13,7 @@ import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.HasConstraints
 import deltas.json.JsonObjectLiteralDelta
 import deltas.{ConstraintSkeleton, FileWithMembersDelta, HasNameDelta}
+import core.deltas.path.ConstraintBuilderExtension._
 
 object TraitDelta extends DeltaWithGrammar {
 

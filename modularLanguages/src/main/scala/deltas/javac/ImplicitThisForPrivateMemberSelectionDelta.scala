@@ -42,7 +42,7 @@ object ImplicitThisForPrivateMemberSelectionDelta extends Delta {
   }
 
   override def inject(language: Language): Unit = {
-    val phase = Phase(this, compilation => transformProgram(compilation.program.asInstanceOf[PathRoot].current, compilation))
+    val phase = Phase(this, description, compilation => transformProgram(compilation.program.asInstanceOf[PathRoot].current, compilation))
     language.insertPhaseAfter(phase, SolveConstraintsDelta)
     super.inject(language)
   }

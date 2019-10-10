@@ -3,13 +3,14 @@ package core
 import _root_.deltas.json.JsonLanguage
 import _root_.deltas.smithy.SmithyLanguage
 import core.bigrammar.textMate.BiGrammarToTextMate
+import core.deltas.grammars.LanguageGrammars
 import org.scalatest.FunSuite
 
 class TextMateTest extends FunSuite {
 
   test("smithy test") {
     val smithy = SmithyLanguage.language
-    var output = BiGrammarToTextMate.toTextMate(smithy.grammars.root)
+    var output = BiGrammarToTextMate.toTextMate(LanguageGrammars.grammars.get(smithy).root)
     val expectation = """{
                         |  "patterns": [
                         |    {
@@ -202,7 +203,7 @@ class TextMateTest extends FunSuite {
 
   test("json test") {
     val json = JsonLanguage.language
-    var output = BiGrammarToTextMate.toTextMate(json.grammars.root)
+    var output = BiGrammarToTextMate.toTextMate(LanguageGrammars.grammars.get(json).root)
     val expectation = """{
                         |  "patterns": [
                         |    {

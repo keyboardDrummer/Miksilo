@@ -39,7 +39,7 @@ class JavaStyleCommentsTest
 
   test("comments with trivia inside node on tiny grammar") {
     val language = LanguageFromDeltas(Seq.empty)
-    val grammars = language.grammars
+    val grammars = LanguageGrammars.grammars.get(language)
     import grammars._
 
     val grammar: BiGrammar = "ParentStart" ~ identifier.as(ParentName) ~
@@ -116,16 +116,17 @@ class JavaStyleCommentsTest
   test("block transformation") {
     val (blockGrammar, statementGrammar, expectedStatementGrammar) = {
       val java = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).buildLanguage
-      import java.grammars._
+      val grammars = LanguageGrammars.grammars.get(java)
+      import grammars._
 
-      val statementGrammar = java.grammars.find(StatementDelta.Grammar)
+      val statementGrammar = find(StatementDelta.Grammar)
       statementGrammar.inner = new NodeGrammar("statement", ParentClass)
-      val blockGrammar = java.grammars.find(BlockDelta.BlockGrammar)
+      val blockGrammar = find(BlockDelta.BlockGrammar)
       val language = LanguageFromDeltas(Seq.empty)
-      language.grammars.root.inner = blockGrammar
-      TriviaInsideNode.transformGrammars(language.grammars, language)
+      root.inner = blockGrammar
+      TriviaInsideNode.transformGrammars(grammars, language)
       val expectedStatementGrammar: BiGrammar =
-        new NodeGrammar(new WithTrivia("statement", language.grammars.trivia, false), ParentClass)
+        new NodeGrammar(new WithTrivia("statement", grammars.trivia, false), ParentClass)
       (blockGrammar, statementGrammar, expectedStatementGrammar)
     }
 

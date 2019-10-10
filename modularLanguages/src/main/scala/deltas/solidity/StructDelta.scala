@@ -12,6 +12,7 @@ import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 import deltas.HasNameDelta.HasName
 import deltas.bytecode.types.TypeSkeleton
 import deltas.statement.LocalDeclarationDelta
+import core.deltas.path.ConstraintBuilderExtension._
 
 object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

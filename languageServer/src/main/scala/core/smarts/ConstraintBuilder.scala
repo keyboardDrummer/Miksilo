@@ -1,6 +1,6 @@
 package core.smarts
 
-import core.language.{SourceElement, SourceElementWithName}
+import core.language.SourceElement
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.imports.DeclarationOfScope
 import core.smarts.scopes.objects.{ConcreteScope, _}
@@ -35,10 +35,6 @@ class ConstraintBuilder(val factory: Factory) {
 
   def importScope(into: Scope, source: Scope): Unit = add(ParentScope(into, source))
 
-  def resolveToType(origin: SourceElementWithName, scope: Scope, _type: Type) : DeclarationVariable = {
-    resolveToType(origin.name, origin, scope, _type)
-  }
-
   def resolveToType(name: String, origin: SourceElement, scope: Scope, _type: Type) : DeclarationVariable = {
     val declaration = declarationVariable()
     val reference = new Reference(name, Option(origin))
@@ -58,22 +54,10 @@ class ConstraintBuilder(val factory: Factory) {
     declaration
   }
 
-  def referSourceElement(hasName: SourceElementWithName, scope: Scope): Reference = {
-    refer(hasName.name, scope, Some(hasName))
-  }
-
   def refer(hasName: String, scope: Scope, origin: Option[SourceElement]): Reference = {
     val result = new Reference(hasName, origin)
     constraints ::= ReferenceInScope(result, scope)
     result
-  }
-
-  def declare(hasName: SourceElementWithName, container: Scope, _type: Type): NamedDeclaration = {
-    declare(hasName.name, container, hasName, Some(_type))
-  }
-
-  def declare(name: SourceElementWithName, container: Scope): NamedDeclaration = {
-    declare(name.name, container, name, None)
   }
 
   def declare(name: String, container: Scope, origin: SourceElement = null, _type: Option[Type] = None): NamedDeclaration = { //TODO the order here is inconsistent with resolve.

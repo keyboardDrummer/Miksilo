@@ -7,6 +7,8 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import util.SourceUtils2
 
+// TODO add a constraintBuilder that's specific to a File, so you add a [Has]SourceRange instead of a SourceElement
+// TODO compute the range based on the children, so only the leafs needs a Range.
 trait Expression extends FileSourceElement {
   def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope)
 }

@@ -44,7 +44,7 @@ class PerformanceTest extends FunSuite {
     val repetitions = 5
     for(_ <- 1.to(repetitions)) {
       val result = jsonParser.getWholeInputParser.parse(new StringReader(program))
-      assert(result.successful)
+      assert(!result.successful)
     }
     val timeB = System.currentTimeMillis()
     val elapsedTime = timeB - timeA

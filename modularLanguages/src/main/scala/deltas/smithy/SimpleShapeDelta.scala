@@ -10,6 +10,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.HasNameDelta
 import deltas.javac.classes.skeleton.HasConstraintsDelta
+import core.deltas.path.ConstraintBuilderExtension._
 
 object SimpleShapeDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

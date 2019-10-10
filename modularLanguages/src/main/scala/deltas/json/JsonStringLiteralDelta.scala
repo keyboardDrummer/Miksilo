@@ -28,6 +28,7 @@ object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     val inner = {
+      import core.bigrammar.DefaultBiGrammarWriter._
       dropPrefix(grammars, grammars.regexGrammar(stringInnerRegex, "string literal"), Value, "\"") ~<
         BiGrammarWriter.stringToGrammar("\"")
     }

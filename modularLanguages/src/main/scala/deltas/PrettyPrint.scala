@@ -4,6 +4,7 @@ import core.bigrammar.BiGrammar
 import core.bigrammar.printer.{BiGrammarToPrinter, PrintError}
 import core.bigrammar.textMate.BiGrammarToTextMate.jsonLanguage
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.path.PathRoot
 import core.deltas.{Contract, Delta}
 import core.language.{Language, Phase}
 import core.responsiveDocument.ResponsiveDocument
@@ -16,9 +17,9 @@ case class PrettyPrint(recover: Boolean = false) extends Delta
     val foundGrammar = LanguageGrammars.grammars.get(language).root
     language.data(this) = foundGrammar.deepClone
 
-    language.compilerPhases = List(Phase(this, compilation => {
+    language.compilerPhases = List(Phase(this, description, compilation => {
       val grammar = getOutputGrammar(language)
-      val documentTry: Try[ResponsiveDocument] = Try(BiGrammarToPrinter.toDocument(compilation.program, grammar))
+      val documentTry: Try[ResponsiveDocument] = Try(BiGrammarToPrinter.toDocument(compilation.program.asInstanceOf[PathRoot].current, grammar))
       val documentTryWithOptionalRecover: Try[ResponsiveDocument] = if (recover) {
         documentTry.recover({ case e: PrintError => e.toDocumentWithPartial })
       }

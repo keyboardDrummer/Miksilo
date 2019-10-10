@@ -11,6 +11,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.smithy.RelativeShapeIdentifierDelta.shapeType
 import deltas.{ConstraintSkeleton, FileWithMembersDelta, HasNameDelta}
+import core.deltas.path.ConstraintBuilderExtension._
 
 object StructureStatementDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

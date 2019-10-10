@@ -5,6 +5,7 @@ import java.io.{ByteArrayInputStream, CharArrayWriter}
 import java.nio.charset.StandardCharsets
 
 import application.StyleSheet
+import core.bigrammar.BiGrammar
 import core.deltas.{Delta, LanguageFromDeltas}
 import core.language.exceptions.CompileException
 import core.layouts.{EquationLayout, Expression, SwingEquationLayout}

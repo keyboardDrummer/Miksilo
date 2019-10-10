@@ -12,6 +12,7 @@ import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, ObjectLiteral
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import play.api.libs.json.{JsObject, Json}
 import util.SourceUtils
+import core.deltas.path.ConstraintBuilderExtension._
 
 object CloudFormationTemplate extends Delta {
   override def description: String = "Add cloudformation template semantics"

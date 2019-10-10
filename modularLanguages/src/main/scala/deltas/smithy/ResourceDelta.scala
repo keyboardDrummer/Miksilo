@@ -16,6 +16,7 @@ import deltas.json.JsonObjectLiteralDelta.ObjectLiteral
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import deltas.smithy.ServiceDelta.Body
 import deltas.{FileWithMembersDelta, HasNameDelta}
+import core.deltas.path.ConstraintBuilderExtension._
 
 object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
   object Shape extends NodeShape

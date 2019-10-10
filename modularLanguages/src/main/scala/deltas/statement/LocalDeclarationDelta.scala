@@ -9,6 +9,7 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
+import core.deltas.path.ConstraintBuilderExtension._
 
 object LocalDeclarationDelta extends StatementInstance
   with DeltaWithGrammar {

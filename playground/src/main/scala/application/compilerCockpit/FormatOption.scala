@@ -2,6 +2,7 @@ package application.compilerCockpit
 
 import java.io.InputStream
 
+import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
 import deltas.PrettyPrint
@@ -36,7 +37,7 @@ object FormatJsonOption extends CompileOption {
 
   override def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar = {
     val state = language.compileStream(input)
-    val outputGrammar = language.grammars.root
+    val outputGrammar = LanguageGrammars.grammars.get(language).root
     TextWithGrammar(state.output, outputGrammar)
   }
 

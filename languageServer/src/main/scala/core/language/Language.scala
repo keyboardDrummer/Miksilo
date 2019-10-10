@@ -20,7 +20,7 @@ case class ConstraintException(solveException: SolveException) extends BadInputE
 
 object Language extends LazyLogging {
   def getConstraintPhase(collectConstraints: (Compilation, ConstraintBuilder) => Unit): Phase = {
-    Phase("constraints", compilation => {
+    Phase("constraints", "solve constraints", compilation => {
       val factory = new Factory()
       val builder = new ConstraintBuilder(factory)
 
@@ -38,9 +38,6 @@ object Language extends LazyLogging {
         case Failure(e) => throw e
       }
       logger.info(s"Constraint solving took ${System.currentTimeMillis() - start}ms")
-//      for(refDecl <- solver.proofs.declarations) {
-//        refDecl._1.origin.foreach(ref => resolvesToDeclaration(ref.asInstanceOf[ChildPath]) = refDecl._2)
-//      }
       compilation.proofs = solver.proofs
       if (compilation.remainingConstraints.nonEmpty) {
         compilation.stopped = true
@@ -48,9 +45,6 @@ object Language extends LazyLogging {
       compilation.diagnostics ++= compilation.remainingConstraints.flatMap(
         constraint => constraint.getDiagnostic)
     })
-
-//    def getDeclarationOfReference(path: AnyPath): NodePath = resolvesToDeclaration(path).origin.get.asInstanceOf[ChildPath].parent
-//    val resolvesToDeclaration = new TypedChildField[NamedDeclaration]("resolvesToDeclaration")
   }
 
   def getParsePhaseFromParser[Program, Input <: StringReaderLike[Input]](
@@ -58,7 +52,7 @@ object Language extends LazyLogging {
     getSourceElement: (Program, String) => SourceElement,
     parser: SingleResultParser[Program, Input]): Phase = {
 
-    Phase("parse", compilation => {
+    Phase("parse", "parse the source code", compilation => {
       val uri = compilation.rootFile.get
       val inputStream = compilation.fileSystem.getFile(uri)
       val time = System.currentTimeMillis()
@@ -83,7 +77,6 @@ object Language extends LazyLogging {
 class Language extends LazyLogging {
 
   val data: mutable.Map[Any, Any] = mutable.Map.empty
-  // val grammars = new LanguageGrammars
   var compilerPhases: List[Phase] = List.empty
 
   def insertPhaseAfter(insert: Phase, phaseKey: Any): Unit = {
@@ -102,12 +95,6 @@ class Language extends LazyLogging {
     compileStream(input.inputStream())
   }
 
-//  def compileFileToOutputFile(inputStream: InputStream, outputFile: File): Compilation = {
-//    val compilation = compileStream(inputStream)
-//    PrintByteCodeToOutputDirectory.perform(outputFile, compilation)
-//    compilation
-//  }
-
   def compileAst(program: SourceElement): Compilation = {
     val compilation = Compilation.fromAst(this, program)
     compilation.program = program
@@ -124,7 +111,7 @@ class Language extends LazyLogging {
   }
 }
 
-case class Phase(key: Any, action: Compilation => Unit)
+case class Phase(key: Any, description: String, action: Compilation => Unit) {}
 
 case class ParseException(message: String) extends BadInputException {
   override def toString: String = message

@@ -9,6 +9,13 @@ trait DeltaWithPhase extends Delta {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    language.compilerPhases ::= Phase(this, compilation => transformProgram(compilation.program.asInstanceOf[PathRoot].current, compilation))
+    language.compilerPhases ::= Phase(this, this.description,
+      compilation => {
+        val rootNode = if (compilation.program != null)
+            compilation.program.asInstanceOf[PathRoot].current
+          else
+            null
+        transformProgram(rootNode, compilation)
+      })
   }
 }

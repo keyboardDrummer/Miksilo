@@ -2,7 +2,10 @@ package deltas.bytecode.readJar
 
 import java.io
 
-import core.bigrammar.BiGrammarToParser
+import core.bigrammar.BiGrammarToParser._
+import core.bigrammar.BiGrammarToParser.Reader
+import core.bigrammar.TestLanguageGrammarUtils
+import core.deltas.grammars.LanguageGrammars
 import core.language.node.Node
 import deltas.PrettyPrint
 import org.scalatest.FunSuite
@@ -21,7 +24,7 @@ class TestClassFileDecompiler extends FunSuite {
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
     val language = compiler.language
 
-    val grammar = language.grammars.find(TypeAbstraction.AbstractMethodTypeGrammar)
+    val grammar = LanguageGrammars.grammars.get(language).find(TypeAbstraction.AbstractMethodTypeGrammar)
     val parser = toParser(grammar)
     val parseResult = parser.parse(new Reader(signature))
     val result = parseResult.get.asInstanceOf[Node]
@@ -30,27 +33,26 @@ class TestClassFileDecompiler extends FunSuite {
   test("TypeVariable") {
     val signature = "<NoSuchMemberException:Ljava/lang/ReflectiveOperationException;>(BLjava/lang/invoke/MemberName;Ljava/lang/Class<*>;Ljava/lang/Class<TNoSuchMemberException;>;)Ljava/lang/invoke/MemberName;^Ljava/lang/IllegalAccessException;"
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.language
+    val language = compiler.language
 
-    val parser = toParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val parser = toParser(LanguageGrammars.grammars.get(language).find(TypeSkeleton.ByteCodeTypeGrammar))
     val result = parser.parse(new Reader(signature)).get.asInstanceOf[Node]
   }
 
   test("TypeVariable2") {
     val signature = "<NoSuchMemberException:Ljava/lang/ReflectiveOperationException;>(BLjava/lang/invoke/MemberName;Ljava/lang/Class<*>;Ljava/lang/Class<TNoSuchMemberException;>;)Ljava/lang/invoke/MemberName;^Ljava/lang/IllegalAccessException;^TNoSuchMemberException;"
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.language
+    val language = compiler.language
 
-    val parser = toParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val parser = toParser(LanguageGrammars.grammars.get(language).find(TypeSkeleton.ByteCodeTypeGrammar))
     val result = parser.parse(new Reader(signature)).get.asInstanceOf[Node]
   }
 
   test("TypeVariable3") {
     val signature = "(BLjava/lang/invoke/MemberName;Ljava/lang/Class<*>;Ljava/lang/Class<TNoSuchMemberException;>;)Ljava/lang/invoke/MemberName;^Ljava/lang/IllegalAccessException;^TNoSuchMemberException;"
     val compiler = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.language
 
-    val parser = toParser(state.grammars.find(TypeSkeleton.ByteCodeTypeGrammar))
+    val parser = toParser(LanguageGrammars.grammars.get(compiler.language).find(TypeSkeleton.ByteCodeTypeGrammar))
     val result = parser.parse(new Reader(signature)).get.asInstanceOf[Node]
   }
 

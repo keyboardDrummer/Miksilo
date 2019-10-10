@@ -6,6 +6,7 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 
 import core.deltas.LanguageFromDeltas
+import core.deltas.grammars.LanguageGrammars
 import javax.swing._
 import languageServer.MiksiloLanguageServer
 import org.fife.ui.rsyntaxtextarea.parser._
@@ -14,7 +15,7 @@ import org.fife.ui.rtextarea.RTextScrollPane
 
 class EditorFromLanguage(language: LanguageFromDeltas) extends JPanel(new CardLayout()) {
 
-  val factory = new TokenMakerFactoryFromGrammar(language.grammars.root)
+  val factory = new TokenMakerFactoryFromGrammar(LanguageGrammars.grammars.get(language).root)
 
   val inputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
   inputDocument.setTokenMakerFactory(factory)
