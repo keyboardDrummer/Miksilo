@@ -1,7 +1,7 @@
 package languageServer
 
-import core.language.node.FilePosition
-import core.language.node.Node.PositionOrdering
+import core.language.SourceElement
+import languageServer.Position.PositionOrdering
 import languageServer.lsp._
 import play.api.libs.json._
 
@@ -40,9 +40,20 @@ trait ReferencesProvider {
   * Position in a text document expressed as zero-based line and character offset.
   */
 case class Position(line: Int, character: Int)
-object Position { implicit val format = Json.format[Position] }
+
+object Position {
+  implicit object PositionOrdering extends Ordering[Position] {
+
+    private val ordering = Ordering.by[Position, (Int, Int)](x => (x.line, x.character))
+    override def compare(x: Position, y: Position): Int = {
+      ordering.compare(x, y)
+    }
+  }
+  implicit val format = Json.format[Position]
+}
 
 object SourceRange { implicit val format = Json.format[SourceRange] }
+
 /**
   * A range in a text document.
   */

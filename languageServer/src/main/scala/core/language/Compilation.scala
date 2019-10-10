@@ -1,7 +1,5 @@
 package core.language
 
-import core.deltas.path.PathRoot
-import core.language.node.Node
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
 import languageServer.{CodeAction, Diagnostic}
 
@@ -9,8 +7,7 @@ import scala.collection.mutable
 import scala.tools.nsc.interpreter.InputStream
 
 class Compilation(val language: Language, val fileSystem: FileSystem, val rootFile: Option[String]) {
-  var program: Node = _
-  def root: PathRoot = PathRoot(program)
+  var program: SourceElement = _
   var proofs: Proofs = _
   var remainingConstraints: Seq[Constraint] = _
   var diagnostics: Set[FileDiagnostic] = Set.empty
@@ -57,7 +54,7 @@ object Compilation
     result
   }
 
-  def fromAst(language: Language, root: Node): Compilation = {
+  def fromAst(language: Language, root: SourceElement): Compilation = {
     val result = new Compilation(language, EmptyFileSystem, None)
     result.program = root
     result

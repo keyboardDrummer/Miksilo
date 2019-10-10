@@ -16,7 +16,7 @@ class Proofs {
   val scopeGraph = new ScopeGraph
   val typeGraph = new TypeGraph
   var environment = Map.empty[Declaration, Type]
-  var declarations = Map.empty[Reference, NamedDeclaration]
+  var references = Map.empty[Reference, NamedDeclaration]
   var referencesPerDeclaration = mutable.Map.empty[NamedDeclaration, ArrayBuffer[Reference]]
 
   def resolveDeclaration(declaration: Declaration): Declaration = declaration match {
@@ -40,7 +40,7 @@ class Proofs {
 
   def gotoDefinition(location: SourceElement): Option[NamedDeclaration] = {
     val maybeReference = scopeGraph.findReference(location)
-    maybeReference.flatMap(reference => declarations.get(reference))
+    maybeReference.flatMap(reference => references.get(reference))
   }
 
   def findReferences(location: SourceElement): Seq[Reference] = {
@@ -59,8 +59,8 @@ class Proofs {
   }
 
   def addResolution(reference: Reference, declaration: NamedDeclaration): Unit = {
-    declarations += reference -> declaration
-    val references = referencesPerDeclaration.getOrElseUpdate(declaration, ArrayBuffer.empty)
-    references.append(reference)
+    references += reference -> declaration
+    val declarationReferences = referencesPerDeclaration.getOrElseUpdate(declaration, ArrayBuffer.empty)
+    declarationReferences.append(reference)
   }
 }

@@ -16,6 +16,6 @@ class ShowPhasesButton(compilerCockpit: LanguageSandbox) extends JButton("Show p
   def getIndexedPhaseDescription(indexedPhase: (Phase, Int)): String = {
     val phase = indexedPhase._1
     val index = indexedPhase._2
-    (index + 1) + ": " + phase.key.name + "\n" + phase.key.description
+    (index + 1) + ": " + phase.key + "\n" + phase.description
   }
 }

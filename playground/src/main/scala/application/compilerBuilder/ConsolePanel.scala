@@ -1,9 +1,9 @@
 package application.compilerBuilder
 
 import java.awt.BorderLayout
+
 import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.{BorderFactory, JPanel, JTextArea}
-
 import application.StyleSheet
 import core.deltas.{Contract, Delta}
 import core.document.Empty

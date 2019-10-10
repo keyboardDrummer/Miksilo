@@ -155,7 +155,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
     val showPhasesButton = equationLayout.addComponent(new ShowPhasesButton(this))
     val inputGrammarButton = equationLayout.addComponent(new ShowInputGrammarButton(this))
     val outputGrammarButton = equationLayout.addComponent(new ShowOutputGrammarButton(this))
-    val exampleDropDown = equationLayout.addComponent(new ExampleDropdown(this))
+    val exampleDropDown = equationLayout.addComponent(new ExampleDropDown(this))
 
     val innerLayout = equationLayout.equationLayout
 

@@ -5,6 +5,7 @@ import org.scalatest.FunSuite
 import strings.StringParserWriter
 import editorParsers.SpotlessHistory
 import editorParsers.History
+import _root_.core.parsers.strings.StringReaderBase
 
 class HistoryTest extends FunSuite with StringParserWriter {
   type Input = IndexInput
@@ -99,7 +100,7 @@ class HistoryTest extends FunSuite with StringParserWriter {
 
   private val text = Array.fill(100)('a')
 
-  class IndexInput(offset: Int) extends StringReaderBase(text, offset, Position(0,0)) {
+  class IndexInput(offset: Int) extends StringReaderBase[IndexInput](text, offset, Position(0,0)) {
     override def drop(amount: Int) = new IndexInput(offset + amount)
   }
 

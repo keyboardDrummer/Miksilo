@@ -96,6 +96,12 @@ lazy val languageServer = (project in file("languageServer")).
 
   )
 
+lazy val modularLanguages = (project in file("modularLanguages")).
+  settings(commonSettings: _*).
+  settings(
+    name := "modularLanguages"
+  ).dependsOn(languageServer)
+
 lazy val playground = (project in file("playground")).
   settings(commonSettings: _*).
   settings(
@@ -108,6 +114,6 @@ lazy val playground = (project in file("playground")).
     libraryDependencies += "jgraph" % "jgraph" % "5.13.0.0",
     libraryDependencies += "org.tinyjee.jgraphx" % "jgraphx" % "2.3.0.5",
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.1",
-  ).dependsOn(languageServer)
+  ).dependsOn(modularLanguages)
 
 lazy val vscode = taskKey[Unit]("Run VS Code with Miksilo")

@@ -1,10 +1,11 @@
 package languageServer
 
+import java.io.ByteArrayInputStream
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
 import com.typesafe.scalalogging.LazyLogging
 import core.language.FileSystem
-import util.SourceUtils
 
 import scala.collection.JavaConverters._
 import scala.tools.nsc.interpreter.InputStream
@@ -44,8 +45,11 @@ class TextDocumentManager extends LazyLogging with FileSystem {
 
   override def getFile(path: String): InputStream = {
     val bytes = getOpenDocumentForUri(path).get.contents
-    SourceUtils.stringToStream(new String(bytes)) //TODO maybe instead of Input stream een byte array gebruiken?
+    stringToStream(new String(bytes)) //TODO maybe instead of Input stream een byte array gebruiken?
   }
+
+  // TODO remove this method and let FileSystem stop using InputStream
+  def stringToStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 }
 
 import java.io.File

@@ -41,7 +41,7 @@ trait LanguageServerTest extends FunSuite {
     server.asInstanceOf[CompletionProvider].complete(DocumentPosition(document, position))
   }
 
-  def getDiagnostic(server: LanguageServer, program: String): Seq[Diagnostic] = {
+  def getDiagnostics(server: LanguageServer, program: String): Seq[Diagnostic] = {
     var result: Seq[Diagnostic] = null
     val document = openDocument(server, program)
     server.setClient(new LanguageClient {
