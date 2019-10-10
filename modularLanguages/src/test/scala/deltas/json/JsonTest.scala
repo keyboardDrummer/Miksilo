@@ -17,7 +17,7 @@ class JsonTest extends FunSuite {
     val input = """b{"hello":"jo"}"""
     val compilation = language.compileString(input)
     val expectedProgram = JsonObjectLiteralDelta.neww(Map("hello" -> JsonStringLiteralDelta.neww("jo")))
-    assertResult(expectedProgram)(compilation.program)
+    assertResult(expectedProgram)(compilation.program.asInstanceOf[PathRoot].current)
     assert(compilation.diagnostics.size == 1)
   }
 
@@ -25,7 +25,7 @@ class JsonTest extends FunSuite {
     val input = """bdddwd{"hello":"jo"}"""
     val compilation = language.compileString(input)
     val expectedProgram = JsonObjectLiteralDelta.neww(Map("hello" -> JsonStringLiteralDelta.neww("jo")))
-    assertResult(expectedProgram)(compilation.program)
+    assertResult(expectedProgram)(compilation.program.asInstanceOf[PathRoot].current)
     assert(compilation.diagnostics.size == 1)
   }
 
@@ -33,7 +33,7 @@ class JsonTest extends FunSuite {
     val input = """uuygyuiijuihh{"hello"}"""
     val compilation = language.compileString(input)
     val expectedProgram = JsonObjectLiteralDelta.neww(Map("hello" -> ExpressionDelta.value))
-    assertResult(expectedProgram)(compilation.program)
+    assertResult(expectedProgram)(compilation.program.asInstanceOf[PathRoot].current)
     assert(compilation.diagnostics.size == 2)
   }
 
@@ -41,7 +41,7 @@ class JsonTest extends FunSuite {
     val input = """iuhiuihu"""
     val compilation = language.compileString(input)
     val expectedProgram = ExpressionDelta.value
-    assertResult(expectedProgram)(compilation.program)
+    assertResult(expectedProgram)(compilation.program.asInstanceOf[PathRoot].current)
     assert(compilation.diagnostics.size == 2)
   }
 
@@ -49,7 +49,7 @@ class JsonTest extends FunSuite {
     val input = """w"""
     val compilation = language.compileString(input)
     val expectedProgram = ExpressionDelta.value
-    assertResult(expectedProgram)(compilation.program)
+    assertResult(expectedProgram)(compilation.program.asInstanceOf[PathRoot].current)
     assert(compilation.diagnostics.size == 2)
   }
 
@@ -57,7 +57,7 @@ class JsonTest extends FunSuite {
     val input = """{f"hello"}"""
     val compilation = language.compileString(input)
     val expectedProgram = JsonObjectLiteralDelta.neww(Map("hello" -> ExpressionDelta.value))
-    assertResult(expectedProgram)(compilation.program)
+    assertResult(expectedProgram)(compilation.program.asInstanceOf[PathRoot].current)
     assert(compilation.diagnostics.size == 2)
   }
 
