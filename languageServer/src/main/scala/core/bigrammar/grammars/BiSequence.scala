@@ -1,20 +1,21 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
-import core.bigrammar.printer.UndefinedDestructuringValue
 
-class BiSequence(var first: BiGrammar, var second: BiGrammar,
-                 val bijective: SequenceBijective,
-                 val horizontal: Boolean) extends BiGrammar with Layout {
+class BiSequence[Left, Right, Result](var first: BiGrammar[Left], var second: BiGrammar[Right],
+                 val bijective: SequenceBijective[Left, Right, Result],
+                 val horizontal: Boolean) extends BiGrammar[Result] with Layout {
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = new BiSequence(newChildren(0), newChildren(1), bijective, horizontal)
+  override def withChildren(newChildren: Seq[BiGrammar[_]]) = new BiSequence(
+    newChildren(0).asInstanceOf[BiGrammar[Left]],
+    newChildren(1).asInstanceOf[BiGrammar[Right]], bijective, horizontal)
 
   override def children = Seq(first, second)
 
-  override def containsParser(recursive: BiGrammar => Boolean): Boolean =
+  override def containsParser(recursive: BiGrammar[_] => Boolean): Boolean =
     recursive(first) || recursive(second)
 
-  override protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]): Seq[BiGrammar] = {
+  override protected def getLeftChildren(recursive: BiGrammar[_] => Seq[BiGrammar[_]]): Seq[BiGrammar[_]] = {
     if (first.containsParser())
       recursive(first)
     else {
@@ -25,17 +26,16 @@ class BiSequence(var first: BiGrammar, var second: BiGrammar,
 
 object BiSequence {
 
-  def identity: SequenceBijective = SequenceBijective(packTuple, unpackTuple)
+  def tuple[A,B]: SequenceBijective[A,B,(A,B)] = SequenceBijective[A,B,(A,B)](packTuple, unpackTuple[A,B])
 
-  private def packTuple: (Any, Any) => (Any, Any) = (a: Any, b: Any) => (a,b)
-  private def unpackTuple: Any => Option[(Any, Any)] = {
-    case UndefinedDestructuringValue => Some(UndefinedDestructuringValue, UndefinedDestructuringValue)
-    case t: (Any, Any) => Some(t)
-    case _ => None
-  }
+  private def packTuple[A,B]: (A, B) => (A, B) = (a: A, b: B) => (a,b)
+  private def unpackTuple[A,B]: ((A,B)) => Option[(A, B)] = t => Some(t)
 
-  def ignoreLeft = SequenceBijective((a: Any, b: Any) => b, x => Some(UndefinedDestructuringValue, x))
-  def ignoreRight = SequenceBijective((a: Any, b: Any) => a, x => Some(x, UndefinedDestructuringValue))
+  def ignoreLeft[Right] =
+    SequenceBijective[Unit, Right, Right]((_, b: Right) => b, x => Some(Unit, x))
+
+  def ignoreRight[Left] =
+    SequenceBijective[Left, Unit, Left]((a: Left, _) => a, x => Some(x, Unit))
 }
 
-case class SequenceBijective(construct: (Any, Any) => Any, destruct: Any => Option[(Any, Any)])
+case class SequenceBijective[Left, Right, Result](construct: (Left, Right) => Result, destruct: Result => Option[(Left, Right)])

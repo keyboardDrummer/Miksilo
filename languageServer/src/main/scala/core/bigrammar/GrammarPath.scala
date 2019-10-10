@@ -8,17 +8,17 @@ import util.{ExtendedType, GraphBasics, Property}
 import scala.collection.concurrent._
 
 object GrammarPath {
-  val cache: TrieMap[Class[_], List[Property[BiGrammar, BiGrammar]]] = TrieMap.empty
+  val cache: TrieMap[Class[_], List[Property[BiGrammar[_], BiGrammar[_]]]] = TrieMap.empty
 
-  def getBiGrammarProperties(clazz: Class[_]): List[Property[BiGrammar, BiGrammar]] = {
+  def getBiGrammarProperties(clazz: Class[_]): List[Property[BiGrammar[_], BiGrammar[_]]] = {
     cache.getOrElseUpdate(clazz, new ExtendedType(clazz).properties.
-      filter(property => classOf[BiGrammar].isAssignableFrom(property._type)).
-      map(p => p.asInstanceOf[Property[BiGrammar, BiGrammar]]).toList)
+      filter(property => classOf[BiGrammar[_]].isAssignableFrom(property._type)).
+      map(p => p.asInstanceOf[Property[BiGrammar[_], BiGrammar[_]]]).toList)
   }
 }
 
 trait GrammarPath {
-  def value: BiGrammar
+  def value: BiGrammar[_]
   def newChildren: List[GrammarReference] = children.filter(c => !seenGrammars.contains(c.value))
 
   def children: List[GrammarReference] = {
@@ -26,21 +26,21 @@ trait GrammarPath {
     properties.map(property => new GrammarReference(this, property))
   }
 
-  def seenGrammars: Set[BiGrammar] = ancestorGrammars + value
-  def ancestorGrammars: Set[BiGrammar]
+  def seenGrammars: Set[BiGrammar[_]] = ancestorGrammars + value
+  def ancestorGrammars: Set[BiGrammar[_]]
   def ancestors: Seq[GrammarPath]
-  def findGrammar(grammar: BiGrammar): Option[GrammarReference] = find(p => p.value == grammar)
+  def findGrammar(grammar: BiGrammar[_]): Option[GrammarReference] = find(p => p.value == grammar)
 
   def findAsNode(shape: NodeShape): GrammarReference = {
     find(p => p.value match { case node: NodeGrammar => node.shape == shape; case _ => false}).get
   }
 
   def findAs(field: NodeField): GrammarReference = {
-    find(p => p.value match { case as:As => as.field == field; case _ => false}).get
+    find(p => p.value match { case as:As[_] => as.field == field; case _ => false}).get
   }
 
   def findLabelled(label: Key): GrammarReference = {
-    find(p => p.value match { case as:Labelled => as.name == label; case _ => false}).get
+    find(p => p.value match { case as:Labelled[_] => as.name == label; case _ => false}).get
   }
 
   def find(predicate: GrammarPath => Boolean): Option[GrammarReference] = {

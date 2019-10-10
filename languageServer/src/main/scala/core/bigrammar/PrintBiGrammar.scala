@@ -7,35 +7,35 @@ import core.responsiveDocument.ResponsiveDocument
 
 object PrintBiGrammar {
 
-  def printReachableGrammars(program: BiGrammar): ResponsiveDocument = {
+  def printReachableGrammars(program: BiGrammar[_]): ResponsiveDocument = {
     val reachableGrammars = getLabelled(program)
     reachableGrammars.map(grammar => toTopLevelDocument(grammar)).reduce((a, b) => a %% b)
   }
 
-  def toTopLevelDocument(labelled: Labelled): ResponsiveDocument = {
+  def toTopLevelDocument(labelled: Labelled[_]): ResponsiveDocument = {
 
-    def getOrs(grammar: BiGrammar): Seq[BiGrammar] = grammar match {
-      case choice:BiChoice => getOrs(choice.left) ++ getOrs(choice.right)
+    def getOrs(grammar: BiGrammar[_]): Seq[BiGrammar[_]] = grammar match {
+      case choice: BiChoice[_] => getOrs(choice.left) ++ getOrs(choice.right)
       case _ => Seq(grammar)
     }
 
-    val transformed: BiGrammar = removeProduceAndMap(contract(simplify(labelled.inner)))
-    val ors: Seq[BiGrammar] = getOrs(transformed)
+    val transformed: BiGrammar[_] = removeProduceAndMap(contract(simplify(labelled.inner)))
+    val ors: Seq[BiGrammar[_]] = getOrs(transformed)
     val result = toDocumentInner(labelled) ~~ "=>" ~~ ors.map(or => toDocumentInner(or)).reduce((a, b) => a % b)
     result
   }
 
-  def toDocument(grammar: BiGrammar): ResponsiveDocument = toDocumentInner(removeProduceAndMap(contract(simplify(grammar))))
+  def toDocument(grammar: BiGrammar[_]): ResponsiveDocument = toDocumentInner(removeProduceAndMap(contract(simplify(grammar))))
 
-  private def toDocumentInner(grammar: BiGrammar): ResponsiveDocument = grammar match {
-    case sequence: BiSequence =>
+  private def toDocumentInner(grammar: BiGrammar[_]): ResponsiveDocument = grammar match {
+    case sequence: BiSequence[_,_,_] =>
       val first = withChoiceParenthesis(sequence.first)
       val second = withChoiceParenthesis(sequence.second)
       if (sequence.horizontal) first ~~ second
       else first ~~ "%" ~~ second
-    case choice:BiChoice => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
-    case many:ManyHorizontal => withParenthesis(many.inner) ~ "*"
-    case many:ManyVertical => withParenthesis(many.inner) ~ "%*"
+    case choice:BiChoice[_] => toDocumentInner(choice.left) ~~ "|" ~~ toDocumentInner(choice.right)
+    case many: ManyHorizontal[_] => withParenthesis(many.inner) ~ "*"
+    case many:ManyVertical[_] => withParenthesis(many.inner) ~ "%*"
     case OptionGrammar(inner, _) => withParenthesis(inner) ~ "?"
     case regex: RegexGrammar => s"Regex(${regex.regex})"
     case keyword: Keyword => keyword.value
@@ -43,73 +43,76 @@ object PrintBiGrammar {
     case delimiter: Delimiter => delimiter.value
     case ValueGrammar(value) => if (value == null) "null" else value.toString
     case BiFailure(message) => message
-    case labelled: Labelled => grammarKeyToName(labelled.name)
+    case labelled: Labelled[_] => grammarKeyToName(labelled.name)
     case NumberGrammar => "number"
     case StringLiteral => "string"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
     case map: MapGrammar[_, _] => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
     case ParseWhiteSpace => ""
-    case custom: CustomGrammar => custom.print(toDocumentInner)
+    case custom: CustomGrammar[_] => custom.print(toDocumentInner)
     case _ => grammar.getClass.toString
   }
 
-  private def withChoiceParenthesis(grammar: BiGrammar): ResponsiveDocument = grammar match {
-    case choice: BiChoice => toDocumentInner(choice).inParenthesis
+  private def withChoiceParenthesis(grammar: BiGrammar[_]): ResponsiveDocument = grammar match {
+    case choice: BiChoice[_] => toDocumentInner(choice).inParenthesis
     case _ => toDocumentInner(grammar)
   }
 
-  def withParenthesis(grammar: BiGrammar): ResponsiveDocument = grammar match {
-    case labelled:Labelled => toDocumentInner(labelled)
+  def withParenthesis(grammar: BiGrammar[_]): ResponsiveDocument = grammar match {
+    case labelled:Labelled[_] => toDocumentInner(labelled)
     case x => toDocumentInner(x).inParenthesis
   }
 
   def grammarKeyToName(key: GrammarKey): String = key.toString
 
-  trait FakeBiGrammar extends BiGrammar {
-    override def withChildren(newChildren: Seq[BiGrammar]): BiGrammar = ???
-    override def children: Seq[BiGrammar] = ???
-    override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
+  trait FakeBiGrammar[Value] extends BiGrammar[Value] {
+    override def withChildren(newChildren: Seq[BiGrammar[_]]): BiGrammar[Value] = ???
+    override def children: Seq[BiGrammar[_]] = ???
+    override def containsParser(recursive: BiGrammar[_] => Boolean): Boolean = true
   }
 
-  case class OptionGrammar(inner: BiGrammar, value: Any) extends FakeBiGrammar
+  case class OptionGrammar[Value](inner: BiGrammar[Value], value: Value) extends FakeBiGrammar[Value]
 
-  def simplify(grammar: BiGrammar): BiGrammar = grammar.deepMap {
-    case choice: BiChoice =>
-      val left = choice.left
-      val right = choice.right
-      if (left.isInstanceOf[BiFailure])
-        return right
+  def simplify[Value](grammar: BiGrammar[Value]): BiGrammar[Value] = {
+    def map(grammar: BiGrammar[_]): BiGrammar[_] = grammar match {
+      case choice: BiChoice[_] =>
+        val left = choice.left
+        val right = choice.right
+        if (left.isInstanceOf[BiFailure[_]])
+          return right
 
-      if (right.isInstanceOf[BiFailure])
-        return left
+        if (right.isInstanceOf[BiFailure[_]])
+          return left
 
-      choice
-    case sequence: BiSequence =>
-      val left = sequence.first
-      val right = sequence.second
-      if (left.isInstanceOf[BiFailure])
-        return left
+        choice
+      case sequence: BiSequence[_, _, _] =>
+        val left = sequence.first
+        val right = sequence.second
+        if (left.isInstanceOf[BiFailure[_]])
+          return left
 
-      if (right.isInstanceOf[BiFailure])
-        return right
+        if (right.isInstanceOf[BiFailure[_]])
+          return right
 
-      sequence
-    case x => x
+        sequence
+      case x => x
+    }
+    grammar.deepMap(map).asInstanceOf[BiGrammar[Value]]
   }
 
-  def contract(grammar: BiGrammar): BiGrammar = grammar.deepMap {
-    case choice: BiChoice =>
+  def contract(grammar: BiGrammar[_]): BiGrammar[_] = grammar.deepMap {
+    case choice: BiChoice[_] =>
       val left = choice.left
       val right = choice.right
 
       right match {
-        case produce: ValueGrammar =>
+        case produce: ValueGrammar[_] =>
           return OptionGrammar(left, produce.value)
         case _ =>
       }
 
       left match {
-        case produce: ValueGrammar =>
+        case produce: ValueGrammar[_] =>
           return OptionGrammar(right, produce.value)
         case _ =>
       }
@@ -118,23 +121,23 @@ object PrintBiGrammar {
     case x => x
   }
 
-  def removeProduceAndMap(grammar: BiGrammar): BiGrammar = grammar.deepMap {
-    case sequence: BiSequence =>
+  def removeProduceAndMap(grammar: BiGrammar[_]): BiGrammar[_] = grammar.deepMap {
+    case sequence: BiSequence[_,_,_] =>
       val left = sequence.first
       val right = sequence.second
-      if (left.isInstanceOf[ValueGrammar])
+      if (left.isInstanceOf[ValueGrammar[_]])
         return right
 
-      if (right.isInstanceOf[ValueGrammar])
+      if (right.isInstanceOf[ValueGrammar[_]])
         return left
 
       sequence
-    case many: Many if many.inner.isInstanceOf[ValueGrammar] => many.inner
+    case many: Many[_] if many.inner.isInstanceOf[ValueGrammar[_]] => many.inner
     case map: MapGrammar[_, _] => map.inner
     case x => x
   }
 
-  def getLabelled(grammar: BiGrammar): Seq[Labelled] = {
-    grammar.selfAndDescendants.collect({ case x: Labelled => x})
+  def getLabelled(grammar: BiGrammar[_]): Seq[Labelled[_]] = {
+    grammar.selfAndDescendants.collect({ case x: Labelled[_] => x})
   }
 }

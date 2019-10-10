@@ -3,7 +3,7 @@ package core2.parsers
 
 import core.document.Empty
 import core.parsers.core.Processor
-import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
+import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, XStepsStopFunction}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.responsiveDocument.ResponsiveDocument
 import org.scalatest.FunSuite
@@ -342,7 +342,7 @@ class YamlTest extends FunSuite
 
   test("big yaml file") {
     val contents = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
-    val result = parseValue.getWholeInputParser.parse(new IndentationReader(contents))
+    val result = parseValue.getWholeInputParser.parse(new IndentationReader(contents), XStepsStopFunction(5))
     assert(result.successful, result.toString)
   }
 }

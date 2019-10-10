@@ -11,19 +11,19 @@ import core.responsiveDocument.ResponsiveDocument
   * verifyWhenPrinting When printing, make sure the string to print can be consumed by the grammar.
   */
 abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
-  extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren
+  extends CustomGrammarWithoutChildren[String] with BiGrammarWithoutChildren[String]
 {
   lazy val parser = getParserBuilder(Set.empty).getWholeInputParser //TODO hacky Set.empty
 
-  override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
+  override def containsParser(recursive: BiGrammar[_] => Boolean): Boolean = true
 
-  override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = {
-    from.value match {
+  override def write(from: String): TryState[ResponsiveDocument] = {
+    from match {
       case string: String =>
         if (verifyWhenPrinting) {
           val parseResult = parser.parse(new Reader(string))
           parseResult.resultOption match {
-            case Some(result) if parseResult.successful && result.equals(from.value) => TryState.value(string)
+            case Some(result) if parseResult.successful && result.equals(from) => TryState.value(string)
             case _ => Printer.fail("StringGrammar could not parse string")
           }
         }
@@ -31,7 +31,7 @@ abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
           TryState.value(string)
 
       case _ =>
-        Printer.fail(s"StringGrammar expects a string value, and not a ${from.value}")
+        Printer.fail(s"StringGrammar expects a string value, and not a ${from}")
     }
   }
 }

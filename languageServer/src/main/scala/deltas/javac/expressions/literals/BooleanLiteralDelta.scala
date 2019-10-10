@@ -1,5 +1,6 @@
 package deltas.javac.expressions.literals
 
+import core.bigrammar.grammars.Keyword
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
@@ -18,8 +19,8 @@ object BooleanLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val booleanLiteral = ("true".setValue(true) | "false".setValue(false)).as(Value).asLabelledNode(Shape)
-    val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
+    val booleanLiteral = (Keyword("true").setValue(true) | Keyword("false").setValue(false)).as(Value).asLabelledNode(Shape)
+    val expressionGrammar = findNode(ExpressionDelta.FirstPrecedenceGrammar)
     expressionGrammar.addAlternative(booleanLiteral)
   }
 

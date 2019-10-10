@@ -1,6 +1,6 @@
 package deltas.bytecode.types
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{BiGrammar, WithMap}
 import core.deltas.grammars.{KeyGrammar, LanguageGrammars}
 import core.language.Language
 import core.language.node.Node
@@ -8,7 +8,7 @@ import core.smarts.types.objects.Type
 
 trait ByteCodeTypeInstance extends TypeInstance {
 
-  def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar
+  def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar[WithMap[Node]]
 
   def constraintName: Any
   def fromConstraintType(_type: Type): Node

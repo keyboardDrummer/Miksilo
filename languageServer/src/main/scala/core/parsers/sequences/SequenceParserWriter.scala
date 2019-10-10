@@ -313,7 +313,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       ParseWholeInput(parser).getSingleResultParser
     }
 
-    def withRange[Other >: Result](addRange: (Input, Input, Result) => Other): Self[Other] = {
+    def withRange[NewResult](addRange: (Input, Input, Result) => NewResult): Self[NewResult] = {
       WithRangeParser(parser, addRange)
     }
   }

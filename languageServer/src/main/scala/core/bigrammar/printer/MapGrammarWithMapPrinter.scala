@@ -5,9 +5,9 @@ import core.bigrammar.WithMap
 import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.ResponsiveDocument
 
-class MapGrammarWithMapPrinter(inner: NodePrinter, deconstruct: AnyWithMap => Option[AnyWithMap]) extends NodePrinter {
+class MapGrammarWithMapPrinter[NewValue, Value](inner: Printer[Value], deconstruct: NewValue => Option[Value]) extends Printer[NewValue] {
   private val fail = Printer.fail("could not deconstruct value")
-  override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = {
+  override def write(from: NewValue): TryState[ResponsiveDocument] = {
     val deconstructed = deconstruct(from)
     for {
       deconstructedValue <- deconstructed match {

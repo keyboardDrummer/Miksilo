@@ -3,10 +3,10 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammar
 import core.language.node.GrammarKey
 
-class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {
+class Labelled[Value](val name: GrammarKey, var inner: BiGrammar[Value] = BiFailure[Value]()) extends BiGrammar[Value] {
 
-  def addAlternative(addition: BiGrammar, precedence: Boolean = false) {
-    if (inner.isInstanceOf[BiFailure])
+  def addAlternative(addition: BiGrammar[Value], precedence: Boolean = false) {
+    if (inner.isInstanceOf[BiFailure[_]])
       inner = addition
     else {
       if (precedence)
@@ -18,7 +18,7 @@ class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends
 
   override def children = Seq(inner)
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = new Labelled(name, newChildren.head)
+  override def withChildren(newChildren: Seq[BiGrammar[_]]) = new Labelled(name, newChildren.head.asInstanceOf[BiGrammar[Value]])
 
-  override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(inner)
+  override def containsParser(recursive: BiGrammar[_] => Boolean): Boolean = recursive(inner)
 }

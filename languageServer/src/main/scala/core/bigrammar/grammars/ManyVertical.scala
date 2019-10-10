@@ -2,10 +2,11 @@ package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
 
-class ManyVertical(inner: BiGrammar, parseGreedy: Boolean = true) extends Many(inner, parseGreedy) {
+class ManyVertical[Value](inner: BiGrammar[Value], parseGreedy: Boolean = true) extends Many(inner, parseGreedy) {
   override def horizontal = false
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = new ManyVertical(newChildren.head, parseGreedy)
+  override def withChildren(newChildren: Seq[BiGrammar[_]]) =
+    new ManyVertical(newChildren.head.asInstanceOf[BiGrammar[Value]], parseGreedy)
 
-  override def containsParser(recursive: BiGrammar => Boolean): Boolean = recursive(inner)
+  override def containsParser(recursive: BiGrammar[_] => Boolean): Boolean = recursive(inner)
 }

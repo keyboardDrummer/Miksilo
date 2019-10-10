@@ -12,47 +12,45 @@ object BiGrammarWriter extends BiGrammarWriter
 
 trait BiGrammarWriter {
 
-  def regexGrammar(regex: Regex, name: String): BiGrammar = RegexGrammar(regex, name)
+  def regexGrammar(regex: Regex, name: String): BiGrammar[String] = RegexGrammar(regex, name)
   def identifier = getIdentifier()
-  def getIdentifier(verifyWhenPrinting: Boolean = false): BiGrammar = Identifier(verifyWhenPrinting)
+  def getIdentifier(verifyWhenPrinting: Boolean = false): BiGrammar[String] = Identifier(verifyWhenPrinting)
 
-  def stringLiteral: BiGrammar = StringLiteral
+  def stringLiteral: BiGrammar[String] = StringLiteral
 
-  def number: BiGrammar = NumberGrammar
+  def number: BiGrammar[String] = NumberGrammar
 
-  def integer: BiGrammar = new ValueMapGrammar[String, Int](number,
+  def integer: BiGrammar[Int] = new MapGrammar[String, Int](number,
     s => Try(Integer.parseInt(s)).fold(e => Left(e.toString), x => Right(x)),
     i => Some(i.toString)
   )
 
-  def long: BiGrammar = number.map[String, Long](
+  def long: BiGrammar[Long] = number.map[Long](
     s => s.toLong,
     i => i.toString
   )
 
-  def leftRight(left: BiGrammar, right: BiGrammar, bijective: SequenceBijective) =
+  def leftRight[Left, Right, Result](left: BiGrammar[Left], right: BiGrammar[Right], bijective: SequenceBijective[Left, Right, Result]) =
     new BiSequence(left, right, bijective, true)
 
-  def topBottom(top: BiGrammar, bottom: BiGrammar, bijective: SequenceBijective) =
+  def topBottom[Left, Right, Result](top: BiGrammar[Left], bottom: BiGrammar[Right], bijective: SequenceBijective[Left, Right, Result]) =
     new BiSequence(top, bottom, bijective, false)
 
-  def failure: BiGrammar = BiFailure()
+  def failure: BiGrammar[Nothing] = BiFailure()
 
-  def value(value: Any): BiGrammar = ValueGrammar(value)
+  def value[T](value: T): BiGrammar[T] = ValueGrammar(value)
 
-  def keywordClass(value: String): BiGrammar = Keyword(value, reserved = false, verifyWhenPrinting = true)
+  def printSpace: BiGrammar[Unit] = print(WhiteSpace(1, 1))
 
-  def printSpace: BiGrammar = print(WhiteSpace(1, 1))
+  def keywordGrammar(word: String): BiGrammar[Unit] = Keyword(word)
 
-  def keywordGrammar(word: String): BiGrammar = Keyword(word)
+  implicit def print(document: ResponsiveDocument): BiGrammar[Unit] = Print(document)
 
-  implicit def print(document: ResponsiveDocument): BiGrammar = Print(document)
+  implicit def print(document: Document): BiGrammar[Unit] = Print(document)
 
-  implicit def print(document: Document): BiGrammar = Print(document)
+  implicit def implicitStringToGrammar(value: String): BiGrammar[Unit] = stringToGrammar(value)
 
-  implicit def implicitStringToGrammar(value: String): BiGrammar = stringToGrammar(value)
-
-  def stringToGrammar(value: String, reserved: Boolean = true): BiGrammar = {
+  def stringToGrammar(value: String, reserved: Boolean = true): BiGrammar[Unit] = {
     if (value.contains(' '))
       throw new RuntimeException(s"Can't implicitly convert $value to BiGrammar because it contains a space")
 

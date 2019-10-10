@@ -8,11 +8,11 @@ import core.responsiveDocument.ResponsiveDocument
 import scala.collection.mutable
 import scala.util.Failure
 
-class CachingPrinter(inner: NodePrinter) extends NodePrinter {
+class CachingPrinter[Value](inner: Printer[Value]) extends Printer[Value] {
   val valueCache: mutable.Map[(Any, State), Printer.Result] = mutable.Map.empty
   val failure = Failure[(State, ResponsiveDocument)](NegativeDepthRootError(FoundDirectRecursionInLabel(inner), -1000))
 
-  override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = state => {
+  override def write(from: Value): TryState[ResponsiveDocument] = state => {
     val key = (from, state)
     valueCache.get(key) match {
       case Some(result) =>
@@ -25,7 +25,7 @@ class CachingPrinter(inner: NodePrinter) extends NodePrinter {
     }
   }
 
-  case class FoundDirectRecursionInLabel(name: NodePrinter) extends Throwable {
+  case class FoundDirectRecursionInLabel(name: Printer[Value]) extends Throwable {
     override def toString = s"found direct recursion in label: $name"
   }
 }

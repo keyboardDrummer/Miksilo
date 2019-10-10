@@ -3,29 +3,29 @@ package core.bigrammar
 import core.bigrammar.grammars.{BiChoice, ValueGrammar}
 import core.bigrammar.printer.UndefinedDestructuringValue
 import util.Property
-
+import scala.language.existentials
 import scala.util.hashing.Hashing
 
-class GrammarReference(val previous: GrammarPath, val property: Property[BiGrammar, BiGrammar]) extends GrammarPath
+class GrammarReference(val previous: GrammarPath, val property: Property[BiGrammar[_], BiGrammar[_]]) extends GrammarPath
 {
-  def parent: BiGrammar = previous.value
-  private var cachedValue: BiGrammar = _
+  def parent: BiGrammar[_] = previous.value
+  private var cachedValue: BiGrammar[_] = _
   private var cachedHashCode: Option[Int] = None
-  private var cachedAncestorGrammars: Set[BiGrammar] = _
+  private var cachedAncestorGrammars: Set[BiGrammar[_]] = _
 
-  def ancestorGrammars: Set[BiGrammar] = {
+  def ancestorGrammars: Set[BiGrammar[_]] = {
     if (cachedAncestorGrammars == null)
       cachedAncestorGrammars = previous.ancestorGrammars + parent
     cachedAncestorGrammars
   }
 
-  def value: BiGrammar = {
+  def value: BiGrammar[_] = {
     if (cachedValue == null)
-      cachedValue = property.get(parent).asInstanceOf[BiGrammar]
+      cachedValue = property.get(parent)
     cachedValue
   }
 
-  def set(newValue: BiGrammar): Unit = {
+  def set(newValue: BiGrammar[_]): Unit = {
     property.set(parent, newValue)
     cachedValue = null
     cachedAncestorGrammars = null
@@ -45,7 +45,7 @@ class GrammarReference(val previous: GrammarPath, val property: Property[BiGramm
   }
 
   def removeMeFromOption(): Unit = {
-    val choiceParent = parent.asInstanceOf[BiChoice]
+    val choiceParent = parent.asInstanceOf[BiChoice[_]]
     val me = value
     val sibling = Set(choiceParent.left,choiceParent.right).filter(grammar => grammar != me).head
     previous.asInstanceOf[GrammarReference].set(sibling)

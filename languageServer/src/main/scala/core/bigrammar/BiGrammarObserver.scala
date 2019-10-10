@@ -9,13 +9,13 @@ trait BiGrammarObserver[Result] {
 
   def setReference(result: Result, reference: Result)
 
-  def handleGrammar(self: BiGrammar, children: Seq[Result], recursive: (BiGrammar) => Result): Result
+  def handleGrammar(self: BiGrammar[_], children: Seq[Result], recursive: BiGrammar[_] => Result): Result
 
-  def observe(grammar: BiGrammar) = {
-    var cache = Map.empty[Labelled, Result]
-    def withoutCache(grammar: BiGrammar) = handleGrammar(grammar, grammar.children.map(child => withCache(child)), withCache)
-    def withCache(grammar: BiGrammar): Result = grammar match {
-      case labelled: Labelled => cache.getOrElse(labelled, {
+  def observe(grammar: BiGrammar[_]) = {
+    var cache = Map.empty[Labelled[_], Result]
+    def withoutCache(grammar: BiGrammar[_]) = handleGrammar(grammar, grammar.children.map(child => withCache(child)), withCache)
+    def withCache(grammar: BiGrammar[_]): Result = grammar match {
+      case labelled: Labelled[_] => cache.getOrElse(labelled, {
           val reference = getReference(labelled.name)
           cache += labelled -> reference
           val result = withoutCache(labelled)

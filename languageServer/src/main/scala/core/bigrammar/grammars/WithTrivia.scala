@@ -1,45 +1,48 @@
 package core.bigrammar.grammars
 
-import core.bigrammar.BiGrammarToParser.{Result, mergeNamedValues}
+import core.bigrammar.BiGrammarToParser.Rec
+import core.bigrammar.printer.BiGrammarToPrinter.ToPrinterCached
 import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
-import core.bigrammar.printer.Printer.NodePrinter
 import core.responsiveDocument.ResponsiveDocument
 import util.Utility
 
-case class WithTrivia(var inner: BiGrammar, var trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true) extends CustomGrammar {
-  override def print(toDocumentInner: BiGrammar => ResponsiveDocument) = toDocumentInner(sequence)
+case class WithTrivia[Value](var inner: BiGrammar[WithMap[Value]], var trivia: BiGrammar[WithMap[Unit]] = ParseWhiteSpace, horizontal: Boolean = true)
+  extends CustomGrammar[WithMap[Value]] {
+  override def print(toDocumentInner: BiGrammar[_] => ResponsiveDocument) = toDocumentInner(sequence)
 
-  def sequence = new BiSequence(trivia, inner, BiSequence.ignoreLeft, horizontal)
-  override def createPrinter(recursive: BiGrammar => NodePrinter) = {
+  def sequence = new BiSequence[WithMap[Unit], WithMap[Value], WithMap[Value]](trivia, inner, BiGrammarToParser.ignoreLeft, horizontal)
+  override def createPrinter(recursive: ToPrinterCached) = {
     recursive(sequence)
   }
 
-  override def toParser(recursive: BiGrammar => BiGrammarToParser.ParserBuilder[Result]) =
+  override def toParser(recursive: Rec) =
     new WithTriviaParser(recursive(inner), recursive(trivia))
 
   override def children = Seq(inner, trivia)
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = WithTrivia(newChildren.head, newChildren(1), horizontal)
+  override def withChildren(newChildren: Seq[BiGrammar[_]]) =
+    WithTrivia(newChildren.head.asInstanceOf[BiGrammar[WithMap[Value]]], newChildren(1).asInstanceOf[BiGrammar[WithMap[Unit]]], horizontal)
 
-  override def containsParser(recursive: BiGrammar => Boolean) = true
+  override def containsParser(recursive: BiGrammar[_] => Boolean) = true
 
-  override protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]) = recursive(inner)
+  override protected def getLeftChildren(recursive: BiGrammar[_] => Seq[BiGrammar[_]]) = recursive(inner)
 }
 
-class WithTriviaParser(original: BiGrammarToParser.Self[Result], triviasParserBuilder: BiGrammarToParser.ParserBuilder[Result])
-  extends BiGrammarToParser.ParserBuilderBase[Result] {
+class WithTriviaParser[Value](original: BiGrammarToParser.Self[WithMap[Value]],
+                              triviasParserBuilder: BiGrammarToParser.ParserBuilder[WithMap[Unit]])
+  extends BiGrammarToParser.ParserBuilderBase[WithMap[Value]] {
 
   import BiGrammarToParser._
 
-  override def getParser(recursive: BiGrammarToParser.GetParser): Parser[Result] = {
+  override def getParser(recursive: GetParser): Parser[WithMap[Value]] = {
     val parseTrivias = recursive(triviasParserBuilder)
     val parseOriginal = recursive(original)
 
-    new Parser[Result] {
-      override def apply(input: Input, state: ParseState): SortedParseResults[Result] = {
-        val leftResults = parseTrivias(input, state)
+    new Parser[WithMap[Value]] {
+      override def apply(input: Input, state: ParseState): SortedParseResults[WithMap[Value]] = {
+        val leftResults = parseTrivias.apply(input, state)
 
-        def rightFromLeftReady(leftReady: ReadyParseResult[Result]): SortedParseResults[Result] = {
+        def rightFromLeftReady(leftReady: ReadyParseResult[WithMap[Unit]]): SortedParseResults[WithMap[Value]] = {
           if (leftReady.history.flawed)
             return SREmpty // Do not error correct Trivia.
 
@@ -51,7 +54,7 @@ class WithTriviaParser(original: BiGrammarToParser.Self[Result], triviasParserBu
               val value = leftReady.resultOption.flatMap(leftValue =>
                 rightReady.resultOption.map(rightValue => {
                   val resultMap = Utility.mergeMaps(leftValue.namedValues, rightValue.namedValues, mergeNamedValues)
-                  WithMap[Any](rightValue.value, resultMap)
+                  WithMap[Value](rightValue.value, resultMap)
                 })
               )
 

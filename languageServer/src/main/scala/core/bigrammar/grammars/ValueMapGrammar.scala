@@ -2,7 +2,7 @@ package core.bigrammar.grammars
 
 import core.bigrammar.{BiGrammar, WithMap}
 
-class ValueMapGrammar[Value, NewValue](inner: BiGrammar,
+class ValueMapGrammar[Value, NewValue](inner: BiGrammar[WithMap[Value]],
                       construct: Value => Either[String, NewValue],
                       deconstruct: NewValue => Option[Value])
   extends MapGrammar[WithMap[Value], WithMap[NewValue]](inner,

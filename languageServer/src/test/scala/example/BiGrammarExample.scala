@@ -1,7 +1,7 @@
 package example
 
 import core.bigrammar._
-import core.bigrammar.grammars.{Labelled, RegexGrammar}
+import core.bigrammar.grammars.{Delimiter, Labelled, RegexGrammar}
 import core.deltas.NodeGrammarWriter
 import core.language.node.{NodeField, NodeShape}
 import org.scalatest.FunSuite
@@ -49,7 +49,7 @@ class BiGrammarExample extends FunSuite with NodeGrammarWriter with WhitespaceTr
     val expression = new Labelled(StringKey("expression"))
     expression.addAlternative(identifier.as(Variable.Name).asNode(Variable.Shape))
     expression.addAlternative(number.as(Constant.Value).asNode(Constant.Shape))
-    val assignment = identifier ~~ keywordClass("=") ~~ expression |
+    val assignment = identifier ~~ Delimiter("=") ~~ expression |
       (identifier.as(PlusEquals.Target) ~~ "+=" ~~ expression.as(PlusEquals.Value)).asNode(PlusEquals.Shape)
     expression.addAlternative(assignment)
     expression.addAlternative(identifier.as(Decrement.Target) ~ "--" asNode Decrement.Shape)

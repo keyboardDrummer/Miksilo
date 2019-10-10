@@ -16,6 +16,16 @@ case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrectingParserWriter
   with IndentationSensitiveParserWriter {
 
+  def ignoreLeft[Value] = new SequenceBijective[WithMap[Unit], WithMap[Value], WithMap[Value]]((firstResult, secondResult) => {
+    val resultMap = Utility.mergeMaps(firstResult.namedValues, secondResult.namedValues, mergeNamedValues)
+    WithMap(secondResult.value, resultMap)
+  }, right => Some(WithMap(Unit, right.namedValues), right))
+
+  def ignoreRight[Value] = new SequenceBijective[WithMap[Value], WithMap[Unit], WithMap[Value]]((firstResult, secondResult) => {
+    val resultMap = Utility.mergeMaps(firstResult.namedValues, secondResult.namedValues, mergeNamedValues)
+    WithMap(firstResult.value, resultMap)
+  },left => Some(left, WithMap(Unit, left.namedValues)))
+
   type AnyWithMap = WithMap[Any]
   type Result = AnyWithMap
   type Input = Reader
@@ -47,33 +57,38 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
   def valueToResult(value: Any): Result = WithMap(value, Map.empty)
 
-  def toParser(grammar: BiGrammar): SingleResultParser[Any] = {
+  def toParser[Value](grammar: BiGrammar[WithMap[Value]]): SingleResultParser[Value] = {
     toParserBuilder(grammar).getWholeInputParser
   }
 
-  def toParserBuilder(grammar: BiGrammar): Self[Any] = {
+  def toParserBuilder[Value](grammar: BiGrammar[WithMap[Value]]): Self[Value] = {
 
     var keywords: Set[String] = Set.empty
-    val allGrammars: Set[BiGrammar] = grammar.selfAndDescendants.toSet
+    val allGrammars: Set[BiGrammar[_]] = grammar.selfAndDescendants.toSet
     keywords ++= allGrammars.flatMap({
       case keyword: Keyword => if (keyword.reserved) Set(keyword.value) else Set.empty[String]
       case _ => Set.empty[String]
     })
 
-    toParserBuilder(grammar, keywords)
+    toParserBuilderInner(grammar, keywords).map(w => w.value)
   }
 
-  def toParserBuilder(grammar: BiGrammar, keywords: scala.collection.Set[String]): Self[Any] = {
-    val cache: mutable.Map[BiGrammar, Self[Result]] = mutable.Map.empty
-    lazy val recursive: BiGrammar => Self[Result] = grammar => {
-      cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
+  trait Rec {
+    def apply[Value](grammar: BiGrammar[Value]): Self[Value]
+  }
+
+  def toParserBuilderInner[Value](grammar: BiGrammar[Value], keywords: scala.collection.Set[String]): Self[Value] = {
+    val cache: mutable.Map[BiGrammar[_], Self[_]] = mutable.Map.empty
+    lazy val recursive: Rec = new Rec {
+
+      override def apply[OtherValue](grammar: BiGrammar[OtherValue]) = {
+        lazy val value = toParser(keywords, recursive, grammar)
+        cache.getOrElseUpdate(grammar, value)
+        value
+      }
+
     }
-    val resultParser = recursive(grammar)
-    resultParser.map(executeResult)
-  }
-
-  private def executeResult(result: Result): Any = {
-    result.value
+    recursive(grammar)
   }
 
   def mergeNamedValues(key: Any, first: Any, second: Any): Any = {
@@ -87,46 +102,38 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   trait CanMerge {
     def merge(first: Any, second: Any): Any
   }
-
-  private def toParser(keywords: scala.collection.Set[String], recursive: BiGrammar => Self[Result], grammar: BiGrammar): Self[Result] = {
+  private def toParser[Value](keywords: scala.collection.Set[String],
+                              recursive: Rec,
+                              grammar: BiGrammar[Value]): Self[Value] = {
     grammar match {
-      case sequence: BiSequence =>
+      case sequence: BiSequence[_, _, Value] =>
         val firstParser = recursive(sequence.first)
         val secondParser = recursive(sequence.second)
-        val parser = leftRightSimple(firstParser, secondParser, (firstResult: Result, secondResult: Result) => {
-          val resultValue = sequence.bijective.construct(firstResult.value, secondResult.value)
-          val resultMap = Utility.mergeMaps(firstResult.namedValues, secondResult.namedValues, mergeNamedValues)
-          WithMap[Any](resultValue, resultMap)
-        })
-        parser
-      case choice: BiChoice =>
+        leftRightSimple(firstParser, secondParser, sequence.bijective.construct)
+      case choice: BiChoice[Value] =>
         val firstParser = recursive(choice.left)
         val secondParser = recursive(choice.right)
         firstParser | secondParser
 
-      case custom: CustomGrammarWithoutChildren =>
-        custom.getParserBuilder(keywords).map(valueToResult)
-      case custom: CustomGrammar =>
+      case custom: CustomGrammarWithoutChildren[Value] =>
+        custom.getParserBuilder(keywords).asInstanceOf[Self[Value]]
+      case custom: CustomGrammar[Value] =>
         custom.toParser(recursive)
 
-      case many: core.bigrammar.grammars.Many =>
+      case many: core.bigrammar.grammars.Many[_] =>
         val innerParser = recursive(many.inner)
-        val parser = innerParser.many[WithMap[List[Any]]](
-          WithMap(List.empty[Any], Map.empty[Any, Any]),
-          (element, result) => WithMap(element.value :: result.value, element.namedValues ++ result.namedValues), many.parseGreedy)
-
-        parser
-      case mapGrammar: MapGrammar[AnyWithMap, AnyWithMap] =>
+        innerParser.*.asInstanceOf[Self[Value]]
+      case mapGrammar: MapGrammar[_, Value] =>
         val innerParser = recursive(mapGrammar.inner)
         FilterMap(innerParser, mapGrammar.construct)
 
       case BiFailure(message) => Fail(None, message, History.failPenalty)
-      case Print(_) => succeed(Unit).map(valueToResult)
-      case ValueGrammar(value) => succeed(value).map(valueToResult)
+      case Print(_) => succeed(Unit).asInstanceOf[Self[Value]]
+      case ValueGrammar(value) => succeed(value)
 
-      case labelled: Labelled =>
+      case labelled: Labelled[Value] =>
         lazy val inner = recursive(labelled.inner)
-        new Lazy(inner, labelled.name) //Laziness to prevent infinite recursion
+        new Lazy[Value](inner.asInstanceOf[Self[Value]], labelled.name) //Laziness to prevent infinite recursion
     }
   }
 }

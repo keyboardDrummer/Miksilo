@@ -4,10 +4,10 @@ import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.printer.Printer
 import core.bigrammar.{BiGrammar, WithMap}
 
-class BiFallback(value: Any, name: String) extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
+class BiFallback[Value](value: Value, name: String) extends CustomGrammarWithoutChildren[Value] with BiGrammarWithoutChildren[Value] {
   override def getParserBuilder(keywords: collection.Set[String]) = Fallback(value, name)
 
-  override def containsParser(recursive: BiGrammar => Boolean) = false
+  override def containsParser(recursive: BiGrammar[_] => Boolean) = false
 
-  override def write(from: WithMap[Any]) = Printer.fail("fallback cannot print")
+  override def write(from: Value) = Printer.fail("fallback cannot print")
 }

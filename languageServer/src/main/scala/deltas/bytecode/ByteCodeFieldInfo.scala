@@ -1,6 +1,8 @@
 package deltas.bytecode
 
+import core.bigrammar.grammars.{Keyword, Print}
 import core.deltas.grammars.LanguageGrammars
+import core.deltas.grammars.LanguageGrammars.WithMapGrammar
 import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.document.BlankLine
 import core.language.node._
@@ -43,15 +45,15 @@ object ByteCodeFieldInfo extends DeltaWithGrammar with AccessFlags with HasBytes
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
 
-    val attributesGrammar = find(AttributesGrammar)
-    val constantIndex = find(ConstantPoolIndexGrammar)
-    val fieldGrammar = "Field" ~ ";" %>
-      ("name" ~ ":" ~~> constantIndex.as(NameIndex) %
-        ("descriptor" ~ ":" ~~> constantIndex.as(DescriptorIndex)) %
-        attributesGrammar.as(FieldAttributes)).asLabelledNode(Shape).indent()
-    val parseFields = (fieldGrammar %< BlankLine).manyVertical.as(ClassFields)
+    val attributesGrammar = findNode(AttributesGrammar).as(FieldAttributes)
+    val constantIndex = findNode(ConstantPoolIndexGrammar)
+    val descriptor = "descriptor" ~ ":" ~~ constantIndex.as(DescriptorIndex)
+    val name = "name" ~ ":" ~~ constantIndex.as(NameIndex)
+    val fieldGrammar = "Field" ~ ";" %
+      name % descriptor % attributesGrammar.asLabelledNode(Shape).indent()
+    val parseFields = (fieldGrammar % print(BlankLine)).manyVertical.as(ClassFields)
 
-    val membersGrammar = find(ByteCodeSkeleton.MembersGrammar)
+    val membersGrammar = findAs(ByteCodeSkeleton.MembersGrammar)
     membersGrammar.inner = parseFields ~< membersGrammar.inner
   }
   

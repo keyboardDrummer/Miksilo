@@ -6,6 +6,6 @@ import core.responsiveDocument.ResponsiveDocument
 /**
   * Prints a value, but parses nothing.
   */
-case class Print(document: ResponsiveDocument) extends BiGrammarWithoutChildren {
-  override def containsParser(recursive: BiGrammar => Boolean): Boolean = false
+case class Print(document: ResponsiveDocument) extends BiGrammarWithoutChildren[Unit] {
+  override def containsParser(recursive: BiGrammar[_] => Boolean): Boolean = false
 }

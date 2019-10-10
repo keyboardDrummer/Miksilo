@@ -1,8 +1,8 @@
 package core.bigrammar
 
-class RootGrammar(val value: BiGrammar) extends GrammarPath
+class RootGrammar(val value: BiGrammar[_]) extends GrammarPath
 {
-  override def ancestorGrammars: Set[BiGrammar] = Set.empty
+  override def ancestorGrammars: Set[BiGrammar[_]] = Set.empty
 
   override def ancestors: Seq[GrammarPath] = Seq.empty
 

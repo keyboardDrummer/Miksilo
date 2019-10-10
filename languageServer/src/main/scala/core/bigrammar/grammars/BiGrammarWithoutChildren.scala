@@ -2,7 +2,7 @@ package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammar
 
-trait BiGrammarWithoutChildren extends BiGrammar {
-  def children: Seq[BiGrammar] = Seq.empty
-  override def withChildren(newChildren: Seq[BiGrammar]) = this
+trait BiGrammarWithoutChildren[Value] extends BiGrammar[Value] {
+  def children: Seq[BiGrammar[_]] = Seq.empty
+  override def withChildren(newChildren: Seq[BiGrammar[_]]) = this
 }

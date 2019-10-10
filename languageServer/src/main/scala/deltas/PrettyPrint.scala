@@ -30,7 +30,7 @@ case class PrettyPrint(recover: Boolean = false) extends Delta
 
   override def description: String = "Prints the program by generating a pretty printer from its grammar."
 
-  def getOutputGrammar(language: Language): BiGrammar = language.data(this).asInstanceOf[BiGrammar]
+  def getOutputGrammar(language: Language): BiGrammar[_] = language.data(this).asInstanceOf[BiGrammar[_]]
 
   override def dependencies: Set[Contract] = Set.empty
 }

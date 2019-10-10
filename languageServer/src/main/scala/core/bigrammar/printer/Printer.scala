@@ -5,8 +5,8 @@ import core.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try
 
-trait Printer[T] {
-  def write(from: WithMap[T]): TryState[ResponsiveDocument]
+trait Printer[-T] {
+  def write(from: T): TryState[ResponsiveDocument]
 
   def map(function: ResponsiveDocument => ResponsiveDocument): Printer[T] =
     from => write(from).map(function)

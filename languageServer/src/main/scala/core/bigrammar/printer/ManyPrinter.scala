@@ -5,18 +5,16 @@ import core.bigrammar.printer.Printer.NodePrinter
 import core.document.Empty
 import core.responsiveDocument.ResponsiveDocument
 
-class ManyPrinter(val inner: NodePrinter,
+class ManyPrinter[Value](val inner: Printer[Value],
                   val combine: (ResponsiveDocument, ResponsiveDocument) => ResponsiveDocument)
-  extends NodePrinter {
-  val bindableInner = (value: WithMap[Any]) => inner.write(value).map(left => (right: ResponsiveDocument) => combine(left, right))
+  extends Printer[List[Value]] {
+  val bindableInner = (value: Value) => inner.write(value).map(left => (right: ResponsiveDocument) => combine(left, right))
 
-  override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = {
-    val result: TryState[ResponsiveDocument] = from.value match {
-      case seq: Seq[_] if seq.nonEmpty => new BindPrinter(bindableInner, this).
-        write(WithMap((seq.head, seq.tail), from.namedValues)) //TODO matching on both list and ArrayBuffer like this is a bit ugly.
-      case _: Seq[_] => TryState.value(Empty)
-      case UndefinedDestructuringValue => TryState.value(Empty)
-      case _ => Printer.fail(s"$from passed to many was not a list")
+  override def write(from: List[Value]): TryState[ResponsiveDocument] = {
+    val result: TryState[ResponsiveDocument] = from match {
+      case head :: tail =>  new BindPrinter(bindableInner, this).
+        write(head, tail) //TODO matching on both list and ArrayBuffer like this is a bit ugly.
+      case Nil => TryState.value(Empty)
     }
     result
   }

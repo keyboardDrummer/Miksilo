@@ -67,7 +67,7 @@ class TriviaInsideNodeTest extends FunSuite {
     expressionGrammar.addAlternative(numberGrammar)
     expressionGrammar.addAlternative(additionGrammar)
 
-    def lr(l: BiGrammar, r: BiGrammar) = leftRight(l, r, BiSequence.identity)
+    def lr(l: BiGrammar, r: BiGrammar) = leftRight(l, r, BiSequence.tuple)
     grammars.find(BodyGrammar).inner = expressionGrammar
     val expectedBeforeAdditionGrammar = lr(expressionGrammar.as(Left), new WithTrivia(lr("+",
       new WithTrivia(expressionGrammar.as(Right), grammars.trivia)), grammars.trivia))

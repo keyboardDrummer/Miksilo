@@ -1,39 +1,40 @@
 package deltas.yaml
 
-import core.bigrammar.BiGrammarToParser.Result
+import core.bigrammar.BiGrammarToParser.Rec
 import core.bigrammar.grammars.{BiSequence, CustomGrammar}
-import core.bigrammar.printer.Printer.NodePrinter
-import core.bigrammar.{BiGrammar, BiGrammarSequenceCombinatorsExtension, BiGrammarToParser}
+import core.bigrammar.printer.BiGrammarToPrinter.ToPrinterCached
+import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.deltas.grammars.LanguageGrammars
 import core.responsiveDocument.ResponsiveDocument
 
-class CheckIndentationGrammar(deltaPredicate: Int => Boolean, property: String, inner: BiGrammar) extends CustomGrammar {
-  override def print(toDocumentInner: BiGrammar => ResponsiveDocument) = toDocumentInner(inner)
+class CheckIndentationGrammar[Value](deltaPredicate: Int => Boolean, property: String, inner: BiGrammar[Value]) extends CustomGrammar[Value] {
+  override def print(toDocumentInner: BiGrammar[_] => ResponsiveDocument) = toDocumentInner(inner)
 
-  override def createPrinter(recursive: BiGrammar => NodePrinter) = recursive(inner)
+  override def createPrinter(recursive: ToPrinterCached) = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => BiGrammarToParser.Self[Result]) = {
+  override def toParser(recursive: Rec) = {
     BiGrammarToParser.CheckIndentation(deltaPredicate, property, recursive(inner))
   }
 
   override def children = Seq(inner)
 
-  override def withChildren(newChildren: Seq[BiGrammar]) = new WithIndentationGrammar(newChildren.head)
+  override def withChildren(newChildren: Seq[BiGrammar[_]]) =
+    new CheckIndentationGrammar(deltaPredicate, property, newChildren.head.asInstanceOf[BiGrammar[Value]])
 
-  override def containsParser(recursive: BiGrammar => Boolean) = true
+  override def containsParser(recursive: BiGrammar[_] => Boolean) = true
 }
 
 object CheckIndentationGrammar {
 
-  def aligned[Element, Sum](grammars: LanguageGrammars, element: BiGrammar): BiGrammar = {
+  def aligned[Element](grammars: LanguageGrammars, element: BiGrammar[WithMap[Element]]): BiGrammar[WithMap[List[Element]]] = {
     import grammars._
+
     val many = equal(element).manyVertical
-    new WithIndentationGrammar(BiGrammarSequenceCombinatorsExtension.someMap(
-      new BiSequence(element, many, BiSequence.identity, false)))
+    new WithIndentationGrammar(new BiSequence(element, many, withMapBijective(listConsBijective), false))
   }
 
-  def equal[Result](inner: BiGrammar) = new CheckIndentationGrammar(delta => delta == 0, "equal to", inner)
-  def greaterThan[Result](inner: BiGrammar) = new CheckIndentationGrammar(delta => {
+  def equal[Value](inner: BiGrammar[Value]) = new CheckIndentationGrammar(delta => delta == 0, "equal to", inner)
+  def greaterThan[Value](inner: BiGrammar[Value]) = new CheckIndentationGrammar(delta => {
     delta > 0
   }, "greater than", inner)
 }

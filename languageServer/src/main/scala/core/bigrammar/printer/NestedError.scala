@@ -3,7 +3,7 @@ package core.bigrammar.printer
 import core.bigrammar.{BiGrammar, PrintBiGrammar}
 import core.responsiveDocument.ResponsiveDocument
 
-case class NestedError(value: Any, grammar: BiGrammar, inner: PrintError) extends PrintError {
+case class NestedError(value: Any, grammar: BiGrammar[_], inner: PrintError) extends PrintError {
   def partial = inner.partial
 
   val depth = inner.depth

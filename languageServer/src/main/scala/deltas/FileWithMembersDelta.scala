@@ -1,5 +1,7 @@
 package deltas
 
+import core.bigrammar.{BiGrammar, WithMap}
+import core.bigrammar.grammars.Print
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{Contract, DeltaWithGrammar}
@@ -22,9 +24,9 @@ object FileWithMembersDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
-    val member = create(Members)
-    val file = member.someSeparatedVertical(BlankLine).as(Members).asNode(Shape)
-    find(BodyGrammar).inner = file
+    val member = create(Members).asInstanceOf[BiGrammar[WithMap[Any]]]
+    val file = member.someSeparatedVertical(Print(BlankLine)).as(Members).asNode(Shape)
+    findNode(BodyGrammar).inner = file
   }
 
   override def dependencies: Set[Contract] = Set.empty

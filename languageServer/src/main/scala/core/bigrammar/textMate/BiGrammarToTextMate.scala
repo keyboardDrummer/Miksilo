@@ -1,9 +1,8 @@
 package core.bigrammar.textMate
 
 import _root_.core.bigrammar.grammars.{ParseWhiteSpace, _}
-import core.bigrammar.BiGrammarToParser.AnyWithMap
-import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.bigrammar.printer.BiGrammarToPrinter
+import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.language.node.Node
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta, StringLiteralDelta}
@@ -15,42 +14,42 @@ import scala.util.matching.Regex
 
 object BiGrammarToTextMate {
 
-  def toTextMate(grammar: BiGrammar): String = {
+  def toTextMate(grammar: BiGrammar[_]): String = {
     val textMate: Node = createTextMateAstFromBiGrammar(grammar)
     printJson(textMate)
   }
 
   // TODO let this operate on parsers instead of BiGrammar, that way less cases have to be handled.
-  def grammarToRegex(root: BiGrammar): Option[String] = {
-    var callStack = List.empty[BiGrammar]
+  def grammarToRegex(root: BiGrammar[_]): Option[String] = {
+    var callStack = List.empty[BiGrammar[_]]
 
-    def recurse(grammar: BiGrammar): Option[String] = {
+    def recurse(grammar: BiGrammar[_]): Option[String] = {
       if (callStack.contains(grammar))
         return None
 
       callStack ::= grammar
 
       val result: Option[String] = grammar match {
-        case sequence: BiSequence =>
+        case sequence: BiSequence[_,_,_] =>
           for {
             left <- recurse(sequence.first)
             right <- recurse(sequence.second)
           } yield left + right
         case regex: RegexGrammar => Some(regex.regex.regex)
-        case many: Many => recurse(many.inner).map(r => r + "*") // TODO add parenthesis
+        case many: Many[_] => recurse(many.inner).map(r => r + "*") // TODO add parenthesis
         case map: ValueMapGrammar[_, _] => recurse(map.inner)
-        case map: MapGrammar[AnyWithMap, AnyWithMap] => recurse(map.inner)
-        case labelled: Labelled => recurse(labelled.inner)
+        case map: MapGrammar[_, _] => recurse(map.inner)
+        case labelled: Labelled[_] => recurse(labelled.inner)
         case delimiter: Delimiter => Some(escapeRegex(delimiter.value))
         case _: Identifier => Some(escapeRegex(BiGrammarToParser.identifierRegex.regex))
         case ParseWhiteSpace => Some(ParseWhiteSpace.regex.regex)
         case keyword: Keyword => Some(escapeRegex(keyword.value))
-        case choice: BiChoice =>
+        case choice: BiChoice[_] =>
           for {
             left <- recurse(choice.left)
             right <- recurse(choice.right)
           } yield left + "|" + right
-        case as: As => recurse(as.inner)
+        case as: As[_] => recurse(as.inner)
       }
 
       callStack = callStack.tail
@@ -133,8 +132,8 @@ object BiGrammarToTextMate {
   }
 
   case class Match(scope: String, regex: Regex)
-  def createTextMateAstFromBiGrammar(grammar: BiGrammar): Node = {
-    val reachables = GraphBasics.traverseBreadth[BiGrammar](Seq(grammar), grammar => grammar.children,
+  def createTextMateAstFromBiGrammar(grammar: BiGrammar[_]): Node = {
+    val reachables = GraphBasics.traverseBreadth[BiGrammar[_]](Seq(grammar), grammar => grammar.children,
       node => if (node.isInstanceOf[Colorize]) GraphBasics.SkipChildren else GraphBasics.Continue )
 
     val typedPatterns: Seq[Match] = reachables.collect({

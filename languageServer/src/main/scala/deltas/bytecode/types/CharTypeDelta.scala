@@ -1,6 +1,6 @@
 package deltas.bytecode.types
 
-import core.bigrammar.BiGrammar
+import core.bigrammar.{BiGrammar, WithMap}
 import core.bigrammar.grammars.Keyword
 import core.deltas.grammars.LanguageGrammars
 import core.language.Compilation
@@ -17,12 +17,12 @@ object CharTypeDelta extends ByteCodeTypeInstance
 
   override def getSuperTypes(_type: Node): Seq[Node] = ???
 
-  override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar = {
+  override def getJavaGrammar(grammars: LanguageGrammars): BiGrammar[WithMap[Node]] = {
     import grammars._
-    "char" ~> value(me)
+    Keyword("char") ~> value(me)
   }
 
-  override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar = {
+  override def getByteCodeGrammar(grammars: LanguageGrammars): BiGrammar[WithMap[Node]] = {
     import grammars._
     Keyword("C", reserved = false) ~> value(me)
   }

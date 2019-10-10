@@ -24,10 +24,10 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
 
-    val assignmentGrammar = find(AssignmentPrecedence.AssignmentGrammar)
-    val assignmentTarget = find(SimpleAssignmentDelta.Target)
-    val operatorGrammar = assignmentTarget ~~
-      (leftRight(operatorDelta.keyword, "=", BiSequence.identity) ~~> assignmentGrammar.as(SimpleAssignmentDelta.Value)) asLabelledNode shape
+    val assignmentGrammar = findNode(AssignmentPrecedence.AssignmentGrammar)
+    val assignmentTarget = findAs(SimpleAssignmentDelta.Target)
+    val operatorGrammar = assignmentTarget ~~>
+      operatorDelta.keyword ~> "=" ~~> assignmentGrammar.as(SimpleAssignmentDelta.Value) asLabelledNode(shape)
     assignmentGrammar.addAlternative(operatorGrammar)
   }
 
