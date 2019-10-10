@@ -23,7 +23,7 @@ class LSPServerTest extends AsyncFunSpec {
                              clientOut: ByteArrayOutputStream,
                              serverOut: ByteArrayOutputStream)
 
-  it("can initialize") {
+  ignore("can initialize") {
 
     val languageServer = new TestLanguageServer {}
     val serverAndClient = setupServerAndClient(languageServer)
@@ -45,7 +45,7 @@ class LSPServerTest extends AsyncFunSpec {
     assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
   }
 
-  it("can open document") {
+  ignore("can open document") {
     val document = TextDocumentItem("a","",0,"content")
 
     val clientOutExpectation =
@@ -172,7 +172,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
-  it("can use references") {
+  ignore("can use references") {
     val document = TextDocumentItem("a","",0,"content")
     val request = ReferencesParams(TextDocumentIdentifier(document.uri), Position(0, 0), ReferenceContext(false))
     val referenceRange = SourceRange(Position(0, 1), Position(1, 2))

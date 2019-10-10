@@ -11,7 +11,7 @@ import deltas.expression.StringLiteralDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, ObjectLiteral, ObjectLiteralMember}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import play.api.libs.json.{JsObject, Json}
-import util.JavaSourceUtils
+import util.{JavaSourceUtils, SourceUtils}
 import core.deltas.path.ConstraintBuilderExtension._
 
 object CloudFormationTemplate extends Delta {
@@ -22,7 +22,7 @@ object CloudFormationTemplate extends Delta {
   override def inject(language: Language): Unit = {
     super.inject(language)
 
-    val resourceTypeSpecification = JavaSourceUtils.getTestFileContents("CloudFormationResourceSpecification.json")
+    val resourceTypeSpecification = SourceUtils.getTestFileContents("CloudFormationResourceSpecification.json")
     val parsedFile = Json.parse(resourceTypeSpecification).as[JsObject]
     val resourceTypes = parsedFile.value("ResourceTypes").as[JsObject]
 

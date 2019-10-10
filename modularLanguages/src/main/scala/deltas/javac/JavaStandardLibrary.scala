@@ -10,16 +10,16 @@ import deltas.ConstraintSkeleton
 import deltas.bytecode.readJar.ClassFileSignatureDecompiler
 import deltas.javac.classes.ClassCompiler
 import deltas.javac.classes.skeleton.PackageSignature
-import util.JavaSourceUtils
+import util.{JavaSourceUtils, SourceUtils}
 
 object JavaStandardLibrary {
 
   val byteCodeDecompiler = LanguageFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
 
-  val systemClass: Node = byteCodeDecompiler.compileStream(JavaSourceUtils.getTestFile("System.class")).program.asInstanceOf[NodePath].current
-  val printStreamClass: Node = byteCodeDecompiler.compileStream(JavaSourceUtils.getTestFile("PrintStream.class")).program.asInstanceOf[NodePath].current
-  val objectClass: Node = byteCodeDecompiler.compileStream(JavaSourceUtils.getTestFile("Object.class")).program.asInstanceOf[NodePath].current
-  val stringClass: Node = byteCodeDecompiler.compileStream(JavaSourceUtils.getTestFile("String2.class")).program.asInstanceOf[NodePath].current
+  val systemClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("System.class")).program.asInstanceOf[NodePath].current
+  val printStreamClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("PrintStream.class")).program.asInstanceOf[NodePath].current
+  val objectClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("Object.class")).program.asInstanceOf[NodePath].current
+  val stringClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getTestFile("String2.class")).program.asInstanceOf[NodePath].current
 
   def loadIntoClassPath(compilation: Compilation) {
     ClassCompiler(objectClass, compilation).bind()
