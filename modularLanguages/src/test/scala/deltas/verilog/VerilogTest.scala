@@ -1,5 +1,6 @@
 package deltas.verilog
 
+import core.deltas.path.PathRoot
 import core.language.{Compilation, InMemoryFileSystem}
 import core.language.node.NodeComparer
 import deltas.{ClearPhases, FileWithMembersDelta}
@@ -46,7 +47,7 @@ class VerilogTest extends FunSuite with LanguageServerTest {
                | endmodule""".stripMargin
 
   test("Can parse") {
-    val actual = justParseLanguage.compileString(code).program
+    val actual = justParseLanguage.compileString(code).program.asInstanceOf[PathRoot].current
 
     val requestOne = VariableDelta.neww("req_1")
     val requestZero = VariableDelta.neww("req_0")
