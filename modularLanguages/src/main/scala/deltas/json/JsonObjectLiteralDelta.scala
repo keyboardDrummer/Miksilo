@@ -22,16 +22,16 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
 
   def neww(entries: Map[String, Node]): Node = Shape.create(Members -> entries.map(entry =>
     MemberShape.create(MemberKey -> entry._1, MemberValue -> entry._2)))
-//JsonObjectLiteralDelta.Shape: Map(Members -> List(JsonObjectLiteralDelta.MemberShape: Map(MemberKey -> hello, MemberValue -> StringLiteralDelta.Shape: Map(Value -> jo)))),
-//JsonObjectLiteralDelta.Shape: Map(Members -> List(JsonObjectLiteralDelta.MemberShape: Map(MemberKey -> hello, MemberValue -> JsonStringLiteralDelta.Shape: Map(Value -> jo))))
+
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
-    import _grammars._
     val grammars = _grammars
 
     val keyGrammar = {
+      import core.bigrammar.DefaultBiGrammarWriter._
       val regexGrammar = RegexGrammar(stringInnerRegex, "object member key", verifyWhenPrinting = false, Some("\""))
       dropPrefix(grammars, regexGrammar, MemberKey, "\"") ~< "\""
     }
+    import _grammars._
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
 
     val member = (Colorize(create(MemberKey, keyGrammar), "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
