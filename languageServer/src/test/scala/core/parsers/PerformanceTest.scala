@@ -1,14 +1,14 @@
 package core.parsers
 
 import org.scalatest.FunSuite
-import util.SourceUtils2
+import util.SourceUtils
 
 class PerformanceTest extends FunSuite {
 
   test("Errorless JSON performance") {
     import ParseJson._
 
-    val source = SourceUtils2.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
+    val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
       replaceAll("\\s", "")
 
     val multiplier = 1
@@ -38,7 +38,7 @@ class PerformanceTest extends FunSuite {
   test("Edited") {
     import ParseJson._
 
-    val program = SourceUtils2.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val timeA = System.currentTimeMillis()
 
     val repetitions = 5

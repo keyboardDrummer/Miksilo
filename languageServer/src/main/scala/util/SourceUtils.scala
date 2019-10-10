@@ -9,7 +9,7 @@ import core.language.Compilation
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
-object SourceUtils2 {
+object SourceUtils {
 
   def streamToString(stream: InputStream): String = scala.io.Source.fromInputStream(stream).mkString
   def stringToStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))

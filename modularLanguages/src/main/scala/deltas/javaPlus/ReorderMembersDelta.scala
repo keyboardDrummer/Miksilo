@@ -10,6 +10,7 @@ import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import languageServer.LanguageServer
 
+// TODO this thing is broken. Add tests+fix or remove.
 object ReorderMembersDelta extends Delta {
 
   override def description: String = "Moves static before instance fields, and fields before members"

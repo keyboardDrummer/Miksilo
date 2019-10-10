@@ -4,7 +4,7 @@ import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import languageServer.{FileRange, HumanPosition, LanguageServerTest, SourceRange}
 import org.scalatest.FunSuite
-import util.{SourceUtils, TestLanguageBuilder}
+import util.{JavaSourceUtils, TestLanguageBuilder}
 
 class GotoDefinitionTest extends FunSuite with LanguageServerTest {
 
@@ -37,7 +37,7 @@ class GotoDefinitionTest extends FunSuite with LanguageServerTest {
   }
 
   test("fibonacci") {
-    val program = SourceUtils.getJavaTestFileContents("Fibonacci")
+    val program = JavaSourceUtils.getJavaTestFileContents("Fibonacci")
     val indexDefinition = gotoDefinition(JavaLanguage.java, program, new HumanPosition(10, 16))
     assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(8,37), new HumanPosition(8,42)))))(indexDefinition)
 
@@ -47,7 +47,7 @@ class GotoDefinitionTest extends FunSuite with LanguageServerTest {
   }
 
   test("assignment") {
-    val program = SourceUtils.getJavaTestFileContents("FieldAssignment")
+    val program = JavaSourceUtils.getJavaTestFileContents("FieldAssignment")
     val myFieldDefinition = gotoDefinition(JavaLanguage.java, program, new HumanPosition(11, 9))
     assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(2,9), new HumanPosition(2,16)))))(myFieldDefinition)
   }

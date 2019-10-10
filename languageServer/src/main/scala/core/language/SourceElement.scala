@@ -2,22 +2,6 @@ package core.language
 
 import languageServer.{FilePosition, FileRange, SourceRange}
 
-trait FileSourceElement {
-  def range: SourceRange
-
-  def childElements: Seq[FileSourceElement]
-}
-
-case class SourceElementFromFileElement(uri: String, element: FileSourceElement) extends SourceElement {
-  override def range = Some(element.range)
-
-  override def uriOption = Some(uri)
-
-  override def childElements: Seq[SourceElementFromFileElement] = {
-    element.childElements.map(e => SourceElementFromFileElement(uri, e))
-  }
-}
-
 trait SourceElement {
   /*
   A None value means the element is not part of the source.

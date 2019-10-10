@@ -3,7 +3,7 @@ package application.compilerCockpit
 import java.awt.event.ActionEvent
 import javax.swing.{DefaultComboBoxModel, JComboBox, JLabel, JPanel}
 
-import util.SourceUtils
+import util.JavaSourceUtils
 
 import scala.reflect.io.Path
 
@@ -41,41 +41,41 @@ class ExampleDropdown(val compilerCockpit: LanguageSandbox) extends JPanel {
   }
 
   def getFibonacciSimplifiedByteCode = {
-    val content = SourceUtils.getTestFileContents("FibonacciInSimplifiedByteCode.txt")
+    val content = JavaSourceUtils.getTestFileContents("FibonacciInSimplifiedByteCode.txt")
     new Example("Fibonacci Simplified Bytecode", content)
   }
 
   def getFibonacci = {
-    val fibonacciContent = SourceUtils.getJavaTestFileContents("Fibonacci.java", Path(""))
+    val fibonacciContent = JavaSourceUtils.getJavaTestFileContents("Fibonacci.java", Path(""))
     new Example("Fibonacci", fibonacciContent)
   }
 
   def getFibonacciByteCode = {
-    val fibonacciContent = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
+    val fibonacciContent = JavaSourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     new Example("Fibonacci Basic Bytecode", fibonacciContent)
   }
 
   def getForLoop = {
-    val fibonacciContent = SourceUtils.getJavaTestFileContents("SimpleForLoop", Path(""))
+    val fibonacciContent = JavaSourceUtils.getJavaTestFileContents("SimpleForLoop", Path(""))
     new Example("For Loop", fibonacciContent)
   }
 
   def getWhile = {
-    val fibonacciContent = SourceUtils.getJavaTestFileContents("Whilee", Path(""))
+    val fibonacciContent = JavaSourceUtils.getJavaTestFileContents("Whilee", Path(""))
     new Example("While", fibonacciContent)
   }
 
   def getFibonacciExpressionMethod = {
-    val fibonacciContent = SourceUtils.getJavaTestFileContents("FibonacciWithExpressionMethod", Path(""))
+    val fibonacciContent = JavaSourceUtils.getJavaTestFileContents("FibonacciWithExpressionMethod", Path(""))
     new Example("Fibonacci with expression method", fibonacciContent)
   }
 
   def getRevealSyntaxSugar = {
-    new Example("Filled with syntax sugar", SourceUtils.getJavaTestFileContents("RevealSyntaxSugar.java"))
+    new Example("Filled with syntax sugar", JavaSourceUtils.getJavaTestFileContents("RevealSyntaxSugar.java"))
   }
 
   def getVariableAlreadyDefined = {
-    new Example("Variable defined twice", SourceUtils.getJavaTestFileContents("VariableAlreadyDefined", Path("")))
+    new Example("Variable defined twice", JavaSourceUtils.getJavaTestFileContents("VariableAlreadyDefined", Path("")))
   }
 
   def getFibonacciWithComments = {
@@ -96,12 +96,12 @@ class ExampleDropdown(val compilerCockpit: LanguageSandbox) extends JPanel {
   }
 
   def getMethodOverloading = {
-    val content = SourceUtils.getTestFileContents("MethodOverloading.java")
+    val content = JavaSourceUtils.getTestFileContents("MethodOverloading.java")
     new Example("MethodOverloading", content)
   }
 
   def getFibonacciWithLabelledLocations = {
-    val content = SourceUtils.getTestFileContents("FibonacciWithLabelledLocations.txt")
+    val content = JavaSourceUtils.getTestFileContents("FibonacciWithLabelledLocations.txt")
     new Example("Fibonacci with labelled locations", content)
   }
 

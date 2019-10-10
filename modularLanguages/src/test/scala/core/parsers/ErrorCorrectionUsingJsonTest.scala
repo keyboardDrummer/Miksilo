@@ -9,7 +9,6 @@ import util.TestLanguageBuilder
 
 class ErrorCorrectionUsingJsonTest extends FunSuite {
 
-
   test("test whether correct inputs always return a ready in one go") {
     val input = """{ "VpcId" : {
                   |  "ConstraintDescription" : "must be the VPC Id of an existing Virtual Private Cloud."

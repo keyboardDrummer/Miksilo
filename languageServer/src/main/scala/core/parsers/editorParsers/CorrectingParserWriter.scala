@@ -474,7 +474,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 }
 
-case class SingleParseResult[+Result, +Input](resultOption: Option[Result], errors: List[ExternalParseError[Input]]) {
+case class SingleParseResult[+Result, Input](resultOption: Option[Result], errors: List[ParseError[Input]]) {
   def successful = errors.isEmpty
   def get: Result = resultOption.get
 }

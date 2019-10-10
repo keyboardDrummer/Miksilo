@@ -2,9 +2,9 @@ package core.parsers
 
 import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
-import util.{SourceUtils2, TestLanguageBuilder}
+import util.{SourceUtils, TestLanguageBuilder}
 
-class PerformanceTest2 extends FunSuite {
+class ModularGrammarPerformanceTest extends FunSuite {
 
   val asapJson = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas)
 
@@ -27,7 +27,7 @@ class PerformanceTest2 extends FunSuite {
   }
 
   test("Errorless JSON performance BiGrammar") {
-    val source = SourceUtils2.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
+    val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
       replaceAll("\\s", "")
 
     val multiplier = 1
@@ -57,7 +57,7 @@ class PerformanceTest2 extends FunSuite {
   }
 
   test("Edited") {
-    val program = SourceUtils2.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val timeA = System.currentTimeMillis()
 
     val repetitions = 5

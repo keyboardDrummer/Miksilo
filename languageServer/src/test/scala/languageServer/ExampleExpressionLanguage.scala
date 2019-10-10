@@ -5,7 +5,7 @@ import core.parsers.CommonStringReaderParser
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import util.SourceUtils2
+import util.SourceUtils
 
 // TODO add a constraintBuilder that's specific to a File, so you add a [Has]SourceRange instead of a SourceElement
 // TODO compute the range based on the children, so only the leafs needs a Range.
@@ -69,7 +69,7 @@ object ExpressionParser extends CommonStringReaderParser with LeftRecursiveCorre
 object ExpressionLanguage extends Language {
   private val parsePhase = Language.getParsePhaseFromParser[Expression, _root_.languageServer.ExpressionParser.StringReader](
     stream => {
-      val program = SourceUtils2.streamToString(stream)
+      val program = SourceUtils.streamToString(stream)
       new ExpressionParser.StringReader(program)
     },
     (program, uri) => SourceElementFromFileElement(uri, program),

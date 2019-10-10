@@ -8,7 +8,7 @@ import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.{ClassInfoConstant, Utf8ConstantDelta}
 import deltas.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
 import deltas.bytecode.constants.Utf8ConstantDelta.Utf8Constant
-import util.SourceUtils
+import util.JavaSourceUtils
 
 object RunWithJVM extends DeltaWithPhase
 {
@@ -18,7 +18,7 @@ object RunWithJVM extends DeltaWithPhase
     val constantPool = classFile.constantPool
     val classNameIndex = new ClassInfoConstantWrapper(constantPool.getValue(classRefIndex).asInstanceOf[Node]).nameIndex
     val className = new Utf8Constant(constantPool.getValue(classNameIndex).asInstanceOf[Node]).value.toString
-    state.output = SourceUtils.runByteCode(className, classFile)
+    state.output = JavaSourceUtils.runByteCode(className, classFile)
   }
 
   override def description: String = "Takes the bytecode program and runs it using the JVM."

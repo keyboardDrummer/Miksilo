@@ -13,13 +13,10 @@ import deltas.javac.ByteCodeLanguage
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
-object SourceUtils {
-
-  def streamToString(stream: InputStream): String = scala.io.Source.fromInputStream(stream).mkString
-  def stringToStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
+object JavaSourceUtils {
 
   def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): InputStream = {
-    val className = SourceUtils.fileNameToClassName(fileName)
+    val className = JavaSourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
     SourceUtils.getTestFile(relativeFilePath)
   }
@@ -89,27 +86,6 @@ object SourceUtils {
   def getJavaTestFileContents(fileName: String, inputDirectory: Path = Path("")): String = {
     val className = fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
-    getTestFileContents(relativeFilePath)
-  }
-
-  def getTestFile(relativeFilePath: Path): InputStream = {
-    if (relativeFilePath.isAbsolute)
-      return File(relativeFilePath).inputStream()
-
-    val fullPath = relativeFilePath
-    var testResources: InputStream = ClassLoader.getSystemResourceAsStream("/" + fullPath.path)
-
-    if (testResources == null)
-      testResources = getClass.getResourceAsStream("/" + fullPath.path)
-
-    if (testResources == null)
-      throw new RuntimeException(s"Test file ${fullPath.path} not found")
-    testResources
-  }
-
-  def getTestFileContents(relativeFilePath: Path): String = {
-    val result = new BufferedReader(new InputStreamReader(getTestFile(relativeFilePath)))
-      .lines().collect(Collectors.joining("\n"))
-    result.replaceAll("\n", System.lineSeparator())
+    SourceUtils.getTestFileContents(relativeFilePath)
   }
 }

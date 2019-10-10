@@ -13,7 +13,7 @@ import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
 import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
 import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap, FunSuite}
-import util.SourceUtils.LineProcessLogger
+import util.JavaSourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
@@ -32,7 +32,7 @@ object LanguageTest {
   def getMethodInstructions(method: MethodInfo[Node]): Seq[Node] = method.codeAttribute.instructions
 
   def printByteCode(byteCode: Node): String = {
-    PrintByteCode.printBytes(SourceUtils.getBytes(byteCode))
+    PrintByteCode.printBytes(JavaSourceUtils.getBytes(byteCode))
   }
 }
 
@@ -58,25 +58,25 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
   expectedOutputDirectory.createDirectory(force = true)
 
   def runByteCode(className: String, code: Node, expectedResult: Int) {
-    val line = SourceUtils.runByteCode(className, code)
+    val line = JavaSourceUtils.runByteCode(className, code)
     assertResult(expectedResult)(Integer.parseInt(line))
   }
 
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
-    val input: String = SourceUtils.getJavaTestFileContents(className, inputDirectory)
-    language.compileStream(SourceUtils.stringToStream(input)).program.asInstanceOf[PathRoot].current
+    val input: String = JavaSourceUtils.getJavaTestFileContents(className, inputDirectory)
+    language.compileStream(JavaSourceUtils.stringToStream(input)).program.asInstanceOf[PathRoot].current
   }
 
   def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
-    val className: String = SourceUtils.fileNameToClassName(fileName)
+    val className: String = JavaSourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
-    val input: InputStream = SourceUtils.getTestFile(relativeFilePath)
+    val input: InputStream = JavaSourceUtils.getTestFile(relativeFilePath)
     val outputDirectory = actualOutputDirectory / inputDirectory
     outputDirectory.createDirectory(force = true)
     val outputFile = outputDirectory / className addExtension "class"
     language.compileToFile(input, outputFile.toFile)
     val qualifiedClassName: String = (inputDirectory / className).segments.reduce[String]((l, r) => l + "." + r)
-    SourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory)
+    JavaSourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory)
   }
 
   def compile(input: String): Compilation = {
@@ -108,7 +108,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     val className = inputFile.stripExtension
 
     val relativeFilePath = inputFile.changeExtension("java")
-    val input: BufferedInputStream = new BufferedInputStream(SourceUtils.getTestFile(relativeFilePath))
+    val input: BufferedInputStream = new BufferedInputStream(JavaSourceUtils.getTestFile(relativeFilePath))
     input.mark(Integer.MAX_VALUE)
 
     val javaCompilerOutput = TestLanguageBuilder.profile("javac", runJavaCIfNeeded(className, input, expectedOutputDirectory))
@@ -119,9 +119,9 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     val state = profile("Miksilo compile", language.compileToFile(input, outputFile))
     val qualifiedClassName: String = (inputFile.parent / className).segments.reduce[String]((l, r) => l + "." + r)
 
-    val expectedOutput = profile("Run classfile from javac", SourceUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
+    val expectedOutput = profile("Run classfile from javac", JavaSourceUtils.runJavaClass(qualifiedClassName, expectedOutputDirectory))
     try {
-      val actualOutput = profile("Run classfile from Miksilo", SourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory))
+      val actualOutput = profile("Run classfile from Miksilo", JavaSourceUtils.runJavaClass(qualifiedClassName, actualOutputDirectory))
       assertResult(expectedOutput)(actualOutput)
     }
     catch {

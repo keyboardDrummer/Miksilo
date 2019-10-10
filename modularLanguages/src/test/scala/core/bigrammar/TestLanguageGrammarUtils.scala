@@ -16,8 +16,6 @@ case class StringKey(value: String) extends GrammarKey {
 
 object TestLanguageGrammarUtils extends TestLanguageGrammarUtils(JavaToByteCodeLanguage.javaCompilerDeltas)
 
-
-
 case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends FunSuite {
 
   def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: GrammarKey = null): Unit = {

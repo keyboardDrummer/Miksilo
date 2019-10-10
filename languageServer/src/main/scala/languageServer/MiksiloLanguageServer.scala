@@ -1,9 +1,7 @@
 package languageServer
 
 import com.typesafe.scalalogging.LazyLogging
-//import core.deltas.path.NodePath
 import core.language.exceptions.BadInputException
-//import core.language.node.{FilePosition, NodeLike}
 import core.language.{Compilation, Language, SourceElement}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration

@@ -11,7 +11,7 @@ import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, Subtr
 import deltas.expression.{ExpressionDelta, IntLiteralDelta}
 import deltas.statement.{BlockDelta, StatementDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
-import util.{LanguageTest, SourceUtils, TestLanguageBuilder}
+import util.{LanguageTest, JavaSourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
@@ -139,13 +139,13 @@ class JavaStyleCommentsTest
   }
 
   test("comparePrintResultWithoutComment") {
-    val input = SourceUtils.getJavaTestFileContents("Whilee")
+    val input = JavaSourceUtils.getJavaTestFileContents("Whilee")
     val result = TestGrammarUtils.parseAndPrint(input, None, TestLanguageGrammarUtils.getGrammarUsingTransformer())
     assertResult(input)(result)
   }
 
   test("comparePrintResult") {
-    val input = SourceUtils.getJavaTestFileContents("WhileeWithComment.java")
+    val input = JavaSourceUtils.getJavaTestFileContents("WhileeWithComment.java")
     val result = TestGrammarUtils.parseAndPrint(input, None, testGrammar.getGrammarUsingTransformer())
     assertResult(input)( result)
   }
@@ -163,8 +163,8 @@ class JavaStyleCommentsTest
       Seq(PrettyPrint(), TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta))
     val deltas = Seq(TriviaInsideNode, StoreTriviaDelta) ++ byteCodeWithComments
     val language = new LanguageTest(TestLanguageBuilder.buildWithParser(deltas))
-    val result = language.compileAndPrettyPrint(SourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
-    val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
+    val result = language.compileAndPrettyPrint(JavaSourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
+    val expectedResult = JavaSourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)
   }
 }

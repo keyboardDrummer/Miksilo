@@ -4,19 +4,6 @@ import core.parsers.core.{ParseInput, Processor}
 import core.parsers.editorParsers.{CorrectingParserWriter, Fix, History, ParseError, SingleParseResult, StopFunction}
 import languageServer.{Position, SourceRange, TextEdit}
 
-trait SequenceInput[Input, Elem] extends ParseInput {
-  def head: Elem
-  def tail: Input
-
-  def drop(amount: Int): Input
-  def safeIncrement(): Input =
-    if (atEnd) this.asInstanceOf[Input]
-    else drop(1)
-  def end: Input
-  def printRange(end: Input): String
-  def position: Position
-}
-
 trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem
   type Input <: SequenceInput[Input, Elem]
