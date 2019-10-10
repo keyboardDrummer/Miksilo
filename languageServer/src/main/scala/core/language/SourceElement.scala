@@ -1,6 +1,6 @@
 package core.language
 
-import languageServer.{FileRange, SourceRange}
+import languageServer.{FilePosition, FileRange, SourceRange}
 
 trait FileSourceElement {
   def range: SourceRange
@@ -38,5 +38,18 @@ trait SourceElement {
       case Some(nodeUri) => uri != nodeUri
       case None => false
     }
+  }
+
+  def getChildForPosition(filePosition: FilePosition): Option[SourceElement] = {
+    if (isInAnotherFile(filePosition.uri))
+      return None
+
+    if (!range.exists(r => r.contains(filePosition.position)))
+      return None
+
+    val childResults = childElements.flatMap(child => child.getChildForPosition(filePosition))
+    Some(childResults.headOption.getOrElse({
+      this
+    }))
   }
 }
