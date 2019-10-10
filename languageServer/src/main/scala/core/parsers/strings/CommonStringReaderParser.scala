@@ -1,8 +1,6 @@
-package core.parsers
+package core.parsers.strings
 
-import strings.CommonParserWriter
 import languageServer.Position
-import _root_.core.parsers.strings.StringReaderBase
 
 trait CommonStringReaderParser extends CommonParserWriter {
   type Input = StringReader

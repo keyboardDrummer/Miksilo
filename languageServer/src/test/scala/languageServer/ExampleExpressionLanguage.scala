@@ -1,8 +1,8 @@
 package languageServer
 
 import core.language.{FileSourceElement, Language, SourceElement, SourceElementFromFileElement}
-import core.parsers.CommonStringReaderParser
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
+import core.parsers.strings.CommonStringReaderParser
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import util.SourceUtils
