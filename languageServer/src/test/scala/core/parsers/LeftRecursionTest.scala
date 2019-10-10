@@ -4,6 +4,7 @@ import editorParsers.LeftRecursiveCorrectingParserWriter
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.{TimeLimitedTests, TimeLimits}
 import org.scalatest.time.{Millis, Span}
+import _root_.core.parsers.strings.CommonStringReaderParser
 
 class LeftRecursionTest extends FunSuite with CommonStringReaderParser
   with LeftRecursiveCorrectingParserWriter

@@ -2,6 +2,7 @@ package core.parsers
 
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import editorParsers.History
+import _root_.core.parsers.strings.CommonStringReaderParser
 
 object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 

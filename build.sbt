@@ -6,6 +6,7 @@ lazy val miksilo = project
   .in(file("."))
   .aggregate(
     languageServer,
+    modularLanguages,
     playground,
   )
 
@@ -64,17 +65,6 @@ lazy val languageServer = (project in file("languageServer")).
   settings(
     name := "MiksiloLspServer",
     assemblySettings,
-    mainClass in Compile := Some("languageServer.Program"),
-    vscode := {
-      val assemblyFile: String = assembly.value.getAbsolutePath
-      val extensionDirectory: File = file("./vscode-extension").getAbsoluteFile
-      val tsc = Process("tsc", file("./vscode-extension"))
-      val vscode = Process(Seq("code", s"--inspect=5875 --extensionDevelopmentPath=$extensionDirectory"),
-        None,
-        "MIKSILO" -> assemblyFile)
-
-      tsc.#&&(vscode).run
-    },
 
     organization := "com.github.keyboardDrummer",
     homepage := Some(url("http://keyboarddrummer.github.io/Miksilo/")),
@@ -99,7 +89,19 @@ lazy val languageServer = (project in file("languageServer")).
 lazy val modularLanguages = (project in file("modularLanguages")).
   settings(commonSettings: _*).
   settings(
-    name := "modularLanguages"
+    name := "modularLanguages",
+    assemblySettings,
+    mainClass in Compile := Some("deltas.Program"),
+    vscode := {
+      val assemblyFile: String = assembly.value.getAbsolutePath
+      val extensionDirectory: File = file("./vscode-extension").getAbsoluteFile
+      val tsc = Process("tsc", file("./vscode-extension"))
+      val vscode = Process(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory"),
+        None,
+        "MIKSILO" -> assemblyFile)
+
+      tsc.#&&(vscode).run
+    },
   ).dependsOn(languageServer)
 
 lazy val playground = (project in file("playground")).

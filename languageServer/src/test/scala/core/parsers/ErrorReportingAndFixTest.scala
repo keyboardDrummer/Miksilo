@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import editorParsers.Fix
 import languageServer.{Position, SourceRange, TextEdit}
+import _root_.core.parsers.strings.CommonStringReaderParser
 
 class ErrorReportingAndFixTest extends FunSuite
   with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {

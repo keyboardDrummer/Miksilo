@@ -2,6 +2,7 @@ package core.parsers
 
 import org.scalatest.FunSuite
 import editorParsers.LeftRecursiveCorrectingParserWriter
+import _root_.core.parsers.strings.CommonStringReaderParser
 
 class StringParserWriterTest extends FunSuite
   with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {

@@ -4,6 +4,7 @@ import org.scalatest.FunSuite
 import editorParsers.AmbiguityFindingParserWriter
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import _root_.core.parsers.editorParsers.NeverStop
+import _root_.core.parsers.strings.CommonStringReaderParser
 
 class AmbiguityFindingParserWriterTest extends FunSuite
   with AmbiguityFindingParserWriter
