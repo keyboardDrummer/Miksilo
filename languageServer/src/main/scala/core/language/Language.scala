@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets
 
 import com.typesafe.scalalogging.LazyLogging
 import core.language.exceptions.BadInputException
+import core.parsers.editorParsers.{StopFunction, TimeRatioStopFunction}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.StringReaderLike
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
@@ -50,13 +51,14 @@ object Language extends LazyLogging {
   def getParsePhaseFromParser[Program, Input <: StringReaderLike[Input]](
     getInput: InputStream => Input,
     getSourceElement: (Program, String) => SourceElement,
-    parser: SingleResultParser[Program, Input]): Phase = {
+    parser: SingleResultParser[Program, Input],
+    stopFunction: StopFunction = new TimeRatioStopFunction): Phase = {
 
     Phase("parse", "parse the source code", compilation => {
       val uri = compilation.rootFile.get
       val inputStream = compilation.fileSystem.getFile(uri)
       val time = System.currentTimeMillis()
-      val parseResult = parser.parse(getInput(inputStream))
+      val parseResult = parser.parse(getInput(inputStream), stopFunction)
       val parseTime = System.currentTimeMillis() - time
       logger.info(s"Parsing took ${parseTime}ms")
       parseResult.resultOption.foreach(program => {

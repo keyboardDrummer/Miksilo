@@ -20,7 +20,7 @@ case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioSt
     val phase = Language.getParsePhaseFromParser[Node, Input](stream => new Reader(SourceUtils.streamToString(stream)), (program, uri) => {
       program.startOfUri = Some(uri)
       PathRoot(program)
-    }, parserProp.get(compilation))
+    }, parserProp.get(compilation), stopFunction)
     phase.action(compilation)
   }
 

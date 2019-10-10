@@ -24,6 +24,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     MemberShape.create(MemberKey -> entry._1, MemberValue -> entry._2)))
 
   override def transformGrammars(_grammars: LanguageGrammars, language: Language): Unit = {
+    import _grammars._
     val grammars = _grammars
 
     val keyGrammar = {
@@ -31,7 +32,6 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
       val regexGrammar = RegexGrammar(stringInnerRegex, "object member key", verifyWhenPrinting = false, Some("\""))
       dropPrefix(grammars, regexGrammar, MemberKey, "\"") ~< "\""
     }
-    import _grammars._
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
 
     val member = (Colorize(create(MemberKey, keyGrammar), "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape

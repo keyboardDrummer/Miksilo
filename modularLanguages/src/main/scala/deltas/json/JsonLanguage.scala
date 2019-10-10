@@ -5,7 +5,6 @@ import core.deltas.path.PathRoot
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.{Language, Phase}
 import deltas.expression._
-import deltas.javac.classes.skeleton.FullyQualifyTypeReferences.description
 import deltas.javac.expressions.literals.BooleanLiteralDelta
 
 object JsonLanguage {
