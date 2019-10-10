@@ -5,7 +5,7 @@ import deltas.PrettyPrint
 import deltas.bytecode.simpleBytecode.{InlineConstantPool, LabelledLocations}
 import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
 import org.scalatest.FunSuite
-import util.{LanguageTest, JavaSourceUtils, TestLanguageBuilder}
+import util.{JavaSourceUtils, LanguageTest, SourceUtils, TestLanguageBuilder}
 
 class TestLabelledLocations extends FunSuite {
 
@@ -15,22 +15,22 @@ class TestLabelledLocations extends FunSuite {
     val particles: Seq[Delta] = TestLanguageBuilder.build(JavaToByteCodeLanguage.javaCompilerDeltas).spliceBeforeTransformations(labelledParticles, Seq(PrettyPrint()))
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(particles))
     val result = utils.compileAndPrettyPrint(JavaSourceUtils.getJavaTestFileContents("Fibonacci.java"))
-    val expectedResult = JavaSourceUtils.getTestFileContents("FibonacciInLabelledByteCode.txt")
+    val expectedResult = SourceUtils.getTestFileContents("FibonacciInLabelledByteCode.txt")
     assertResult(expectedResult)(result)
   }
 
   test("labelledToByteCode") {
     val labelledByteCodeCompiler = TestLanguageBuilder.build(labelledParticles)
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(labelledByteCodeCompiler.spliceBeforeTransformations(ByteCodeLanguage.byteCodeDeltas, Seq(PrettyPrint()))))
-    val result = utils.compileAndPrettyPrint(JavaSourceUtils.getTestFileContents("FibonacciInLabelledByteCode.txt"))
-    val expectedResult = JavaSourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
+    val result = utils.compileAndPrettyPrint(SourceUtils.getTestFileContents("FibonacciInLabelledByteCode.txt"))
+    val expectedResult = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     assertResult(expectedResult)(result)
   }
 
   test("labelledToInlinedByteCode") {
     val labelledByteCodeCompiler = TestLanguageBuilder.build(labelledParticles)
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(labelledByteCodeCompiler.spliceBeforeTransformations(Seq(InlineConstantPool) ++ ByteCodeLanguage.byteCodeDeltas, Seq(PrettyPrint()))))
-    val result = utils.compileAndPrettyPrint(JavaSourceUtils.getTestFileContents("FibonacciInLabelledByteCode.txt"))
+    val result = utils.compileAndPrettyPrint(SourceUtils.getTestFileContents("FibonacciInLabelledByteCode.txt"))
     val expectedResult =
       """class Fibonacci extends java/lang/Object with: ()
         |{

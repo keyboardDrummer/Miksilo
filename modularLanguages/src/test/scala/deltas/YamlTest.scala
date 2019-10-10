@@ -9,7 +9,7 @@ import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import deltas.yaml.{PlainScalarDelta, YamlArrayDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}
 import org.scalatest.FunSuite
-import util.{JavaSourceUtils, TestLanguageBuilder}
+import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
 
 class YamlTest extends FunSuite {
 
@@ -189,7 +189,7 @@ class YamlTest extends FunSuite {
 
   // TODO if this test parses too many steps it gets a stack overflow, fix.
   test("big yaml file") {
-    val contents = JavaSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val contents = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
 
     val compilation = language.compileString(contents)
     assert(compilation.diagnostics.isEmpty)

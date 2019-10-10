@@ -11,7 +11,7 @@ import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
 import deltas.statement.BlockDelta
 import deltas.{PrettyPrint, RunWithJVM}
 import org.scalatest.FunSuite
-import util.{JavaSourceUtils, TestLanguageBuilder}
+import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
@@ -80,7 +80,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
   test("PrettyPrintByteCode") {
     val input = JavaSourceUtils.getJavaTestFile("Fibonacci", Path(""))
-    val expectation = JavaSourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
+    val expectation = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
 
     val prettyPrintCompiler = getPrettyPrintJavaToByteCodeCompiler
 
@@ -102,21 +102,21 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
-    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileStream(JavaSourceUtils.stringToStream(byteCode)).output
+    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileStream(SourceUtils.stringToStream(byteCode)).output
     assertResult("8")(output)
   }
 
   test("prettyPrintByteCode") {
-    val input = JavaSourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
+    val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(new PrettyPrint) ++ ByteCodeLanguage.byteCodeDeltas
-    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileStream(JavaSourceUtils.stringToStream(input)).output
+    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileStream(SourceUtils.stringToStream(input)).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
-    val input = JavaSourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
+    val input = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
     val deltas = Seq(RunWithJVM) ++ ByteCodeLanguage.byteCodeDeltas
-    val output = TestLanguageBuilder.buildWithParser(deltas).compileStream(JavaSourceUtils.stringToStream(input)).output
+    val output = TestLanguageBuilder.buildWithParser(deltas).compileStream(SourceUtils.stringToStream(input)).output
     assertResult("8")(output)
   }
 }

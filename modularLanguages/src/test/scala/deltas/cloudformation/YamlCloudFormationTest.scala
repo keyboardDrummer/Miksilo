@@ -3,7 +3,7 @@ package cloudformation
 import deltas.cloudformation.CloudFormationLanguage
 import languageServer._
 import org.scalatest.FunSuite
-import util.{JavaSourceUtils, TestLanguageBuilder}
+import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
 import TestLanguageBuilder._
 import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
@@ -13,32 +13,32 @@ class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
   val yamlServer = new MiksiloLanguageServer(yamlLanguage)
 
   test("No diagnostics") {
-    val program = JavaSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result = getDiagnostics(yamlServer, program)
     assert(result.isEmpty)
   }
 
   test("Edited") {
-    val program = JavaSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.yaml")
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.yaml")
     val result = getDiagnostics(yamlServer, program)
     assertResult(2)(result.size)
   }
 
   test("Edited 2") {
-    val program = JavaSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited2.yaml")
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited2.yaml")
     val result = getDiagnostics(yamlServer, program)
     assertResult(1)(result.size)
   }
 
   test("Goto definition resource reference") {
-    val program = JavaSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result: Seq[FileRange] = gotoDefinition(yamlServer, program, new HumanPosition(467, 32))
     val expectation = Seq(FileRange(itemUri, SourceRange(new HumanPosition(443, 3), new HumanPosition(443, 25))))
     assertResult(expectation)(result)
   }
 
   test("Rename resource") {
-    val program = JavaSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result: WorkspaceEdit = rename(yamlServer, program, new HumanPosition(467, 32), "boop")
     val expectation = WorkspaceEdit(Map(
       itemUri -> Seq(
@@ -50,7 +50,7 @@ class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
   }
 
   test("Document symbols") {
-    val program = JavaSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result: Set[SymbolInformation] = documentSymbols(yamlServer, program).toSet
     val expectation = Set(
       SymbolInformation("CPUAlarmLow",13,FileRange(itemUri,SourceRange(Position(471,2),Position(471,13))),None),

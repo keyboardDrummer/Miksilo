@@ -11,7 +11,7 @@ import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, Subtr
 import deltas.expression.{ExpressionDelta, IntLiteralDelta}
 import deltas.statement.{BlockDelta, StatementDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
-import util.{LanguageTest, JavaSourceUtils, TestLanguageBuilder}
+import util.{JavaSourceUtils, LanguageTest, SourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
@@ -164,7 +164,7 @@ class JavaStyleCommentsTest
     val deltas = Seq(TriviaInsideNode, StoreTriviaDelta) ++ byteCodeWithComments
     val language = new LanguageTest(TestLanguageBuilder.buildWithParser(deltas))
     val result = language.compileAndPrettyPrint(JavaSourceUtils.getJavaTestFileContents("FibonacciWithComments.java"))
-    val expectedResult = JavaSourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
+    val expectedResult = SourceUtils.getTestFileContents("FibonacciWithCommentsByteCode.txt")
     assertResult(expectedResult)(result)
   }
 }
