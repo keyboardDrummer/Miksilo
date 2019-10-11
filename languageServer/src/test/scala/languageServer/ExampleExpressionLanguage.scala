@@ -37,7 +37,7 @@ case class Number(range: SourceRange, value: Int) extends Expression {
 
 case class Identifier(range: SourceRange, name: String) extends Expression {
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
-    builder.resolve(name, SourceElementFromFileElement(uri, this), scope)
+    builder.resolve(name, this.addFile(uri), scope)
   }
 
   override def childElements = Seq.empty
@@ -54,9 +54,12 @@ case class Addition(range: SourceRange, left: Expression, right: Expression) ext
 
 object ExpressionParser extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter with WhitespaceParserWriter {
 
-  val numberParser: Self[Expression] = wholeNumber.map(x => Integer.parseInt(x)).withSourceRange((range, value) => Number(range, value))
   lazy val expression: Self[Expression] = new Lazy(addition | numberParser | let | variable)
+
+  val numberParser: Self[Expression] = wholeNumber.map(x => Integer.parseInt(x)).withSourceRange((range, value) => Number(range, value))
+
   val addition: Self[Expression] = (expression ~< "+" ~ expression).withSourceRange((range, value) => Addition(range, value._1, value._2))
+
   val variable: Self[Expression] = parseIdentifier.withSourceRange((range, value) => Identifier(range, value))
   val variableDeclaration = parseIdentifier.withSourceRange((r,x) => VariableDeclaration(r,x))
   val let: Self[Expression] = ("let" ~> variableDeclaration ~< "=" ~ expression ~< "in" ~ expression).withSourceRange((range, t) => Let(range, t._1._1, t._1._2, t._2))

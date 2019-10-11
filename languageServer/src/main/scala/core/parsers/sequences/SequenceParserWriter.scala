@@ -275,6 +275,10 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     def ~>[Right](right: Self[Right]): ParserBuilder[Right] = leftRight(parser, right, Processor.ignoreLeft[Option[Result], Option[Right]])
 
+    def +(elementName: String): Self[List[Result]] = {
+      leftRight(parser, parser.*, combineMany[Result])
+    }
+
     def someSeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
       lazy val result: Self[List[Result]] = separator ~>
         leftRight[Result, List[Result], List[Result]](parser, result, combineMany[Result]) |
