@@ -137,6 +137,10 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation] = {
     currentDocumentId = params.textDocument
+    val proofs = getCompilation.proofs
+    if (proofs == null)
+      return Seq.empty
+
     val declarations = getCompilation.proofs.scopeGraph.declarationsPerFile.getOrElse(params.textDocument.uri, Seq.empty).toSeq
     declarations.
       filter(declaration => declaration.name.nonEmpty).
