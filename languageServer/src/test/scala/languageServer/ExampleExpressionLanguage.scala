@@ -1,6 +1,6 @@
 package languageServer
 
-import core.language.{FileSourceElement, Language, SourceElement, SourceElementFromFileElement}
+import core.language.{FileSourceElement, FileSourceElementFromRange, Language, SourceElement, SourceElementFromFileElement}
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import core.parsers.strings.CommonStringReaderParser
 import core.smarts.ConstraintBuilder
@@ -20,13 +20,15 @@ case class SourceElementFromFileRange(_fileRange: FileRange) extends SourceEleme
 }
 
 case class Let(range: SourceRange, variableRange: SourceRange, variableName: String, variableValue: Expression, value: Expression) extends Expression {
+
+  val variableElement = FileSourceElementFromRange(variableRange)
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
     val valueScope = builder.newScope(Some(scope))
-    builder.declare(variableName, valueScope, SourceElementFromFileRange(new FileRange(uri, variableRange)))
+    builder.declare(variableName, valueScope, variableElement.addFile(uri))
     value.collectConstraints(builder, uri, valueScope)
   }
 
-  override def childElements: Seq[Expression] = Seq(variableValue, value)
+  override def childElements: Seq[FileSourceElement] = Seq(variableElement, variableValue, value)
 }
 
 case class Number(range: SourceRange, value: Int) extends Expression {
@@ -109,5 +111,14 @@ class ExampleExpressionLanguage extends LanguageServerTest {
 
     assertResult(xDefinition)(gotoDefinition(server, program, firstXUsage).head.range)
     assertResult(xDefinition)(gotoDefinition(server, program, secondXUsage).head.range)
+  }
+
+  test("go to references") {
+    val firstXUsage = SourceRange(HumanPosition(1, 14),HumanPosition(1, 15))
+    val secondXUsage = SourceRange(HumanPosition(1, 22),HumanPosition(1, 23))
+    val xPosition = HumanPosition(1, 5)
+    val results = references(server, program, xPosition, includeDeclaration = false)
+
+    assertResult(Seq(firstXUsage,secondXUsage))(results.map(r => r.range))
   }
 }

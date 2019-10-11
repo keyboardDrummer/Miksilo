@@ -12,8 +12,14 @@ case class SourceElementFromFileElement(uri: String, element: FileSourceElement)
   }
 }
 
+case class FileSourceElementFromRange(range: SourceRange, origin: Any = null) extends FileSourceElement {
+  override def childElements = Seq.empty
+}
+
 trait FileSourceElement {
   def range: SourceRange
 
   def childElements: Seq[FileSourceElement]
+
+  def addFile(uri: String) = SourceElementFromFileElement(uri, this)
 }
