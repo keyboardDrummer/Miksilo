@@ -1,6 +1,6 @@
 package languageServer
 
-import core.language.{FileSourceElement, FileSourceElementFromRange, Language, SourceElement, SourceElementFromFileElement}
+import core.language.{FileElement, Language, SourceElementFromFileElement}
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import core.parsers.strings.CommonStringReaderParser
 import core.smarts.ConstraintBuilder
@@ -9,26 +9,23 @@ import util.SourceUtils
 
 // TODO add a constraintBuilder that's specific to a File, so you add a [Has]SourceRange instead of a SourceElement
 // TODO compute the range based on the children, so only the leafs needs a Range.
-trait Expression extends FileSourceElement {
+trait Expression extends FileElement {
   def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope)
 }
 
-case class SourceElementFromFileRange(_fileRange: FileRange) extends SourceElement {
-  override def range = Some(_fileRange.range)
-
-  override def uriOption = Some(_fileRange.uri)
+case class VariableDeclaration(range: SourceRange, name: String) extends FileElement {
+  override def childElements = Seq.empty
 }
 
-case class Let(range: SourceRange, variableRange: SourceRange, variableName: String, variableValue: Expression, value: Expression) extends Expression {
+case class Let(range: SourceRange, variable: VariableDeclaration, variableValue: Expression, value: Expression) extends Expression {
 
-  val variableElement = FileSourceElementFromRange(variableRange)
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
     val valueScope = builder.newScope(Some(scope))
-    builder.declare(variableName, valueScope, variableElement.addFile(uri))
+    builder.declare(variable.name, valueScope, variable.addFile(uri))
     value.collectConstraints(builder, uri, valueScope)
   }
 
-  override def childElements: Seq[FileSourceElement] = Seq(variableElement, variableValue, value)
+  override def childElements: Seq[FileElement] = Seq(variable, variableValue, value)
 }
 
 case class Number(range: SourceRange, value: Int) extends Expression {
@@ -62,8 +59,9 @@ object ExpressionParser extends CommonStringReaderParser with LeftRecursiveCorre
   lazy val expression: Self[Expression] = new Lazy(addition | numberParser | let | variable)
   val addition: Self[Expression] = (expression ~< whiteSpace ~< "+" ~< whiteSpace ~ expression).withSourceRange[Expression]((range, value) => Addition(range, value._1, value._2))
   val variable: Self[Expression] = parseIdentifier.withSourceRange((range, value) => Identifier(range, value))
-  val let: Self[Expression] = ("let" ~< whiteSpace ~> parseIdentifier.withSourceRange((r,x) => (r,x)) ~<
-    whiteSpace ~< "=" ~< whiteSpace ~ expression ~< whiteSpace ~< "in" ~< whiteSpace ~ expression).withSourceRange[Expression]((range, t) => Let(range, t._1._1._1, t._1._1._2, t._1._2, t._2))
+  val variableDeclaration = parseIdentifier.withSourceRange((r,x) => VariableDeclaration(r,x))
+  val let: Self[Expression] = ("let" ~< whiteSpace ~> variableDeclaration ~<
+    whiteSpace ~< "=" ~< whiteSpace ~ expression ~< whiteSpace ~< "in" ~< whiteSpace ~ expression).withSourceRange[Expression]((range, t) => Let(range, t._1._1, t._1._2, t._2))
 
   val root = whiteSpace ~> expression
 }
