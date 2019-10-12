@@ -1,5 +1,10 @@
 package core.textMate
 
+trait JsExpression
+case class JsArray(elements: Seq[JsExpression]) extends JsExpression
+case class JsObject(fields: Map[String, JsExpression]) extends JsExpression
+case class JsLiteral(value: String) extends JsExpression
+
 object Json {
 
   def printJson(root: JsExpression): String = {

@@ -6,12 +6,7 @@ import util.GraphBasics
 
 import scala.util.matching.Regex
 
-trait JsExpression
-case class JsArray(elements: Seq[JsExpression]) extends JsExpression
-case class JsObject(fields: Map[String, JsExpression]) extends JsExpression
-case class JsLiteral(value: String) extends JsExpression
-
-trait ColoringParserWriter extends CommonParserWriter with OptimizingParserWriter {
+trait TextMateGeneratingParserWriter extends CommonParserWriter with OptimizingParserWriter {
   case class Colorize[Result](original: Self[Result], textMateScope: String) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     override def getParser(recursive: GetParser) = recursive(original)
   }
@@ -21,7 +16,6 @@ trait ColoringParserWriter extends CommonParserWriter with OptimizingParserWrite
     Json.printJson(textMate)
   }
 
-  // TODO let this operate on parsers instead of BiGrammar, that way less cases have to be handled.
   def grammarToRegex[Result](root: Self[Result]): Option[String] = {
     var callStack = List.empty[Self[_]]
 

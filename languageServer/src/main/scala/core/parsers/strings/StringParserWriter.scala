@@ -1,13 +1,10 @@
 package core.parsers.strings
 
-import core.parsers.core.Processor
 import core.parsers.editorParsers.{History, ParseError}
 import core.parsers.sequences.SequenceParserWriter
 import languageServer.SourceRange
 
 import scala.util.matching.Regex
-
-
 
 trait StringParserWriter extends SequenceParserWriter {
   type Elem = Char
