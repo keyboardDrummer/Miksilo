@@ -35,14 +35,6 @@ class TextMateTest extends FunSuite {
                         |      "match": "\\]"
                         |    },
                         |    {
-                        |      "name": "keyword.control",
-                        |      "match": "\\bfalse\\b"
-                        |    },
-                        |    {
-                        |      "name": "keyword.control",
-                        |      "match": "\\btrue\\b"
-                        |    },
-                        |    {
                         |      "name": "keyword.operator",
                         |      "match": "\\{"
                         |    },
