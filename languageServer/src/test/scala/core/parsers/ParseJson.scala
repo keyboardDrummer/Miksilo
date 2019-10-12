@@ -3,9 +3,11 @@ package core.parsers
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import editorParsers.History
 import _root_.core.parsers.strings.CommonStringReaderParser
+import _root_.core.textMate.ColoringParserWriter
 
-object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
+object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter with ColoringParserWriter {
 
+  lazy val boolean = literalOrKeyword("true") | literalOrKeyword("false")
   lazy val arrayParser = literal("[") ~> jsonParser.manySeparated(",", "array element") ~< "]"
   lazy val memberParser = stringLiteral ~< ":" ~ jsonParser
   lazy val objectParser = literal("{", 2 * History.missingInputPenalty) ~>
@@ -13,6 +15,6 @@ object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingPa
   object UnknownExpression {
     override def toString = "unknown"
   }
-  lazy val jsonParser: Self[Any] = stringLiteral | objectParser | wholeNumber | arrayParser |
+  lazy val jsonParser: Self[Any] = stringLiteral | objectParser | wholeNumber | arrayParser | boolean |
     Fallback(UnknownExpression, "value")
 }

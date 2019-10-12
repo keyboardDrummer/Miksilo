@@ -1,7 +1,7 @@
 package core.textMate
 
-import core.parsers.core.{OptimizingParserWriter, ParserWriter}
-import core.parsers.strings.StringParserWriter
+import core.parsers.core.OptimizingParserWriter
+import core.parsers.strings.CommonParserWriter
 import util.GraphBasics
 
 import scala.util.matching.Regex
@@ -11,7 +11,7 @@ case class JsArray(elements: Seq[JsExpression]) extends JsExpression
 case class JsObject(fields: Map[String, JsExpression]) extends JsExpression
 case class JsLiteral(value: String) extends JsExpression
 
-trait ColoringParserWriter extends StringParserWriter with OptimizingParserWriter {
+trait ColoringParserWriter extends CommonParserWriter with OptimizingParserWriter {
   case class Colorize[Result](original: Self[Result], textMateScope: String) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     override def getParser(recursive: GetParser) = recursive(original)
   }
@@ -32,6 +32,7 @@ trait ColoringParserWriter extends StringParserWriter with OptimizingParserWrite
       callStack ::= grammar
 
       val result: Option[String] = grammar match {
+        case drop: DropParser[_] => recurse(drop.original)
         case sequence: Sequence[_, _, _] =>
           for {
             left <- recurse(sequence.left)
@@ -44,8 +45,8 @@ trait ColoringParserWriter extends StringParserWriter with OptimizingParserWrite
           } yield left + "|" + right
         case regex: RegexParser => Some(regex.regex.regex)
         case map: MapParser[_, _] => recurse(map.original)
-        case delimiter: Literal => Some(escapeRegex(delimiter.value))
-        case keyword: KeywordParser => Some(escapeRegex(keyword.value))
+        case delimiter: Literal => Some(escapeLiteral(delimiter.value))
+        case keyword: KeywordParser => Some("\\b" + escapeLiteral(keyword.value) + "\\b")
         // TODO how to incorporate many? case many: Many => recurse(many.inner).map(r => r + "*") // TODO add parenthesis
       }
 
@@ -57,22 +58,23 @@ trait ColoringParserWriter extends StringParserWriter with OptimizingParserWrite
   }
 
   case class Match(scope: String, regex: Regex)
-  
+
   def createTextMateAstFromBiGrammar(grammar: Self[_]): JsExpression = {
     val reachables: Seq[Self[_]] = GraphBasics.traverseBreadth[Self[_]](Seq(grammar), grammar => grammar.children,
-      node => if (node.isInstanceOf[Colorize[_]]) GraphBasics.SkipChildren else GraphBasics.Continue )
+      node => if (node.isInstanceOf[Colorize[_]] || node.isInstanceOf[KeywordParser] ||
+        node == parseIdentifier || node == stringLiteral) GraphBasics.SkipChildren else GraphBasics.Continue )
 
     val typedPatterns: Seq[Match] = reachables.collect({
-      case regexParser: RegexParser if regexParser.regexName == "identifier" =>
+      case parser if parser == parseIdentifier =>
         Match("variable", """\b[A-Za-z][A-Za-z0-9_]*\b""".r)
       case regexParser: RegexParser if Set("decimal number","floating point number","whole number").contains(regexParser.regexName) =>
         Match("constant.numeric", """-?\d+""".r)
       case keyword: KeywordParser /*if keyword.reserved*/ =>
-        Match("keyword.control", ("\\b" + escapeRegex(keyword.value) + "\\b").r)
+        Match("keyword.control", grammarToRegex(keyword).get.r)
       case delimiter: Literal =>
-        Match("keyword.operator", escapeRegex(delimiter.value).r)
-      case regexParser: RegexParser if regexParser.regexName == "string literal" =>
-        Match("string.quoted", """"([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*"""".r)
+        Match("keyword.operator", escapeLiteral(delimiter.value).r)
+      case parser if parser == stringLiteral =>
+        Match("string.quoted.double", grammarToRegex(parser).get.r)
       case Colorize(inner, textMateScope) =>
         val maybeRegex = grammarToRegex(inner)
         maybeRegex match {
@@ -91,14 +93,14 @@ trait ColoringParserWriter extends StringParserWriter with OptimizingParserWrite
       "patterns" -> JsArray(patterns)
     ))
   }
-  
+
   def singleMatch(name: String, regex: Regex): JsExpression = {
     JsObject(Map(
       "name" -> JsLiteral(name),
       "match" -> JsLiteral(regex.toString())))
   }
 
-  def escapeRegex(regex: String): String = {
+  def escapeLiteral(regex: String): String = {
     var result = regex
     val chars = "\\<([{^-=$!|]})?*+.>"
     for(char <- chars) {

@@ -1,10 +1,10 @@
-//package core.textMate
-//
-//import core.parsers.ParseJson
-//import org.scalatest.FunSuite
-//
-//class TextMateTest extends FunSuite {
-//
+package core.textMate
+
+import core.parsers.ParseJson
+import org.scalatest.FunSuite
+
+class TextMateTest extends FunSuite {
+
 //  test("smithy test") {
 //    val smithy = SmithyLanguage.language
 //    var output = BiGrammarToTextMate.toTextMate(LanguageGrammars.grammars.get(smithy).root)
@@ -197,62 +197,54 @@
 //                     |  """.stripMargin
 //    val pastable = output.replaceFirst("\n  ", "\n" + addition)
 //  }
-//
-//  test("json test") {
-//    val jsonParser = ParseJson.jsonParser
-//    var output = ParserTo.toTextMate(LanguageGrammars.grammars.get(json).root)
-//    val expectation = """{
-//                        |  "patterns": [
-//                        |    {
-//                        |      "name": "string.quoted.double",
-//                        |      "match": "\\"([^\\"\\x00-\\x1F\\x7F\\\\]|\\\\[\\\\'\\"bfnrt]|\\\\u[a-fA-F0-9]{4})*\\""
-//                        |    },
-//                        |    {
-//                        |      "name": "string.quoted.single",
-//                        |      "match": "'[^']*'"
-//                        |    },
-//                        |    {
-//                        |      "name": "keyword.operator",
-//                        |      "match": ","
-//                        |    },
-//                        |    {
-//                        |      "name": "constant.numeric",
-//                        |      "match": "-?\\d+"
-//                        |    },
-//                        |    {
-//                        |      "name": "keyword.operator",
-//                        |      "match": ":"
-//                        |    },
-//                        |    {
-//                        |      "name": "keyword.operator",
-//                        |      "match": "\\["
-//                        |    },
-//                        |    {
-//                        |      "name": "keyword.operator",
-//                        |      "match": "\\]"
-//                        |    },
-//                        |    {
-//                        |      "name": "keyword.control",
-//                        |      "match": "\\b,\\b"
-//                        |    },
-//                        |    {
-//                        |      "name": "keyword.control",
-//                        |      "match": "\\bfalse\\b"
-//                        |    },
-//                        |    {
-//                        |      "name": "keyword.control",
-//                        |      "match": "\\btrue\\b"
-//                        |    },
-//                        |    {
-//                        |      "name": "keyword.operator",
-//                        |      "match": "\\{"
-//                        |    },
-//                        |    {
-//                        |      "name": "keyword.operator",
-//                        |      "match": "\\}"
-//                        |    }
-//                        |  ]
-//                        |}""".stripMargin
-//    assertResult(expectation)(output)
-//  }
-//}
+
+  test("json test") {
+    val jsonParser = ParseJson.jsonParser
+    var output = ParseJson.toTextMate(jsonParser)
+    val expectation = """{
+                        |  "patterns": [
+                        |    {
+                        |      "name": "string.quoted.double",
+                        |      "match": "\"([^\"\\x00-\\x1F\\x7F\\\\]|\\\\[\\\\'\"bfnrt]|\\\\u[a-fA-F0-9]{4})*\""
+                        |    },
+                        |    {
+                        |      "name": "keyword.operator",
+                        |      "match": ","
+                        |    },
+                        |    {
+                        |      "name": "constant.numeric",
+                        |      "match": "-?\\d+"
+                        |    },
+                        |    {
+                        |      "name": "keyword.operator",
+                        |      "match": ":"
+                        |    },
+                        |    {
+                        |      "name": "keyword.operator",
+                        |      "match": "\\["
+                        |    },
+                        |    {
+                        |      "name": "keyword.operator",
+                        |      "match": "\\]"
+                        |    },
+                        |    {
+                        |      "name": "keyword.control",
+                        |      "match": "\\bfalse\\b"
+                        |    },
+                        |    {
+                        |      "name": "keyword.control",
+                        |      "match": "\\btrue\\b"
+                        |    },
+                        |    {
+                        |      "name": "keyword.operator",
+                        |      "match": "\\{"
+                        |    },
+                        |    {
+                        |      "name": "keyword.operator",
+                        |      "match": "\\}"
+                        |    }
+                        |  ]
+                        |}""".stripMargin
+    assertResult(expectation)(output)
+  }
+}
