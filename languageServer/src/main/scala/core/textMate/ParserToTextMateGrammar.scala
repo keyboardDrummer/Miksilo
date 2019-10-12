@@ -26,7 +26,6 @@ trait TextMateGeneratingParserWriter extends CommonParserWriter with OptimizingP
       callStack ::= grammar
 
       val result: Option[String] = grammar match {
-        case drop: DropParser[_] => recurse(drop.original)
         case sequence: Sequence[_, _, _] =>
           for {
             left <- recurse(sequence.left)
@@ -42,6 +41,7 @@ trait TextMateGeneratingParserWriter extends CommonParserWriter with OptimizingP
         case delimiter: Literal => Some(escapeLiteral(delimiter.value))
         case keyword: KeywordParser => Some("\\b" + escapeLiteral(keyword.value) + "\\b")
         // TODO how to incorporate many? case many: Many => recurse(many.inner).map(r => r + "*") // TODO add parenthesis
+        case wrapper: ParserWrapper[_] => recurse(wrapper.original)
       }
 
       callStack = callStack.tail

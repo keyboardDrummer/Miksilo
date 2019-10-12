@@ -5,6 +5,7 @@ import core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, 
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase}
+import core.textMate.TextMateGeneratingParserWriter
 import languageServer.Position
 import util.Utility
 
@@ -12,10 +13,9 @@ import scala.collection.mutable
 
 case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 
-
 //noinspection ZeroIndexToHead
 object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrectingParserWriter
-  with IndentationSensitiveParserWriter {
+  with IndentationSensitiveParserWriter with TextMateGeneratingParserWriter {
 
   type AnyWithMap = WithMap[Any]
   type Result = AnyWithMap
