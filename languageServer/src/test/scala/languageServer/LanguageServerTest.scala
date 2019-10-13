@@ -1,7 +1,6 @@
 package languageServer
 
 import core.language.Language
-import languageServer._
 import languageServer.lsp._
 import org.scalatest.FunSuite
 

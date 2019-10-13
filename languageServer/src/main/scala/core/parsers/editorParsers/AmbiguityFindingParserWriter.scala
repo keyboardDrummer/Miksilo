@@ -13,7 +13,8 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       val (parseResult: LazyParseResult[Result], tail) = queue.pop()
 
       queue = parseResult match {
-        case parseResult: ReadyParseResult[Result] =>
+        case _parseResult: ReadyParseResult[_] =>
+          val parseResult = _parseResult.asInstanceOf[ReadyParseResult[Result]]
           val parseResultKey = ReadyParseResult(parseResult.resultOption, parseResult.remainder, getHistoryWithoutChoices(parseResult.history))
           if (resultsSeen.contains(parseResultKey)) {
             val previousResult = resultsSeen(parseResultKey)
@@ -32,7 +33,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
-            case tailCons: SRCons[Result] =>
+            case tailCons: SRCons[_] =>
               if (mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty
               else
@@ -40,7 +41,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
             case _ =>
               SREmpty
           }
-        case delayedResult: DelayedParseResult[Result] =>
+        case delayedResult: DelayedParseResult[_] =>
           val results = delayedResult.results
           tail.merge(results)
       }
@@ -74,16 +75,14 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      new Parser[Result] {
-        override def apply(input: Input, state: ParseState) = {
-          val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input -> first)))
-          val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input -> second)))
-          firstResult match {
-            case cons: SRCons[Result]
-              if !cons.head.history.flawed => firstResult
-            case _ =>
-              firstResult.merge(secondResult)
-          }
+      (input: Input, state: ParseState) => {
+        val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input -> first)))
+        val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input -> second)))
+        firstResult match {
+          case cons: SRCons[Result]
+            if !cons.head.history.flawed => firstResult
+          case _ =>
+            firstResult.merge(secondResult)
         }
       }
     }
@@ -98,13 +97,11 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      new Parser[Result] {
-        override def apply(input: Input, state: ParseState) = {
-          val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input -> first)))
-          val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input -> second)))
-          val merged = firstResult.merge(secondResult)
-          merged
-        }
+      (input: Input, state: ParseState) => {
+        val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input -> first)))
+        val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input -> second)))
+        val merged = firstResult.merge(secondResult)
+        merged
       }
     }
   }
