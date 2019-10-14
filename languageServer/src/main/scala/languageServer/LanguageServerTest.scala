@@ -2,7 +2,6 @@ package languageServer
 
 import core.language.Language
 import languageServer.lsp._
-import org.scalatest.FunSuite
 
 import scala.util.Random
 
