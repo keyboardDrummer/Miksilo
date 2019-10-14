@@ -5,6 +5,7 @@ import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
+import org.scalatest.FunSuite
 import util.SourceUtils
 
 // TODO add a constraintBuilder that's specific to a File, so you add a [Has]SourceRange instead of a SourceElement
@@ -85,7 +86,7 @@ object ExpressionLanguage extends Language {
   compilerPhases = List(parsePhase, constraintPhase)
 }
 
-class ExampleExpressionLanguage extends LanguageServerTest {
+class ExampleExpressionLanguage extends FunSuite with LanguageServerTest {
 
   val language: Language = ExpressionLanguage
   val program = "let x = 3 in x + 3 + x"
