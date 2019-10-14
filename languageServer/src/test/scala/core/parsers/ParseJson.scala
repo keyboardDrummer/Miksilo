@@ -15,5 +15,5 @@ object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingPa
     override def toString = "unknown"
   }
   lazy val jsonParser: Self[Any] = stringLiteral | objectParser | wholeNumber | arrayParser |
-    Fallback(UnknownExpression, "value")
+    Fallback(_ => UnknownExpression, "value")
 }

@@ -55,7 +55,7 @@ class ScopeGraph extends
     declarations.collect({ case n: NamedDeclaration => n })
   }
 
-  def findReference(location: SourceElement): Option[Reference] = {
+  def getReferenceFromSourceElement(location: SourceElement): Option[Reference] = {
     val references = for {
       elementRange <- location.fileRange
       result <- rangeToNode.get(elementRange)

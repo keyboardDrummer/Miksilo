@@ -89,11 +89,11 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def canMerge = true
   }
 
-  case class Fallback[Result](value: Result, name: String) extends ParserBuilderBase[Result] with LeafParser[Result] { // TODO combine with failure?
+  case class Fallback[Result](getValue: Input => Result, name: String) extends ParserBuilderBase[Result] with LeafParser[Result] { // TODO combine with failure?
     override def getParser(recursive: GetParser): Parser[Result] = {
       (input, _) => {
-        val history = History.error(new MissingInput(input, s"<$name>", " ", History.insertFallbackPenalty))
-        val result = ReadyParseResult(Some(value), input, history)
+        val history = History.error(MissingInput(input, s"<$name>", " ", History.insertFallbackPenalty))
+        val result = ReadyParseResult(Some(getValue(input)), input, history)
         singleResult(result)
       }
     }

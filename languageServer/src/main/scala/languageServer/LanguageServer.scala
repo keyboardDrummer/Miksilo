@@ -49,7 +49,7 @@ object Position {
       ordering.compare(x, y)
     }
   }
-  implicit val format = Json.format[Position]
+  implicit val format: OFormat[Position] = Json.format[Position]
 }
 
 object SourceRange { implicit val format = Json.format[SourceRange] }
