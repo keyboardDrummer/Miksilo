@@ -5,6 +5,7 @@ import core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, 
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase}
+import core.textMate.TextMateGeneratingParserWriter
 import languageServer.Position
 import util.Utility
 
@@ -12,10 +13,9 @@ import scala.collection.mutable
 
 case class WithMap[+T](value: T, namedValues: Map[Any,Any] = Map.empty) {}
 
-
 //noinspection ZeroIndexToHead
 object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrectingParserWriter
-  with IndentationSensitiveParserWriter {
+  with IndentationSensitiveParserWriter with TextMateGeneratingParserWriter {
 
   type AnyWithMap = WithMap[Any]
   type Result = AnyWithMap
@@ -117,9 +117,9 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
           (element, result) => WithMap(element.value :: result.value, element.namedValues ++ result.namedValues), many.parseGreedy)
 
         parser
-      case mapGrammar: MapGrammar[AnyWithMap, AnyWithMap] =>
+      case mapGrammar: MapGrammar[_, _] =>
         val innerParser = recursive(mapGrammar.inner)
-        FilterMap(innerParser, mapGrammar.construct)
+        FilterMap(innerParser, mapGrammar.asInstanceOf[MapGrammar[AnyWithMap, AnyWithMap]].construct)
 
       case BiFailure(message) => Fail(None, message, History.failPenalty)
       case Print(_) => succeed(Unit).map(valueToResult)

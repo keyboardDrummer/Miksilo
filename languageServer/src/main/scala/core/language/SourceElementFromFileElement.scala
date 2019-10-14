@@ -2,7 +2,7 @@ package core.language
 
 import languageServer.SourceRange
 
-case class SourceElementFromFileElement(uri: String, element: FileSourceElement) extends SourceElement {
+case class SourceElementFromFileElement(uri: String, element: FileElement) extends SourceElement {
   override def range = Some(element.range)
 
   override def uriOption = Some(uri)
@@ -12,8 +12,10 @@ case class SourceElementFromFileElement(uri: String, element: FileSourceElement)
   }
 }
 
-trait FileSourceElement {
+trait FileElement {
   def range: SourceRange
 
-  def childElements: Seq[FileSourceElement]
+  def childElements: Seq[FileElement]
+
+  def addFile(uri: String) = SourceElementFromFileElement(uri, this)
 }

@@ -1,13 +1,11 @@
-package cloudformation
+package deltas.cloudformation
 
 import core.bigrammar.TestLanguageGrammarUtils
 import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
-import deltas.cloudformation.CloudFormationLanguage
-import languageServer._
 import languageServer.lsp._
-import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
+import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer, _}
 import org.scalatest.FunSuite
-import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
+import util.{SourceUtils, TestLanguageBuilder}
 
 class JsonCloudFormationTest extends FunSuite with LanguageServerTest {
 

@@ -1,13 +1,10 @@
 package languageServer
 
 import core.language.Language
-import languageServer._
 import languageServer.lsp._
-import org.scalatest.FunSuite
-
 import scala.util.Random
 
-trait LanguageServerTest extends FunSuite {
+trait LanguageServerTest {
 
   val itemUri = "helloWorld"
 

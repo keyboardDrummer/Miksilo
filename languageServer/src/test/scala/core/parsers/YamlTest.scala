@@ -4,12 +4,11 @@ package core2.parsers
 import core.document.Empty
 import core.parsers.core.Processor
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
-import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
+import _root_.core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase, WhitespaceParserWriter}
 import core.responsiveDocument.ResponsiveDocument
 import org.scalatest.FunSuite
 import languageServer.Position
 import util.SourceUtils
-import _root_.core.parsers.strings.StringReaderBase
 
 trait YamlExpression {
   def toDocument: ResponsiveDocument
@@ -53,7 +52,7 @@ object FlowKey extends YamlContext
 
 class YamlTest extends FunSuite
   with LeftRecursiveCorrectingParserWriter
-  with IndentationSensitiveParserWriter with CommonParserWriter {
+  with IndentationSensitiveParserWriter with CommonParserWriter with WhitespaceParserWriter {
 
   type Input = IndentationReader
 
@@ -76,13 +75,6 @@ class YamlTest extends FunSuite
       case other: IndentationReader => offset == other.offset && indentation == other.indentation && context == other.context
       case _ => false
     }
-  }
-
-  val whiteSpace = RegexParser("""\s*""".r, "whitespace", score = 0)
-
-  override def leftRight[Left, Right, Result](left: ParserBuilder[Left], right: => ParserBuilder[Right],
-                                              combine: (Option[Left], Option[Right]) => Option[Result]) =  {
-    new Sequence(left, new Sequence(whiteSpace, right, Processor.ignoreLeft[Option[String], Option[Right]]), combine)
   }
 
   class IfContext[Result](inners: Map[YamlContext, Self[Result]]) extends ParserBuilderBase[Result] {
@@ -176,7 +168,7 @@ class YamlTest extends FunSuite
 
   lazy val plainStyleSingleLineString = nsPlainSafe
   lazy val plainStyleMultiLineString = {
-    val firstLine = new Sequence[String, String, String](nsPlainSafe, whiteSpace, Processor.ignoreRight)
+    val firstLine = new Sequence[String, Any, String](nsPlainSafe, whiteSpace, Processor.ignoreRight)
     val followingLines = greaterThan(WithIndentation(equal(nsPlainSafe).someSeparated("\n", "line")))
     new Sequence(firstLine, followingLines, combineSimple((firstLine: String, rest: List[String]) => {
         rest.fold(firstLine)((a, b) => a + " " + b)

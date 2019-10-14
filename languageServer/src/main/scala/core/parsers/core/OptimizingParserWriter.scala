@@ -66,7 +66,8 @@ trait OptimizingParserWriter extends ParserWriter {
     override def children = List(original)
   }
 
-  class Lazy[Result](_original: => Self[Result], val debugName: Any = null) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
+  class Lazy[Result](_original: => Self[Result], val debugName: Any = null)
+    extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     lazy val original: Self[Result] = _original
     def getOriginal = original
 

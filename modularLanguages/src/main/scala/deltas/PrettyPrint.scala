@@ -2,7 +2,6 @@ package deltas
 
 import core.bigrammar.BiGrammar
 import core.bigrammar.printer.{BiGrammarToPrinter, PrintError}
-import core.bigrammar.textMate.BiGrammarToTextMate.jsonLanguage
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.deltas.{Contract, Delta}

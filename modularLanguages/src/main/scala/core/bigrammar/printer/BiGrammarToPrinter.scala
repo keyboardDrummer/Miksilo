@@ -51,8 +51,9 @@ class BiGrammarToPrinter {
           val deconstruct = (withMap: AnyWithMap) =>
             sequence.bijective.destruct(withMap.value).map(v => WithMap(v, withMap.namedValues))
           new MapGrammarWithMapPrinter(inner, deconstruct)
-        case mapGrammar: MapGrammar[AnyWithMap, AnyWithMap] =>
-          new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner), mapGrammar.deconstruct)
+        case mapGrammar: MapGrammar[_, _] =>
+          new MapGrammarWithMapPrinter(toPrinterCached(mapGrammar.inner),
+            mapGrammar.asInstanceOf[MapGrammar[AnyWithMap, AnyWithMap]].deconstruct)
         case BiFailure(message) => _ => failureToGrammar(message, grammar)
         case valueGrammar: ValueGrammar => new ValuePrinter(valueGrammar.value)
         case Print(document) => _ => TryState.value(document)
