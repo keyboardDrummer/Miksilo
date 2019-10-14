@@ -14,7 +14,7 @@ trait WhitespaceParserWriter extends StringParserWriter {
     result
   }
 
-  lazy val trivias: Self[List[String]] = oldMany(trivia, List.empty, (h: String, t: List[String]) =>  h :: t, parseGreedy = true)
+  lazy val trivias: Self[List[String]] = oldMany(trivia, List.empty, (h: String, t: List[String]) =>  h :: t)
 
   override def leftRight[Left, Right, Result](left: ParserBuilder[Left], right: => ParserBuilder[Right],
                                               combine: (Option[Left], Option[Right]) => Option[Result]) =  {
