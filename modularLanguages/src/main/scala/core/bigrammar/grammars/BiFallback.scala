@@ -5,7 +5,7 @@ import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import BiGrammarToParser._
 
 class BiFallback(value: Any, name: String) extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
-  override def getParserBuilder(keywords: collection.Set[String]) = Fallback(value, name)
+  override def getParserBuilder(keywords: collection.Set[String]) = Fallback(_ => value, name)
 
   override def containsParser(recursive: BiGrammar => Boolean) = false
 

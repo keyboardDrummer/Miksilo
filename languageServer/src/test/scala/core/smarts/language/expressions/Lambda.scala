@@ -15,7 +15,7 @@ case class Lambda(name: String, body: Expression, parameterDefinedType: Option[L
     builder.typesAreEqual(_type, ConstraintClosureType(parentScope, name, this, wrappedBody))
   }
 
-  class TypeCheckWrapper(name: String, location: SourceElement,original: ConstraintExpression, parameterType: Type)
+  class TypeCheckWrapper(name: String, location: SourceElement, original: ConstraintExpression, parameterType: Type)
     extends ConstraintExpression with FakeSourceElement
   {
     override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {

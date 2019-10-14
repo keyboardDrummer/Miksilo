@@ -39,7 +39,7 @@ class Proofs {
   }
 
   def gotoDefinition(location: SourceElement): Option[NamedDeclaration] = {
-    val maybeReference = scopeGraph.findReference(location)
+    val maybeReference = scopeGraph.getReferenceFromSourceElement(location)
     maybeReference.flatMap(reference => references.get(reference))
   }
 
@@ -53,7 +53,7 @@ class Proofs {
   }
 
   def getDeclarationsInScope(location: SourceElement): Seq[NamedDeclaration] = {
-    val maybeReference = scopeGraph.findReference(location)
+    val maybeReference = scopeGraph.getReferenceFromSourceElement(location)
     val declarations = maybeReference.map(reference => scopeGraph.resolveWithoutNameCheck(reference)).getOrElse(Seq.empty)
     declarations.filter(declaration => declaration.origin.nonEmpty)
   }

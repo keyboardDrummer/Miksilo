@@ -90,7 +90,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       proofs <- getProofs.toSeq
       scopeGraph = proofs.scopeGraph
       element = getSourceElement(FilePosition(params.textDocument.uri, position))
-      reference <- scopeGraph.findReference(element).toSeq
+      reference <- scopeGraph.getReferenceFromSourceElement(element).toSeq
       prefixLength = position.character - reference.origin.get.range.get.start.character
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
