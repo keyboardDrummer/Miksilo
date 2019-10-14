@@ -19,7 +19,7 @@ object WildcardImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: NodePath, parentScope: Scope): Unit = {
     val elements = getParts(_import)
     val fullPackage: String = elements.reduce((a, b) => a + "." + b)
-    val packageDeclaration = builder.resolve(fullPackage, _import.asInstanceOf[NodeChildPath], parentScope)
+    val packageDeclaration = builder.resolve(fullPackage, parentScope, _import.asInstanceOf[NodeChildPath])
     val packageScope = builder.getDeclaredScope(packageDeclaration)
     builder.importScope(parentScope, packageScope)
   }

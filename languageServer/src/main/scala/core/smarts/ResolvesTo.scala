@@ -36,7 +36,7 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
     for {
       fileRange <- reference.origin.flatMap(e => e.fileRange)
     } yield {
-      val diagnostic = Diagnostic(fileRange.range, Some(DiagnosticSeverity.Error), None, None, s"Could not find definition of ${reference.name}")
+      val diagnostic = Diagnostic(fileRange.range, Some(DiagnosticSeverity.Error), s"Could not find definition of ${reference.name}", None, None)
       FileDiagnostic(fileRange.uri, diagnostic)
     }
   }

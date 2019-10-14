@@ -32,6 +32,6 @@ object GotoStatementDelta extends DeltaWithGrammar with StatementInstance {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val target = getTarget(statement)
-    builder.resolve(target, statement, parentScope)
+    builder.resolve(target, parentScope, statement)
   }
 }

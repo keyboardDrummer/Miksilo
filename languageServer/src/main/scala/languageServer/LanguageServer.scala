@@ -71,14 +71,8 @@ case class SourceRange(start: Position, end: Position) {
 object Diagnostic {
   implicit val format = Json.format[Diagnostic]
 }
-case class Diagnostic(
-                       range: SourceRange, // the range at which this diagnostic applies
-                       severity: Option[Int], // severity of this diagnostics (see above)
-                       code: Option[String], // a code for this diagnostic
-                       source: Option[String], // the source of this diagnostic (like 'typescript' or 'scala')
-                       message: String // the diagnostic message
-                     ) {
-  def identifier = Diagnostic(range, None, None, None, message)
+case class Diagnostic(range: SourceRange, severity: Option[Int], message: String, code: Option[String] = None, source: Option[String] = None) {
+  def identifier = Diagnostic(range, None, message, None, None)
 }
 
 object TextEdit {

@@ -14,7 +14,7 @@ class CompletionTest extends FunSuite with LanguageServerTest {
   test("fibonacci") {
     val program = JavaSourceUtils.getJavaTestFileContents("Fibonacci")
     val indexDefinition = complete(server, program, new HumanPosition(5, 40))
-    val item = CompletionItem("fibonacci", kind = Some(CompletionItemKind.Text), insertText = Some("fibonacci"))
+    val item = createCompletionItem("fibonacci")
     assertResult(CompletionList(isIncomplete = false, Seq(item)))(indexDefinition)
   }
 }

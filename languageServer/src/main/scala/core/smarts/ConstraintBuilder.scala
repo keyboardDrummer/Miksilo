@@ -43,7 +43,7 @@ class ConstraintBuilder(val factory: Factory) {
     declaration
   }
 
-  def resolve(name: String, origin: SourceElement, scope: Scope, _type: Option[Type] = None) : DeclarationVariable = {
+  def resolve(name: String, scope: Scope, origin: SourceElement, _type: Option[Type] = None) = {
     resolveOption(name, Some(origin), scope, _type)
   }
 

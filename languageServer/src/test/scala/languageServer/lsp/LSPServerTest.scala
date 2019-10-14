@@ -279,7 +279,7 @@ class LSPServerTest extends AsyncFunSpec {
         |
         |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"a","languageId":"","version":0,"text":"content"}}}""".stripMargin
 
-    val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)),Some(2), None, None, "Woeps"))
+    val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)), Some(2), "Woeps", None, None))
     val p = Promise[Assertion]()
     val languageClient = new TestLanguageClient {
       override def sendDiagnostics(receivedDiagnostics: PublishDiagnostics): Unit = {

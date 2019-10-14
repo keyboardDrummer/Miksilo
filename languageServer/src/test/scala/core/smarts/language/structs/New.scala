@@ -11,7 +11,7 @@ import core.smarts.language.types.LanguageType
 case class New(structName: String, fieldInitializers: Seq[StructFieldInit], genericTypeArgument: Option[LanguageType] = None) extends Expression
 {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
-    val structDeclaration = builder.resolve(structName, this, parentScope)
+    val structDeclaration = builder.resolve(structName, parentScope, this)
     val structType: Type = genericTypeArgument.fold[Type](TypeFromDeclaration(structDeclaration))((t: LanguageType) => {
       val typeArgument = t.constraints(builder, parentScope)
       val instantiatedStruct = builder.declarationVariable()

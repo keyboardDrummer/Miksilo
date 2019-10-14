@@ -43,7 +43,7 @@ object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance {
     val method: Method[NodePath] = call.findAncestorShape(MethodDelta.Shape)
     val clazz: JavaClass[NodePath] = call.findAncestorShape(JavaClassDelta.Shape)
     val parentName = clazz.parent.get
-    val superClass = builder.resolve(parentName, call.getField(ClassParent), parentScope)
+    val superClass = builder.resolve(parentName, parentScope, call.getField(ClassParent))
     val superScope = builder.getDeclaredScope(superClass)
 
     val superReference = new Reference(method.name, Some(call))

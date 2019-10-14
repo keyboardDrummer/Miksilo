@@ -62,8 +62,8 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     Option(getCompilation.proofs)
   }
 
-  def getSourceElement(position: FilePosition): SourceElement = {
-    getCompilation.program.getChildForPosition(position).get
+  def getSourceElement(position: FilePosition): Option[SourceElement] = {
+    getCompilation.program.getChildForPosition(position)
   }
 
   override def initialize(parameters: InitializeParams): Unit = {}
@@ -75,7 +75,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     logger.debug("Went into gotoDefinition")
     val fileRange = for {
       proofs <- getProofs
-      element = getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
+      element <- getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- proofs.gotoDefinition(element)
       fileRange <- definition.origin.flatMap(o => o.fileRange)
     } yield fileRange //TODO misschien de Types file kopieren en Location vervangen door FileRange?
@@ -89,14 +89,14 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     val completions: Seq[CompletionItem] = for {
       proofs <- getProofs.toSeq
       scopeGraph = proofs.scopeGraph
-      element = getSourceElement(FilePosition(params.textDocument.uri, position))
+      element <- getSourceElement(FilePosition(params.textDocument.uri, position)).toSeq
       reference <- scopeGraph.getReferenceFromSourceElement(element).toSeq
       prefixLength = position.character - reference.origin.get.range.get.start.character
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
         filter(declaration => declaration.name.startsWith(prefix))
       insertText = declaration.name
-      completion = CompletionItem(declaration.name, kind = Some(CompletionItemKind.Text), insertText = Some(insertText))
+      completion = CompletionItem(declaration.name, kind = Some(CompletionItemKind.Variable), insertText = Some(insertText))
     } yield completion
 
     CompletionList(isIncomplete = false, completions)
@@ -113,7 +113,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     logger.debug("Went into references")
     val maybeResult = for {
       proofs <- getProofs
-      element = getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
+      element <- getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- getDefinitionFromDefinitionOrReferencePosition(proofs, element)
     } yield {
 

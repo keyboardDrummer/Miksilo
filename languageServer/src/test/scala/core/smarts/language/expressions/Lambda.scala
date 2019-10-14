@@ -19,7 +19,7 @@ case class Lambda(name: String, body: Expression, parameterDefinedType: Option[L
     extends ConstraintExpression with FakeSourceElement
   {
     override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
-      val declaration = builder.resolve(name, location, parentScope)
+      val declaration = builder.resolve(name, parentScope, location)
       builder.add(CheckSubType(builder.getType(declaration), parameterType))
       original.constraints(builder, _type, parentScope)
     }

@@ -38,7 +38,7 @@ case class Number(range: SourceRange, value: Int) extends Expression {
 
 case class Identifier(range: SourceRange, name: String) extends Expression {
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
-    builder.resolve(name, this.addFile(uri), scope)
+    builder.resolve(name, scope, this.addFile(uri))
   }
 
   override def childElements = Seq.empty
