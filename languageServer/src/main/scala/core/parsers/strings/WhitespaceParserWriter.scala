@@ -4,7 +4,7 @@ import core.parsers.core.Processor
 
 trait WhitespaceParserWriter extends StringParserWriter {
 
-  final val whiteSpace: Self[String] = RegexParser("""\s+""".r, "whitespace", score = -0.001, penaltyOption = None)
+  final val whiteSpace: Self[String] = RegexParser("""\s+""".r, "whitespace", score = 0, penaltyOption = None)
   def trivia = whiteSpace
 
   def oldMany[Result, Sum](original: ParserBuilder[Result],
@@ -15,7 +15,7 @@ trait WhitespaceParserWriter extends StringParserWriter {
   }
 
   // Not parsing greedily allow us to not parse whiteSpace, which allow us to place missing input errors before whitespace.
-  lazy val trivias: Self[List[String]] = oldMany(trivia, List.empty, (h: String, t: List[String]) =>  h :: t, parseGreedy = false)
+  lazy val trivias: Self[List[String]] = oldMany(trivia, List.empty, (h: String, t: List[String]) =>  h :: t, parseGreedy = true)
 
   override def leftRight[Left, Right, Result](left: ParserBuilder[Left], right: => ParserBuilder[Right],
                                               combine: (Option[Left], Option[Right]) => Option[Result]) =  {

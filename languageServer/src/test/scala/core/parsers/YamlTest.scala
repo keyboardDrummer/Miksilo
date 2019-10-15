@@ -1,11 +1,11 @@
 
-package core2.parsers
+package core.parsers
 
-import core.document.Empty
-import core.parsers.core.Processor
-import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
+import _root_.core.document.Empty
+import _root_.core.parsers.core.Processor
+import _root_.core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import _root_.core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase, WhitespaceParserWriter}
-import core.responsiveDocument.ResponsiveDocument
+import _root_.core.responsiveDocument.ResponsiveDocument
 import org.scalatest.FunSuite
 import languageServer.Position
 import util.SourceUtils
