@@ -14,7 +14,6 @@ trait WhitespaceParserWriter extends StringParserWriter {
     result
   }
 
-  // Not parsing greedily allow us to not parse whiteSpace, which allow us to place missing input errors before whitespace.
   lazy val trivias: Self[List[String]] = oldMany(trivia, List.empty, (h: String, t: List[String]) =>  h :: t, parseGreedy = true)
 
   override def leftRight[Left, Right, Result](left: ParserBuilder[Left], right: => ParserBuilder[Right],
