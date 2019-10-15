@@ -3,7 +3,6 @@ package core.parsers
 import languageServer.Position
 import org.scalatest.FunSuite
 import strings.StringParserWriter
-import editorParsers.SpotlessHistory
 import editorParsers.History
 import _root_.core.parsers.strings.StringReaderBase
 

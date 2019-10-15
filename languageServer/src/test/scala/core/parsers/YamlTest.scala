@@ -25,7 +25,7 @@ case class Object(members: Map[YamlExpression, YamlExpression]) extends YamlExpr
   }
 }
 
-case class Array(elements: Seq[YamlExpression]) extends YamlExpression {
+case class YamlArray(elements: Seq[YamlExpression]) extends YamlExpression {
   override def toDocument: ResponsiveDocument = {
     elements.
       map(member => ResponsiveDocument.text("- ") ~~ member.toDocument).
@@ -126,13 +126,13 @@ class YamlTest extends FunSuite
   }
 
   lazy val parseBracketArray: Self[YamlExpression] = {
-    val inner = "[" ~> parseFlowValue.manySeparated(",", "array element").map(elements => Array(elements)) ~< "]"
+    val inner = "[" ~> parseFlowValue.manySeparated(",", "array element").map(elements => YamlArray(elements)) ~< "]"
     new WithContext(_ => FlowIn, inner)
   }
 
   lazy val parseArray: Self[YamlExpression] = {
     val element = literalOrKeyword("- ") ~> greaterThan(parseValue)
-    alignedList(element).map(elements => Array(elements))
+    alignedList(element).map(elements => YamlArray(elements))
   }
 
   lazy val parseNumber: Self[YamlExpression] =
@@ -254,7 +254,7 @@ class YamlTest extends FunSuite
         |- 3""".stripMargin
 
     val result = parseValue.getWholeInputParser.parse(new IndentationReader(program))
-    val expectation = Array(Seq(Number(2), Number(3)))
+    val expectation = YamlArray(Seq(Number(2), Number(3)))
     assertResult(expectation)(result.get)
   }
 
@@ -264,7 +264,7 @@ class YamlTest extends FunSuite
         |  y: 4""".stripMargin
 
     val result = parseValue.getWholeInputParser.parse(new IndentationReader(program))
-    val expectation = Array(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
+    val expectation = YamlArray(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
 
@@ -275,7 +275,7 @@ class YamlTest extends FunSuite
         |- 2""".stripMargin
 
     val result = parseValue.getWholeInputParser.parse(new IndentationReader(program))
-    val expectation = Array(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4))), Number(2)))
+    val expectation = YamlArray(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4))), Number(2)))
     assertResult(expectation)(result.get)
   }
 
@@ -286,7 +286,7 @@ class YamlTest extends FunSuite
         |  y: 4""".stripMargin
 
     val result = parseValue.getWholeInputParser.parse(new IndentationReader(program))
-    val expectation = Array(Seq(Number(2), Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
+    val expectation = YamlArray(Seq(Number(2), Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
 
@@ -296,11 +296,11 @@ class YamlTest extends FunSuite
         |- b: - 2""".stripMargin
 
     val result = parseValue.getWholeInputParser.parse(new IndentationReader(program))
-    val expectation = Array(Seq(
+    val expectation = YamlArray(Seq(
       Object(Map(
-        StringLiteral("a") -> Array(Seq(Number(1))))),
+        StringLiteral("a") -> YamlArray(Seq(Number(1))))),
       Object(Map(
-        StringLiteral("b") -> Array(Seq(Number(2)))))
+        StringLiteral("b") -> YamlArray(Seq(Number(2)))))
     ))
     assertResult(expectation)(result.get)
   }
@@ -320,15 +320,15 @@ class YamlTest extends FunSuite
 
     val result = parseValue.getWholeInputParser.parse(new IndentationReader(program))
     val expectation =
-      Array(Seq(
+      YamlArray(Seq(
         Number(2),
         Object(Map(StringLiteral("x") -> Number(3),
           StringLiteral("y") -> Object(Map(StringLiteral("a") -> Number(4), StringLiteral("b") -> Number(5))),
-          StringLiteral("z") -> Array(Seq(Number(2), Number(4))))),
+          StringLiteral("z") -> YamlArray(Seq(Number(2), Number(4))))),
         Number(6),
         Object(Map(
           StringLiteral("q") ->
-            Array(Seq(Number(7), Number(8))),
+            YamlArray(Seq(Number(7), Number(8))),
           StringLiteral("r") -> Number(9)))))
     assertResult(expectation)(result.get)
   }

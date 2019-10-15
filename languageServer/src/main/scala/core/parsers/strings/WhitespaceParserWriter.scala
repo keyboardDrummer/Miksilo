@@ -4,7 +4,7 @@ import core.parsers.core.Processor
 
 trait WhitespaceParserWriter extends StringParserWriter {
 
-  final val whiteSpace: Self[String] = RegexParser("""\s+""".r, "whitespace", score = 0, penaltyOption = None)
+  final val whiteSpace: Self[String] = RegexParser("""\s+""".r, "whitespace", penaltyOption = None)
   def trivia = whiteSpace
 
   def oldMany[Result, Sum](original: ParserBuilder[Result],
