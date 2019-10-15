@@ -323,6 +323,52 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     override def flatMapReady[NewResult](f: ReadyParseResult[Result] => SortedParseResults[NewResult], uniform: Boolean) = f(this)
   }
 
+  class LeftIfRightMoved[+Left, Result](val left: Self[Left],
+                                         _right: => Self[Result],
+                                         combine: (Option[Left], Option[Result]) => Option[Result])
+    extends ParserBuilderBase[Result] with SequenceLike[Result] {
+
+    lazy val right: Self[Result] = _right
+
+    override def getParser(recursive: GetParser): Parser[Result] = {
+      val parseLeft = recursive(left)
+      lazy val parseRight = recursive(right)
+
+      class LeftIfRightParser extends Parser[Result] {
+
+        def parse(input: Input, state: ParseState, mayFail: Boolean): ParseResult[Result] = {
+
+          def rightFromLeftReady(leftReady: ReadyParseResult[Left]): SortedParseResults[Result] = {
+
+            val rightResult = parseRight(leftReady.remainder, state)
+            rightResult.flatMapReady(rightReady => {
+              if (rightReady.remainder == leftReady.remainder)
+                SREmpty
+              else {
+                val combinedReady = ReadyParseResult(combine(leftReady.resultOption, rightReady.resultOption),
+                  rightReady.remainder,
+                  leftReady.history ++ rightReady.history)
+                singleResult(combinedReady)
+              }
+            }, uniform = !leftReady.history.canMerge)
+          }
+
+          val withoutLeft = parseRight(input, state)
+          if (input.atEnd)
+            return withoutLeft
+
+          val withLeft = parseLeft(input, state).flatMapReady(rightFromLeftReady, uniform = true)
+          withoutLeft.merge(withLeft)
+        }
+
+        override def apply(input: Input, state: ParseState): ParseResult[Result] = {
+          parse(input, state, mayFail = true)
+        }
+      }
+      new LeftIfRightParser
+    }
+  }
+
   class Sequence[+Left, +Right, Result](val left: Self[Left],
                                          _right: => Self[Right],
                                          combine: (Option[Left], Option[Right]) => Option[Result])
@@ -390,6 +436,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   class Choice[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
     extends ParserBuilderBase[Result] with ChoiceLike[Result] {
 
+    if (first == null) {
+      System.out.append("")
+    }
     lazy val second = _second
 
     override def getParser(recursive: GetParser): Parser[Result] = {
