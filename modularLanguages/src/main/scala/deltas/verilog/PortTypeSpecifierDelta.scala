@@ -41,7 +41,7 @@ object PortTypeSpecifierDelta extends DeltaWithGrammar with HasConstraintsDelta 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val portTypeSpecifier: PortTypeSpecifier[NodePath] = path
     for(variable <- portTypeSpecifier.variables) {
-      builder.resolve(variable.name, variable, parentScope)
+      builder.resolve(variable.name, parentScope, variable)
     }
   }
 

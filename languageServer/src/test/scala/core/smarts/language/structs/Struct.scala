@@ -20,7 +20,7 @@ case class Struct(name: String, fields: Seq[Field], maybeParent: Option[String] 
     val structDeclaration: NamedDeclaration = builder.declare(name, parentScope, this)
     builder.add(DeclarationHasType(structDeclaration, TypeFromDeclaration(structDeclaration)))
     val scopeOfParent: Option[Scope] = maybeParent.map(parent => {
-      val parentDeclaration = builder.resolve(parent, this, parentScope)
+      val parentDeclaration = builder.resolve(parent, parentScope, this)
       val scopeOfParent = builder.getDeclaredScope(parentDeclaration)
 
       builder.add(List(AssignSubType(TypeFromDeclaration(structDeclaration), TypeFromDeclaration(parentDeclaration))))

@@ -54,7 +54,7 @@ object CloudFormationTemplate extends Delta {
         val resourceMembers: ObjectLiteral[NodePath] = resource.value
         val typeString = resourceMembers.getValue("Type")
         val resourceType = JsonStringLiteralDelta.getValue(typeString)
-        val typeDeclaration = builder.resolve(resourceType, typeString.getField(JsonStringLiteralDelta.Value), rootScope)
+        val typeDeclaration = builder.resolve(resourceType, rootScope, typeString.getField(JsonStringLiteralDelta.Value))
         val typeScope = builder.getDeclaredScope(typeDeclaration)
         resourceMembers.get("Properties").foreach(_properties => {
           if (_properties.shape == JsonObjectLiteralDelta.Shape) {

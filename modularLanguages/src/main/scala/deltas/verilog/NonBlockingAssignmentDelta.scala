@@ -39,7 +39,7 @@ object NonBlockingAssignmentDelta extends DeltaWithGrammar with HasConstraintsDe
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val assignment: NonBlockingAssignment[NodePath] = path
     ExpressionDelta.addConstraints(compilation, builder, assignment.value, builder.typeVariable(), parentScope)
-    builder.resolve(assignment.target, path.getField(Target), parentScope)
+    builder.resolve(assignment.target, parentScope, path.getField(Target))
   }
 
   override def dependencies: Set[Contract] = Set(ExpressionDelta)

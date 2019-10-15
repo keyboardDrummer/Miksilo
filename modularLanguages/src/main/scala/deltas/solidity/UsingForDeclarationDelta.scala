@@ -50,7 +50,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val usingFor: UsingFor[NodePath] = path
     val _type = TypeSkeleton.getType(compilation, builder, usingFor._type, parentScope)
-    val libraryDeclaration: DeclarationVariable = builder.resolve(usingFor.libraryName, usingFor.getField(LibraryName), parentScope)
+    val libraryDeclaration: DeclarationVariable = builder.resolve(usingFor.libraryName, parentScope, usingFor.getField(LibraryName))
     val libraryScope = builder.getDeclaredScope(libraryDeclaration)
 
     val typeDeclaration = builder.getDeclarationOfType(_type)

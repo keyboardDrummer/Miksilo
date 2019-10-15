@@ -12,7 +12,7 @@ case class MatchType(subject: Expression, cases: Seq[TypeCase]) extends Expressi
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
     val subjectType = subject.getType(builder, parentScope)
     cases.foreach(_case => {
-      val caseTypeDeclaration = builder.resolve(_case.typeName, this, parentScope)
+      val caseTypeDeclaration = builder.resolve(_case.typeName, parentScope, this)
       val caseType = builder.getType(caseTypeDeclaration)
       builder.add(CheckSubType(caseType, subjectType))
       val bodyScope = builder.newScope(Some(parentScope))
@@ -29,7 +29,7 @@ case class Access(target: Expression, field: String) extends Expression
   override def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit = {
     val structDeclaration = builder.declarationVariable()
     val structScope = builder.getDeclaredScope(structDeclaration)
-    builder.resolve(field, this, structScope, Some(_type))
+    builder.resolve(field, structScope, this, Some(_type))
     target.constraints(builder, TypeFromDeclaration(structDeclaration), scope)
   }
 }

@@ -27,8 +27,7 @@ object DecodeByteCodeParser extends DeltaWithPhase {
       compilation.program = PathRoot(parseResult.get)
       parseResult.get.startOfUri = Some(uri)
     } else {
-      val diagnostic = Diagnostic(SourceRange(HumanPosition(0, 0), HumanPosition(0, 0)),
-        Some(DiagnosticSeverity.Error), None, None, "File was not a JVM classfile")
+      val diagnostic = Diagnostic(SourceRange(HumanPosition(0, 0), HumanPosition(0, 0)), Some(DiagnosticSeverity.Error), "File was not a JVM classfile", None, None)
       compilation.diagnostics += FileDiagnostic(uri, diagnostic)
     }
   }

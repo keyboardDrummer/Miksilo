@@ -33,7 +33,7 @@ trait LanguageServerTest {
     server.asInstanceOf[ReferencesProvider].references(ReferencesParams(document, position, ReferenceContext(includeDeclaration)))
   }
 
-  def createCompletionItem(value: String) = CompletionItem(value, Some(CompletionItemKind.Text), insertText = Some(value))
+  def createCompletionItem(value: String) = CompletionItem(value, Some(CompletionItemKind.Variable), insertText = Some(value))
 
   def complete(server: LanguageServer, program: String, position: HumanPosition): CompletionList = {
     val document = openDocument(server, program)
@@ -43,10 +43,8 @@ trait LanguageServerTest {
   def getDiagnostics(server: LanguageServer, program: String): Seq[Diagnostic] = {
     var result: Seq[Diagnostic] = null
     val document = openDocument(server, program)
-    server.setClient(new LanguageClient {
-      override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {
-        result = diagnostics.diagnostics
-      }
+    server.setClient((diagnostics: PublishDiagnostics) => {
+      result = diagnostics.diagnostics
     })
     server.didChange(DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, 0), Seq.empty))
     result

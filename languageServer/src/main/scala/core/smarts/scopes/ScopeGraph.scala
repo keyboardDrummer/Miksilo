@@ -67,7 +67,7 @@ class ScopeGraph extends
   def addImport(currentScope: ConcreteScope, importedScope: ConcreteScope): Unit = addEdge(currentScope, ImportEdge(importedScope))
 
   def resolveScope(importedModule: NamedDeclaration): ConcreteScope = {
-    val reachableNodes = depthFirst(importedModule).collect({case d:ConcreteScope => d})
+    val reachableNodes = depthFirst(importedModule).collect({ case d: ConcreteScope => d })
     if (reachableNodes.nonEmpty)
     {
       return reachableNodes.head
@@ -78,7 +78,7 @@ class ScopeGraph extends
   def addReference(reference: Reference, currentScope: ConcreteScope): Unit = addEdge(reference, ReferenceEdge(currentScope))
 
   def resolveWithoutNameCheck(reference: Reference): Seq[NamedDeclaration] = {
-    val reachableNodes = depthFirst(reference).collect({case d:NamedDeclaration => d})
+    val reachableNodes = depthFirst(reference).collect({ case declaration: NamedDeclaration => declaration })
 
     if (reachableNodes.isEmpty)
       return Seq.empty
