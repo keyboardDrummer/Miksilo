@@ -116,6 +116,7 @@ class YamlTest extends FunSuite
   lazy val parseFlowValue = (tag.option ~ parseUntaggedFlowValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
   lazy val parseUntaggedValue = new Lazy(parseBracketArray | parseArray | parseNumber | parseStringLiteral | parseBlockMapping, "untagged value")
   lazy val parseValue: Self[YamlExpression] = (tag.option ~ parseUntaggedValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
+  lazy val parseYaml = parseValue ~< trivias
 
   lazy val parseBlockMapping: Self[YamlExpression] = {
     val member = new WithContext(_ =>
@@ -143,7 +144,6 @@ class YamlTest extends FunSuite
   lazy val parseStringLiteralInner: Self[String] =
     RegexParser("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
 
-
   lazy val plainScalar = new WithContext({
     case FlowIn => FlowIn
     case BlockKey => BlockKey
@@ -157,8 +157,10 @@ class YamlTest extends FunSuite
 
   val plainSafeOutChars = s"""$nbChars#'"""
   val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
-  val doubleColonPlainSafeIn =  RegexParser(s"""([^$plainSafeInChars:]|:[^$plainSafeInChars ])+""".r, "plain scalar")
-  val doubleColonPlainSafeOut =  RegexParser(s"""([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])+""".r, "plain scalar")
+
+  //first char shouldn't be a space.
+  val doubleColonPlainSafeIn = RegexParser(s"""([^$plainSafeInChars: ]|:[^$plainSafeInChars ])([^$plainSafeInChars:]|:[^$plainSafeInChars ])*""".r, "plain scalar")
+  val doubleColonPlainSafeOut = RegexParser(s"""([^$plainSafeInChars: ]|:[^$plainSafeInChars ])([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])*""".r, "plain scalar")
 
   val nsPlainSafe = new IfContext(Map(
     FlowIn -> doubleColonPlainSafeIn,
@@ -210,7 +212,7 @@ class YamlTest extends FunSuite
                   |
                   |            ']
                   |""".stripMargin
-    val result = parseValue.getWholeInputParser.parse(new IndentationReader(input))
+    val result = parseYaml.getWholeInputParser.parse(new IndentationReader(input))
     assert(result.successful)
   }
 
