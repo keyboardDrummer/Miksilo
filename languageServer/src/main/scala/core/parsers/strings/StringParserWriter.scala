@@ -11,7 +11,7 @@ trait StringParserWriter extends SequenceParserWriter {
   type Input <: StringReaderLike[Input]
 
   val identifierRegex = """[_a-zA-Z][_a-zA-Z0-9]*""".r
-  val parseIdentifier = parseRegex(identifierRegex, "identifier")
+  lazy val parseIdentifier = parseRegex(identifierRegex, "identifier")
 
   implicit def literalToExtensions(value: String): SequenceParserExtensions[String] =
     literalOrKeyword(value)
@@ -45,7 +45,7 @@ trait StringParserWriter extends SequenceParserWriter {
           while (index < value.length) {
             val arrayIndex = index + input.offset
             val remainder = input.drop(index)
-            val errorHistory = History.error(MissingInput(remainder, value.substring(index), value.substring(index), penalty))
+            val errorHistory = History.error(new MissingInput(remainder, value.substring(index), value.substring(index), penalty))
             if (array.length <= arrayIndex) {
               return singleResult(ReadyParseResult(Some(value), remainder, errorHistory))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
@@ -76,7 +76,7 @@ trait StringParserWriter extends SequenceParserWriter {
           if (ready.resultOption.contains(value)) {
             ready
           } else {
-            val insertError = MissingInput(input, value, value + " ")
+            val insertError = new MissingInput(input, value, value + " ")
             ReadyParseResult(Some(value), input, History.error(insertError))
           }
         }, uniform = false)

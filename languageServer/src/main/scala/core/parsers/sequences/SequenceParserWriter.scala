@@ -25,6 +25,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     result
   }
 
+  // Why can't the drop be done after the original, then it wouldn't need this tricky mayFail mechanism?
   case class DropParser[Result](original: Self[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
     override def getParser(recursive: GetParser): Parser[Result] = {
@@ -36,6 +37,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           var originalResult = parseOriginal(input, state)
           if (input.atEnd)
             return originalResult
+
           if (!mayFail) {
             originalResult = originalResult.flatMapReady(ready => {
               if (ready.remainder == input)
@@ -94,9 +96,10 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
       val parseOriginal = recursive(original)
       (input, state) => {
-        parseOriginal.apply(input, state).mapReady(r => {
-          val history = History.error(MissingInput(input, s"<$name>", " ", History.insertFallbackPenalty))
-          ReadyParseResult(r.resultOption, input, history)
+        val originalResult = parseOriginal.apply(input, state)
+        originalResult.mapReady(r => {
+          val history = History.error(MissingInput(input, r.remainder, s"<$name>", " ", History.insertFallbackPenalty))
+          ReadyParseResult(r.resultOption, r.remainder, history)
         }, uniform = true)
       }
     }
@@ -105,12 +108,24 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 
   case class MissingInput(from: Input,
+                          to: Input,
                           expectation: String,
                           insertFix: String = "",
                           penalty: Double = History.missingInputPenalty)
     extends ParseError[Input] {
 
-    override def to = from.safeIncrement()
+    def this(from: Input, expectation: String, penalty: Double) {
+      this(from, from.safeIncrement(), expectation, "", penalty)
+    }
+    def this(from: Input, expectation: String, insertFix: String, penalty: Double) {
+      this(from, from.safeIncrement(), expectation, insertFix, penalty)
+    }
+    def this(from: Input, expectation: String, insertFix: String) {
+      this(from, expectation, insertFix, History.missingInputPenalty)
+    }
+    def this(from: Input, expectation: String) {
+      this(from, expectation, "")
+    }
 
     override def message: String = s"expected '$expectation'"
 
@@ -131,7 +146,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           val max = Math.max(penalty, next.penalty)
           val min = Math.min(penalty, next.penalty)
           val newPenalty = max + min * 0.5
-          Some(MissingInput(from, expectation + next.expectation, insertFix + next.insertFix, newPenalty))
+          Some(new MissingInput(from, expectation + next.expectation, insertFix + next.insertFix, newPenalty))
         case _ => None
       }
     }

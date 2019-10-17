@@ -59,4 +59,45 @@ class ExampleExpressionLanguageTest extends FunSuite with LanguageServerTest {
     //assertResult(Seq(abcCompletion))(complete(server, program, beforeA).items)
     assertResult(Seq(abcCompletion))(complete(server, program, afterA).items)
   }
+
+  test("diagnostics placement in whitespace 1") {
+    val program = "    "
+
+    val diagnostic = Diagnostic(SourceRange(Position(0,0), Position(0,4)), Some(DiagnosticSeverity.Error), "expected '<expression>'")
+    val result = getDiagnostics(server, program)
+    assertResult(Seq(diagnostic))(result)
+  }
+
+  // TODO seems to fail because of SREmpty with TODO in LeftRecursiveCorrectingParserWriter
+  ignore("diagnostics placement in whitespace 2") {
+    val program = "   + 3"
+
+    val diagnostic = Diagnostic(SourceRange(Position(0,0), Position(0,3)), Some(DiagnosticSeverity.Error), "expected '<expression>'")
+    val result = getDiagnostics(server, program)
+    assertResult(Seq(diagnostic))(result)
+  }
+
+  test("diagnostics placement in whitespace 3") {
+    val program = "3 +    "
+
+    val diagnostic = Diagnostic(SourceRange(Position(0,3), Position(0,7)), Some(DiagnosticSeverity.Error), "expected '<expression>'")
+    val result = getDiagnostics(server, program)
+    assertResult(Seq(diagnostic))(result)
+  }
+
+  test("diagnostics placement in whitespace 5") {
+    val program = "let   = 3 in abc"
+
+    val diagnostic = Diagnostic(SourceRange(Position(0,3), Position(0,4)), Some(DiagnosticSeverity.Error), "expected '<identifier>'")
+    val result = getDiagnostics(server, program)
+    assertResult(Seq(diagnostic))(result)
+  }
+
+  test("diagnostics placement in whitespace 6") {
+    val program = "let abc =      in abc"
+
+    val diagnostic = Diagnostic(SourceRange(Position(0,9), Position(0,15)), Some(DiagnosticSeverity.Error), "expected '<expression>'")
+    val result = getDiagnostics(server, program)
+    assertResult(Seq(diagnostic))(result)
+  }
 }

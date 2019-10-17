@@ -44,6 +44,7 @@ case class Identifier(range: SourceRange, name: String) extends Expression {
 }
 
 case class ExpressionHole(range: SourceRange) extends Expression {
+
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
     builder.refer("", scope, Some(this.addFile(uri)))
   }
@@ -73,7 +74,7 @@ object ExpressionParser extends CommonStringReaderParser with LeftRecursiveCorre
   val let: Self[Expression] = ("let" ~> variableDeclaration ~< "=" ~ expression ~< "in" ~ expression).withSourceRange((range, t) => Let(range, t._1._1, t._1._2, t._2))
   val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((r,_) => ExpressionHole(r)), "expression")
 
-  val root = whiteSpace ~> expression
+  val root = expression ~< trivias
 }
 
 object ExampleExpressionLanguage extends Language {

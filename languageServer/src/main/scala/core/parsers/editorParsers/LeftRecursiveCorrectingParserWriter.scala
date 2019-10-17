@@ -32,7 +32,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               val initialResult = parser(input, newState)
 
               val RecursionsList(recursions, resultWithoutRecursion) = initialResult.recursionsFor(parser)
-              var foundRecursion = recursions.nonEmpty
+              val foundRecursion = recursions.nonEmpty
 
               val result = if (foundRecursion)
                 grow(recursions, resultWithoutRecursion, initialResult)
