@@ -436,9 +436,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   class Choice[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
     extends ParserBuilderBase[Result] with ChoiceLike[Result] {
 
-    if (first == null) {
-      System.out.append("")
-    }
     lazy val second = _second
 
     override def getParser(recursive: GetParser): Parser[Result] = {

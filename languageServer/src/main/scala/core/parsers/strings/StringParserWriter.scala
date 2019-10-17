@@ -32,9 +32,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
   def literal(value: String, penalty: Double = History.missingInputPenalty,
               allowDrop: Boolean = true) =
-    if (allowDrop) createDrop(Literal(value, penalty)) else Literal(value, penalty)
-
-  def createDrop[Result](inner: Self[Result]) = DropParser(inner)
+    if (allowDrop) DropParser(Literal(value, penalty)) else Literal(value, penalty)
 
   case class Literal(value: String, penalty: Double = History.missingInputPenalty) extends ParserBuilderBase[String] with LeafParser[String] {
 
@@ -100,7 +98,7 @@ trait StringParserWriter extends SequenceParserWriter {
                  penaltyOption: Option[Double] = Some(History.missingInputPenalty),
                  allowDrop: Boolean = true) = {
     val initial = RegexParser(regex, regexName, defaultValue, score, penaltyOption)
-    if (allowDrop) createDrop(initial) else initial
+    if (allowDrop) DropParser(initial) else initial
   }
 
   case class RegexParser(regex: Regex, regexName: String,
