@@ -4,9 +4,6 @@ import deltas.json.JsonLanguage
 import org.scalatest.FunSuite
 import util.TestLanguageBuilder
 
-import deltas.json.JsonLanguage
-import util.TestLanguageBuilder
-
 class ErrorCorrectionUsingJsonTest extends FunSuite {
 
   test("test whether correct inputs always return a ready in one go") {

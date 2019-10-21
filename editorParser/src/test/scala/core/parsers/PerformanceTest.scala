@@ -2,6 +2,7 @@ package core.parsers
 
 import _root_.core.TestSourceUtils
 import org.scalatest.FunSuite
+import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
 class PerformanceTest extends FunSuite {
 
@@ -43,8 +44,9 @@ class PerformanceTest extends FunSuite {
 
     val repetitions = 5
     for(_ <- 1.to(repetitions)) {
-      val result = jsonParser.getWholeInputParser.parse(new StringReader(program))
-      assert(!result.successful)
+      val result = jsonParser.getWholeInputParser.parse(new StringReader(program), UntilBestAndXStepsStopFunction())
+      assert(result.errors.size == 2)
+      assert(result.resultOption.head.asInstanceOf[List[_]].size == 6)
     }
     val timeB = System.currentTimeMillis()
     val elapsedTime = timeB - timeA
