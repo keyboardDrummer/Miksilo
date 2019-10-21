@@ -3,8 +3,9 @@ package core.parsers
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import editorParsers.History
 import _root_.core.parsers.strings.CommonStringReaderParser
+import _root_.core.parsers.strings.WhitespaceParserWriter
 
-object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
+object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter with WhitespaceParserWriter {
 
   lazy val arrayParser = literal("[") ~> jsonParser.manySeparated(",", "array element") ~< "]"
   lazy val memberParser = stringLiteral ~< ":" ~ jsonParser

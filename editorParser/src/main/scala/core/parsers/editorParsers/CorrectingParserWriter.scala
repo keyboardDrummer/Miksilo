@@ -340,16 +340,20 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
           def rightFromLeftReady(leftReady: ReadyParseResult[Left]): SortedParseResults[Result] = {
 
+            def mapRightResult(rightResult: ReadyParseResult[Result]): ReadyParseResult[Result] = ReadyParseResult(
+              combine(leftReady.resultOption, rightResult.resultOption),
+              rightResult.remainder,
+              rightResult.history)
+
             val rightResult = parseRight(leftReady.remainder, state)
-            rightResult.flatMapReady(rightReady => {
-              if (rightReady.remainder == leftReady.remainder)
-                SREmpty
-              else {
-                val combinedReady = ReadyParseResult(combine(leftReady.resultOption, rightReady.resultOption),
-                  rightReady.remainder,
-                  leftReady.history ++ rightReady.history)
-                singleResult(combinedReady)
-              }
+            rightResult.flatMap({
+              case rightReady: ReadyParseResult[Result] =>
+                if (rightReady.remainder == leftReady.remainder)
+                  SREmpty
+                else {
+                  singleResult(rightReady.mapWithHistory(mapRightResult, leftReady.history))
+                }
+              case other => singleResult(other.mapWithHistory(mapRightResult, leftReady.history))
             }, uniform = !leftReady.history.canMerge)
           }
 
@@ -357,7 +361,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           if (input.atEnd)
             return withoutLeft
 
-          val withLeft = parseLeft(input, state).flatMapReady(rightFromLeftReady, uniform = true)
+          val withLeft = parseLeft(input, state).flatMapReady(rightFromLeftReady, uniform = false)
           withoutLeft.merge(withLeft)
         }
 

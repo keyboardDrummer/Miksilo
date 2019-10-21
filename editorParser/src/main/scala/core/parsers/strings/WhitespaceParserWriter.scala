@@ -7,14 +7,15 @@ trait WhitespaceParserWriter extends StringParserWriter {
   final val whiteSpace: Self[String] = RegexParser("""\s+""".r, "whitespace", score = 0, penaltyOption = None)
   def trivia = whiteSpace
 
-  def oldMany[Result, Sum](original: ParserBuilder[Result],
-                        zero: Sum, reduce: (Result, Sum) => Sum,
-                        parseGreedy: Boolean = true) = {
+  def oldSome[Result, Sum](original: ParserBuilder[Result],
+                           zero: Sum, reduce: (Result, Sum) => Sum,
+                           parseGreedy: Boolean = true) = {
     lazy val result: Self[Sum] = choice(new Sequence(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
-    result
+    leftRight(original, result, combineFold(zero, reduce))
   }
 
-  lazy val trivias: Self[List[String]] = oldMany(trivia, List.empty, (h: String, t: List[String]) =>  h :: t)
+
+  lazy val trivias: Self[List[String]] = oldSome(trivia, List.empty, (h: String, t: List[String]) =>  h :: t)
 
   override def leftRight[Left, Right, Result](left: ParserBuilder[Left], right: => ParserBuilder[Right],
                                               combine: (Option[Left], Option[Right]) => Option[Result]) =  {
