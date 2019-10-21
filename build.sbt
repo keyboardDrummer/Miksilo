@@ -5,6 +5,7 @@ import scala.sys.process._
 lazy val miksilo = project
   .in(file("."))
   .aggregate(
+    editorParser,
     languageServer,
     modularLanguages,
     playground,
@@ -60,6 +61,10 @@ lazy val assemblySettings = Seq(
   }
 )
 
+lazy val editorParser = (project in file("editorParser")).
+  settings(
+    libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.4" % "test")
+
 lazy val languageServer = (project in file("languageServer")).
   settings(commonSettings: _*).
   settings(
@@ -84,7 +89,7 @@ lazy val languageServer = (project in file("languageServer")).
         Opts.resolver.sonatypeStaging
     ),
 
-  )
+  ).dependsOn(editorParser)
 
 lazy val modularLanguages = (project in file("modularLanguages")).
   settings(commonSettings: _*).

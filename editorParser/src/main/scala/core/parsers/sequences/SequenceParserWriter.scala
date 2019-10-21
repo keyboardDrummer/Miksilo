@@ -1,8 +1,7 @@
 package core.parsers.sequences
 
-import core.parsers.core.{ParseInput, Processor}
-import core.parsers.editorParsers.{CorrectingParserWriter, Fix, History, ParseError, SingleParseResult, StopFunction}
-import languageServer.{Position, SourceRange, TextEdit}
+import core.parsers.core.Processor
+import core.parsers.editorParsers._
 
 trait SequenceParserWriter extends CorrectingParserWriter {
   type Elem

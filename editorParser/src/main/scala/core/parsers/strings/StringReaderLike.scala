@@ -1,8 +1,8 @@
 package core.parsers.strings
 
 import core.parsers.core.ParseInput
+import core.parsers.editorParsers.Position
 import core.parsers.sequences.SequenceInput
-import languageServer.Position
 
 trait StringReaderLike[Input] extends SequenceInput[Input, Char] {
   def position: Position

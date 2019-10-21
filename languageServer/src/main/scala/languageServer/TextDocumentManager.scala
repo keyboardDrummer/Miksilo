@@ -6,6 +6,7 @@ import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
 import com.typesafe.scalalogging.LazyLogging
 import core.language.FileSystem
+import core.parsers.editorParsers.Position
 
 import scala.collection.JavaConverters._
 import scala.tools.nsc.interpreter.InputStream

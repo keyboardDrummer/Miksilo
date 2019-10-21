@@ -4,7 +4,7 @@ import core.bigrammar.{BiGrammar, WithMap}
 import core.bigrammar.BiGrammarToParser.AnyWithMap
 import core.bigrammar.grammars.{FieldPosition, MapGrammar}
 import core.bigrammar.printer.UndefinedDestructuringValue
-import languageServer.SourceRange
+import core.parsers.editorParsers.SourceRange
 
 class NodeGrammar(inner: BiGrammar, val shape: NodeShape)
   extends MapGrammar[AnyWithMap, AnyWithMap](inner,

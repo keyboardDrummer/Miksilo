@@ -2,6 +2,7 @@ package languageServer.lsp
 
 import java.io.ByteArrayOutputStream
 
+import core.parsers.editorParsers.{Position, SourceRange, TextEdit}
 import languageServer._
 import org.scalatest.{Assertion, AsyncFunSpec}
 

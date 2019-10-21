@@ -1,8 +1,7 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.{History, ParseError}
+import core.parsers.editorParsers.{History, ParseError, SourceRange}
 import core.parsers.sequences.SequenceParserWriter
-import languageServer.SourceRange
 
 import scala.util.matching.Regex
 

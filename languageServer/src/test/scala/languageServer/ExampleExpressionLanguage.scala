@@ -1,7 +1,7 @@
 package languageServer
 
 import core.language.{FileElement, Language, SourceElementFromFileElement}
-import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
+import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, SourceRange}
 import core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope

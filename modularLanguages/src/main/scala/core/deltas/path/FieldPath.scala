@@ -1,7 +1,7 @@
 package core.deltas.path
 
 import core.language.node.{Node, NodeField}
-import languageServer.SourceRange
+import core.parsers.editorParsers.SourceRange
 
 class NodeFieldPath(parent: NodePath, field: NodeField) extends FieldPath(parent, field) with NodeChildPath {
   override lazy val current: Node = super[FieldPath].current.asInstanceOf[Node]

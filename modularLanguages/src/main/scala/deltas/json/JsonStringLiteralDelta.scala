@@ -7,11 +7,11 @@ import core.deltas.path.NodePath
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
+import core.parsers.editorParsers.{Position, SourceRange}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{PrimitiveType, Type}
 import deltas.expression.{ExpressionDelta, ExpressionInstance, StringLiteralDelta}
-import languageServer.{Position, SourceRange}
 
 import scala.util.matching.Regex
 

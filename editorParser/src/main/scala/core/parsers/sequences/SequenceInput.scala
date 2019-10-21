@@ -1,7 +1,7 @@
 package core.parsers.sequences
 
 import core.parsers.core.ParseInput
-import languageServer.Position
+import core.parsers.editorParsers.Position
 
 trait SequenceInput[Input, Elem] extends ParseInput {
   def head: Elem

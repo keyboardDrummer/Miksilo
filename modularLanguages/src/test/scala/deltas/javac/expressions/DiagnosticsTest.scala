@@ -1,7 +1,8 @@
 package deltas.javac.expressions
 
+import core.parsers.editorParsers.SourceRange
 import deltas.javac.JavaToByteCodeLanguage
-import languageServer.{Diagnostic, HumanPosition, LanguageServerTest, MiksiloLanguageServer, SourceRange}
+import languageServer.{Diagnostic, HumanPosition, LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.FunSuite
 import util.JavaSourceUtils
 

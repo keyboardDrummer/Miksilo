@@ -2,11 +2,11 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, CustomGrammarWithoutChildren, Keyword, Labelled, MapGrammar, Print, ValueGrammar}
-import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, Position}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase}
 import core.textMate.TextMateGeneratingParserWriter
-import languageServer.Position
+import languageServer.PositionFormat
 import util.Utility
 
 import scala.collection.mutable

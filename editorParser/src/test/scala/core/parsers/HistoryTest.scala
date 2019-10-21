@@ -1,10 +1,10 @@
 package core.parsers
 
-import languageServer.Position
 import org.scalatest.FunSuite
 import strings.StringParserWriter
 import editorParsers.History
 import _root_.core.parsers.strings.StringReaderBase
+import _root_.core.parsers.editorParsers.Position
 
 class HistoryTest extends FunSuite with StringParserWriter {
   type Input = IndexInput
