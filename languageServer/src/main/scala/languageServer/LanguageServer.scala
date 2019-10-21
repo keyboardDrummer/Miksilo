@@ -1,10 +1,8 @@
 package languageServer
 
-import core.language.SourceElement
-import languageServer.Position.PositionOrdering
 import languageServer.lsp._
 import play.api.libs.json._
-
+import core.parsers.editorParsers.{Position, SourceRange, TextEdit}
 trait DocumentSymbolProvider {
   def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation]
 }
@@ -36,12 +34,7 @@ trait ReferencesProvider {
   def references(location: ReferencesParams): Seq[FileRange]
 }
 
-/**
-  * Position in a text document expressed as zero-based line and character offset.
-  */
-case class Position(line: Int, character: Int)
-
-object Position {
+object PositionFormat {
   implicit object PositionOrdering extends Ordering[Position] {
 
     private val ordering = Ordering.by[Position, (Int, Int)](x => (x.line, x.character))
@@ -52,35 +45,26 @@ object Position {
   implicit val format: OFormat[Position] = Json.format[Position]
 }
 
-object SourceRange { implicit val format = Json.format[SourceRange] }
-
-/**
-  * A range in a text document.
-  */
-case class SourceRange(start: Position, end: Position) {
-
-  def contains(position: Position): Boolean = {
-    PositionOrdering.lteq(start, position) && PositionOrdering.lteq(position, end)
-  }
-
-  def contains(position: SourceRange): Boolean = {
-    PositionOrdering.lteq(start, position.start) && PositionOrdering.lteq(position.end, end)
-  }
+object SourceRangeFormat {
+  implicit val positionFormat = PositionFormat.format
+  implicit val format = Json.format[SourceRange]
 }
 
 object Diagnostic {
+  implicit val rangeFormat = SourceRangeFormat.format
   implicit val format = Json.format[Diagnostic]
 }
 case class Diagnostic(range: SourceRange, severity: Option[Int], message: String, code: Option[String] = None, source: Option[String] = None) {
   def identifier = Diagnostic(range, None, message, None, None)
 }
 
-object TextEdit {
+object TextEditFormat {
+  implicit val rangeFormat = SourceRangeFormat.format
   implicit val format = Json.format[TextEdit]
 }
-case class TextEdit(range: SourceRange, newText: String)
 
 object WorkspaceEdit {
+  implicit val f = TextEditFormat.format
   implicit val format = Json.format[WorkspaceEdit]
 }
 /**
@@ -100,6 +84,7 @@ case class CodeActionParams(textDocument: TextDocumentIdentifier, range: SourceR
 object CodeAction {
   implicit val format = Json.format[CodeAction]
 }
+
 case class CodeAction(title: String, kind: String,
                       diagnostics: Option[Seq[Diagnostic]],
                       edit: Option[WorkspaceEdit])
@@ -134,7 +119,10 @@ case class FileRange(uri: String, range: SourceRange) {
   }
 }
 
-object FileRange { implicit val format = Json.format[FileRange] }
+object FileRange {
+  implicit val rangeFormat = SourceRangeFormat.format
+  implicit val format = Json.format[FileRange]
+}
 
 object DiagnosticSeverity {
   final val Error = 1
@@ -443,5 +431,6 @@ case class TextDocumentContentChangeEvent(
                                          )
 
 object TextDocumentContentChangeEvent {
+  implicit val sourceRangeFormat = SourceRangeFormat.format
   implicit val format = Json.format[TextDocumentContentChangeEvent]
 }

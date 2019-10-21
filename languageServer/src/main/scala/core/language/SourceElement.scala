@@ -1,6 +1,7 @@
 package core.language
 
-import languageServer.{FilePosition, FileRange, SourceRange}
+import core.parsers.editorParsers.SourceRange
+import languageServer.{FilePosition, FileRange}
 
 trait SourceElement {
   /*

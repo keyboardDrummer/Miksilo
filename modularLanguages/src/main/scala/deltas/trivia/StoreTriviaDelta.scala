@@ -9,9 +9,9 @@ import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
 import core.language.node.{Key, NodeField, NodeGrammar}
-import core.responsiveDocument.ResponsiveDocument
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.printer.Printer.NodePrinter
+import core.responsiveDocument.ResponsiveDocument
 
 object StoreTriviaDelta extends DeltaWithGrammar {
 

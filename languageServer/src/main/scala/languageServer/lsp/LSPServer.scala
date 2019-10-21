@@ -1,5 +1,6 @@
 package languageServer.lsp
 
+import core.parsers.editorParsers.TextEdit
 import languageServer._
 import play.api.libs.json._
 
@@ -36,19 +37,21 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
       }
     }
 
+    implicit val positionFormat = PositionFormat.format
+    implicit val sourceRangeFormat = SourceRangeFormat.format
     implicit val textDocumentPositionParams: OFormat[DocumentPosition] = Json.format
     implicit val referenceContext: OFormat[ReferenceContext] = Json.format
     implicit val textEdit: OFormat[TextEdit] = Json.format[TextEdit]
-    implicit val workspaceEdit: OFormat[WorkspaceEdit] = Json.format
     implicit val codeActionContext: OFormat[CodeActionContext] = Json.format
     implicit val codeAction: OFormat[CodeAction] = Json.format
+
     addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[FileRange]])
     addProvider(LSPProtocol.documentSymbol, (provider: DocumentSymbolProvider) => provider.documentSymbols)(Json.format, Writes.of[Seq[SymbolInformation]])
     addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[Seq[FileRange]])
     addProvider(LSPProtocol.codeAction, (provider: CodeActionProvider) => provider.getCodeActions)(Json.format, Writes.of[Seq[CodeAction]])
     addProvider(LSPProtocol.completion, (provider: CompletionProvider) => provider.complete)(Json.format, Json.format)
     addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hoverRequest)(Json.format[TextDocumentHoverRequest], Json.format[Hover])
-    addProvider(LSPProtocol.rename, (provider: RenameProvider) => provider.rename)(Json.format, Json.format[WorkspaceEdit])
+    addProvider(LSPProtocol.rename, (provider: RenameProvider) => provider.rename)(Json.format, WorkspaceEdit.format)
   }
 
   def addNotificationHandlers(): Unit = {

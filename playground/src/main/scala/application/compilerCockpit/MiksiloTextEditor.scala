@@ -2,10 +2,11 @@ package application.compilerCockpit
 
 import java.awt.event
 
+import core.parsers.editorParsers.Position
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JMenuItem, JPopupMenu}
 import languageServer._
-import languageServer.{Position, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
+import languageServer.{PositionFormat, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 import languageServer.{LanguageServer, MiksiloLanguageServer}
 import languageServer.lsp._
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea}

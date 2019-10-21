@@ -2,10 +2,10 @@ package core.bigrammar.grammars
 
 import core.bigrammar.{BiGrammar, WithMap}
 import core.document.{Empty, Text}
-import core.responsiveDocument.ResponsiveDocument
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.printer.TryState
+import core.responsiveDocument.ResponsiveDocument
 
 case class Parse(grammar: BiGrammar) extends CustomGrammar {
   override def children: Seq[BiGrammar] = Seq(grammar)

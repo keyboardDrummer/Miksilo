@@ -1,14 +1,14 @@
 
 package core.parsers
 
+import _root_.core.TestSourceUtils
+import _root_.core.responsiveDocument._
+import _root_.core.parsers.editorParsers.Position
 import _root_.core.document.Empty
 import _root_.core.parsers.core.Processor
 import _root_.core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import _root_.core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase, WhitespaceParserWriter}
-import _root_.core.responsiveDocument.ResponsiveDocument
 import org.scalatest.FunSuite
-import languageServer.Position
-import util.SourceUtils
 
 trait YamlExpression {
   def toDocument: ResponsiveDocument
@@ -336,7 +336,7 @@ class YamlTest extends FunSuite
   }
 
   test("big yaml file") {
-    val contents = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val contents = TestSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result = parseValue.getWholeInputParser.parse(new IndentationReader(contents))
     assert(result.successful, result.toString)
   }

@@ -2,6 +2,7 @@ package languageServer.lsp
 
 import com.dhpcs.jsonrpc.Message._
 import com.dhpcs.jsonrpc.CommandCompanion
+import core.parsers.editorParsers.{Position, SourceRange}
 import languageServer._
 import play.api.libs.json._
 
@@ -177,6 +178,7 @@ case class TextDocumentHoverRequest(params: DocumentPosition) extends ServerComm
 
 case class Hover(contents: Seq[MarkedString], range: Option[SourceRange]) extends ResultResponse
 object Hover {
+  implicit val rangeFormat = SourceRangeFormat.format
   implicit val format = Json.format[Hover]
 }
 

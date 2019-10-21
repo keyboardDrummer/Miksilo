@@ -4,9 +4,9 @@ import core.bigrammar.{BiGrammar, PrintBiGrammar, WithMap}
 import core.bigrammar.printer.AsPrinter
 import core.bigrammar.printer.Printer.NodePrinter
 import core.language.node.NodeField
-import core.responsiveDocument.ResponsiveDocument
-import languageServer.SourceRange
 import core.bigrammar.BiGrammarToParser._
+import core.parsers.editorParsers.SourceRange
+import core.responsiveDocument.ResponsiveDocument
 
 case class As(var inner: BiGrammar, field: NodeField, changePosition: SourceRange => SourceRange = null) extends CustomGrammar
 {

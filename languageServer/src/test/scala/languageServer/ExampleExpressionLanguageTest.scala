@@ -1,6 +1,7 @@
 package languageServer
 
 import core.language.Language
+import core.parsers.editorParsers.{Position, SourceRange}
 import org.scalatest.FunSuite
 
 class ExampleExpressionLanguageTest extends FunSuite with LanguageServerTest {

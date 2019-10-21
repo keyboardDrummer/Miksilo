@@ -3,6 +3,7 @@ package languageServer
 import com.typesafe.scalalogging.LazyLogging
 import core.language.exceptions.BadInputException
 import core.language.{Compilation, Language, SourceElement}
+import core.parsers.editorParsers.TextEdit
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
 import languageServer.lsp._

@@ -1,6 +1,6 @@
 package core.language
 
-import languageServer.SourceRange
+import core.parsers.editorParsers.SourceRange
 
 case class SourceElementFromFileElement(uri: String, element: FileElement) extends SourceElement {
   override def range = Some(element.range)

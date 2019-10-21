@@ -1,6 +1,6 @@
 package core.language
 
-import core.parsers.editorParsers.{ParseError}
+import core.parsers.editorParsers.{ParseError, SourceRange}
 import core.parsers.strings.StringReaderLike
 import core.smarts.FileDiagnostic
 import languageServer._

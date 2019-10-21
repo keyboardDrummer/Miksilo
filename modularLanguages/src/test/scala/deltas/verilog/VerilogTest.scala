@@ -3,11 +3,12 @@ package deltas.verilog
 import core.deltas.path.PathRoot
 import core.language.{Compilation, InMemoryFileSystem}
 import core.language.node.NodeComparer
+import core.parsers.editorParsers.SourceRange
 import deltas.{ClearPhases, FileWithMembersDelta}
 import deltas.expression.{IntLiteralDelta, VariableDelta}
 import deltas.expression.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
-import languageServer.{FileRange, HumanPosition, LanguageServerTest, MiksiloLanguageServer, SourceRange, TextDocumentIdentifier}
+import languageServer.{FileRange, HumanPosition, LanguageServerTest, MiksiloLanguageServer, TextDocumentIdentifier}
 import languageServer.lsp.DocumentPosition
 import org.scalatest.FunSuite
 import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}

@@ -1,7 +1,7 @@
 package core.deltas.path
 
 import core.language.node.Node
-import languageServer.SourceRange
+import core.parsers.editorParsers.SourceRange
 
 trait NodeChildPath extends NodePath with ChildPath {
   def current: Node

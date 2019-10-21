@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import languageServer.Position
+import core.parsers.editorParsers.Position
 
 abstract class StringReaderBase[Input <: StringReaderBase[Input]](val array: ArrayCharSequence, val offset: Int, val position: Position)
   extends StringReaderLike[Input] {

@@ -1,8 +1,7 @@
 package core.responsiveDocument
 
-import core.responsiveDocument.ResponsiveDocument._
-import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
+import core.responsiveDocument.ResponsiveDocument._
 
 class TestResponsiveDocument extends FunSuite {
 

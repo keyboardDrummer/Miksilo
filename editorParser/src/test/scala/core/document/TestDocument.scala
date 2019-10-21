@@ -1,6 +1,5 @@
 package core.document
 
-import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 
 class TestDocument extends FunSuite {
