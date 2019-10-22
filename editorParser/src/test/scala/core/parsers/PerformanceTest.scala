@@ -52,7 +52,7 @@ class PerformanceTest extends FunSuite {
     val elapsedTime = timeB - timeA
     val average = elapsedTime / repetitions
     System.out.println(s"edited average: $average")
-    assert(average < 1000)
+    assert(average < 1200)
   }
 }
 
