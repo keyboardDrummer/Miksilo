@@ -1,9 +1,7 @@
 package core.parsers
 
-import editorParsers.LeftRecursiveCorrectingParserWriter
-import editorParsers.History
-import _root_.core.parsers.strings.CommonStringReaderParser
-import _root_.core.parsers.strings.WhitespaceParserWriter
+import _root_.core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
+import _root_.core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 
 object ParseJson extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter with WhitespaceParserWriter {
 

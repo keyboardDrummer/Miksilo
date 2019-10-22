@@ -2,6 +2,7 @@ package application.compilerCockpit
 
 import core.bigrammar.grammars._
 import core.bigrammar.{BiGrammar, BiGrammarToParser}
+import core.textMate.GenerateTextMateGrammar
 import javax.swing.text.Segment
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
 import util.GraphBasics
@@ -40,7 +41,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker
       case StringLiteral =>
         stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
       case Colorize(inner, textMateScope) =>
-        val theRegex = BiGrammarToParser.grammarToRegex(BiGrammarToParser.toParserBuilder(inner)).get.r
+        val theRegex = GenerateTextMateGrammar.grammarToRegex(BiGrammarToParser)(BiGrammarToParser.toParserBuilder(inner)).get.r
         regex(theRegex) ^^ (s => {
           MyToken(textMateScopeToToken(textMateScope), s)
         })
