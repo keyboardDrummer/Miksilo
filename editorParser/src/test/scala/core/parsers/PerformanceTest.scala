@@ -11,7 +11,7 @@ class PerformanceTest extends FunSuite {
 
     val source = TestSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
 
-    val multiplier = 15
+    val multiplier = 1
     val manySourcesCount = 10
     val manySources = s"[${1.to(manySourcesCount).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
@@ -34,11 +34,11 @@ class PerformanceTest extends FunSuite {
     }
 
     val average = (manyRepetitions + manySourcesTime) / (2 * manySourcesCount * multiplier)
-    assert(manySourcesTime < manyRepetitions * 1.1) // Verify that performance does not degrade with input length
-    assert(average < 150)
     System.out.println(s"manyRepetitions:$manyRepetitions")
     System.out.println(s"manySources:$manySourcesTime")
     System.out.println(s"average:${average}")
+    assert(manySourcesTime < manyRepetitions * 1.1) // Verify that performance does not degrade with input length
+    assert(average < 150)
   }
 
   test("JSON with small errors performance") {

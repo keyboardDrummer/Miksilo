@@ -62,7 +62,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       scala.util.Success(newState, field)
     }
 
-    override def toParser(recursive: BiGrammar => Self[Result]): Self[Result] = {
+    override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
       val triviaParser = recursive(triviaGrammar)
       leftRightSimple[Input, Result, Result](PositionParser, triviaParser, (position, triviasWithMap) => {
         val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
@@ -104,9 +104,9 @@ object StoreTriviaDelta extends DeltaWithGrammar {
     }
 
     // TODO move this transformation to the printing side.
-    override def toParser(recursive: BiGrammar => Self[Result]): Self[Result] = {
+    override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
       val oldInner = recursive(node.inner)
-      val newInner: Self[Result] = oldInner.map((result: Result) => {
+      val newInner: Parser[Result] = oldInner.map((result: Result) => {
         var trivias: Seq[(ParseTriviaField, Any)] = List.empty
         var rest: List[(Any, Any)] = List.empty
         for(namedValue <- result.namedValues) {

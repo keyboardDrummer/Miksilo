@@ -77,7 +77,7 @@ class YamlTest extends FunSuite
     }
   }
 
-  class IfContext[Result](inners: Map[YamlContext, Self[Result]]) extends ParserBuilderBase[Result] {
+  class IfContext[Result](inners: Map[YamlContext, Parser[Result]]) extends ParserBuilderBase[Result] {
 
     override def getParser(recursive: GetParser) = {
       val innerParsers = inners.mapValues(p => recursive(p))
@@ -91,10 +91,10 @@ class YamlTest extends FunSuite
     override def children = leftChildren
   }
 
-  class WithContext[Result](update: YamlContext => YamlContext, val original: Self[Result])
+  class WithContext[Result](update: YamlContext => YamlContext, val original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParser): Parser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
       def apply(input: IndentationReader, state: ParseState): ParseResult[Result] = {
@@ -107,7 +107,7 @@ class YamlTest extends FunSuite
     }
   }
 
-  val tag: Self[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
+  val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
   case class TaggedNode(tag: String, node: YamlExpression) extends YamlExpression {
     override def toDocument: ResponsiveDocument = ResponsiveDocument.text("!") ~ tag ~~ node.toDocument
   }
@@ -115,10 +115,10 @@ class YamlTest extends FunSuite
   lazy val parseUntaggedFlowValue = parseBracketArray | parseStringLiteral
   lazy val parseFlowValue = (tag.option ~ parseUntaggedFlowValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
   lazy val parseUntaggedValue = new Lazy(parseBracketArray | parseArray | parseNumber | parseStringLiteral | parseBlockMapping, "untagged value")
-  lazy val parseValue: Self[YamlExpression] = (tag.option ~ parseUntaggedValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
+  lazy val parseValue: Parser[YamlExpression] = (tag.option ~ parseUntaggedValue).map(t => t._1.fold(t._2)(tag => TaggedNode(tag, t._2)))
   lazy val parseYaml = parseValue ~< trivias
 
-  lazy val parseBlockMapping: Self[YamlExpression] = {
+  lazy val parseBlockMapping: Parser[YamlExpression] = {
     val member = new WithContext(_ =>
       BlockKey, parseFlowValue) ~< literalOrKeyword(":") ~ greaterThan(parseValue)
     alignedList(member).map(values => {
@@ -126,22 +126,22 @@ class YamlTest extends FunSuite
     })
   }
 
-  lazy val parseBracketArray: Self[YamlExpression] = {
+  lazy val parseBracketArray: Parser[YamlExpression] = {
     val inner = "[" ~> parseFlowValue.manySeparated(",", "array element").map(elements => YamlArray(elements)) ~< "]"
     new WithContext(_ => FlowIn, inner)
   }
 
-  lazy val parseArray: Self[YamlExpression] = {
+  lazy val parseArray: Parser[YamlExpression] = {
     val element = literalOrKeyword("- ") ~> greaterThan(parseValue)
     alignedList(element).map(elements => YamlArray(elements))
   }
 
-  lazy val parseNumber: Self[YamlExpression] =
+  lazy val parseNumber: Parser[YamlExpression] =
     wholeNumber.map(n => Number(Integer.parseInt(n)))
 
-  lazy val parseStringLiteral: Self[YamlExpression] =
+  lazy val parseStringLiteral: Parser[YamlExpression] =
     parseStringLiteralInner.map(s => StringLiteral(s))
-  lazy val parseStringLiteralInner: Self[String] =
+  lazy val parseStringLiteralInner: Parser[String] =
     RegexParser("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
 
   lazy val plainScalar = new WithContext({

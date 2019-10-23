@@ -13,6 +13,6 @@ case class RegexGrammar(regex: Regex, name: String, verifyWhenPrinting: Boolean 
                         allowDrop: Boolean = true)
   extends StringGrammar(verifyWhenPrinting) {
 
-  override def getParserBuilder(keywords: scala.collection.Set[String]): Self[Any] =
+  override def getParserBuilder(keywords: scala.collection.Set[String]): Parser[Any] =
       BiGrammarToParser.parseRegex(regex, name, defaultValue, score, penaltyOption, allowDrop = allowDrop)
 }

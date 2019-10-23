@@ -11,7 +11,7 @@ import scala.util.matching.Regex
 object ParseWhiteSpace extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren {
   val regex: Regex = """\s+""".r
 
-  override def getParserBuilder(keywords: scala.collection.Set[String]): Self[Any] =
+  override def getParserBuilder(keywords: scala.collection.Set[String]): Parser[Any] =
     parseRegex(regex, "whitespace", score = -0.001,
       penaltyOption = None, // Do not allow insertion
       allowDrop = false)

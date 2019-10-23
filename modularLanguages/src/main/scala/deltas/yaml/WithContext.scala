@@ -11,7 +11,7 @@ class WithContext[Result](update: YamlContext => YamlContext, inner: BiGrammar) 
 
   override def createPrinter(recursive: BiGrammar => NodePrinter) = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => BiGrammarToParser.Self[BiGrammarToParser.Result]) =
+  override def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[BiGrammarToParser.Result]) =
     new WithContextParser(update, recursive(inner))
 
   override def children = Seq(inner)

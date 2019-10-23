@@ -9,8 +9,8 @@ class IndentationParserTest extends FunSuite with LeftRecursiveCorrectingParserW
 
   lazy val expression = new Lazy(block | anA)
   val whiteSpace = RegexParser("""\s*""".r, "whitespace")
-  val anA: Self[Any] = "a" ~< whiteSpace
-  val block: Self[Any] = WithIndentation("block:" ~< whiteSpace ~ greaterThan(alignedList(expression)))
+  val anA: Parser[Any] = "a" ~< whiteSpace
+  val block: Parser[Any] = WithIndentation("block:" ~< whiteSpace ~ greaterThan(alignedList(expression)))
 
   test("basic") {
     val program =

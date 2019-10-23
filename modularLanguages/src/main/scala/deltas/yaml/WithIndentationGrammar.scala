@@ -11,7 +11,7 @@ class WithIndentationGrammar(inner: BiGrammar) extends CustomGrammar {
 
   override def createPrinter(recursive: BiGrammar => NodePrinter) = recursive(inner)
 
-  override def toParser(recursive: BiGrammar => BiGrammarToParser.Self[Result]) = {
+  override def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[Result]) = {
     BiGrammarToParser.WithIndentation(recursive(inner))
   }
 

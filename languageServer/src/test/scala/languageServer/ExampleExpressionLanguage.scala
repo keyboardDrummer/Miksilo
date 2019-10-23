@@ -63,15 +63,15 @@ case class Addition(range: SourceRange, left: Expression, right: Expression) ext
 
 object ExpressionParser extends CommonStringReaderParser with LeftRecursiveCorrectingParserWriter with WhitespaceParserWriter {
 
-  lazy val expression: Self[Expression] = new Lazy(addition | numberParser | let | variable | hole)
+  lazy val expression: Parser[Expression] = new Lazy(addition | numberParser | let | variable | hole)
 
-  val numberParser: Self[Expression] = wholeNumber.map(x => Integer.parseInt(x)).withSourceRange((range, value) => Number(range, value))
+  val numberParser: Parser[Expression] = wholeNumber.map(x => Integer.parseInt(x)).withSourceRange((range, value) => Number(range, value))
 
-  val addition: Self[Expression] = (expression ~< "+" ~ expression).withSourceRange((range, value) => Addition(range, value._1, value._2))
+  val addition: Parser[Expression] = (expression ~< "+" ~ expression).withSourceRange((range, value) => Addition(range, value._1, value._2))
 
-  val variable: Self[Expression] = parseIdentifier.withSourceRange((range, value) => Identifier(range, value))
+  val variable: Parser[Expression] = parseIdentifier.withSourceRange((range, value) => Identifier(range, value))
   val variableDeclaration = parseIdentifier.withSourceRange((r,x) => VariableDeclaration(r,x))
-  val let: Self[Expression] = ("let" ~> variableDeclaration ~< "=" ~ expression ~< "in" ~ expression).withSourceRange((range, t) => Let(range, t._1._1, t._1._2, t._2))
+  val let: Parser[Expression] = ("let" ~> variableDeclaration ~< "=" ~ expression ~< "in" ~ expression).withSourceRange((range, t) => Let(range, t._1._1, t._1._2, t._2))
   val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((r,_) => ExpressionHole(r)), "expression")
 
   val root = expression ~< trivias

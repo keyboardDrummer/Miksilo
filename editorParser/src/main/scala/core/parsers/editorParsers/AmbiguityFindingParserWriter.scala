@@ -2,13 +2,13 @@ package core.parsers.editorParsers
 
 trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
-  override def findBestParseResult[Result](parser: Parser[Result], input: Input, mayStop: StopFunction): SingleParseResult[Result, Input] = {
+  override def findBestParseResult[Result](parser: BuiltParser[Result], input: Input, mayStop: StopFunction): SingleParseResult[Result, Input] = {
 
     val noResultFound = ReadyParseResult(None, input, History.error(FatalError(input, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Input, Result] = noResultFound
 
     var resultsSeen = Map.empty[Any, ReadyParseResult[Input, Result]]
-    var queue: SortedParseResults[Input, Result] = parser(input, newParseState(input))
+    var queue: ParseResults[Input, Result] = parser(input, newParseState(input))
     while(queue.nonEmpty) {
       val (parseResult: LazyParseResult[Input, Result], tail) = queue.pop()
 
@@ -63,15 +63,15 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  override def choice[Result](first: Self[Result], other: => Self[Result], firstIsLonger: Boolean = false): Self[Result] =
+  override def choice[Result](first: Parser[Result], other: => Parser[Result], firstIsLonger: Boolean = false): Parser[Result] =
     if (firstIsLonger) new TrackingFirstIsLonger(first, other) else new TrackingChoice(first, other)
 
-  class TrackingFirstIsLonger[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
+  class TrackingFirstIsLonger[+First <: Result, +Second <: Result, Result](val first: Parser[First], _second: => Parser[Second])
     extends ParserBuilderBase[Result] with ChoiceLike[Result] {
 
     lazy val second = _second
 
-    override def getParser(recursive: GetParser): Parser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
@@ -88,12 +88,12 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  class TrackingChoice[+First <: Result, +Second <: Result, Result](val first: Self[First], _second: => Self[Second])
+  class TrackingChoice[+First <: Result, +Second <: Result, Result](val first: Parser[First], _second: => Parser[Second])
     extends ParserBuilderBase[Result] with ChoiceLike[Result] {
 
     lazy val second = _second
 
-    override def getParser(recursive: GetParser): Parser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
