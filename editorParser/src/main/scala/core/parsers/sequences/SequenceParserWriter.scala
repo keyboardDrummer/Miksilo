@@ -40,7 +40,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           if (!mayFail) {
             originalResult = originalResult.flatMapReady(ready => {
               if (ready.remainder == input)
-                SREmpty
+                SREmpty.empty
               else
                 singleResult(ready)
             }, uniform = true)
@@ -233,7 +233,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
                   ReadyParseResult(Some(value), ready.remainder, ready.history)
               }
             case None =>
-              ready.asInstanceOf[ReadyParseResult[NewResult]]
+              ready.asInstanceOf[ReadyParseResult[Input, NewResult]]
           }
         }, uniform = false)
       }

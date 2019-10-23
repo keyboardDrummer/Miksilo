@@ -6,43 +6,48 @@ import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
 class PerformanceTest extends FunSuite {
 
-  test("Errorless JSON performance") {
+  test("Correct JSON performance") {
     import ParseJson._
 
-    val source = TestSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
-      replaceAll("\\s", "")
+    val source = TestSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
 
-    val multiplier = 1
-    val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
+    val multiplier = 15
+    val manySourcesCount = 10
+    val manySources = s"[${1.to(manySourcesCount).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
-    val timeA = System.currentTimeMillis()
-    for(_ <- 1.to(multiplier * 10)) {
-      val result = jsonParser.getWholeInputParser.parse(new StringReader(source))
-      assert(result.successful)
-    }
-
-    val timeB = System.currentTimeMillis()
+    var manyRepetitions = 0L
+    var manySourcesTime = 0L
     for(_ <- 1.to(multiplier)) {
-      val result = jsonParser.getWholeInputParser.parse(new StringReader(tenTimesSource))
+      val timeA = System.currentTimeMillis()
+      for (_ <- 1.to(manySourcesCount)) {
+        val result = jsonParser.getWholeInputParser.parse(new StringReader(source))
+        assert(result.successful)
+      }
+
+      val timeB = System.currentTimeMillis()
+      val result = jsonParser.getWholeInputParser.parse(new StringReader(manySources))
       assert(result.successful)
+      val timeC = System.currentTimeMillis()
+
+      manyRepetitions += timeB - timeA
+      manySourcesTime += timeC - timeB
     }
 
-    val timeC = System.currentTimeMillis()
-
-    val singleSource = timeB - timeA
-    val sourceTimesTen = timeC - timeB
-    assert(singleSource < 3500 * multiplier)
-    System.out.println(s"singleSource:$singleSource")
-    System.out.println(s"totalTime:${singleSource + sourceTimesTen}")
+    val average = (manyRepetitions + manySourcesTime) / (2 * manySourcesCount * multiplier)
+    assert(manySourcesTime < manyRepetitions * 1.1) // Verify that performance does not degrade with input length
+    assert(average < 150)
+    System.out.println(s"manyRepetitions:$manyRepetitions")
+    System.out.println(s"manySources:$manySourcesTime")
+    System.out.println(s"average:${average}")
   }
 
-  test("Edited") {
+  test("JSON with small errors performance") {
     import ParseJson._
 
     val program = TestSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val timeA = System.currentTimeMillis()
 
-    val repetitions = 5
+    val repetitions = 300
     for(_ <- 1.to(repetitions)) {
       val result = jsonParser.getWholeInputParser.parse(new StringReader(program), UntilBestAndXStepsStopFunction())
       assert(result.errors.size == 2)
@@ -52,7 +57,7 @@ class PerformanceTest extends FunSuite {
     val elapsedTime = timeB - timeA
     val average = elapsedTime / repetitions
     System.out.println(s"edited average: $average")
-    assert(average < 1200)
+    assert(average < 500)
   }
 }
 

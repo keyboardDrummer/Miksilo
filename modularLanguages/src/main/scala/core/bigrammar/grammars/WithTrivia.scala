@@ -3,6 +3,7 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.bigrammar.printer.Printer.NodePrinter
+import core.parsers.editorParsers.{ReadyParseResult, SREmpty, SortedParseResults}
 import core.responsiveDocument.ResponsiveDocument
 import util.Utility
 
@@ -36,17 +37,17 @@ class WithTriviaParser(original: BiGrammarToParser.Self[Result], triviasParserBu
     val parseOriginal = recursive(original)
 
     new Parser[Result] {
-      override def apply(input: Input, state: ParseState): SortedParseResults[Result] = {
+      override def apply(input: Input, state: ParseState): SortedParseResults[Input, Result] = {
         val leftResults = parseTrivias(input, state)
 
-        def rightFromLeftReady(leftReady: ReadyParseResult[Result]): SortedParseResults[Result] = {
+        def rightFromLeftReady(leftReady: ReadyParseResult[Input, Result]): SortedParseResults[Input, Result] = {
           if (leftReady.history.flawed)
-            return SREmpty // Do not error correct Trivia.
+            return SREmpty.empty // Do not error correct Trivia.
 
           val rightResult = parseOriginal(leftReady.remainder, state)
           rightResult.flatMapReady(rightReady => {
             if (input != leftReady.remainder && leftReady.remainder == rightReady.remainder) {
-              SREmpty // To avoid ambiguities, trivia may only occur before parsed input, not before inserted input.
+              SREmpty.empty // To avoid ambiguities, trivia may only occur before parsed input, not before inserted input.
             } else {
               val value = leftReady.resultOption.flatMap(leftValue =>
                 rightReady.resultOption.map(rightValue => {

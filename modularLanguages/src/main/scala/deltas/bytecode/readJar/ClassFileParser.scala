@@ -9,7 +9,7 @@ import deltas.javac.classes.ConstantPool
 object ClassFileParser extends ByteParserWriter {
 
   def parse(bytes: Array[Byte]): ParseResult[Node] = {
-    classFileParser.parseWholeInput(new ByteReader(bytes))
+    phrase(classFileParser)(new ByteReader(bytes))
   }
 
   lazy val classFileParser: Parser[Node] = {
@@ -37,7 +37,7 @@ object ClassFileParser extends ByteParserWriter {
   } yield new ConstantPool(constants)
 
   def constantsParser(constantCount: Int): Parser[List[Any]] = constantCount match {
-    case 0 => succeed(List.empty)
+    case 0 => success(List.empty)
     case _ => for {
       constantResult <- constantParser
       result <- constantsParser(constantCount - constantResult.entriesConsumed).map(rest => constantResult.constant :: rest)
@@ -47,7 +47,7 @@ object ClassFileParser extends ByteParserWriter {
   def attributeParser: Parser[Node] = for {
     nameIndex <- ParseShort
     length <- ParseInteger
-    bytes <- ParseByte.repN(length)
+    bytes <- repN(length, ParseByte)
   } yield UnParsedAttribute.construct(nameIndex, bytes)
 
   def methodParser: Parser[Node] = for {
@@ -59,7 +59,7 @@ object ClassFileParser extends ByteParserWriter {
 
   def sizedSequenceParser[T](inner: Parser[T]): Parser[Seq[T]] = for {
     amount <- ParseShort
-    items <- inner.repN(amount)
+    items <- repN(amount, inner)
   } yield items
 
   def fieldParser: Parser[Node] = for {
@@ -137,6 +137,6 @@ object ClassFileParser extends ByteParserWriter {
     case 15 => consumeOne(methodHandleParser)
     case 16 => consumeOne(methodTypeParser)
     case 18 => consumeOne(invokeDynamicParser)
-    case _ => FailureParser
+    case _ => failure("no match for constant")
   }
 }

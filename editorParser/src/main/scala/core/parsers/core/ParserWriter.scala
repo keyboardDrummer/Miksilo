@@ -1,11 +1,13 @@
 package core.parsers.core
 
+import core.parsers.editorParsers.SortedParseResults
+
 import scala.language.{existentials, higherKinds}
 
 trait ParserWriter {
 
   type Input <: ParseInput
-  type ParseResult[+Result] <: ParseResultLike[Result]
+  type ParseResult[+Result] = SortedParseResults[Input, Result]
   type Self[+R]
 
   def succeed[Result](result: Result): Self[Result]
@@ -29,11 +31,6 @@ trait ParserWriter {
   case class Success[+Result](result: Result, remainder: Input) {
     def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)
   }
-
-  trait ParseResultLike[+Result] {
-    def map[NewResult](f: Result => NewResult): ParseResult[NewResult]
-  }
-
 }
 
 

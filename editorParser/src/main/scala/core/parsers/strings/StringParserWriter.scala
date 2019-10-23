@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.{History, ParseError, SourceRange}
+import core.parsers.editorParsers.{History, ParseError, ReadyParseResult, SREmpty, SourceRange}
 import core.parsers.sequences.SequenceParserWriter
 
 import scala.util.matching.Regex
@@ -118,7 +118,7 @@ trait StringParserWriter extends SequenceParserWriter {
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
-              penaltyOption.fold[ParseResult[String]](SREmpty)(penalty => {
+              penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
                 val history = History.error(new MissingInput(input, s"<$regexName>", defaultValue.getOrElse(""), penalty))
                 singleResult(ReadyParseResult(defaultValue, input, history))
               })

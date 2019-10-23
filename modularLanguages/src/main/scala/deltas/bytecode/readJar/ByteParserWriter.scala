@@ -3,26 +3,29 @@ package deltas.bytecode.readJar
 import java.nio.ByteBuffer
 
 import core.language.node.Node
-import core.parsers.basicParsers.MonadicMachineParserWriter
-import core.parsers.core.ParseInput
 import deltas.bytecode.constants.Utf8ConstantDelta
 
-case class ByteReader(array: Array[Byte], offset: Int) extends ParseInput {
+import scala.util.parsing.combinator.Parsers
+import scala.util.parsing.input.Reader
+
+case class ByteReader(array: Array[Byte], _offset: Int) extends Reader[Byte] {
   def this(array: Array[Byte]) {
     this(array, 0)
   }
 
-  def drop(amount: Int): ByteReader = ByteReader(array, offset + amount)
+  override def drop(amount: Int): ByteReader = ByteReader(array, offset + amount)
 
-  def head: Byte = array(offset)
+  def first: Byte = array(offset)
 
-  def tail: ByteReader = drop(1)
+  def rest: ByteReader = drop(1)
 
   override def atEnd: Boolean = offset == array.length
+
+  override def pos = ???
 }
 
-trait ByteParserWriter extends MonadicMachineParserWriter {
-  type Input = ByteReader
+trait ByteParserWriter extends Parsers {
+  //type Input = ByteReader
   type Elem = Byte
 
   val ParseInteger = XBytes(4).map(bytes => bytes.getInt)
@@ -35,8 +38,8 @@ trait ByteParserWriter extends MonadicMachineParserWriter {
 
   case class XBytes(amount: Int) extends Parser[ByteBuffer] {
 
-    override def parse(input: ByteReader) = {
-      newSuccess(ByteBuffer.wrap(input.array, input.offset, amount), input.drop(amount))
+    def apply(input: Input): ParseResult[ByteBuffer] = {
+      Success(ByteBuffer.wrap(input.asInstanceOf[ByteReader].array, input.offset, amount), input.drop(amount))
     }
   }
 
@@ -45,15 +48,15 @@ trait ByteParserWriter extends MonadicMachineParserWriter {
       new String(bytes.array(), bytes.position(), length, "UTF-8")
     })
 
-  def elems(bytes: Seq[Byte]): Self[Unit] = {
+  def elems(bytes: Seq[Byte]): Parser[Unit] = {
     XBytes(bytes.length).flatMap((parsedBytes: ByteBuffer) => {
       val destination = new Array[Byte](bytes.length)
       parsedBytes.get(destination)
       val result = if (destination sameElements bytes) {
-        succeed(())
+        success(())
       }
       else {
-        fail("parsed bytes '$parsedBytes' were not equal to expected bytes $bytes")
+        failure("parsed bytes '$parsedBytes' were not equal to expected bytes $bytes")
       }
       result
     })

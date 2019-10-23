@@ -3,6 +3,10 @@ package core.parsers.core
 import scala.collection.mutable
 import scala.language.higherKinds
 
+
+trait ParserLike[+Result] {
+}
+
 trait OptimizingParserWriter extends ParserWriter {
 
   type Self[+Result] = ParserBuilder[Result]
@@ -13,7 +17,7 @@ trait OptimizingParserWriter extends ParserWriter {
   def newParseState(input: Input): ParseState
   type ParseState
 
-  trait Parser[+Result] {
+  trait Parser[+Result] extends ParserLike[Result] {
     def apply(input: Input, state: ParseState): ParseResult[Result]
     def debugName: Any = null
   }

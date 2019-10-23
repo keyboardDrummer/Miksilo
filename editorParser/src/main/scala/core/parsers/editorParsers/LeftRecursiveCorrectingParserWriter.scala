@@ -45,16 +45,16 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
     }
 
-    def grow(recursions: List[RecursiveParseResult[Result, Result]], previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
+    def grow(recursions: List[RecursiveParseResult[Input, Result, Result]], previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
       // TODO Consider replacing the previous.merge by moving that inside the lambda.
       previous.merge(previous.flatMapReady(prev => {
         if (prev.history.flawed)
-          SREmpty // TODO consider growing this as well
+          SREmpty.empty // TODO consider growing this as well
         else {
-          val grown: ParseResult[Result] = recursions.map((recursive: RecursiveParseResult[Result, Result]) => {
+          val grown: ParseResult[Result] = recursions.map((recursive: RecursiveParseResult[Input, Result, Result]) => {
             val results = recursive.get(singleResult(prev))
             results.flatMapReady(
-              ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else SREmpty,
+              ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else SREmpty.empty,
               uniform = false) // TODO maybe set this to uniform = true
           }).reduce((a,b) => a.merge(b))
           grow(recursions, grown, initialResults)
@@ -64,7 +64,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     def getPreviousResult(input: Input, state: ParseState): Option[ParseResult[Result]] = {
       if (state.input == input && state.parsers.contains(parser))
-          Some(RecursiveResults(Map(parser -> List(RecursiveParseResult[Result, Result](x => x))), SREmpty))
+          Some(RecursiveResults(Map(parser -> List(RecursiveParseResult[Input, Result, Result](x => x))), SREmpty.empty))
       else
         None
     }
