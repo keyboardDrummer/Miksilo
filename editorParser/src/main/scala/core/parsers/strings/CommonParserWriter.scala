@@ -1,5 +1,7 @@
 package core.parsers.strings
 
+import core.parsers.core.Processor
+
 trait CommonParserWriter extends StringParserWriter {
 
   /** An integer, without sign or with a negative sign. */
@@ -22,8 +24,8 @@ trait CommonParserWriter extends StringParserWriter {
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
   lazy val stringLiteral: Self[String] =
-    parseRegex(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r, "string literal", Some("\"")).
-      map(r => r.substring(1, r.length )) ~< literal("\"", allowDrop = false)
+    new Sequence(parseRegex(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r, "string literal", Some("\"")).
+      map(r => r.substring(1, r.length )), literal("\"", allowDrop = false), Processor.ignoreRight[Option[String], Option[String]])
 
   /** A number following the rules of `decimalNumber`, with the following
     *  optional additions:
