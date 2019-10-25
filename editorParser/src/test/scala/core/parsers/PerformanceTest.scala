@@ -38,7 +38,7 @@ class PerformanceTest extends FunSuite {
     System.out.println(s"manySources:$manySourcesTime")
     System.out.println(s"average:${average}")
     assert(manySourcesTime < manyRepetitions * 1.1) // Verify that performance does not degrade with input length
-    assert(average < 150)
+    assert(average < 450)
   }
 
   test("JSON with small errors performance") {
