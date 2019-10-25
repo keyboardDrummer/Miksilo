@@ -11,7 +11,7 @@ class PerformanceTest extends FunSuite {
 
     val source = TestSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
 
-    val multiplier = 1
+    val multiplier = 10
     val manySourcesCount = 10
     val manySources = s"[${1.to(manySourcesCount).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
