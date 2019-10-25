@@ -6,7 +6,7 @@ import core.bigrammar.printer.TryState
 import core.responsiveDocument.ResponsiveDocument
 
 object StringLiteral extends StringGrammar {
-  override def getParserBuilder(keywords: scala.collection.Set[String]): Self[Any] = stringLiteral
+  override def getParserBuilder(keywords: scala.collection.Set[String]): Parser[Any] = stringLiteral
 
   override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = TryState.value("\"" + from.value + "\"")
 }

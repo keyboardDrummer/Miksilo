@@ -5,25 +5,26 @@ import scala.language.higherKinds
 
 trait OptimizingParserWriter extends ParserWriter {
 
-  type Self[+Result] = ParserBuilder[Result]
-
-  def wrapParser[Result](parser: Parser[Result],
-                         shouldCache: Boolean, shouldDetectLeftRecursion: Boolean): Parser[Result]
-
+  type Parser[+Result] = ParserBuilder[Result]
   def newParseState(input: Input): ParseState
   type ParseState
+  type ParseResult[+Result]
 
-  trait Parser[+Result] {
+  def wrapParser[Result](parser: BuiltParser[Result],
+                         shouldCache: Boolean,
+                         shouldDetectLeftRecursion: Boolean): BuiltParser[Result]
+
+  trait BuiltParser[+Result] {
     def apply(input: Input, state: ParseState): ParseResult[Result]
     def debugName: Any = null
   }
 
   trait GetParser {
-    def apply[Result](parser: Self[Result]): Parser[Result]
+    def apply[Result](parser: Parser[Result]): BuiltParser[Result]
   }
 
   trait ParserBuilder[+Result] {
-    def getParser(recursive: GetParser): Parser[Result]
+    def getParser(recursive: GetParser): BuiltParser[Result]
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[ParserBuilder[_]]
@@ -35,8 +36,8 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait SequenceLike[+Result] extends ParserBuilder[Result] {
-    def left: Self[Any]
-    def right: Self[Any]
+    def left: Parser[Any]
+    def right: Parser[Any]
 
     override def children = List(left, right)
 
@@ -46,8 +47,8 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait ChoiceLike[+Result] extends ParserBuilder[Result] {
-    def first: Self[Result]
-    def second: Self[Result]
+    def first: Parser[Result]
+    def second: Parser[Result]
 
     override def children = List(first, second)
 
@@ -66,14 +67,14 @@ trait OptimizingParserWriter extends ParserWriter {
     override def children = List(original)
   }
 
-  class Lazy[Result](_original: => Self[Result], val debugName: Any = null)
+  class Lazy[Result](_original: => Parser[Result], val debugName: Any = null)
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
-    lazy val original: Self[Result] = _original
+    lazy val original: Parser[Result] = _original
     def getOriginal = original
 
-    override def getParser(recursive: GetParser): Parser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       lazy val parseOriginal = recursive(original)
-      new Parser[Result] {
+      new BuiltParser[Result] {
         override def apply(input: Input, state: ParseState) = {
           parseOriginal(input, state)
         }
@@ -97,16 +98,7 @@ trait OptimizingParserWriter extends ParserWriter {
     override def children = List.empty
   }
 
-  case class MapParser[Result, NewResult](original: Self[Result], f: Result => NewResult)
-    extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
-
-    override def getParser(recursive: GetParser): Parser[NewResult] = {
-      val parseOriginal = recursive(original)
-      (input, state) => parseOriginal(input, state).map(f)
-    }
-  }
-
-  def compile[Result](root: Self[Result]): ParserAnalysis = {
+  def compile[Result](root: Parser[Result]): ParserAnalysis = {
     var nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]] = Set.empty
     val mustConsumeCache = new ConsumeCache
 
@@ -126,7 +118,7 @@ trait OptimizingParserWriter extends ParserWriter {
           nodesThatShouldDetectLeftRecursion += cycle.head
       })
 
-    val components = SCC.scc[ParserBuilder[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
+    val components = StronglyConnectedComponents.computeComponents[ParserBuilder[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
     val nodesInCycle: Set[ParserBuilder[_]] = components.filter(c => c.size > 1).flatten.toSet
 
     val nodesWithMultipleIncomingEdges: Set[ParserBuilder[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
@@ -138,27 +130,27 @@ trait OptimizingParserWriter extends ParserWriter {
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
-    def buildParser[Result](root: Self[Result]): Parser[Result] = {
-      val cacheOfParses = new mutable.HashMap[Self[Any], Parser[Any]]
-      var caches = List.empty[CheckCache[_]]
+    def buildParser[Result](root: Parser[Result]): BuiltParser[Result] = {
+      val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
+      var caches = List.empty[CacheLike[_]]
       def recursive: GetParser = new GetParser {
-        override def apply[SomeResult](_parser: Self[SomeResult]): Parser[SomeResult] = {
+        override def apply[SomeResult](_parser: Parser[SomeResult]): BuiltParser[SomeResult] = {
           cacheOfParses.getOrElseUpdate(_parser, {
             val parser = _parser.asInstanceOf[ParserBuilder[SomeResult]]
             val result = parser.getParser(recursive)
             val wrappedParser = wrapParser(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
             wrappedParser match {
-              case check: CheckCache[_] => caches ::= check
+              case check: CacheLike[_] => caches ::= check
               case _ =>
             }
             wrappedParser
-          }).asInstanceOf[Parser[SomeResult]]
+          }).asInstanceOf[BuiltParser[SomeResult]]
         }
       }
 
       val wrappedRoot = recursive(root)
-      val reusableParser: Parser[Result] = (input, state) => {
-        caches.foreach(cache => cache.cache.clear())
+      val reusableParser: BuiltParser[Result] = (input, state) => {
+        caches.foreach(cache => cache.clear())
         wrappedRoot.apply(input, state)
       }
       reusableParser
@@ -180,28 +172,15 @@ trait OptimizingParserWriter extends ParserWriter {
     }
   }
 
-  implicit class ParserExtensions[+Result](parser: Self[Result]) extends super.ParserExtensions(parser) {
+  implicit class ParserExtensions[+Result](parser: Parser[Result]) extends super.ParserExtensions(parser) {
 
-    def addAlternative[Other >: Result](getAlternative: (Self[Other], Self[Other]) => Self[Other], debugName: Any = null): Self[Other] = {
-      lazy val result: Self[Other] = new Lazy(parser | getAlternative(parser, result), debugName)
+    def addAlternative[Other >: Result](getAlternative: (Parser[Other], Parser[Other]) => Parser[Other], debugName: Any = null): Parser[Other] = {
+      lazy val result: Parser[Other] = new Lazy(parser | getAlternative(parser, result), debugName)
       result
     }
   }
 
-  class CheckCache[Result](parser: Parser[Result]) extends Parser[Result] {
-    // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
-    val cache = mutable.HashMap[(Input, ParseState), ParseResult[Result]]()
-
-    def apply(input: Input, state: ParseState): ParseResult[Result] = {
-      val key = (input, state)
-      cache.get(key) match {
-        case Some(value) =>
-          value
-        case _ =>
-          val value: ParseResult[Result] = parser(input, state)
-          cache.put(key, value)
-          value
-      }
-    }
+  trait CacheLike[Result] extends BuiltParser[Result] {
+    def clear(): Unit
   }
 }

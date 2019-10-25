@@ -10,7 +10,7 @@ class ErrorReportingAndFixTest extends FunSuite
   with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   test("left recursion with lazy indirection error") {
-    lazy val head: Self[Any] = new Lazy(head) ~ "#" | "!"
+    lazy val head: Parser[Any] = new Lazy(head) ~ "#" | "!"
 
     val input = "@@"
     val parseResult = head.getWholeInputParser.parse(new StringReader(input))
@@ -19,7 +19,7 @@ class ErrorReportingAndFixTest extends FunSuite
   }
 
   test("left recursion with lazy indirection error v2") {
-    lazy val head: Self[Any] = "!" | new Lazy(head) ~ "#"
+    lazy val head: Parser[Any] = "!" | new Lazy(head) ~ "#"
 
     val input = "@@"
     val parseResult = head.getWholeInputParser.parse(new StringReader(input))

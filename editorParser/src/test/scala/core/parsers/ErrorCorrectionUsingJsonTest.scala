@@ -173,7 +173,7 @@ class ErrorCorrectionUsingJsonTest extends FunSuite {
    */
   test("mass garbage, and virtual left recursion through error correction") {
     val input = """doesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatch"""
-    lazy val parser: Self[Any] = "{" ~ parser | "!"
+    lazy val parser: Parser[Any] = "{" ~ parser | "!"
     val detectValueParser = new DetectValueParser(("{",("{", ("{", "!"))), parser)
     val result = detectValueParser.getWholeInputParser.parse(new StringReader(input))
     assert(!detectValueParser.detected)

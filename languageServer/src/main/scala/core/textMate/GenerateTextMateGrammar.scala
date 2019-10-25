@@ -8,15 +8,15 @@ import scala.util.matching.Regex
 
 object GenerateTextMateGrammar {
 
-  def toTextMate(writer: CommonParserWriter)(grammar: writer.Self[_]): String = {
+  def toTextMate(writer: CommonParserWriter)(grammar: writer.Parser[_]): String = {
     val textMate: JsExpression = createTextMateAstFromBiGrammar(writer)(grammar)
     Json.printJson(textMate)
   }
 
-  def grammarToRegex[Result](writer: CommonParserWriter)(root: writer.Self[Result]): Option[String] = {
-    var callStack = List.empty[writer.Self[_]]
+  def grammarToRegex[Result](writer: CommonParserWriter)(root: writer.Parser[Result]): Option[String] = {
+    var callStack = List.empty[writer.Parser[_]]
 
-    def recurse(grammar: writer.Self[_]): Option[String] = {
+    def recurse(grammar: writer.Parser[_]): Option[String] = {
       if (callStack.contains(grammar))
         return None
 
@@ -49,8 +49,8 @@ object GenerateTextMateGrammar {
 
   case class Match(scope: String, regex: Regex)
 
-  def createTextMateAstFromBiGrammar(writer: CommonParserWriter)(grammar: writer.Self[_]): JsExpression = {
-    val reachables: Seq[writer.Self[_]] = GraphBasics.traverseBreadth[writer.Self[_]](Seq(grammar), grammar => grammar.children,
+  def createTextMateAstFromBiGrammar(writer: CommonParserWriter)(grammar: writer.Parser[_]): JsExpression = {
+    val reachables: Seq[writer.Parser[_]] = GraphBasics.traverseBreadth[writer.Parser[_]](Seq(grammar), grammar => grammar.children,
       node => if (node.isInstanceOf[ColorizeLike] || node.isInstanceOf[writer.KeywordParser] ||
         node == writer.parseIdentifier || node == writer.stringLiteral) GraphBasics.SkipChildren else GraphBasics.Continue )
 
@@ -107,7 +107,7 @@ trait ColorizeLike {
 
 trait TextMateGeneratingParserWriter extends CommonParserWriter with OptimizingParserWriter {
 
-  case class Colorize[Result](original: Self[Result], textMateScope: String) extends ParserBuilderBase[Result]
+  case class Colorize[Result](original: Parser[Result], textMateScope: String) extends ParserBuilderBase[Result]
     with ParserWrapper[Result] with ColorizeLike {
     override def getParser(recursive: GetParser) = recursive(original)
 

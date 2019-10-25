@@ -10,7 +10,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class Fail[Result](value: Option[Result], message: String, penalty: Double)
     extends ParserBuilderBase[Result] with LeafParser[Result] {
 
-    override def getParser(recursive: GetParser): Parser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       (input, _) => newFailure(value, input, History.error(FatalError(input, message, penalty)))
     }
 
@@ -20,17 +20,17 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   def many[Result, Sum](original: ParserBuilder[Result],
                         zero: Sum, reduce: (Result, Sum) => Sum,
                         parseGreedy: Boolean = true) = {
-    lazy val result: Self[Sum] = choice(leftRight(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
+    lazy val result: Parser[Sum] = choice(leftRight(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
     result
   }
 
   // Why can't the drop be done after the original, then it wouldn't need this tricky mayFail mechanism?
-  case class DropParser[Result](original: Self[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
+  case class DropParser[Result](original: Parser[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParser): Parser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
-      class DroppingParser extends Parser[Result] {
+      class DroppingParser extends BuiltParser[Result] {
 
         def parse(input: Input, state: ParseState, mayFail: Boolean): ParseResult[Result] = {
           var originalResult = parseOriginal(input, state)
@@ -40,7 +40,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           if (!mayFail) {
             originalResult = originalResult.flatMapReady(ready => {
               if (ready.remainder == input)
-                SREmpty
+                SREmpty.empty
               else
                 singleResult(ready)
             }, uniform = true)
@@ -90,8 +90,8 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def canMerge = true
   }
 
-  case class Fallback[Result](original: Self[Result], name: String) extends ParserBuilderBase[Result] with LeafParser[Result] { // TODO combine with failure?
-    override def getParser(recursive: GetParser): Parser[Result] = {
+  case class Fallback[Result](original: Parser[Result], name: String) extends ParserBuilderBase[Result] with LeafParser[Result] { // TODO combine with failure?
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
 
       val parseOriginal = recursive(original)
       (input, state) => {
@@ -159,13 +159,13 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
   }
 
-  case class ParseWholeInput[Result](original: Self[Result])
+  case class ParseWholeInput[Result](original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParser): Parser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
-      new Parser[Result] {
+      new BuiltParser[Result] {
         override def apply(input: Input, state: ParseState) = {
           val result = parseOriginal(input, state)
           result.mapReady(parseResult => {
@@ -187,7 +187,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class ElemPredicate(predicate: Elem => Boolean, kind: String)
     extends ParserBuilderBase[Elem] with LeafParser[Elem] {
 
-    override def getParser(recursive: GetParser): Parser[Elem] = {
+    override def getParser(recursive: GetParser): BuiltParser[Elem] = {
 
       def apply(input: Input, state: ParseState): ParseResult[Elem] = {
         if (input.atEnd) {
@@ -213,11 +213,11 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 
   case class FilterMap[Other, Result <: Other, NewResult](
-      original: Self[Result],
-      map: Other => Either[String, NewResult])
+                                                           original: Parser[Result],
+                                                           map: Other => Either[String, NewResult])
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
-    override def getParser(recursive: GetParser): Parser[NewResult] = {
+    override def getParser(recursive: GetParser): BuiltParser[NewResult] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         val originalResult = parseOriginal(input, state)
@@ -233,19 +233,19 @@ trait SequenceParserWriter extends CorrectingParserWriter {
                   ReadyParseResult(Some(value), ready.remainder, ready.history)
               }
             case None =>
-              ready.asInstanceOf[ReadyParseResult[NewResult]]
+              ready.asInstanceOf[ReadyParseResult[Input, NewResult]]
           }
         }, uniform = false)
       }
     }
   }
 
-  case class Filter[Other, Result <: Other](original: Self[Result],
+  case class Filter[Other, Result <: Other](original: Parser[Result],
                                             predicate: Other => Boolean,
                                             getMessage: Other => String)
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParser): Parser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         val originalResult = parseOriginal(input, state)
@@ -277,34 +277,34 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     combineFold(zero, reduce)
   }
 
-  implicit class SequenceParserExtensions[Result](parser: Self[Result]) extends ParserExtensions(parser) {
+  implicit class SequenceParserExtensions[Result](parser: Parser[Result]) extends ParserExtensions(parser) {
 
     def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum,
-                  parseGreedy: Boolean = true): Self[Sum] = SequenceParserWriter.this.many(parser, zero, reduce, parseGreedy)
+                  parseGreedy: Boolean = true): Parser[Sum] = SequenceParserWriter.this.many(parser, zero, reduce, parseGreedy)
 
-    def * : Self[List[Result]] = {
+    def * : Parser[List[Result]] = {
       many(List.empty, (h: Result, t: List[Result]) => h :: t)
     }
 
-    def ~[Right](right: => Self[Right]): Self[(Result, Right)] = leftRightSimple(parser, right, (a: Result, b: Right) => (a,b))
+    def ~[Right](right: => Parser[Right]): Parser[(Result, Right)] = leftRightSimple(parser, right, (a: Result, b: Right) => (a,b))
 
-    def ~<[Right](right: Self[Right]): ParserBuilder[Result] = leftRight(parser, right, Processor.ignoreRight[Option[Result], Option[Right]])
+    def ~<[Right](right: Parser[Right]): ParserBuilder[Result] = leftRight(parser, right, Processor.ignoreRight[Option[Result], Option[Right]])
 
-    def ~>[Right](right: Self[Right]): ParserBuilder[Right] = leftRight(parser, right, Processor.ignoreLeft[Option[Result], Option[Right]])
+    def ~>[Right](right: Parser[Right]): ParserBuilder[Right] = leftRight(parser, right, Processor.ignoreLeft[Option[Result], Option[Right]])
 
-    def +(elementName: String): Self[List[Result]] = {
+    def +(elementName: String): Parser[List[Result]] = {
       leftRight(parser, parser.*, combineMany[Result])
     }
 
-    def someSeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
-      lazy val result: Self[List[Result]] = separator ~>
+    def someSeparated(separator: Parser[Any], elementName: String): Parser[List[Result]] = {
+      lazy val result: Parser[List[Result]] = separator ~>
         leftRight[Result, List[Result], List[Result]](parser, result, combineMany[Result]) |
           Fail(Some(List.empty[Result]), elementName, History.insertDefaultPenalty) | // TODO can we remove this Fail?
           succeed(List.empty[Result])
       leftRight(parser, result, combineMany[Result])
     }
 
-    def manySeparated(separator: Self[Any], elementName: String): Self[List[Result]] = {
+    def manySeparated(separator: Parser[Any], elementName: String): Parser[List[Result]] = {
       val zero = List.empty[Result]
       choice(someSeparated(separator, elementName), succeed(zero), firstIsLonger = true)
     }
@@ -321,7 +321,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       ParseWholeInput(parser).getSingleResultParser
     }
 
-    def withRange[Other](addRange: (Input, Input, Result) => Other): Self[Other] = {
+    def withRange[Other](addRange: (Input, Input, Result) => Other): Parser[Other] = {
       WithRangeParser(parser, addRange)
     }
   }

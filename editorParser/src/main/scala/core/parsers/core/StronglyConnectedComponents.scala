@@ -1,7 +1,7 @@
 package core.parsers.core
 
-object SCC {
-  def scc[T](allVertices: Set[T], getChildren: T => Set[T]) : List[Set[T]] = {
+object StronglyConnectedComponents {
+  def computeComponents[T](allVertices: Set[T], getChildren: T => Set[T]) : List[Set[T]] = {
     // The first part is a shameless adaptation from Wikipedia
 
     var index = 0

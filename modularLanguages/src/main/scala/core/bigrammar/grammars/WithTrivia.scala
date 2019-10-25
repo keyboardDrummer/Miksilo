@@ -3,6 +3,7 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.bigrammar.printer.Printer.NodePrinter
+import core.parsers.editorParsers.{ReadyParseResult, SREmpty, ParseResults}
 import core.responsiveDocument.ResponsiveDocument
 import util.Utility
 
@@ -26,27 +27,27 @@ case class WithTrivia(var inner: BiGrammar, var trivia: BiGrammar = ParseWhiteSp
   override protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]) = recursive(inner)
 }
 
-class WithTriviaParser(original: BiGrammarToParser.Self[Result], triviasParserBuilder: BiGrammarToParser.ParserBuilder[Result])
+class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParserBuilder: BiGrammarToParser.ParserBuilder[Result])
   extends BiGrammarToParser.ParserBuilderBase[Result] {
 
   import BiGrammarToParser._
 
-  override def getParser(recursive: BiGrammarToParser.GetParser): Parser[Result] = {
+  override def getParser(recursive: BiGrammarToParser.GetParser): BuiltParser[Result] = {
     val parseTrivias = recursive(triviasParserBuilder)
     val parseOriginal = recursive(original)
 
-    new Parser[Result] {
-      override def apply(input: Input, state: ParseState): SortedParseResults[Result] = {
+    new BuiltParser[Result] {
+      override def apply(input: Input, state: ParseState): ParseResults[Input, Result] = {
         val leftResults = parseTrivias(input, state)
 
-        def rightFromLeftReady(leftReady: ReadyParseResult[Result]): SortedParseResults[Result] = {
+        def rightFromLeftReady(leftReady: ReadyParseResult[Input, Result]): ParseResults[Input, Result] = {
           if (leftReady.history.flawed)
-            return SREmpty // Do not error correct Trivia.
+            return SREmpty.empty // Do not error correct Trivia.
 
           val rightResult = parseOriginal(leftReady.remainder, state)
           rightResult.flatMapReady(rightReady => {
             if (input != leftReady.remainder && leftReady.remainder == rightReady.remainder) {
-              SREmpty // To avoid ambiguities, trivia may only occur before parsed input, not before inserted input.
+              SREmpty.empty // To avoid ambiguities, trivia may only occur before parsed input, not before inserted input.
             } else {
               val value = leftReady.resultOption.flatMap(leftValue =>
                 rightReady.resultOption.map(rightValue => {

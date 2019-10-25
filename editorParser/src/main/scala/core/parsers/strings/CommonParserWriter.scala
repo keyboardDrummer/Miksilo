@@ -5,7 +5,7 @@ import core.parsers.core.Processor
 trait CommonParserWriter extends StringParserWriter {
 
   /** An integer, without sign or with a negative sign. */
-  lazy val wholeNumber: Self[String] =
+  lazy val wholeNumber: Parser[String] =
     parseRegex("""-?\d+""".r, "whole number")
   /** Number following one of these rules:
     *
@@ -14,7 +14,7 @@ trait CommonParserWriter extends StringParserWriter {
     *  - An integer followed by a decimal point and fractional part. For example: `3.14`
     *  - A decimal point followed by a fractional part. For example: `.1`
     */
-  lazy val decimalNumber: Self[String] =
+  lazy val decimalNumber: Parser[String] =
     parseRegex("""(\d+(\.\d*)?|\d*\.\d+)""".r, "decimal number")
   /** Double quotes (`"`) enclosing a sequence of:
     *
@@ -23,7 +23,7 @@ trait CommonParserWriter extends StringParserWriter {
     *    of the letters `b`, `f`, `n`, `r` or `t`
     *  - `\` followed by `u` followed by four hexadecimal digits
     */
-  lazy val stringLiteral: Self[String] =
+  lazy val stringLiteral: Parser[String] =
     new Sequence(parseRegex(""""([^"\x00-\x1F\x7F\\]|\\[\\'"bfnrt]|\\u[a-fA-F0-9]{4})*""".r, "string literal", Some("\"")).
       map(r => r.substring(1, r.length )), literal("\"", allowDrop = false), Processor.ignoreRight[Option[String], Option[String]])
 
@@ -34,6 +34,6 @@ trait CommonParserWriter extends StringParserWriter {
     *  - Followed by `e` or `E` and an optionally signed integer
     *  - Followed by `f`, `f`, `d` or `D` (after the above rule, if both are used)
     */
-  lazy val floatingPointNumber: Self[String] =
+  lazy val floatingPointNumber: Parser[String] =
     parseRegex("""-?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?[fFdD]?""".r, "floating point number")
 }

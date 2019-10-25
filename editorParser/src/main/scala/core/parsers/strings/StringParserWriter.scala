@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.{History, ParseError, SourceRange}
+import core.parsers.editorParsers.{History, ParseError, ReadyParseResult, SREmpty, SourceRange}
 import core.parsers.sequences.SequenceParserWriter
 
 import scala.util.matching.Regex
@@ -15,11 +15,11 @@ trait StringParserWriter extends SequenceParserWriter {
   implicit def literalToExtensions(value: String): SequenceParserExtensions[String] =
     literalOrKeyword(value)
 
-  implicit def stringToLiteralOrKeyword(value: String): Self[String] = {
+  implicit def stringToLiteralOrKeyword(value: String): Parser[String] = {
     literalOrKeyword(value)
   }
 
-  def literalOrKeyword(value: String, allowDrop: Boolean = true): Self[String] = {
+  def literalOrKeyword(value: String, allowDrop: Boolean = true): Parser[String] = {
     val isKeyword = identifierRegex.findFirstIn(value).contains(value)
     if (isKeyword)
       if (allowDrop)
@@ -35,9 +35,9 @@ trait StringParserWriter extends SequenceParserWriter {
 
   case class Literal(value: String, penalty: Double = History.missingInputPenalty) extends ParserBuilderBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: GetParser): Parser[String] = {
+    override def getParser(recursive: GetParser): BuiltParser[String] = {
 
-      lazy val result: Parser[String] = new Parser[String] {
+      lazy val result: BuiltParser[String] = new BuiltParser[String] {
         def apply(input: Input, state: ParseState): ParseResult[String] = {
           var index = 0
           val array = input.array
@@ -68,7 +68,7 @@ trait StringParserWriter extends SequenceParserWriter {
     * Don't wrap KeywordParser in a Drop. Since it wraps identifier, it already has a drop.
     */
   case class KeywordParser(value: String) extends ParserBuilderBase[String] with ParserWrapper[String] {
-    override def getParser(recursive: GetParser): Parser[String] = {
+    override def getParser(recursive: GetParser): BuiltParser[String] = {
       val identifierParser = recursive(parseIdentifier)
       (input, state) => {
         identifierParser(input, state).mapReady(ready => {
@@ -82,7 +82,7 @@ trait StringParserWriter extends SequenceParserWriter {
       }
     }
 
-    override def original: Self[String] = parseIdentifier
+    override def original: Parser[String] = parseIdentifier
   }
 
   trait NextCharError extends ParseError[Input] {
@@ -107,9 +107,9 @@ trait StringParserWriter extends SequenceParserWriter {
                          penaltyOption: Option[Double] = Some(History.missingInputPenalty))
     extends ParserBuilderBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: GetParser): Parser[String] = {
+    override def getParser(recursive: GetParser): BuiltParser[String] = {
 
-      lazy val result: Parser[String] = new Parser[String] {
+      lazy val result: BuiltParser[String] = new BuiltParser[String] {
 
         def apply(input: Input, state: ParseState): ParseResult[String] = {
           regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
@@ -118,7 +118,7 @@ trait StringParserWriter extends SequenceParserWriter {
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
-              penaltyOption.fold[ParseResult[String]](SREmpty)(penalty => {
+              penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
                 val history = History.error(new MissingInput(input, s"<$regexName>", defaultValue.getOrElse(""), penalty))
                 singleResult(ReadyParseResult(defaultValue, input, history))
               })
@@ -133,9 +133,9 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
   }
 
-  implicit class StringParserExtensions[Result](parser: Self[Result]) {
+  implicit class StringParserExtensions[Result](parser: Parser[Result]) {
 
-    def withSourceRange[Other](addRange: (SourceRange, Result) => Other): Self[Other] = {
+    def withSourceRange[Other](addRange: (SourceRange, Result) => Other): Parser[Other] = {
       parser.withRange((l,r,v) => addRange(SourceRange(l.position, r.position), v))
     }
   }
