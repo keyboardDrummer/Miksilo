@@ -8,7 +8,7 @@ import deltas.bytecode.constants.Utf8ConstantDelta
 import scala.util.parsing.combinator.Parsers
 import scala.util.parsing.input.Reader
 
-case class ByteReader(array: Array[Byte], _offset: Int) extends Reader[Byte] {
+case class ByteReader(array: Array[Byte], override val offset: Int) extends Reader[Byte] {
   def this(array: Array[Byte]) {
     this(array, 0)
   }
