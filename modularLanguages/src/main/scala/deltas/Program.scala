@@ -17,20 +17,73 @@ import languageServer.MiksiloLanguageServer
 import lsp.LSPServer
 import org.slf4j.LoggerFactory
 
+import scala.reflect.io.File
 import scala.util.Try
+
+trait LanguageBuilder {
+  def key: String
+  def build(arguments: Seq[String]): Language
+}
+
+class CloudFormationLanguageBuilder(json: Boolean = true) extends LanguageBuilder with LazyLogging {
+  override def build(arguments: Seq[String]) = {
+    val resourceSpecificationOption = if (arguments.isEmpty) {
+      logger.debug("CloudFormation language requires passing a path to a resource specification as an argument")
+      None
+    } else {
+      val path = arguments.head
+      val inputStream = File(path).inputStream()
+      Some(inputStream)
+    }
+    val cloudFormation = new CloudFormationLanguage(resourceSpecificationOption)
+    if (json) cloudFormation.jsonLanguage else cloudFormation.yamlLanguage
+  }
+
+  override def key = if (json) "cloudFormation" else "yamlCloudFormation"
+}
+
+object VerilogLanguageBuilder extends LanguageBuilder {
+  override def key = "verilog"
+  override def build(arguments: Seq[String]) = VerilogLanguage.language
+}
+
+object JavaLanguageBuilder extends LanguageBuilder {
+  override def key = "java"
+
+  override def build(arguments: Seq[String]) = JavaLanguage.java
+}
+
+object SolidityLanguageBuilder extends LanguageBuilder {
+  override def key = "solidity"
+
+  override def build(arguments: Seq[String]) = SolidityLanguage.language
+}
+
+object SmithyLanguageBuilder extends LanguageBuilder {
+  override def key = "smithy"
+
+  override def build(arguments: Seq[String]) = SmithyLanguage.language
+}
 
 object Program extends LazyLogging {
 
-  val languages: Map[String, Language] = Map(
-    "cloudFormation" -> CloudFormationLanguage.jsonLanguage,
-    "yamlCloudFormation" -> CloudFormationLanguage.yamlLanguage,
-    "verilog" -> VerilogLanguage.language,
-    "java" -> JavaLanguage.java,
-    "solidity" -> SolidityLanguage.language,
-    "smithy" -> SmithyLanguage.language
+  val languages: Seq[LanguageBuilder] = Seq(
+    new CloudFormationLanguageBuilder(json = true),
+    new CloudFormationLanguageBuilder(json = false),
+    VerilogLanguageBuilder,
+    JavaLanguageBuilder,
+    SolidityLanguageBuilder,
+    SmithyLanguageBuilder
   )
+  val languageMap = languages.map(l => (l.key, l)).toMap
 
   def main(args: Array[String]): Unit = {
+    if (args.isEmpty) {
+      logger.debug("Please specify with which language to run Miksilo")
+      return
+    }
+
+    val remainingArguments = args.drop(1)
 
     val innerLogger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).asInstanceOf[Logger]
     innerLogger.setLevel(Level.INFO)
@@ -38,15 +91,19 @@ object Program extends LazyLogging {
     sendAllLoggingToStdErr(innerLogger)
     logger.debug(s"Starting server in ${System.getenv("PWD")}")
 
-    val languageNameOption = args.headOption
-    val language = languageNameOption.flatMap(languageName => languages.get(languageName)).getOrElse(languages.values.head)
-    val connection = new JsonRpcConnection(System.in, System.out)
-    val lspServer = Try {
-      val languageServer = new MiksiloLanguageServer(language)
-      new LSPServer(languageServer, connection)
+    val languageOption = languageMap.get(args.head)
+    languageOption match {
+      case None =>
+        logger.debug("Please specify with which language to run Miksilo")
+      case Some(languageBuilder) =>
+        val connection = new JsonRpcConnection(System.in, System.out)
+        val lspServer = Try {
+          val languageServer = new MiksiloLanguageServer(languageBuilder.build(remainingArguments))
+          new LSPServer(languageServer, connection)
+        }
+        lspServer.recover{case e => logger.error(e.getMessage); e.printStackTrace() }
+        connection.listen()
     }
-    lspServer.recover{case e => logger.error(e.getMessage); e.printStackTrace() }
-    connection.listen()
   }
 
   private def sendAllLoggingToStdErr(innerLogger: Logger): Unit = {

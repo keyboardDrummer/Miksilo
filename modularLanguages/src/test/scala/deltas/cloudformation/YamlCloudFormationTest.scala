@@ -1,16 +1,18 @@
 package cloudformation
 
-import deltas.cloudformation.CloudFormationLanguage
+import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import languageServer._
 import org.scalatest.FunSuite
 import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
 import TestLanguageBuilder._
 import core.parsers.editorParsers.{Position, SourceRange, TextEdit, UntilBestAndXStepsStopFunction}
 import _root_.lsp.{FileRange, HumanPosition, SymbolInformation, WorkspaceEdit}
+import util.TestLanguageBuilder._
+import util.{SourceUtils, TestLanguageBuilder}
 
 class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
 
-  val yamlLanguage = TestLanguageBuilder.buildWithParser(CloudFormationLanguage.yamlDeltas, UntilBestAndXStepsStopFunction(1))
+  val yamlLanguage = TestLanguageBuilder.buildWithParser(CloudFormationTest.language.yamlDeltas, UntilBestAndXStepsStopFunction(1))
   val yamlServer = new MiksiloLanguageServer(yamlLanguage)
 
   test("No diagnostics") {
