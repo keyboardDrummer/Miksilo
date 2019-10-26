@@ -3,7 +3,7 @@ package core.smarts
 import core.smarts.objects.{Declaration, DeclarationVariable}
 import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.types.objects.{Type, TypeVariable}
-import languageServer.Diagnostic
+import lsp.Diagnostic
 
 trait Constraint {
   def apply(solver: ConstraintSolver): Boolean

@@ -1,7 +1,7 @@
 package core.language
 
 import core.parsers.editorParsers.SourceRange
-import languageServer.{FilePosition, FileRange}
+import lsp.{FilePosition, FileRange}
 
 trait SourceElement {
   /*

@@ -3,7 +3,7 @@ package core.smarts.scopes
 import core.language.SourceElement
 import core.smarts.objects.{NamedDeclaration, Reference}
 import core.smarts.scopes.objects.ConcreteScope
-import languageServer.FileRange
+import lsp.FileRange
 
 import scala.collection.mutable
 

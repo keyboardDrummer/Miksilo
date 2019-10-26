@@ -3,7 +3,7 @@ package core.language
 import core.parsers.editorParsers.{ParseError, SourceRange}
 import core.parsers.strings.StringReaderLike
 import core.smarts.FileDiagnostic
-import languageServer._
+import lsp._
 
 object DiagnosticUtil {
 

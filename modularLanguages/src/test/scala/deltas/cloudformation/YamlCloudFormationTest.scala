@@ -6,6 +6,7 @@ import org.scalatest.FunSuite
 import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
 import TestLanguageBuilder._
 import core.parsers.editorParsers.{Position, SourceRange, TextEdit, UntilBestAndXStepsStopFunction}
+import _root_.lsp.{FileRange, HumanPosition, SymbolInformation, WorkspaceEdit}
 
 class YamlCloudFormationTest extends FunSuite with LanguageServerTest {
 

@@ -2,7 +2,7 @@ package languageServer
 
 import core.language.Language
 import core.parsers.editorParsers.Position
-import languageServer.lsp._
+import lsp._
 
 import scala.util.Random
 

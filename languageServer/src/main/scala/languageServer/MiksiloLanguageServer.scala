@@ -6,7 +6,7 @@ import core.language.{Compilation, Language, SourceElement}
 import core.parsers.editorParsers.TextEdit
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
-import languageServer.lsp._
+import lsp._
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider

@@ -1,6 +1,5 @@
 package core.grammar
 
-import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 
 import scala.util.parsing.combinator.PackratParsers

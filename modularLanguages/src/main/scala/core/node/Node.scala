@@ -3,8 +3,8 @@ package core.language.node
 import core.deltas.path.NodePath
 import core.language.node.Node._
 import core.parsers.editorParsers.SourceRange
-import languageServer.PositionFormat.PositionOrdering
-import languageServer.PositionFormat
+import lsp.PositionFormat.PositionOrdering
+import lsp.PositionFormat
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing

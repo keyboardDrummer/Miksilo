@@ -1,4 +1,4 @@
-package languageServer.lsp
+package lsp
 
 object TextDocumentSyncKind {
   /**

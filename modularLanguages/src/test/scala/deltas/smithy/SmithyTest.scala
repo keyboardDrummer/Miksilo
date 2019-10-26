@@ -1,10 +1,10 @@
 package deltas.smithy
 
+import _root_.lsp.HumanPosition
 import core.parsers.editorParsers.SourceRange
-import languageServer._
-import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer}
+import languageServer.{MiksiloLanguageServer, _}
 import org.scalatest.FunSuite
-import util.{JavaSourceUtils, SourceUtils}
+import util.SourceUtils
 
 class SmithyTest extends FunSuite with LanguageServerTest {
 

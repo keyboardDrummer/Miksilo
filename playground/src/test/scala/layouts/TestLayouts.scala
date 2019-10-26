@@ -1,6 +1,5 @@
 package core.layouts
 
-import org.junit.{Assert, Test}
 import org.scalatest.FunSuite
 
 class TestLayouts extends FunSuite {

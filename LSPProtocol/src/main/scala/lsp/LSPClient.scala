@@ -1,7 +1,7 @@
-package languageServer.lsp
+package lsp
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
-import languageServer._
+import jsonRpc.{JsonRpcConnection, SimpleJsonRpcHandler}
 import play.api.libs.json.{Json, Reads}
 
 import scala.concurrent.Promise

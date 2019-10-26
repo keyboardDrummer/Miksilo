@@ -1,4 +1,4 @@
-package languageServer
+package lsp
 
 import core.parsers.editorParsers.Position
 

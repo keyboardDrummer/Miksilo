@@ -8,8 +8,8 @@ import deltas.{ClearPhases, FileWithMembersDelta}
 import deltas.expression.{IntLiteralDelta, VariableDelta}
 import deltas.expression.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
-import languageServer.{FileRange, HumanPosition, LanguageServerTest, MiksiloLanguageServer, TextDocumentIdentifier}
-import languageServer.lsp.DocumentPosition
+import languageServer.{LanguageServerTest, MiksiloLanguageServer}
+import lsp.{DocumentPosition, FileRange, HumanPosition, TextDocumentIdentifier}
 import org.scalatest.FunSuite
 import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
 

@@ -2,7 +2,7 @@ package core.smarts
 
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.ResolutionConstraint
-import languageServer.{Diagnostic, DiagnosticSeverity}
+import lsp.{Diagnostic, DiagnosticSeverity}
 
 case class ResolvesTo(reference: Reference, var declaration: Declaration) extends ResolutionConstraint
 {

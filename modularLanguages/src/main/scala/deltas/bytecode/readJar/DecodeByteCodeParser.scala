@@ -1,6 +1,6 @@
 package deltas.bytecode.readJar
 
-import java.io.BufferedInputStream
+import java.io.{BufferedInputStream, InputStreamReader}
 
 import core.deltas._
 import core.deltas.path.PathRoot
@@ -10,7 +10,7 @@ import core.parsers.editorParsers.SourceRange
 import core.smarts.FileDiagnostic
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import languageServer.{Diagnostic, DiagnosticSeverity, HumanPosition}
+import lsp.{Diagnostic, DiagnosticSeverity, HumanPosition}
 
 object DecodeByteCodeParser extends DeltaWithPhase {
 
@@ -22,7 +22,7 @@ object DecodeByteCodeParser extends DeltaWithPhase {
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
     val bis = new BufferedInputStream(inputStream)
-    val inputBytes: Array[Byte] = Stream.continually(bis.read).takeWhile(-1 !=).map(_.toByte).toArray
+    val inputBytes: Array[Byte] = inputStream.readAllBytes()
     val parseResult: ClassFileParser.ParseResult[Node] = ClassFileParser.parse(inputBytes)
     if (parseResult.successful) {
       compilation.program = PathRoot(parseResult.get)

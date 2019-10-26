@@ -1,6 +1,5 @@
-package languageServer
+package lsp
 
-import languageServer.lsp._
 import play.api.libs.json._
 import core.parsers.editorParsers.{Position, SourceRange, TextEdit}
 trait DocumentSymbolProvider {

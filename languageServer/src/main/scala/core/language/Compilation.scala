@@ -1,10 +1,12 @@
 package core.language
 
+import java.io.InputStream
+
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
-import languageServer.{CodeAction, Diagnostic}
+import lsp.{CodeAction, Diagnostic}
 
 import scala.collection.mutable
-import scala.tools.nsc.interpreter.InputStream
+import scala.io.BufferedSource
 
 class Compilation(val language: Language, val fileSystem: FileSystem, val rootFile: Option[String]) {
   var program: SourceElement = _
@@ -43,11 +45,11 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
 object Compilation
 {
   val singleFileDefaultName = "singleFileDefault"
-  def singleFile(language: Language, inputStream: InputStream): Compilation = {
+  def singleFile(language: Language, input: InputStream): Compilation = {
     val filePath = singleFileDefaultName
     val result = new Compilation(language, new FileSystem {
       override def getFile(path: String): InputStream =
-        if (path == filePath) inputStream
+        if (path == filePath) input
         else throw new IllegalArgumentException(s"no file for path $path")
     }, Some(filePath))
 

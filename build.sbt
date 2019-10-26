@@ -6,9 +6,10 @@ lazy val miksilo = project
   .in(file("."))
   .aggregate(
     editorParser,
+    LSPProtocol,
     languageServer,
     modularLanguages,
-    playground,
+    playground
   )
 
 lazy val commonSettings = Seq(
@@ -25,29 +26,8 @@ lazy val commonSettings = Seq(
 
   libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.4" % "test",
 
-  libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
-
-  libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.12.3",
-
-  libraryDependencies += "org.scala-lang.modules" % "scala-xml_2.12" % "1.0.6",
-
-  libraryDependencies += "org.scala-lang.modules" % "scala-swing_2.12" % "2.0.0",
-
-  libraryDependencies += "org.scala-lang.modules" % "scala-parser-combinators_2.12" % "1.0.6",
-
-  libraryDependencies += "org.apache.commons" % "commons-math3" % "3.5",
-
-  libraryDependencies += "com.google.guava" % "guava" % "18.0",
-
-  libraryDependencies += "io.github.shogowada" %% "scala-json-rpc" % "0.9.3",
-
-  // https://mvnrepository.com/artifact/com.typesafe.play/play-json
-  libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
-
   // https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
   libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-
-  libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1",
   libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
 )
 
@@ -62,13 +42,17 @@ lazy val assemblySettings = Seq(
 )
 
 lazy val editorParser = (project in file("editorParser")).
+  settings(commonSettings: _*)
+
+lazy val LSPProtocol = (project in file("LSPProtocol")).
+  settings(commonSettings: _*).
   settings(
-    libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.4" % "test")
+    libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1"
+  ).dependsOn(editorParser)
 
 lazy val languageServer = (project in file("languageServer")).
   settings(commonSettings: _*).
   settings(
-    name := "MiksiloLspServer",
     assemblySettings,
 
     organization := "com.github.keyboardDrummer",
@@ -79,7 +63,7 @@ lazy val languageServer = (project in file("languageServer")).
       "Remy Willems",
       "rgv.willems@gmail.com",
       url("https://github.com/keyboardDrummer"))),
-    licenses += ("GPL-3.0", url("https://github.com/keyboardDrummer/Miksilo/blob/master/LICENSE")),
+    licenses += ("MIT", url("https://github.com/keyboardDrummer/Miksilo/blob/master/LICENSE")),
     publishMavenStyle := true,
 
     publishTo := Some(
@@ -89,7 +73,7 @@ lazy val languageServer = (project in file("languageServer")).
         Opts.resolver.sonatypeStaging
     ),
 
-  ).dependsOn(editorParser)
+  ).dependsOn(editorParser, LSPProtocol)
 
 lazy val modularLanguages = (project in file("modularLanguages")).
   settings(commonSettings: _*).
@@ -107,20 +91,31 @@ lazy val modularLanguages = (project in file("modularLanguages")).
 
       tsc.#&&(vscode).run
     },
+
+    // byteCode parser
+    libraryDependencies += "org.scala-lang.modules" % "scala-parser-combinators_2.12" % "1.0.6",
+
+    //import com.google.common.primitives.{Ints, Longs}
+    libraryDependencies += "com.google.guava" % "guava" % "18.0",
+
+    // https://mvnrepository.com/artifact/com.typesafe.play/play-json
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
+
   ).dependsOn(languageServer)
 
 lazy val playground = (project in file("playground")).
   settings(commonSettings: _*).
   settings(
-    name := "MiksiloPlayground",
     assemblySettings,
     mainClass in Compile := Some("application.Program"),
+    libraryDependencies += "org.scala-lang.modules" % "scala-swing_2.12" % "2.0.0",
     libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "2.5.8",
     libraryDependencies += "org.bidib.org.oxbow" % "swingbits" % "1.2.2",
     libraryDependencies += "org.swinglabs" % "swingx" % "1.6.1",
     libraryDependencies += "jgraph" % "jgraph" % "5.13.0.0",
     libraryDependencies += "org.tinyjee.jgraphx" % "jgraphx" % "2.3.0.5",
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.1",
+    libraryDependencies += "org.apache.commons" % "commons-math3" % "3.5",
   ).dependsOn(modularLanguages)
 
 lazy val vscode = taskKey[Unit]("Run VS Code with Miksilo")
