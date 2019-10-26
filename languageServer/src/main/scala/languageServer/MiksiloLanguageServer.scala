@@ -22,6 +22,8 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   var currentDocumentId: TextDocumentIdentifier = _
   var compilation: Option[Compilation] = None
 
+  override def textDocumentSync = TextDocumentSyncKind.Incremental
+
   override def didOpen(parameters: TextDocumentItem): Unit = {
     compilation = None
     documentManager.onOpenTextDocument(parameters)

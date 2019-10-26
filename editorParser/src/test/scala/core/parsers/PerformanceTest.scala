@@ -36,7 +36,7 @@ class PerformanceTest extends FunSuite {
 
       manyRepetitionsTime = Math.min(manyRepetitionsTime, timeB - timeA)
       manySourcesTime = Math.min(manySourcesTime, timeC - timeB)
-      if (manySourcesTime < manyRepetitionsTime // Verify that performance does not degrade with input length
+      if (manySourcesTime < manyRepetitionsTime * 1.25 // Verify that performance does not degrade with input length
         && average < 450) {
         success = true
       }
