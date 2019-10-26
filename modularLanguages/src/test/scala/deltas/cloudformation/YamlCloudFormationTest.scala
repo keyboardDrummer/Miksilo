@@ -7,6 +7,7 @@ import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
 import TestLanguageBuilder._
 import core.parsers.editorParsers.{Position, SourceRange, TextEdit, UntilBestAndXStepsStopFunction}
 import _root_.lsp.{FileRange, HumanPosition, SymbolInformation, WorkspaceEdit}
+import deltas.cloudformation.CloudFormationTest
 import util.TestLanguageBuilder._
 import util.{SourceUtils, TestLanguageBuilder}
 
