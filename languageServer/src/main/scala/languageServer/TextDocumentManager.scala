@@ -3,10 +3,8 @@ package languageServer
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
-
 import com.typesafe.scalalogging.LazyLogging
 import core.language.FileSystem
-import core.parsers.editorParsers.Position
 import lsp.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 
 import scala.collection.JavaConverters.collectionAsScalaIterable
@@ -26,17 +24,17 @@ class TextDocumentManager extends LazyLogging with FileSystem {
   def allOpenDocuments: Seq[InMemoryTextDocument] = collectionAsScalaIterable(docs.values).toSeq
 
   def onOpenTextDocument(testDocument: TextDocumentItem): InMemoryTextDocument = {
-    docs.put(testDocument.uri, InMemoryTextDocument(testDocument.uri, testDocument.text.toCharArray))
+    docs.put(testDocument.uri, new InMemoryTextDocument(testDocument.uri, testDocument.text))
   }
 
-  def onChangeTextDocument(documentIdentifier: VersionedTextDocumentIdentifier, changes: Seq[TextDocumentContentChangeEvent]): InMemoryTextDocument = {
+  def onChangeTextDocument(documentIdentifier: VersionedTextDocumentIdentifier, changes: Seq[TextDocumentContentChangeEvent]): Unit = {
     docs.get(documentIdentifier.uri) match {
       case null =>
         logger.error(s"Document ${documentIdentifier.uri} not found in this manager. Adding now")
         // we assume full text sync
-        docs.put(documentIdentifier.uri, InMemoryTextDocument(documentIdentifier.uri, changes.head.text.toCharArray))
+        docs.put(documentIdentifier.uri, new InMemoryTextDocument(documentIdentifier.uri, changes.head.text))
       case doc =>
-        docs.put(documentIdentifier.uri, doc.applyChanges(changes))
+        docs.get(documentIdentifier.uri).applyUnsafeChanges(changes)
     }
   }
 
@@ -45,7 +43,7 @@ class TextDocumentManager extends LazyLogging with FileSystem {
   }
 
   override def getFile(path: String): InputStream = {
-    val bytes: Array[Byte] = new String(getOpenDocumentForUri(path).get.contents).getBytes("UTF-8")
+    val bytes: Array[Byte] = getOpenDocumentForUri(path).get.mkString.getBytes("UTF-8")
     new ByteArrayInputStream(bytes) //TODO maybe instead of Input stream een byte array gebruiken?
   }
 
@@ -53,86 +51,3 @@ class TextDocumentManager extends LazyLogging with FileSystem {
   def stringToStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 }
 
-import java.io.File
-import java.net.URI
-
-case class InMemoryTextDocument(uri: String, contents: Array[Char]) {
-  def applyChanges(changes: Seq[TextDocumentContentChangeEvent]): InMemoryTextDocument = {
-    // we assume full text sync
-    assert(changes.size == 1)
-    val change = changes.head
-    assert(change.range.isEmpty)
-    assert(change.rangeLength.isEmpty)
-
-    copy(contents = change.text.toArray)
-  }
-
-  private def peek(idx: Int) =
-    if (idx < contents.size) contents(idx) else -1
-
-  def toFile: File =
-    new File(URI.create(uri))
-
-  /**
-    * Return the corresponding position in this text document as 0-based line and column.
-    */
-  def offsetToPosition(offset: Int): Position = {
-    if (offset >= contents.size)
-      throw new IndexOutOfBoundsException(s"$uri: asked position at offset $offset, but contents is only ${contents.size} characters long.")
-
-    var i, line, col = 0
-
-    while (i < offset) {
-      contents(i) match {
-        case '\r' =>
-          line += 1
-          col = 0
-          if (peek(i + 1) == '\n') i += 1
-
-        case '\n' =>
-          line += 1
-          col = 0
-
-        case _ =>
-          col += 1
-      }
-      i += 1
-    }
-
-    Position(line, col)
-  }
-
-  /**
-    * Return the offset in the current document, for a given 0-based line/col position.
-    */
-  def positionToOffset(pos: Position): Int = {
-    val Position(line, col) = pos
-
-    var i, l, c = 0
-    while (i < contents.size && l < line) {
-      contents(i) match {
-        case '\r' =>
-          l += 1
-          if (peek(i + 1) == '\n') i += 1
-
-        case '\n' =>
-          l += 1
-
-        case _ =>
-      }
-      i += 1
-    }
-
-    if (l < line)
-      throw new IllegalArgumentException(s"$uri: Can't find position $pos in contents of only $l lines long.")
-    if (i + col < contents.size)
-      i + col
-    else
-      throw new IllegalArgumentException(s"$uri: Invalid column. Position $pos in line '${contents.slice(i, contents.size).mkString}'")
-  }
-
-  def lineToOffset(lineNr: Int): Int = {
-    positionToOffset(Position(lineNr, 0))
-  }
-
-}

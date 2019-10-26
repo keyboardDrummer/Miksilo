@@ -97,6 +97,7 @@ trait LanguageClient {
 }
 
 trait LanguageServer {
+  def textDocumentSync: Int = TextDocumentSyncKind.Full
   def setClient(client: LanguageClient): Unit
 
   def initialize(parameters: InitializeParams): Unit
@@ -106,8 +107,6 @@ trait LanguageServer {
   def didChange(parameters: DidChangeTextDocumentParams): Unit
   def initialized(): Unit
 }
-
-
 
 /**
   * Corresponds to an LSP Location
