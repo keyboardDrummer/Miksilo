@@ -70,6 +70,7 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
   def getCapabilities(clientCapabilities: ClientCapabilities): ServerCapabilities = {
     ServerCapabilities(
+      textDocumentSync = languageServer.textDocumentSync,
       codeActionProvider = languageServer.isInstanceOf[CodeActionProvider],
       documentSymbolProvider = languageServer.isInstanceOf[DocumentSymbolProvider],
       referencesProvider = languageServer.isInstanceOf[ReferencesProvider],
