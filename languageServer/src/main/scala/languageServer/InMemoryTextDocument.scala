@@ -14,7 +14,9 @@ object InMemoryTextDocument {
 class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) extends LazyLogging {
 
   def this(uri: String, contents: String) = {
-    this(uri, ArrayBuffer[Array[Char]](contents.split(newLine).map(line => line.toArray):_*))
+    this(uri, ArrayBuffer[Array[Char]](
+      contents.split(newLine, -1).map(line =>
+      line.toArray):_*))
   }
 
   def applyUnsafeChanges(changes: Seq[TextDocumentContentChangeEvent]): Unit = {
@@ -25,6 +27,7 @@ class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) 
         logger.error("Failed to apply changes because: " + error.getMessage)
     }
   }
+
   def applyChanges(changes: Seq[TextDocumentContentChangeEvent]): Unit = {
     for(change <- changes) {
       change.range match {
@@ -46,7 +49,7 @@ class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) 
       throw new IllegalArgumentException(s"range '$range' is out of bounds")
     }
 
-    val newLines: Array[Array[Char]] = change.text.split(newLine).map(line => line.toCharArray)
+    val newLines: Array[Array[Char]] = change.text.split(newLine, -1).map(line => line.toCharArray)
     newLines(0) = contents(range.start.line).take(range.start.character) ++ newLines(0)
     newLines(newLines.length - 1) = newLines(newLines.length - 1) ++ contents(range.end.line).drop(range.end.character)
 
@@ -64,5 +67,7 @@ class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) 
     }
   }
 
-  def mkString = contents.map(line => new String(line)).mkString(newLine)
+  def mkString = {
+    contents.map(line => new String(line)).mkString(newLine)
+  }
 }

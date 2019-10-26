@@ -50,6 +50,29 @@ class InMemoryTextDocumentTest extends FunSuite {
     assert(document.mkString == end)
   }
 
+  test("add blank lines") {
+    val uri = "foo"
+
+    val start =
+      """
+        |
+        |
+        |""".stripMargin
+    val document = new InMemoryTextDocument(uri, start)
+
+    val change1 = new TextDocumentContentChangeEvent(Some(SourceRange(Position(1, 0), Position(1,0))), None, "\n")
+
+    val end =
+      """
+        |
+        |
+        |
+        |""".stripMargin
+    assert(document.mkString == start)
+    document.applyChanges(Seq(change1))
+    assert(document.mkString == end)
+  }
+
   test("remove lines") {
     val uri = "foo"
 

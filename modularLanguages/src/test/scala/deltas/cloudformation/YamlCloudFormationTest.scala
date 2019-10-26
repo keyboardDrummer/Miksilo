@@ -1,13 +1,9 @@
-package cloudformation
+package deltas.cloudformation
 
-import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
+import _root_.lsp.{FileRange, HumanPosition, SymbolInformation, WorkspaceEdit}
+import core.parsers.editorParsers.{Position, SourceRange, TextEdit, UntilBestAndXStepsStopFunction}
 import languageServer._
 import org.scalatest.FunSuite
-import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
-import TestLanguageBuilder._
-import core.parsers.editorParsers.{Position, SourceRange, TextEdit, UntilBestAndXStepsStopFunction}
-import _root_.lsp.{FileRange, HumanPosition, SymbolInformation, WorkspaceEdit}
-import deltas.cloudformation.CloudFormationTest
 import util.TestLanguageBuilder._
 import util.{SourceUtils, TestLanguageBuilder}
 
