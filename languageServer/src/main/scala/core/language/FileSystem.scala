@@ -1,6 +1,6 @@
 package core.language
 
-import scala.tools.nsc.interpreter.InputStream
+import java.io.InputStream
 
 trait FileSystem {
   def getFile(path: String): InputStream

@@ -1,7 +1,7 @@
-package languageServer.lsp
+package lsp
 
 import core.parsers.editorParsers.TextEdit
-import languageServer._
+import jsonRpc.{JsonRpcConnection, SimpleJsonRpcHandler}
 import play.api.libs.json._
 
 import scala.reflect.ClassTag

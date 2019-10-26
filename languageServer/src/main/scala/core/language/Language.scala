@@ -1,6 +1,6 @@
 package core.language
 
-import java.io.ByteArrayInputStream
+import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
 import com.typesafe.scalalogging.LazyLogging
@@ -11,8 +11,8 @@ import core.parsers.strings.StringReaderLike
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
 
 import scala.collection.mutable
+import scala.io.{BufferedSource, Source}
 import scala.reflect.io.File
-import scala.tools.nsc.interpreter.InputStream
 import scala.util.{Failure, Success}
 
 case class ConstraintException(solveException: SolveException) extends BadInputException {

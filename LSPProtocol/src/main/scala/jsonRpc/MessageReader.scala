@@ -1,4 +1,4 @@
-package languageServer.lsp
+package jsonRpc
 
 import java.io.InputStream
 import java.nio.charset.Charset

@@ -13,11 +13,13 @@ import core.parsers.editorParsers.{SingleParseResult, StopFunction, TimeRatioSto
 import core.parsers.sequences.SingleResultParser
 import util.{JavaSourceUtils, SourceUtils}
 
+import scala.io.Source
+
 case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction)
   extends DeltaWithPhase with LazyLogging {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val phase = Language.getParsePhaseFromParser[Node, Input](stream => new Reader(SourceUtils.streamToString(stream)), (program, uri) => {
+    val phase = Language.getParsePhaseFromParser[Node, Input](stream => new Reader(Source.fromInputStream(stream, "UTF-8").mkString), (program, uri) => {
       program.startOfUri = Some(uri)
       PathRoot(program)
     }, parserProp.get(compilation), stopFunction)

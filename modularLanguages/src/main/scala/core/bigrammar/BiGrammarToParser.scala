@@ -6,7 +6,7 @@ import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter,
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase}
 import core.textMate.TextMateGeneratingParserWriter
-import languageServer.PositionFormat
+import lsp.PositionFormat
 import util.Utility
 
 import scala.collection.mutable

@@ -1,9 +1,9 @@
-package languageServer.lsp
+package lsp
 
 import java.io.ByteArrayOutputStream
 
 import core.parsers.editorParsers.{Position, SourceRange, TextEdit}
-import languageServer._
+import jsonRpc.JsonRpcConnection
 import org.scalatest.{Assertion, AsyncFunSpec}
 
 import scala.concurrent.duration.Duration
@@ -24,7 +24,7 @@ class LSPServerTest extends AsyncFunSpec {
                              clientOut: ByteArrayOutputStream,
                              serverOut: ByteArrayOutputStream)
 
-  ignore("can initialize") {
+  it("can initialize") {
 
     val languageServer = new TestLanguageServer {}
     val serverAndClient = setupServerAndClient(languageServer)

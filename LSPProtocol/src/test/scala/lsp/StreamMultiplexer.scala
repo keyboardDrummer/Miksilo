@@ -1,4 +1,4 @@
-package languageServer.lsp
+package lsp
 
 import java.io.OutputStream
 

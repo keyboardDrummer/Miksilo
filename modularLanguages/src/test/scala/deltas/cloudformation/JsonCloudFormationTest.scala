@@ -2,8 +2,9 @@ package deltas.cloudformation
 
 import core.bigrammar.TestLanguageGrammarUtils
 import core.parsers.editorParsers.{Position, SourceRange, UntilBestAndXStepsStopFunction}
-import languageServer.lsp._
-import languageServer.{HumanPosition, LanguageServerTest, MiksiloLanguageServer, _}
+import languageServer.{LanguageServerTest, MiksiloLanguageServer}
+import lsp._
+import lsp.HumanPosition
 import org.scalatest.FunSuite
 import util.{SourceUtils, TestLanguageBuilder}
 

@@ -1,7 +1,7 @@
 package application.compilerCockpit
 
 import java.awt._
-import java.io.{ByteArrayInputStream, CharArrayWriter}
+import java.io.{ByteArrayInputStream, CharArrayWriter, PrintWriter}
 import java.nio.charset.StandardCharsets
 
 import application.StyleSheet
@@ -16,7 +16,6 @@ import org.fife.ui.rsyntaxtextarea._
 import org.fife.ui.rtextarea.RTextScrollPane
 
 import scala.swing.{Component, Frame}
-import scala.tools.nsc.NewLinePrintWriter
 import scala.util.Try
 
 class LanguageSandbox(val name: String, val deltas: Seq[Delta],
@@ -108,7 +107,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
       recover({ case e: CompileException => setOutputText(e.toString) }).
       recover({ case e: Throwable =>
         val writer = new CharArrayWriter()
-        e.printStackTrace(new NewLinePrintWriter(writer))
+        e.printStackTrace(new PrintWriter(writer))
         e.printStackTrace()
         setOutputText(writer.toString) }).get
   }

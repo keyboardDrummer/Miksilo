@@ -1,9 +1,8 @@
-package languageServer.lsp
+package lsp
 
 import com.dhpcs.jsonrpc.Message._
 import com.dhpcs.jsonrpc.CommandCompanion
 import core.parsers.editorParsers.{Position, SourceRange}
-import languageServer._
 import play.api.libs.json._
 
 sealed trait Message

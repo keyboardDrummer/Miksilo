@@ -1,4 +1,4 @@
-package languageServer.lsp
+package jsonRpc
 
 import java.io.OutputStream
 import play.api.libs.json._

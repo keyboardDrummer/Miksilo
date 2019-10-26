@@ -12,8 +12,9 @@ import deltas.javac.JavaLanguage
 import deltas.smithy.SmithyLanguage
 import deltas.solidity.SolidityLanguage
 import deltas.verilog.VerilogLanguage
+import jsonRpc.JsonRpcConnection
 import languageServer.MiksiloLanguageServer
-import languageServer.lsp.{JsonRpcConnection, LSPServer}
+import lsp.LSPServer
 import org.slf4j.LoggerFactory
 
 import scala.util.Try

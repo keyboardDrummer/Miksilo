@@ -1,4 +1,4 @@
-package languageServer.lsp
+package jsonRpc
 
 import java.io.{InputStream, OutputStream}
 import java.util.concurrent.Executors

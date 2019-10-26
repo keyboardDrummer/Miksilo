@@ -1,6 +1,5 @@
 package deltas.javac.methods
 
-import org.junit.{Assert, Ignore, Test}
 import org.scalatest.FunSuite
 
 class TestMethodC extends FunSuite {
