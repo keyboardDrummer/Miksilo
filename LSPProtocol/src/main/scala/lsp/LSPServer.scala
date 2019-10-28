@@ -1,5 +1,6 @@
 package lsp
 
+import com.dhpcs.jsonrpc.JsonRpcNotificationMessage
 import core.parsers.editorParsers.TextEdit
 import jsonRpc.{JsonRpcConnection, SimpleJsonRpcHandler}
 import play.api.libs.json._

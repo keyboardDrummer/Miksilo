@@ -39,7 +39,7 @@ class LSPServerTest extends AsyncFunSpec {
         |{"jsonrpc":"2.0","method":"initialize","params":{"rootUri":"someRootUri","capabilities":{}},"id":0}""".stripMargin
     val initializePromise = serverAndClient.client.initialize(InitializeParams(None, "someRootUri", ClientCapabilities()))
 
-    val result = Await.result(initializePromise.future, Duration.Inf)
+    val result = Await.result(initializePromise, Duration.Inf)
 
     assert(result.capabilities == serverAndClient.server.getCapabilities(ClientCapabilities()))
     assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
@@ -97,7 +97,7 @@ class LSPServerTest extends AsyncFunSpec {
       """Content-Length: 133
         |
         |{"jsonrpc":"2.0","method":"textDocument/definition","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0}},"id":0}""".stripMargin
-    gotoPromise.future.map(result => {
+    gotoPromise.map(result => {
       assert(result == Seq(FileRange(document.uri, definitionRange)))
       assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
@@ -127,7 +127,7 @@ class LSPServerTest extends AsyncFunSpec {
       """Content-Length: 133
         |
         |{"jsonrpc":"2.0","method":"textDocument/completion","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0}},"id":0}""".stripMargin
-    val result = Await.result(completePromise.future, Duration.Inf)
+    val result = Await.result(completePromise, Duration.Inf)
 
     assertResult(Seq(CompletionItem("hello")))(result.items)
     assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
@@ -166,7 +166,7 @@ class LSPServerTest extends AsyncFunSpec {
       """Content-Length: 200
         |
         |{"jsonrpc":"2.0","method":"textDocument/codeAction","params":{"textDocument":{"uri":"a"},"range":{"start":{"line":0,"character":1},"end":{"line":1,"character":2}},"context":{"diagnostics":[]}},"id":0}""".stripMargin
-    codeActionPromise.future.map(result => {
+    codeActionPromise.map(result => {
       assert(result == Seq(resultAction))
       assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
@@ -198,7 +198,7 @@ class LSPServerTest extends AsyncFunSpec {
       """Content-Length: 172
         |
         |{"jsonrpc":"2.0","method":"textDocument/references","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0},"context":{"includeDeclaration":false}},"id":0}""".stripMargin
-    gotoPromise.future.map(result => {
+    gotoPromise.map(result => {
       assert(result == Seq(FileRange(document.uri, referenceRange)))
       assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
@@ -230,7 +230,7 @@ class LSPServerTest extends AsyncFunSpec {
       """Content-Length: 101
         |
         |{"jsonrpc":"2.0","method":"textDocument/documentSymbol","params":{"textDocument":{"uri":"a"}},"id":0}""".stripMargin
-    gotoPromise.future.map(result => {
+    gotoPromise.map(result => {
       assert(result == Seq(symbolInformation))
       assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
@@ -265,7 +265,7 @@ class LSPServerTest extends AsyncFunSpec {
       """Content-Length: 149
         |
         |{"jsonrpc":"2.0","method":"textDocument/rename","params":{"textDocument":{"uri":"a"},"position":{"line":0,"character":0},"newName":"newName"},"id":0}""".stripMargin
-    gotoPromise.future.map(result => {
+    gotoPromise.map(result => {
       assert(result == expectation)
       assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString)
       assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)

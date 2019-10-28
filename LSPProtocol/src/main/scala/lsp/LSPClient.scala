@@ -4,7 +4,7 @@ import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
 import jsonRpc.{JsonRpcConnection, SimpleJsonRpcHandler}
 import play.api.libs.json.{Json, Reads}
 
-import scala.concurrent.Promise
+import scala.concurrent.{Future, Promise}
 
 class LSPClient(languageClient: LanguageClient, connection: JsonRpcConnection) {
 
@@ -28,37 +28,37 @@ class LSPClient(languageClient: LanguageClient, connection: JsonRpcConnection) {
   implicit val positionFormat = PositionFormat.format
   implicit val sourceRangeFormat = SourceRangeFormat.format
   implicit val textEditFormat = TextEditFormat.format
-  def rename(parameters: RenameParams): Promise[WorkspaceEdit] = {
+  def rename(parameters: RenameParams): Future[WorkspaceEdit] = {
     simpleConnection.sendRequest[RenameParams, WorkspaceEdit](
       LSPProtocol.rename, getCorrelationId, parameters)(Json.format, Json.format[WorkspaceEdit])
   }
 
-  def documentSymbol(parameters: DocumentSymbolParams): Promise[Seq[SymbolInformation]] = {
+  def documentSymbol(parameters: DocumentSymbolParams): Future[Seq[SymbolInformation]] = {
     simpleConnection.sendRequest[DocumentSymbolParams, Seq[SymbolInformation]](
       LSPProtocol.documentSymbol, getCorrelationId, parameters)(Json.format, Reads.of[Seq[SymbolInformation]])
   }
 
-  def references(parameters: ReferencesParams): Promise[Seq[FileRange]] = {
+  def references(parameters: ReferencesParams): Future[Seq[FileRange]] = {
     simpleConnection.sendRequest[ReferencesParams, Seq[FileRange]](
       LSPProtocol.references, getCorrelationId, parameters)(Json.format, Reads.of[Seq[FileRange]])
   }
 
-  def codeAction(parameters: CodeActionParams): Promise[Seq[CodeAction]] = {
+  def codeAction(parameters: CodeActionParams): Future[Seq[CodeAction]] = {
     simpleConnection.sendRequest[CodeActionParams, Seq[CodeAction]](
       LSPProtocol.codeAction, getCorrelationId, parameters)(Json.format, Reads.of[Seq[CodeAction]])
   }
 
-  def gotoDefinition(parameters: DocumentPosition): Promise[Seq[FileRange]] = {
+  def gotoDefinition(parameters: DocumentPosition): Future[Seq[FileRange]] = {
     simpleConnection.sendRequest[DocumentPosition, Seq[FileRange]](
       LSPProtocol.definition, getCorrelationId, parameters)(Json.format, Reads.of[Seq[FileRange]])
   }
 
-  def complete(parameters: DocumentPosition): Promise[CompletionList] = {
+  def complete(parameters: DocumentPosition): Future[CompletionList] = {
     simpleConnection.sendRequest[DocumentPosition, CompletionList](
       LSPProtocol.completion, getCorrelationId, parameters)(Json.format, Json.format)
   }
 
-  def initialize(parameters: InitializeParams): Promise[InitializeResult] = {
+  def initialize(parameters: InitializeParams): Future[InitializeResult] = {
     simpleConnection.sendRequest[InitializeParams, InitializeResult](
       LSPProtocol.initialize, getCorrelationId, parameters)(Json.format, Json.format)
   }

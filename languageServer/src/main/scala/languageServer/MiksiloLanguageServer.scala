@@ -37,12 +37,16 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     compilation = None
     if (parameters.contentChanges.nonEmpty)
       documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
+    if (diagnosticsAreDirty)
+    diagnosticsAreDirty = true
     if (client != null) {
       currentDocumentId = TextDocumentIdentifier(parameters.textDocument.uri)
       val diagnostics = getCompilation.diagnosticsForFile(parameters.textDocument.uri)
       client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, diagnostics))
     }
   }
+
+  var diagnosticsAreDirty: Boolean = false
 
   def compile(): Unit = {
     val compilation = new Compilation(language, documentManager, Some(currentDocumentId.uri))

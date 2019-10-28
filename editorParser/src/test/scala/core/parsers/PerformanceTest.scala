@@ -44,7 +44,7 @@ class PerformanceTest extends FunSuite {
     }
     System.out.println(s"manyRepetitions:$manyRepetitionsTime")
     System.out.println(s"manySources:$manySourcesTime")
-    System.out.println(s"average:${average}")
+    System.out.println(s"average:$average")
     assert(success)
   }
 
