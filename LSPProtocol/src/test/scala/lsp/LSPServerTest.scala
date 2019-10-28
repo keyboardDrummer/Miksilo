@@ -46,7 +46,7 @@ class LSPServerTest extends AsyncFunSpec {
     assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
   }
 
-  ignore("can open document") {
+  it("can open document") {
     val document = TextDocumentItem("a","",0,"content")
 
     val clientOutExpectation =
@@ -72,7 +72,7 @@ class LSPServerTest extends AsyncFunSpec {
     p.future
   }
 
-  ignore("can use goto definition") {
+  it("can use goto definition") {
     val document = TextDocumentItem("a","",0,"content")
     val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
     val definitionRange = SourceRange(Position(0, 1), Position(1, 2))
@@ -104,7 +104,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
-  ignore("can use completion") {
+  it("can use completion") {
     val document = TextDocumentItem("a","",0, "content")
     val request = DocumentPosition(TextDocumentIdentifier(document.uri), Position(0, 0))
 
@@ -134,7 +134,7 @@ class LSPServerTest extends AsyncFunSpec {
     assertResult(fixNewlines(serverOutExpectation))(serverAndClient.serverOut.toString)
   }
 
-  ignore("can use code action") {
+  it("can use code action") {
     val document = TextDocumentItem("a","",0,"content")
     val someRange = SourceRange(Position(0, 1), Position(1, 2))
     val someOtherRange = SourceRange(Position(0, 0), Position(0, 0))
@@ -173,7 +173,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
-  ignore("can use references") {
+  it("can use references") {
     val document = TextDocumentItem("a","",0,"content")
     val request = ReferencesParams(TextDocumentIdentifier(document.uri), Position(0, 0), ReferenceContext(false))
     val referenceRange = SourceRange(Position(0, 1), Position(1, 2))
@@ -205,7 +205,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
- ignore("can use documentSymbol") {
+ it("can use documentSymbol") {
     val document = TextDocumentItem("a","",0,"content")
     val request = DocumentSymbolParams(TextDocumentIdentifier(document.uri))
     val symbolRange = SourceRange(Position(0, 1), Position(1, 2))
@@ -237,7 +237,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
-  ignore("can use rename") {
+  it("can use rename") {
     val document = TextDocumentItem("a","",0,"content")
     val request = RenameParams(TextDocumentIdentifier(document.uri), Position(0, 0), "newName")
     val referenceRange = SourceRange(Position(0, 1), Position(1, 2))
@@ -272,7 +272,7 @@ class LSPServerTest extends AsyncFunSpec {
     })
   }
 
-  ignore("can receive diagnostics") {
+  it("can receive diagnostics") {
     val document = TextDocumentItem("a","",0,"content")
 
     val clientOutExpectation =

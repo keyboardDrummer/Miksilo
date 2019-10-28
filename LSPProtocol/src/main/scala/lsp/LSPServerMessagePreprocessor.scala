@@ -5,7 +5,7 @@ import com.dhpcs.jsonrpc.JsonRpcNotificationMessage
 import jsonRpc._
 import play.api.libs.json.{JsResult, Json}
 
-class LSPServerAggregator(original: JsonRpcHandler) extends WorkAggregator(original) {
+class LSPServerMessagePreprocessor(original: JsonRpcHandler) extends MessagePreprocessor(original) {
 
   val changeParamsFormat = Json.format[DidChangeTextDocumentParams]
   override def aggregate(messages: List[WorkItem]): List[WorkItem] = {
