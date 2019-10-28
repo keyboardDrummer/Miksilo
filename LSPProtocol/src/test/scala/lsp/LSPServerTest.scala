@@ -288,6 +288,7 @@ class LSPServerTest extends AsyncFunSpec {
       }
     }
     val languageServer: LanguageServer = new TestLanguageServer {
+
       override def getDiagnostics: Seq[Diagnostic] = {
         diagnostics
       }
@@ -300,6 +301,55 @@ class LSPServerTest extends AsyncFunSpec {
     p.future
   }
 
+  it("merges change notifications") {
+    val document = TextDocumentItem("a","",0,"content")
+
+    val clientOutExpectation =
+      """Content-Length: 132
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"a","languageId":"","version":0,"text":"content"}}}""".stripMargin
+
+    val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)), Some(2), "Woeps", None, None))
+    val promise = Promise[Assertion]()
+    val languageClient = new TestLanguageClient {
+      override def sendDiagnostics(receivedDiagnostics: PublishDiagnostics): Unit = {
+        promise.success(assertResult(diagnostics)(receivedDiagnostics.diagnostics))
+      }
+    }
+
+    val change1 = new TextDocumentContentChangeEvent(None, None, "a")
+    val change2 = new TextDocumentContentChangeEvent(None, None, "b")
+    val change3 = new TextDocumentContentChangeEvent(None, None, "c")
+    val first = DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, document.version + 1), Seq(change1))
+    val second = DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, document.version + 2), Seq(change2))
+    val third = DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, document.version + 3), Seq(change3))
+    val merged = DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, document.version + 3), Seq(change2, change3))
+
+    var expectations = List(first, merged)
+    val languageServer: LanguageServer = new TestLanguageServer {
+      override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
+        Thread.sleep(5)
+        assertResult(expectations.head)(parameters)
+        expectations = expectations.tail
+        if (expectations.isEmpty) {
+            promise.success(assert(true))
+        }
+        super.didChange(parameters)
+      }
+
+      override def getDiagnostics: Seq[Diagnostic] = {
+        diagnostics
+      }
+    }
+    val serverAndClient = setupServerAndClient(languageServer, languageClient)
+    val client = serverAndClient.client
+
+    client.didChange(first)
+    client.didChange(second)
+    client.didChange(third)
+
+    promise.future
+  }
 
   def fixNewlines(text: String): String = text.replace("\n","\r\n")
 

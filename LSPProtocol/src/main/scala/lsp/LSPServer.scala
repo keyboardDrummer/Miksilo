@@ -1,15 +1,16 @@
 package lsp
 
-import com.dhpcs.jsonrpc.JsonRpcNotificationMessage
 import core.parsers.editorParsers.TextEdit
-import jsonRpc.{JsonRpcConnection, SimpleJsonRpcHandler}
+import jsonRpc.{JsonRpcConnection, MethodBasedJsonRpcHandler}
 import play.api.libs.json._
 
 import scala.reflect.ClassTag
 
 class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
-  val handler = new SimpleJsonRpcHandler(connection)
+  val handler = new MethodBasedJsonRpcHandler(connection)
+  connection.setHandler(new LSPServerMessagePreprocessor(handler))
+
   addRequestHandlers()
   addNotificationHandlers()
   languageServer.setClient(new LanguageClientProxy())

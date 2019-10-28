@@ -1,14 +1,16 @@
 package lsp
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
-import jsonRpc.{JsonRpcConnection, SimpleJsonRpcHandler}
+import jsonRpc.{JsonRpcConnection, MethodBasedJsonRpcHandler}
 import play.api.libs.json.{Json, Reads}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
 
 class LSPClient(languageClient: LanguageClient, connection: JsonRpcConnection) {
 
-  val simpleConnection = new SimpleJsonRpcHandler(connection)
+  val simpleConnection = new MethodBasedJsonRpcHandler(connection)
+  connection.setHandler(simpleConnection)
+
   var correlationId = 0
 
   simpleConnection.addNotificationHandler[PublishDiagnostics](LSPProtocol.diagnostics, notification => {

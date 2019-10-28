@@ -5,7 +5,7 @@ import com.dhpcs.jsonrpc.JsonRpcNotificationMessage
 import jsonRpc._
 import play.api.libs.json.{JsResult, Json}
 
-class LSPServerMessagePreprocessor(original: JsonRpcHandler) extends MessagePreprocessor(original) {
+class LSPServerMessagePreprocessor(original: AsyncJsonRpcHandler) extends MessagePreprocessor(original) {
 
   val changeParamsFormat = Json.format[DidChangeTextDocumentParams]
   override def aggregate(messages: List[WorkItem]): List[WorkItem] = {
@@ -14,8 +14,8 @@ class LSPServerMessagePreprocessor(original: JsonRpcHandler) extends MessagePrep
       case Notification(JsonRpcNotificationMessage(LSPProtocol.didChange, firstParams)) ::
         Notification(JsonRpcNotificationMessage(LSPProtocol.didChange, secondParams)) :: rest =>
         val maybeMessages: JsResult[List[WorkItem]] = for {
-          firstChange <- changeParamsFormat.reads(SimpleJsonRpcHandler.toJson(firstParams))
-          secondChange <- changeParamsFormat.reads(SimpleJsonRpcHandler.toJson(secondParams))
+          firstChange <- changeParamsFormat.reads(MethodBasedJsonRpcHandler.toJson(firstParams))
+          secondChange <- changeParamsFormat.reads(MethodBasedJsonRpcHandler.toJson(secondParams))
         } yield {
           if (firstChange.textDocument.uri == secondChange.textDocument.uri) {
             val mergedChange = DidChangeTextDocumentParams(firstChange.textDocument, firstChange.contentChanges ++ secondChange.contentChanges)

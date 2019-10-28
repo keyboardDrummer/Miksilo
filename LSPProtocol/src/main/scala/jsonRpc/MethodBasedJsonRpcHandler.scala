@@ -11,7 +11,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
-object SimpleJsonRpcHandler {
+object MethodBasedJsonRpcHandler {
   def toJson(params: Params): JsValue = params match {
     case obj: ObjectParams => obj.value
     case array: ArrayParams => array.value
@@ -19,8 +19,7 @@ object SimpleJsonRpcHandler {
   }
 }
 
-class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJsonRpcHandler with LazyLogging {
-  connection.setHandler(this)
+class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJsonRpcHandler with LazyLogging {
 
   private var requestHandlers: Map[String, JsonRpcRequestMessage => JsonRpcResponseMessage] = Map.empty
   private val notificationHandlers: mutable.Map[String, ListBuffer[JsonRpcNotificationMessage => Unit]] = mutable.Map.empty
@@ -74,7 +73,7 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJsonRpcHa
   def addNotificationHandler[Notification](method: String, handler: Notification => Unit)(notificationFormat: OFormat[Notification]): Unit = {
     val handlers = getNotificationHandlersForMethod(method)
     val handle = (notification: JsonRpcNotificationMessage) => {
-      val requestJson = SimpleJsonRpcHandler.toJson(notification.params)
+      val requestJson = MethodBasedJsonRpcHandler.toJson(notification.params)
       notificationFormat.reads(requestJson) match {
         case JsSuccess(typedRequest, _) =>
           handler(typedRequest)
@@ -92,7 +91,7 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJsonRpcHa
   def addRequestHandler[Request, Response](method: String, handler: Request => Response)
                                           (requestFormat: Reads[Request], responseFormat: Writes[Response]): Unit = {
     val handle = (request: JsonRpcRequestMessage) => {
-      val requestJson = SimpleJsonRpcHandler.toJson(request.params)
+      val requestJson = MethodBasedJsonRpcHandler.toJson(request.params)
       requestFormat.reads(requestJson) match {
         case JsSuccess(typedRequest, _) =>
           val typedResponse = handler(typedRequest)

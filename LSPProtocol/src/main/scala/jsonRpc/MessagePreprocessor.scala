@@ -1,14 +1,14 @@
 package jsonRpc
 
-import com.dhpcs.jsonrpc.{JsonRpcMessage, JsonRpcNotificationMessage, JsonRpcRequestMessage, JsonRpcResponseMessage}
+import com.dhpcs.jsonrpc.{JsonRpcNotificationMessage, JsonRpcRequestMessage, JsonRpcResponseMessage}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
 trait WorkItem
 case class Notification(notification: JsonRpcNotificationMessage) extends WorkItem
 case class Request(request: JsonRpcRequestMessage, result: Promise[JsonRpcResponseMessage]) extends WorkItem
 
-abstract class MessagePreprocessor(original: JsonRpcHandler) extends AsyncJsonRpcHandler {
+abstract class MessagePreprocessor(original: AsyncJsonRpcHandler) extends AsyncJsonRpcHandler {
 
   def aggregate(items: List[WorkItem]): List[WorkItem]
 
@@ -25,7 +25,7 @@ abstract class MessagePreprocessor(original: JsonRpcHandler) extends AsyncJsonRp
           case None =>
           case Some(message) => message match {
             case Notification(notification) => original.handleNotification(notification)
-            case Request(request, result) => result.success(original.handleRequest(request))
+            case Request(request, resultPromise) => original.handleRequest(request).map(result => resultPromise.success(result))(ExecutionContext.global)
           }
         }
       }
