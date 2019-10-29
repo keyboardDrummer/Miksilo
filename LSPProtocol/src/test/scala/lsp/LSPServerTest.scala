@@ -304,11 +304,6 @@ class LSPServerTest extends AsyncFunSpec {
   it("merges change notifications") {
     val document = TextDocumentItem("a","",0,"content")
 
-    val clientOutExpectation =
-      """Content-Length: 132
-        |
-        |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"a","languageId":"","version":0,"text":"content"}}}""".stripMargin
-
     val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)), Some(2), "Woeps", None, None))
     val promise = Promise[Assertion]()
     val languageClient = new TestLanguageClient {
@@ -324,6 +319,7 @@ class LSPServerTest extends AsyncFunSpec {
 
     var expectations = List(first, merged)
     val languageServer: LanguageServer = new TestLanguageServer {
+
       override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
         Thread.sleep(10)
         try {
@@ -375,7 +371,7 @@ class LSPServerTest extends AsyncFunSpec {
     override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {}
   }
 
-  class TestLanguageServer extends LanguageServer {
+  class TestLanguageServer extends LanguageServer with CompletionProvider {
     override def didOpen(parameters: TextDocumentItem): Unit = {}
 
     override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
@@ -396,5 +392,9 @@ class LSPServerTest extends AsyncFunSpec {
     override def setClient(client: LanguageClient): Unit = {
       this.client = client
     }
+
+    override def getOptions = new CompletionOptions(true, Seq.empty)
+
+    override def complete(request: DocumentPosition) = new CompletionList(true, Seq.empty)
   }
 }

@@ -11,7 +11,7 @@ import core.language.node.Node
 import core.language.{Compilation, Language}
 import core.parsers.editorParsers.{SingleParseResult, StopFunction, TimeRatioStopFunction}
 import core.parsers.sequences.SingleResultParser
-import util.{JavaSourceUtils, SourceUtils}
+import util.SourceUtils
 
 import scala.io.Source
 
