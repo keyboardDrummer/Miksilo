@@ -1,8 +1,9 @@
 package core.parsers.editorParsers
 
+import com.typesafe.scalalogging.LazyLogging
 import core.parsers.core.OptimizingParserWriter
 
-trait CorrectingParserWriter extends OptimizingParserWriter {
+trait CorrectingParserWriter extends OptimizingParserWriter with LazyLogging {
 
   type ParseResult[+Result] = ParseResults[Input, Result]
 
@@ -12,8 +13,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     var bestResult: ReadyParseResult[Input, Result] = noResultFound
 
     mayStop.reset()
+
+    var cycles = 0
     var queue = parser(input, newParseState(input))
     while(queue.nonEmpty) {
+      cycles += 1
       val (parseResult, tail) = queue.pop()
 
       queue = parseResult match {
@@ -22,7 +26,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
             case tailCons: SRCons[Input, Result] =>
-              if (mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
+              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty.empty[Input]
               else
                 tail
@@ -34,6 +38,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           tail.merge(results)
       }
     }
+    logger.info(s"Error correcting parser ran for $cycles cycles.")
     SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 

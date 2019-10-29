@@ -26,6 +26,7 @@ object History {
 
 trait History[Input] {
   def canMerge: Boolean
+  def spotless: Boolean = !flawed
   def flawed: Boolean
   def addError(newHead: ParseError[Input]): History[Input]
   def ++(right: History[Input]): History[Input]
