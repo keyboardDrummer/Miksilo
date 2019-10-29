@@ -30,30 +30,43 @@ class ModularGrammarPerformanceTest extends FunSuite {
     val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json").
       replaceAll("\\s", "")
 
-    val multiplier = 1
-    val tenTimesSource = s"[${1.to(10).map(_ => source).reduce((a,b) => a + "," + b)}]"
+    val manySourcesCount = 10
+    val maxAttempts = 10
+    val tenTimesSource = s"[${1.to(manySourcesCount).map(_ => source).reduce((a,b) => a + "," + b)}]"
+
+    var manyRepetitionsTime = Long.MaxValue
+    var manySourcesTime = Long.MaxValue
+
+    def average = (manyRepetitionsTime + manySourcesTime) / (2.0 * manySourcesCount)
 
     val timeA = System.currentTimeMillis()
-    val repetitions = 10 * multiplier
-    for(_ <- 1.to(repetitions)) {
-      val result = asapJson.compileString(source).diagnostics
-      assert(result.isEmpty)
-    }
+    var success = false
+    var repetition = 0
+    while(!success && repetition < maxAttempts) {
+      for(_ <- 1.to(manySourcesCount)) {
+        val result = asapJson.compileString(source).diagnostics
+        assert(result.isEmpty)
+      }
 
-    val timeB = System.currentTimeMillis()
-    for(_ <- 1.to(multiplier)) {
+      val timeB = System.currentTimeMillis()
       val result = asapJson.compileString(tenTimesSource).diagnostics
       assert(result.isEmpty)
+
+      val timeC = System.currentTimeMillis()
+
+      manyRepetitionsTime = Math.min(manyRepetitionsTime, timeB - timeA)
+      manySourcesTime = Math.min(manySourcesTime, timeC - timeB)
+      if (average < 400) {
+        success = true
+      } else {
+        System.out.println(s"current average:$average")
+      }
+      repetition += 1
     }
-
-    val timeC = System.currentTimeMillis()
-
-    val singleSource = timeB - timeA
-    val sourceTimesTen = timeC - timeB
-    val averageSingleSource = singleSource / repetitions
-    System.out.println(s"average singleSource: $averageSingleSource")
-    System.out.println(s"totalTime: ${singleSource + sourceTimesTen}")
-    assert(averageSingleSource < 400)
+    System.out.println(s"manyRepetitions:$manyRepetitionsTime")
+    System.out.println(s"manySources:$manySourcesTime")
+    System.out.println(s"average:$average")
+    assert(success)
   }
 
   test("Edited") {

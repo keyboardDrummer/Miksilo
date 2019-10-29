@@ -8,8 +8,14 @@ import com.dhpcs.jsonrpc._
 import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json._
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService, Future, Promise}
 import scala.util.{Failure, Success, Try}
+
+trait AsyncJsonRpcHandler {
+  def dispose(): Unit
+  def handleNotification(notification: JsonRpcNotificationMessage)
+  def handleRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage]
+}
 
 trait JsonRpcHandler {
   def handleNotification(notification: JsonRpcNotificationMessage)
@@ -30,22 +36,28 @@ class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
 
   private val msgReader = new MessageReader(inStream)
   private val msgWriter = new MessageWriter(outStream)
-  private var handler: JsonRpcHandler = _
+  private var handler: AsyncJsonRpcHandler = _
+  private val writeLock = new Object()
 
-  def setHandler(handler: JsonRpcHandler): Unit = {
-    this.handler = handler
+  def setHandler(partner: AsyncJsonRpcHandler): Unit = {
+    this.handler = partner
   }
 
   def sendNotification(notification: JsonRpcNotificationMessage): Unit = {
     msgWriter.write(notification)
   }
 
-  def sendRequest(request: JsonRpcRequestMessage, responseHandler: JsonRpcResponseMessage => Unit): Unit = {
-    responseHandlers += request.id -> responseHandler //TODO add a timeout for cleaning up ResponseHandlers
-    msgWriter.write(request)
-  }
-
   private var responseHandlers: Map[CorrelationId, JsonRpcResponseMessage => Unit] = Map.empty
+
+  def sendRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage] = {
+    val result = Promise[JsonRpcResponseMessage]
+
+    // TODO decide after what time to remove responseHandlers
+    responseHandlers += request.id -> ((response: JsonRpcResponseMessage) => result.success(response))
+
+    msgWriter.write(request)
+    result.future
+  }
 
   def listen() {
     if (handler == null)
@@ -58,6 +70,7 @@ class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
         case Some(jsonString) => handleMessage(jsonString)
       }
     }
+    handler.dispose()
   }
 
   private def handleMessage(message: String): Unit = {
@@ -65,7 +78,8 @@ class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
       case error: JsonRpcResponseErrorMessage => msgWriter.write(error)
       case notification: JsonRpcNotificationMessage => handler.handleNotification(notification)
 
-      case request: JsonRpcRequestMessage => msgWriter.write(handler.handleRequest(request))
+      case request: JsonRpcRequestMessage => handler.handleRequest(request).
+        foreach(response => writeLock.synchronized(msgWriter.write(response)))
 
       case response: JsonRpcResponseMessage =>
         responseHandlers.get(response.id).fold({
@@ -90,4 +104,5 @@ class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
 
   // 4 threads should be enough for everyone
   implicit private val commandExecutionContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
+
 }

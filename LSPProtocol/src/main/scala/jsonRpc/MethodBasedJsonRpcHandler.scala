@@ -9,10 +9,17 @@ import play.api.libs.json._
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.Promise
+import scala.concurrent.{ExecutionContext, Future, Promise}
 
-class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler with LazyLogging {
-  connection.setHandler(this)
+object MethodBasedJsonRpcHandler {
+  def toJson(params: Params): JsValue = params match {
+    case obj: ObjectParams => obj.value
+    case array: ArrayParams => array.value
+    case _ => JsNull
+  }
+}
+
+class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJsonRpcHandler with LazyLogging {
 
   private var requestHandlers: Map[String, JsonRpcRequestMessage => JsonRpcResponseMessage] = Map.empty
   private val notificationHandlers: mutable.Map[String, ListBuffer[JsonRpcNotificationMessage => Unit]] = mutable.Map.empty
@@ -24,21 +31,19 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
 
   def sendRequest[Request, Response](method: String, correlationId: CorrelationId, request: Request)
                                     (implicit requestFormat: OWrites[Request], responseFormat: Reads[Response]):
-    Promise[Response] = {
+    Future[Response] = {
     val requestJson = requestFormat.writes(request)
     val requestMessage = new JsonRpcRequestMessage(method, ObjectParams(requestJson), correlationId)
 
-    val result = Promise[Response]()
-    connection.sendRequest(requestMessage, {
+    connection.sendRequest(requestMessage).flatMap({
       case success: JsonRpcResponseSuccessMessage =>
         responseFormat.reads(success.result) match {
-          case JsSuccess(response, _) => result.success(response)
-          case JsError(errors) => result.failure(new Exception())
+          case JsSuccess(response, _) => Future.successful(response)
+          case JsError(errors) => Future.failed(new Exception())
         }
       case error: JsonRpcResponseErrorMessage =>
-        result.failure(new Exception())
-    })
-    result
+        Future.failed(new Exception(error.message))
+    })(ExecutionContext.global)
   }
 
   override def handleNotification(notification: JsonRpcNotificationMessage): Unit = {
@@ -58,23 +63,17 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
     }
   }
 
-  override def handleRequest(request: JsonRpcRequestMessage): JsonRpcResponseMessage = {
+  override def handleRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage] = {
     requestHandlers.get(request.method) match {
-      case Some(handle) => handle(request)
-      case None => JsonRpcResponseErrorMessage.methodNotFound(request.method, request.id)
+      case Some(handle) => Future.successful(handle(request))
+      case None => Future.successful(JsonRpcResponseErrorMessage.methodNotFound(request.method, request.id))
     }
-  }
-
-  def toJson(params: Params): JsValue = params match {
-    case obj: ObjectParams => obj.value
-    case array: ArrayParams => array.value
-    case _ => JsNull
   }
 
   def addNotificationHandler[Notification](method: String, handler: Notification => Unit)(notificationFormat: OFormat[Notification]): Unit = {
     val handlers = getNotificationHandlersForMethod(method)
     val handle = (notification: JsonRpcNotificationMessage) => {
-      val requestJson = toJson(notification.params)
+      val requestJson = MethodBasedJsonRpcHandler.toJson(notification.params)
       notificationFormat.reads(requestJson) match {
         case JsSuccess(typedRequest, _) =>
           handler(typedRequest)
@@ -92,7 +91,7 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
   def addRequestHandler[Request, Response](method: String, handler: Request => Response)
                                           (requestFormat: Reads[Request], responseFormat: Writes[Response]): Unit = {
     val handle = (request: JsonRpcRequestMessage) => {
-      val requestJson = toJson(request.params)
+      val requestJson = MethodBasedJsonRpcHandler.toJson(request.params)
       requestFormat.reads(requestJson) match {
         case JsSuccess(typedRequest, _) =>
           val typedResponse = handler(typedRequest)
@@ -104,4 +103,6 @@ class SimpleJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler
     }
     requestHandlers += method -> handle
   }
+
+  override def dispose(): Unit = {}
 }
