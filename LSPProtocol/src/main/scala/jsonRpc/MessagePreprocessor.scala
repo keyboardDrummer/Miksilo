@@ -10,9 +10,9 @@ case class Request(request: JsonRpcRequestMessage, result: Promise[JsonRpcRespon
 
 abstract class MessagePreprocessor(original: AsyncJsonRpcHandler) extends AsyncJsonRpcHandler {
 
-  def aggregate(items: List[WorkItem]): List[WorkItem]
+  def aggregate(items: CircularArrayBuffer[WorkItem]): Unit
 
-  var messages: List[WorkItem] = List.empty[WorkItem]
+  var messages: CircularArrayBuffer[WorkItem] = new CircularArrayBuffer[WorkItem]
   val lock = new Object()
 
   @volatile
@@ -21,7 +21,7 @@ abstract class MessagePreprocessor(original: AsyncJsonRpcHandler) extends AsyncJ
   private class PumpInput extends Thread("Input Reader") {
     override def run() {
       while (!streamClosed) {
-        popWorkItem() match {
+        dequeueWorkItem() match {
           case None =>
           case Some(message) => message match {
             case Notification(notification) => original.handleNotification(notification)
@@ -38,20 +38,20 @@ abstract class MessagePreprocessor(original: AsyncJsonRpcHandler) extends AsyncJ
     streamClosed = true
   }
 
-  def popWorkItem(): Option[WorkItem] = {
+  def dequeueWorkItem(): Option[WorkItem] = {
     lock.synchronized {
-      messages match {
-        case Nil =>
-          if (!streamClosed) {
-            lock.wait()
-            popWorkItem()
-          }
-          else {
-            None
-          }
-        case head :: tail =>
-          messages = tail
-          Some(head)
+      if (messages.isEmpty) {
+        if (!streamClosed) {
+          lock.wait()
+          dequeueWorkItem()
+        }
+        else {
+          None
+        }
+      }
+      else {
+        val message = messages.popLeft()
+        Some(message)
       }
     }
   }
@@ -68,7 +68,8 @@ abstract class MessagePreprocessor(original: AsyncJsonRpcHandler) extends AsyncJ
 
   def addMessage(message: WorkItem): Unit = {
     lock.synchronized {
-      messages = aggregate(message :: messages)
+      messages += message
+      aggregate(messages)
       lock.notify()
     }
   }

@@ -312,9 +312,6 @@ class LSPServerTest extends AsyncFunSpec {
     val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)), Some(2), "Woeps", None, None))
     val promise = Promise[Assertion]()
     val languageClient = new TestLanguageClient {
-      override def sendDiagnostics(receivedDiagnostics: PublishDiagnostics): Unit = {
-        promise.success(assertResult(diagnostics)(receivedDiagnostics.diagnostics))
-      }
     }
 
     val change1 = new TextDocumentContentChangeEvent(None, None, "a")
@@ -328,8 +325,12 @@ class LSPServerTest extends AsyncFunSpec {
     var expectations = List(first, merged)
     val languageServer: LanguageServer = new TestLanguageServer {
       override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
-        Thread.sleep(5)
-        assertResult(expectations.head)(parameters)
+        Thread.sleep(10)
+        try {
+          assertResult(expectations.head)(parameters)
+        } catch {
+          case e: Throwable => promise.failure(e)
+        }
         expectations = expectations.tail
         if (expectations.isEmpty) {
             promise.success(assert(true))
@@ -345,6 +346,7 @@ class LSPServerTest extends AsyncFunSpec {
     val client = serverAndClient.client
 
     client.didChange(first)
+    client.complete(DocumentPosition(new TextDocumentIdentifier(document.uri), Position(0, 0)))
     client.didChange(second)
     client.didChange(third)
 
