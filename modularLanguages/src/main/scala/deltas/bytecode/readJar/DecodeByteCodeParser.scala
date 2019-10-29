@@ -1,7 +1,5 @@
 package deltas.bytecode.readJar
 
-import java.io.{BufferedInputStream, InputStreamReader}
-
 import core.deltas._
 import core.deltas.path.PathRoot
 import core.language.Compilation
@@ -11,6 +9,9 @@ import core.smarts.FileDiagnostic
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 import lsp.{Diagnostic, DiagnosticSeverity, HumanPosition}
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.InputStream
 
 object DecodeByteCodeParser extends DeltaWithPhase {
 
@@ -21,8 +22,7 @@ object DecodeByteCodeParser extends DeltaWithPhase {
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val uri = compilation.rootFile.get
     val inputStream = compilation.fileSystem.getFile(uri)
-    val bis = new BufferedInputStream(inputStream)
-    val inputBytes: Array[Byte] = inputStream.readAllBytes()
+    val inputBytes: Array[Byte] = readAllBytes(inputStream)
     val parseResult: ClassFileParser.ParseResult[Node] = ClassFileParser.parse(inputBytes)
     if (parseResult.successful) {
       compilation.program = PathRoot(parseResult.get)
@@ -30,6 +30,42 @@ object DecodeByteCodeParser extends DeltaWithPhase {
     } else {
       val diagnostic = Diagnostic(SourceRange(HumanPosition(0, 0), HumanPosition(0, 0)), Some(DiagnosticSeverity.Error), "File was not a JVM classfile", None, None)
       compilation.diagnostics += FileDiagnostic(uri, diagnostic)
+    }
+  }
+
+  def readAllBytes(inputStream: InputStream): Array[Byte] = {
+    val bufferLength = 4 * 0x400 // 4KB
+    val buffer = new Array[Byte](bufferLength)
+    var exception: IOException = null
+    try {
+      val outputStream = new ByteArrayOutputStream
+      try {
+        var readLength = 0
+        while ( {
+          readLength = inputStream.read(buffer, 0, bufferLength)
+          readLength != -1
+        }) {
+          outputStream.write(buffer, 0, readLength)
+        }
+        outputStream.toByteArray
+      } finally {
+        if (outputStream != null) outputStream.close()
+      }
+    }
+    catch {
+      case e: IOException =>
+        exception = e
+        throw e
+    }
+    finally {
+      if (exception == null) inputStream.close()
+      else {
+        try inputStream.close()
+        catch {
+          case e: IOException =>
+            exception.addSuppressed(e)
+        }
+      }
     }
   }
 }
