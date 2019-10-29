@@ -46,6 +46,8 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     override def withIndentation(value: Int) = withState(state + (IndentationKey -> value))
   }
 
+  override def dropByDefault = false
+
   def valueToResult(value: Any): Result = WithMap(value, Map.empty)
 
   def toParser(grammar: BiGrammar): SingleResultParser[Any, Input] = {
