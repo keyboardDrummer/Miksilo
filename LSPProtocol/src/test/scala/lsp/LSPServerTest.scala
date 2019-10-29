@@ -11,15 +11,6 @@ import scala.concurrent.{Await, Promise}
 
 class LSPServerTest extends AsyncFunSpec {
 
-  val initialize: String = """Content-Length: 304
-                             |
-                             |{"jsonrpc":"2.0","id":0,"method":"initialize","params":{"rootUri":"file:///local/home/rwillems/workspaces/cloud9-dev/ide-assets/src/AWSCloud9Core/plugins/c9.ide.language.languageServer.lsp/worker/test_files/project","capabilities":{"workspace":{"applyEdit":false},"textDocument":{"definition":true}},"trace":"verbose"}}""".stripMargin.replace("\n", "\r\n")
-
-  val expectedInitializeResult: String = """Content-Length: 440
-                                           |
-                                           |{"jsonrpc":"2.0","result":{"capabilities":{"textDocumentSync":1,"hoverProvider":false,"completionProvider":{"resolveProvider":false,"triggerCharacters":[]},"definitionProvider":true,"referencesProvider":false,"documentHighlightProvider":false,"documentSymbolProvider":false,"workspaceSymbolProvider":false,"codeActionProvider":false,"documentFormattingProvider":false,"documentRangeFormattingProvider":false,"renameProvider":false}},"id":0}""".
-    stripMargin.replace("\n","\r\n")
-
   case class ServerAndClient(client: LSPClient, server: LSPServer,
                              clientOut: ByteArrayOutputStream,
                              serverOut: ByteArrayOutputStream)
@@ -30,9 +21,9 @@ class LSPServerTest extends AsyncFunSpec {
     val serverAndClient = setupServerAndClient(languageServer)
 
     val serverOutExpectation =
-      """Content-Length: 371
+      """Content-Length: 440
         |
-        |{"jsonrpc":"2.0","result":{"capabilities":{"textDocumentSync":1,"hoverProvider":false,"definitionProvider":false,"referencesProvider":false,"documentHighlightProvider":false,"documentSymbolProvider":false,"workspaceSymbolProvider":false,"codeActionProvider":false,"documentFormattingProvider":false,"documentRangeFormattingProvider":false,"renameProvider":false}},"id":0}""".stripMargin
+        |{"jsonrpc":"2.0","result":{"capabilities":{"textDocumentSync":1,"hoverProvider":false,"completionProvider":{"resolveProvider":true,"triggerCharacters":[]},"definitionProvider":false,"referencesProvider":false,"documentHighlightProvider":false,"documentSymbolProvider":false,"workspaceSymbolProvider":false,"codeActionProvider":false,"documentFormattingProvider":false,"documentRangeFormattingProvider":false,"renameProvider":false}},"id":0}""".stripMargin
     val clientOutExpectation =
       """Content-Length: 99
         |
@@ -321,14 +312,14 @@ class LSPServerTest extends AsyncFunSpec {
     val languageServer: LanguageServer = new TestLanguageServer {
 
       override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
-        Thread.sleep(10)
+        Thread.sleep(50)
         try {
           assertResult(expectations.head)(parameters)
         } catch {
           case e: Throwable => promise.failure(e)
         }
         expectations = expectations.tail
-        if (expectations.isEmpty) {
+        if (expectations.isEmpty && !promise.isCompleted) {
             promise.success(assert(true))
         }
         super.didChange(parameters)
