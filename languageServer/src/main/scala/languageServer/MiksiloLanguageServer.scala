@@ -1,5 +1,7 @@
 package languageServer
 
+import java.util.{Timer, TimerTask}
+
 import com.typesafe.scalalogging.LazyLogging
 import core.language.exceptions.BadInputException
 import core.language.{Compilation, Language, SourceElement}
@@ -19,13 +21,13 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   var client: LanguageClient = _
   private val documentManager = new TextDocumentManager()
-  var currentDocumentId: TextDocumentIdentifier = _
+  var currentDocumentId: VersionedTextDocumentIdentifier = _
   var compilation: Option[Compilation] = None
 
   override def textDocumentSync = TextDocumentSyncKind.Incremental
 
   override def didOpen(parameters: TextDocumentItem): Unit = {
-    compilation = None
+    documentChanged(VersionedTextDocumentIdentifier(parameters.uri, parameters.version))
     documentManager.onOpenTextDocument(parameters)
   }
 
@@ -33,14 +35,28 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def didSave(parameters: DidSaveTextDocumentParams): Unit = {}
 
+  val diagnosticsComputeDelay = 10
+  val timer = new java.util.Timer()
   override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
-    compilation = None
+    documentChanged(parameters.textDocument)
     if (parameters.contentChanges.nonEmpty)
       documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
+
     if (client != null) {
-      currentDocumentId = TextDocumentIdentifier(parameters.textDocument.uri)
-      val diagnostics = getCompilation.diagnosticsForFile(parameters.textDocument.uri)
-      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, diagnostics))
+      timer.schedule(new TimerTask() {
+        override def run(): Unit = computeDiagnostics(currentDocumentId)
+      }, diagnosticsComputeDelay)
+    }
+  }
+  def documentChanged(documentIdentifier: VersionedTextDocumentIdentifier): Unit = {
+    compilation = None
+    currentDocumentId = documentIdentifier
+  }
+
+  def computeDiagnostics(document: VersionedTextDocumentIdentifier): Unit = {
+    if (document.version == currentDocumentId.version) {
+      val diagnostics = getCompilation.diagnosticsForFile(document.uri)
+      client.sendDiagnostics(PublishDiagnostics(document.uri, diagnostics))
     }
   }
 
@@ -56,8 +72,10 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def getCompilation: Compilation = {
-    if (compilation.isEmpty)
-      compile()
+    compilation.synchronized(
+      if (compilation.isEmpty) {
+        compile()
+    })
     compilation.get
   }
 
@@ -74,7 +92,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   override def initialized(): Unit = {}
 
   override def gotoDefinition(parameters: DocumentPosition): Seq[FileRange] = {
-    currentDocumentId = parameters.textDocument
     logger.debug("Went into gotoDefinition")
     val fileRange = for {
       proofs <- getProofs
@@ -86,7 +103,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   override def complete(params: DocumentPosition): CompletionList = {
-    currentDocumentId = params.textDocument
     val position = params.position
     logger.debug("Went into complete")
     val completions: Seq[CompletionItem] = for {
@@ -112,7 +128,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   override def references(parameters: ReferencesParams): Seq[FileRange] = {
-    currentDocumentId = parameters.textDocument
     logger.debug("Went into references")
     val maybeResult = for {
       proofs <- getProofs
@@ -139,7 +154,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   override def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation] = {
-    currentDocumentId = params.textDocument
     val proofs = getCompilation.proofs
     if (proofs == null)
       return Seq.empty
@@ -158,8 +172,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   override def getCodeActions(parameters: CodeActionParams): Seq[CodeAction] = {
-    currentDocumentId = parameters.textDocument
-
     val diagnostics = parameters.context.diagnostics.map(d => d.identifier).toSet
     val compilation = getCompilation
     compilation.fixesPerDiagnostics.
