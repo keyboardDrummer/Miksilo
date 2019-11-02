@@ -45,8 +45,12 @@ trait LanguageServerTest {
   def getDiagnostics(server: LanguageServer, program: String): Seq[Diagnostic] = {
     var result: Seq[Diagnostic] = null
     val document = openDocument(server, program)
-    server.setClient((diagnostics: PublishDiagnostics) => {
-      result = diagnostics.diagnostics
+    server.setClient(new LanguageClient {
+      override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {
+        result = diagnostics.diagnostics
+      }
+
+      override def trackMetric(name: String, value: Double): Unit = {}
     })
     server.didChange(DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, 0), Seq.empty))
     result

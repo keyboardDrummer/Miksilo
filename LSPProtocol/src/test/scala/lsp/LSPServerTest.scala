@@ -277,6 +277,8 @@ class LSPServerTest extends AsyncFunSpec {
       override def sendDiagnostics(receivedDiagnostics: PublishDiagnostics): Unit = {
         p.success(assertResult(diagnostics)(receivedDiagnostics.diagnostics))
       }
+
+
     }
     val languageServer: LanguageServer = new TestLanguageServer {
 
@@ -360,6 +362,7 @@ class LSPServerTest extends AsyncFunSpec {
 
   class TestLanguageClient extends LanguageClient {
     override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {}
+    override def trackMetric(name: String, value: Double): Unit = {}
   }
 
   class TestLanguageServer extends LanguageServer with CompletionProvider {

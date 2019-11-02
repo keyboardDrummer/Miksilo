@@ -23,7 +23,7 @@ object IncludeDelta extends DirectiveDelta {
     val input = preprocessor.compilation.fileSystem.getFile(filePath.toString())
 
     val parser = parserProp.get(compilation)
-    val parseResult = ParseUsingTextualGrammar().parseStream(parser, input)
+    val parseResult = ParseUsingTextualGrammar().parseStream(compilation, parser, input)
     parseResult.resultOption match {
       case Some(success) =>
         val value: FileWithMembers[Node] = success.asInstanceOf[Node]

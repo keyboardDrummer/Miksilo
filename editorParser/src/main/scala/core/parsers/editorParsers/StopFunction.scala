@@ -5,6 +5,10 @@ trait StopFunction {
   def apply(offset: Int, best: Double, second: Double): Boolean
 }
 
+object StopImmediately extends StopFunction {
+  override def apply(offset: Int, best: Double, second: Double) = true
+}
+
 object NeverStop extends StopFunction {
   override def apply(offset: Int, best: Double, second: Double) = {
     false

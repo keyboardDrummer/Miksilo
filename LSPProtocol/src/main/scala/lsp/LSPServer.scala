@@ -6,6 +6,11 @@ import play.api.libs.json._
 
 import scala.reflect.ClassTag
 
+case class Measurement(name: String, value: Double)
+object Measurement {
+  implicit val format = Json.format[Measurement]
+}
+
 class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
   val handler = new MethodBasedJsonRpcHandler(connection)
@@ -19,6 +24,10 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
     override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {
       implicit val publishDiagnosticsFormat: OFormat[PublishDiagnostics] = Json.format
       handler.sendNotification(LSPProtocol.diagnostics, diagnostics)
+    }
+
+    override def trackMetric(name: String, value: Double): Unit = {
+      handler.sendNotification(LSPProtocol.telemetry, Measurement(name, value))
     }
   }
 

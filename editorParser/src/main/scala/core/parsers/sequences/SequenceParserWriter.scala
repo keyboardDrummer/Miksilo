@@ -1,6 +1,6 @@
 package core.parsers.sequences
 
-import core.parsers.core.Processor
+import core.parsers.core.{Metrics, NoMetrics, Processor}
 import core.parsers.editorParsers._
 
 trait SequenceParserWriter extends CorrectingParserWriter {
@@ -314,7 +314,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     def getSingleResultParser: SingleResultParser[Result, Input] = {
       val parser = compile(this.parser).buildParser(this.parser)
-      (input, mayStop) => findBestParseResult(parser, input, mayStop)
+      (input, mayStop: StopFunction, metrics: Metrics) => findBestParseResult(parser, input, mayStop, metrics)
     }
 
     def getWholeInputParser: SingleResultParser[Result, Input] = {
@@ -328,5 +328,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 }
 
 trait SingleResultParser[+Result, Input] {
-  def parse(input: Input, mayStop: StopFunction = (_, _, _) => true): SingleParseResult[Result, Input]
+  def parse(input: Input,
+            mayStop: StopFunction = StopImmediately,
+            metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]
 }
