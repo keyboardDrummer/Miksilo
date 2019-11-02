@@ -1,6 +1,7 @@
 package lsp
 
 object LSPProtocol {
+  val telemetry = "telemetry/event"
   val diagnostics = "textDocument/publishDiagnostics"
   val references = "textDocument/references"
   val definition = "textDocument/definition"

@@ -3,6 +3,7 @@ package languageServer
 import com.typesafe.scalalogging.LazyLogging
 import core.language.exceptions.BadInputException
 import core.language.{Compilation, Language, SourceElement}
+import core.parsers.core.{Metrics, NoMetrics}
 import core.parsers.editorParsers.TextEdit
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
@@ -49,7 +50,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   var diagnosticsAreDirty: Boolean = false
 
   def compile(): Unit = {
-    val compilation = new Compilation(language, documentManager, Some(currentDocumentId.uri))
+    val compilation = new Compilation(language, documentManager, Some(currentDocumentId.uri), metrics)
     this.compilation = Some(compilation)
     try {
       compilation.runPhases()
@@ -138,8 +139,11 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     maybeResult.getOrElse(Seq.empty)
   }
 
+  var metrics: Metrics = NoMetrics // Change to buffered metrics?
+
   override def setClient(client: LanguageClient): Unit = {
     this.client = client
+    metrics = client.trackMetric
   }
 
   override def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation] = {

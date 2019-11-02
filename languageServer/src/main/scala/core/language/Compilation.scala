@@ -2,13 +2,15 @@ package core.language
 
 import java.io.InputStream
 
+import core.parsers.core.{Metrics, NoMetrics}
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
 import lsp.{CodeAction, Diagnostic}
 
 import scala.collection.mutable
-import scala.io.BufferedSource
 
-class Compilation(val language: Language, val fileSystem: FileSystem, val rootFile: Option[String]) {
+class Compilation(val language: Language, val fileSystem: FileSystem, val rootFile: Option[String],
+                  val metrics: Metrics = NoMetrics) {
+
   var program: SourceElement = _
   var proofs: Proofs = _
   var remainingConstraints: Seq[Constraint] = _

@@ -94,6 +94,7 @@ trait CodeActionProvider {
 
 trait LanguageClient {
   def sendDiagnostics(diagnostics: PublishDiagnostics)
+  def trackMetric(name: String, value: Double)
 }
 
 trait LanguageServer {

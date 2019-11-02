@@ -1,14 +1,15 @@
 package core.parsers.editorParsers
 
-import com.typesafe.scalalogging.LazyLogging
-import core.parsers.core.OptimizingParserWriter
+import core.parsers.core.{Metrics, OptimizingParserWriter}
 
-trait CorrectingParserWriter extends OptimizingParserWriter with LazyLogging {
+trait CorrectingParserWriter extends OptimizingParserWriter {
 
   type ParseResult[+Result] = ParseResults[Input, Result]
 
-  def findBestParseResult[Result](parser: BuiltParser[Result], input: Input, mayStop: StopFunction): SingleParseResult[Result, Input] = {
+  def findBestParseResult[Result](parser: BuiltParser[Result], input: Input, mayStop: StopFunction,
+                                  metrics: Metrics): SingleParseResult[Result, Input] = {
 
+    val start = System.currentTimeMillis()
     val noResultFound = ReadyParseResult(None, input, History.error(FatalError(input, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Input, Result] = noResultFound
 
@@ -38,7 +39,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter with LazyLogging {
           tail.merge(results)
       }
     }
-    logger.info(s"Error correcting parser ran for $cycles cycles.")
+    val millisecondsSpent = System.currentTimeMillis() - start
+    metrics.measure("Parse trees evaluated", cycles)
+    metrics.measure("Parse time", millisecondsSpent)
     SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 

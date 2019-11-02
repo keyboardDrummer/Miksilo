@@ -27,8 +27,6 @@ lazy val commonSettings = Seq(
   libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.4" % "test",
 
   // https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
-  libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
 )
 
 lazy val assemblySettings = Seq(
@@ -47,7 +45,9 @@ lazy val editorParser = (project in file("editorParser")).
 lazy val LSPProtocol = (project in file("LSPProtocol")).
   settings(commonSettings: _*).
   settings(
-    libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1"
+    libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1",
+    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
   ).dependsOn(editorParser)
 
 lazy val languageServer = (project in file("languageServer")).
@@ -65,6 +65,9 @@ lazy val languageServer = (project in file("languageServer")).
       url("https://github.com/keyboardDrummer"))),
     licenses += ("MIT", url("https://github.com/keyboardDrummer/Miksilo/blob/master/LICENSE")),
     publishMavenStyle := true,
+
+    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
+    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
 
     publishTo := Some(
       if (isSnapshot.value)
