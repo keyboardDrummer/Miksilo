@@ -1,17 +1,15 @@
 package core
 
+
 import java.io.{BufferedReader, ByteArrayInputStream, InputStream, InputStreamReader}
 import java.nio.charset.StandardCharsets
 import java.util.stream.Collectors
 
 import scala.reflect.io.{File, Path}
 
-object TestSourceUtils {
+object SourceUtils {
 
-  def streamToString(stream: InputStream): String = scala.io.Source.fromInputStream(stream).mkString
-  def stringToStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
-
-  def getTestFile(relativeFilePath: Path): InputStream = {
+  def getResourceFile(relativeFilePath: Path): InputStream = {
     if (relativeFilePath.isAbsolute)
       return File(relativeFilePath).inputStream()
 
@@ -26,8 +24,8 @@ object TestSourceUtils {
     testResources
   }
 
-  def getTestFileContents(relativeFilePath: Path): String = {
-    val result = new BufferedReader(new InputStreamReader(getTestFile(relativeFilePath)))
+  def getResourceFileContents(relativeFilePath: Path): String = {
+    val result = new BufferedReader(new InputStreamReader(getResourceFile(relativeFilePath)))
       .lines().collect(Collectors.joining("\n"))
     result.replaceAll("\n", System.lineSeparator())
   }

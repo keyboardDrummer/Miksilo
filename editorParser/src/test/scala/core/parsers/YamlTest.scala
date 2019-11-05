@@ -1,7 +1,7 @@
 
 package core.parsers
 
-import _root_.core.TestSourceUtils
+import _root_.core.SourceUtils
 import _root_.core.responsiveDocument._
 import _root_.core.parsers.editorParsers.Position
 import _root_.core.document.Empty
@@ -336,7 +336,7 @@ class YamlTest extends FunSuite
   }
 
   test("big yaml file") {
-    val contents = TestSourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val contents = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result = parseValue.getWholeInputParser.parse(new IndentationReader(contents))
     assert(result.successful, result.toString)
   }

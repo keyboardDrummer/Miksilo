@@ -1,5 +1,6 @@
 package deltas.verilog
 
+import core.SourceUtils
 import core.deltas.path.PathRoot
 import core.language.{Compilation, InMemoryFileSystem}
 import core.language.node.NodeComparer
@@ -11,7 +12,7 @@ import deltas.statement.{IfThenDelta, IfThenElseDelta}
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import lsp.{DocumentPosition, FileRange, HumanPosition, TextDocumentIdentifier}
 import org.scalatest.FunSuite
-import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
+import util.{JavaSourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
@@ -98,8 +99,8 @@ class VerilogTest extends FunSuite with LanguageServerTest {
 
   test("can compile multiple files") {
     val fileSystem = InMemoryFileSystem(Map(
-      "./Bus_pkg.sv" -> SourceUtils.getTestFile(Path("verilog") / "Bus_pkg.sv"),
-      "testbench.sv" -> SourceUtils.getTestFile(Path("verilog") / "testbench.sv")))
+      "./Bus_pkg.sv" -> SourceUtils.getResourceFile(Path("verilog") / "Bus_pkg.sv"),
+      "testbench.sv" -> SourceUtils.getResourceFile(Path("verilog") / "testbench.sv")))
     val compilation = new Compilation(language.language, fileSystem, Some("testbench.sv"))
     compilation.runPhases()
     assert(compilation.diagnostics.isEmpty, compilation.diagnostics)
@@ -109,7 +110,7 @@ class VerilogTest extends FunSuite with LanguageServerTest {
     val server = new MiksiloLanguageServer(VerilogLanguage.language)
     val files = Seq(Path("verilog") / "Bus_pkg.sv", Path("verilog") / "testbench.sv")
     for(file <- files) {
-      openDocument(server, SourceUtils.getTestFileContents(file), file.toString())
+      openDocument(server, SourceUtils.getResourceFileContents(file), file.toString())
     }
     val mainIdentifier = TextDocumentIdentifier(files(1).toString())
     val busIdentifier = TextDocumentIdentifier(files(0).toString())

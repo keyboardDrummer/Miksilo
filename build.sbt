@@ -40,7 +40,13 @@ lazy val assemblySettings = Seq(
 )
 
 lazy val editorParser = (project in file("editorParser")).
-  settings(commonSettings: _*)
+  settings(commonSettings: _*).
+  settings(
+
+    // Only used for SourceUtils, should get rid of it.
+    // https://mvnrepository.com/artifact/org.scala-lang/scala-reflect
+    libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.4"
+  )
 
 lazy val LSPProtocol = (project in file("LSPProtocol")).
   settings(commonSettings: _*).
@@ -76,7 +82,7 @@ lazy val languageServer = (project in file("languageServer")).
         Opts.resolver.sonatypeStaging
     ),
 
-  ).dependsOn(editorParser, LSPProtocol)
+  ).dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
 lazy val modularLanguages = (project in file("modularLanguages")).
   settings(commonSettings: _*).
@@ -104,7 +110,8 @@ lazy val modularLanguages = (project in file("modularLanguages")).
     // https://mvnrepository.com/artifact/com.typesafe.play/play-json
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
 
-  ).dependsOn(languageServer)
+  ).dependsOn(languageServer,
+    editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )
 
 lazy val playground = (project in file("playground")).
   settings(commonSettings: _*).
