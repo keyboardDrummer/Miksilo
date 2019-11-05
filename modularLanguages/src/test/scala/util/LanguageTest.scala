@@ -4,6 +4,7 @@ import java.io.{BufferedInputStream, ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
+import core.SourceUtils
 import core.deltas.path.PathRoot
 import core.language.Compilation
 import core.language.node.{Node, NodeComparer}
@@ -64,13 +65,13 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
 
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
     val input: String = JavaSourceUtils.getJavaTestFileContents(className, inputDirectory)
-    language.compileStream(SourceUtils.stringToStream(input)).program.asInstanceOf[PathRoot].current
+    language.compileStream(StreamUtils.stringToStream(input)).program.asInstanceOf[PathRoot].current
   }
 
   def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
     val className: String = JavaSourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
-    val input: InputStream = SourceUtils.getTestFile(relativeFilePath)
+    val input: InputStream = SourceUtils.getResourceFile(relativeFilePath)
     val outputDirectory = actualOutputDirectory / inputDirectory
     outputDirectory.createDirectory(force = true)
     val outputFile = outputDirectory / className addExtension "class"
@@ -108,7 +109,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     val className = inputFile.stripExtension
 
     val relativeFilePath = inputFile.changeExtension("java")
-    val input: BufferedInputStream = new BufferedInputStream(SourceUtils.getTestFile(relativeFilePath))
+    val input: BufferedInputStream = new BufferedInputStream(SourceUtils.getResourceFile(relativeFilePath))
     input.mark(Integer.MAX_VALUE)
 
     val javaCompilerOutput = TestLanguageBuilder.profile("javac", runJavaCIfNeeded(className, input, expectedOutputDirectory))

@@ -2,6 +2,7 @@ package deltas.bytecode.readJar
 
 import java.io
 
+import core.SourceUtils
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.BiGrammarToParser.Reader
 import core.bigrammar.TestLanguageGrammarUtils
@@ -13,7 +14,7 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import deltas.javac.JavaToByteCodeLanguage
 import deltas.javac.types.TypeAbstraction
-import util.{JavaSourceUtils, SourceUtils, TestLanguageBuilder}
+import util.{JavaSourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.{File, Path}
 
@@ -75,56 +76,56 @@ class TestClassFileDecompiler extends FunSuite {
   }
 
   test("ObjectClassUnParsedAttributes") {
-    val inputStream = SourceUtils.getTestFile("Object.class")
+    val inputStream = SourceUtils.getResourceFile("Object.class")
     val compiler = TestLanguageBuilder.build(Seq(DecodeByteCodeParser, PrettyPrint()) ++ ClassFileSignatureDecompiler.byteCodeParticles)
     val state = compiler.compileStream(inputStream)
 
-    val expected = SourceUtils.getTestFileContents("DecodedObjectClassPrettyPrint.txt")
+    val expected = SourceUtils.getResourceFileContents("DecodedObjectClassPrettyPrint.txt")
     assertResult(expected)(state.output)
   }
 
   test("ObjectClassParsedAttributes") {
     val compiler = TestLanguageBuilder.build(Seq(DecodeByteCodeParser, ParseKnownAttributes) ++ Seq(PrettyPrint()) ++
       ClassFileSignatureDecompiler.onlySignatureAttribute)
-    val state = compiler.compileStream(SourceUtils.getTestFile("Object.class"))
+    val state = compiler.compileStream(SourceUtils.getResourceFile("Object.class"))
 
-    val expected = SourceUtils.getTestFileContents("DecodedWithAttributesObjectClassPrettyPrint.txt")
+    val expected = SourceUtils.getResourceFileContents("DecodedWithAttributesObjectClassPrettyPrint.txt")
     assertResult(expected)(state.output)
   }
 
   test("ObjectClassSignatureDeCompilation") {
     val compiler = TestLanguageBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
-    val compilation = compiler.compileStream(SourceUtils.getTestFile("Object.class"))
+    val compilation = compiler.compileStream(SourceUtils.getResourceFile("Object.class"))
     val output = TestLanguageBuilder.build(Seq(PrettyPrint()) ++ JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(compilation.program).output
 
-    val expected = SourceUtils.getTestFileContents("DecompiledObjectClassFileSignature.txt")
+    val expected = SourceUtils.getResourceFileContents("DecompiledObjectClassFileSignature.txt")
     assertResult(expected)(output)
   }
 
   test("StringClassSignatureDeCompilation") {
     val compiler = TestLanguageBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
-    val compilation = compiler.compileStream(SourceUtils.getTestFile("String2.class"))
+    val compilation = compiler.compileStream(SourceUtils.getResourceFile("String2.class"))
     val output = TestLanguageBuilder.build(Seq(PrettyPrint()) ++ JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(compilation.program).output
 
-    val expected = SourceUtils.getTestFileContents("DecompiledStringClassFileSignature.txt")
+    val expected = SourceUtils.getResourceFileContents("DecompiledStringClassFileSignature.txt")
     assertResult(expected)(output)
   }
 
   test("SystemClassSignatureDeCompilation") {
     val compiler = TestLanguageBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.compileStream(SourceUtils.getTestFile("System.class"))
+    val state = compiler.compileStream(SourceUtils.getResourceFile("System.class"))
     val output = TestLanguageBuilder.build(Seq(PrettyPrint()) ++ JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(state.program).output
 
-    val expected = SourceUtils.getTestFileContents("DecompiledSystemClassFileSignature.txt")
+    val expected = SourceUtils.getResourceFileContents("DecompiledSystemClassFileSignature.txt")
     assertResult(expected)(output)
   }
 
   test("PrintStreamClassSignatureDeCompilation") {
     val compiler = TestLanguageBuilder.build(ClassFileSignatureDecompiler.getDecompiler)
-    val state = compiler.compileStream(SourceUtils.getTestFile("PrintStream.class"))
+    val state = compiler.compileStream(SourceUtils.getResourceFile("PrintStream.class"))
     val output = TestLanguageBuilder.build(Seq(PrettyPrint()) ++ JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(state.program).output
 
-    val expected = SourceUtils.getTestFileContents("DecompiledPrintStreamClassFileSignature.txt")
+    val expected = SourceUtils.getResourceFileContents("DecompiledPrintStreamClassFileSignature.txt")
     assertResult(expected)(output)
   }
 

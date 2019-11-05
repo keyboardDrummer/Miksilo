@@ -2,8 +2,9 @@ package application.compilerCockpit
 
 import java.awt.event.ActionEvent
 
+import core.SourceUtils
 import javax.swing.{DefaultComboBoxModel, JComboBox, JLabel, JPanel}
-import util.{JavaSourceUtils, SourceUtils}
+import util.JavaSourceUtils
 
 import scala.reflect.io.Path
 
@@ -41,7 +42,7 @@ class ExampleDropDown(val compilerCockpit: LanguageSandbox) extends JPanel {
   }
 
   def getFibonacciSimplifiedByteCode = {
-    val content = SourceUtils.getTestFileContents("FibonacciInSimplifiedByteCode.txt")
+    val content = SourceUtils.getResourceFileContents("FibonacciInSimplifiedByteCode.txt")
     new Example("Fibonacci Simplified Bytecode", content)
   }
 
@@ -51,7 +52,7 @@ class ExampleDropDown(val compilerCockpit: LanguageSandbox) extends JPanel {
   }
 
   def getFibonacciByteCode = {
-    val fibonacciContent = SourceUtils.getTestFileContents("FibonacciByteCodePrettyPrinted.txt")
+    val fibonacciContent = SourceUtils.getResourceFileContents("FibonacciByteCodePrettyPrinted.txt")
     new Example("Fibonacci Basic Bytecode", fibonacciContent)
   }
 
@@ -96,12 +97,12 @@ class ExampleDropDown(val compilerCockpit: LanguageSandbox) extends JPanel {
   }
 
   def getMethodOverloading = {
-    val content = SourceUtils.getTestFileContents("MethodOverloading.java")
+    val content = SourceUtils.getResourceFileContents("MethodOverloading.java")
     new Example("MethodOverloading", content)
   }
 
   def getFibonacciWithLabelledLocations = {
-    val content = SourceUtils.getTestFileContents("FibonacciWithLabelledLocations.txt")
+    val content = SourceUtils.getResourceFileContents("FibonacciWithLabelledLocations.txt")
     new Example("Fibonacci with labelled locations", content)
   }
 

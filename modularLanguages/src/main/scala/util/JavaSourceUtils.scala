@@ -4,6 +4,7 @@ import java.io._
 import java.nio.charset.StandardCharsets
 import java.util.stream.Collectors
 
+import core.SourceUtils
 import core.deltas._
 import core.language.Compilation
 import core.language.node.Node
@@ -18,7 +19,7 @@ object JavaSourceUtils {
   def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): InputStream = {
     val className = JavaSourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
-    SourceUtils.getTestFile(relativeFilePath)
+    SourceUtils.getResourceFile(relativeFilePath)
   }
 
   class LineProcessLogger extends ProcessLogger {
@@ -86,6 +87,6 @@ object JavaSourceUtils {
   def getJavaTestFileContents(fileName: String, inputDirectory: Path = Path("")): String = {
     val className = fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
-    SourceUtils.getTestFileContents(relativeFilePath)
+    SourceUtils.getResourceFileContents(relativeFilePath)
   }
 }

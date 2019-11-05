@@ -1,15 +1,16 @@
 package deltas.cloudformation
 
+import core.SourceUtils
 import core.bigrammar.TestLanguageGrammarUtils
 import core.parsers.editorParsers.{Position, SourceRange, UntilBestAndXStepsStopFunction}
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import lsp._
 import lsp.HumanPosition
 import org.scalatest.FunSuite
-import util.{SourceUtils, TestLanguageBuilder}
+import util.TestLanguageBuilder
 
 object CloudFormationTest {
-  val file = SourceUtils.getTestFile("CloudFormationResourceSpecification.json")
+  val file = SourceUtils.getResourceFile("CloudFormationResourceSpecification.json")
   val language = new CloudFormationLanguage(Some(file))
 }
 
@@ -20,13 +21,13 @@ class JsonCloudFormationTest extends FunSuite with LanguageServerTest {
   val jsonServer = new MiksiloLanguageServer(jsonLanguage)
 
   test("No diagnostics") {
-    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = getDiagnostics(jsonServer, program)
     assert(result.size == 1)
   }
 
   test("Diagnostics edited") {
-    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications_edited.json")
+    val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     val result = getDiagnostics(jsonServer, program)
     assert(result.size == 2)
   }
@@ -61,45 +62,45 @@ class JsonCloudFormationTest extends FunSuite with LanguageServerTest {
   }
 
   test("Goto definition resource reference") {
-    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
     val result: Seq[FileRange] = gotoDefinition(jsonServer, program, new HumanPosition(365, 37))
     assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(336,6), new HumanPosition(336,28)))))(result)
   }
 
   test("Goto definition") {
-    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
     val result: Seq[FileRange] = gotoDefinition(jsonServer, program, new HumanPosition(437, 36))
     assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(42,6), new HumanPosition(42,17)))))(result)
   }
 
   test("Goto definition overloaded parameter") {
-    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = gotoDefinition(jsonServer, program, new HumanPosition(445, 32))
     assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(8,6), new HumanPosition(8,11)))))(result)
   }
 
   test("Goto definition overloaded parameter second") {
-    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = gotoDefinition(jsonServer, program, new HumanPosition(425, 32))
     assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(8,6), new HumanPosition(8,11)))))(result)
   }
 
   test("Code completion parameter") {
-    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = complete(jsonServer, program, new HumanPosition(437, 38))
     val item = createCompletionItem("SSHLocation")
     assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
   }
 
   test("Code completion property") {
-    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = complete(jsonServer, program, new HumanPosition(214, 14))
     val item = createCompletionItem("Subscription")
     assertResult(CompletionList(isIncomplete = false, Seq(item))) (result)
   }
 
   test("Code completion overloaded parameter") {
-    val program = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
     val result = complete(jsonServer, program, new HumanPosition(425, 32))
     val item = createCompletionItem("VpcId")
     assertResult(CompletionList(isIncomplete = false, Seq(item)))(result)
@@ -107,7 +108,7 @@ class JsonCloudFormationTest extends FunSuite with LanguageServerTest {
 
   test("Parse example") {
     val utils = new TestLanguageGrammarUtils(CloudFormationTest.language.jsonDeltas)
-    val source = SourceUtils.getTestFileContents("AutoScalingMultiAZWithNotifications.json")
+    val source = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
     utils.parse(source)
   }
 

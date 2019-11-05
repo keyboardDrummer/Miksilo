@@ -9,10 +9,9 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.language.node.Node
 import core.language.{Compilation, Language}
-import core.parsers.core.{Metrics, NoMetrics}
 import core.parsers.editorParsers.{SingleParseResult, StopFunction, TimeRatioStopFunction}
 import core.parsers.sequences.SingleResultParser
-import util.SourceUtils
+import util.StreamUtils
 
 import scala.io.Source
 
@@ -28,7 +27,7 @@ case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioSt
   }
 
   def parseStream[T](compilation: Compilation, parser: SingleResultParser[T, BiGrammarToParser.Input], input: InputStream): SingleParseResult[T, BiGrammarToParser.Input] = {
-    parser.parse(new Reader(SourceUtils.streamToString(input)), stopFunction, compilation.metrics)
+    parser.parse(new Reader(StreamUtils.streamToString(input)), stopFunction, compilation.metrics)
   }
 
   val parserProp = new Property[SingleResultParser[Node, BiGrammarToParser.Input]](null)

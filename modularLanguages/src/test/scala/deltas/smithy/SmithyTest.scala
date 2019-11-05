@@ -1,15 +1,14 @@
 package deltas.smithy
 
 import _root_.lsp.HumanPosition
+import core.SourceUtils
 import core.parsers.editorParsers.SourceRange
 import languageServer.{MiksiloLanguageServer, _}
 import org.scalatest.FunSuite
-import util.SourceUtils
-
 class SmithyTest extends FunSuite with LanguageServerTest {
 
   val server = new MiksiloLanguageServer(SmithyLanguage.language)
-  val program = SourceUtils.getTestFileContents("smithy/model.smithy")
+  val program = SourceUtils.getResourceFileContents("smithy/model.smithy")
 
   test("example model") {
     val diagnostics = getDiagnostics(server, program)

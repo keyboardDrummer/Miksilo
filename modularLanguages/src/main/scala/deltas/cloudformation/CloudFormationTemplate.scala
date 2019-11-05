@@ -3,6 +3,7 @@ package deltas.cloudformation
 import core.SolveConstraintsDelta
 import core.deltas.path.{NodePath, PathRoot}
 import java.io.InputStream
+
 import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.NodePath
 import core.deltas.{Contract, Delta}
@@ -14,13 +15,13 @@ import deltas.expression.StringLiteralDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberKey, MemberShape, ObjectLiteral, ObjectLiteralMember}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import play.api.libs.json.{JsObject, Json}
-import util.{JavaSourceUtils, SourceUtils}
+import util.{JavaSourceUtils, StreamUtils}
 import core.deltas.path.ConstraintBuilderExtension._
 
 class CloudFormationTemplate(resourceSpecificationOption: Option[InputStream]) extends Delta with LazyLogging {
 
   val resourceTypes = resourceSpecificationOption.fold(JsObject.empty)(resourceSpecification => {
-    val resourceTypeSpecification = SourceUtils.streamToString(resourceSpecification)
+    val resourceTypeSpecification = StreamUtils.streamToString(resourceSpecification)
     val parsedFile = Json.parse(resourceTypeSpecification).as[JsObject]
     parsedFile.value("ResourceTypes").as[JsObject]
   })
