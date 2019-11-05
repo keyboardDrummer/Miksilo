@@ -9,6 +9,7 @@ import core.language.Compilation
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}
 
+// TODO replace with TestUtils
 object SourceUtils {
 
   def streamToString(stream: InputStream): String = scala.io.Source.fromInputStream(stream).mkString

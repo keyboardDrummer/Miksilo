@@ -76,7 +76,7 @@ lazy val languageServer = (project in file("languageServer")).
         Opts.resolver.sonatypeStaging
     ),
 
-  ).dependsOn(editorParser, LSPProtocol)
+  ).dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
 lazy val modularLanguages = (project in file("modularLanguages")).
   settings(commonSettings: _*).
@@ -104,7 +104,8 @@ lazy val modularLanguages = (project in file("modularLanguages")).
     // https://mvnrepository.com/artifact/com.typesafe.play/play-json
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
 
-  ).dependsOn(languageServer)
+  ).dependsOn(languageServer,
+    editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )
 
 lazy val playground = (project in file("playground")).
   settings(commonSettings: _*).
