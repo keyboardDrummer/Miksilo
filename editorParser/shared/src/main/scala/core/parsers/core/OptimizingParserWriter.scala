@@ -1,5 +1,7 @@
 package core.parsers.core
 
+import core.parsers.editorParsers.SourceRange
+
 import scala.collection.mutable
 import scala.language.higherKinds
 
@@ -128,9 +130,11 @@ trait OptimizingParserWriter extends ParserWriter {
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
+  case class ParserAndCaches[Result](parser: BuiltParser[Result], caches: List[CacheLike[_]])
+
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
-    def buildParser[Result](root: Parser[Result]): BuiltParser[Result] = {
+    def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
       var caches = List.empty[CacheLike[_]]
       def recursive: GetParser = new GetParser {
@@ -149,11 +153,7 @@ trait OptimizingParserWriter extends ParserWriter {
       }
 
       val wrappedRoot = recursive(root)
-      val reusableParser: BuiltParser[Result] = (input, state) => {
-        caches.foreach(cache => cache.clear())
-        wrappedRoot.apply(input, state)
-      }
-      reusableParser
+      ParserAndCaches(wrappedRoot, caches)
     }
   }
 
@@ -181,6 +181,7 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait CacheLike[Result] extends BuiltParser[Result] {
+    def clearForRange(start: Int, end: Int): Unit
     def clear(): Unit
   }
 }

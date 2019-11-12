@@ -1,6 +1,6 @@
 package core.parsers.sequences
 
-import core.parsers.core.{Metrics, NoMetrics, Processor}
+import core.parsers.core.{Metrics, NoMetrics, ParseInput, Processor}
 import core.parsers.editorParsers._
 
 trait SequenceParserWriter extends CorrectingParserWriter {
@@ -49,7 +49,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           val droppedInput = input.drop(1)
           val dropError = DropError(input, droppedInput)
           val dropHistory = History.error(dropError)
-          val withDrop = singleResult(new DelayedParseResult(dropHistory , () => {
+          val withDrop = singleResult(new DelayedParseResult(input, dropHistory , () => {
             parse(droppedInput, state, mayFail = false).addHistory(dropHistory)
           }))
           originalResult.merge(withDrop)
@@ -313,8 +313,16 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       Filter(parser, predicate, getMessage)
 
     def getSingleResultParser: SingleResultParser[Result, Input] = {
-      val parser = compile(this.parser).buildParser(this.parser)
-      (input, mayStop: StopFunction, metrics: Metrics) => findBestParseResult(parser, input, mayStop, metrics)
+      val parserAndCaches = compile(this.parser).buildParser(this.parser)
+      new SingleResultParser[Result, Input] {
+        override def applyChange(start: Int, end: Int): Unit = {
+          parserAndCaches.caches.foreach(cache => cache.clearForRange(start, end))
+        }
+
+        override def parse(input: Input, mayStop: StopFunction, metrics: Metrics) = {
+          findBestParseResult(parserAndCaches.parser, input, mayStop, metrics)
+        }
+      }
     }
 
     def getWholeInputParser: SingleResultParser[Result, Input] = {
@@ -328,6 +336,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 }
 
 trait SingleResultParser[+Result, Input] {
+  def applyChange(start: Int, end: Int): Unit
   def parse(input: Input,
             mayStop: StopFunction = StopImmediately,
             metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]

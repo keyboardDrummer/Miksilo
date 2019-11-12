@@ -139,7 +139,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           val delayedLeftResults: ParseResults[Input, Left] = leftResults.mapResult({
             case ready: ReadyParseResult[Input, Left] =>
               if (ready.history.flawed) {
-                new DelayedParseResult[Input, Left](ready.history, () => singleResult(ready))
+                new DelayedParseResult[Input, Left](ready.remainder, ready.history, () => singleResult(ready))
               }
               else
                 ready

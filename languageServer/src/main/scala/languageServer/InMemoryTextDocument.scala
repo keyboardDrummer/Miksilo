@@ -7,6 +7,16 @@ import lsp.TextDocumentContentChangeEvent
 
 import scala.collection.mutable.ArrayBuffer
 
+// Normally each node has a value, and the node to the left has a smaller value, and to the right has a larger value.
+
+
+
+// Problem is vrij simple, de absolute offsets in the cache kwijt raken. Relative offset zou zijn.. alles in een binary tree stoppen?
+// Elke node heeft absolute start offset, die berekent wordt op basis van de absolute offset van zijn parent + een modifier.
+// Als we ergens text inserten
+// Er zijn meerdere ASTs als result mogelijk, dus de cache kan niet 1 AST reflecten.
+//
+
 object InMemoryTextDocument {
   val newLine = "\n"
 }

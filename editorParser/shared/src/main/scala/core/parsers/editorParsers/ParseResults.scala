@@ -3,6 +3,7 @@ package core.parsers.editorParsers
 import ParseResults._
 
 trait ParseResults[Input, +Result] {
+  def latestRemainder: Input
   def nonEmpty: Boolean
   def pop(): (LazyParseResult[Input, Result], ParseResults[Input, Result])
   def toList: List[LazyParseResult[Input, Result]]
@@ -46,11 +47,12 @@ trait ParseResults[Input, +Result] {
 
 object ParseResults {
   def singleResult[Input, Result](parseResult: LazyParseResult[Input, Result]): ParseResults[Input, Result] =
-    new SRCons(parseResult,0, SREmpty.empty[Input])
+    new SRCons(parseResult,???,0, SREmpty.empty[Input])
 }
 
 
 final class SRCons[Input, +Result](val head: LazyParseResult[Input, Result],
+                                   val latestRemainder: Input,
                                    var tailDepth: Int,
                                    _tail: => ParseResults[Input, Result]) extends ParseResults[Input, Result] {
 
@@ -76,7 +78,7 @@ final class SRCons[Input, +Result](val head: LazyParseResult[Input, Result],
         else
         {
           new SRCons(
-            cons.head,
+            cons.head, cons.latestRemainder,
             1 + Math.max(this.tailDepth, cons.tailDepth),
             cons.tail.merge(tail.flatMap(f, uniform)))
         }

@@ -154,5 +154,17 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     override def clear(): Unit = cache.clear()
+
+    override def clearForRange(changeStart: Int, changeEnd: Int): Unit = {
+      val entries = cache.toList
+      for(entry <- entries) {
+        val entryStart = entry._1._1.offset
+        val entryEnd = entry._2.latestRemainder.offset
+        val entryIntersectsWithChange = changeStart <= entryEnd && entryStart <= changeEnd
+        if (entryIntersectsWithChange) {
+          cache.remove(entry._1)
+        }
+      }
+    }
   }
 }
