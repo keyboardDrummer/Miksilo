@@ -2,10 +2,7 @@ package jsonRpc
 
 import java.io.InputStream
 import java.nio.charset.Charset
-
-import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
-import com.typesafe.scalalogging.LazyLogging
 
 /**
   * A Language Server message Reader. It expects the following format:

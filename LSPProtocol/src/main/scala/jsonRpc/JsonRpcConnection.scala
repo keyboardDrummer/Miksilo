@@ -3,19 +3,34 @@ package jsonRpc
 import java.io.{InputStream, OutputStream}
 import java.util.concurrent.Executors
 
-import com.dhpcs.jsonrpc.JsonRpcMessage._
+import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NoCorrelationId}
 import com.dhpcs.jsonrpc._
-import com.typesafe.scalalogging.LazyLogging
-import play.api.libs.json._
+import play.api.libs.json.{JsError, Json}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService, Future, Promise}
 import scala.util.{Failure, Success, Try}
 
+trait Logger {
+  def debug(message: String): Unit
+  def info(message: String): Unit
+  def error(message: String): Unit
+}
+
+trait LazyLogging {
+  def logger: Logger = ???
+}
+
+trait Thenable[T] {
+  def onComplete[U](f: Try[T] => U): Unit
+  def map[U](f: T => U): Thenable[U]
+}
+
 trait AsyncJsonRpcHandler {
   def dispose(): Unit
   def handleNotification(notification: JsonRpcNotificationMessage)
-  def handleRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage]
+  def handleRequest(request: JsonRpcRequestMessage): Thenable[JsonRpcResponseMessage]
 }
+
 
 trait JsonRpcHandler {
   def handleNotification(notification: JsonRpcNotificationMessage)
@@ -49,7 +64,7 @@ class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
 
   private var responseHandlers: Map[CorrelationId, JsonRpcResponseMessage => Unit] = Map.empty
 
-  def sendRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage] = {
+  def sendRequest(request: JsonRpcRequestMessage): Thenable[JsonRpcResponseMessage] = {
     val result = Promise[JsonRpcResponseMessage]
 
     // TODO decide after what time to remove responseHandlers

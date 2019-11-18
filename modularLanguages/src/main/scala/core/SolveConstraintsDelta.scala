@@ -1,7 +1,6 @@
 package core
 
 import _root_.deltas.ConstraintSkeleton
-import com.typesafe.scalalogging.LazyLogging
 import core.deltas.path.{AnyPath, ChildPath, NodePath, PathRoot}
 import core.deltas.{Contract, Delta, Property}
 import core.language.exceptions.BadInputException
@@ -9,6 +8,7 @@ import core.language.node.TypedChildField
 import core.language.{Compilation, Language, Phase}
 import core.smarts.objects.NamedDeclaration
 import core.smarts.{ConstraintBuilder, SolveException}
+import jsonRpc.LazyLogging
 
 trait ConstraintCollector {
   def build(compilation: Compilation, builder: ConstraintBuilder): Unit

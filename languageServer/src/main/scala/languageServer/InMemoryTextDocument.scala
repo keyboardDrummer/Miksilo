@@ -1,7 +1,7 @@
 package languageServer
 
-import com.typesafe.scalalogging.LazyLogging
 import core.parsers.editorParsers.{Position, SourceRange}
+import jsonRpc.LazyLogging
 import languageServer.InMemoryTextDocument._
 import lsp.TextDocumentContentChangeEvent
 

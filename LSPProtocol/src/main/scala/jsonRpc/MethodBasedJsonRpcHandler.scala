@@ -4,12 +4,12 @@ import java.io.{PrintWriter, StringWriter}
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{ArrayParams, CorrelationId, ObjectParams, Params}
 import com.dhpcs.jsonrpc._
-import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json._
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.util.{Failure, Success, Try}
 
 object MethodBasedJsonRpcHandler {
   def toJson(params: Params): JsValue = params match {
@@ -31,19 +31,20 @@ class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJson
 
   def sendRequest[Request, Response](method: String, correlationId: CorrelationId, request: Request)
                                     (implicit requestFormat: OWrites[Request], responseFormat: Reads[Response]):
-    Future[Response] = {
+    Thenable[Try[Response]] = {
+
     val requestJson = requestFormat.writes(request)
     val requestMessage = new JsonRpcRequestMessage(method, ObjectParams(requestJson), correlationId)
 
-    connection.sendRequest(requestMessage).flatMap({
+    connection.sendRequest(requestMessage).map({
       case success: JsonRpcResponseSuccessMessage =>
         responseFormat.reads(success.result) match {
-          case JsSuccess(response, _) => Future.successful(response)
-          case JsError(errors) => Future.failed(new Exception())
+          case JsSuccess(response, _) => Success(response)
+          case JsError(errors) => Failure(new Exception())
         }
       case error: JsonRpcResponseErrorMessage =>
-        Future.failed(new Exception(error.message))
-    })(ExecutionContext.global)
+        Failure(new Exception(error.message))
+    })
   }
 
   override def handleNotification(notification: JsonRpcNotificationMessage): Unit = {
@@ -63,10 +64,10 @@ class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJson
     }
   }
 
-  override def handleRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage] = {
+  override def handleRequest(request: JsonRpcRequestMessage): Thenable[JsonRpcResponseMessage] = {
     requestHandlers.get(request.method) match {
-      case Some(handle) => Future.successful(handle(request))
-      case None => Future.successful(JsonRpcResponseErrorMessage.methodNotFound(request.method, request.id))
+      case Some(handle) => handle(request)
+      case None => JsonRpcResponseErrorMessage.methodNotFound(request.method, request.id)
     }
   }
 

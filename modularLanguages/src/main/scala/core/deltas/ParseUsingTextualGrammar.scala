@@ -2,7 +2,6 @@ package core.deltas
 
 import java.io.InputStream
 
-import com.typesafe.scalalogging.LazyLogging
 import core.bigrammar.BiGrammarToParser
 import core.bigrammar.BiGrammarToParser.{Reader, _}
 import core.deltas.grammars.LanguageGrammars
@@ -11,6 +10,7 @@ import core.language.node.Node
 import core.language.{Compilation, Language}
 import core.parsers.editorParsers.{SingleParseResult, StopFunction, TimeRatioStopFunction}
 import core.parsers.sequences.SingleResultParser
+import jsonRpc.LazyLogging
 import util.StreamUtils
 
 import scala.io.Source

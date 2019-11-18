@@ -3,8 +3,9 @@ package languageServer
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
-import com.typesafe.scalalogging.LazyLogging
+
 import core.language.FileSystem
+import jsonRpc.LazyLogging
 import lsp.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 
 import scala.collection.JavaConverters.collectionAsScalaIterable

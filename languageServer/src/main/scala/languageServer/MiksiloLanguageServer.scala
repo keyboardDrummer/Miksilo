@@ -1,13 +1,15 @@
 package languageServer
 
-import com.typesafe.scalalogging.LazyLogging
 import core.language.exceptions.BadInputException
 import core.language.{Compilation, Language, SourceElement}
 import core.parsers.core.{Metrics, NoMetrics}
 import core.parsers.editorParsers.TextEdit
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
+import jsonRpc.LazyLogging
 import lsp._
+
+import scala.scalajs.js.annotation.JSExportTopLevel
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider

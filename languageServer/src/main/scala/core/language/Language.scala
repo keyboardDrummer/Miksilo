@@ -3,13 +3,13 @@ package core.language
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
-import com.typesafe.scalalogging.LazyLogging
 import core.language.exceptions.BadInputException
 import core.parsers.core.{Metrics, NoMetrics}
 import core.parsers.editorParsers.{StopFunction, TimeRatioStopFunction}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.StringReaderLike
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
+import jsonRpc.LazyLogging
 
 import scala.collection.mutable
 import scala.reflect.io.File

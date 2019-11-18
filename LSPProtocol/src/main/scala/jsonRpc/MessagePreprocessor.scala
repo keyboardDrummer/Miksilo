@@ -25,7 +25,7 @@ abstract class MessagePreprocessor(original: AsyncJsonRpcHandler) extends AsyncJ
           case None =>
           case Some(message) => message match {
             case Notification(notification) => original.handleNotification(notification)
-            case Request(request, resultPromise) => original.handleRequest(request).map(result => resultPromise.success(result))(ExecutionContext.global)
+            case Request(request, resultPromise) => original.handleRequest(request).map(result => resultPromise.success(result))
           }
         }
       }

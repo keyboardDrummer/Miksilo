@@ -1,9 +1,8 @@
 package jsonRpc
 
 import java.io.OutputStream
-import play.api.libs.json._
-import java.nio.charset.Charset
-import com.typesafe.scalalogging.LazyLogging
+
+import play.api.libs.json.{Format, Json}
 
 /**
   * A class to write Json RPC messages on an output stream, following the Language Server Protocol.
@@ -26,9 +25,9 @@ class MessageWriter(out: OutputStream) extends LazyLogging {
   private val lock = new Object
 
   /**
-    * Write a message to the output stream. This method can be called from multiple threads,
-    * but it may block waiting for other threads to finish writing.
-    */
+   * Write a message to the output stream. This method can be called from multiple threads,
+   * but it may block waiting for other threads to finish writing.
+   */
   def write[T](msg: T, h: Map[String, String] = Map.empty)(implicit o: Format[T]): Unit = lock.synchronized {
     require(h.get(ContentLen).isEmpty)
 

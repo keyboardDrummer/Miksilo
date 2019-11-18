@@ -1,15 +1,8 @@
 package languageServer
 
-import ch.qos.logback.classic.{Level, Logger}
-import ch.qos.logback.classic.spi.ILoggingEvent
-import ch.qos.logback.core.ConsoleAppender
-import ch.qos.logback.core.encoder.LayoutWrappingEncoder
-import ch.qos.logback.core.layout.EchoLayout
-import com.typesafe.scalalogging.LazyLogging
 import core.language.Language
-import jsonRpc.JsonRpcConnection
+import jsonRpc.{JsonRpcConnection, LazyLogging}
 import lsp.LSPServer
-import org.slf4j.LoggerFactory
 
 import scala.util.Try
 
@@ -23,10 +16,6 @@ class LanguageServerMain(builders: Seq[LanguageBuilder]) extends LazyLogging {
   val languageMap = builders.map(l => (l.key, l)).toMap
 
   def main(args: Array[String]): Unit = {
-
-    val innerLogger = LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME).asInstanceOf[Logger]
-    innerLogger.setLevel(Level.INFO)
-    sendAllLoggingToStdErr(innerLogger)
 
     val languageOption = getLanguage(args)
     languageOption.foreach(language => {
@@ -59,17 +48,5 @@ class LanguageServerMain(builders: Seq[LanguageBuilder]) extends LazyLogging {
           Some(languageBuilder.build(args.drop(1)))
       }
     }
-  }
-
-  private def sendAllLoggingToStdErr(innerLogger: Logger): Unit = {
-    innerLogger.detachAndStopAllAppenders()
-    val consoleAppender = new ConsoleAppender[ILoggingEvent]()
-    consoleAppender.setContext(innerLogger.getLoggerContext)
-    consoleAppender.setTarget("System.err")
-    val encoder = new LayoutWrappingEncoder[ILoggingEvent]
-    encoder.setLayout(new EchoLayout[ILoggingEvent])
-    consoleAppender.setEncoder(encoder)
-    consoleAppender.start()
-    innerLogger.addAppender(consoleAppender)
   }
 }
