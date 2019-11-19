@@ -4,7 +4,8 @@ import deltas.javac.JavaLanguage
 import deltas.smithy.SmithyLanguage
 import deltas.solidity.SolidityLanguage
 import deltas.verilog.VerilogLanguage
-import languageServer.{LanguageServerMain, LanguageBuilder}
+import jsonRpc.{JVMJsonRpcConnection, JsonRpcConnection}
+import languageServer.{LanguageBuilder, LanguageServerMain}
 
 object VerilogLanguageBuilder extends LanguageBuilder {
   override def key = "verilog"
@@ -34,5 +35,5 @@ object Program extends LanguageServerMain(Seq(
   JavaLanguageBuilder,
   SolidityLanguageBuilder,
   SmithyLanguageBuilder
-))
+), new JVMJsonRpcConnection(System.in, System.out))
 

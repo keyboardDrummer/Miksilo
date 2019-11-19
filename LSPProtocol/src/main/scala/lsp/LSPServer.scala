@@ -14,7 +14,7 @@ object Measurement {
 class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
 
   val handler = new MethodBasedJsonRpcHandler(connection)
-  connection.setHandler(new LSPServerMessagePreprocessor(handler))
+  connection.setHandler(handler) // TODO bring this back: new LSPServerMessagePreprocessor(handler))
 
   addRequestHandlers()
   addNotificationHandlers()

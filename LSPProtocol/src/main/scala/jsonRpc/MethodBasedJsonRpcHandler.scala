@@ -8,8 +8,7 @@ import play.api.libs.json._
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.{ExecutionContext, Future, Promise}
-import scala.util.{Failure, Success, Try}
+import scala.concurrent.{ExecutionContext, Future}
 
 object MethodBasedJsonRpcHandler {
   def toJson(params: Params): JsValue = params match {
@@ -31,20 +30,20 @@ class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJson
 
   def sendRequest[Request, Response](method: String, correlationId: CorrelationId, request: Request)
                                     (implicit requestFormat: OWrites[Request], responseFormat: Reads[Response]):
-    Thenable[Try[Response]] = {
+    Future[Response] = {
 
     val requestJson = requestFormat.writes(request)
     val requestMessage = new JsonRpcRequestMessage(method, ObjectParams(requestJson), correlationId)
 
-    connection.sendRequest(requestMessage).map({
+    connection.sendRequest(requestMessage).flatMap({
       case success: JsonRpcResponseSuccessMessage =>
         responseFormat.reads(success.result) match {
-          case JsSuccess(response, _) => Success(response)
-          case JsError(errors) => Failure(new Exception())
+          case JsSuccess(response, _) => Future.successful(response)
+          case JsError(errors) => Future.failed(new Exception())
         }
       case error: JsonRpcResponseErrorMessage =>
-        Failure(new Exception(error.message))
-    })
+        Future.failed(new Exception(error.message))
+    })(ExecutionContext.global)
   }
 
   override def handleNotification(notification: JsonRpcNotificationMessage): Unit = {
@@ -64,11 +63,11 @@ class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJson
     }
   }
 
-  override def handleRequest(request: JsonRpcRequestMessage): Thenable[JsonRpcResponseMessage] = {
-    requestHandlers.get(request.method) match {
+  override def handleRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage] = {
+    Future.successful(requestHandlers.get(request.method) match {
       case Some(handle) => handle(request)
       case None => JsonRpcResponseErrorMessage.methodNotFound(request.method, request.id)
-    }
+    })
   }
 
   def addNotificationHandler[Notification](method: String, handler: Notification => Unit)(notificationFormat: OFormat[Notification]): Unit = {

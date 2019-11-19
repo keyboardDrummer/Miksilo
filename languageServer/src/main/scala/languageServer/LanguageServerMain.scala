@@ -11,7 +11,7 @@ trait LanguageBuilder {
   def build(arguments: Seq[String]): Language
 }
 
-class LanguageServerMain(builders: Seq[LanguageBuilder]) extends LazyLogging {
+class LanguageServerMain(builders: Seq[LanguageBuilder], connection: JsonRpcConnection) extends LazyLogging {
 
   val languageMap = builders.map(l => (l.key, l)).toMap
 
@@ -20,7 +20,6 @@ class LanguageServerMain(builders: Seq[LanguageBuilder]) extends LazyLogging {
     val languageOption = getLanguage(args)
     languageOption.foreach(language => {
       logger.debug(s"Starting server in ${System.getenv("PWD")}")
-      val connection = new JsonRpcConnection(System.in, System.out)
       val lspServer = Try {
         val languageServer = new MiksiloLanguageServer(language)
         new LSPServer(languageServer, connection)
