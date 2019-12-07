@@ -24,12 +24,7 @@ class JVMJsonRpcConnection(inStream: InputStream, outStream: OutputStream)
 
   private val msgReader = new MessageReader(inStream)
   private val msgWriter = new MessageWriter(outStream)
-  private var handler: AsyncJsonRpcHandler = _
   private val writeLock = new Object()
-
-  def setHandler(partner: AsyncJsonRpcHandler): Unit = {
-    this.handler = partner
-  }
 
   def sendNotification(notification: JsonRpcNotificationMessage): Unit = {
     msgWriter.write(notification)
@@ -73,20 +68,7 @@ class JVMJsonRpcConnection(inStream: InputStream, outStream: OutputStream)
         responseHandlers.get(response.id).fold({
           logger.info(s"Received a response for which there was no handler: $response")
         })(handler => handler(response))
-      case _ => ???
-    }
-  }
-
-  private def parseJsonRpcMessage(message: String): JsonRpcMessage = {
-    logger.debug(s"Received $message")
-    Try(Json.parse(message)) match {
-      case Failure(exception) =>
-        JsonRpcResponseErrorMessage.parseError(exception, NoCorrelationId)
-
-      case Success(json) =>
-        Json.fromJson[JsonRpcMessage](json).fold({ errors =>
-          JsonRpcResponseErrorMessage.invalidRequest(JsError(errors), NoCorrelationId)
-        }, x => x)
+      case _ => throw new Error(s"JSON-RPC message $message is not supported yet")
     }
   }
 

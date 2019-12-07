@@ -8,7 +8,7 @@ trait WorkItem
 case class Notification(notification: JsonRpcNotificationMessage) extends WorkItem
 case class Request(request: JsonRpcRequestMessage, result: Promise[JsonRpcResponseMessage]) extends WorkItem
 
-abstract class MessagePreprocessor(original: AsyncJsonRpcHandler) extends AsyncJsonRpcHandler {
+abstract class MessagePreprocessor(original: JsonRpcHandler) extends JsonRpcHandler {
 
   def aggregate(items: CircularArrayBuffer[WorkItem]): Unit
 

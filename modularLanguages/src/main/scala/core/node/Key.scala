@@ -11,6 +11,7 @@ trait Key extends AnyRef
   override def hashCode(): Int = this.getClass.toString.hashCode
 
   def debugRepresentation: String = this match {
+     // "barp"
     case anyRef: AnyRef =>
       try
       {
@@ -25,6 +26,7 @@ trait Key extends AnyRef
   }
 
   private def getClassName(shape: Class[_]): String = {
+//    "blurp"
     val enclosing: Class[_] = shape.getEnclosingClass
     val addition = if (enclosing == null) "" else getClassName(enclosing) + "."
     addition + getDirectClassName(shape)

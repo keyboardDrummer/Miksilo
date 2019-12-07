@@ -16,10 +16,10 @@ import scala.sys.process.{Process, ProcessLogger}
 
 object JavaSourceUtils {
 
-  def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): InputStream = {
+  def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): String = {
     val className = JavaSourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
-    SourceUtils.getResourceFile(relativeFilePath)
+    StreamUtils.streamToString(SourceUtils.getResourceFile(relativeFilePath))
   }
 
   class LineProcessLogger extends ProcessLogger {

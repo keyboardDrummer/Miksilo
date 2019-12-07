@@ -30,7 +30,7 @@ class EditorFromLanguage(language: LanguageFromDeltas) extends JPanel(new CardLa
       val stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8.name()))
 
       val result = new DefaultParseResult(this)
-      val compilation = language.compileStream(stream)
+      val compilation = language.compileString(stream)
       for(diagnostic <- compilation.diagnosticsForFile(inputTextArea.freshTextDocumentReference.uri)) {
 
         val lineLengths = text.split("\n").map(line => line.length + 1)

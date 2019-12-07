@@ -14,12 +14,15 @@ import deltas.javac.classes.skeleton.PackageSignature
 
 object JavaStandardLibrary {
 
-  val byteCodeDecompiler = LanguageFromDeltas(ClassFileSignatureDecompiler.getDecompiler)
+  def getByteCodeNode(uri: String): Node = {
+    val fileStream = SourceUtils.getResourceFile(uri)
+    LanguageFromDeltas(ClassFileSignatureDecompiler.getDecompiler(uri, fileStream)).compile().program.asInstanceOf[NodePath].current
+  }
 
-  val systemClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getResourceFile("System.class")).program.asInstanceOf[NodePath].current
-  val printStreamClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getResourceFile("PrintStream.class")).program.asInstanceOf[NodePath].current
-  val objectClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getResourceFile("Object.class")).program.asInstanceOf[NodePath].current
-  val stringClass: Node = byteCodeDecompiler.compileStream(SourceUtils.getResourceFile("String2.class")).program.asInstanceOf[NodePath].current
+  val systemClass: Node = getByteCodeNode("System.class")
+  val printStreamClass: Node = getByteCodeNode("PrintStream.class")
+  val objectClass: Node = getByteCodeNode("Object.class")
+  val stringClass: Node = getByteCodeNode("String2.class")
 
   def loadIntoClassPath(compilation: Compilation) {
     ClassCompiler(objectClass, compilation).bind()

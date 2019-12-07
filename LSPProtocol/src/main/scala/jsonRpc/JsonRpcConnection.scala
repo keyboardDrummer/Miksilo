@@ -1,38 +1,35 @@
 package jsonRpc
 
+import com.dhpcs.jsonrpc.JsonRpcMessage.NoCorrelationId
 import com.dhpcs.jsonrpc._
+import play.api.libs.json.{JsError, Json}
 
 import scala.concurrent.Future
+import scala.util.{Failure, Success, Try}
 
-trait Logger {
-  def debug(message: String): Unit
-  def info(message: String): Unit
-  def error(message: String): Unit
-}
+trait JsonRpcConnection extends LazyLogging {
+  protected var handler: JsonRpcHandler = _
 
-trait LazyLogging {
-  def logger: Logger = ???
-}
-
-trait AsyncJsonRpcHandler {
-  def dispose(): Unit
-  def handleNotification(notification: JsonRpcNotificationMessage)
-  def handleRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage]
-}
-
-
-trait JsonRpcHandler {
-  def handleNotification(notification: JsonRpcNotificationMessage)
-  def handleRequest(request: JsonRpcRequestMessage): JsonRpcResponseMessage
-}
-
-trait JsonRpcConnection {
   def listen(): Unit
-
-  def setHandler(simpleConnection: AsyncJsonRpcHandler): Unit
 
   def sendRequest(requestMessage: JsonRpcRequestMessage): Future[JsonRpcResponseMessage]
 
   def sendNotification(message: JsonRpcNotificationMessage): Unit
 
+  def setHandler(handler: JsonRpcHandler): Unit = {
+    this.handler = handler
+  }
+
+  protected def parseJsonRpcMessage(message: String): JsonRpcMessage = {
+    logger.debug(s"Received $message")
+    Try(Json.parse(message)) match {
+      case Failure(exception) =>
+        JsonRpcResponseErrorMessage.parseError(exception, NoCorrelationId)
+
+      case Success(json) =>
+        Json.fromJson[JsonRpcMessage](json).fold({ errors =>
+          JsonRpcResponseErrorMessage.invalidRequest(JsError(errors), NoCorrelationId)
+        }, x => x)
+    }
+  }
 }

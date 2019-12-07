@@ -13,16 +13,14 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
 
-object DecodeByteCodeParser extends DeltaWithPhase {
+class DecodeFileStream(uri: String, fileStream: InputStream) extends DeltaWithPhase {
 
   override def description: String = "Decodes a binary bytecode classfile."
 
   override def dependencies: Set[Contract] = Set[Contract](UnParsedAttribute, ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton)
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val uri = compilation.rootFile.get
-    val inputStream = compilation.fileSystem.getFile(uri)
-    val inputBytes: Array[Byte] = readAllBytes(inputStream)
+    val inputBytes: Array[Byte] = readAllBytes(fileStream)
     val parseResult: ClassFileParser.ParseResult[Node] = ClassFileParser.parse(inputBytes)
     if (parseResult.successful) {
       compilation.program = PathRoot(parseResult.get)

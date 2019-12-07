@@ -19,15 +19,16 @@ case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioSt
   extends DeltaWithPhase with LazyLogging {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val phase = Language.getParsePhaseFromParser[Node, Input](stream => new Reader(Source.fromInputStream(stream, "UTF-8").mkString), (program, uri) => {
+    val phase = Language.getParsePhaseFromParser[Node, Input](input => new Reader(input), (program, uri) => {
       program.startOfUri = Some(uri)
       PathRoot(program)
     }, parserProp.get(compilation), stopFunction)
     phase.action(compilation)
   }
 
-  def parseStream[T](compilation: Compilation, parser: SingleResultParser[T, BiGrammarToParser.Input], input: InputStream): SingleParseResult[T, BiGrammarToParser.Input] = {
-    parser.parse(new Reader(StreamUtils.streamToString(input)), stopFunction, compilation.metrics)
+  def parseStream[T](compilation: Compilation, parser: SingleResultParser[T, BiGrammarToParser.Input], input: String):
+    SingleParseResult[T, BiGrammarToParser.Input] = {
+    parser.parse(new Reader(input), stopFunction, compilation.metrics)
   }
 
   val parserProp = new Property[SingleResultParser[Node, BiGrammarToParser.Input]](null)

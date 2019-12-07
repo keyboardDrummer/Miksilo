@@ -202,8 +202,8 @@ class SolidityExamples extends FunSuite {
                     |}""".stripMargin
 
     val compilation = new Compilation(solidity.language, InMemoryFileSystem(Map(
-      "testLibrary.sol" -> StreamUtils.stringToStream(program),
-      "browser/library.sol" -> StreamUtils.stringToStream(library))), Some("testLibrary.sol"))
+      "testLibrary.sol" -> program,
+      "browser/library.sol" -> library)), Some("testLibrary.sol"))
 
     compilation.runPhases()
     assertResult(Seq.empty)(compilation.diagnostics)

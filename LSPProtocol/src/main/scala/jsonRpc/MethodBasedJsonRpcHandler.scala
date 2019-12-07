@@ -18,7 +18,7 @@ object MethodBasedJsonRpcHandler {
   }
 }
 
-class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJsonRpcHandler with LazyLogging {
+class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler with LazyLogging {
 
   private var requestHandlers: Map[String, JsonRpcRequestMessage => JsonRpcResponseMessage] = Map.empty
   private val notificationHandlers: mutable.Map[String, ListBuffer[JsonRpcNotificationMessage => Unit]] = mutable.Map.empty

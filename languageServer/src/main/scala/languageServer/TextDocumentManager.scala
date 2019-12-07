@@ -43,9 +43,8 @@ class TextDocumentManager extends LazyLogging with FileSystem {
     docs.remove(td.uri)
   }
 
-  override def getFile(path: String): InputStream = {
-    val bytes: Array[Byte] = getOpenDocumentForUri(path).get.mkString.getBytes("UTF-8")
-    new ByteArrayInputStream(bytes) //TODO maybe instead of Input stream een byte array gebruiken?
+  override def getFile(path: String): String = {
+    getOpenDocumentForUri(path).get.mkString
   }
 
   // TODO remove this method and let FileSystem stop using InputStream
