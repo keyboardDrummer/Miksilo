@@ -27,7 +27,7 @@ case class InitializeParams(
   /**
    * The rootUri of the workspace. Is null if no folder is open.
    */
-  rootUri: String,
+  rootUri: Option[String],
 
   /**
    * The capabilities provided by the client (editor)

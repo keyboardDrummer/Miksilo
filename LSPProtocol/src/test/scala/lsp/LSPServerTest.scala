@@ -28,7 +28,7 @@ class LSPServerTest extends AsyncFunSpec {
       """Content-Length: 99
         |
         |{"jsonrpc":"2.0","method":"initialize","params":{"rootUri":"someRootUri","capabilities":{}},"id":0}""".stripMargin
-    val initializePromise = serverAndClient.client.initialize(InitializeParams(None, "someRootUri", ClientCapabilities()))
+    val initializePromise = serverAndClient.client.initialize(InitializeParams(None, Some("someRootUri"), ClientCapabilities()))
 
     val result = Await.result(initializePromise, Duration.Inf)
 
