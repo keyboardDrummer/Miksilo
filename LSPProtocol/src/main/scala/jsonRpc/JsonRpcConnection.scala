@@ -28,7 +28,7 @@ class JsonRpcConnection(reader: MessageReader, writer: MessageWriter) extends La
   private var responseHandlers: Map[CorrelationId, JsonRpcResponseMessage => Unit] = Map.empty
   protected var handler: JsonRpcHandler = _
 
-  protected def parseJsonRpcMessage(message: String): JsonRpcMessage = {
+  def parseJsonRpcMessage(message: String): JsonRpcMessage = {
     logger.debug(s"Received $message")
     Try(Json.parse(message)) match {
       case Failure(exception) =>
