@@ -25,13 +25,13 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
   val language = LanguageFromDeltas(deltas)
 
   private val inputPanel = new EditorFromLanguage(language)
-  private def getInputStream = () => {
-    new ByteArrayInputStream(inputPanel.inputDocument.getText(0, inputPanel.inputDocument.getLength).getBytes(StandardCharsets.UTF_8))
+  private def getText = () => {
+    inputPanel.inputDocument.getText(0, inputPanel.inputDocument.getLength)
   }
   initializeTextArea(inputPanel.inputTextArea)
 
   private val outputDocument = new RSyntaxDocument(SyntaxConstants.SYNTAX_STYLE_NONE)
-  private val textAreaInput: InputOption = new ParseFromFunction(getInputStream)
+  private val textAreaInput: InputOption = new ParseFromFunction(getText)
 
   val textAreaOutput: TextAreaOutput =
     new TextAreaOutput(textWithGrammar => setOutputText(textWithGrammar.text, textWithGrammar.grammar))

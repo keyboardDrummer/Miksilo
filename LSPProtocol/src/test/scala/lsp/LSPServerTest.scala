@@ -3,7 +3,7 @@ package lsp
 import java.io.ByteArrayOutputStream
 
 import core.parsers.editorParsers.{Position, SourceRange, TextEdit}
-import jsonRpc.{JVMJsonRpcConnection, JsonRpcConnection}
+import jsonRpc.{JVMMessageReader, JVMMessageWriter, MessageJsonRpcConnection}
 import org.scalatest.{Assertion, AsyncFunSpec}
 
 import scala.concurrent.duration.Duration
@@ -352,9 +352,13 @@ class LSPServerTest extends AsyncFunSpec {
     val clientOutCopy = new ByteArrayOutputStream()
     val clientOut = new StreamMultiplexer(Seq(clientToServer.out, clientOutCopy))
     val serverOut = new StreamMultiplexer(Seq(serverToClient.out, serverOutCopy))
-    val serverConnection = new JVMJsonRpcConnection(clientToServer.in, serverOut)
+    val serverConnection = new MessageJsonRpcConnection(
+      new JVMMessageReader(clientToServer.in),
+      new JVMMessageWriter(serverOut))
     val server = new LSPServer(languageServer, serverConnection)
-    val client = new LSPClient(languageClient, new JVMJsonRpcConnection(serverToClient.in, clientOut))
+    val client = new LSPClient(languageClient, new MessageJsonRpcConnection(
+      new JVMMessageReader(serverToClient.in),
+      new JVMMessageWriter(clientOut)))
     new Thread(() => server.listen()).start()
     new Thread(() => client.listen()).start()
     ServerAndClient(client, server, clientOutCopy, serverOutCopy)

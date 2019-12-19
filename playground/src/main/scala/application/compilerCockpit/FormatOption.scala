@@ -18,7 +18,7 @@ object FormatOption extends CompileOption {
     language = LanguageFromDeltas(startWithPrettyPrint)
   }
 
-  override def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar = {
+  override def run(sandbox: LanguageSandbox, input: String): TextWithGrammar = {
     val state = language.compileString(input)
     val outputGrammar = prettyPrint.getOutputGrammar(state.language)
     TextWithGrammar(state.output, outputGrammar)
@@ -35,7 +35,7 @@ object FormatJsonOption extends CompileOption {
     language = LanguageFromDeltas(startWithPrettyPrint)
   }
 
-  override def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar = {
+  override def run(sandbox: LanguageSandbox, input: String): TextWithGrammar = {
     val state = language.compileString(input)
     val outputGrammar = LanguageGrammars.grammars.get(language).root
     TextWithGrammar(state.output, outputGrammar)

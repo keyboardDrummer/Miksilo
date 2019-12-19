@@ -9,8 +9,6 @@ import core.smarts.objects.NamedDeclaration
 import jsonRpc.LazyLogging
 import lsp._
 
-import scala.scalajs.js.annotation.JSExportTopLevel
-
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider
   with ReferencesProvider

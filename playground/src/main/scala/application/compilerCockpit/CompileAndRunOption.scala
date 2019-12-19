@@ -15,8 +15,8 @@ object CompileAndRunOption extends CompileOption {
     language = LanguageFromDeltas(deltas)
   }
 
-  override def run(sandbox: LanguageSandbox, inputStream: InputStream): TextWithGrammar = {
-    val state = language.compileString(inputStream)
+  override def run(sandbox: LanguageSandbox, text: String): TextWithGrammar = {
+    val state = language.compileString(text)
     TextWithGrammar(state.output)
   }
 

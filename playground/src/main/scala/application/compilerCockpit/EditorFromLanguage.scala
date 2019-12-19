@@ -27,10 +27,9 @@ class EditorFromLanguage(language: LanguageFromDeltas) extends JPanel(new CardLa
   inputTextArea.addParser(new Parser() {
     override def parse(doc: RSyntaxDocument, style: String): ParseResult = {
       val text = doc.getText(0, doc.getLength)
-      val stream = new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8.name()))
 
       val result = new DefaultParseResult(this)
-      val compilation = language.compileString(stream)
+      val compilation = language.compileString(text)
       for(diagnostic <- compilation.diagnosticsForFile(inputTextArea.freshTextDocumentReference.uri)) {
 
         val lineLengths = text.split("\n").map(line => line.length + 1)
