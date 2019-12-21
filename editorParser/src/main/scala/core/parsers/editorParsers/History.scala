@@ -79,7 +79,7 @@ case class SingleError[Input](successScore: Double, error: ParseError[Input]) ex
 object Rose {
   val empty = Node[Nothing]()
 
-  def node[Value](children: Rose[Value]*) = Node[Value](children.filter(v => v != null).toArray:_*)
+  def node[Value](children: Rose[Value]*) = Node[Value](children.filter(v => v != null).toIndexedSeq:_*)
 }
 
 trait Rose[+Value] {

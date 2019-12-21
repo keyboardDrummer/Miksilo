@@ -6,6 +6,6 @@ import scala.concurrent.Future
 
 trait JsonRpcHandler {
   def dispose(): Unit
-  def handleNotification(notification: JsonRpcNotificationMessage)
+  def handleNotification(notification: JsonRpcNotificationMessage): Unit
   def handleRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage]
 }

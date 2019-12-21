@@ -30,7 +30,7 @@ class JVMMessageReader(in: InputStream) extends MessageReader with LazyLogging {
   private val lock = new Object
 
   private class PumpInput extends Thread("Input Reader") {
-    override def run() {
+    override def run(): Unit = {
       var nRead = 0
       do {
         nRead = in.read(buffer)

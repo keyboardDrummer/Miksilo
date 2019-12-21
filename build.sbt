@@ -18,7 +18,7 @@ lazy val commonSettings = Seq(
   resolvers += "dhpcs at bintray" at "https://dl.bintray.com/dhpcs/maven",
   logLevel := Level.Info,
   logBuffered in Test := false,
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.13.1",
   scalacOptions += "-deprecation",
   scalacOptions += "-feature",
   scalacOptions += "-language:implicitConversions",
@@ -51,7 +51,7 @@ lazy val editorParser = (project in file("editorParser")).
 lazy val LSPProtocol = (project in file("LSPProtocol")).
   settings(commonSettings: _*).
   settings(
-    libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1",
+    // libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1",
     libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
     libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
   ).dependsOn(editorParser)

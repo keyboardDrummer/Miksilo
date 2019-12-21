@@ -93,8 +93,8 @@ trait CodeActionProvider {
 }
 
 trait LanguageClient {
-  def sendDiagnostics(diagnostics: PublishDiagnostics)
-  def trackMetric(name: String, value: Double)
+  def sendDiagnostics(diagnostics: PublishDiagnostics): Unit
+  def trackMetric(name: String, value: Double): Unit
 }
 
 trait LanguageServer {

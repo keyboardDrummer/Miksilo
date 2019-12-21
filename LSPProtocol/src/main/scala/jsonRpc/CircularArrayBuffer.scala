@@ -44,10 +44,10 @@ class CircularArrayBuffer[A: ClassTag](initialSize: Int = 1<<4) extends mutable.
     this
   }
 
-  override def prependAll(xs: TraversableOnce[A]): Unit =
+  override def prependAll(xs: IterableOnce[A]): Unit =
     xs.toSeq.reverse.foreach(x => x +=: this)
 
-  override def insertAll(idx: Int, elems: Traversable[A]): Unit = {
+  override def insertAll(idx: Int, elems: IterableOnce[A]): Unit = {
     checkIndex(idx)
     if (idx == 0) {
       prependAll(elems)

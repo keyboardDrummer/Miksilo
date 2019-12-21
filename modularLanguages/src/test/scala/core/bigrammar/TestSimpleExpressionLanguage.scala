@@ -41,7 +41,7 @@ class TestSimpleExpressionLanguage extends FunSuite with WhitespaceTriviaSequenc
     parseAndPrint(example, expected)
   }
 
-  ignore("MultiplyWithAdditionWithParenthesisFailure") {
+  test("MultiplyWithAdditionWithParenthesisFailure") {
     val example = "3 * (4 + 2)"
     val expected = Multiply(Value(3), Add(Value(4), UndefinedExpression))
 
