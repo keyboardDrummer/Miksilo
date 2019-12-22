@@ -86,7 +86,7 @@ class TestSimpleExpressionLanguage extends AnyFunSuite with WhitespaceTriviaSequ
     parseAndPrint(example, expected)
   }
 
-  def parseAndPrint(example: String, expected: Any) {
+  def parseAndPrint(example: String, expected: Any): Unit = {
     val grammarDocument = getExpressionGrammarDocument
     TestGrammarUtils.parseAndPrintSame(example, Some(expected), grammarDocument)
   }

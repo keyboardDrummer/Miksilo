@@ -4,7 +4,8 @@ import java.io.ByteArrayOutputStream
 
 import core.parsers.editorParsers.{Position, SourceRange, TextEdit}
 import jsonRpc.{JVMMessageReader, JVMMessageWriter, JsonRpcConnection}
-import org.scalatest.{Assertion, AsyncFunSpec}
+import org.scalatest.Assertion
+import org.scalatest.funspec.AsyncFunSpec
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Promise}

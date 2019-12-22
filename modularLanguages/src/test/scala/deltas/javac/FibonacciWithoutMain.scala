@@ -17,7 +17,7 @@ class FibonacciWithoutMain {
   val defaultPackage = Seq("transformations", "bytecode", "testing")
   val methodName = "fibonacci"
 
-  def compileAndPrintFibonacciWithoutMain() {
+  def compileAndPrintFibonacciWithoutMain(): Unit = {
     val fibonacci = getJavaFibonacciWithoutMain
     val byteCode = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).compileAst(fibonacci).program
     LanguageTest.printByteCode(byteCode.asInstanceOf[PathRoot].current)

@@ -61,7 +61,7 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
       if (lastInstructionWasNotReplaced)
         newInstructions += instructions(i)
 
-      newInstructions
+      newInstructions.asInstanceOf[Seq[Node]]
     }
   }
 

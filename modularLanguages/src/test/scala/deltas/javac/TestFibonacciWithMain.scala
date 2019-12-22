@@ -4,11 +4,11 @@ import util.JavaLanguageTest
 
 class TestFibonacciWithMain extends JavaLanguageTest {
 
-  def test() {
+  def test(): Unit = {
     compareWithJavacAfterRunning("Fibonacci")
   }
 
-  def testInstanceMethod() {
+  def testInstanceMethod(): Unit = {
     compareWithJavacAfterRunning("FibonacciInstanceMethod")
   }
 

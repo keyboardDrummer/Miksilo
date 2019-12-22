@@ -38,7 +38,7 @@ object MethodToByteCode {
     //    method.current.data.remove(ReturnType)
     //    method.current.data.remove(Parameters)
 
-    def addCodeAnnotation(method: NodePath) {
+    def addCodeAnnotation(method: NodePath): Unit = {
       setMethodCompiler(method, compilation)
       val statementToInstructions = ToByteCodeSkeleton.getToInstructions(compilation)
       val instructions = statementToInstructions(method.body)

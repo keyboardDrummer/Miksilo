@@ -27,7 +27,7 @@ class TestRecursion extends AnyFunSuite with DefaultBiGrammarWriter {
     testUsingGrammar(grammar)
   }
 
-  def testUsingGrammar(grammar: Labelled) {
+  def testUsingGrammar(grammar: Labelled): Unit = {
     TestGrammarUtils.parseAndPrintSame(input, Some(getExpectedRightRecursiveResult), grammar)
   }
 

@@ -69,9 +69,9 @@ object TypeSkeleton extends DeltaWithGrammar {
     resultDepth.head
   }
 
-  def getAllSuperTypes(state: Language)(_type: Node): Stream[Set[Node]] = {
+  def getAllSuperTypes(state: Language)(_type: Node): LazyList[Set[Node]] = {
     var returnedTypes = Set.empty[Node]
-    Stream.iterate(Set(_type))(previousDepthTypes => {
+    LazyList.iterate(Set(_type))(previousDepthTypes => {
       val result = previousDepthTypes.flatMap(_type => getSuperTypes(state)(_type)).diff(returnedTypes)
       returnedTypes ++= result
       result

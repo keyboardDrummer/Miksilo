@@ -24,7 +24,7 @@ object JavaStandardLibrary {
   val objectClass: Node = getByteCodeNode("Object.class")
   val stringClass: Node = getByteCodeNode("String2.class")
 
-  def loadIntoClassPath(compilation: Compilation) {
+  def loadIntoClassPath(compilation: Compilation): Unit = {
     ClassCompiler(objectClass, compilation).bind()
     ClassCompiler(stringClass, compilation).bind()
     ClassCompiler(systemClass, compilation).bind()

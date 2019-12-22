@@ -25,7 +25,7 @@ case class As(var inner: BiGrammar, field: NodeField, changePosition: SourceRang
       var range = SourceRange(left.position, right.position)
       if (changePosition != null)
         range = changePosition(range)
-      WithMap[Any](Unit, result.namedValues + (field -> result.value) + (FieldPosition(field) -> range))
+      WithMap[Any]((), result.namedValues + (field -> result.value) + (FieldPosition(field) -> range))
     })
   }
 }

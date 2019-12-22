@@ -25,8 +25,8 @@ object ReorderMembersDelta extends Delta {
   trait CustomCommand {
     def name: String
 
-    def initialize(deltas: Seq[Delta])
-    def perform(server: LanguageServer)
+    def initialize(deltas: Seq[Delta]): Unit
+    def perform(server: LanguageServer): Unit
   }
 
   object ReorderOption extends CustomCommand {

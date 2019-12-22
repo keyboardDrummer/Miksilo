@@ -30,7 +30,7 @@ trait DefinitionProvider {
 case class ReferencesParams(textDocument: TextDocumentIdentifier, position: Position, context: ReferenceContext)
 
 trait ReferencesProvider {
-  def references(location: ReferencesParams): Seq[FileRange]
+  def references(location: ReferencesParams): collection.Seq[FileRange]
 }
 
 object PositionFormat {
@@ -70,9 +70,7 @@ object WorkspaceEdit {
   * A workspace edit represents changes to many resources managed
   * in the workspace.
   */
-case class WorkspaceEdit(
-                          changes: Map[String, Seq[TextEdit]] // uri -> changes
-                        )
+case class WorkspaceEdit(changes: Map[String, collection.Seq[TextEdit]])
 
 object CodeActionContext {
   implicit val format = Json.format[CodeActionContext]

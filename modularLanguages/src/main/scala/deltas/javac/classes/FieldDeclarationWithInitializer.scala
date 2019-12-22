@@ -58,10 +58,9 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     if (initializerStatements.isEmpty)
       return
 
-    val reversedInitializerStatements = initializerStatements.reverse //TODO: hack to fix the reverse hack in NodeLike.
-
+    val reversedInitializerStatements = initializerStatements.view.reverse //TODO: hack to fix the reverse hack in NodeLike.
     val fieldInitializerMethod = MethodDelta.neww(getFieldInitializerMethodName,VoidTypeDelta.voidType, Seq.empty,
-      BlockDelta.neww(ArraySeq.unsafeWrapArray(initializerStatements).reverse)))
+      BlockDelta.neww(reversedInitializerStatements.toSeq))
     program.members = Seq(fieldInitializerMethod) ++ program.members
 
     for(constructor <- ConstructorDelta.getConstructors(program)) {

@@ -1,7 +1,6 @@
 package util
 
-import java.io.{BufferedInputStream, ByteArrayInputStream, InputStream}
-import java.nio.charset.StandardCharsets
+import java.io.{BufferedInputStream, InputStream}
 import java.nio.file.Files
 
 import core.SourceUtils
@@ -13,7 +12,8 @@ import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
 import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
-import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap, FunSuite}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap}
 import util.JavaSourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
@@ -24,7 +24,7 @@ class JavaLanguageTest
 
 object LanguageTest {
 
-  def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]) {
+  def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]): Unit = {
     for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
       assert(NodeComparer(compareIntegers = false, takeAllRightKeys = false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
     }
@@ -58,7 +58,7 @@ class LanguageTest(val language: TestingLanguage) extends AnyFunSuite with Befor
   actualOutputDirectory.createDirectory(force = true)
   expectedOutputDirectory.createDirectory(force = true)
 
-  def runByteCode(className: String, code: Node, expectedResult: Int) {
+  def runByteCode(className: String, code: Node, expectedResult: Int): Unit = {
     val line = JavaSourceUtils.runByteCode(className, code)
     assertResult(expectedResult)(Integer.parseInt(line))
   }
@@ -101,7 +101,7 @@ class LanguageTest(val language: TestingLanguage) extends AnyFunSuite with Befor
     compareWithJavacAfterRunning(File(inputDirectory / name))
   }
 
-  def compareWithJavacAfterRunning(inputFile: Path) {
+  def compareWithJavacAfterRunning(inputFile: Path): Unit = {
     val className = inputFile.stripExtension
 
     val relativeFilePath = inputFile.changeExtension("java")
@@ -176,7 +176,7 @@ class LanguageTest(val language: TestingLanguage) extends AnyFunSuite with Befor
     logger.line
   }
 
-  def compareConstantPools(expectedByteCode: Node, compiledCode: Node) {
+  def compareConstantPools(expectedByteCode: Node, compiledCode: Node): Unit = {
     val expectedConstantPoolSet = expectedByteCode.constantPool.constants
     val compiledConstantPoolSet = compiledCode.constantPool.constants
     assertResult(expectedConstantPoolSet.length)(compiledConstantPoolSet.length)

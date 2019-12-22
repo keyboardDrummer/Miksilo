@@ -7,7 +7,7 @@ trait BiGrammarObserver[Result] {
 
   def getReference(name: GrammarKey): Result
 
-  def setReference(result: Result, reference: Result)
+  def setReference(result: Result, reference: Result): Unit
 
   def handleGrammar(self: BiGrammar, children: Seq[Result], recursive: (BiGrammar) => Result): Result
 

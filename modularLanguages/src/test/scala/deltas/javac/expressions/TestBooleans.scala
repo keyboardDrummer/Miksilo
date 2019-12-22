@@ -4,7 +4,7 @@ import util.JavaLanguageTest
 
 class TestBooleans extends JavaLanguageTest {
 
-  def test() {
+  def test(): Unit = {
     compareWithJavacAfterRunning("Booleans")
   }
 }

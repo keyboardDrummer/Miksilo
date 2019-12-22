@@ -19,6 +19,8 @@ import scala.collection.mutable.ArrayBuffer
 import core.bigrammar.BiGrammarToParser._
 import core.deltas.grammars.LanguageGrammars
 
+import scala.collection.immutable.ArraySeq
+
 object DecompileByteCodeSignature extends DeltaWithPhase {
 
   override def description: String = "Decompiles the field and method signatures in a classfile."
@@ -52,14 +54,12 @@ object DecompileByteCodeSignature extends DeltaWithPhase {
     //    val nameIndex = classReference(ClassRefConstant.ClassRefName).asInstanceOf[Int]
     //    val qualifiedClassName = new QualifiedClassName(constantPool.getUtf8(nameIndex).split("/").toSeq)
 
-    val members = new ArrayBuffer[Node]()
-    val javaClass = JavaClassDelta.neww(qualifiedClassName.parts.dropRight(1), qualifiedClassName.parts.last, members, List.empty[Node], None)
-
     val fieldInfos = program(ByteCodeSkeleton.ClassFields).asInstanceOf[Seq[Node]]
 
-    members ++= getFields(state, constantPool, fieldInfos)
-    members ++= getMethods(state, constantPool, program(ByteCodeSkeleton.Methods).asInstanceOf[Seq[Node]])
-
+    val fields = getFields(state, constantPool, fieldInfos)
+    val methods = getMethods(state, constantPool, program(ByteCodeSkeleton.Methods).asInstanceOf[Seq[Node]])
+    val members = fields ++ methods
+    val javaClass = JavaClassDelta.neww(qualifiedClassName.parts.dropRight(1), qualifiedClassName.parts.last, members, List.empty[Node], None)
     program.replaceData(javaClass)
 
   }

@@ -18,5 +18,4 @@ class TypedChildField[T](name: String) extends NodeField {
   def update(path: AnyPath, value: T): Unit = getFieldData(path)(this) = value
 
   override lazy val toString = name
-  override def debugRepresentation = name
 }

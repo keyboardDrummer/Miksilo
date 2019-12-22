@@ -13,7 +13,6 @@ import deltas.bytecode.coreInstructions.InstructionInstance.Instruction
 import deltas.bytecode.coreInstructions.integers.integerCompare._
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
 
-import scala.collection.immutable.ArraySeq
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -68,8 +67,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     }
 
     def getNewInstructions(instructions: Seq[Instruction[Node]], targetLocations: Map[String, Int]): Seq[Node] = {
-      var newInstructions = mutable.ArrayBuffer[Node]()
-      newInstructions.sizeHint(instructions.length)
+      var newInstructions = List.empty[Node]
 
       var location = 0
       for (instruction <- instructions) {
@@ -80,12 +78,12 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
         }
 
         if (instruction.shape != LabelDelta.shape)
-          newInstructions += instruction
+          newInstructions ::= instruction
 
         location += instructionSize(instruction)
       }
 
-      ArraySeq.unsafeWrapArray(newInstructions)
+      newInstructions
     }
   }
 

@@ -67,7 +67,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
       leftRightSimple[Input, Result, Result](PositionParser, triviaParser, (position, triviasWithMap) => {
         val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
         val field = new ParseTriviaField(position)
-        WithMap[Any](Unit, Map(field -> Seq(trivias)))
+        WithMap[Any]((), Map(field -> Seq(trivias)))
       })
     }
 

@@ -35,7 +35,7 @@ object PoptimizeDelta extends DeltaWithPhase {
       var newInstructions = List.empty[Node]
       var consumptions = List.empty[Boolean]
 
-      def processInstruction(instructionIndex: Int) {
+      def processInstruction(instructionIndex: Int): Unit = {
         val instruction = instructions(instructionIndex)
         if (instruction.shape == PopDelta.shape) {
           consumptions ::= true

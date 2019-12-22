@@ -36,7 +36,7 @@ object CodeAttributeDelta extends ByteCodeAttribute with HasBytes with HasShape 
 
   def getInstructionArguments(instruction: Node): Seq[Int] = instruction(InstructionArgumentsKey).asInstanceOf[Seq[Int]]
 
-  def setInstructionArguments(instruction: Node, arguments: Seq[Any]) {
+  def setInstructionArguments(instruction: Node, arguments: Seq[Any]): Unit = {
     instruction(InstructionArgumentsKey) = arguments
   }
 

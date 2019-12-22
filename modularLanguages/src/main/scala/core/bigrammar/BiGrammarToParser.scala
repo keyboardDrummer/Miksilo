@@ -122,7 +122,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
         FilterMap(innerParser, mapGrammar.asInstanceOf[MapGrammar[AnyWithMap, AnyWithMap]].construct)
 
       case BiFailure(message) => Fail(None, message, History.failPenalty)
-      case Print(_) => succeed(Unit).map(valueToResult)
+      case Print(_) => succeed(()).map(valueToResult)
       case ValueGrammar(value) => succeed(value).map(valueToResult)
 
       case labelled: Labelled =>
