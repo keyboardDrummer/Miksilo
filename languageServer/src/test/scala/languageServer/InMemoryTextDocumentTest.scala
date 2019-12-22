@@ -2,9 +2,9 @@ package languageServer
 
 import core.parsers.editorParsers.{Position, SourceRange}
 import lsp.TextDocumentContentChangeEvent
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class InMemoryTextDocumentTest extends FunSuite {
+class InMemoryTextDocumentTest extends AnyFunSuite {
 
   test("full sync") {
     val uri = "foo"

@@ -1,13 +1,13 @@
 package core.parsers
 
 import deltas.json.JsonLanguage
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 import _root_.core.SourceUtils
 import _root_.core.TestUtils
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
-class ModularGrammarPerformanceTest extends FunSuite {
+class ModularGrammarPerformanceTest extends AnyFunSuite {
 
   val json = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas, UntilBestAndXStepsStopFunction())
 

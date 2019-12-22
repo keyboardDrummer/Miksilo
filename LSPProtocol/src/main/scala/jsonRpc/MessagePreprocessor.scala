@@ -39,7 +39,7 @@ abstract class MessagePreprocessor(original: JsonRpcHandler) extends JsonRpcHand
   }
 
   def addMessage(message: WorkItem): Unit = {
-    messages += message
+    messages.append(message)
     aggregate(messages)
     ExecutionContext.global.execute(() => dequeueWorkItem())
   }

@@ -8,7 +8,7 @@ import _root_.core.document.Empty
 import _root_.core.parsers.core.Processor
 import _root_.core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 import _root_.core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase, WhitespaceParserWriter}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 trait YamlExpression {
   def toDocument: ResponsiveDocument
@@ -50,7 +50,7 @@ object BlockOut extends YamlContext
 object BlockKey extends YamlContext
 object FlowKey extends YamlContext
 
-class YamlTest extends FunSuite
+class YamlTest extends AnyFunSuite
   with LeftRecursiveCorrectingParserWriter
   with IndentationSensitiveParserWriter with CommonParserWriter with WhitespaceParserWriter {
 

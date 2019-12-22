@@ -4,12 +4,12 @@ import deltas.javac.JavaToByteCodeLanguage
 import deltas.json.JsonLanguage
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.fife.ui.rsyntaxtextarea.TokenTypes
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
 import scala.util.parsing.input.CharArrayReader
 
-class TokenMakerFromGrammarTest extends FunSuite {
+class TokenMakerFromGrammarTest extends AnyFunSuite {
 
   private val language = TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++
     JavaToByteCodeLanguage.javaCompilerDeltas)

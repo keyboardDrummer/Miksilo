@@ -5,9 +5,9 @@ import core.smarts.language.expressions.Add
 import core.smarts.language.modules.{Binding, Module}
 import core.smarts.language.structs._
 import core.smarts.language.types.{BoolType, IntType}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class UnionTypes extends FunSuite with LanguageWriter {
+class UnionTypes extends AnyFunSuite with LanguageWriter {
 
   test("matchTypeZero") {
     val baseType = Struct("intOrBool", Seq.empty)

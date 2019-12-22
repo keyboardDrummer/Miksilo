@@ -6,9 +6,9 @@ import core.smarts.language.modules.{Binding, Module}
 import core.smarts.language.structs._
 import core.smarts.language.types.IntType
 import core.smarts.modes.ConstraintClosure
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Structs extends FunSuite with LanguageWriter {
+class Structs extends AnyFunSuite with LanguageWriter {
 
 
   test("struct") {

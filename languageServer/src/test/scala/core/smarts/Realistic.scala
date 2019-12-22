@@ -1,8 +1,8 @@
 package core.smarts
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Realistic extends FunSuite with LanguageWriter {
+class Realistic extends AnyFunSuite with LanguageWriter {
 
   test("list with map") {
 //    val nilDef = Struct("nilS", Seq.empty)

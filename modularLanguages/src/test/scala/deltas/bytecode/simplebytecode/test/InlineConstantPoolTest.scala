@@ -5,10 +5,10 @@ import deltas.PrettyPrint
 import deltas.bytecode.ConstantPoolIndices
 import deltas.bytecode.simpleBytecode.InlineConstantPool
 import deltas.javac.ByteCodeLanguage
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{LanguageTest, TestLanguageBuilder}
 
-class InlineConstantPoolTest extends FunSuite {
+class InlineConstantPoolTest extends AnyFunSuite {
 
   private val inlinedConstantPoolFibonacci =
     """class Fibonacci extends java/lang/Object with: ()

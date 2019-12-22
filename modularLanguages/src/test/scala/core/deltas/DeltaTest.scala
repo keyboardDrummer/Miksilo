@@ -1,9 +1,9 @@
 package core.deltas
 
 import core.language.Language
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class DeltaTest extends FunSuite {
+class DeltaTest extends AnyFunSuite {
 
   test("missing dependencies are added") {
     object A extends Delta {

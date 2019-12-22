@@ -3,7 +3,7 @@ package core.deltas.grammars
 import core.bigrammar.{BiGrammar, BiGrammarSequenceCombinatorsExtension}
 import core.bigrammar.grammars.{BiFailure, BiSequence, Labelled, ManyHorizontal, ManyVertical, ParseWhiteSpace, SequenceBijective, WithTrivia}
 import core.deltas.{GrammarForAst, NodeGrammarWriter, Property}
-import core.language.node.{GrammarKey, Key, NodeShape, named}
+import core.language.node.{GrammarKey, Key, NodeShape}
 
 case class KeyGrammar(key: Key) extends GrammarKey
 {

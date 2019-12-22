@@ -1,9 +1,9 @@
 package core.textMate
 
 import _root_.core.parsers.ParseJson
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class TextMateTest extends FunSuite {
+class TextMateTest extends AnyFunSuite {
 
   test("json test") {
     val jsonParser = ParseJson.jsonParser

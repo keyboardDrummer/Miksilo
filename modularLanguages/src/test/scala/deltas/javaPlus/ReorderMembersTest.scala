@@ -8,10 +8,10 @@ import deltas.javac.methods.ReturnVoidDelta
 import deltas.statement.{BlockDelta, GotoStatementDelta, StatementDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.{ClearPhases, PrettyPrint}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
-class ReorderMembersTest extends FunSuite {
+class ReorderMembersTest extends AnyFunSuite {
 
   test("cannot parse comment") {
     val input =

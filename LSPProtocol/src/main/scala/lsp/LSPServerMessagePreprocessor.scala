@@ -29,7 +29,7 @@ class LSPServerMessagePreprocessor(original: JsonRpcHandler) extends MessagePrep
             val mergedChange = DidChangeTextDocumentParams(secondChange.textDocument, firstChange.contentChanges ++ secondChange.contentChanges)
             val newMessage = Notification(JsonRpcNotificationMessage(LSPProtocol.didChange, ObjectParams(changeParamsFormat.writes(mergedChange))))
             messages.remove(messages.size - 2, 2)
-            messages += newMessage
+            messages.append(newMessage)
           }
         }
       case _ =>

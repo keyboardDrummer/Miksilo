@@ -10,10 +10,10 @@ import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import deltas.bytecode.types.IntTypeDelta
 import deltas.javac.ByteCodeLanguage
 import deltas.javac.classes.ConstantPool
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{LanguageTest, TestLanguageBuilder}
 
-class TestByteCodeGoTo extends FunSuite {
+class TestByteCodeGoTo extends AnyFunSuite {
 
   def testMain(instructions: Seq[Node]): Node = {
     val method = ByteCodeMethodInfo.methodInfo(0, 0, Seq(CodeAttributeDelta.codeAttribute(0, 0, 0, instructions, Seq(), Seq())))

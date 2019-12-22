@@ -10,12 +10,12 @@ import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, Impl
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
 import deltas.statement.BlockDelta
 import deltas.{PrettyPrint, RunWithJVM}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, StreamUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
-class TestDocumentGrammarWithJavaExamples extends FunSuite {
+class TestDocumentGrammarWithJavaExamples extends AnyFunSuite {
   val lineSeparator: String = System.lineSeparator()
 
   test("SimpleForLoop") {

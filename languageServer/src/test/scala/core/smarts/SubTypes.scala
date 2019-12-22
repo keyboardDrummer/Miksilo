@@ -6,9 +6,9 @@ import core.smarts.language.expressions._
 import core.smarts.language.modules.{Binding, Module}
 import core.smarts.language.structs._
 import core.smarts.language.types._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class SubTypes extends FunSuite with LanguageWriter {
+class SubTypes extends AnyFunSuite with LanguageWriter {
 
   test("intAddition") {
     val program = OverloadedAdd(Const(3), Const(2))

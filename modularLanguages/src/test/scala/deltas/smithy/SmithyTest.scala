@@ -4,8 +4,8 @@ import _root_.lsp.HumanPosition
 import core.SourceUtils
 import core.parsers.editorParsers.SourceRange
 import languageServer.{MiksiloLanguageServer, _}
-import org.scalatest.FunSuite
-class SmithyTest extends FunSuite with LanguageServerTest {
+import org.scalatest.funsuite.AnyFunSuite
+class SmithyTest extends AnyFunSuite with LanguageServerTest {
 
   val server = new MiksiloLanguageServer(SmithyLanguage.language)
   val program = SourceUtils.getResourceFileContents("smithy/model.smithy")

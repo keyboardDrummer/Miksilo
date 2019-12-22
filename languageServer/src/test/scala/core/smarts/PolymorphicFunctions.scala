@@ -2,9 +2,9 @@ package core.smarts
 
 import core.smarts.language.expressions._
 import core.smarts.language.types.{IntType, LanguageForAllType, LanguageTypeVariable}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class PolymorphicFunctions extends FunSuite with LanguageWriter {
+class PolymorphicFunctions extends AnyFunSuite with LanguageWriter {
 
   test("boolIntoIdentity") {
     val program = Application(Lambda("x", Variable("x")), BoolConst(true))

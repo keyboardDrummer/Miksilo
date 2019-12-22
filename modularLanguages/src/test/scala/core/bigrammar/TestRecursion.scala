@@ -2,11 +2,11 @@ package core.bigrammar
 
 import core.bigrammar.grammars.Labelled
 import core.bigrammar.printer.BiGrammarToPrinter
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.immutable.StringOps
 
-class TestRecursion extends FunSuite with DefaultBiGrammarWriter {
+class TestRecursion extends AnyFunSuite with DefaultBiGrammarWriter {
 
   val input = "!!!!!"
 

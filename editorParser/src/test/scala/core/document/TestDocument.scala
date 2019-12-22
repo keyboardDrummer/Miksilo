@@ -1,8 +1,8 @@
 package core.document
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestDocument extends FunSuite {
+class TestDocument extends AnyFunSuite {
 
   val lineSep = System.lineSeparator()
 

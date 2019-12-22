@@ -9,10 +9,10 @@ import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import deltas.yaml.{PlainScalarDelta, YamlArrayDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, TestLanguageBuilder}
 
-class YamlTest extends FunSuite {
+class YamlTest extends AnyFunSuite {
 
   val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltas, stopFunction = UntilBestAndXStepsStopFunction())
 

@@ -1,10 +1,10 @@
 package core.parsers
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import _root_.core.parsers.strings.CommonStringReaderParser
 
-class AssociativityTest extends FunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
+class AssociativityTest extends AnyFunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   test("binary operators are right associative by default") {
     lazy val expr: Parser[Any] = new Lazy(expr) ~< "-" ~ expr | wholeNumber

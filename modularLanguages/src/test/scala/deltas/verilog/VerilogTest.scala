@@ -11,12 +11,12 @@ import deltas.expression.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import lsp.{DocumentPosition, FileRange, HumanPosition, TextDocumentIdentifier}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
-class VerilogTest extends FunSuite with LanguageServerTest {
+class VerilogTest extends AnyFunSuite with LanguageServerTest {
 
   val language = TestLanguageBuilder.buildWithParser(VerilogLanguage.deltas)
   val justParseLanguage = TestLanguageBuilder.buildWithParser(Seq(ClearPhases) ++ VerilogLanguage.deltas)

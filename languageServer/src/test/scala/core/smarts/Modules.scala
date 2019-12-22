@@ -4,9 +4,9 @@ import core.smarts.language.Program
 import core.smarts.language.expressions.{Const, Variable}
 import core.smarts.language.modules.{Binding, Module, ModuleImport}
 import core.smarts.language.types.IntType
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class Modules extends FunSuite with LanguageWriter  {
+class Modules extends AnyFunSuite with LanguageWriter  {
 
   test("module") {
     val moduleWithX = Module("hasX", Seq(Binding("x", Const(3), Some(IntType))))

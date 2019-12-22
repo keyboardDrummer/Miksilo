@@ -7,9 +7,9 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
 import deltas.trivia.TriviaInsideNode
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class TriviaInsideNodeTest extends FunSuite {
+class TriviaInsideNodeTest extends AnyFunSuite {
 
   object ParentClass extends NodeShape
   object ChildClass extends NodeShape

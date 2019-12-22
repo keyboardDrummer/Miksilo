@@ -1,9 +1,9 @@
 package core.parsers
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
-class ErrorCorrectionUsingJsonTest extends FunSuite {
+class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   import ParseJson._
 
   test("removes incorrect b at start") {

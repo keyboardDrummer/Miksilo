@@ -5,10 +5,10 @@ import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import lsp.{CompletionItem, CompletionItemKind}
 import lsp.CompletionList
 import lsp.HumanPosition
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.JavaSourceUtils
 
-class CompletionTest extends FunSuite with LanguageServerTest {
+class CompletionTest extends AnyFunSuite with LanguageServerTest {
 
   val server = new MiksiloLanguageServer(JavaLanguage.java)
 

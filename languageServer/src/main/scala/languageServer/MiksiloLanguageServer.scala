@@ -9,6 +9,8 @@ import core.smarts.objects.NamedDeclaration
 import jsonRpc.LazyLogging
 import lsp._
 
+import scala.collection.mutable
+
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider
   with ReferencesProvider
@@ -125,7 +127,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       definition <- getDefinitionFromDefinitionOrReferencePosition(proofs, element)
     } yield {
 
-      val referencesRanges = for {
+      val referencesRanges: Seq[FileRange] = for {
         references <- proofs.findReferences(definition)
         range <- references.origin.flatMap(e => e.fileRange).toSeq
       } yield range

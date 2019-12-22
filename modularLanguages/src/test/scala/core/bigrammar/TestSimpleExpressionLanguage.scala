@@ -2,9 +2,9 @@ package core.bigrammar
 
 import core.bigrammar.grammars.Labelled
 import core.bigrammar.printer.PrintError
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestSimpleExpressionLanguage extends FunSuite with WhitespaceTriviaSequenceCombinators {
+class TestSimpleExpressionLanguage extends AnyFunSuite with WhitespaceTriviaSequenceCombinators {
 
   test("SimpleAddition") {
     val example = "3 + 4"

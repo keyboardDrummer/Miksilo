@@ -9,11 +9,11 @@ import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.{CallVariableDelta, JavaLanguage}
 import deltas.statement.assignment.{AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{LanguageTest, TestLanguageBuilder}
 import _root_.core.bigrammar.SelectGrammar
 
-class LeftRecursionTestBiGrammar extends FunSuite {
+class LeftRecursionTestBiGrammar extends AnyFunSuite {
 
   test("recursion detector caching regression") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases,

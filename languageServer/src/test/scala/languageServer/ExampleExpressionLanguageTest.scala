@@ -3,9 +3,9 @@ package languageServer
 import core.language.Language
 import core.parsers.editorParsers.{Position, SourceRange}
 import lsp.{Diagnostic, DiagnosticSeverity, HumanPosition}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class ExampleExpressionLanguageTest extends FunSuite with LanguageServerTest {
+class ExampleExpressionLanguageTest extends AnyFunSuite with LanguageServerTest {
 
   val language: Language = ExampleExpressionLanguage
   val program = "let x = 3 in x + 3 + x"

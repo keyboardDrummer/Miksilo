@@ -6,10 +6,10 @@ import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, VoidType
 import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameters}
 import deltas.statement.BlockDelta
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, TestLanguageBuilder}
 
-class EmptyMain extends FunSuite {
+class EmptyMain extends AnyFunSuite {
   val className = "EmptyMain"
   val defaultPackage = Seq()
   val other = new FibonacciWithoutMain()

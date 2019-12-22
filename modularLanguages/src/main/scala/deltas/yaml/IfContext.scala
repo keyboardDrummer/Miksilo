@@ -18,7 +18,7 @@ class IfContext[Result](inners: Map[YamlContext, BiGrammar], printer: BiGrammar)
   override def createPrinter(recursive: BiGrammar => NodePrinter) = recursive(printer)
 
   override def toParser(recursive: BiGrammar => BiGrammarToParser.Parser[BiGrammarToParser.Result]) =
-    new IfContextParser(inners.mapValues(recursive))
+    new IfContextParser(inners.view.mapValues(recursive).toMap)
 
   override def children = contexts.flatMap(inners.get(_).toSeq)
 

@@ -12,12 +12,12 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import deltas.javac.JavaToByteCodeLanguage
 import deltas.javac.types.TypeAbstraction
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{StreamUtils, TestLanguageBuilder}
 
 import scala.reflect.io.{File, Path}
 
-class TestClassFileDecompiler extends FunSuite {
+class TestClassFileDecompiler extends AnyFunSuite {
 
   private val testingLanguage = TestLanguageBuilder.buildWithParser(ClassFileSignatureDecompiler.getDecompiler("", StreamUtils.stringToStream("")))
   test("TypeVariableSimilarToBooleanSignature") {

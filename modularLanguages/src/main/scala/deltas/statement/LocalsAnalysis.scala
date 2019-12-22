@@ -21,6 +21,6 @@ class LocalsAnalysis(compilation: Compilation, body: Node, initialVariables: Var
     if (first.typedVariables.keys == second.typedVariables.keys)
       return None
 
-    Some(VariablePool(first.language, first.typedVariables.filterKeys(second.typedVariables.contains)))
+    Some(VariablePool(first.language, first.typedVariables.view.filterKeys(second.typedVariables.contains).toMap))
   }
 }

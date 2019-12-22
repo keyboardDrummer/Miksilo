@@ -1,12 +1,13 @@
 package jsonRpc
 
 import scala.collection.mutable
+import scala.collection.mutable.Seq
 import scala.reflect.ClassTag
 
 /**
  * A data structure that provides O(1) get, update, length, append, prepend, clear, trimStart and trimRight
  */
-class CircularArrayBuffer[A: ClassTag](initialSize: Int = 1<<4) extends mutable.Buffer[A] {
+class CircularArrayBuffer[A: ClassTag](initialSize: Int = 1<<4) extends mutable.Seq[A] {
   private var array = Array.ofDim[A](initialSize)
   private var start, end = 0
 
@@ -28,43 +29,48 @@ class CircularArrayBuffer[A: ClassTag](initialSize: Int = 1<<4) extends mutable.
 
   override def length = mod(mod(end) - mod(start))
 
-  override def +=(elem: A) = {
+  def append(elem: A) = {
     ensureCapacity()
     array(mod(end)) = elem
     end += 1
     this
   }
 
-  override def clear(): Unit = start = end
+  def clear(): Unit = start = end
 
-  override def +=:(elem: A) = {
+  def prepend(elem: A) = {
     ensureCapacity()
     start -= 1
     array(mod(start)) = elem
     this
   }
 
-  override def prependAll(xs: IterableOnce[A]): Unit =
-    xs.toSeq.reverse.foreach(x => x +=: this)
+  def appendAll(xs: IterableOnce[A]): Unit = {
+    xs.iterator.foreach(x => this.append(x))
+  }
 
-  override def insertAll(idx: Int, elems: IterableOnce[A]): Unit = {
+  def prependAll(xs: IterableOnce[A]): Unit =
+    xs.iterator.toSeq.reverse.foreach(x => this.prepend(x))
+
+  def insertAll(idx: Int, elems: IterableOnce[A]): Unit = {
     checkIndex(idx)
     if (idx == 0) {
       prependAll(elems)
     } else {
       val shift = (idx until size).map(this)
       end = start + idx
-      this ++= elems ++= shift
+      this.appendAll(elems)
+      this.appendAll(shift)
     }
   }
 
-  override def remove(idx: Int) = {
+  def remove(idx: Int): A = {
     val elem = this(idx)
     remove(idx, 1)
     elem
   }
 
-  override def remove(idx: Int, count: Int): Unit = {
+  def remove(idx: Int, count: Int): Unit = {
     checkIndex(idx)
     if (idx + count >= size) {
       end = start + idx
@@ -85,9 +91,9 @@ class CircularArrayBuffer[A: ClassTag](initialSize: Int = 1<<4) extends mutable.
 
   override def iterator = indices.iterator.map(apply)
 
-  override def trimStart(n: Int): Unit = if (n >= size) clear() else if (n >= 0) start += n
+  def trimStart(n: Int): Unit = if (n >= size) clear() else if (n >= 0) start += n
 
-  override def trimEnd(n: Int): Unit = if (n >= size) clear() else if (n >= 0) end -= n
+  def trimEnd(n: Int): Unit = if (n >= size) clear() else if (n >= 0) end -= n
 
   override def head = this(0)
 

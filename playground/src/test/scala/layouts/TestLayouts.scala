@@ -1,8 +1,8 @@
 package core.layouts
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestLayouts extends FunSuite {
+class TestLayouts extends AnyFunSuite {
 
   val smallNumber: Double = 0.0001
 

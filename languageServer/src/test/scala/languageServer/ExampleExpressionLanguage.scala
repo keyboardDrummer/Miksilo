@@ -11,7 +11,7 @@ import util.StreamUtils
 // TODO add a constraintBuilder that's specific to a File, so you add a [Has]SourceRange instead of a SourceElement
 // TODO compute the range based on the children, so only the leafs needs a Range.
 trait Expression extends FileElement {
-  def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope)
+  def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit
 }
 
 case class VariableDeclaration(range: SourceRange, name: String) extends FileElement {

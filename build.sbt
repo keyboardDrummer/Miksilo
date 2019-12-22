@@ -24,7 +24,7 @@ lazy val commonSettings = Seq(
   scalacOptions += "-language:implicitConversions",
   scalacOptions += "-language:postfixOps",
 
-  libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.4" % "test",
+  libraryDependencies += "org.scalatest" % "scalatest_2.13" % "3.1.0" % "test",
 
   // https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
 )

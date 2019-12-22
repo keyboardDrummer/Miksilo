@@ -12,7 +12,10 @@ case class TypeApplication(override val function: Type, var arguments: Seq[Type]
 
   override def fullyApplied: Boolean = arguments.forall(a => a.fullyApplied)
 
-  override def toString: String = function + (if (arguments.nonEmpty) "<" + arguments.map(a => a.toString).reduce((a, b) => a + ", " + b) + ">" else "")
+  override def toString: String = {
+    val typeArgument = if (arguments.nonEmpty) "<" + arguments.map(a => a.toString).reduce((a, b) => a + ", " + b) + ">" else ""
+    s"$function$typeArgument"
+  }
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[TypeApplication]
 

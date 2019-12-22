@@ -2,9 +2,9 @@ package core.smarts
 
 import core.smarts.language.expressions._
 import core.smarts.language.types.IntType
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class RecursiveFunctions extends FunSuite with LanguageWriter {
+class RecursiveFunctions extends AnyFunSuite with LanguageWriter {
 
   test("recursive function")
   {

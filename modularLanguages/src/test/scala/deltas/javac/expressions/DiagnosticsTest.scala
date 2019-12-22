@@ -4,10 +4,10 @@ import core.parsers.editorParsers.SourceRange
 import deltas.javac.JavaToByteCodeLanguage
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import lsp.{Diagnostic, HumanPosition}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.JavaSourceUtils
 
-class DiagnosticsTest extends FunSuite with LanguageServerTest {
+class DiagnosticsTest extends AnyFunSuite with LanguageServerTest {
 
   val server = new MiksiloLanguageServer(JavaToByteCodeLanguage.getJava)
 

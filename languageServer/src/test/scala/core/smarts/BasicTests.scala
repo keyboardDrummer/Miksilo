@@ -2,9 +2,9 @@ package core.smarts
 
 import core.smarts.language.expressions._
 import core.smarts.language.types.IntType
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class BasicTests extends FunSuite with LanguageWriter {
+class BasicTests extends AnyFunSuite with LanguageWriter {
 
   test("constant") {
     val program = Const(3)

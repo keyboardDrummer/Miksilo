@@ -98,7 +98,7 @@ class ConstraintSolver(val builder: ConstraintBuilder, val startingConstraints: 
 
     proofs.mappedTypeVariables += variable -> _type
     allConstraints.foreach(c => c.instantiateType(variable, _type)) //TODO startingConstraints mag ook gewoon constraints zijn.
-    environment = environment.mapValues(existingType => existingType.instantiateType(variable, _type))
+    environment = environment.view.mapValues(existingType => existingType.instantiateType(variable, _type)).toMap
     true
   }
 
