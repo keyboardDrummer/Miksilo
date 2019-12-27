@@ -68,7 +68,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
 
   def inputOption = inputOptionModel.getSelectedItem.asInstanceOf[InputOption]
 
-  def setOutputText(text: String, useThisGrammar: BiGrammar = null) {
+  def setOutputText(text: String, useThisGrammar: BiGrammar = null): Unit = {
     outputDocument.replace(0, outputDocument.getLength, text, null)
     if (useThisGrammar != null)
     {
@@ -80,7 +80,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
     }
   }
 
-  def setInputText(text: String) {
+  def setInputText(text: String): Unit = {
     inputPanel.inputDocument.replace(0, inputPanel.inputDocument.getLength, text, null)
   }
 
@@ -135,7 +135,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
     layout.expressions += equations(mode)
   }
 
-  def initialise() {
+  def initialise(): Unit = {
     val panel = new JPanel()
     val layout = new GroupLayout(panel)
     panel.setLayout(layout)
@@ -169,7 +169,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
     equationLayout.makePreferredSize(executeButton)
     equationLayout.makePreferredSize(executeCheckBox)
 
-    def addHorizontalEquations() {
+    def addHorizontalEquations(): Unit = {
       innerLayout.addLeftToRight(innerLayout.container, inputPanelComponent, outputPanel, innerLayout.container)
       innerLayout.addLeftToRight(exampleDropDown, showPhasesButton, inputGrammarButton, outputGrammarButton, innerLayout.container)
       innerLayout.addLeftToRight(innerLayout.container, chooseInput, chooseCompile, chooseOutput, executeButton, executeCheckBox, choosePanels)
@@ -197,7 +197,7 @@ class LanguageSandbox(val name: String, val deltas: Seq[Delta],
     })
     applyInputOutputMode(inputOutputModeEquations, innerLayout, Both)
 
-    def addVerticalEquations() {
+    def addVerticalEquations(): Unit = {
       innerLayout.addEquals(chooseInput.verticalCenter2,
         chooseCompile.verticalCenter2,
         chooseOutput.verticalCenter2,

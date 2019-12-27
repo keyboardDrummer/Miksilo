@@ -25,8 +25,6 @@ lazy val commonSettings = Seq(
   scalacOptions += "-language:postfixOps",
 
   libraryDependencies += "org.scalatest" % "scalatest_2.13" % "3.1.0" % "test",
-
-  // https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
 )
 
 lazy val assemblySettings = Seq(
@@ -51,9 +49,7 @@ lazy val editorParser = (project in file("editorParser")).
 lazy val LSPProtocol = (project in file("LSPProtocol")).
   settings(commonSettings: _*).
   settings(
-    // libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1",
-    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.7.4",
   ).dependsOn(editorParser)
 
 lazy val languageServer = (project in file("languageServer")).
@@ -71,9 +67,6 @@ lazy val languageServer = (project in file("languageServer")).
       url("https://github.com/keyboardDrummer"))),
     licenses += ("MIT", url("https://github.com/keyboardDrummer/Miksilo/blob/master/LICENSE")),
     publishMavenStyle := true,
-
-    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
 
     publishTo := Some(
       if (isSnapshot.value)
@@ -106,9 +99,6 @@ lazy val modularLanguages = (project in file("modularLanguages")).
 
     //import com.google.common.primitives.{Ints, Longs}
     libraryDependencies += "com.google.guava" % "guava" % "18.0",
-
-    // https://mvnrepository.com/artifact/com.typesafe.play/play-json
-    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
 
   ).dependsOn(languageServer,
     editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )

@@ -29,7 +29,7 @@ class LanguageServerMain(builders: Seq[LanguageBuilder], connection: JsonRpcConn
     })
   }
 
-  def getLanguage(args: Array[String]): Option[Language] = {
+  def getLanguage(args: Seq[String]): Option[Language] = {
     if (builders.size == 1) {
       Some(builders.head.build(args))
     } else {

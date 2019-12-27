@@ -46,7 +46,7 @@ case class Constant(value: Double) extends Expression {
 }
 
 case class Multiply(left: Expression, right: Double) extends Expression {
-  override def getElements: Map[Variable, Double] = left.getElements.mapValues(v => v * right)
+  override def getElements: Map[Variable, Double] = left.getElements.view.mapValues(v => v * right).toMap
 
   override def getConstant: Double = left.getConstant * right
 

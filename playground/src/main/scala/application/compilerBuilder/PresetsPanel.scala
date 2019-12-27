@@ -121,7 +121,7 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: DeltaInsta
 
   initialise()
 
-  def initialise() {
+  def initialise(): Unit =  {
     val listConstraints: GridBagConstraints = new GridBagConstraints()
     listConstraints.fill = GridBagConstraints.BOTH
     listConstraints.weightx = 1
@@ -179,7 +179,7 @@ class PresetsPanel(compilerName: AbstractDocument, selectedParticles: DeltaInsta
     applyButton
   }
 
-  def applyPreset(preset: Preset) {
+  def applyPreset(preset: Preset): Unit = {
     selectedParticles.clear()
     compilerName.replace(0, compilerName.getLength, preset.name, null)
     for (particle <- preset.deltas)

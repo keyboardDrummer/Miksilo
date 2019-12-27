@@ -27,20 +27,9 @@ object DeltaInstance
 
 class DeltaInstance(val delta: Delta)
 
-class DeltaInstanceJXList() extends JXList() {
-  override def getToolTipText(event: MouseEvent): String = {
-    val index = this.locationToIndex(event.getPoint)
-    val model = this.getModel
-    if (index >= 0)
-      model.getElementAt(index).asInstanceOf[DeltaInstance].delta.description
-    else
-      ""
-  }
-}
-
 object SelectedDeltasPanel {
   def getPanel(panel: LanguageWorkbench, compilerParticles: DefaultListModel[DeltaInstance]): JPanel = {
-    val compilerList = new DeltaInstanceJXList()
+    val compilerList = new ParticleList()
     compilerList.setTransferHandler(new SelectedDeltasTransferHandler(compilerList, compilerParticles))
     compilerList.setDropMode(DropMode.INSERT)
     compilerList.setModel(compilerParticles)

@@ -13,7 +13,7 @@ import deltas.javac.JavaToByteCodeLanguage
 import org.jdesktop.swingx.JXList
 
 object LanguageWorkbench {
-  val availableDeltas = JavaToByteCodeLanguage.allDeltas ++ Seq(MarkOutputGrammar)
+  val availableDeltas: Set[Delta] = JavaToByteCodeLanguage.allDeltas ++ Seq(MarkOutputGrammar)
 }
 
 class LanguageWorkbench extends JPanel(new GridBagLayout()) {
@@ -54,7 +54,7 @@ class LanguageWorkbench extends JPanel(new GridBagLayout()) {
     result.add(searchField, BorderLayout.PAGE_START)
 
     val scrollPane: JScrollPane = StyleSheet.getAnyListVisuals(list)
-    list.setCellRenderer(new InjectorListCellRenderer(painter))
+    new InjectorListCellRenderer(painter).setInJXList(list)
 
     result.add(scrollPane, BorderLayout.CENTER)
 
@@ -62,7 +62,7 @@ class LanguageWorkbench extends JPanel(new GridBagLayout()) {
   }
 
   def getAvailableScrollPane: JPanel = {
-    val availableItems: Seq[Delta] = LanguageWorkbench.availableDeltas.toStream.sortBy(i => i.name)
+    val availableItems: Seq[Delta] = LanguageWorkbench.availableDeltas.toSeq.sortBy(i => i.name)
     val availableList = new ParticleList()
     availableList.setModel(new AbstractListModel[Delta] {
       def getSize: Int = availableItems.length

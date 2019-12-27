@@ -25,7 +25,7 @@ class DeltaLabelPainter(container: JPanel, availableDeltas: Set[Delta]) {
     dependants
   }
 
-  def select(selection: Seq[Delta]) {
+  def select(selection: Seq[Delta]): Unit =  {
     this.selection = selection
     dependenciesCache.clear()
     container.repaint()

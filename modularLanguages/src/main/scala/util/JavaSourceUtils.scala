@@ -49,14 +49,14 @@ object JavaSourceUtils {
     logger.line
   }
 
-  def getBytes(byteCode: Node): Seq[Byte] = {
-    var output: Seq[Byte] = null
+  def getBytes(byteCode: Node): LazyList[Byte] = {
+    var output: LazyList[Byte] = null
     val deltas: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ ByteCodeLanguage.byteCodeDeltas
     TestLanguageBuilder.build(deltas).compileAst(byteCode)
     output
   }
 
-  class GetBytes(write: Seq[Byte] => Unit) extends DeltaWithPhase {
+  class GetBytes(write: LazyList[Byte] => Unit) extends DeltaWithPhase {
     override def transformProgram(program: Node, compilation: Compilation): Unit = {
       write(PrintByteCode.getBytes(compilation, program))
     }

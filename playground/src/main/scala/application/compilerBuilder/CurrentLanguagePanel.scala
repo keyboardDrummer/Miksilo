@@ -2,18 +2,18 @@ package application.compilerBuilder
 
 import java.awt._
 import java.awt.event.ActionEvent
+
 import javax.swing._
 import javax.swing.text.PlainDocument
-
 import application.StyleSheet
 import application.compilerCockpit.LanguageSandbox
 import core.deltas.Delta
 
-import scala.collection.convert.Wrappers.JEnumerationWrapper
+import scala.jdk.CollectionConverters
 
 class DeltaInstanceList extends DefaultListModel[DeltaInstance]
 {
-  def scalaElements: Seq[Delta] = JEnumerationWrapper(super.elements()).map(instance => instance.delta).toSeq
+  def scalaElements: Seq[Delta] = CollectionConverters.EnumerationHasAsScala(super.elements()).asScala.map(instance => instance.delta).toSeq
 }
 
 class CurrentLanguagePanel(panel: LanguageWorkbench) extends JPanel(new GridBagLayout()) {

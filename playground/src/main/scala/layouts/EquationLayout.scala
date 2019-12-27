@@ -18,24 +18,24 @@ class EquationLayout() {
     result
   }
 
-  def addEquals(expressions: Expression*) {
+  def addEquals(expressions: Expression*): Unit =  {
     for (pair <- expressions.zip(expressions.drop(1))) {
       this.expressions += pair._1 - pair._2
     }
   }
 
-  def addRow(components: Component*) {
+  def addRow(components: Component*): Unit =  {
     addEquals(components.map(c => c.height): _*)
     addEquals(components.map(c => c.bottom): _*)
   }
 
-  def addLeftToRight(components: Component*) {
+  def addLeftToRight(components: Component*): Unit =  {
     for (pair <- components.zip(components.drop(1))) {
       expressions += pair._1.right - pair._2.left
     }
   }
 
-  def addTopToBottom(components: Component*) {
+  def addTopToBottom(components: Component*): Unit =  {
     for (pair <- components.zip(components.drop(1))) {
       expressions += pair._1.bottom - pair._2.top
     }

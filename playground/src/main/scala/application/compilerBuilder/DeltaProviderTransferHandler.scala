@@ -2,17 +2,18 @@ package application.compilerBuilder
 
 import java.awt.datatransfer.{DataFlavor, Transferable}
 import java.awt.dnd.DnDConstants
+
 import javax.swing.{JComponent, JList, TransferHandler}
 import application.compilerBuilder.DeltaInstance._
 import core.deltas.Delta
 
-import scala.collection.convert.Wrappers.JListWrapper
+import scala.jdk.CollectionConverters
 
 class DeltaProviderTransferHandler(val availableList: JList[_]) extends TransferHandler {
 
   @Override
   override def createTransferable(comp: JComponent): Transferable = {
-    new ListItemTransferable(JListWrapper(availableList.getSelectedValuesList).map(x => x.getParticleInstance).toSeq)
+    new ListItemTransferable(CollectionConverters.ListHasAsScala(availableList.getSelectedValuesList).asScala.map(x => x.getParticleInstance).toSeq)
   }
 
   override def getSourceActions(c: JComponent): Int = DnDConstants.ACTION_COPY

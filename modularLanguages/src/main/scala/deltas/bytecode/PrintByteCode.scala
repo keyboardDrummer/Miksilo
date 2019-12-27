@@ -9,7 +9,7 @@ import deltas.bytecode.ByteCodeSkeleton._
 import deltas.javac.classes.skeleton.QualifiedClassName
 
 object PrintByteCode {
-  def longToBytes(long: Long): scala.Seq[Byte] = Longs.toByteArray(long)
+  def longToBytes(long: Long): LazyList[Byte] = LazyList.from(Longs.toByteArray(long))
 
   //TODO code uit deze classe naar byte code particles verplaatsen.
   val classAccessFlags: Map[String, Int] = Map("super" -> 0x0020)
@@ -18,11 +18,11 @@ object PrintByteCode {
 
   val versionNumber: Seq[Byte] = intToBytes(0x00000033)
 
-  def getBytes(compilation: Compilation, byteCode: Node): Seq[Byte] = {
+  def getBytes(compilation: Compilation, byteCode: Node): LazyList[Byte] = {
 
     val classFile = new ClassFile(byteCode)
-    def getBytes(byteCode: Node): Seq[Byte] = {
-      var result = List[Byte]()
+    def getBytes(byteCode: Node): LazyList[Byte] = {
+      var result = LazyList[Byte]()
 
       result ++= cafeBabeBytes
       result ++= versionNumber
@@ -67,28 +67,28 @@ object PrintByteCode {
     getBytes(byteCode)
   }
 
-  def prefixWithIntLength(_bytes: () => Seq[Byte]): Seq[Byte] = {
+  def prefixWithIntLength(_bytes: () => Seq[Byte]): LazyList[Byte] = {
     val bytes = _bytes()
-    Ints.toByteArray(bytes.length) ++ bytes
+    LazyList.from(Ints.toByteArray(bytes.length)) ++ bytes
   }
 
-  def getInterfacesByteCode(shape: Node): Seq[Byte] = {
+  def getInterfacesByteCode(shape: Node): LazyList[Byte] = {
     val interfaces = shape.interfaceIndices
     shortToBytes(interfaces.length) ++ interfaces.flatMap(interface => shortToBytes(interface))
   }
 
-  def getAccessFlagsByteCode(shape: Node): Seq[Byte] = {
+  def getAccessFlagsByteCode(shape: Node): LazyList[Byte] = {
     shortToBytes(classAccessFlags("super"))
   }
 
-  def hexToBytes(hex: String): Seq[Byte] = new BigInteger(hex, 16).toByteArray.takeRight(hex.length / 2)
+  def hexToBytes(hex: String): LazyList[Byte] = LazyList.from(new BigInteger(hex, 16).toByteArray).takeRight(hex.length / 2)
 
-  def toUTF8ConstantEntry(utf8: String): Seq[Byte] = {
+  def toUTF8ConstantEntry(utf8: String): LazyList[Byte] = {
     val bytes = utf8.toString.getBytes("UTF-8")
     byteToBytes(1) ++ shortToBytes(bytes.length) ++ bytes
   }
 
-  def getExceptionByteCode(exception: Node): Seq[Byte] = ???
+  def getExceptionByteCode(exception: Node): LazyList[Byte] = ???
 
   def getAttributesByteCode(compilation: Compilation, attributes: Seq[Node]): Seq[Byte] = {
 
@@ -102,19 +102,19 @@ object PrintByteCode {
 
   def hexToInt(hex: String): Int = new BigInteger(hex, 16).intValue()
 
-  def byteToBytes(value: Int): Seq[Byte] = {
-    Ints.toByteArray(value).drop(3)
+  def byteToBytes(value: Int): LazyList[Byte] = {
+    LazyList.from(Ints.toByteArray(value)).drop(3)
   }
 
-  def shortToBytes(short: Int): Seq[Byte] = {
-    Ints.toByteArray(short).takeRight(2)
+  def shortToBytes(short: Int): LazyList[Byte] = {
+    LazyList.from(Ints.toByteArray(short)).takeRight(2)
   }
 
-  def intToBytes(int: Int): Seq[Byte] = {
-    Ints.toByteArray(int)
+  def intToBytes(int: Int): LazyList[Byte] = {
+    LazyList.from(Ints.toByteArray(int))
   }
 
-  def printBytes(bytes: Seq[Byte]): String = {
+  def printBytes(bytes: LazyList[Byte]): String = {
     formatHexLikeClassFile(valueOf(bytes)).toLowerCase
   }
 

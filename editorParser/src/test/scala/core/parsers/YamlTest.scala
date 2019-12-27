@@ -80,7 +80,7 @@ class YamlTest extends AnyFunSuite
   class IfContext[Result](inners: Map[YamlContext, Parser[Result]]) extends ParserBuilderBase[Result] {
 
     override def getParser(recursive: GetParser) = {
-      val innerParsers = inners.mapValues(p => recursive(p))
+      val innerParsers = inners.view.mapValues(p => recursive(p)).toMap
       (input, state) => innerParsers(input.context)(input, state)
     }
 
