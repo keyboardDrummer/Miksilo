@@ -3,9 +3,9 @@ package core.parsers
 import _root_.core.parsers.editorParsers._
 import _root_.core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, ParseError, Position, SourceRange}
 import _root_.core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class WhiteSpaceTest extends FunSuite {
+class WhiteSpaceTest extends AnyFunSuite {
 
   val parser = ExpressionParser.root.getWholeInputParser
 

@@ -2,10 +2,10 @@ package deltas.solidity
 
 import core.SourceUtils
 import core.language.{Compilation, InMemoryFileSystem}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, StreamUtils, TestLanguageBuilder}
 
-class SolidityExamples extends FunSuite {
+class SolidityExamples extends AnyFunSuite {
   val solidity = TestLanguageBuilder.build(SolidityLanguage.deltas)
 
   ignore("contract, fields, functions, return expression, assignment") {
@@ -202,8 +202,8 @@ class SolidityExamples extends FunSuite {
                     |}""".stripMargin
 
     val compilation = new Compilation(solidity.language, InMemoryFileSystem(Map(
-      "testLibrary.sol" -> StreamUtils.stringToStream(program),
-      "browser/library.sol" -> StreamUtils.stringToStream(library))), Some("testLibrary.sol"))
+      "testLibrary.sol" -> program,
+      "browser/library.sol" -> library)), Some("testLibrary.sol"))
 
     compilation.runPhases()
     assertResult(Seq.empty)(compilation.diagnostics)

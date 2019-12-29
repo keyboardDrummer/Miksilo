@@ -1,5 +1,7 @@
 package core.language.node
 
+import scala.language.experimental.macros
+
 trait Key extends AnyRef
 {
   override lazy val toString: String = debugRepresentation

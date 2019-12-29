@@ -1,14 +1,13 @@
 package application.graphing.model
 
 import application.graphing.model.simplifications._
-import com.google.common.collect.Lists
+import deltas.javac.JavaToByteCodeLanguage
 import org.jgrapht.alg.{DijkstraShortestPath, StrongConnectivityInspector}
 import org.jgrapht.graph.DefaultEdge
 import org.jgrapht.traverse.TopologicalOrderIterator
-import deltas.javac.JavaToByteCodeLanguage
 
-import scala.collection.convert.Wrappers
-import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
+import scala.collection.mutable
+import scala.jdk.CollectionConverters
 
 class DeltaGraph
   extends GraphFromDeltas(JavaToByteCodeLanguage.allDeltas) {
@@ -17,16 +16,16 @@ class DeltaGraph
     JavaSimpleStatement, JavaMethodGroup, JavaGroup)
   addSimplifications()
 
-  val sources: JSetWrapper[DeltaVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
+  val sources: mutable.Set[DeltaVertex] = getVertices.filter(vertex => this.inDegreeOf(vertex) == 0)
 //  if (sources.size > 1)
 //    throw new RuntimeException(s"more than once source, sources = $sources.")
 
-  if (sources.size == 0)
+  if (sources.isEmpty)
     throw new RuntimeException("zero sources.")
 
   optimizeDependencies()
 
-  def addSimplifications() {
+  def addSimplifications(): Unit = {
     for (simplification <- simplifications) {
       addVertex(simplification)
 
@@ -49,16 +48,16 @@ class DeltaGraph
     }
   }
 
-  def getOutgoingNodes(vertex: DeltaVertex): Set[DeltaVertex] = {
-    JSetWrapper(this.outgoingEdgesOf(vertex)).map(outgoingEdge => getEdgeTarget(outgoingEdge)).toSet
+  def getOutgoingNodes(vertex: DeltaVertex): mutable.Set[DeltaVertex] = {
+    CollectionConverters.SetHasAsScala(this.outgoingEdgesOf(vertex)).asScala.map(outgoingEdge => getEdgeTarget(outgoingEdge))
   }
 
-  def optimizeDependencies() {
-    val topologicalOrdering = Lists.newArrayList(new TopologicalOrderIterator(this))
+  def optimizeDependencies(): Unit = {
+    val topologicalOrdering = Array.from(CollectionConverters.IteratorHasAsScala(new TopologicalOrderIterator(this)).asScala)
 
-    if (topologicalOrdering.size() < vertexSet().size()) {
+    if (topologicalOrdering.length < vertexSet().size()) {
       val detector = new StrongConnectivityInspector(this)
-      val cycles = JListWrapper(detector.stronglyConnectedSets()).map(s => JSetWrapper(s)).filter(s => s.size > 1)
+      val cycles = CollectionConverters.ListHasAsScala(detector.stronglyConnectedSets()).asScala.filter(s => s.size > 1)
       if (cycles.nonEmpty) {
         throw new RuntimeException(s"you have cycles: $cycles")
       }
@@ -67,7 +66,7 @@ class DeltaGraph
     }
 
     var deepDependencies = Map.empty[DeltaVertex, Map[DeltaVertex, Int]]
-    for (vertex <- JListWrapper[DeltaVertex](topologicalOrdering)) {
+    for (vertex <- topologicalOrdering) {
       deepDependencies += vertex -> Map[DeltaVertex, Int](vertex -> 1)
 
       for (outgoingNode <- getIncomingNodes(vertex)) {
@@ -88,8 +87,8 @@ class DeltaGraph
     }
   }
 
-  def getIncomingNodes(dependency: DeltaVertex): Set[DeltaVertex] = {
-    JSetWrapper(incomingEdgesOf(dependency)).map(edge => getEdgeSource(edge)).toSet
+  def getIncomingNodes(dependency: DeltaVertex): mutable.Set[DeltaVertex] = {
+    CollectionConverters.SetHasAsScala(incomingEdgesOf(dependency)).asScala.map(edge => getEdgeSource(edge))
   }
 
   def alterNestedMap[K, K2, V](map: Map[K, Map[K2, V]], key: K, key2: K2, default: V, alter: V => V): Map[K, Map[K2, V]] = {
@@ -101,8 +100,7 @@ class DeltaGraph
     map + (key -> alter(map.getOrElse(key, default)))
   }
 
-  def getVertices: Wrappers.JSetWrapper[DeltaVertex] = {
-    JSetWrapper(vertexSet())
+  def getVertices: mutable.Set[DeltaVertex] = {
+    CollectionConverters.SetHasAsScala(vertexSet()).asScala
   }
-
 }

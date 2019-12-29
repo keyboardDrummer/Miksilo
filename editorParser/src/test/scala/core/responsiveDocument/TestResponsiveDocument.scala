@@ -1,9 +1,9 @@
 package core.responsiveDocument
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import core.responsiveDocument.ResponsiveDocument._
 
-class TestResponsiveDocument extends FunSuite {
+class TestResponsiveDocument extends AnyFunSuite {
 
   val newLine = System.lineSeparator()
 

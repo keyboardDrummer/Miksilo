@@ -18,15 +18,13 @@ lazy val commonSettings = Seq(
   resolvers += "dhpcs at bintray" at "https://dl.bintray.com/dhpcs/maven",
   logLevel := Level.Info,
   logBuffered in Test := false,
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.13.1",
   scalacOptions += "-deprecation",
   scalacOptions += "-feature",
   scalacOptions += "-language:implicitConversions",
   scalacOptions += "-language:postfixOps",
 
-  libraryDependencies += "org.scalatest" % "scalatest_2.12" % "3.0.4" % "test",
-
-  // https://mvnrepository.com/artifact/com.typesafe.scala-logging/scala-logging
+  libraryDependencies += "org.scalatest" % "scalatest_2.13" % "3.1.0" % "test",
 )
 
 lazy val assemblySettings = Seq(
@@ -51,9 +49,7 @@ lazy val editorParser = (project in file("editorParser")).
 lazy val LSPProtocol = (project in file("LSPProtocol")).
   settings(commonSettings: _*).
   settings(
-    libraryDependencies += "com.dhpcs" %% "scala-json-rpc" % "2.0.1",
-    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1",
   ).dependsOn(editorParser)
 
 lazy val languageServer = (project in file("languageServer")).
@@ -71,9 +67,6 @@ lazy val languageServer = (project in file("languageServer")).
       url("https://github.com/keyboardDrummer"))),
     licenses += ("MIT", url("https://github.com/keyboardDrummer/Miksilo/blob/master/LICENSE")),
     publishMavenStyle := true,
-
-    libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-    libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.1.7",
 
     publishTo := Some(
       if (isSnapshot.value)
@@ -102,13 +95,7 @@ lazy val modularLanguages = (project in file("modularLanguages")).
     },
 
     // byteCode parser
-    libraryDependencies += "org.scala-lang.modules" % "scala-parser-combinators_2.12" % "1.0.6",
-
-    //import com.google.common.primitives.{Ints, Longs}
-    libraryDependencies += "com.google.guava" % "guava" % "18.0",
-
-    // https://mvnrepository.com/artifact/com.typesafe.play/play-json
-    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.6.9",
+    libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
 
   ).dependsOn(languageServer,
     editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )

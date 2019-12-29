@@ -127,7 +127,7 @@ class ScopeGraph extends
     edges.add(edge)
   }
 
-  private def addNode(node: GraphNode, element: SourceElement) {
+  private def addNode(node: GraphNode, element: SourceElement): Unit = {
     elementToNode(element) = node
     element.fileRange.foreach(position => rangeToNode(position) = node)
     node match {

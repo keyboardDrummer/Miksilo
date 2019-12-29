@@ -26,7 +26,7 @@ object JavaClassToByteCodeDelta extends Delta {
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     transformClass(program)
 
-    def transformClass(program: Node) {
+    def transformClass(program: Node): Unit = {
       val javaClass: JavaClass[NodePath] = PathRoot(program)
       JavaStandardLibrary.loadIntoClassPath(compilation)
       javaClass.node.shape = ByteCodeSkeleton.Shape

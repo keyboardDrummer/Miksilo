@@ -5,7 +5,7 @@ import com.dhpcs.jsonrpc.JsonRpcNotificationMessage
 import jsonRpc._
 import play.api.libs.json.Json
 
-class LSPServerMessagePreprocessor(original: AsyncJsonRpcHandler) extends MessagePreprocessor(original) {
+class LSPServerMessagePreprocessor(original: JsonRpcHandler) extends MessagePreprocessor(original) {
 
   val changeParamsFormat = Json.format[DidChangeTextDocumentParams]
   override def aggregate(messages: CircularArrayBuffer[WorkItem]): Unit = {
@@ -29,7 +29,7 @@ class LSPServerMessagePreprocessor(original: AsyncJsonRpcHandler) extends Messag
             val mergedChange = DidChangeTextDocumentParams(secondChange.textDocument, firstChange.contentChanges ++ secondChange.contentChanges)
             val newMessage = Notification(JsonRpcNotificationMessage(LSPProtocol.didChange, ObjectParams(changeParamsFormat.writes(mergedChange))))
             messages.remove(messages.size - 2, 2)
-            messages += newMessage
+            messages.append(newMessage)
           }
         }
       case _ =>

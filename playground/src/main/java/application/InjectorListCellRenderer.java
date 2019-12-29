@@ -4,6 +4,7 @@ import application.compilerBuilder.DeltaInstance;
 import application.compilerBuilder.DeltaLabelPainter;
 import application.compilerCockpit.MarkOutputGrammar$;
 import core.deltas.Delta;
+import org.jdesktop.swingx.JXList;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +14,10 @@ public class InjectorListCellRenderer extends DefaultListCellRenderer {
 
   public InjectorListCellRenderer(DeltaLabelPainter painter) {
     this.painter = painter;
+  }
+
+  public void setInJXList(JXList list) {
+    list.setCellRenderer(this);
   }
 
   public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

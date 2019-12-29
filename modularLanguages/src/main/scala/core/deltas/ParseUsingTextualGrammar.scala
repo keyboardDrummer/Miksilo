@@ -2,7 +2,6 @@ package core.deltas
 
 import java.io.InputStream
 
-import com.typesafe.scalalogging.LazyLogging
 import core.bigrammar.BiGrammarToParser
 import core.bigrammar.BiGrammarToParser.{Reader, _}
 import core.deltas.grammars.LanguageGrammars
@@ -11,6 +10,7 @@ import core.language.node.Node
 import core.language.{Compilation, Language}
 import core.parsers.editorParsers.{SingleParseResult, StopFunction, TimeRatioStopFunction}
 import core.parsers.sequences.SingleResultParser
+import jsonRpc.LazyLogging
 import util.StreamUtils
 
 import scala.io.Source
@@ -19,15 +19,16 @@ case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioSt
   extends DeltaWithPhase with LazyLogging {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    val phase = Language.getParsePhaseFromParser[Node, Input](stream => new Reader(Source.fromInputStream(stream, "UTF-8").mkString), (program, uri) => {
+    val phase = Language.getParsePhaseFromParser[Node, Input](input => new Reader(input), (program, uri) => {
       program.startOfUri = Some(uri)
       PathRoot(program)
     }, parserProp.get(compilation), stopFunction)
     phase.action(compilation)
   }
 
-  def parseStream[T](compilation: Compilation, parser: SingleResultParser[T, BiGrammarToParser.Input], input: InputStream): SingleParseResult[T, BiGrammarToParser.Input] = {
-    parser.parse(new Reader(StreamUtils.streamToString(input)), stopFunction, compilation.metrics)
+  def parseStream[T](compilation: Compilation, parser: SingleResultParser[T, BiGrammarToParser.Input], input: String):
+    SingleParseResult[T, BiGrammarToParser.Input] = {
+    parser.parse(new Reader(input), stopFunction, compilation.metrics)
   }
 
   val parserProp = new Property[SingleResultParser[Node, BiGrammarToParser.Input]](null)

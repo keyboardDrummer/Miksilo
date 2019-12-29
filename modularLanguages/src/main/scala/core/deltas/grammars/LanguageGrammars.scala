@@ -11,6 +11,7 @@ case class KeyGrammar(key: Key) extends GrammarKey
 }
 
 object TriviasGrammar extends GrammarKey
+
 object TriviaGrammar extends GrammarKey
 object BodyGrammar extends GrammarKey
 object ProgramGrammar extends GrammarKey

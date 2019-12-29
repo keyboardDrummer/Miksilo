@@ -23,7 +23,7 @@ trait LazyParseResult[Input, +Result] {
 class DelayedParseResult[Input, Result](val history: History[Input], _getResults: () => ParseResults[Input, Result])
   extends LazyParseResult[Input, Result] {
 
-  override def toString = score + " delayed: " + history
+  override def toString = s"$score delayed: $history"
 
   override def map[NewResult](f: Result => NewResult): DelayedParseResult[Input, NewResult] = {
     new DelayedParseResult(history, () => results.map(f))

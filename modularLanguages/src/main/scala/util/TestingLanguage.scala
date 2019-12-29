@@ -21,22 +21,15 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   lazy val language: Language = buildLanguage
   lazy val grammars: LanguageGrammars = LanguageGrammars.grammars.get(language)
 
-  def compileString(input: String): Compilation = {
-    compileStream(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
-  }
-
-  def compile(input: File): Compilation = {
-    compileStream(input.inputStream())
-  }
 
   def compileToFile(inputStream: InputStream, outputFile: File): Compilation = {
-    val compilation: Compilation = compileStream(inputStream)
+    val compilation: Compilation = compileString(StreamUtils.streamToString(inputStream))
 
     PrintByteCodeToOutputDirectory.perform(outputFile, compilation)
     compilation
   }
 
-  def compileStream(input: InputStream): Compilation = {
+  def compileString(input: String): Compilation = {
     val compilation = Compilation.singleFile(language, input)
     runPhases(compilation)
     compilation

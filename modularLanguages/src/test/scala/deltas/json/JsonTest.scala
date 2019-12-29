@@ -6,10 +6,10 @@ import core.language.node.Node
 import core.parsers.editorParsers.{Position, UntilBestAndXStepsStopFunction}
 import deltas.expression.ExpressionDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
-class JsonTest extends FunSuite {
+class JsonTest extends AnyFunSuite {
   val language = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas, UntilBestAndXStepsStopFunction())
 
   test("removes incorrect b at start") {

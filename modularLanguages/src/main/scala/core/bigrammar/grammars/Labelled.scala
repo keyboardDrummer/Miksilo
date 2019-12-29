@@ -5,7 +5,7 @@ import core.language.node.GrammarKey
 
 class Labelled(val name: GrammarKey, var inner: BiGrammar = BiFailure()) extends BiGrammar {
 
-  def addAlternative(addition: BiGrammar, precedence: Boolean = false) {
+  def addAlternative(addition: BiGrammar, precedence: Boolean = false): Unit = {
     if (inner.isInstanceOf[BiFailure])
       inner = addition
     else {

@@ -1,12 +1,12 @@
 package core.parsers
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import editorParsers.Fix
 import _root_.core.parsers.editorParsers.{Position, SourceRange, TextEdit}
 import _root_.core.parsers.strings.CommonStringReaderParser
 
-class ErrorReportingAndFixTest extends FunSuite
+class ErrorReportingAndFixTest extends AnyFunSuite
   with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   test("left recursion with lazy indirection error") {

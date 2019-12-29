@@ -5,10 +5,10 @@ import core.deltas.Delta
 import deltas.PrettyPrint
 import deltas.bytecode.simpleBytecode.{InlineConstantPool, LabelledLocations}
 import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
 
-class TestLabelledLocations extends FunSuite {
+class TestLabelledLocations extends AnyFunSuite {
 
   val labelledParticles: Seq[Delta] = Seq(LabelledLocations, InlineConstantPool) ++ ByteCodeLanguage.byteCodeDeltas
 

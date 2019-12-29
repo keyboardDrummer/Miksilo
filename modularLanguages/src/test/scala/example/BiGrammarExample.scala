@@ -4,7 +4,7 @@ import core.bigrammar._
 import core.bigrammar.grammars.{Labelled, RegexGrammar}
 import core.deltas.NodeGrammarWriter
 import core.language.node.{NodeField, NodeShape}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 object While {
   object Shape extends NodeShape
@@ -36,7 +36,7 @@ object Constant {
 /**
   * Contains some examples for the wiki.
   */
-class BiGrammarExample extends FunSuite with NodeGrammarWriter with WhitespaceTriviaSequenceCombinators {
+class BiGrammarExample extends AnyFunSuite with NodeGrammarWriter with WhitespaceTriviaSequenceCombinators {
 
   test("mapAndRegexExample") {
     new RegexGrammar("""-?\d+""".r, "whole number").map[String, Int](

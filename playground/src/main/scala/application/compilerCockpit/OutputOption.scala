@@ -8,9 +8,9 @@ object OutputOption {
 
   def getOutput(state: Language) = state.data.get(Output).collect({ case x: String => x})
 
-  def setOutput(state: Language, value: String) = state.data(Output) = value
+  def setOutput(state: Language, value: String): Unit = state.data(Output) = value
 }
 
 trait OutputOption {
-    def handleOutput(output: TextWithGrammar)
+    def handleOutput(output: TextWithGrammar): Unit
 }

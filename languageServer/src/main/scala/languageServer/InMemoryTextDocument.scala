@@ -1,7 +1,7 @@
 package languageServer
 
-import com.typesafe.scalalogging.LazyLogging
 import core.parsers.editorParsers.{Position, SourceRange}
+import jsonRpc.LazyLogging
 import languageServer.InMemoryTextDocument._
 import lsp.TextDocumentContentChangeEvent
 
@@ -12,11 +12,9 @@ object InMemoryTextDocument {
 }
 
 class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) extends LazyLogging {
-
   def this(uri: String, contents: String) = {
     this(uri, ArrayBuffer[Array[Char]](
-      contents.split(newLine, -1).map(line =>
-      line.toArray):_*))
+      contents.split(newLine, -1).view.map(line => line.toArray).toSeq: _*))
   }
 
   def applyUnsafeChanges(changes: Seq[TextDocumentContentChangeEvent]): Unit = {

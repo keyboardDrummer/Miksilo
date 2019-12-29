@@ -13,8 +13,9 @@ import deltas.bytecode.coreInstructions.InstructionInstance.Instruction
 import deltas.bytecode.coreInstructions.integers.integerCompare._
 import deltas.bytecode.simpleBytecode.LabelDelta.Label
 
+import scala.collection.immutable.ArraySeq
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
 
@@ -66,9 +67,8 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
       targetLocations.toMap
     }
 
-    def getNewInstructions(instructions: Seq[Instruction[Node]], targetLocations: Map[String, Int]): ArrayBuffer[Node] = {
-      var newInstructions = mutable.ArrayBuffer[Node]()
-      newInstructions.sizeHint(instructions.length)
+    def getNewInstructions(instructions: Seq[Instruction[Node]], targetLocations: Map[String, Int]): Seq[Node] = {
+      var newInstructions = ListBuffer.empty[Node]
 
       var location = 0
       for (instruction <- instructions) {
@@ -79,12 +79,12 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
         }
 
         if (instruction.shape != LabelDelta.shape)
-          newInstructions += instruction
+          newInstructions.addOne(instruction)
 
         location += instructionSize(instruction)
       }
 
-      newInstructions
+      newInstructions.toSeq
     }
   }
 
@@ -96,8 +96,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     val locationsWithFrame = instructions.filter(i => i.shape == LabelDelta.Shape).map(i => new Label(i)).
       map(i => (labelLocations(i.name), i.stackFrame))
     var locationAfterPreviousFrame = 0
-    var stackFrames = ArrayBuffer[Node]()
-    stackFrames.sizeHint(locationsWithFrame.size)
+    var stackFrames = ListBuffer.empty[Node]
     for ((location, frame) <- locationsWithFrame) {
       val offset = location - locationAfterPreviousFrame
       if (offset >= 0) { //TODO add a test-case for consecutive labels.
@@ -109,7 +108,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     if (stackFrames.nonEmpty) {
       Seq(StackMapTableAttributeDelta.Shape.create(
         AttributeNameKey -> StackMapTableAttributeDelta.entry,
-        StackMapTableAttributeDelta.Maps -> stackFrames))
+        StackMapTableAttributeDelta.Maps -> stackFrames.toSeq))
     }
     else
       Seq.empty[Node]

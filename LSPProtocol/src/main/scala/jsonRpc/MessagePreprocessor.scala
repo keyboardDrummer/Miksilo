@@ -8,52 +8,24 @@ trait WorkItem
 case class Notification(notification: JsonRpcNotificationMessage) extends WorkItem
 case class Request(request: JsonRpcRequestMessage, result: Promise[JsonRpcResponseMessage]) extends WorkItem
 
-abstract class MessagePreprocessor(original: AsyncJsonRpcHandler) extends AsyncJsonRpcHandler {
+abstract class MessagePreprocessor(original: JsonRpcHandler) extends JsonRpcHandler {
 
   def aggregate(items: CircularArrayBuffer[WorkItem]): Unit
 
   var messages: CircularArrayBuffer[WorkItem] = new CircularArrayBuffer[WorkItem]
-  val lock = new Object()
 
-  @volatile
-  private var streamClosed = false
+  def dispose(): Unit = {}
 
-  private class PumpInput extends Thread("Input Reader") {
-    override def run() {
-      while (!streamClosed) {
-        dequeueWorkItem() match {
-          case None =>
-          case Some(message) => message match {
-            case Notification(notification) => original.handleNotification(notification)
-            case Request(request, resultPromise) => original.handleRequest(request).map(result => resultPromise.success(result))(ExecutionContext.global)
-          }
-        }
-      }
+  def dequeueWorkItem(): Unit = {
+    if (messages.isEmpty)
+      return
+
+    val message = messages.popLeft()
+    message match {
+      case Notification(notification) => original.handleNotification(notification)
+      case Request(request, resultPromise) => original.handleRequest(request).map(result => resultPromise.success(result))(ExecutionContext.global)
     }
-  }
-
-  (new PumpInput).start()
-
-  def dispose(): Unit = {
-    streamClosed = true
-  }
-
-  def dequeueWorkItem(): Option[WorkItem] = {
-    lock.synchronized {
-      if (messages.isEmpty) {
-        if (!streamClosed) {
-          lock.wait()
-          dequeueWorkItem()
-        }
-        else {
-          None
-        }
-      }
-      else {
-        val message = messages.popLeft()
-        Some(message)
-      }
-    }
+    dequeueWorkItem()
   }
 
   override def handleNotification(notification: JsonRpcNotificationMessage): Unit = {
@@ -67,11 +39,9 @@ abstract class MessagePreprocessor(original: AsyncJsonRpcHandler) extends AsyncJ
   }
 
   def addMessage(message: WorkItem): Unit = {
-    lock.synchronized {
-      messages += message
-      aggregate(messages)
-      lock.notify()
-    }
+    messages.append(message)
+    aggregate(messages)
+    ExecutionContext.global.execute(() => dequeueWorkItem())
   }
 
 }

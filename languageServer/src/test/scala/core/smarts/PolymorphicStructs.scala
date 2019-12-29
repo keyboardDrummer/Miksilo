@@ -6,9 +6,9 @@
 //import core.nabl.language.modules.{Binding, Module}
 //import core.nabl.language.structs.{Field, New, Struct, StructFieldInit}
 //import core.nabl.language.types.{LanguageTypeApplication, LanguageTypeVariable}
-//import org.scalatest.FunSuite
+//import org.scalatest.funsuite.AnyFunSuite
 //
-//class PolymorphicStructs extends FunSuite with LanguageWriter {
+//class PolymorphicStructs extends AnyFunSuite with LanguageWriter {
 //
 //  test("struct") {
 //    val structDeclaration = Struct("s", Seq("x" of "a"), typeParameter = Some("a"))

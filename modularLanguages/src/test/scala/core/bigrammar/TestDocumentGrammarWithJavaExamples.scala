@@ -10,12 +10,12 @@ import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, Impl
 import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
 import deltas.statement.BlockDelta
 import deltas.{PrettyPrint, RunWithJVM}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, StreamUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
-class TestDocumentGrammarWithJavaExamples extends FunSuite {
+class TestDocumentGrammarWithJavaExamples extends AnyFunSuite {
   val lineSeparator: String = System.lineSeparator()
 
   test("SimpleForLoop") {
@@ -72,7 +72,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
       ImplicitObjectSuperClass, ConstructorDelta, ImplicitReturnAtEndOfMethod, SolveConstraintsDelta, ImplicitThisForPrivateMemberSelectionDelta)
     val newDeltas = TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas).spliceAfterTransformations(implicits, Seq(new PrettyPrint))
 
-    val state = TestLanguageBuilder.buildWithParser(newDeltas).compileStream(input)
+    val state = TestLanguageBuilder.buildWithParser(newDeltas).compileString(input)
     val output = state.output
 
     assertResult(expectation)(output)
@@ -84,7 +84,7 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
 
     val prettyPrintCompiler = getPrettyPrintJavaToByteCodeCompiler
 
-    val state = prettyPrintCompiler.compileStream(input)
+    val state = prettyPrintCompiler.compileString(input)
     assertResult(expectation)(state.output)
   }
 
@@ -98,25 +98,25 @@ class TestDocumentGrammarWithJavaExamples extends FunSuite {
     val byteCodeTransformations = ByteCodeLanguage.byteCodeDeltas
     val prettyPrintCompiler = getPrettyPrintJavaToByteCodeCompiler
 
-    val state = prettyPrintCompiler.compileStream(input)
+    val state = prettyPrintCompiler.compileString(input)
     val byteCode = state.output
 
     val parseTransformations = Seq(RunWithJVM) ++ byteCodeTransformations
-    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileStream(StreamUtils.stringToStream(byteCode)).output
+    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileString(byteCode).output
     assertResult("8")(output)
   }
 
   test("prettyPrintByteCode") {
     val input = SourceUtils.getResourceFileContents("FibonacciByteCodePrettyPrinted.txt")
     val parseTransformations = Seq(new PrettyPrint) ++ ByteCodeLanguage.byteCodeDeltas
-    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileStream(StreamUtils.stringToStream(input)).output
+    val output = TestLanguageBuilder.buildWithParser(parseTransformations).compileString(input).output
     assertResult(input)(output)
   }
 
   test("parseByteCode") {
     val input = SourceUtils.getResourceFileContents("FibonacciByteCodePrettyPrinted.txt")
     val deltas = Seq(RunWithJVM) ++ ByteCodeLanguage.byteCodeDeltas
-    val output = TestLanguageBuilder.buildWithParser(deltas).compileStream(StreamUtils.stringToStream(input)).output
+    val output = TestLanguageBuilder.buildWithParser(deltas).compileString(input).output
     assertResult("8")(output)
   }
 }

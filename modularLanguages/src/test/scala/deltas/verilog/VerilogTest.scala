@@ -11,12 +11,12 @@ import deltas.expression.VariableDelta.Variable
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import lsp.{DocumentPosition, FileRange, HumanPosition, TextDocumentIdentifier}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 
-class VerilogTest extends FunSuite with LanguageServerTest {
+class VerilogTest extends AnyFunSuite with LanguageServerTest {
 
   val language = TestLanguageBuilder.buildWithParser(VerilogLanguage.deltas)
   val justParseLanguage = TestLanguageBuilder.buildWithParser(Seq(ClearPhases) ++ VerilogLanguage.deltas)
@@ -99,8 +99,8 @@ class VerilogTest extends FunSuite with LanguageServerTest {
 
   test("can compile multiple files") {
     val fileSystem = InMemoryFileSystem(Map(
-      "./Bus_pkg.sv" -> SourceUtils.getResourceFile(Path("verilog") / "Bus_pkg.sv"),
-      "testbench.sv" -> SourceUtils.getResourceFile(Path("verilog") / "testbench.sv")))
+      "./Bus_pkg.sv" -> SourceUtils.getResourceFileContents(Path("verilog") / "Bus_pkg.sv"),
+      "testbench.sv" -> SourceUtils.getResourceFileContents(Path("verilog") / "testbench.sv")))
     val compilation = new Compilation(language.language, fileSystem, Some("testbench.sv"))
     compilation.runPhases()
     assert(compilation.diagnostics.isEmpty, compilation.diagnostics)

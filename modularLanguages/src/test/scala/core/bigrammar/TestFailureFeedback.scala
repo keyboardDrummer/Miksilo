@@ -1,9 +1,9 @@
 package core.bigrammar
 
 import core.bigrammar.printer.{BiGrammarToPrinter, PrintError}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestFailureFeedback extends FunSuite with WhitespaceTriviaSequenceCombinators {
+class TestFailureFeedback extends AnyFunSuite with WhitespaceTriviaSequenceCombinators {
 
   test("FailureFeedback") {
     val input = ("1", "2")

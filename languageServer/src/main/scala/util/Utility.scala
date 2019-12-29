@@ -3,7 +3,7 @@ package util
 import scala.reflect.ClassTag
 
 object Utility {
-  def repeat[T](seed: T, function: T => T): Stream[T] = {
+  def repeat[T](seed: T, function: T => T): LazyList[T] = {
     seed #:: repeat(function(seed),function)
   }
 

@@ -35,7 +35,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar)
 
     val member = (Colorize(create(MemberKey, keyGrammar), "string.quoted.double") ~< ":") ~~ expressionGrammar.as(MemberValue) asNode MemberShape
-    val optionalTrailingComma = Parse(Keyword(",") | value(Unit))
+    val optionalTrailingComma = Parse(Keyword(",") | value(()))
     val inner = Delimiter("{", History.missingInputPenalty * 2) %> (member.manySeparatedVertical(",").as(Members) ~< optionalTrailingComma).indent() %< "}"
 
     val grammar = inner.asLabelledNode(Shape)

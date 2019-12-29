@@ -4,29 +4,30 @@ import deltas.javac.JavaLanguage
 import deltas.smithy.SmithyLanguage
 import deltas.solidity.SolidityLanguage
 import deltas.verilog.VerilogLanguage
-import languageServer.{LanguageServerMain, LanguageBuilder}
+import jsonRpc.{JVMMessageReader, JVMMessageWriter, JsonRpcConnection}
+import languageServer.{LanguageBuilder, LanguageServerMain}
 
 object VerilogLanguageBuilder extends LanguageBuilder {
   override def key = "verilog"
-  override def build(arguments: Seq[String]) = VerilogLanguage.language
+  override def build(arguments: collection.Seq[String]) = VerilogLanguage.language
 }
 
 object JavaLanguageBuilder extends LanguageBuilder {
   override def key = "java"
 
-  override def build(arguments: Seq[String]) = JavaLanguage.java
+  override def build(arguments: collection.Seq[String]) = JavaLanguage.java
 }
 
 object SolidityLanguageBuilder extends LanguageBuilder {
   override def key = "solidity"
 
-  override def build(arguments: Seq[String]) = SolidityLanguage.language
+  override def build(arguments: collection.Seq[String]) = SolidityLanguage.language
 }
 
 object SmithyLanguageBuilder extends LanguageBuilder {
   override def key = "smithy"
 
-  override def build(arguments: Seq[String]) = SmithyLanguage.language
+  override def build(arguments: collection.Seq[String]) = SmithyLanguage.language
 }
 
 object Program extends LanguageServerMain(Seq(
@@ -34,5 +35,5 @@ object Program extends LanguageServerMain(Seq(
   JavaLanguageBuilder,
   SolidityLanguageBuilder,
   SmithyLanguageBuilder
-))
+), new JsonRpcConnection(new JVMMessageReader(System.in), new JVMMessageWriter(System.out)))
 

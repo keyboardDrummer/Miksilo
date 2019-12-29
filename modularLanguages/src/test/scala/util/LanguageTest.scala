@@ -1,7 +1,6 @@
 package util
 
-import java.io.{BufferedInputStream, ByteArrayInputStream, InputStream}
-import java.nio.charset.StandardCharsets
+import java.io.{BufferedInputStream, InputStream}
 import java.nio.file.Files
 
 import core.SourceUtils
@@ -13,7 +12,8 @@ import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.PrintByteCode
 import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
-import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap, FunSuite}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap}
 import util.JavaSourceUtils.LineProcessLogger
 
 import scala.reflect.io.{Directory, File, Path}
@@ -24,9 +24,11 @@ class JavaLanguageTest
 
 object LanguageTest {
 
-  def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]) {
+  def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]): Unit = {
     for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
-      assert(NodeComparer(compareIntegers = false, takeAllRightKeys = false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
+      val expected = getMethodInstructions(methodPair._1)
+      val compiled = getMethodInstructions(methodPair._2)
+      assert(NodeComparer(compareIntegers = false, takeAllRightKeys = false).deepEquality(expected, compiled))
     }
   }
 
@@ -37,7 +39,7 @@ object LanguageTest {
   }
 }
 
-class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAndAfterAllConfigMap {
+class LanguageTest(val language: TestingLanguage) extends AnyFunSuite with BeforeAndAfterAllConfigMap {
 
   override protected def afterAll(configMap: ConfigMap): Unit = {
     TestLanguageBuilder.statistics.printAll()
@@ -58,14 +60,14 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
   actualOutputDirectory.createDirectory(force = true)
   expectedOutputDirectory.createDirectory(force = true)
 
-  def runByteCode(className: String, code: Node, expectedResult: Int) {
+  def runByteCode(className: String, code: Node, expectedResult: Int): Unit = {
     val line = JavaSourceUtils.runByteCode(className, code)
     assertResult(expectedResult)(Integer.parseInt(line))
   }
 
   def parseAndTransform(className: String, inputDirectory: Path): Node = {
     val input: String = JavaSourceUtils.getJavaTestFileContents(className, inputDirectory)
-    language.compileStream(StreamUtils.stringToStream(input)).program.asInstanceOf[PathRoot].current
+    language.compileString(input).program.asInstanceOf[PathRoot].current
   }
 
   def compileAndRun(fileName: String, inputDirectory: Path = Path("")): String = {
@@ -85,11 +87,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
   }
 
   def compileAndPrettyPrint(input: String): String = {
-    compileAndPrettyPrint(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)))
-  }
-
-  def compileAndPrettyPrint(input: InputStream): String = {
-    val compilation = language.compileStream(input)
+    val compilation = language.compileString(input)
     compilation.output
   }
 
@@ -105,7 +103,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     compareWithJavacAfterRunning(File(inputDirectory / name))
   }
 
-  def compareWithJavacAfterRunning(inputFile: Path) {
+  def compareWithJavacAfterRunning(inputFile: Path): Unit = {
     val className = inputFile.stripExtension
 
     val relativeFilePath = inputFile.changeExtension("java")
@@ -180,7 +178,7 @@ class LanguageTest(val language: TestingLanguage) extends FunSuite with BeforeAn
     logger.line
   }
 
-  def compareConstantPools(expectedByteCode: Node, compiledCode: Node) {
+  def compareConstantPools(expectedByteCode: Node, compiledCode: Node): Unit = {
     val expectedConstantPoolSet = expectedByteCode.constantPool.constants
     val compiledConstantPoolSet = compiledCode.constantPool.constants
     assertResult(expectedConstantPoolSet.length)(compiledConstantPoolSet.length)

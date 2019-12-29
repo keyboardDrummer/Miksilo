@@ -3,13 +3,13 @@ package core.language
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 
-import com.typesafe.scalalogging.LazyLogging
 import core.language.exceptions.BadInputException
 import core.parsers.core.{Metrics, NoMetrics}
 import core.parsers.editorParsers.{StopFunction, TimeRatioStopFunction}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.StringReaderLike
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
+import jsonRpc.LazyLogging
 
 import scala.collection.mutable
 import scala.reflect.io.File
@@ -53,15 +53,15 @@ object Language extends LazyLogging {
   }
 
   def getParsePhaseFromParser[Program, Input <: StringReaderLike[Input]](
-    getInput: InputStream => Input,
+    getInput: String => Input,
     getSourceElement: (Program, String) => SourceElement,
     parser: SingleResultParser[Program, Input],
     stopFunction: StopFunction = new TimeRatioStopFunction): Phase = {
 
     Phase("parse", "parse the source code", compilation => {
       val uri = compilation.rootFile.get
-      val inputStream = compilation.fileSystem.getFile(uri)
-      val parseResult = parser.parse(getInput(inputStream), stopFunction, compilation.metrics)
+      val input = compilation.fileSystem.getFile(uri)
+      val parseResult = parser.parse(getInput(input), stopFunction, compilation.metrics)
       parseResult.resultOption.foreach(program => {
         compilation.program = getSourceElement(program, uri)
       })
@@ -88,14 +88,6 @@ class Language extends LazyLogging {
     compilerPhases = left ++ (insert :: right)
   }
 
-  def compileString(input: String): Compilation = {
-    compileStream(stringToInputStream(input))
-  }
-
-  def compileFile(input: File): Compilation = {
-    compileStream(input.inputStream())
-  }
-
   def compileAst(program: SourceElement): Compilation = {
     val compilation = Compilation.fromAst(this, program)
     compilation.program = program
@@ -105,8 +97,14 @@ class Language extends LazyLogging {
 
   def stringToInputStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
-  def compileStream(input: InputStream): Compilation = {
+  def compileString(input: String): Compilation = {
     val compilation = Compilation.singleFile(this, input)
+    compilation.runPhases()
+    compilation
+  }
+
+  def compile(): Compilation = {
+    val compilation = new Compilation(this, EmptyFileSystem, None)
     compilation.runPhases()
     compilation
   }

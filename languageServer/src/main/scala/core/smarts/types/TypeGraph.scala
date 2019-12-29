@@ -18,8 +18,10 @@ case class SuperType(target: TypeGraphNode) extends TypeGraphEdge
 {
 }
 
-class TypeGraph extends scala.collection.mutable.HashMap[TypeGraphNode, mutable.Set[TypeGraphEdge]]
+class TypeGraph
 {
+  val data = scala.collection.mutable.HashMap.empty[TypeGraphNode, mutable.Set[TypeGraphEdge]]
+
   def areCompatible(left: Type, right: Type): Boolean = {
     val rightNode: TypeNode = TypeNode(right)
     val leftNode: TypeNode = TypeNode(left)
@@ -41,7 +43,7 @@ class TypeGraph extends scala.collection.mutable.HashMap[TypeGraphNode, mutable.
       if (visited.add(element))
       {
         result ::= element
-        this.get(element).foreach(x => x.foreach(c => queue.enqueue(c.target)))
+        data.get(element).foreach(x => x.foreach(c => queue.enqueue(c.target)))
       }
     }
     result.reverse
@@ -54,7 +56,7 @@ class TypeGraph extends scala.collection.mutable.HashMap[TypeGraphNode, mutable.
 
   def add(node: TypeGraphNode, edge: TypeGraphEdge): Unit =
   {
-    val edges = this.getOrElseUpdate(node, mutable.Set.empty)
+    val edges = data.getOrElseUpdate(node, mutable.Set.empty)
     edges.add(edge)
   }
 }

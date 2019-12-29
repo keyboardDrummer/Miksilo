@@ -25,7 +25,7 @@ case class VariablePool(language: Language, typedVariables: Map[String, Node] = 
 
   def contains(name: String): Boolean = variables.contains(name)
 
-  private def privateAdd(variable: String, _type: Node) {
+  private def privateAdd(variable: String, _type: Node): Unit = {
     variables = variables.updated(variable, VariableInfo(offset, _type))
     offset += TypeSkeleton.getTypeSize(_type, language)
   }

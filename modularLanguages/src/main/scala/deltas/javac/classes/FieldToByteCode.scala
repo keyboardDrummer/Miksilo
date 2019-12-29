@@ -20,7 +20,7 @@ object FieldToByteCode {
     field
   }
 
-  def convertField(node: Node, classCompiler: ClassCompiler, state: Language) {
+  def convertField(node: Node, classCompiler: ClassCompiler, state: Language): Unit = {
     val field: Field[Node] = node
     val nameIndex = classCompiler.getNameIndex(field.name)
 

@@ -30,7 +30,7 @@ trait LanguageServerTest {
     server.asInstanceOf[DefinitionProvider].gotoDefinition(DocumentPosition(document, position))
   }
 
-  def references(server: LanguageServer, program: String, position: HumanPosition, includeDeclaration: Boolean): Seq[FileRange] = {
+  def references(server: LanguageServer, program: String, position: HumanPosition, includeDeclaration: Boolean): collection.Seq[FileRange] = {
     val document = openDocument(server, program)
     server.asInstanceOf[ReferencesProvider].references(ReferencesParams(document, position, ReferenceContext(includeDeclaration)))
   }

@@ -72,7 +72,7 @@ object StackMapTableAttributeDelta extends ByteCodeAttribute {
       Map(QualifiedObjectTypeDelta.Name -> ClassInfoConstant.shape))
   }
 
-  def getBytes(compilation: Compilation, attribute: Node): Seq[Byte] = {
+  def getBytes(compilation: Compilation, attribute: Node): LazyList[Byte] = {
 
     def getFrameByteCode(frame: Node): Seq[Byte] = {
       val offset = StackMapTableAttributeDelta.getFrameOffset(frame)

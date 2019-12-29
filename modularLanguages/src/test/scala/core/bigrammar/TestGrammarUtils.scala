@@ -3,9 +3,9 @@ package core.bigrammar
 import core.bigrammar.BiGrammarToParser.{Input, Reader, toParserBuilder}
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.parsers.editorParsers.{SingleParseResult, UntilBestAndXStepsStopFunction}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-object TestGrammarUtils extends FunSuite {
+object TestGrammarUtils extends AnyFunSuite {
 
   def parseAndPrintSame(example: String, expectedOption: Option[Any] = None, grammarDocument: BiGrammar): Unit = {
     val documentResult: String = parseAndPrint(example, expectedOption, grammarDocument)

@@ -1,11 +1,9 @@
 package jsonRpc
 
 import java.io.InputStream
-import java.nio.charset.Charset
 
-import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
-import com.typesafe.scalalogging.LazyLogging
+import scala.concurrent.Future
 
 /**
   * A Language Server message Reader. It expects the following format:
@@ -20,7 +18,7 @@ import com.typesafe.scalalogging.LazyLogging
   *
   * @note The header part is defined to be ASCII encoded, while the content part is UTF8.
   */
-class MessageReader(in: InputStream) extends LazyLogging {
+class JVMMessageReader(in: InputStream) extends MessageReader with LazyLogging {
   val BufferSize = 8192
 
   private val buffer = new Array[Byte](BufferSize)
@@ -32,7 +30,7 @@ class MessageReader(in: InputStream) extends LazyLogging {
   private val lock = new Object
 
   private class PumpInput extends Thread("Input Reader") {
-    override def run() {
+    override def run(): Unit = {
       var nRead = 0
       do {
         nRead = in.read(buffer)
@@ -59,7 +57,7 @@ class MessageReader(in: InputStream) extends LazyLogging {
     *         was closed, or there were no headers before the delimiter. You can disambiguate
     *         by checking {{{this.streamClosed}}}
     */
-  private final def getHeaders(): Map[String, String] = lock.synchronized {
+  private final def readHeaders(): Map[String, String] = lock.synchronized {
     val EmptyPair = "" -> ""
     val EmptyMap = Map.empty[String, String]
     def atDelimiter(idx: Int): Boolean = {
@@ -98,13 +96,13 @@ class MessageReader(in: InputStream) extends LazyLogging {
       // if there was a malformed header we keep trying to re-sync and read again
       if (pairs.contains(EmptyPair)) {
         logger.error("There was an empty pair in $pairs, trying to read another header.")
-        getHeaders()
+        readHeaders()
       } else pairs.toMap
     } else if (streamClosed) {
       EmptyMap
     } else {
       lock.wait()
-      getHeaders()
+      readHeaders()
     }
   }
 
@@ -128,12 +126,12 @@ class MessageReader(in: InputStream) extends LazyLogging {
   /**
     * Return the next JSON RPC content payload. Blocks until enough data has been received.
     */
-  def nextPayload(): Option[String] = if (streamClosed) None else {
+  def nextPayload(): Future[String] = if (streamClosed) Future.successful(null) else {
     // blocks until headers are available
-    val headers = getHeaders()
+    val headers = readHeaders()
 
     if (headers.isEmpty && streamClosed)
-      None
+      Future.successful(null)
     else {
       val length = headers.get("Content-Length") match {
         case Some(len) => try len.toInt catch { case e: NumberFormatException => -1 }
@@ -142,17 +140,12 @@ class MessageReader(in: InputStream) extends LazyLogging {
 
       if (length > 0) {
         val content = getContent(length)
-        if (content.isEmpty() && streamClosed) None else Some(content)
+        if (content.isEmpty && streamClosed) Future.successful(null) else Future.successful(content)
       } else {
         logger.error("Input must have Content-Length header with a numeric value.")
         nextPayload()
       }
     }
   }
-}
-
-object MessageReader {
-  val AsciiCharset = Charset.forName("ASCII")
-  val Utf8Charset = Charset.forName("UTF-8")
 }
 

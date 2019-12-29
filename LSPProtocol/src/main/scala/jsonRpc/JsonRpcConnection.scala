@@ -1,95 +1,34 @@
 package jsonRpc
 
-import java.io.{InputStream, OutputStream}
-import java.util.concurrent.Executors
+import java.nio.charset.Charset
 
-import com.dhpcs.jsonrpc.JsonRpcMessage._
+import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NoCorrelationId}
 import com.dhpcs.jsonrpc._
-import com.typesafe.scalalogging.LazyLogging
-import play.api.libs.json._
+import play.api.libs.json.{Format, JsError, Json}
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService, Future, Promise}
+import scala.concurrent.{Future, Promise}
 import scala.util.{Failure, Success, Try}
+import scala.concurrent.ExecutionContext.Implicits.global
 
-trait AsyncJsonRpcHandler {
-  def dispose(): Unit
-  def handleNotification(notification: JsonRpcNotificationMessage)
-  def handleRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage]
+trait MessageReader {
+  def nextPayload(): Future[String]
 }
 
-trait JsonRpcHandler {
-  def handleNotification(notification: JsonRpcNotificationMessage)
-  def handleRequest(request: JsonRpcRequestMessage): JsonRpcResponseMessage
+object MessageReader {
+  val AsciiCharset = Charset.forName("ASCII")
+  val Utf8Charset = Charset.forName("UTF-8")
 }
 
-/**
-  * A connection that reads and writes Language Server Protocol messages.
-  *
-  * @note Commands are executed asynchronously via a thread pool
-  * @note Notifications are executed synchronously on the calling thread
-  * @note The command handler returns Any because sometimes response objects can't be part
-  *       of a sealed hierarchy. For instance, goto definition returns a {{{Seq[Location]}}}
-  *       and that can't subclass anything other than Any
-  */
-class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
-  extends LazyLogging {
+trait MessageWriter {
+  def write(msg: String): Unit
+}
 
-  private val msgReader = new MessageReader(inStream)
-  private val msgWriter = new MessageWriter(outStream)
-  private var handler: AsyncJsonRpcHandler = _
-  private val writeLock = new Object()
-
-  def setHandler(partner: AsyncJsonRpcHandler): Unit = {
-    this.handler = partner
-  }
-
-  def sendNotification(notification: JsonRpcNotificationMessage): Unit = {
-    msgWriter.write(notification)
-  }
+class JsonRpcConnection(reader: MessageReader, writer: MessageWriter) extends LazyLogging {
 
   private var responseHandlers: Map[CorrelationId, JsonRpcResponseMessage => Unit] = Map.empty
+  protected var handler: JsonRpcHandler = _
 
-  def sendRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage] = {
-    val result = Promise[JsonRpcResponseMessage]
-
-    // TODO decide after what time to remove responseHandlers
-    responseHandlers += request.id -> ((response: JsonRpcResponseMessage) => result.success(response))
-
-    msgWriter.write(request)
-    result.future
-  }
-
-  def listen() {
-    if (handler == null)
-      throw new Exception("Handler must first be set")
-
-    var streamClosed = false
-    while (!streamClosed) {
-      msgReader.nextPayload() match {
-        case None => streamClosed = true
-        case Some(jsonString) => handleMessage(jsonString)
-      }
-    }
-    handler.dispose()
-  }
-
-  private def handleMessage(message: String): Unit = {
-    parseJsonRpcMessage(message) match {
-      case error: JsonRpcResponseErrorMessage => msgWriter.write(error)
-      case notification: JsonRpcNotificationMessage => handler.handleNotification(notification)
-
-      case request: JsonRpcRequestMessage => handler.handleRequest(request).
-        foreach(response => writeLock.synchronized(msgWriter.write(response)))
-
-      case response: JsonRpcResponseMessage =>
-        responseHandlers.get(response.id).fold({
-          logger.info(s"Received a response for which there was no handler: $response")
-        })(handler => handler(response))
-      case _ => ???
-    }
-  }
-
-  private def parseJsonRpcMessage(message: String): JsonRpcMessage = {
+  def parseJsonRpcMessage(message: String): JsonRpcMessage = {
     logger.debug(s"Received $message")
     Try(Json.parse(message)) match {
       case Failure(exception) =>
@@ -102,7 +41,56 @@ class JsonRpcConnection(inStream: InputStream, outStream: OutputStream)
     }
   }
 
-  // 4 threads should be enough for everyone
-  implicit private val commandExecutionContext: ExecutionContextExecutorService = ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(4))
+  def listen(): Unit = {
 
+    def processItem(): Unit = {
+      reader.nextPayload().foreach {
+        case null =>
+          handler.dispose()
+        case jsonString =>
+          handleMessage(jsonString)
+          processItem()
+      }
+    }
+    processItem()
+  }
+
+  private def handleMessage(message: String): Unit = {
+    parseJsonRpcMessage(message) match {
+      case error: JsonRpcResponseErrorMessage => write(error)
+      case notification: JsonRpcNotificationMessage => handler.handleNotification(notification)
+
+      case request: JsonRpcRequestMessage => handler.handleRequest(request).
+        foreach(response => write(response))
+
+      case response: JsonRpcResponseMessage =>
+        responseHandlers.get(response.id).fold({
+          logger.info(s"Received a response for which there was no handler: $response")
+        })(handler => handler(response))
+      case _ => throw new Error(s"JSON-RPC message $message is not supported yet")
+    }
+  }
+
+  def setHandler(handler: JsonRpcHandler): Unit = {
+    this.handler = handler
+  }
+
+  def sendRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage] = {
+    val result = Promise[JsonRpcResponseMessage]
+
+    // TODO decide after what time to remove responseHandlers
+    responseHandlers += request.id -> ((response: JsonRpcResponseMessage) => result.success(response))
+
+    write(request)
+    result.future
+  }
+
+  def sendNotification(notification: JsonRpcNotificationMessage): Unit = {
+    write(notification)
+  }
+
+  private def write[T](msg: T)(implicit o: Format[T]): Unit = {
+    val str = Json.stringify(o.writes(msg))
+    writer.write(str)
+  }
 }

@@ -16,10 +16,10 @@ import scala.sys.process.{Process, ProcessLogger}
 
 object JavaSourceUtils {
 
-  def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): InputStream = {
+  def getJavaTestFile(fileName: String, inputDirectory: Path = Path("")): String = {
     val className = JavaSourceUtils.fileNameToClassName(fileName)
     val relativeFilePath = inputDirectory / (className + ".java")
-    SourceUtils.getResourceFile(relativeFilePath)
+    StreamUtils.streamToString(SourceUtils.getResourceFile(relativeFilePath))
   }
 
   class LineProcessLogger extends ProcessLogger {
@@ -49,14 +49,14 @@ object JavaSourceUtils {
     logger.line
   }
 
-  def getBytes(byteCode: Node): Seq[Byte] = {
-    var output: Seq[Byte] = null
+  def getBytes(byteCode: Node): LazyList[Byte] = {
+    var output: LazyList[Byte] = null
     val deltas: Seq[Delta] = Seq(new GetBytes(s => output = s)) ++ ByteCodeLanguage.byteCodeDeltas
     TestLanguageBuilder.build(deltas).compileAst(byteCode)
     output
   }
 
-  class GetBytes(write: Seq[Byte] => Unit) extends DeltaWithPhase {
+  class GetBytes(write: LazyList[Byte] => Unit) extends DeltaWithPhase {
     override def transformProgram(program: Node, compilation: Compilation): Unit = {
       write(PrintByteCode.getBytes(compilation, program))
     }

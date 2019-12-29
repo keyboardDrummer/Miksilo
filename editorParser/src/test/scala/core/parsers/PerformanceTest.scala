@@ -2,7 +2,7 @@ package core.parsers
 
 import _root_.core.SourceUtils
 import _root_.core.TestUtils
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
 object PerformanceTest {
@@ -12,7 +12,7 @@ object PerformanceTest {
   val manySourcesTargetTime = manyRepetitionsTargetTime * manySourcesCount * 1.50 // Sadly, the larger file is relatively slower at the moment
 }
 
-class PerformanceTest extends FunSuite {
+class PerformanceTest extends AnyFunSuite {
   import PerformanceTest._
   import ParseJson._
 

@@ -3,9 +3,9 @@ package core.bigrammar
 import core.bigrammar.grammars.{BiFallback, Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
 import core.parsers.editorParsers.{SingleParseResult, UntilBestAndXStepsStopFunction}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class PartiallyParseJsonTest extends FunSuite with DefaultBiGrammarWriter {
+class PartiallyParseJsonTest extends AnyFunSuite with DefaultBiGrammarWriter {
 
   import BiGrammarToParser._
 

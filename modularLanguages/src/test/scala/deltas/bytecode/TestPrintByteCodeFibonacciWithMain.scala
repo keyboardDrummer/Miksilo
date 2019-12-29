@@ -15,6 +15,7 @@ import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.types.MethodTypeDelta
 import util.{JavaLanguageTest, LanguageTest}
 
+import scala.collection.immutable.ArraySeq
 import scala.collection.mutable.ArrayBuffer
 
 class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
@@ -72,7 +73,7 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
   }
 
   def getConstantPool: ConstantPool = {
-    val constantPool = ArrayBuffer[Any](MethodRefConstant.methodRef(6, 18),
+    val constantPool = Seq(MethodRefConstant.methodRef(6, 18),
       FieldRefConstant.fieldRef(19, 20),
       MethodRefConstant.methodRef(5, 21),
       MethodRefConstant.methodRef(22, 23),

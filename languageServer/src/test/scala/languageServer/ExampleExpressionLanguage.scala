@@ -11,7 +11,7 @@ import util.StreamUtils
 // TODO add a constraintBuilder that's specific to a File, so you add a [Has]SourceRange instead of a SourceElement
 // TODO compute the range based on the children, so only the leafs needs a Range.
 trait Expression extends FileElement {
-  def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope)
+  def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit
 }
 
 case class VariableDeclaration(range: SourceRange, name: String) extends FileElement {
@@ -80,10 +80,7 @@ object ExpressionParser extends CommonStringReaderParser with LeftRecursiveCorre
 
 object ExampleExpressionLanguage extends Language {
   private val parsePhase = Language.getParsePhaseFromParser[Expression, _root_.languageServer.ExpressionParser.StringReader](
-    stream => {
-      val program = StreamUtils.streamToString(stream)
-      new ExpressionParser.StringReader(program)
-    },
+    program => new ExpressionParser.StringReader(program),
     (program, uri) => SourceElementFromFileElement(uri, program),
     ExpressionParser.expression.getWholeInputParser)
 

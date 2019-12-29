@@ -17,7 +17,7 @@ trait AccessFlags {
   private val accessCodesToByteCode = Map(
     PublicAccess -> "0001",
     StaticAccess -> "0008",
-    PrivateAccess -> "0002").mapValues(s => hexToInt(s))
+    PrivateAccess -> "0002").view.mapValues(s => hexToInt(s)).toMap
 
   def getAccessFlagsByteCode(field: Node): Seq[Byte] = {
     getAccessFlagsByteCode(getAccessFlags(field))

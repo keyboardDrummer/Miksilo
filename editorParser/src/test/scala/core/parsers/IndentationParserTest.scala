@@ -1,10 +1,10 @@
 package core.parsers
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import strings.DefaultIndentationSensitiveWriter
 
-class IndentationParserTest extends FunSuite with LeftRecursiveCorrectingParserWriter
+class IndentationParserTest extends AnyFunSuite with LeftRecursiveCorrectingParserWriter
   with DefaultIndentationSensitiveWriter {
 
   lazy val expression = new Lazy(block | anA)

@@ -47,13 +47,10 @@ class Compilation(val language: Language, val fileSystem: FileSystem, val rootFi
 object Compilation
 {
   val singleFileDefaultName = "singleFileDefault"
-  def singleFile(language: Language, input: InputStream): Compilation = {
+  def singleFile(language: Language, input: String): Compilation = {
     val filePath = singleFileDefaultName
-    val result = new Compilation(language, new FileSystem {
-      override def getFile(path: String): InputStream =
-        if (path == filePath) input
-        else throw new IllegalArgumentException(s"no file for path $path")
-    }, Some(filePath))
+    val result = new Compilation(language, (path: String) => if (path == filePath) input
+    else throw new IllegalArgumentException(s"no file for path $path"), Some(filePath))
 
     result
   }

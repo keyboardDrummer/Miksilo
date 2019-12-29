@@ -8,7 +8,7 @@ trait LanguageType
 {
   def variables: Set[LanguageTypeVariable]
 
-  def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope)
+  def constraints(builder: ConstraintBuilder, _type: Type, scope: Scope): Unit
 
   def constraints(builder: ConstraintBuilder, scope: Scope) : Type = {
     val result = builder.typeVariable()

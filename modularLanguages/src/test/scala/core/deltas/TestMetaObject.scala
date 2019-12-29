@@ -2,11 +2,11 @@ package core.deltas
 
 import core.language.node.{Node, NodeField, NodeShape}
 import deltas.expression.{IntLiteralDelta, VariableDelta}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MemberSelectorDelta, VariableToByteCodeDelta}
 
-class TestMetaObject extends FunSuite {
+class TestMetaObject extends AnyFunSuite {
 
   test("Equals") {
     val first = new Node(ShapeKey, FieldKey -> FieldValue)

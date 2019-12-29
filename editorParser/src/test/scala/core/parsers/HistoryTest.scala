@@ -1,12 +1,12 @@
 package core.parsers
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import strings.StringParserWriter
 import editorParsers.History
 import _root_.core.parsers.strings.StringReaderBase
 import _root_.core.parsers.editorParsers.Position
 
-class HistoryTest extends FunSuite with StringParserWriter {
+class HistoryTest extends AnyFunSuite with StringParserWriter {
   type Input = IndexInput
 
   test("Dropping , is worse than missing <object member key>:<value>") {

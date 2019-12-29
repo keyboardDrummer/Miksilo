@@ -8,9 +8,9 @@ import deltas.bytecode.attributes.{CodeAttributeDelta, StackMapTableAttributeDel
 import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import deltas.javac.ByteCodeLanguage
 import deltas.javac.classes.skeleton.QualifiedClassName
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestParseTypes extends FunSuite {
+class TestParseTypes extends AnyFunSuite {
 
   test("ArrayArrayType") {
     val input = "int[][]"

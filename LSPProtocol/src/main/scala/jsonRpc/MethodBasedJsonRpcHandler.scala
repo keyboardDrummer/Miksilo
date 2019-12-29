@@ -4,12 +4,11 @@ import java.io.{PrintWriter, StringWriter}
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{ArrayParams, CorrelationId, ObjectParams, Params}
 import com.dhpcs.jsonrpc._
-import com.typesafe.scalalogging.LazyLogging
 import play.api.libs.json._
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.{ExecutionContext, Future}
 
 object MethodBasedJsonRpcHandler {
   def toJson(params: Params): JsValue = params match {
@@ -19,7 +18,7 @@ object MethodBasedJsonRpcHandler {
   }
 }
 
-class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJsonRpcHandler with LazyLogging {
+class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler with LazyLogging {
 
   private var requestHandlers: Map[String, JsonRpcRequestMessage => JsonRpcResponseMessage] = Map.empty
   private val notificationHandlers: mutable.Map[String, ListBuffer[JsonRpcNotificationMessage => Unit]] = mutable.Map.empty
@@ -32,6 +31,7 @@ class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJson
   def sendRequest[Request, Response](method: String, correlationId: CorrelationId, request: Request)
                                     (implicit requestFormat: OWrites[Request], responseFormat: Reads[Response]):
     Future[Response] = {
+
     val requestJson = requestFormat.writes(request)
     val requestMessage = new JsonRpcRequestMessage(method, ObjectParams(requestJson), correlationId)
 
@@ -64,10 +64,10 @@ class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends AsyncJson
   }
 
   override def handleRequest(request: JsonRpcRequestMessage): Future[JsonRpcResponseMessage] = {
-    requestHandlers.get(request.method) match {
-      case Some(handle) => Future.successful(handle(request))
-      case None => Future.successful(JsonRpcResponseErrorMessage.methodNotFound(request.method, request.id))
-    }
+    Future.successful(requestHandlers.get(request.method) match {
+      case Some(handle) => handle(request)
+      case None => JsonRpcResponseErrorMessage.methodNotFound(request.method, request.id)
+    })
   }
 
   def addNotificationHandler[Notification](method: String, handler: Notification => Unit)(notificationFormat: OFormat[Notification]): Unit = {

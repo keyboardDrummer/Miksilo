@@ -14,7 +14,7 @@ case class LanguageFromDeltas(val topToBottom: Seq[Delta], addMissingDeltas: Boo
 
   //Bad order error
   //All missing dependencies.
-  def validateDependencies(explicitDeltas: Seq[Delta]): Seq[Delta] = {
+  def validateDependencies(explicitDeltas: Seq[Delta]): collection.Seq[Delta] = {
     var available = Set.empty[Contract]
     var allDeltas = ArrayBuffer.empty[Delta]
 

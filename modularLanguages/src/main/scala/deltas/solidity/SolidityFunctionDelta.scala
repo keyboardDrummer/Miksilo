@@ -54,7 +54,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
   }
 
   override def inject(language: Language): Unit = {
-    LabelStatementDelta.isLabelScope.add(language, Shape, Unit)
+    LabelStatementDelta.isLabelScope.add(language, Shape, ())
     super.inject(language)
   }
 

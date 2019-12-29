@@ -1,13 +1,15 @@
 package languageServer
 
-import com.typesafe.scalalogging.LazyLogging
 import core.language.exceptions.BadInputException
 import core.language.{Compilation, Language, SourceElement}
 import core.parsers.core.{Metrics, NoMetrics}
 import core.parsers.editorParsers.TextEdit
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
+import jsonRpc.LazyLogging
 import lsp._
+
+import scala.collection.mutable
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider
@@ -116,7 +118,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     proofs.scopeGraph.findDeclaration(element).orElse(proofs.gotoDefinition(element))
   }
 
-  override def references(parameters: ReferencesParams): Seq[FileRange] = {
+  override def references(parameters: ReferencesParams): collection.Seq[FileRange] = {
     currentDocumentId = parameters.textDocument
     logger.debug("Went into references")
     val maybeResult = for {
@@ -125,12 +127,12 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       definition <- getDefinitionFromDefinitionOrReferencePosition(proofs, element)
     } yield {
 
-      val referencesRanges = for {
+      val referencesRanges: collection.Seq[FileRange] = for {
         references <- proofs.findReferences(definition)
         range <- references.origin.flatMap(e => e.fileRange).toSeq
       } yield range
 
-      var fileRanges: Seq[FileRange] = referencesRanges
+      var fileRanges: collection.Seq[FileRange] = referencesRanges
       if (parameters.context.includeDeclaration)
         fileRanges = definition.origin.flatMap(o => o.fileRange).toSeq ++ fileRanges
 

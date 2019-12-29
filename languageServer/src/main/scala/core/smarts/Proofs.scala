@@ -48,8 +48,8 @@ class Proofs {
     maybeDeclaration.toSeq.flatMap(declaration => findReferences(declaration))
   }
 
-  def findReferences(declaration: NamedDeclaration): Seq[Reference] = {
-    referencesPerDeclaration.getOrElse(declaration, ArrayBuffer.empty)
+  def findReferences(declaration: NamedDeclaration): collection.Seq[Reference] = {
+    referencesPerDeclaration.getOrElse(declaration, Seq.empty)
   }
 
   def getDeclarationsInScope(location: SourceElement): Seq[NamedDeclaration] = {

@@ -131,7 +131,7 @@ class ExampleDropDown(val compilerCockpit: LanguageSandbox) extends JPanel {
     Example("Reorder members with comments", content)
   }
 
-  def initialise() {
+  def initialise(): Unit =  {
     try
     {
       val exampleModel = new DefaultComboBoxModel[Example](Array(getFibonacci, getForLoop, getWhile,

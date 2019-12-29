@@ -1,7 +1,7 @@
 package deltas.bytecode
 
 import core.language.node.{Node, NodeWrapper}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import deltas.bytecode.additions.PoptimizeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.constants.Utf8ConstantDelta
@@ -15,7 +15,7 @@ import deltas.javac.classes.ConstantPool
 import deltas.javac.types.MethodTypeDelta
 import util.TestLanguageBuilder
 
-class TestPoptimize extends FunSuite {
+class TestPoptimize extends AnyFunSuite {
 
   test("Basic") {
     val instructions = Seq(SmallIntegerConstantDelta.integerConstant(3), PopDelta.pop, VoidReturnInstructionDelta.voidReturn)

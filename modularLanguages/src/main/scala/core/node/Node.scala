@@ -4,7 +4,6 @@ import core.deltas.path.NodePath
 import core.language.node.Node._
 import core.parsers.editorParsers.SourceRange
 import lsp.PositionFormat.PositionOrdering
-import lsp.PositionFormat
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing
@@ -86,7 +85,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
           return className
         return s"$className: ${data.
           filter(kv => !kv._1.isInstanceOf[TypedNodeField[_]]).
-          map(kv => (kv._1.debugRepresentation, kv._2))}"
+          map(kv => (kv._1.toString, kv._2))}"
       }
       "recursive"
     }

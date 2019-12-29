@@ -15,6 +15,7 @@ import deltas.bytecode.extraBooleanInstructions.NotInstructionDelta.NotInstructi
 import deltas.bytecode.simpleBytecode.LabelledLocations
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
 
@@ -35,9 +36,9 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
       codeAnnotation.instructions = newInstructions
     }
 
-    def getNewInstructions(instructions: Seq[Node]) = {
+    def getNewInstructions(instructions: Seq[Node]): Seq[Node] = {
 
-      var newInstructions = mutable.ArrayBuffer[Node]()
+      val newInstructions = ListBuffer.empty[Node]
 
       var i = 0
       while (i < instructions.size - 1) {
@@ -54,14 +55,14 @@ object OptimizeComparisonInstructionsDelta extends DeltaWithPhase {
         if (replacementInstruction.isDefined)
           i += 1
 
-        newInstructions += replacementInstruction.fold(first)(x => x)
+        newInstructions.addOne(replacementInstruction.fold(first)(x => x))
         i += 1
       }
       val lastInstructionWasNotReplaced = i == instructions.size - 1
       if (lastInstructionWasNotReplaced)
-        newInstructions += instructions(i)
+        newInstructions.addOne(instructions(i))
 
-      newInstructions
+      newInstructions.toSeq
     }
   }
 

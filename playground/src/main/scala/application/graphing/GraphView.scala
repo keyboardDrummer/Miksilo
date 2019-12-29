@@ -4,7 +4,6 @@ import java.util
 
 import application.graphing.model.simplifications.DeltaGroup
 import application.graphing.model.{DeltaGraph, DeltaVertex}
-import com.google.common.collect.Lists
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.model.mxCell
 import com.mxgraph.util.mxConstants
@@ -12,13 +11,13 @@ import com.mxgraph.view.{mxGraph, mxStylesheet}
 import core.deltas.{DeltaWithGrammar, DeltaWithPhase}
 import org.jgrapht.traverse.TopologicalOrderIterator
 
-import scala.collection.convert.Wrappers.{JListWrapper, JSetWrapper}
+import scala.jdk.CollectionConverters
 
 class GraphView(origin: DeltaGraph) extends mxGraph {
 
   initialise()
 
-  def initialise() {
+  def initialise(): Unit = {
 
     this.getModel.beginUpdate()
 
@@ -30,12 +29,13 @@ class GraphView(origin: DeltaGraph) extends mxGraph {
     var vertexMap: Map[DeltaVertex, mxCell] = Map.empty[DeltaVertex, mxCell]
     val parent = getDefaultParent
 
-    val topologicalOrdering = Lists.reverse(Lists.newArrayList(new TopologicalOrderIterator(origin)))
-    for (vertex <- JListWrapper(topologicalOrdering)) {
+
+    val topologicalOrdering = List.from(CollectionConverters.IteratorHasAsScala(new TopologicalOrderIterator(origin)).asScala).reverse
+    for (vertex <- topologicalOrdering) {
       val cell: mxCell = getVertex(parent, vertex, vertexMap)
       vertexMap += (vertex -> cell)
     }
-    for (edge <- new JSetWrapper(origin.edgeSet())) {
+    for (edge <- CollectionConverters.SetHasAsScala(origin.edgeSet()).asScala) {
       val source = vertexMap(origin.getEdgeSource(edge))
       val target = vertexMap(origin.getEdgeTarget(edge))
       insertEdge(parent, source, target)
@@ -47,7 +47,7 @@ class GraphView(origin: DeltaGraph) extends mxGraph {
   }
 
 
-  def setStyleSheet() {
+  def setStyleSheet(): Unit =  {
     val stylesheet: mxStylesheet = getStylesheet
     val simplification = new util.Hashtable[String, Object]()
     simplification.put(mxConstants.STYLE_FILLCOLOR, "#FFFFFF")
@@ -66,7 +66,7 @@ class GraphView(origin: DeltaGraph) extends mxGraph {
     stylesheet.putCellStyle("TRANSFORMATION", transformationStyle)
   }
 
-  def setLayout() {
+  def setLayout(): Unit =  {
     val layout = new mxHierarchicalLayout(this)
     layout.setIntraCellSpacing(layout.getIntraCellSpacing * 1.0)
     layout.setParallelEdgeSpacing(layout.getParallelEdgeSpacing * 1.0)

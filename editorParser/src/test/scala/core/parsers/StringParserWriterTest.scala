@@ -1,10 +1,10 @@
 package core.parsers
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import _root_.core.parsers.strings.CommonStringReaderParser
 
-class StringParserWriterTest extends FunSuite
+class StringParserWriterTest extends AnyFunSuite
   with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
   test("keywordParser cannot parse start of identifier") {

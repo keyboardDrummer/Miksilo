@@ -40,7 +40,7 @@ trait BiGrammar {
     set => set.toSeq)
 
   def setValue[T: ClassTag](value: T): BiGrammar = new ValueMapGrammar[Any, T](this, _ => Right(value),
-    aValue => if (aValue == value) Some(Unit) else None)
+    aValue => if (aValue == value) Some(()) else None)
 
   def map[T, U: ClassTag](afterParsing: T => U, beforePrinting: U => T): BiGrammar =
     mapSome(afterParsing, (u: U) => Some(beforePrinting(u)))

@@ -3,11 +3,13 @@ package languageServer
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
-import com.typesafe.scalalogging.LazyLogging
+
 import core.language.FileSystem
+import jsonRpc.LazyLogging
 import lsp.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 
 import scala.collection.JavaConverters.collectionAsScalaIterable
+import scala.jdk.CollectionConverters
 
 /**
   * A class to manage text documents coming over the wire from a Language Server client.
@@ -21,7 +23,7 @@ class TextDocumentManager extends LazyLogging with FileSystem {
   def getOpenDocumentForUri(uri: String): Option[InMemoryTextDocument] =
     Option(docs.get(uri))
 
-  def allOpenDocuments: Seq[InMemoryTextDocument] = collectionAsScalaIterable(docs.values).toSeq
+  def allOpenDocuments: Seq[InMemoryTextDocument] = CollectionConverters.CollectionHasAsScala(docs.values).asScala.toSeq
 
   def onOpenTextDocument(testDocument: TextDocumentItem): InMemoryTextDocument = {
     docs.put(testDocument.uri, new InMemoryTextDocument(testDocument.uri, testDocument.text))
@@ -42,9 +44,8 @@ class TextDocumentManager extends LazyLogging with FileSystem {
     docs.remove(td.uri)
   }
 
-  override def getFile(path: String): InputStream = {
-    val bytes: Array[Byte] = getOpenDocumentForUri(path).get.mkString.getBytes("UTF-8")
-    new ByteArrayInputStream(bytes) //TODO maybe instead of Input stream een byte array gebruiken?
+  override def getFile(path: String): String = {
+    getOpenDocumentForUri(path).get.mkString
   }
 
   // TODO remove this method and let FileSystem stop using InputStream

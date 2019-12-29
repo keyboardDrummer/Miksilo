@@ -5,10 +5,10 @@ import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import languageServer.LanguageServerTest
 import lsp.{FileRange, HumanPosition}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, TestLanguageBuilder}
 
-class GotoDefinitionTest extends FunSuite with LanguageServerTest {
+class GotoDefinitionTest extends AnyFunSuite with LanguageServerTest {
 
   private val blockLanguage = TestLanguageBuilder.buildWithParser(Seq(
     DropPhases(1), BlockLanguageDelta) ++

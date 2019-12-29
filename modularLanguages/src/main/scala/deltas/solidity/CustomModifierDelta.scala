@@ -41,7 +41,7 @@ object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
 
   override def inject(language: Language): Unit = {
-    LabelStatementDelta.isLabelScope.add(language, Shape, Unit)
+    LabelStatementDelta.isLabelScope.add(language, Shape, ())
     ExpressionDelta.expressionInstances.add(language, UnderScoreShape, new IsExpression {
       override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
       }

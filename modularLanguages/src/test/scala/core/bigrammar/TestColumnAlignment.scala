@@ -1,9 +1,9 @@
 package core.bigrammar
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.exceptions.TestFailedException
 
-class TestColumnAlignment extends FunSuite with WhitespaceTriviaSequenceCombinators {
+class TestColumnAlignment extends AnyFunSuite with WhitespaceTriviaSequenceCombinators {
 
   //This test shows that when translating the bigrammars to parsers, some of the structure is lost.
   //We might expect this parse and print to become identity for this input, but it doesn't even parse.

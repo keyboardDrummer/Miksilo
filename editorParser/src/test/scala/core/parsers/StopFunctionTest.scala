@@ -1,9 +1,9 @@
 package core.parsers
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.TimeRatioStopFunction
 
-class StopFunctionTest extends FunSuite {
+class StopFunctionTest extends AnyFunSuite {
 
   test("TimeRatioStopFunction") {
     val stopFunction = new TimeRatioStopFunction()

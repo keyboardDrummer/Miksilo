@@ -16,8 +16,8 @@ object PrettyPrintOption extends CompileOption {
     language = LanguageFromDeltas(splicedParticles)
   }
 
-  override def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar = {
-    val compilation = language.compileStream(input)
+  override def run(sandbox: LanguageSandbox, input: String): TextWithGrammar = {
+    val compilation = language.compileString(input)
     val outputGrammar = prettyPrint.getOutputGrammar(compilation.language)
     TextWithGrammar(compilation.output, outputGrammar)
   }

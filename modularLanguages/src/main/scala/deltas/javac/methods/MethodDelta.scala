@@ -68,7 +68,7 @@ object MethodDelta extends DeltaWithGrammar
   }
 
 
-  def setMethodCompiler(method: Node, compilation: Compilation) {
+  def setMethodCompiler(method: Node, compilation: Compilation): Unit = {
     state(compilation) = MethodCompiler(compilation, method)
   }
 
@@ -154,7 +154,7 @@ object MethodDelta extends DeltaWithGrammar
   override def shape: NodeShape = Shape
 
   override def inject(language: Language): Unit = {
-    LabelStatementDelta.isLabelScope.add(language, Shape, Unit)
+    LabelStatementDelta.isLabelScope.add(language, Shape, ())
     super.inject(language)
   }
 }

@@ -4,10 +4,10 @@ import core.SourceUtils
 import core.deltas.Delta
 import deltas.PrettyPrint
 import deltas.javac.{ByteCodeLanguage, ExtendedByteCode, JavaToByteCodeLanguage}
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
 
-class SimplifiedByteCodeTest extends FunSuite {
+class SimplifiedByteCodeTest extends AnyFunSuite {
 
   test("javaToSimplified") {
     val deltas = JavaToByteCodeLanguage.spliceBeforeTransformations(ExtendedByteCode.simpleByteCodeDeltas, Seq(PrettyPrint()))

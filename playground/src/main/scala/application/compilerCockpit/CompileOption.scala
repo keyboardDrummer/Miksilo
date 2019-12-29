@@ -12,5 +12,5 @@ trait CompileOption {
 
   def initialize(sandbox: LanguageSandbox): Unit
 
-  def run(sandbox: LanguageSandbox, input: InputStream): TextWithGrammar
+  def run(sandbox: LanguageSandbox, input: String): TextWithGrammar
 }
