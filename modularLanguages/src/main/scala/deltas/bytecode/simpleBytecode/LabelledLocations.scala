@@ -96,8 +96,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     val locationsWithFrame = instructions.filter(i => i.shape == LabelDelta.Shape).map(i => new Label(i)).
       map(i => (labelLocations(i.name), i.stackFrame))
     var locationAfterPreviousFrame = 0
-    var stackFrames = ArrayBuffer[Node]()
-    stackFrames.sizeHint(locationsWithFrame.size)
+    var stackFrames = ListBuffer.empty[Node]
     for ((location, frame) <- locationsWithFrame) {
       val offset = location - locationAfterPreviousFrame
       if (offset >= 0) { //TODO add a test-case for consecutive labels.
@@ -109,7 +108,7 @@ object LabelledLocations extends DeltaWithPhase with DeltaWithGrammar {
     if (stackFrames.nonEmpty) {
       Seq(StackMapTableAttributeDelta.Shape.create(
         AttributeNameKey -> StackMapTableAttributeDelta.entry,
-        StackMapTableAttributeDelta.Maps -> stackFrames))
+        StackMapTableAttributeDelta.Maps -> stackFrames.toSeq))
     }
     else
       Seq.empty[Node]

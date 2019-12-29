@@ -28,7 +28,7 @@ class ConstantPool(items: Seq[Any] = Seq.empty) {
       index
     })
     ref match {
-      case node:Node => node.shape match {
+      case node: Node => node.shape match {
         case LongInfoConstant.LongEntryKey => store(new Hole())
         case DoubleInfoConstant.DoubleEntryKey => store(new Hole())
         case _ =>
