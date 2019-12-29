@@ -40,10 +40,10 @@ lazy val assemblySettings = Seq(
 )
 
 lazy val editorParser = crossProject(JVMPlatform, JSPlatform).
-  crossType(CrossType.Pure).
+  crossType(CrossType.Full).
   in(file("editorParser")).
   settings(commonSettings: _*).
-  settings(
+  jvmSettings(
 
     // Only used for SourceUtils, should get rid of it.
     // https://mvnrepository.com/artifact/org.scala-lang/scala-reflect
