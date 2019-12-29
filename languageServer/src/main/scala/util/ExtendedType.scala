@@ -14,9 +14,9 @@ class ExtendedType[T](_type: Class[T])
   }
 
   def properties: Seq[Property[T, AnyRef]] = {
-    val getters = _type.getMethods.filter(method => method.getParameterCount == 0 && method.getReturnType != null)
+    val getters = _type.getMethods.view.filter(method => method.getParameterCount == 0 && method.getReturnType != null)
     val methodsByName = _type.getMethods.map(method => (method.getName,method)).toMap
-    getters.flatMap(getter => getterToProperty(methodsByName, getter))
+    getters.flatMap(getter => getterToProperty(methodsByName, getter)).toSeq
   }
 
   def getterToProperty(methodsByName: Map[String, Method], getter: Method): Option[Property[T, AnyRef]] = {

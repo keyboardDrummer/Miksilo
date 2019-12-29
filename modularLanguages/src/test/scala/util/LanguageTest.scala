@@ -26,7 +26,9 @@ object LanguageTest {
 
   def testInstructionEquivalence(expectedByteCode: ClassFile[Node], compiledCode: ClassFile[Node]): Unit = {
     for (methodPair <- expectedByteCode.methods.zip(compiledCode.methods)) {
-      assert(NodeComparer(compareIntegers = false, takeAllRightKeys = false).deepEquality(getMethodInstructions(methodPair._1), getMethodInstructions(methodPair._2)))
+      val expected = getMethodInstructions(methodPair._1)
+      val compiled = getMethodInstructions(methodPair._2)
+      assert(NodeComparer(compareIntegers = false, takeAllRightKeys = false).deepEquality(expected, compiled))
     }
   }
 

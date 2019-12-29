@@ -2,17 +2,27 @@ package deltas.bytecode
 
 import java.math.BigInteger
 
-import com.google.common.primitives.{Ints, Longs}
 import core.language.Compilation
 import core.language.node.Node
 import deltas.bytecode.ByteCodeSkeleton._
 import deltas.javac.classes.skeleton.QualifiedClassName
 
 object PrintByteCode {
-  def longToBytes(long: Long): LazyList[Byte] = LazyList.from(Longs.toByteArray(long))
+  def longToBytes(long: Long): LazyList[Byte] = LazyList.from(toByteArray(long))
 
+  def toByteArray(value: Long): Array[Byte] = {
+    // bugs when narrowing byte casts of long values occur.
+    val result = new Array[Byte](8)
+    var newValue = value
+    for (i <- 7 to 0 by -1) {
+      result(i) = (value & 0xffL).toByte
+      newValue >>= 8
+    }
+    result
+  }
+  
   //TODO code uit deze classe naar byte code particles verplaatsen.
-  val classAccessFlags: Map[String, Int] = Map("super" -> 0x0020)
+  val classAccessFlags = Map("super" -> 0x0020)
 
   val cafeBabeBytes: Seq[Byte] = intToBytes(0xCAFEBABE)
 
@@ -69,10 +79,12 @@ object PrintByteCode {
 
   def prefixWithIntLength(_bytes: () => Seq[Byte]): LazyList[Byte] = {
     val bytes = _bytes()
-    LazyList.from(Ints.toByteArray(bytes.length)) ++ bytes
+    LazyList.from(toByteArray(bytes.length)) ++ bytes
   }
 
-  def getInterfacesByteCode(shape: Node): LazyList[Byte] = {
+  def toByteArray(value: Int) = Array[Byte]((value >> 24).toByte, (value >> 16).toByte, (value >> 8).toByte, value.toByte)
+  
+  def getInterfacesByteCode(shape: Node) = {
     val interfaces = shape.interfaceIndices
     shortToBytes(interfaces.length) ++ interfaces.flatMap(interface => shortToBytes(interface))
   }
@@ -103,15 +115,15 @@ object PrintByteCode {
   def hexToInt(hex: String): Int = new BigInteger(hex, 16).intValue()
 
   def byteToBytes(value: Int): LazyList[Byte] = {
-    LazyList.from(Ints.toByteArray(value)).drop(3)
+    LazyList.from(toByteArray(value)).drop(3)
   }
 
   def shortToBytes(short: Int): LazyList[Byte] = {
-    LazyList.from(Ints.toByteArray(short)).takeRight(2)
+    LazyList.from(toByteArray(short)).takeRight(2)
   }
 
   def intToBytes(int: Int): LazyList[Byte] = {
-    LazyList.from(Ints.toByteArray(int))
+    LazyList.from(toByteArray(int))
   }
 
   def printBytes(bytes: LazyList[Byte]): String = {

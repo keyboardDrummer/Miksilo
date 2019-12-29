@@ -95,10 +95,7 @@ lazy val modularLanguages = (project in file("modularLanguages")).
     },
 
     // byteCode parser
-    libraryDependencies += "org.scala-lang.modules" % "scala-parser-combinators_2.12" % "1.0.6",
-
-    //import com.google.common.primitives.{Ints, Longs}
-    libraryDependencies += "com.google.guava" % "guava" % "18.0",
+    libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
 
   ).dependsOn(languageServer,
     editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )

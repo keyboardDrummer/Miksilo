@@ -8,7 +8,7 @@ import scala.util.Try
 
 trait LanguageBuilder {
   def key: String
-  def build(arguments: Seq[String]): Language
+  def build(arguments: collection.Seq[String]): Language
 }
 
 class LanguageServerMain(builders: Seq[LanguageBuilder], connection: JsonRpcConnection) extends LazyLogging {
@@ -29,7 +29,7 @@ class LanguageServerMain(builders: Seq[LanguageBuilder], connection: JsonRpcConn
     })
   }
 
-  def getLanguage(args: Seq[String]): Option[Language] = {
+  def getLanguage(args: collection.Seq[String]): Option[Language] = {
     if (builders.size == 1) {
       Some(builders.head.build(args))
     } else {

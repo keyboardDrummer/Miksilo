@@ -3,15 +3,17 @@ package core.deltas.grammars
 import core.bigrammar.{BiGrammar, BiGrammarSequenceCombinatorsExtension}
 import core.bigrammar.grammars.{BiFailure, BiSequence, Labelled, ManyHorizontal, ManyVertical, ParseWhiteSpace, SequenceBijective, WithTrivia}
 import core.deltas.{GrammarForAst, NodeGrammarWriter, Property}
-import core.language.node.{GrammarKey, Key, NodeShape/*, named*/}
+import core.language.node.{GrammarKey, Key, NodeShape}
 
 case class KeyGrammar(key: Key) extends GrammarKey
 {
   override lazy val toString = key.toString
 }
 
-//@named
-object TriviasGrammar extends GrammarKey
+object TriviasGrammar extends GrammarKey {
+  override def toString = "TriviasGrammar"
+}
+
 object TriviaGrammar extends GrammarKey
 object BodyGrammar extends GrammarKey
 object ProgramGrammar extends GrammarKey

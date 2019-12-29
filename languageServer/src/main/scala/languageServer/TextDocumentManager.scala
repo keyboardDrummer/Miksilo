@@ -9,6 +9,7 @@ import jsonRpc.LazyLogging
 import lsp.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 
 import scala.collection.JavaConverters.collectionAsScalaIterable
+import scala.jdk.CollectionConverters
 
 /**
   * A class to manage text documents coming over the wire from a Language Server client.
@@ -22,7 +23,7 @@ class TextDocumentManager extends LazyLogging with FileSystem {
   def getOpenDocumentForUri(uri: String): Option[InMemoryTextDocument] =
     Option(docs.get(uri))
 
-  def allOpenDocuments: Seq[InMemoryTextDocument] = collectionAsScalaIterable(docs.values).toSeq
+  def allOpenDocuments: Seq[InMemoryTextDocument] = CollectionConverters.CollectionHasAsScala(docs.values).asScala.toSeq
 
   def onOpenTextDocument(testDocument: TextDocumentItem): InMemoryTextDocument = {
     docs.put(testDocument.uri, new InMemoryTextDocument(testDocument.uri, testDocument.text))

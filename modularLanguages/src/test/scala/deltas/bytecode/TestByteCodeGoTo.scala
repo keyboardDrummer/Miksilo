@@ -25,7 +25,7 @@ class TestByteCodeGoTo extends AnyFunSuite {
     val language = TestLanguageBuilder.build(Seq(LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas)
     val compiledWhile = language.compileAst(labelledWhile).program.asInstanceOf[PathRoot].current
     val expectedCode = getExpectedJumpWhile
-    LanguageTest.testInstructionEquivalence(compiledWhile, expectedCode)
+    LanguageTest.testInstructionEquivalence(expectedCode, compiledWhile)
   }
 
   def getExpectedJumpWhile: Node = {

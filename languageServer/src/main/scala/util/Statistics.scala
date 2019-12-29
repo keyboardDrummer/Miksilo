@@ -29,6 +29,8 @@ class Statistics(parent: Statistics = null) extends LazyLogging {
   def printAll(): Unit = {
 
     System.out.println("Profiling global results:")
+    import Ordering.Double.TotalOrdering
+
     for(timingsForKey <- timingsPerKey.toSeq.sortBy(p => -1 * p._2.sum)) {
       val timings = timingsForKey._2
       val average = "%05.1f".format(timings.sum / timings.length)
