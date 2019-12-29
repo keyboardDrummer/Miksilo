@@ -49,7 +49,7 @@ lazy val editorParser = (project in file("editorParser")).
 lazy val LSPProtocol = (project in file("LSPProtocol")).
   settings(commonSettings: _*).
   settings(
-    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.7.4",
+    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1",
   ).dependsOn(editorParser)
 
 lazy val languageServer = (project in file("languageServer")).
