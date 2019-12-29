@@ -1,8 +1,7 @@
 package core
 
 
-import java.io.{BufferedReader, ByteArrayInputStream, InputStream, InputStreamReader}
-import java.nio.charset.StandardCharsets
+import java.io.{BufferedReader, InputStream, InputStreamReader}
 import java.util.stream.Collectors
 
 import scala.reflect.io.{File, Path}

@@ -1,13 +1,15 @@
 import sbt.Keys.{homepage, scmInfo}
 
 import scala.sys.process._
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 lazy val miksilo = project
   .in(file("."))
   .aggregate(
-    editorParser,
-    LSPProtocol,
-    languageServer,
+    editorParser.jvm,
+    LSPProtocol.jvm,
+    LSPProtocol.js,
+    languageServer.jvm,
     modularLanguages,
     playground
   )
@@ -37,22 +39,30 @@ lazy val assemblySettings = Seq(
   }
 )
 
-lazy val editorParser = (project in file("editorParser")).
+lazy val editorParser = crossProject(JVMPlatform, JSPlatform).
+  crossType(CrossType.Pure).
+  in(file("editorParser")).
   settings(commonSettings: _*).
   settings(
 
     // Only used for SourceUtils, should get rid of it.
     // https://mvnrepository.com/artifact/org.scala-lang/scala-reflect
-    libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.4"
+    libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.13.1"
   )
 
-lazy val LSPProtocol = (project in file("LSPProtocol")).
+lazy val LSPProtocol = crossProject(JVMPlatform, JSPlatform).
+  crossType(CrossType.Full).
+  in(file("LSPProtocol")).
   settings(commonSettings: _*).
   settings(
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1",
-  ).dependsOn(editorParser)
+  ).
+  jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault").
+  dependsOn(editorParser)
 
-lazy val languageServer = (project in file("languageServer")).
+lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
+  crossType(CrossType.Pure).
+  in(file("languageServer")).
   settings(commonSettings: _*).
   settings(
     assemblySettings,
@@ -97,8 +107,8 @@ lazy val modularLanguages = (project in file("modularLanguages")).
     // byteCode parser
     libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
 
-  ).dependsOn(languageServer,
-    editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )
+  ).dependsOn(languageServer.jvm,
+    editorParser.jvm % "compile->compile;test->test" /* for bigrammar testing utils*/ )
 
 lazy val playground = (project in file("playground")).
   settings(commonSettings: _*).
