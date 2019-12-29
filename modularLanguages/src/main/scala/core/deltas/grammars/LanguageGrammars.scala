@@ -10,9 +10,7 @@ case class KeyGrammar(key: Key) extends GrammarKey
   override lazy val toString = key.toString
 }
 
-object TriviasGrammar extends GrammarKey {
-  override def toString = "TriviasGrammar"
-}
+object TriviasGrammar extends GrammarKey
 
 object TriviaGrammar extends GrammarKey
 object BodyGrammar extends GrammarKey
