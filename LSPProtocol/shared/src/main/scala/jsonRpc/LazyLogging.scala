@@ -3,6 +3,7 @@ package jsonRpc
 object LazyLogging {
   var logger: Logger = VoidLogger
 }
+
 trait LazyLogging {
   def logger: Logger = LazyLogging.logger
 }

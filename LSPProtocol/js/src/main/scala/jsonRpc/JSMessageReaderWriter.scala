@@ -1,5 +1,6 @@
 package jsonRpc
 
+import scala.concurrent.Future
 import scala.scalajs.js
 
 trait JSMessageReader extends js.Object {
@@ -7,7 +8,7 @@ trait JSMessageReader extends js.Object {
 }
 
 class FromJSMessageReader(js: JSMessageReader) extends MessageReader {
-  override def nextPayload() = js.nextPayload().toFuture
+  override def nextPayload(): Future[String] = js.nextPayload().toFuture
 }
 
 trait JSMessageWriter extends js.Object {
