@@ -1,4 +1,4 @@
-package cloudformation
+package jsonRpc
 
 import jsonRpc.{LazyLogging, MessageReader, MessageWriter}
 

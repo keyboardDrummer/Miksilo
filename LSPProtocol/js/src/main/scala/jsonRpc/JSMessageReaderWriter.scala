@@ -1,9 +1,6 @@
-package cloudformation
-
-import jsonRpc.{MessageReader, MessageWriter}
+package jsonRpc
 
 import scala.scalajs.js
-import scala.scalajs.js.annotation.ScalaJSDefined
 
 trait JSMessageReader extends js.Object {
   def nextPayload(): js.Promise[String]

@@ -1,10 +1,10 @@
-package cloudformation
+package jsonRpc
 
 import jsonRpc.MessageReader
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{Future, Promise}
 import scala.scalajs.js
 
 /**
@@ -26,16 +26,32 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader {
   private var data = ArrayBuffer.empty[Byte]
   private var streamClosed = false
 
-  val lock = new Lock
+  var dataArrival: Promise[Unit] = _
+
+  def receiveData(): Unit = {
+    this.notify()
+    if (dataArrival != null) {
+      dataArrival.success(())
+      dataArrival = null
+    }
+  }
+
+  def waitForData(): Future[Unit] = {
+    if (this.dataArrival != null)
+      return this.dataArrival.future
+
+    this.dataArrival = Promise[Unit]
+    this.dataArrival.future
+  }
 
   in.on("data", (chunk: js.Array[Byte]) => {
     data ++= chunk.toArray
-    lock.notify2()
+    receiveData()
   })
 
   in.on("end", () => {
     streamClosed = true
-    lock.notify2() // some threads might be still waiting for input
+    receiveData() // some threads might be still waiting for input
   })
 
   /**
@@ -59,7 +75,7 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader {
     }
 
     if (data.size < 4 && !streamClosed)
-      return lock.wait2().flatMap(_ => readHeaders())
+      return waitForData().flatMap(_ => readHeaders())
 
     if (streamClosed) return Future.successful(EmptyMap)
 
@@ -89,7 +105,7 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader {
     } else if (streamClosed) {
       Future.successful(EmptyMap)
     } else {
-      lock.wait2().flatMap(_ => readHeaders())
+      waitForData().flatMap(_ => readHeaders())
     }
   }
 
@@ -100,7 +116,7 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader {
    */
   def getContent(len: Int): Future[String] = {
     if (data.size < len && !streamClosed)
-      return lock.wait2().flatMap(_ => getContent(len))
+      return waitForData().flatMap(_ => getContent(len))
 
     if (streamClosed) Future.successful("")
     else {
@@ -124,7 +140,7 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader {
         else {
           val length = headers.get("Content-Length") match {
             case Some(len) => try len.toInt catch {
-              case e: NumberFormatException => -1
+              case _: NumberFormatException => -1
             }
             case _ => -1
           }
