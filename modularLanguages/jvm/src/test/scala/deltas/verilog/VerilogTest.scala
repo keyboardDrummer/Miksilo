@@ -2,17 +2,17 @@ package deltas.verilog
 
 import core.SourceUtils
 import core.deltas.path.PathRoot
-import core.language.{Compilation, InMemoryFileSystem}
 import core.language.node.NodeComparer
+import core.language.{Compilation, InMemoryFileSystem}
 import core.parsers.editorParsers.SourceRange
-import deltas.{ClearPhases, FileWithMembersDelta}
-import deltas.expression.{IntLiteralDelta, VariableDelta}
 import deltas.expression.VariableDelta.Variable
+import deltas.expression.{IntLiteralDelta, VariableDelta}
 import deltas.statement.{IfThenDelta, IfThenElseDelta}
+import deltas.{ClearPhases, FileWithMembersDelta}
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import lsp.{DocumentPosition, FileRange, HumanPosition, TextDocumentIdentifier}
 import org.scalatest.funsuite.AnyFunSuite
-import util.{JavaSourceUtils, TestLanguageBuilder}
+import util.TestLanguageBuilder
 
 import scala.reflect.io.Path
 

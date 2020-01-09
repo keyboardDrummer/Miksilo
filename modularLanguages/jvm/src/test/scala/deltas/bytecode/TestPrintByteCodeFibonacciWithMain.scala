@@ -15,9 +15,6 @@ import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.types.MethodTypeDelta
 import util.{JavaLanguageTest, LanguageTest}
 
-import scala.collection.immutable.ArraySeq
-import scala.collection.mutable.ArrayBuffer
-
 class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
 
   val className = "Fibonacci"

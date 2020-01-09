@@ -2,9 +2,14 @@ package core.bigrammar
 
 import core.bigrammar.grammars.Labelled
 import core.bigrammar.printer.BiGrammarToPrinter
+import core.language.node.GrammarKey
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.immutable.StringOps
+
+case class StringKey(value: String) extends GrammarKey {
+  override lazy val toString: String = value
+}
 
 class TestRecursion extends AnyFunSuite with DefaultBiGrammarWriter {
 

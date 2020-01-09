@@ -1,10 +1,6 @@
 package deltas.javaPlus
 
-import java.io.ByteArrayInputStream
-import java.nio.charset.StandardCharsets
-
 import deltas.javac.JavaToByteCodeLanguage
-import deltas.statement.{BlockDelta, GotoStatementDelta, StatementDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import deltas.{ClearPhases, PrettyPrint}
 import org.scalatest.funsuite.AnyFunSuite

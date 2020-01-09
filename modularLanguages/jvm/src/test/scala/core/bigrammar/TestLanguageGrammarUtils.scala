@@ -10,10 +10,6 @@ import deltas.javac.JavaToByteCodeLanguage
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
-case class StringKey(value: String) extends GrammarKey {
-  override lazy val toString: String = value
-}
-
 object TestLanguageGrammarUtils extends TestLanguageGrammarUtils(JavaToByteCodeLanguage.javaCompilerDeltas)
 
 case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends AnyFunSuite {

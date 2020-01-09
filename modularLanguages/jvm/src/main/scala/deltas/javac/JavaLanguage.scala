@@ -27,7 +27,7 @@ object JavaLanguage {
 
   def javaClass = Seq(ClassifyTypeIdentifiers) ++ // TODO what is ClassifyTypeIdentifiers??
     imports ++ constructors ++ Seq(FullyQualifyTypeReferences,
-    ThisVariableDelta, ImplicitObjectSuperClass, JavaClassDelta) ++ fields ++ method
+    ThisVariableDelta, ImplicitObjectSuperClass, JavaStandardLibraryDelta, JavaClassDelta) ++ fields ++ method
 
   def constructors = Seq(DefaultConstructorDelta, ImplicitSuperConstructorCall,
     SuperCallExpression, ThisCallExpression, NewDelta, ConstructorDelta)

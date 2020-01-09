@@ -1,7 +1,7 @@
 package core.bigrammar
 
-import core.{SolveConstraintsDelta, SourceUtils}
 import core.deltas.Delta
+import core.{SolveConstraintsDelta, SourceUtils}
 import deltas.expression.ExpressionDelta
 import deltas.javac.ByteCodeLanguage.byteCodeDeltas
 import deltas.javac.JavaToByteCodeLanguage.spliceBeforeTransformations
@@ -11,7 +11,7 @@ import deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
 import deltas.statement.BlockDelta
 import deltas.{PrettyPrint, RunWithJVM}
 import org.scalatest.funsuite.AnyFunSuite
-import util.{JavaSourceUtils, StreamUtils, TestLanguageBuilder}
+import util.{JavaSourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 

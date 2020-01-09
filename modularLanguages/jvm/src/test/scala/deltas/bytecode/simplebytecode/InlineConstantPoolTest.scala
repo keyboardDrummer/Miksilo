@@ -1,4 +1,4 @@
-package deltas.bytecode.simplebytecode.test
+package deltas.bytecode.simpleBytecode
 
 import core.bigrammar.TestLanguageGrammarUtils
 import deltas.PrettyPrint

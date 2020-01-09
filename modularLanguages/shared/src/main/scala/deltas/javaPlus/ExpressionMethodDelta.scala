@@ -9,7 +9,6 @@ import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.methods.MethodDelta.ReturnType
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, ReturnExpressionDelta}
-import deltas.javac.types.MethodTypeDelta.Parameters
 import deltas.statement.BlockDelta
 
 object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
@@ -26,7 +25,7 @@ object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
     val visibilityGrammar = find(AccessibilityFieldsDelta.VisibilityField)
     val parseStatic = find(AccessibilityFieldsDelta.Static)
     val parseReturnType = find(MethodDelta.ReturnTypeGrammar).as(ReturnType)
-    val parseParameters = find(MethodDelta.Parameters).as(Parameters)
+    val parseParameters = find(MethodDelta.Parameters).as(MethodDelta.Parameters)
     val expressionGrammar = find(ExpressionDelta.FirstPrecedenceGrammar).as(Expression)
     val expressionMethodGrammar = (visibilityGrammar ~~ parseStatic ~~ parseReturnType ~~
       identifier.as(Name) ~ parseParameters ~~ ("=" ~~> expressionGrammar)).

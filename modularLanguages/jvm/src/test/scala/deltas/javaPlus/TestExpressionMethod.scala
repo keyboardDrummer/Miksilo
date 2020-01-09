@@ -1,9 +1,8 @@
 package deltas.javaPlus
 
-import org.scalatest.funsuite.AnyFunSuite
 import deltas.javac.JavaToByteCodeLanguage
-import util.TestLanguageBuilder
-import util.LanguageTest
+import org.scalatest.funsuite.AnyFunSuite
+import util.{LanguageTest, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 

@@ -1,7 +1,6 @@
 package deltas.bytecode
 
 import core.language.node.{Node, NodeWrapper}
-import org.scalatest.funsuite.AnyFunSuite
 import deltas.bytecode.additions.PoptimizeDelta
 import deltas.bytecode.attributes.CodeAttributeDelta
 import deltas.bytecode.constants.Utf8ConstantDelta
@@ -10,9 +9,10 @@ import deltas.bytecode.coreInstructions.longs.PushLongDelta
 import deltas.bytecode.coreInstructions.{Pop2Delta, PopDelta, VoidReturnInstructionDelta}
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.VoidTypeDelta
+import deltas.javac.ByteCodeLanguage
 import deltas.javac.classes.ConstantPool
-import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
 import deltas.javac.types.MethodTypeDelta
+import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
 class TestPoptimize extends AnyFunSuite {

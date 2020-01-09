@@ -19,6 +19,6 @@ object TestUtils {
     }
     System.out.println(s"time: $bestTime")
     System.out.println(s"repetitions: $repetition")
-    assert(success, s"did not reach target time of $targetTime")
+    assert(success, s"only reached $bestTime instead of target time $targetTime")
   }
 }

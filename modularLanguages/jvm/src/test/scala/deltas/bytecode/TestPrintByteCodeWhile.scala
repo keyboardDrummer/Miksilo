@@ -1,7 +1,6 @@
 package deltas.bytecode
 
 import core.language.node.Node
-import org.scalatest.funsuite.AnyFunSuite
 import deltas.bytecode.attributes._
 import deltas.bytecode.constants.{ClassInfoConstant, MethodRefConstant, NameAndTypeConstant}
 import deltas.bytecode.coreInstructions._
@@ -13,6 +12,7 @@ import deltas.bytecode.types.{IntTypeDelta, VoidTypeDelta}
 import deltas.javac.classes.ConstantPool
 import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.types.MethodTypeDelta
+import org.scalatest.funsuite.AnyFunSuite
 import util.LanguageTest
 
 class TestPrintByteCodeWhile extends AnyFunSuite {

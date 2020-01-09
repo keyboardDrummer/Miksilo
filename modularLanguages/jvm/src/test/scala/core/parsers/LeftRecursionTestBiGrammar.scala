@@ -1,17 +1,17 @@
 package core.parsers
 
+import _root_.core.bigrammar.SelectGrammar
 import deltas.ClearPhases
 import deltas.expression.relational.{EqualsComparisonDelta, RelationalPrecedenceDelta}
 import deltas.expression.{ExpressionDelta, PostFixIncrementDelta, VariableDelta}
+import deltas.javac.classes.SelectFieldDelta
+import deltas.javac.methods.MemberSelectorDelta
+import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.{CallVariableDelta, JavaLanguage}
 import deltas.statement.assignment.{AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.scalatest.funsuite.AnyFunSuite
 import util.{LanguageTest, TestLanguageBuilder}
-import _root_.core.bigrammar.SelectGrammar
-import deltas.javac.classes.SelectFieldDelta
-import deltas.javac.methods.MemberSelectorDelta
-import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 
 class LeftRecursionTestBiGrammar extends AnyFunSuite {
 

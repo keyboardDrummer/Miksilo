@@ -8,9 +8,9 @@ import core.language.Compilation
 import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
-import deltas.yaml.{PlainScalarDelta, YamlArrayDelta, YamlCoreDelta, YamlLanguage, YamlObjectDelta}
+import deltas.yaml._
 import org.scalatest.funsuite.AnyFunSuite
-import util.{JavaSourceUtils, TestLanguageBuilder}
+import util.TestLanguageBuilder
 
 class YamlTest extends AnyFunSuite {
 

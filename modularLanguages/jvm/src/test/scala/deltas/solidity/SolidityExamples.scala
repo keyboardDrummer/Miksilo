@@ -1,9 +1,8 @@
 package deltas.solidity
 
-import core.SourceUtils
 import core.language.{Compilation, InMemoryFileSystem}
 import org.scalatest.funsuite.AnyFunSuite
-import util.{JavaSourceUtils, StreamUtils, TestLanguageBuilder}
+import util.TestLanguageBuilder
 
 class SolidityExamples extends AnyFunSuite {
   val solidity = TestLanguageBuilder.build(SolidityLanguage.deltas)

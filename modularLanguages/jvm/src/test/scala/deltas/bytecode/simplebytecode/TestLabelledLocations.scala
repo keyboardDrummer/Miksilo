@@ -1,4 +1,4 @@
-package deltas.bytecode.simplebytecode.test
+package deltas.bytecode.simpleBytecode
 
 import core.SourceUtils
 import core.deltas.Delta
