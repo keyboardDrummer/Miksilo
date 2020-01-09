@@ -16,8 +16,8 @@ import deltas.javac.CallVariableDelta
 import deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta}
 import deltas.javac.constructor.DefaultConstructorDelta
 import deltas.javac.expressions.literals.BooleanLiteralDelta
-import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
+import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.statements.{ExpressionAsStatementDelta, ForLoopContinueDelta, WhileBreakDelta}
 import deltas.javac.types.BooleanTypeDelta
 import deltas.statement._

@@ -7,11 +7,10 @@ import core.language.{Compilation, Language, Phase}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
-import deltas.javac.classes.skeleton.FullyQualifyTypeReferences
-import deltas.javac.classes.skeleton.JavaClassDelta.{JavaClass, Members, getFields, state}
 import deltas.javac.classes.{ClassCompiler, FieldToByteCode}
-import deltas.javac.methods.MethodDelta.getMethods
-import deltas.javac.methods.MethodToByteCode
+import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassDelta}
+import deltas.javac.classes.skeleton.JavaClassDelta.{JavaClass, Members}
+import deltas.javac.methods.{MethodDelta, MethodToByteCode}
 
 object JavaClassToByteCodeDelta extends Delta {
 
@@ -31,7 +30,7 @@ object JavaClassToByteCodeDelta extends Delta {
       javaClass.node.shape = ByteCodeSkeleton.Shape
       val classFile = new ClassFile(javaClass.node)
       val classCompiler: ClassCompiler = ClassCompiler(javaClass.node, compilation)
-      state(compilation).classCompiler = classCompiler
+      JavaClassDelta.state(compilation).classCompiler = classCompiler
       classCompiler.bind()
 
       val classInfo = classCompiler.currentClassInfo
@@ -44,10 +43,10 @@ object JavaClassToByteCodeDelta extends Delta {
       program(ByteCodeSkeleton.ClassParentIndex) = parentRef
       program(ByteCodeSkeleton.ClassInterfaces) = Seq()
 
-      program(ByteCodeSkeleton.ClassFields) = getFields[NodePath](javaClass).map(field =>
+      program(ByteCodeSkeleton.ClassFields) = JavaClassDelta.getFields[NodePath](javaClass).map(field =>
         FieldToByteCode.compile(compilation, field))
 
-      program(ByteCodeSkeleton.Methods) = getMethods[NodePath](javaClass).map(method =>
+      program(ByteCodeSkeleton.Methods) = MethodDelta.getMethods[NodePath](javaClass).map(method =>
         MethodToByteCode.compile(compilation, method))
 
       javaClass.node.data.remove(Members)

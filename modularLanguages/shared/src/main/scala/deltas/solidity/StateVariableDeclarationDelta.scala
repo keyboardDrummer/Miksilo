@@ -10,10 +10,9 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.statement.LocalDeclarationDelta
 import deltas.HasNameDelta.Name
-import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 
 object StateVariableDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

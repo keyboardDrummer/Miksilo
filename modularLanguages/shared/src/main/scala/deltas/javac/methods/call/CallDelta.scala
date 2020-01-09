@@ -13,9 +13,8 @@ import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.constants.{ClassInfoConstant, MethodRefConstant, NameAndTypeConstant, Utf8ConstantDelta}
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
-import deltas.javac.classes.skeleton.QualifiedClassName
 import deltas.javac.methods.MethodDelta
 import deltas.javac.methods.MethodDelta.Method
 

@@ -15,8 +15,7 @@ import deltas.ConstraintSkeleton
 import deltas.HasNameDelta.{HasName, Name}
 import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta}
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 import deltas.javac.classes.skeleton.JavaClassDelta.ClassImports
 
 object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {

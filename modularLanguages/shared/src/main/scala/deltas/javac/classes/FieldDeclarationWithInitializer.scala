@@ -7,16 +7,16 @@ import core.language.node.{Node, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
 import deltas.expression.{ExpressionDelta, VariableDelta}
-import deltas.javac.classes.FieldDeclarationDelta.{Field, Type}
-import deltas.javac.classes.skeleton.JavaClassDelta._
 import deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
-import deltas.javac.methods.call.CallDelta
-import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.statement.LocalDeclarationWithInitializerDelta.LocalDeclarationWithInitializer
 import deltas.statement.assignment.SimpleAssignmentDelta
 import deltas.statement.{BlockDelta, LocalDeclarationWithInitializerDelta}
 import deltas.HasNameDelta.Name
+import deltas.javac.classes.FieldDeclarationDelta.{Field, Type}
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
+import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
+import deltas.javac.methods.call.CallDelta
 
 import scala.collection.immutable.ArraySeq
 import scala.collection.mutable.ArrayBuffer
@@ -53,6 +53,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
+    val clazz: JavaClass[Node] = program
     PathRoot(program).visitShape(Shape, obj => transformDeclarationWithInitializer(obj, initializerStatements, compilation))
 
     if (initializerStatements.isEmpty)
@@ -61,7 +62,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
     val reversedInitializerStatements = initializerStatements.view.reverse //TODO: hack to fix the reverse hack in NodeLike.
     val fieldInitializerMethod = MethodDelta.neww(getFieldInitializerMethodName,VoidTypeDelta.voidType, Seq.empty,
       BlockDelta.neww(reversedInitializerStatements.toSeq))
-    program.members = Seq(fieldInitializerMethod) ++ program.members
+    clazz.members = Seq(fieldInitializerMethod) ++ program.members
 
     for(constructor <- ConstructorDelta.getConstructors(program)) {
       val body = constructor.body.statements

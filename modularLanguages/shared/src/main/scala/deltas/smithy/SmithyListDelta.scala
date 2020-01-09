@@ -9,8 +9,8 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.{ConstraintSkeleton, HasNameDelta}
-import deltas.javac.classes.skeleton.HasConstraintsDelta
 import core.deltas.path.ConstraintBuilderExtension._
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object SmithyListDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

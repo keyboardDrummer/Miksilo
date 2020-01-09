@@ -5,9 +5,9 @@ import core.language.Compilation
 import core.language.exceptions.BadInputException
 import core.language.node.Node
 import deltas.bytecode.types.QualifiedObjectTypeDelta
-import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.classes.ClassCompiler
-import deltas.javac.methods.MethodDelta._
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.methods.MethodDelta.Method
 import deltas.statement.{LocalsAnalysis, StatementDelta}
 
 case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
@@ -23,7 +23,7 @@ case class MethodCompiler(compilation: Compilation, method: Method[Node]) {
     if (!method.isStatic)
       result = result.add("this", QualifiedObjectTypeDelta.neww(classCompiler.fullyQualify(classCompiler.currentClassInfo.name)))
     for (parameter <- method.parameters)
-      result = result.add(parameter.name, getParameterType(PathRoot(parameter), classCompiler))
+      result = result.add(parameter.name, MethodDelta.getParameterType(PathRoot(parameter), classCompiler))
     result
   }
 

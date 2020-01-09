@@ -11,11 +11,10 @@ import core.smarts.types.objects.{PrimitiveType, TypeApplication}
 import deltas.HasNameDelta
 import deltas.HasNameDelta.{HasName, Name}
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.javac.methods.MethodParameters.MethodParameter
-import deltas.javac.methods.{MethodDelta, MethodParameters}
 import core.deltas.path.ConstraintBuilderExtension._
-import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.javac.methods.{MethodDelta, MethodParameters}
+import deltas.javac.methods.MethodParameters.MethodParameter
 
 object EventDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

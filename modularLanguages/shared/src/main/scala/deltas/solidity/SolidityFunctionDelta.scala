@@ -11,9 +11,8 @@ import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
 import deltas.HasNameDelta.Name
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.javac.methods.MethodDelta.{Method, Shape}
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.methods.{MethodDelta, MethodParameters}
@@ -55,7 +54,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
   }
 
   override def inject(language: Language): Unit = {
-    LabelStatementDelta.isLabelScope.add(language, Shape, ())
+    LabelStatementDelta.isLabelScope.add(language, MethodDelta.Shape, ())
     super.inject(language)
   }
 

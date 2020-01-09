@@ -3,7 +3,7 @@ package deltas.javac
 import core.deltas.path.PathRoot
 import core.language.node.Node
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, VoidTypeDelta}
-import deltas.javac.classes.skeleton.QualifiedClassName
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameters}
 import deltas.statement.BlockDelta
 import org.scalatest.funsuite.AnyFunSuite

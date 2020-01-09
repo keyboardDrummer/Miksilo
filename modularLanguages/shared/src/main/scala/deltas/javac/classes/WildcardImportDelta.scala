@@ -7,9 +7,8 @@ import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.BasicImportDelta._
-import deltas.javac.classes.skeleton._
+import deltas.javac.classes.BasicImportDelta.Elements
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta, PackageSignature, QualifiedClassName}
 
 object WildcardImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -18,7 +17,7 @@ object WildcardImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
   def wildCardImport(elements: Seq[String]) = new Node(Shape, Elements -> elements)
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, _import: NodePath, parentScope: Scope): Unit = {
-    val elements = getParts(_import)
+    val elements = BasicImportDelta.getParts(_import)
     val fullPackage: String = elements.reduce((a, b) => a + "." + b)
     val packageDeclaration = builder.resolve(fullPackage, parentScope, _import.asInstanceOf[NodeChildPath])
     val packageScope = builder.getDeclaredScope(packageDeclaration)
@@ -35,7 +34,7 @@ object WildcardImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def inject(language: Language): Unit = {
     JavaClassDelta.importToClassMap.add(language, Shape, (compilation: Compilation, wildcardImport) => {
-      val packageParts = getParts(wildcardImport)
+      val packageParts = BasicImportDelta.getParts(wildcardImport)
       val classCompiler = JavaClassDelta.state(compilation).classCompiler
       val compiler = classCompiler.javaCompiler
       val finalPackage = compiler.find(packageParts).asInstanceOf[PackageSignature]

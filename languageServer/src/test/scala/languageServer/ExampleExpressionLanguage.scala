@@ -1,12 +1,10 @@
 package languageServer
 
-import core.SourceUtils
 import core.language.{FileElement, Language, SourceElementFromFileElement}
 import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, SourceRange}
 import core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import util.StreamUtils
 
 // TODO add a constraintBuilder that's specific to a File, so you add a [Has]SourceRange instead of a SourceElement
 // TODO compute the range based on the children, so only the leafs needs a Range.

@@ -11,11 +11,11 @@ import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.PrimitiveType
 import deltas.expression.{ArrayLiteralDelta, StringLiteralDelta}
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
-import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.json.JsonObjectLiteralDelta.ObjectLiteral
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import deltas.{FileWithMembersDelta, HasNameDelta}
 import core.deltas.path.ConstraintBuilderExtension._
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object ServiceDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

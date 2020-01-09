@@ -6,7 +6,8 @@ import deltas.bytecode.types._
 import deltas.expression.additive.{AdditionDelta, SubtractionDelta}
 import deltas.expression.relational.LessThanDelta
 import deltas.expression.{ExpressionDelta, IntLiteralDelta, TernaryDelta, VariableDelta}
-import deltas.javac.methods._
+import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.methods.{AccessibilityFieldsDelta, MemberSelectorDelta, MethodDelta, MethodParameters, ReturnExpressionDelta}
 import deltas.javac.methods.call.CallDelta
 import deltas.javac.statements.ExpressionAsStatementDelta
 import deltas.statement.BlockDelta

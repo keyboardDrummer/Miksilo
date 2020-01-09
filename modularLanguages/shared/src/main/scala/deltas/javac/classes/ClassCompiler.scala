@@ -7,11 +7,9 @@ import core.language.node.Node
 import deltas.bytecode.constants._
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
-import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta._
-import deltas.javac.classes.skeleton._
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
+import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassDelta, PackageSignature, QualifiedClassName}
 import deltas.javac.methods.MethodDelta
-import deltas.javac.methods.MethodDelta.getMethods
 
 case class FieldInfo(parent: ClassSignature, name: String, _static: Boolean, _type: Node) extends ClassMember
 
@@ -33,10 +31,10 @@ case class ClassCompiler(currentClass: Node, compilation: Compilation) {
 
     val javaClass: JavaClass[Node] = currentClass
 
-    getFields(javaClass).foreach(field =>
+    JavaClassDelta.getFields(javaClass).foreach(field =>
       FieldDeclarationDelta.bind(compilation, currentClassInfo, field))
 
-    getMethods(javaClass).foreach(method =>
+    MethodDelta.getMethods(javaClass).foreach(method =>
       MethodDelta.bind(compilation, currentClassInfo, method))
 
     JavaClassDelta.state(compilation).classCompiler = previous

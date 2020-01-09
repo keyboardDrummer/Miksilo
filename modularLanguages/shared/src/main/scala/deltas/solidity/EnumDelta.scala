@@ -11,9 +11,8 @@ import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.HasNameDelta
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.HasConstraintsDelta
 import core.deltas.path.ConstraintBuilderExtension._
-import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 
 object EnumDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

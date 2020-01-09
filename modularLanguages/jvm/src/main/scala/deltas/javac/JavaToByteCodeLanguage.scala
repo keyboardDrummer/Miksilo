@@ -4,7 +4,7 @@ import core.deltas._
 import deltas.PrettyPrint
 import deltas.bytecode._
 import deltas.javaPlus.{ExpressionMethodDelta, ReorderMembersDelta}
-import deltas.javac.classes._
+import deltas.javac.classes.{NewToByteCodeDelta, SelectFieldToByteCodeDelta}
 import deltas.javac.constructor._
 import deltas.javac.expressions._
 import deltas.javac.expressions.additive._
@@ -13,7 +13,7 @@ import deltas.javac.expressions.literals._
 import deltas.javac.expressions.postfix.PostFixIncrementToByteCodeDelta
 import deltas.javac.expressions.prefix.LogicalNotToByteCode
 import deltas.javac.expressions.relational.{GreaterThanToByteCodeDelta, LessThanToByteCodeDelta}
-import deltas.javac.methods._
+import deltas.javac.methods.{AssignmentToByteCodeDelta, BlockLanguageDelta, ReturnExpressionToByteCodeDelta, ReturnVoidToByteCodeDelta, VariableToByteCodeDelta}
 import deltas.javac.methods.call.CallStaticOrInstanceDelta
 import deltas.javac.statements._
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}

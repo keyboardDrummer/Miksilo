@@ -10,14 +10,13 @@ import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.{Constraint, ConstraintBuilder, ConstraintSolver}
 import deltas.HasNameDelta.Name
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.javac.methods.MethodDelta.Method
-import deltas.javac.methods.MethodParameters
-import deltas.javac.methods.MethodParameters.MethodParameter
 import deltas.solidity.SolidityContractDelta.ContractLike
 import deltas.solidity.SolidityFunctionDelta.ReturnValues
 import core.deltas.path.ConstraintBuilderExtension._
-import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.javac.methods.MethodDelta.Method
+import deltas.javac.methods.MethodParameters
+import deltas.javac.methods.MethodParameters.MethodParameter
 
 object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

@@ -10,10 +10,10 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.PrimitiveType
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.HasConstraints
 import deltas.json.JsonObjectLiteralDelta
 import deltas.{ConstraintSkeleton, FileWithMembersDelta, HasNameDelta}
 import core.deltas.path.ConstraintBuilderExtension._
+import deltas.javac.classes.skeleton.HasConstraints
 
 object TraitDelta extends DeltaWithGrammar {
 

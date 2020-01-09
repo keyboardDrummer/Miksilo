@@ -9,7 +9,6 @@ import deltas.bytecode.coreInstructions.longs.LongReturnInstructionDelta
 import deltas.bytecode.types._
 import deltas.expression.ExpressionDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
-import deltas.javac.methods.ReturnExpressionDelta.getReturnValue
 
 object ReturnExpressionToByteCodeDelta extends ConvertsToByteCodeDelta {
 
@@ -19,7 +18,7 @@ object ReturnExpressionToByteCodeDelta extends ConvertsToByteCodeDelta {
   }
 
   def returnToLines(_return: NodePath, compiler: MethodCompiler): Seq[Node] = {
-    val returnValue: NodePath = getReturnValue(_return)
+    val returnValue: NodePath = ReturnExpressionDelta.getReturnValue(_return)
     val returnValueInstructions = ToByteCodeSkeleton.getToInstructions(compiler.compilation)(returnValue)
     val returnType = ExpressionDelta.cachedNodeType(compiler.compilation, returnValue)
     returnValueInstructions ++ (returnType match

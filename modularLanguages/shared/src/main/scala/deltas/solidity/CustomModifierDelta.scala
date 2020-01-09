@@ -13,13 +13,12 @@ import deltas.ConstraintSkeleton
 import deltas.HasNameDelta.Name
 import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
 import deltas.expression.{ExpressionDelta, IsExpression}
-import deltas.javac.classes.skeleton.HasConstraintsDelta
-import deltas.javac.methods.MethodDelta.Method
-import deltas.javac.methods.MethodParameters.MethodParameter
-import deltas.javac.methods.{MethodDelta, MethodParameters}
 import deltas.statement.{BlockDelta, LabelStatementDelta}
 import core.deltas.path.ConstraintBuilderExtension._
-import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.javac.methods.{MethodDelta, MethodParameters}
+import deltas.javac.methods.MethodDelta.Method
+import deltas.javac.methods.MethodParameters.MethodParameter
 
 object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

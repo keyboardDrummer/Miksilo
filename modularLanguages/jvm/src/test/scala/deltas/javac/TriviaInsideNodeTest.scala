@@ -2,7 +2,6 @@ package deltas.javac
 
 import core.bigrammar._
 import core.bigrammar.grammars.{BiSequence, Labelled, WithTrivia}
-import core.deltas.NodeGrammarWriter
 import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}

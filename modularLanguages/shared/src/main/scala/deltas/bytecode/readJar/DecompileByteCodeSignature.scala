@@ -8,17 +8,16 @@ import deltas.bytecode.attributes.SignatureAttribute
 import deltas.bytecode.constants.ClassInfoConstant
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import deltas.javac.classes.skeleton.QualifiedClassName
-import deltas.javac.classes.{ConstantPool, FieldDeclarationDelta}
-import deltas.javac.methods.AccessibilityFieldsDelta.{Static, Visibility, VisibilityField}
-import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameters}
 import deltas.javac.types.{MethodTypeDelta, TypeAbstraction}
 import deltas.statement.BlockDelta
 
 import scala.collection.mutable.ArrayBuffer
 import core.bigrammar.BiGrammarToParser._
 import core.deltas.grammars.LanguageGrammars
-import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.{ConstantPool, FieldDeclarationDelta}
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
+import deltas.javac.methods.AccessibilityFieldsDelta.{Static, Visibility, VisibilityField}
+import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameters}
 
 import scala.collection.immutable.ArraySeq
 

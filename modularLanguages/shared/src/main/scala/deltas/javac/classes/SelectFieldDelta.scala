@@ -10,14 +10,14 @@ import core.smarts.types.objects.Type
 import core.smarts.{ConstraintBuilder, ResolvesTo}
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.methods.MemberSelectorDelta
-import deltas.javac.methods.MemberSelectorDelta._
+import deltas.javac.methods.MemberSelectorDelta.{Member, MemberSelector, Shape}
 import deltas.javac.methods.call.ReferenceExpressionDelta
 
 object SelectFieldDelta extends DeltaWithGrammar with ExpressionInstance with ReferenceExpressionDelta {
 
   override def description: String = "Enables using the . operator to select a field from a class."
 
-  override val shape = Shape
+  override val shape = MemberSelectorDelta.Shape
 
   override def dependencies: Set[Contract] = Set(MemberSelectorDelta)
 

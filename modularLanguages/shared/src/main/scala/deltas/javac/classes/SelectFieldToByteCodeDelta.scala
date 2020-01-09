@@ -12,7 +12,6 @@ import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.MemberSelectorDelta.MemberSelector

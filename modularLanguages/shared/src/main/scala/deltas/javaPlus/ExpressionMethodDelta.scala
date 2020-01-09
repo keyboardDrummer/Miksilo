@@ -6,9 +6,10 @@ import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
 import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta._
-import deltas.javac.methods.MethodDelta.{Parameters, ReturnType}
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
+import deltas.javac.methods.MethodDelta.ReturnType
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, ReturnExpressionDelta}
+import deltas.javac.types.MethodTypeDelta.Parameters
 import deltas.statement.BlockDelta
 
 object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
@@ -35,7 +36,8 @@ object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {
   }
 
   override def transformProgram(program: Node, state: Compilation): Unit = {
-    for(expressionMethod <- program.members.filter(method => method.shape == Shape))
+    val clazz: JavaClass[Node] = program
+    for(expressionMethod <- clazz.members.filter(method => method.shape == Shape))
     {
       val expression = expressionMethod(Expression).asInstanceOf[Node]
       expressionMethod.shape = MethodDelta.Shape

@@ -7,8 +7,8 @@ import core.language.{Compilation, Language}
 import core.language.node.{NodeField, NodeShape}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.{ConstraintSkeleton, FileWithMembersDelta}
 import deltas.javac.classes.skeleton.HasConstraintsDelta
+import deltas.{ConstraintSkeleton, FileWithMembersDelta}
 
 // TODO change this so that traits inject themselves
 object ShapeStatementDelta extends DeltaWithGrammar with HasConstraintsDelta {

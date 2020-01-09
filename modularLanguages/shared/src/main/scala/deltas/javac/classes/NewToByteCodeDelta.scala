@@ -8,7 +8,6 @@ import deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
 import deltas.expression.NewDelta
 import deltas.expression.NewDelta.NewCall
-import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.classes.skeleton.{ClassSignature, JavaClassDelta}
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
 import deltas.javac.methods.MethodDelta.Method

@@ -8,12 +8,12 @@ import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.logical.LogicalNotDelta
 import deltas.expression.relational.{EqualsComparisonDelta, GreaterThanDelta, LessThanDelta, RelationalPrecedenceDelta}
-import deltas.javac.classes._
+import deltas.javac.classes.{AssignToMemberDelta, BasicImportDelta, ClassifyTypeIdentifiers, FieldDeclarationDelta, FieldDeclarationWithInitializer, SelectFieldDelta, ThisVariableDelta, WildcardImportDelta}
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassDelta}
 import deltas.javac.constructor._
 import deltas.javac.expressions.equality.AddEqualityPrecedence
 import deltas.javac.expressions.literals._
-import deltas.javac.methods._
+import deltas.javac.methods.{AccessibilityFieldsDelta, ImplicitReturnAtEndOfMethod, MemberSelectorDelta, MethodDelta, ReturnExpressionDelta, ReturnVoidDelta}
 import deltas.javac.methods.call.{CallDelta, CallMemberDelta}
 import deltas.javac.statements.{ExpressionAsStatementDelta, ForLoopContinueDelta, IfThenElseToIfThenAndGotoDelta, WhileBreakDelta}
 import deltas.statement._

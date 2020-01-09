@@ -1,7 +1,7 @@
 package deltas.javac.classes.skeleton
 
 import core.language.node.Node
-import deltas.javac.classes.{MethodQuery, FieldInfo, MethodInfo}
+import deltas.javac.classes.{FieldInfo, MethodInfo, MethodQuery}
 import deltas.javac.types.MethodTypeDelta._
 
 import scala.collection.mutable

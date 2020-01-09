@@ -11,9 +11,7 @@ import core.smarts.objects.NamedDeclaration
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.bytecode.constants.ClassInfoConstant
-import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
-import deltas.javac.classes.skeleton.QualifiedClassName
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 
 object QualifiedObjectTypeDelta extends ByteCodeTypeInstance with HasStackTypeDelta {
 

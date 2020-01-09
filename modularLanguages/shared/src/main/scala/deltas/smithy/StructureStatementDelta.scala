@@ -8,10 +8,10 @@ import core.language.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
-import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.smithy.RelativeShapeIdentifierDelta.shapeType
 import deltas.{ConstraintSkeleton, FileWithMembersDelta, HasNameDelta}
 import core.deltas.path.ConstraintBuilderExtension._
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object StructureStatementDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

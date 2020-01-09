@@ -10,8 +10,8 @@ import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.Scope
 import deltas.HasNameDelta.HasName
 import deltas.bytecode.types.TypeSkeleton
-import deltas.javac.classes.skeleton.JavaClassDelta._
-import deltas.javac.classes.skeleton._
+import deltas.javac.classes.skeleton.{ClassSignature, HasConstraintsDelta, HasDeclarationDelta}
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.methods.AccessibilityFieldsDelta
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 

@@ -8,12 +8,11 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.{ConstraintSkeleton, HasNameDelta}
-import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.HasNameDelta.HasName
 import deltas.bytecode.types.TypeSkeleton
 import deltas.statement.LocalDeclarationDelta
 import core.deltas.path.ConstraintBuilderExtension._
-import deltas.javac.classes.skeleton.JavaClassDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
 
 object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

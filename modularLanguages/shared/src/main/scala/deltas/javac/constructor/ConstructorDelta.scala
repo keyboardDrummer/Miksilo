@@ -6,12 +6,12 @@ import core.language.exceptions.BadInputException
 import core.language.node._
 import core.language.{Compilation, Language}
 import deltas.bytecode.types.VoidTypeDelta
-import deltas.javac.classes.skeleton.JavaClassDelta._
-import deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
-import deltas.javac.methods.MethodDelta._
-import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.statement.BlockDelta
 import deltas.HasNameDelta.Name
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
+import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
+import deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
+import deltas.javac.methods.MethodDelta.{Body, Method, Parameters}
 
 object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 

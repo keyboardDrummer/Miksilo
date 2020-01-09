@@ -8,9 +8,9 @@ import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.PrimitiveType
-import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.{ConstraintSkeleton, HasNameDelta}
 import core.deltas.path.ConstraintBuilderExtension._
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object OperationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

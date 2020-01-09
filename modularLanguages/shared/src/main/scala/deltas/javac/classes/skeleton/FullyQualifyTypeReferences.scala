@@ -6,7 +6,6 @@ import core.deltas.{Contract, Delta}
 import core.language.node.Node
 import core.language.{Compilation, Language, Phase}
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
-import deltas.javac.classes.skeleton.JavaClassDelta
 
 object FullyQualifyTypeReferences extends Delta {
   override def description: String = "Replaces unqualified type references with qualified ones."

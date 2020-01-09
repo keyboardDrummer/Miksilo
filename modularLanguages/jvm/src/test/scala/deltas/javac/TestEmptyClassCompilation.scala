@@ -10,7 +10,7 @@ import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.classes.ConstantPool
-import deltas.javac.classes.skeleton.QualifiedClassName
+import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.types.MethodTypeDelta
 import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}

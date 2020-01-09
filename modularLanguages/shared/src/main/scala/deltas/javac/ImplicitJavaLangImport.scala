@@ -5,7 +5,7 @@ import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
 import deltas.javac.classes.WildcardImportDelta
 import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta._
+import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 
 object ImplicitJavaLangImport extends DeltaWithPhase {
   val javaPackageName: String = "java"

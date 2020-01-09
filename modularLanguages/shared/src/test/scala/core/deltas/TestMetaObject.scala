@@ -2,9 +2,9 @@ package core.deltas
 
 import core.language.node.{Node, NodeField, NodeShape}
 import deltas.expression.{IntLiteralDelta, VariableDelta}
-import org.scalatest.funsuite.AnyFunSuite
+import deltas.javac.methods.MemberSelectorDelta
 import deltas.javac.methods.call.CallDelta
-import deltas.javac.methods.{MemberSelectorDelta, VariableToByteCodeDelta}
+import org.scalatest.funsuite.AnyFunSuite
 
 class TestMetaObject extends AnyFunSuite {
 

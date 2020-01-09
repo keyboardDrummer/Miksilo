@@ -10,7 +10,6 @@ import deltas.bytecode.coreInstructions.InstructionSignature
 import deltas.bytecode.simpleBytecode.InstructionTypeAnalysis.InstructionSideEffects
 import deltas.bytecode.types.QualifiedObjectTypeDelta
 import deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
-import deltas.javac.classes.skeleton.QualifiedClassName
 
 class InstructionTypeAnalysisForMethod(program: Node, language: Language, method: MethodInfo[Node]) {
   private val typeAnalysis = getTypeAnalysis
