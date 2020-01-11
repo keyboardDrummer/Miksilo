@@ -1,14 +1,16 @@
 import sbt.Keys.{homepage, scmInfo}
 
 import scala.sys.process._
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 lazy val miksilo = project
   .in(file("."))
   .aggregate(
-    editorParser,
-    LSPProtocol,
-    languageServer,
-    modularLanguages,
+    editorParser.jvm,
+    LSPProtocol.jvm,
+    LSPProtocol.js,
+    languageServer.jvm,
+    modularLanguages.jvm,
     playground
   )
 
@@ -37,22 +39,30 @@ lazy val assemblySettings = Seq(
   }
 )
 
-lazy val editorParser = (project in file("editorParser")).
+lazy val editorParser = crossProject(JVMPlatform, JSPlatform).
+  crossType(CrossType.Full).
+  in(file("editorParser")).
   settings(commonSettings: _*).
-  settings(
+  jvmSettings(
 
     // Only used for SourceUtils, should get rid of it.
     // https://mvnrepository.com/artifact/org.scala-lang/scala-reflect
-    libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.12.4"
+    libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.13.1"
   )
 
-lazy val LSPProtocol = (project in file("LSPProtocol")).
+lazy val LSPProtocol = crossProject(JVMPlatform, JSPlatform).
+  crossType(CrossType.Full).
+  in(file("LSPProtocol")).
   settings(commonSettings: _*).
   settings(
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1",
-  ).dependsOn(editorParser)
+  ).
+  jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault").
+  dependsOn(editorParser)
 
-lazy val languageServer = (project in file("languageServer")).
+lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
+  crossType(CrossType.Pure).
+  in(file("languageServer")).
   settings(commonSettings: _*).
   settings(
     assemblySettings,
@@ -77,7 +87,9 @@ lazy val languageServer = (project in file("languageServer")).
 
   ).dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
-lazy val modularLanguages = (project in file("modularLanguages")).
+lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
+  crossType(CrossType.Full).
+  in(file("modularLanguages")).
   settings(commonSettings: _*).
   settings(
     name := "modularLanguages",
@@ -98,7 +110,7 @@ lazy val modularLanguages = (project in file("modularLanguages")).
     libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
 
   ).dependsOn(languageServer,
-    editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )
+  editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )
 
 lazy val playground = (project in file("playground")).
   settings(commonSettings: _*).
@@ -113,6 +125,6 @@ lazy val playground = (project in file("playground")).
     libraryDependencies += "org.tinyjee.jgraphx" % "jgraphx" % "2.3.0.5",
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.1",
     libraryDependencies += "org.apache.commons" % "commons-math3" % "3.5",
-  ).dependsOn(modularLanguages)
+  ).dependsOn(modularLanguages.jvm)
 
 lazy val vscode = taskKey[Unit]("Run VS Code with Miksilo")
