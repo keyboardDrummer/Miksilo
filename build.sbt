@@ -10,7 +10,7 @@ lazy val miksilo = project
     LSPProtocol.jvm,
     LSPProtocol.js,
     languageServer.jvm,
-    modularLanguages,
+    modularLanguages.jvm,
     playground
   )
 
@@ -87,7 +87,9 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
 
   ).dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
-lazy val modularLanguages = (project in file("modularLanguages")).
+lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
+  crossType(CrossType.Full).
+  in(file("modularLanguages")).
   settings(commonSettings: _*).
   settings(
     name := "modularLanguages",
@@ -107,8 +109,8 @@ lazy val modularLanguages = (project in file("modularLanguages")).
     // byteCode parser
     libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
 
-  ).dependsOn(languageServer.jvm,
-    editorParser.jvm % "compile->compile;test->test" /* for bigrammar testing utils*/ )
+  ).dependsOn(languageServer,
+  editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )
 
 lazy val playground = (project in file("playground")).
   settings(commonSettings: _*).
@@ -123,6 +125,6 @@ lazy val playground = (project in file("playground")).
     libraryDependencies += "org.tinyjee.jgraphx" % "jgraphx" % "2.3.0.5",
     libraryDependencies += "org.jgrapht" % "jgrapht-core" % "0.9.1",
     libraryDependencies += "org.apache.commons" % "commons-math3" % "3.5",
-  ).dependsOn(modularLanguages)
+  ).dependsOn(modularLanguages.jvm)
 
 lazy val vscode = taskKey[Unit]("Run VS Code with Miksilo")
