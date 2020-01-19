@@ -41,6 +41,6 @@ trait OperatorWithAssignmentDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(shape, obj => transformAssignment(obj, compilation))
+    PathRoot.fromCompilation(compilation).visitShape(shape, obj => transformAssignment(obj, compilation))
   }
 }

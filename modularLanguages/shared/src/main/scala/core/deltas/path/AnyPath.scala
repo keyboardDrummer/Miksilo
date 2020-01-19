@@ -9,6 +9,7 @@ import core.smarts.types.objects.Type
 
 trait AnyPath extends SourceElement {
 
+  def replaceWith(replacement: Any): Unit
   def current: Any
   def uriOption: Option[String]
   def parentOption: Option[NodePath]

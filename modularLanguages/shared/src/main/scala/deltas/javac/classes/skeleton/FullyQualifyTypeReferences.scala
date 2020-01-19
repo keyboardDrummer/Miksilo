@@ -17,7 +17,7 @@ object FullyQualifyTypeReferences extends Delta {
   }
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(UnqualifiedObjectTypeDelta.Shape, _type => {
+    PathRoot.fromCompilation(compilation).visitShape(UnqualifiedObjectTypeDelta.Shape, _type => {
       val declaration = compilation.proofs.gotoDefinition(_type).get.origin.get.asInstanceOf[FieldPath].parent.current
       val clazz: JavaClassDelta.JavaClass[Node] = declaration
       val parts = clazz._package ++ Seq(clazz.name)

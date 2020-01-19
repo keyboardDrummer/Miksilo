@@ -21,7 +21,7 @@ case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioSt
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val phase = Language.getParsePhaseFromParser[Node, Input](input => new Reader(input), (program, uri) => {
       program.startOfUri = Some(uri)
-      PathRoot(program)
+      PathRoot(compilation, program)
     }, parserProp.get(compilation), stopFunction)
     phase.action(compilation)
   }

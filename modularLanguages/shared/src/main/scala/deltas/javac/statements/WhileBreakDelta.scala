@@ -21,7 +21,7 @@ object WhileBreakDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val endLabels = new mutable.HashMap[NodePath, String]()
-    PathRoot(program).visitShape(BreakShape, path => transformBreak(compilation, path, endLabels))
+    PathRoot.fromCompilation(compilation).visitShape(BreakShape, path => transformBreak(compilation, path, endLabels))
   }
 
   def transformBreak(compilation: Compilation, breakPath: NodePath, endLabels: mutable.Map[NodePath, String]): Unit = {

@@ -17,7 +17,7 @@ object ExpandVirtualInstructionsDelta extends DeltaWithPhase {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
 
-    val classFile: ClassFile[NodePath] = PathRoot(program)
+    val classFile: ClassFile[NodePath] = PathRoot.fromCompilation(compilation)
     val codeAnnotations = CodeAttributeDelta.getCodeAnnotations[NodePath](classFile)
 
     for (codeAnnotation <- codeAnnotations) {

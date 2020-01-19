@@ -17,7 +17,7 @@ object ForLoopContinueDelta extends DeltaWithPhase {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val beforeIncrementLabels = new mutable.HashMap[NodePath, String]()
-    PathRoot(program).visitShape(WhileContinueDelta.ContinueKey).foreach(
+    PathRoot.fromCompilation(compilation).visitShape(WhileContinueDelta.ContinueKey).foreach(
       path => transformContinue(compilation, path, beforeIncrementLabels))
   }
 

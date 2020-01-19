@@ -19,7 +19,7 @@ object WhileContinueDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
     val startLabels = new mutable.HashMap[NodePath, String]()
-    PathRoot(program).visitShape(ContinueKey, path => transformContinue(compilation, path, startLabels))
+    PathRoot.fromCompilation(compilation).visitShape(ContinueKey, path => transformContinue(compilation, path, startLabels))
   }
 
   def transformContinue(compilation: Compilation, continuePath: NodePath, startLabels: mutable.Map[NodePath, String]): Unit = {

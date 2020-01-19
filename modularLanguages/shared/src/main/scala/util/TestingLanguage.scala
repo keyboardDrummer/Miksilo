@@ -7,7 +7,7 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.language.node.Node
-import core.language.{Compilation, Language}
+import core.language.{Compilation, EmptyFileSystem, Language}
 
 import scala.reflect.io.File
 
@@ -36,7 +36,8 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
   }
 
   def compileAst(program: Node): Compilation = {
-    val compilation = Compilation.fromAst(language, PathRoot(program))
+    val compilation = new Compilation(language, EmptyFileSystem, None)
+    compilation.program = PathRoot(compilation, program)
     runPhases(compilation)
     compilation
   }

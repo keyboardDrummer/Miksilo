@@ -59,6 +59,6 @@ object LocalDeclarationWithInitializerDelta extends DeltaWithGrammar with DeltaW
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(Shape, obj => transformDeclarationWithInitializer(obj, compilation))
+    PathRoot.fromCompilation(compilation).visitShape(Shape, obj => transformDeclarationWithInitializer(obj, compilation))
   }
 }

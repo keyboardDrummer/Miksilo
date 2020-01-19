@@ -54,7 +54,7 @@ object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPh
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val initializerStatements = new ArrayBuffer[Node]()
     val clazz: JavaClass[Node] = program
-    PathRoot(program).visitShape(Shape, obj => transformDeclarationWithInitializer(obj, initializerStatements, compilation))
+    PathRoot.fromCompilation(compilation).visitShape(Shape, obj => transformDeclarationWithInitializer(obj, initializerStatements, compilation))
 
     if (initializerStatements.isEmpty)
       return

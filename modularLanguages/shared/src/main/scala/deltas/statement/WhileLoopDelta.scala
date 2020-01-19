@@ -23,7 +23,7 @@ object WhileLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(Shape, path => transformWhileLoop(path, compilation))
+    PathRoot.fromCompilation(compilation).visitShape(Shape, path => transformWhileLoop(path, compilation))
   }
 
   def transformWhileLoop(whileLoopPath: NodePath, compilation: Compilation): Unit = {

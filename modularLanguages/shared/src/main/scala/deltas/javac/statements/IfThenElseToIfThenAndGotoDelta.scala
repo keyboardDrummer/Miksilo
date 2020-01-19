@@ -14,7 +14,7 @@ object IfThenElseToIfThenAndGotoDelta extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(IfThenElseDelta, GotoStatementDelta, LabelStatementDelta, BlockDelta)
 
   def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(shape, path => transform(compilation, path))
+    PathRoot.fromCompilation(compilation).visitShape(shape, path => transform(compilation, path))
   }
 
   def transform(compilation: Compilation, ifElsePath: NodePath): Unit = {

@@ -29,7 +29,7 @@ object ForLoopDelta extends DeltaWithPhase with DeltaWithGrammar {
   }
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
-    PathRoot(program).visitShape(Shape, path => transformForLoop(path))
+    PathRoot.fromCompilation(compilation).visitShape(Shape, path => transformForLoop(path))
   }
 
   def transformForLoop(forLoopPath: NodePath): Unit = {

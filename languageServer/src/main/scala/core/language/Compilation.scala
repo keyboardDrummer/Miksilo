@@ -1,7 +1,5 @@
 package core.language
 
-import java.io.InputStream
-
 import core.parsers.core.{Metrics, NoMetrics}
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
 import lsp.{CodeAction, Diagnostic}

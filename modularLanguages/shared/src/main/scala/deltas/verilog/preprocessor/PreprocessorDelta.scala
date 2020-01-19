@@ -15,7 +15,7 @@ object PreprocessorDelta extends DeltaWithPhase with DeltaWithGrammar {
 
   override def transformProgram(program: Node, compilation: Compilation): Unit = {
     val preprocessor = new Preprocessor(compilation)
-    PathRoot(program).visit(beforeChildren = path => {
+    PathRoot.fromCompilation(compilation).visit(beforeChildren = path => {
       for (transformation <- transformations.get(compilation, path.shape)) {
         transformation.apply(preprocessor, path)
       }

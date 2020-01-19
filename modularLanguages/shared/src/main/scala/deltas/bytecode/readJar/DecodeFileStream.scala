@@ -23,7 +23,7 @@ class DecodeFileStream(uri: String, fileStream: InputStream) extends DeltaWithPh
     val inputBytes: Array[Byte] = readAllBytes(fileStream)
     val parseResult: ClassFileParser.ParseResult[Node] = ClassFileParser.parse(inputBytes)
     if (parseResult.successful) {
-      compilation.program = PathRoot(parseResult.get)
+      compilation.program = PathRoot(compilation, parseResult.get)
       parseResult.get.startOfUri = Some(uri)
     } else {
       val diagnostic = Diagnostic(SourceRange(HumanPosition(0, 0), HumanPosition(0, 0)), Some(DiagnosticSeverity.Error), "File was not a JVM classfile", None, None)
