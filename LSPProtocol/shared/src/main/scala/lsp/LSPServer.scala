@@ -4,6 +4,7 @@ import core.parsers.editorParsers.TextEdit
 import jsonRpc.{JsonRpcConnection, MethodBasedJsonRpcHandler}
 import play.api.libs.json._
 
+import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 
 case class Measurement(name: String, value: Double)

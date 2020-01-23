@@ -1,11 +1,9 @@
 package jsonRpc
 
-import jsonRpc.MessageReader
-
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.scalajs.js
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
  * A Language Server message Reader. It expects the following format:
@@ -20,7 +18,8 @@ import scala.scalajs.js
  *
  * @note The header part is defined to be ASCII encoded, while the content part is UTF8.
  */
-class NodeMessageReader(in: js.Dynamic) extends MessageReader {
+class NodeMessageReader(in: js.Dynamic) extends MessageReader with LazyLogging {
+
   val BufferSize = 8192
 
   private var data = ArrayBuffer.empty[Byte]
@@ -29,7 +28,6 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader {
   var dataArrival: Promise[Unit] = _
 
   def receiveData(): Unit = {
-    this.notify()
     if (dataArrival != null) {
       dataArrival.success(())
       dataArrival = null
@@ -37,6 +35,7 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader {
   }
 
   def waitForData(): Future[Unit] = {
+    logger.info("Waiting for data")
     if (this.dataArrival != null)
       return this.dataArrival.future
 
@@ -45,6 +44,7 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader {
   }
 
   in.on("data", (chunk: js.Array[Byte]) => {
+    logger.info("Received data")
     data ++= chunk.toArray
     receiveData()
   })
@@ -75,7 +75,7 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader {
     }
 
     if (data.size < 4 && !streamClosed)
-      return waitForData().flatMap(_ => readHeaders())
+      return waitForData().flatMap(_ => readHeaders())(ExecutionContext.global)
 
     if (streamClosed) return Future.successful(EmptyMap)
 

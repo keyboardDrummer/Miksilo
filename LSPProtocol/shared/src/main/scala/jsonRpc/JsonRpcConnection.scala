@@ -6,7 +6,7 @@ import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NoCorrelationId}
 import com.dhpcs.jsonrpc._
 import play.api.libs.json.{Format, JsError, Json}
 
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.util.{Failure, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -44,13 +44,13 @@ class JsonRpcConnection(reader: MessageReader, writer: MessageWriter) extends La
   def listen(): Unit = {
 
     def processItem(): Unit = {
-      reader.nextPayload().foreach {
+      reader.nextPayload().foreach({
         case null =>
           handler.dispose()
         case jsonString =>
           handleMessage(jsonString)
           processItem()
-      }
+      })
     }
     processItem()
   }
@@ -61,7 +61,7 @@ class JsonRpcConnection(reader: MessageReader, writer: MessageWriter) extends La
       case notification: JsonRpcNotificationMessage => handler.handleNotification(notification)
 
       case request: JsonRpcRequestMessage => handler.handleRequest(request).
-        foreach(response => write(response))
+        foreach(response => write(response))(ExecutionContext.global)
 
       case response: JsonRpcResponseMessage =>
         responseHandlers.get(response.id).fold({
