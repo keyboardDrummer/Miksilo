@@ -4,9 +4,19 @@ import com.dhpcs.jsonrpc.{JsonRpcNotificationMessage, JsonRpcRequestMessage, Jso
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
-trait WorkItem
-case class Notification(notification: JsonRpcNotificationMessage) extends WorkItem
-case class Request(request: JsonRpcRequestMessage, result: Promise[JsonRpcResponseMessage]) extends WorkItem
+trait WorkItem {
+  def method: String
+}
+case class Notification(notification: JsonRpcNotificationMessage) extends WorkItem {
+  override def method: String = notification.method
+}
+case class Request(request: JsonRpcRequestMessage, result: Promise[JsonRpcResponseMessage]) extends WorkItem {
+  override def method: String = request.method
+}
+
+object AfterIOExecution {
+  var context: ExecutionContext = ExecutionContext.global
+}
 
 abstract class MessagePreprocessor(original: JsonRpcHandler) extends JsonRpcHandler {
 
@@ -41,7 +51,7 @@ abstract class MessagePreprocessor(original: JsonRpcHandler) extends JsonRpcHand
   def addMessage(message: WorkItem): Unit = {
     messages.append(message)
     aggregate(messages)
-    ExecutionContext.global.execute(() => dequeueWorkItem())
+    AfterIOExecution.context.execute(() => dequeueWorkItem())
   }
 
 }

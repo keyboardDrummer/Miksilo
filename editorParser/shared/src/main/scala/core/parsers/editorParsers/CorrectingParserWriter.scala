@@ -171,7 +171,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       lazy val parseSecond = recursive(second)
 
       new BuiltParser[Result] {
-        override def apply(input: Input, state: ParseState) = {
+        override def apply(input: Input, state: ParseState): ParseResults[Input, Result] = {
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
           firstResult match {
@@ -195,11 +195,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       lazy val parseSecond = recursive(second)
 
       new BuiltParser[Result] {
-        override def apply(input: Input, state: ParseState) = {
+        override def apply(input: Input, state: ParseState): ParseResults[Input, Result] = {
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
-          val merged = firstResult.merge(secondResult)
-          merged
+          firstResult.merge(secondResult)
         }
       }
     }
@@ -231,7 +230,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 
   override def succeed[Result](result: Result): Parser[Result] = Succeed(result)
-
 
   def newSuccess[Result](result: Result, remainder: Input, score: Double): SRCons[Input, Result] =
     singleResult(ReadyParseResult(Some(result), remainder, History.success(remainder, remainder, result, score)))

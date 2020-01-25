@@ -39,7 +39,7 @@ trait ParseResults[Input, +Result] {
     flatMap[NewResult](l => l.flatMapReady(f, uniform), uniform)
   }
 
-  def updateRemainder(f: Input => Input) = {
+  def updateRemainder(f: Input => Input): ParseResults[Input, Result] = {
     mapReady(r => ReadyParseResult(r.resultOption, f(r.remainder), r.history), uniform = true)
   }
 }
@@ -98,7 +98,8 @@ final class SRCons[Input, +Result](val head: LazyParseResult[Input, Result],
     if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
       return SREmpty.empty[Input]
 
-    def getResult(head: LazyParseResult[Input, Other], tailDepth: Int, getTail: Map[Input, Double] => ParseResults[Input, Other]) = {
+    def getResult(head: LazyParseResult[Input, Other], tailDepth: Int,
+                  getTail: Map[Input, Double] => ParseResults[Input, Other]): ParseResults[Input, Other] = {
       head match {
         case ready: ReadyParseResult[Input, Other] =>
           bests.get(ready.remainder) match {

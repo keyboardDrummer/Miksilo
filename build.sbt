@@ -26,7 +26,7 @@ lazy val commonSettings = Seq(
   scalacOptions += "-language:implicitConversions",
   scalacOptions += "-language:postfixOps",
 
-  libraryDependencies += "org.scalatest" % "scalatest_2.13" % "3.1.0" % "test",
+  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0" % "test"
 )
 
 lazy val assemblySettings = Seq(
