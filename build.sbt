@@ -5,6 +5,10 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 lazy val miksilo = project
   .in(file("."))
+  .settings(commonSettings: _*)
+  .settings(
+    publishArtifact := false,
+    skip in publish := true)
   .aggregate(
     editorParser.jvm,
     LSPProtocol.jvm,
@@ -16,7 +20,7 @@ lazy val miksilo = project
 
 lazy val commonSettings = Seq(
 
-  version := "1.0",
+  version := "0.0.1",
   resolvers += "dhpcs at bintray" at "https://dl.bintray.com/dhpcs/maven",
   logLevel := Level.Info,
   logBuffered in Test := false,
@@ -26,11 +30,29 @@ lazy val commonSettings = Seq(
   scalacOptions += "-language:implicitConversions",
   scalacOptions += "-language:postfixOps",
 
+  publishConfiguration := publishConfiguration.value.withOverwrite(true),
+  organization := "com.github.keyboardDrummer",
+  homepage := Some(url("http://keyboarddrummer.github.io/Miksilo/")),
+  scmInfo := Some(ScmInfo(url("https://github.com/keyboardDrummer/Miksilo"),
+    "git@github.com:keyboardDrummer/Miksilo.git")),
+  developers := List(Developer("keyboardDrummer",
+    "Remy Willems",
+    "rgv.willems@gmail.com",
+    url("https://github.com/keyboardDrummer"))),
+  licenses += ("MIT", url("https://github.com/keyboardDrummer/Miksilo/blob/master/LICENSE")),
+  publishMavenStyle := true,
+
+  publishTo := Some(
+    if (isSnapshot.value)
+      Opts.resolver.sonatypeSnapshots
+    else
+      Opts.resolver.sonatypeStaging
+  ),
+
   libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0" % "test"
 )
 
 lazy val assemblySettings = Seq(
-
   assemblyJarName in assembly := name.value + ".jar",
   test in assembly := {},
   assemblyMergeStrategy in assembly := {
@@ -44,7 +66,9 @@ lazy val editorParser = crossProject(JVMPlatform, JSPlatform).
   in(file("editorParser")).
   settings(commonSettings: _*).
   jvmSettings(
-
+    assemblySettings,
+  ).
+  jvmSettings(
     // Only used for SourceUtils, should get rid of it.
     // https://mvnrepository.com/artifact/org.scala-lang/scala-reflect
     libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.13.1"
@@ -54,6 +78,9 @@ lazy val LSPProtocol = crossProject(JVMPlatform, JSPlatform).
   crossType(CrossType.Full).
   in(file("LSPProtocol")).
   settings(commonSettings: _*).
+  jvmSettings(
+    assemblySettings,
+  ).
   settings(
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.1",
   ).
@@ -64,33 +91,17 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
   crossType(CrossType.Pure).
   in(file("languageServer")).
   settings(commonSettings: _*).
-  settings(
+  jvmSettings(
     assemblySettings,
-
-    organization := "com.github.keyboardDrummer",
-    homepage := Some(url("http://keyboarddrummer.github.io/Miksilo/")),
-    scmInfo := Some(ScmInfo(url("https://github.com/keyboardDrummer/Miksilo"),
-      "git@github.com:keyboardDrummer/Miksilo.git")),
-    developers := List(Developer("keyboardDrummer",
-      "Remy Willems",
-      "rgv.willems@gmail.com",
-      url("https://github.com/keyboardDrummer"))),
-    licenses += ("MIT", url("https://github.com/keyboardDrummer/Miksilo/blob/master/LICENSE")),
-    publishMavenStyle := true,
-
-    publishTo := Some(
-      if (isSnapshot.value)
-        Opts.resolver.sonatypeSnapshots
-      else
-        Opts.resolver.sonatypeStaging
-    ),
-
   ).dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
 lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
   crossType(CrossType.Full).
   in(file("modularLanguages")).
   settings(commonSettings: _*).
+  jvmSettings(
+    assemblySettings,
+  ).
   settings(
     name := "modularLanguages",
     assemblySettings,
@@ -115,6 +126,8 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
 lazy val playground = (project in file("playground")).
   settings(commonSettings: _*).
   settings(
+    skip in publish := true,
+
     assemblySettings,
     mainClass in Compile := Some("application.Program"),
     libraryDependencies += "org.scala-lang.modules" % "scala-swing_2.12" % "2.0.0",
