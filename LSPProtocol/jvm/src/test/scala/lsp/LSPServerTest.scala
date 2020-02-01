@@ -41,19 +41,34 @@ class LSPServerTest extends AsyncFunSpec {
   ignore("can open document") {
     val document = TextDocumentItem("a","",0,"content")
 
-    val clientOutExpectation =
+    val clientDidOpenOutExpectation =
       """Content-Length: 132
         |
         |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"a","languageId":"","version":0,"text":"content"}}}""".stripMargin
 
-    val p = Promise[Assertion]()
+    val clientDidCloseOutExpectation =
+      """Content-Length: 88
+        |
+        |{"jsonrpc":"2.0","method":"textDocument/didClose","params":{"textDocument":{"uri":"a"}}}""".stripMargin
+
+    val opened = Promise[Assertion]()
+    val closed = Promise[Assertion]()
     lazy val serverAndClient = setupServerAndClient(languageServer)
     lazy val languageServer: LanguageServer = new TestLanguageServer {
       override def didOpen(parameters: TextDocumentItem): Unit = {
         try {
-          p.success(assertResult(fixNewlines(clientOutExpectation))(serverAndClient.clientOut.toString))
+          opened.success(assertResult(fixNewlines(clientDidOpenOutExpectation))(serverAndClient.clientOut.toString))
+          serverAndClient.clientOut.reset()
         } catch {
-          case e: Throwable => p.failure(e)
+          case e: Throwable => opened.failure(e)
+        }
+      }
+
+      override def didClose(parameters: TextDocumentIdentifier): Unit = {
+        try {
+          closed.success(assertResult(fixNewlines(clientDidCloseOutExpectation))(serverAndClient.clientOut.toString))
+        } catch {
+          case e: Throwable => closed.failure(e)
         }
       }
     }
@@ -61,7 +76,10 @@ class LSPServerTest extends AsyncFunSpec {
     val client = serverAndClient.client
     client.didOpen(document)
 
-    p.future
+    opened.future.flatMap(a => {
+      client.didClose(TextDocumentIdentifier(document.uri))
+      closed.future
+    })
   }
 
   ignore("can use goto definition") {

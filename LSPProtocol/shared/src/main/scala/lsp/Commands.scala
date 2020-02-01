@@ -198,7 +198,7 @@ case class PublishDiagnostics(uri: String, diagnostics: Seq[Diagnostic]) extends
 // from client to server
 
 case class ExitNotification() extends Notification
-case class DidCloseTextDocumentParams(identifier: TextDocumentIdentifier) extends Notification
+case class DidCloseTextDocumentParams(textDocument: TextDocumentIdentifier) extends Notification
 case class DidOpenTextDocumentParams(textDocument: TextDocumentItem) extends Notification
 case class DidSaveTextDocumentParams(textDocument: TextDocumentIdentifier) extends Notification
 case class DidChangeTextDocumentParams(

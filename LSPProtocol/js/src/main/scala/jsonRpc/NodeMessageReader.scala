@@ -35,7 +35,6 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader with LazyLogging {
   }
 
   def waitForData(): Future[Unit] = {
-    logger.info("Waiting for data")
     if (this.dataArrival != null)
       return this.dataArrival.future
 
@@ -44,7 +43,6 @@ class NodeMessageReader(in: js.Dynamic) extends MessageReader with LazyLogging {
   }
 
   in.on("data", (chunk: js.Array[Byte]) => {
-    logger.info("Received data")
     data ++= chunk.toArray
     receiveData()
   })

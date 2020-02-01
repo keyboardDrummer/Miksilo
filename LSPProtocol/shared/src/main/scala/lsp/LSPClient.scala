@@ -70,7 +70,7 @@ class LSPClient(languageClient: LanguageClient, connection: JsonRpcConnection) {
   }
 
   def didClose(identifier: TextDocumentIdentifier): Unit = {
-    simpleConnection.sendNotification[DidCloseTextDocumentParams](LSPProtocol.didOpen, DidCloseTextDocumentParams(identifier))(Json.format)
+    simpleConnection.sendNotification[DidCloseTextDocumentParams](LSPProtocol.didClose, DidCloseTextDocumentParams(identifier))(Json.format)
   }
 
   def didSave(params: DidSaveTextDocumentParams): Unit = {
