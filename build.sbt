@@ -28,6 +28,7 @@ lazy val commonSettings = Seq(
   logLevel := Level.Info,
   logBuffered in Test := false,
   scalaVersion := "2.13.1",
+  crossScalaVersions := List("2.13.1"),
   scalacOptions += "-deprecation",
   scalacOptions += "-feature",
   scalacOptions += "-language:implicitConversions",
