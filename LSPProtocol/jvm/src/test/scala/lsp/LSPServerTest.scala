@@ -3,7 +3,7 @@ package lsp
 import java.io.ByteArrayOutputStream
 
 import core.parsers.editorParsers.{Position, SourceRange, TextEdit}
-import jsonRpc.{JVMMessageReader, JVMMessageWriter, JsonRpcConnection}
+import jsonRpc.{JVMMessageReader, JVMMessageWriter, JVMQueue, JsonRpcConnection, LSPServer, WorkItem}
 import org.scalatest.Assertion
 import org.scalatest.funspec.AsyncFunSpec
 

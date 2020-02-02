@@ -5,7 +5,8 @@ import com.dhpcs.jsonrpc.JsonRpcNotificationMessage
 import jsonRpc._
 import play.api.libs.json.Json
 
-class LSPServerMessagePreprocessor(original: JsonRpcHandler) extends MessagePreprocessor(original) with LazyLogging {
+class LSPServerMessagePreprocessor(original: JsonRpcHandler, workQueue: SerialWorkQueue[WorkItem])
+  extends MessagePreprocessor(original, workQueue) with LazyLogging {
 
   val changeParamsFormat = Json.format[DidChangeTextDocumentParams]
   override def aggregate(messages: CircularArrayBuffer[WorkItem]): Unit = {
