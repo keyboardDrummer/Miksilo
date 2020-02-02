@@ -2,6 +2,6 @@ language: scala
 jdk:
   - oraclejdk12
 scala:
-   - 2.12.3
+   - 2.13.1
 env:
   PLATFORM=travis
