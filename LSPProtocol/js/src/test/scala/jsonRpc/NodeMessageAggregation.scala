@@ -1,11 +1,9 @@
 package jsonRpc
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.ObjectParams
-import com.dhpcs.jsonrpc.JsonRpcNotificationMessage
-import lsp.{DidChangeTextDocumentParams, LSPProtocol, LSPServerMessagePreprocessor, TextDocumentIdentifier, VersionedTextDocumentIdentifier}
+import lsp.{DidChangeTextDocumentParams, LSPProtocol, LSPServerMessagePreprocessor, VersionedTextDocumentIdentifier}
 import org.scalatest.Assertion
 import org.scalatest.funspec.AsyncFunSpec
-import org.scalatest.funsuite.AnyFunSuite
 import play.api.libs.json.Json
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
@@ -14,7 +12,6 @@ import scala.scalajs.js.Dynamic.{global => g}
 class NodeMessageAggregation extends AsyncFunSpec {
 
   LazyLogging.logger = ConsoleLogger
-  AfterIOExecution.context = SetTimeoutContext
 
   // Required because of https://github.com/scalatest/scalatest/issues/1039
   implicit override def executionContext: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
@@ -39,7 +36,7 @@ class NodeMessageAggregation extends AsyncFunSpec {
       override def write(msg: String): Unit = { g.console.log(msg) }
     })
     val handler = new MethodBasedJsonRpcHandler(connection)
-    connection.setHandler(new LSPServerMessagePreprocessor(handler))
+    connection.setHandler(new LSPServerMessagePreprocessor(handler, new JSQueue[WorkItem]))
     handler.addNotificationHandler[DidChangeTextDocumentParams](LSPProtocol.didChange, (notification: DidChangeTextDocumentParams) => {
       counter += 1
       if (payloadCounter == 0) {

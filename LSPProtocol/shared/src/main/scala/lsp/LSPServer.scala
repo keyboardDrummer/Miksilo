@@ -1,21 +1,22 @@
 package lsp
 
-import core.parsers.editorParsers.TextEdit
-import jsonRpc.{JsonRpcConnection, MethodBasedJsonRpcHandler}
+import core.parsers.editorParsers.{Position, SourceRange, TextEdit}
+import jsonRpc.{JsonRpcConnection, MethodBasedJsonRpcHandler, WorkItem, SerialWorkQueue}
 import play.api.libs.json._
 
-import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 
 case class Measurement(name: String, value: Double)
 object Measurement {
-  implicit val format = Json.format[Measurement]
+  implicit val format: OFormat[Measurement] = Json.format[Measurement]
 }
 
-class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
+class SharedLSPServer(languageServer: LanguageServer,
+                connection: JsonRpcConnection,
+                workQueue: SerialWorkQueue[WorkItem]) {
 
   val handler = new MethodBasedJsonRpcHandler(connection)
-  connection.setHandler(new LSPServerMessagePreprocessor(handler))
+  connection.setHandler(new LSPServerMessagePreprocessor(handler, workQueue))
 
   addRequestHandlers()
   addNotificationHandlers()
@@ -49,8 +50,8 @@ class LSPServer(languageServer: LanguageServer, connection: JsonRpcConnection) {
       }
     }
 
-    implicit val positionFormat = PositionFormat.format
-    implicit val sourceRangeFormat = SourceRangeFormat.format
+    implicit val positionFormat: OFormat[Position] = PositionFormat.format
+    implicit val sourceRangeFormat: OFormat[SourceRange] = SourceRangeFormat.format
     implicit val textDocumentPositionParams: OFormat[DocumentPosition] = Json.format
     implicit val referenceContext: OFormat[ReferenceContext] = Json.format
     implicit val textEdit: OFormat[TextEdit] = Json.format[TextEdit]

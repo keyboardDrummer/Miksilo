@@ -1,8 +1,8 @@
 package languageServer
 
 import core.language.Language
-import jsonRpc.{JsonRpcConnection, LazyLogging}
-import lsp.LSPServer
+import jsonRpc.{JsonRpcConnection, LazyLogging, SerialWorkQueue, WorkItem}
+import lsp.SharedLSPServer
 
 import scala.util.Try
 
@@ -11,7 +11,9 @@ trait LanguageBuilder {
   def build(arguments: collection.Seq[String]): Language
 }
 
-class LanguageServerMain(builders: Seq[LanguageBuilder], connection: JsonRpcConnection) extends LazyLogging {
+class LanguageServerMain(builders: Seq[LanguageBuilder],
+                         connection: JsonRpcConnection,
+                         workQueue: SerialWorkQueue[WorkItem]) extends LazyLogging {
 
   val languageMap = builders.map(l => (l.key, l)).toMap
 
@@ -22,7 +24,7 @@ class LanguageServerMain(builders: Seq[LanguageBuilder], connection: JsonRpcConn
       logger.debug(s"Starting server in ${System.getenv("PWD")}")
       val lspServer = Try {
         val languageServer = new MiksiloLanguageServer(language)
-        new LSPServer(languageServer, connection)
+        new SharedLSPServer(languageServer, connection, workQueue)
       }
       lspServer.recover{case e => logger.error(e.getMessage); e.printStackTrace() }
       connection.listen()
@@ -34,14 +36,14 @@ class LanguageServerMain(builders: Seq[LanguageBuilder], connection: JsonRpcConn
       Some(builders.head.build(args))
     } else {
       if (args.isEmpty) {
-        logger.debug("Please specify with which language to run Miksilo")
+        logger.error("Please specify with which language to run Miksilo")
         return None
       }
 
       val languageOption = languageMap.get(args.head)
       languageOption match {
         case None =>
-          logger.debug("Please specify with which language to run Miksilo")
+          logger.error("Please specify with which language to run Miksilo")
           None
         case Some(languageBuilder) =>
           Some(languageBuilder.build(args.drop(1)))

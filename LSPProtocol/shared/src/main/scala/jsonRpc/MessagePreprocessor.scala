@@ -14,29 +14,29 @@ case class Request(request: JsonRpcRequestMessage, result: Promise[JsonRpcRespon
   override def method: String = request.method
 }
 
-object AfterIOExecution {
-  var context: ExecutionContext = ExecutionContext.global
+/**
+  * A asynchronous queue that executes work serially
+  */
+trait SerialWorkQueue[Item] {
+  protected var handler: Item => Unit = _ => throw new Exception("Handler not set!")
+
+  def setHandler(handler: Item => Unit): Unit = {
+    this.handler = handler
+  }
+
+  def modifyQueue(queue: CircularArrayBuffer[Item] => Unit): Unit
 }
 
-abstract class MessagePreprocessor(original: JsonRpcHandler) extends JsonRpcHandler {
+abstract class MessagePreprocessor(original: JsonRpcHandler, workQueue: SerialWorkQueue[WorkItem]) extends JsonRpcHandler with LazyLogging {
+
+  workQueue.setHandler {
+    case Notification(notification) => original.handleNotification(notification)
+    case Request(request, resultPromise) => original.handleRequest(request).map(result => resultPromise.success(result))(ExecutionContext.global)
+  }
 
   def aggregate(items: CircularArrayBuffer[WorkItem]): Unit
 
-  var messages: CircularArrayBuffer[WorkItem] = new CircularArrayBuffer[WorkItem]
-
   def dispose(): Unit = {}
-
-  def dequeueWorkItem(): Unit = {
-    if (messages.isEmpty)
-      return
-
-    val message = messages.popLeft()
-    message match {
-      case Notification(notification) => original.handleNotification(notification)
-      case Request(request, resultPromise) => original.handleRequest(request).map(result => resultPromise.success(result))(ExecutionContext.global)
-    }
-    dequeueWorkItem()
-  }
 
   override def handleNotification(notification: JsonRpcNotificationMessage): Unit = {
     addMessage(Notification(notification))
@@ -49,9 +49,10 @@ abstract class MessagePreprocessor(original: JsonRpcHandler) extends JsonRpcHand
   }
 
   def addMessage(message: WorkItem): Unit = {
-    messages.append(message)
-    aggregate(messages)
-    AfterIOExecution.context.execute(() => dequeueWorkItem())
+    workQueue.modifyQueue(messages => {
+      messages.append(message)
+      aggregate(messages)
+    })
   }
 
 }
