@@ -97,10 +97,20 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
   in(file("languageServer")).
   settings(commonSettings: _*).
   jvmSettings(
-    assemblySettings,
+    assemblySettings
   ).
   jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
+
+def languageServerCommonTask(assemblyFile: String) = {
+  val extension = assemblyFile.split("\\.").last
+  val removePrevious = Process(Seq("rm", "-f", "./vscode-extension/out/LanguageServer.*"))
+  val copyJar = Process(Seq("cp", assemblyFile, s"./vscode-extension/out/LanguageServer.${extension}"))
+  val yarn = Process(Seq("yarn", "compile"), file("./vscode-extension"))
+  val extensionDirectory = file("./vscode-extension").getAbsolutePath
+  val vscode = Process(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory"))
+  removePrevious.#&&(copyJar).#&&(yarn).#&&(vscode)
+}
 
 lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
   crossType(CrossType.Full).
@@ -108,22 +118,20 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
   settings(commonSettings: _*).
   jvmSettings(
     assemblySettings,
+    vscode := {
+      val assemblyFile: String = assembly.value.getAbsolutePath
+      languageServerCommonTask(assemblyFile).run
+    },
   ).
-  jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault").
+  jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault",
+    vscode := {
+      val assemblyFile: String = (fastOptJS in Compile).value.data.getAbsolutePath
+      languageServerCommonTask(assemblyFile).run
+    }).
   settings(
     name := "modularLanguages",
     assemblySettings,
     mainClass in Compile := Some("deltas.Program"),
-    vscode := {
-      val assemblyFile: String = assembly.value.getAbsolutePath
-      val extensionDirectory: File = file("./vscode-extension").getAbsoluteFile
-      val tsc = Process("tsc", file("./vscode-extension"))
-      val vscode = Process(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory"),
-        None,
-        "MIKSILO" -> assemblyFile)
-
-      tsc.#&&(vscode).run
-    },
 
     // byteCode parser
     libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
