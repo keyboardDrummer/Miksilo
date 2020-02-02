@@ -68,24 +68,6 @@
 				"extensions": [
 					".java"
 				]
-			},
-			{
-				"id": "cloudFormation",
-				"aliases": [
-					"cloudFormation"
-				],
-				"extensions": [
-					".clfm"
-				]
-			},
-			{
-				"id": "yamlCloudFormation",
-				"aliases": [
-					"yamlCloudFormation"
-				],
-				"extensions": [
-					".yclfm"
-				]
 			}
 		],
 		"snippets": [
@@ -104,16 +86,6 @@
 				"language": "systemverilog",
 				"scopeName": "text.systemverilog",
 				"path": "./src/verilog/tmLanguage.json"
-			},
-			{
-				"language": "yamlCloudFormation",
-				"scopeName": "source.yaml",
-				"path": "./src/cloudFormation/yaml.tmLanguage.json"
-			},
-			{
-				"language": "cloudFormation",
-				"scopeName": "source.cloudFormation",
-				"path": "./src/cloudFormation/tmLanguage.json"
 			},
 			{
 				"language": "solidity",

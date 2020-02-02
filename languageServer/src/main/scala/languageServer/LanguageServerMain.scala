@@ -36,14 +36,14 @@ class LanguageServerMain(builders: Seq[LanguageBuilder],
       Some(builders.head.build(args))
     } else {
       if (args.isEmpty) {
-        logger.debug("Please specify with which language to run Miksilo")
+        logger.error("Please specify with which language to run Miksilo")
         return None
       }
 
       val languageOption = languageMap.get(args.head)
       languageOption match {
         case None =>
-          logger.debug("Please specify with which language to run Miksilo")
+          logger.error("Please specify with which language to run Miksilo")
           None
         case Some(languageBuilder) =>
           Some(languageBuilder.build(args.drop(1)))

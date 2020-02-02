@@ -27,7 +27,7 @@ trait SerialWorkQueue[Item] {
   def modifyQueue(queue: CircularArrayBuffer[Item] => Unit): Unit
 }
 
-abstract class MessagePreprocessor(original: JsonRpcHandler, workQueue: SerialWorkQueue[WorkItem]) extends JsonRpcHandler {
+abstract class MessagePreprocessor(original: JsonRpcHandler, workQueue: SerialWorkQueue[WorkItem]) extends JsonRpcHandler with LazyLogging {
 
   workQueue.setHandler {
     case Notification(notification) => original.handleNotification(notification)

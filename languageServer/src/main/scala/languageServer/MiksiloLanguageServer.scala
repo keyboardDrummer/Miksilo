@@ -156,7 +156,17 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
     val declarations = getCompilation.proofs.scopeGraph.declarationsPerFile.getOrElse(params.textDocument.uri, Seq.empty).toSeq
     declarations.
-      filter(declaration => declaration.name.nonEmpty).
+      filter(declaration => declaration.name.nonEmpty && {
+        if (declaration.origin.isEmpty) {
+          logger.error(s"[BUG] Empty origin for declaration ${declaration.name}")
+          false
+        } else if (declaration.origin.get.fileRange.isEmpty) {
+          logger.error(s"[BUG] Empty fileRange for declaration ${declaration.name}")
+          false
+        } else {
+          true
+        }
+      }).
       map(declaration => SymbolInformation(declaration.name, SymbolKind.Variable, declaration.origin.get.fileRange.get, None))
   }
 
