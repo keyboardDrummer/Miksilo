@@ -1,7 +1,8 @@
 'use strict';
 
 import { workspace, ExtensionContext, window, Disposable } from 'vscode';
-import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient';
+import { Executable, LanguageClient, LanguageClientOptions, ServerOptions, ExecutableOptions } from 'vscode-languageclient';
+import * as fs from 'fs'
 
 interface LanguageConfiguration {
 	vscodeName: string,
@@ -34,22 +35,84 @@ const languages: Array<LanguageConfiguration> = [
     }
 ]
 
-export function activate(context: ExtensionContext) {	
+export function activate(context: ExtensionContext) {
+
 	workspace.onDidChangeConfiguration(() => activateJar(context));
 	activateJar(context);
 }
 
-let previousJar: string | null | undefined = undefined;
-function activateJar(context: ExtensionContext) {
-	const jar: string = workspace.getConfiguration('miksilo').get("jar") || process.env.MIKSILO || null;
-	if (jar === previousJar)
-		return;
-	previousJar = jar;
+abstract class Mode {
+    constructor(readonly reason: string) {}
+    abstract setupExecutable(executable: Executable): void
+}
 
-	if (!jar) {
-		window.showErrorMessage("Could not locate a .jar for Miksilo. Please configure \"miksilo.jar\" in settings.");
+class JVMMode extends Mode {
+    constructor(readonly jar: string, reason: string = "") {
+        super(reason);
+    }
+    setupExecutable(executable: Executable): void {
+    	executable.command = "java";
+
+	    executable.args = ["-jar", this.jar]
+    }
+
+    toString() {
+        return "JVM with jar " + this.jar;
+    }
+}
+
+class JSMode extends Mode {
+    constructor(readonly program: string, reason: string = "") {
+        super(reason);
+    }
+
+    setupExecutable(executable: Executable): void {
+	    executable.command = "node";
+
+	    executable.args = [this.program]
+    }
+
+    toString() {
+        return "Node with program " + this.program;
+    }
+}
+
+function getMode(): Mode | undefined {
+    if (process.env.MIKSILO) {
+        return new JVMMode(process.env.MIKSILO, "JVM language server passed in environment variable MIKSILO");
+    }
+
+    if (process.env.JSMIKSILO) {
+        return new JSMode(process.env.JSMIKSILO, "Node language server passed in environment variable JSMIKSILO");
+    }
+
+	const settingsJar: string = workspace.getConfiguration('miksilo').get("jar")
+	if (settingsJar) {
+	    return new JVMMode(settingsJar, "Miksilo jar settings specified");
+	}
+	const jar: string = `${__dirname}/LanguageServer.jar`;
+	if (fs.existsSync(jar)) {
+	    return new JVMMode(jar, `Found ${jar}`);
+	}
+
+	const nodeProgram: string = workspace.getConfiguration('miksilo').get("js") || `${__dirname}/LanguageServer.js`
+	if (nodeProgram) {
+	    return new JSMode(nodeProgram)
+	}
+	return undefined
+}
+
+let previousMode: Mode | undefined = undefined;
+function activateJar(context: ExtensionContext) {
+
+	const mode = getMode()
+	if (mode === previousMode)
 		return;
-	} 
+	previousMode = mode;
+	if (!mode) {
+		window.showErrorMessage("Could not locate a language server. Please configure \"miksilo.jar\" in settings.");
+		return;
+	}
 
 	for(const previousClient of context.subscriptions) {
 		previousClient.dispose()
@@ -57,35 +120,58 @@ function activateJar(context: ExtensionContext) {
 	context.subscriptions.length = 0;
 
 	for(const language of languages) {
-		const disposable = activateLanguage(jar, language);
+		const disposable = activateLanguage(mode, language);
 		context.subscriptions.push(disposable);
 	}
 }
 
-function activateLanguage(jar: string, language: LanguageConfiguration): Disposable {
+function activateLanguage(mode: Mode, language: LanguageConfiguration): Disposable {
 
-	language.miksiloName = language.miksiloName || language.vscodeName;
+	let serverOptions: ServerOptions = prepareExecutable(mode, language)
 
-	let serverOptions: ServerOptions = {
-		command: "java",
-		args: ["-jar",
-			jar,
-			//"-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=localhost:1044",
-			//"-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=6007",
-			language.miksiloName]
-	}
-	
 	let clientOptions: LanguageClientOptions = {
 		documentSelector: [{scheme: 'file', language: language.vscodeName}],
 		synchronize: {
 			configurationSection: 'miksilo',
 		}
 	}
-	
+
+	const start = Date.now()
 	const languageClient = new LanguageClient(
-		'miksilo' + language.vscodeName, 
-		language.vscodeName + " Miksilo", 
+		'miksilo' + language.vscodeName,
+		language.vscodeName + " Miksilo",
 		serverOptions, clientOptions);
-		
+
+	const info = (message: String) => {
+		languageClient.outputChannel.appendLine(`[INFO] ${message}`);
+	}
+	info(mode.reason);
+	languageClient.onReady().then(_ => {
+		const connectionTime = Date.now() - start;
+		info(`Connection time was ${connectionTime}`);
+	})
+	languageClient.onTelemetry((data: any) => {
+		const {name, value} = data
+		info(`${name} was ${value}`);
+	})
+
+	info("Using Miksilo mode " + mode);
 	return languageClient.start();
+}
+
+function prepareExecutable(mode: Mode, language: LanguageConfiguration): Executable {
+
+	const executable: Executable = Object.create(null);
+	const options: ExecutableOptions = Object.create(null);
+	options.env = process.env;
+	options.stdio = 'pipe';
+	executable.options = options;
+	mode.setupExecutable(executable);
+
+	language.miksiloName = language.miksiloName || language.vscodeName;
+	executable.args.push(language.miksiloName)
+	return executable;
+}
+
+export function deactivate() {
 }
