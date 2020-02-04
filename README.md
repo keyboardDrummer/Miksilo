@@ -3,14 +3,13 @@ Miksilo [![Build Status](https://travis-ci.org/keyboardDrummer/Miksilo.svg?branc
 
 Miksilo is a [language workbench](https://en.wikipedia.org/wiki/Language_workbench), which is a tool to construct programming languages. Miksilo, whose name comes from the [Esperanto](https://en.wikipedia.org/wiki/Esperanto) word for mixer, lets you create languages quickly by mixing existing languages and building on top of them. Language construction is notoriously hard, and these days involves not just writing a compiler or interpreter, but also editor tooling to provide features such as code completion, inline errors and code navigation. Miksilo takes a declarative language definition and from that generates all the tools expected of a modern language. To learn how to use Miksilo to generate editor tooling, visit [this page](http://keyboarddrummer.github.io/Miksilo/practical/buildLanguageTooling/).
 
-### Repository structure
-Miksilo is divided into the following sub-projects:
+This repository is divided into the following sub-projects:
 
-- [EditorParser](editorParser). Defines a parser API that can be used to create parsers suitable for use in text editors.
-- [LSPProtocol](LSPProtocol). Defines the communication layers of an LSP client and an LSP server.
-- [LanguageServer](languageServer). Enables starting an LSP server from a language definition.
-- [ModularLanguages](modularLanguages). Defines various tools for defining languages in a modular way, and come with many predefined language building blocks.
-- [Playground](playground). A desktop UI application that enables constructing languages by combining predefined languages blocks using drag and drop.
+- [EditorParser](editorParser): Defines a parser API that can be used to create parsers suitable for use in text editors.
+- [LSPProtocol](LSPProtocol): Defines the communication layers of an LSP client and an LSP server.
+- [LanguageServer](languageServer): Enables starting an LSP server from a language definition. Consume this library if you already have a codebase that defines your language and you want to create a language server for it.
+- [ModularLanguages](modularLanguages): Defines various tools for defining languages in a modular way, and come with many predefined language building blocks. Consume this library if you're writing a language from scratch.
+- [Playground](playground): A desktop UI application that enables constructing languages on-the-fly by combining predefined languages blocks using drag and drop. This application is for educational purposes.
 
 ### Build instructions
 
