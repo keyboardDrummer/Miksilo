@@ -10,7 +10,7 @@ import util.GraphBasics
 import scala.collection.mutable
 import scala.util.matching.Regex
 import scala.util.parsing.combinator.{JavaTokenParsers, Parsers, RegexParsers}
-import scala.util.parsing.input.CharArrayReader
+import scala.util.parsing.input.{CharArrayReader, CharSequenceReader}
 
 case class MyToken(tokenType: Int, text: String)
 class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker
@@ -60,7 +60,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker
 
     resetTokenList()
 
-    val resultOption = parser.apply(new CharArrayReader(text.array))
+    val resultOption = parser.apply(new CharSequenceReader(text))
     var start = text.offset
     if (resultOption.successful) {
       val tokens = resultOption.get

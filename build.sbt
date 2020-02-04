@@ -146,8 +146,8 @@ lazy val playground = (project in file("playground")).
 
     assemblySettings,
     mainClass in Compile := Some("application.Program"),
-    libraryDependencies += "org.scala-lang.modules" % "scala-swing_2.12" % "2.0.0",
-    libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "2.5.8",
+    libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "2.1.1",
+    libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "3.0.8",
     libraryDependencies += "org.bidib.org.oxbow" % "swingbits" % "1.2.2",
     libraryDependencies += "org.swinglabs" % "swingx" % "1.6.1",
     libraryDependencies += "jgraph" % "jgraph" % "5.13.0.0",
