@@ -3,6 +3,25 @@ Miksilo [![Build Status](https://travis-ci.org/keyboardDrummer/Miksilo.svg?branc
 
 Miksilo is a [language workbench](https://en.wikipedia.org/wiki/Language_workbench), which is a tool to construct programming languages. Miksilo, whose name comes from the [Esperanto](https://en.wikipedia.org/wiki/Esperanto) word for mixer, lets you create languages quickly by mixing existing languages and building on top of them. Language construction is notoriously hard, and these days involves not just writing a compiler or interpreter, but also editor tooling to provide features such as code completion, inline errors and code navigation. Miksilo takes a declarative language definition and from that generates all the tools expected of a modern language. To learn how to use Miksilo to generate editor tooling, visit [this page](http://keyboarddrummer.github.io/Miksilo/practical/buildLanguageTooling/).
 
+### Onboarding
+To consume the Miksilo library, add a dependency to either the [ModularLanguages](https://mvnrepository.com/artifact/com.github.keyboardDrummer/modularlanguages) or the [LanguageServer](https://mvnrepository.com/artifact/com.github.keyboardDrummer/languageserver) library. Using the ModularLanguages library allows you to re-use language definitions of existing languages, but a downside is that it uses its own datatype for representing the abstract syntax tree, which makes it harder to integrate with existing AST types you may have for your language.
+
+Using the ModularLanguages library is recommended when:
+- Your language syntactically looks like an existing language, for example it's a configuration language based on JSON or YAML.
+- Your language is turing complete and has features that commonly occur in languages such as expressions or statements.
+
+The LanguageServer library does not enable modular language definition, but it can integrate directly with an existing language definition if you already have one. Using this is recommended when:
+- You already have type definitions for your language that you want Miksilo to directly integrate with.
+- Your language has custom syntax and doesn't contain any typical language features, an example could be a small configuration language with very custom syntax.
+
+
+### Build instructions
+1. Grab [the source](https://github.com/keyboardDrummer/Miksilo) from GitHub
+1. Make sure you have installed the Java 8 JDK, or a higher version.
+1. Install <a href="http://www.scala-sbt.org/">sbt</a>
+1. Call 'sbt playground/run' in the project root to build Miksilo and start the sandbox desktop application.
+
+### Repository structure
 This repository is divided into the following sub-projects:
 
 - [EditorParser](editorParser): Defines a parser API that can be used to create parsers suitable for use in text editors.
@@ -11,14 +30,7 @@ This repository is divided into the following sub-projects:
 - [ModularLanguages](modularLanguages): Defines various tools for defining languages in a modular way, and come with many predefined language building blocks. Consume this library if you're writing a language from scratch.
 - [Playground](playground): A desktop UI application that enables constructing languages on-the-fly by combining predefined languages blocks using drag and drop. This application is for educational purposes.
 
-### Build instructions
-
-1. Grab [the source](https://github.com/keyboardDrummer/Miksilo) from GitHub
-1. Make sure you have installed the Java 8 JDK, or a higher version.
-1. Install <a href="http://www.scala-sbt.org/">sbt</a>
-1. Call 'sbt playground/run' in the project root to build Miksilo and start the sandbox desktop application.
-
-### Contributions
+### Contributing
 There's an infinite amount of work to be done for Miksilo, so contributions are very welcome. There are many different topics to work on, some suitable for a Bachelor's or Master's thesis.
 
 Some examples of cool features:
