@@ -322,6 +322,10 @@ trait SequenceParserWriter extends CorrectingParserWriter {
         override def parse(input: Input, mayStop: StopFunction, metrics: Metrics) = {
           findBestParseResult(parserAndCaches.parser, input, mayStop, metrics)
         }
+
+        override def reset(): Unit = {
+          parserAndCaches.caches.foreach(cache => cache.clear())
+        }
       }
     }
 
@@ -336,6 +340,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 }
 
 trait SingleResultParser[+Result, Input] {
+  def reset(): Unit
   def applyChange(start: Int, end: Int): Unit
   def parse(input: Input,
             mayStop: StopFunction = StopImmediately,

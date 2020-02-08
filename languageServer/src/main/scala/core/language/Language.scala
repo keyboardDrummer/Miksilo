@@ -5,9 +5,9 @@ import java.nio.charset.StandardCharsets
 
 import core.language.exceptions.BadInputException
 import core.parsers.core.{Metrics, NoMetrics}
-import core.parsers.editorParsers.{StopFunction, TimeRatioStopFunction}
-import core.parsers.sequences.SingleResultParser
-import core.parsers.strings.StringReaderLike
+import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, StopFunction, TimeRatioStopFunction}
+import core.parsers.sequences.{SequenceParserWriter, SingleResultParser}
+import core.parsers.strings.{StringParserWriter, StringReaderLike}
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
 import jsonRpc.LazyLogging
 
@@ -52,16 +52,21 @@ object Language extends LazyLogging {
     })
   }
 
-  def getParsePhaseFromParser[Program, Input <: StringReaderLike[Input]](
-    getInput: String => Input,
+  def getParsePhaseFromParser[Program](parserWriter: StringParserWriter)(
+    getInput: String => parserWriter.Input,
     getSourceElement: (Program, String) => SourceElement,
-    parser: SingleResultParser[Program, Input],
+    parserBuilder: parserWriter.Parser[Program],
     stopFunction: StopFunction = new TimeRatioStopFunction): Phase = {
+
+    val builtParser = new CompilationState[mutable.HashMap[String, SingleResultParser[Program, parserWriter.Input]]](_ => mutable.HashMap.empty)
 
     Phase("parse", "parse the source code", compilation => {
       val uri = compilation.rootFile.get
       val input = compilation.fileSystem.getFile(uri)
-      val parseResult = parser.parse(getInput(input), stopFunction, compilation.metrics)
+      val parsersPerFile = builtParser(compilation).getOrElseUpdate(uri, {
+        parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser
+      })
+      val parseResult = parsersPerFile.parse(getInput(input), stopFunction, compilation.metrics)
       parseResult.resultOption.foreach(program => {
         compilation.program = getSourceElement(program, uri)
       })

@@ -1,6 +1,6 @@
 package core.language
 
-class CompilationState[T](default: => T = null) {
+class CompilationState[T](default: Compilation => T = null) {
 
   private def map(compilation: Compilation): T =
     compilation.state.getOrElseUpdate(this, default).asInstanceOf[T]

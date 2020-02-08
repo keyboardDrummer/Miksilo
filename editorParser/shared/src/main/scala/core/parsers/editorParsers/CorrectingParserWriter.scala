@@ -46,7 +46,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 
   def singleResult[Result](parseResult: LazyParseResult[Input, Result]) =
-    new SRCons(parseResult,0, SREmpty.empty)
+    new SRCons(parseResult, parseResult.offset, 0, SREmpty.empty)
 
   def newFailure[Result](error: MyParseError): SRCons[Input, Result] =
     singleResult(ReadyParseResult(None, error.from, History.error(error)))

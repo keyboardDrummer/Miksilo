@@ -96,7 +96,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   }
 
   // TODO: replace List with something that has constant concat operation.
-  case class RecursiveResults[+Result](recursions: Map[BuiltParser[Any], List[RecursiveParseResult[Input, _, Result]]], tail: ParseResults[Input, Result])
+  case class RecursiveResults[+Result](recursions: Map[BuiltParser[Any], List[RecursiveParseResult[Input, _, Result]]],
+                                       tail: ParseResults[Input, Result])
     extends ParseResults[Input, Result] {
 
     override def nonEmpty = false
@@ -135,6 +136,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       else
         super.mapWithHistory(f, oldHistory)
     }
+
+    override def latestRemainder = tail.latestRemainder
   }
 
   class CheckCache[Result](parser: BuiltParser[Result]) extends CacheLike[Result] {
@@ -159,10 +162,12 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       val entries = cache.toList
       for(entry <- entries) {
         val entryStart = entry._1._1.offset
-        val entryEnd = entry._2.latestRemainder.offset
+        val entryEnd = Math.max(entryStart, entry._2.latestRemainder)
         val entryIntersectsWithChange = changeStart <= entryEnd && entryStart <= changeEnd
         if (entryIntersectsWithChange) {
           cache.remove(entry._1)
+        } else {
+          System.out.append("bla")
         }
       }
     }

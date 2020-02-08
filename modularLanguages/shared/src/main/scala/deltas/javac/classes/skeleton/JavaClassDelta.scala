@@ -95,7 +95,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
   val importToClassMap = new ShapeProperty[(Compilation, Node) => Map[String, QualifiedClassName]]
 
-  val state = new CompilationState[State](new State())
+  val state = new CompilationState[State](_ => new State())
   class State {
     var classCompiler: ClassCompiler = _
     val javaCompiler: JavaCompiler = new JavaCompiler()

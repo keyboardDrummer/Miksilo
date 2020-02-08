@@ -3,6 +3,7 @@ package core.parsers.core
 import core.parsers.editorParsers.SourceRange
 
 import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 import scala.language.higherKinds
 
 trait OptimizingParserWriter extends ParserWriter {
@@ -130,13 +131,13 @@ trait OptimizingParserWriter extends ParserWriter {
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
-  case class ParserAndCaches[Result](parser: BuiltParser[Result], caches: List[CacheLike[_]])
+  case class ParserAndCaches[Result](parser: BuiltParser[Result], caches: ArrayBuffer[CacheLike[_]])
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
     def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
-      var caches = List.empty[CacheLike[_]]
+      var caches = ArrayBuffer.empty[CacheLike[_]]
       def recursive: GetParser = new GetParser {
         override def apply[SomeResult](_parser: Parser[SomeResult]): BuiltParser[SomeResult] = {
           cacheOfParses.getOrElseUpdate(_parser, {
@@ -144,7 +145,7 @@ trait OptimizingParserWriter extends ParserWriter {
             val result = parser.getParser(recursive)
             val wrappedParser = wrapParser(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
             wrappedParser match {
-              case check: CacheLike[_] => caches ::= check
+              case check: CacheLike[_] => caches.addOne(check)
               case _ =>
             }
             wrappedParser

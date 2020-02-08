@@ -1,9 +1,10 @@
 package core.parsers.editorParsers
 
 import ParseResults._
+import core.parsers.core.ParseInput
 
-trait ParseResults[Input, +Result] {
-  def latestRemainder: Input
+trait ParseResults[Input <: ParseInput, +Result] {
+  def latestRemainder: Int
   def nonEmpty: Boolean
   def pop(): (LazyParseResult[Input, Result], ParseResults[Input, Result])
   def toList: List[LazyParseResult[Input, Result]]
@@ -46,15 +47,16 @@ trait ParseResults[Input, +Result] {
 }
 
 object ParseResults {
-  def singleResult[Input, Result](parseResult: LazyParseResult[Input, Result]): ParseResults[Input, Result] =
-    new SRCons(parseResult,???,0, SREmpty.empty[Input])
+  def singleResult[Input <: ParseInput, Result](parseResult: LazyParseResult[Input, Result]): ParseResults[Input, Result] =
+    new SRCons(parseResult, parseResult.offset,0, SREmpty.empty[Input])
 }
 
-
-final class SRCons[Input, +Result](val head: LazyParseResult[Input, Result],
-                                   val latestRemainder: Input,
-                                   var tailDepth: Int,
-                                   _tail: => ParseResults[Input, Result]) extends ParseResults[Input, Result] {
+final class SRCons[Input <: ParseInput, +Result](
+  val head: LazyParseResult[Input, Result],
+  val latestRemainder: Int,
+  var tailDepth: Int,
+  _tail: => ParseResults[Input, Result])
+  extends ParseResults[Input, Result] {
 
   // Used for debugging
   def toList: List[LazyParseResult[Input, Result]] = head :: tail.toList
@@ -78,7 +80,8 @@ final class SRCons[Input, +Result](val head: LazyParseResult[Input, Result],
         else
         {
           new SRCons(
-            cons.head, cons.latestRemainder,
+            cons.head,
+            cons.latestRemainder, // TODO is this correct?
             1 + Math.max(this.tailDepth, cons.tailDepth),
             cons.tail.merge(tail.flatMap(f, uniform)))
         }
@@ -87,7 +90,7 @@ final class SRCons[Input, +Result](val head: LazyParseResult[Input, Result],
   }
 
   override def map[NewResult](f: Result => NewResult): SRCons[Input, NewResult] = {
-    new SRCons(head.map(f), tailDepth + 1, tail.map(f))
+    new SRCons(head.map(f), latestRemainder, tailDepth + 1, tail.map(f))
   }
 
   /*
@@ -100,7 +103,7 @@ final class SRCons[Input, +Result](val head: LazyParseResult[Input, Result],
     if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
       return SREmpty.empty[Input]
 
-    def getResult(head: LazyParseResult[Input, Other], tailDepth: Int,
+    def getResult(head: LazyParseResult[Input, Other], latestRemainder: Int, tailDepth: Int,
                   getTail: Map[Input, Double] => ParseResults[Input, Other]): ParseResults[Input, Other] = {
       head match {
         case ready: ReadyParseResult[Input, Other] =>
@@ -108,22 +111,27 @@ final class SRCons[Input, +Result](val head: LazyParseResult[Input, Result],
             case Some(previousBest) if previousBest >= ready.score =>
               getTail(bests)
             case _ =>
-              new SRCons(head, tailDepth, getTail(bests + (ready.remainder -> ready.score)))
+              new SRCons(head, latestRemainder, tailDepth, getTail(bests + (ready.remainder -> ready.score)))
           }
         case _ =>
-          new SRCons(head, tailDepth, getTail(bests))
+          new SRCons(head, latestRemainder, tailDepth, getTail(bests))
       }
     }
 
     other match {
       case _: SREmpty[Input] => this
       case cons: SRCons[Input, Other] =>
+        val latestRemainder = getLatest(this.latestRemainder, other.latestRemainder)
         if (head.score >= cons.head.score) {
-          getResult(head,1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
+          getResult(head, latestRemainder,1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
         } else
-          getResult(cons.head,1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
+          getResult(cons.head, latestRemainder,1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
       case earlier => earlier.merge(this)
     }
+  }
+
+  def getLatest(one: Int, other: Int): Int = {
+    if (one > other) one else other
   }
 
   override def nonEmpty = true
@@ -133,10 +141,10 @@ final class SRCons[Input, +Result](val head: LazyParseResult[Input, Result],
 
 object SREmpty {
   private val value = new SREmpty[Nothing]
-  def empty[Input]: SREmpty[Input] = value.asInstanceOf[SREmpty[Input]]
+  def empty[Input <: ParseInput]: SREmpty[Input] = value.asInstanceOf[SREmpty[Input]]
 }
 
-class SREmpty[Input] extends ParseResults[Input, Nothing] {
+class SREmpty[Input <: ParseInput] extends ParseResults[Input, Nothing] {
   override def merge[Other >: Nothing](other: ParseResults[Input, Other], depth: Int,
                                        bests: Map[Input, Double] = Map.empty) = other
 
@@ -153,4 +161,6 @@ class SREmpty[Input] extends ParseResults[Input, Nothing] {
   override def nonEmpty = false
 
   override def pop() = throw new Exception("Can't pop empty results")
+
+  override def latestRemainder = Int.MinValue
 }

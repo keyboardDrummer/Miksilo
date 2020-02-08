@@ -1,11 +1,15 @@
 package core.parsers.editorParsers
 
 import ParseResults._
+import core.parsers.core.ParseInput
 
-case class RecursionsList[Input, SeedResult, +Result](recursions: List[RecursiveParseResult[Input, SeedResult, Result]],
-                                                      rest: ParseResults[Input, Result])
+case class RecursionsList[Input <: ParseInput, SeedResult, +Result](
+  recursions: List[RecursiveParseResult[Input, SeedResult, Result]],
+  rest: ParseResults[Input, Result])
 
-trait LazyParseResult[Input, +Result] {
+trait LazyParseResult[Input <: ParseInput, +Result] {
+  def offset: Int
+
   def flatMapReady[NewResult](f: ReadyParseResult[Input, Result] => ParseResults[Input, NewResult],
                               uniform: Boolean): ParseResults[Input, NewResult]
 
@@ -20,7 +24,7 @@ trait LazyParseResult[Input, +Result] {
                                 oldHistory: History[Input]): LazyParseResult[Input, NewResult]
 }
 
-class DelayedParseResult[Input, Result](val remainder: Input, val history: History[Input], _getResults: () => ParseResults[Input, Result])
+class DelayedParseResult[Input <: ParseInput, Result](val remainder: Input, val history: History[Input], _getResults: () => ParseResults[Input, Result])
   extends LazyParseResult[Input, Result] {
 
   override def toString = s"$score delayed: $history"
@@ -48,9 +52,12 @@ class DelayedParseResult[Input, Result](val remainder: Input, val history: Histo
       val intermediate = this.results
       intermediate.flatMapReady(f, uniform)
     }))
+
+  override def offset = remainder.offset
 }
 
-case class RecursiveParseResult[Input, SeedResult, +Result](get: ParseResults[Input, SeedResult] => ParseResults[Input, Result]) {
+case class RecursiveParseResult[Input <: ParseInput, SeedResult, +Result](
+  get: ParseResults[Input, SeedResult] => ParseResults[Input, Result]) {
 
   def compose[NewResult](f: ParseResults[Input, Result] => ParseResults[Input, NewResult]):
     RecursiveParseResult[Input, SeedResult, NewResult] = {
@@ -59,7 +66,7 @@ case class RecursiveParseResult[Input, SeedResult, +Result](get: ParseResults[In
   }
 }
 
-case class ReadyParseResult[Input, +Result](resultOption: Option[Result], remainder: Input, history: History[Input])
+case class ReadyParseResult[Input <: ParseInput, +Result](resultOption: Option[Result], remainder: Input, history: History[Input])
   extends LazyParseResult[Input, Result] {
 
   val originalScore = (if (history.flawed) 0 else 10000) + history.score
@@ -78,4 +85,6 @@ case class ReadyParseResult[Input, +Result](resultOption: Option[Result], remain
     ReadyParseResult[Input, NewResult] = f(this)
 
   override def flatMapReady[NewResult](f: ReadyParseResult[Input, Result] => ParseResults[Input, NewResult], uniform: Boolean) = f(this)
+
+  override def offset = remainder.offset
 }
