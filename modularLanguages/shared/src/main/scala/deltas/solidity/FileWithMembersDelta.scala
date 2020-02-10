@@ -32,7 +32,7 @@ object FileWithMembersDelta extends DeltaWithGrammar with HasConstraintsDelta {
   val fileType = PrimitiveType("file")
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val fileDeclaration = builder.declare(path.startOfUri.get, parentScope, _type = Some(fileType))
-    val fileScope = builder.declareScope(fileDeclaration, Some(parentScope), s"file '${path.startOfUri.get}'")
+    val fileScope = builder.declareScope(fileDeclaration, parentScope, s"file '${path.startOfUri.get}'")
     for(member <- path(Members).asInstanceOf[Seq[NodePath]]) {
       ConstraintSkeleton.constraints(compilation, builder, member, fileScope)
     }

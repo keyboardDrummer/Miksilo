@@ -26,7 +26,7 @@ case class Struct(name: String, fields: Seq[Field], maybeParent: Option[String] 
       builder.add(List(AssignSubType(TypeFromDeclaration(structDeclaration), TypeFromDeclaration(parentDeclaration))))
       scopeOfParent
     })
-    val structScope = builder.declareScope(structDeclaration, scopeOfParent)
+    val structScope = builder.declareScope(structDeclaration, scopeOfParent.orNull)
     fields.foreach(field => {
       val _type = field._type.constraints(builder, parentScope)
       builder.declare(field.name, structScope, field, Some(_type))

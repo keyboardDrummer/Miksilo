@@ -142,7 +142,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
       val fullPackage: String = packageParts.reduce[String]((a, b) => a + "." + b)
       state(compilation).packageScopes.getOrElseUpdate(fullPackage, {
         val packageDeclaration = builder.declare(fullPackage, defaultPackageScope, path)
-        builder.declareScope(packageDeclaration, Some(defaultPackageScope), fullPackage )
+        builder.declareScope(packageDeclaration, defaultPackageScope, fullPackage)
       })
     }
 
@@ -152,7 +152,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
     builder.add(DeclarationHasType(clazzDeclaration, clazzType))
     builder.assignSubType(TypeSkeleton.typeKind, clazzType)
 
-    val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
+    val classScope = builder.declareScope(clazzDeclaration, packageScope, clazz.name)
     staticDeclaration(path) = clazzDeclaration
 
     val members = clazz.members

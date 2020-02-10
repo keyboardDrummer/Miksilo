@@ -65,7 +65,7 @@ object Language extends LazyLogging {
       val parsersPerFile = builtParser(compilation).getOrElseUpdate(uri, {
         parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser
       })
-      val parseResult = parsersPerFile.parse(input.toCharArray, stopFunction, compilation.metrics)
+      val parseResult = parsersPerFile.parse(input, stopFunction, compilation.metrics)
       parseResult.resultOption.foreach(program => {
         compilation.program = getSourceElement(program, uri)
       })

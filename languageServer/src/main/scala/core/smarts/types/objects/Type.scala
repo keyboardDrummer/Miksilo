@@ -44,7 +44,7 @@ case class ConstraintClosureType(parentScope: Scope, name: String, variableOrigi
   override def fullyApplied: Boolean = true
 
   def instantiate(builder: ConstraintBuilder, input: Type): Type = {
-    val bodyScope = builder.newScope(Some(parentScope))
+    val bodyScope = builder.newScope(parentScope)
     builder.declare(name, bodyScope, variableOrigin, Some(input))
     val actualOutput = body.getType(builder, bodyScope)
     actualOutput

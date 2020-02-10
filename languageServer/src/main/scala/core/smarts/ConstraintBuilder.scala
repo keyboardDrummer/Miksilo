@@ -27,9 +27,9 @@ class ConstraintBuilder(val factory: Factory) {
 
   var constraints: List[Constraint] = List.empty
 
-  def newScope(parent: Option[Scope] = None, debugName: String = "") : ConcreteScope = {
+  def newScope(parent: Scope = null, debugName: String = "") : ConcreteScope = {
     val result = factory.newScope(debugName)
-    parent.foreach(p => add(ParentScope(result, p)))
+    Option(parent).foreach(p => add(ParentScope(result, p)))
     result
   }
 
@@ -113,7 +113,7 @@ class ConstraintBuilder(val factory: Factory) {
     result
   }
 
-  def declareScope(declaration: Declaration, parent: Option[Scope] = None, debugName: String = ""): ConcreteScope = {
+  def declareScope(declaration: Declaration, parent: Scope = null, debugName: String = ""): ConcreteScope = {
     val result = newScope(parent, debugName)
     constraints ::= DeclarationOfScope(declaration, result)
     result

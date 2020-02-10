@@ -29,6 +29,6 @@ object TestGrammarUtils extends AnyFunSuite {
 
   def parse(example: String, grammarDocument: BiGrammar): SingleParseResult[Any, Input] = {
     val parser = toParserBuilder(grammarDocument)
-    parser.getWholeInputParser.parse(new Reader(example), UntilBestAndXStepsStopFunction())
+    parser.getWholeInputParser.parse(example, UntilBestAndXStepsStopFunction())
   }
 }

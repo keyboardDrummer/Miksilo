@@ -55,7 +55,7 @@ object SolidityLibraryDelta extends Delta {
       builder.declare("transfer", addressScope, null, Some(transferType))
 
       val msgType = builder.declare("<MSGDECLARATION>", rootScope) // TODO get rid of fake declarations
-      val msgScope = builder.declareScope(msgType, Some(rootScope), "msgScope")
+      val msgScope = builder.declareScope(msgType, rootScope, "msgScope")
       val message = builder.declare("msg", rootScope, _type = Some(TypeFromDeclaration(msgType)))
 
       builder.declare("data", msgScope)

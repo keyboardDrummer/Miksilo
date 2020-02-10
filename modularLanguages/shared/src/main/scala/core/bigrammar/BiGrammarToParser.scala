@@ -1,13 +1,11 @@
 package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
-import core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, CustomGrammarWithoutChildren, Keyword, Labelled, MapGrammar, Print, ValueGrammar}
-import core.parsers.core.Container
+import core.bigrammar.grammars._
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, Position}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase}
 import core.textMate.TextMateGeneratingParserWriter
-import lsp.PositionFormat
 import util.Utility
 
 import scala.collection.mutable
@@ -23,17 +21,16 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   type Input = Reader
 
   object IndentationKey
-  class Reader(array: ArrayCharSequence, offset: Int, position: Position, val state: State)
-    extends StringReaderBase[Reader](array, offset, position)
+
+  override def startInput = new Reader(0, Position(0, 0), Map.empty)
+
+  class Reader(offset: Int, position: Position, val state: State)
+    extends StringReaderBase[Reader](offset, position)
     with IndentationReaderLike {
 
-    def withState(newState: State): Reader = new Reader(array, offset, position, newState)
+    def withState(newState: State): Reader = new Reader(offset, position, newState)
 
-    def this(text: String) {
-      this(text.toCharArray, 0, Position(0, 0), Map.empty)
-    }
-
-    override def drop(amount: Int) = new Reader(array, offset + amount, move(amount), state)
+    override def drop(array: ArrayCharSequence, amount: Int) = new Reader(offset + amount, move(array, amount), state)
 
     override def hashCode(): Int = offset
 

@@ -68,7 +68,7 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val contractInstanceType = TypeFromDeclaration(contractDeclaration) // TODO fix this
     builder.add(DeclarationHasType(contractDeclaration, contractStaticType))
     builder.assignSubType(TypeSkeleton.typeKind, contractStaticType)
-    val contractScope = builder.declareScope(contractDeclaration, Some(parentScope), s"contract '${contractLike.name}'")
+    val contractScope = builder.declareScope(contractDeclaration, parentScope, s"contract '${contractLike.name}'")
 
     if (Set("interface", "contract").contains(contractLike.contractType)) {
       val addressDeclaration = SolidityLibraryDelta.addressDeclaration(compilation)

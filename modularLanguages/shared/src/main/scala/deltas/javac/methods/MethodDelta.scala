@@ -143,7 +143,7 @@ object MethodDelta extends DeltaWithGrammar
 
   def getBodyScope(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): ConcreteScope = {
     val method: Method[NodePath] = path
-    val bodyScope = builder.newScope(Some(parentScope), "methodBody")
+    val bodyScope = builder.newScope(parentScope, "methodBody")
     method.parameters.foreach(parameter => {
       MethodParameters.declare(compilation, builder, parameter, parentScope, bodyScope)
     })
