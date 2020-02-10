@@ -18,6 +18,17 @@ class IncrementalParsingTest extends AnyFunSuite {
     assertResult(List("hello" -> "bla"))(result3.resultOption.get)
   }
 
+  test("partial clearing works") {
+    val input = """{"foo":"bar"}"""
+    val input2 = """{"bar":"foo"}"""
+    val parser = getParser
+    parser.parse(new StringReader(input))
+    parser.applyChange(7,12)
+    val result = parser.parse(new StringReader(input2))
+    assertResult(List("foo" -> "foo"))(result.resultOption.get)
+  }
+  // TODO add test where the text moves because of an insertion/deletion, and the cache indices should be updated.
+
   def getParser = {
     jsonParser.getWholeInputParser
   }

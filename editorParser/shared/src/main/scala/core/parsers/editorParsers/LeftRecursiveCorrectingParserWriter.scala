@@ -162,12 +162,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       val entries = cache.toList
       for(entry <- entries) {
         val entryStart = entry._1._1.offset
-        val entryEnd = Math.max(entryStart, entry._2.latestRemainder)
+        val entryEnd = Math.max(entryStart, entry._2.latestRemainder) // TODO consider adding +1 to entryStart
         val entryIntersectsWithChange = changeStart <= entryEnd && entryStart <= changeEnd
         if (entryIntersectsWithChange) {
           cache.remove(entry._1)
-        } else {
-          System.out.append("bla")
         }
       }
     }
