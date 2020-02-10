@@ -78,7 +78,6 @@ object ExpressionParser extends CommonStringReaderParser with LeftRecursiveCorre
 
 object ExampleExpressionLanguage extends Language {
   private val parsePhase = Language.getParsePhaseFromParser[Expression](ExpressionParser)(
-    program => new ExpressionParser.StringReader(program),
     (program, uri) => SourceElementFromFileElement(uri, program),
     ExpressionParser.ParseWholeInput(ExpressionParser.expression))
 

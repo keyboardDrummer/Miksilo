@@ -27,6 +27,17 @@ class IncrementalParsingTest extends AnyFunSuite {
     val result = parser.parse(input2)
     assertResult(List("foo" -> "foo"))(result.resultOption.get)
   }
+
+  test("inserts work") {
+    val input = """[1,3]"""
+    val input2 = """[1,2,4]"""
+    val parser = getParser
+    val result1 = parser.parse(input)
+    parser.applyChange(2,2)
+    val result = parser.parse(input2)
+    assertResult(List(1,2,3))(result.resultOption.get)
+  }
+
   // TODO add test where the text moves because of an insertion/deletion, and the cache indices should be updated.
 
   def getParser = {
