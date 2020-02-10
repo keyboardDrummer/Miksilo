@@ -13,7 +13,7 @@ class ErrorReportingAndFixTest extends AnyFunSuite
     lazy val head: Parser[Any] = new Lazy(head) ~ "#" | "!"
 
     val input = "@@"
-    val parseResult = head.getWholeInputParser.parse(new StringReader(input))
+    val parseResult = head.getWholeInputParser.parse(input)
     assert(!parseResult.successful)
     assertResult("expected '!'")(parseResult.errors.head.message)
   }
@@ -22,7 +22,7 @@ class ErrorReportingAndFixTest extends AnyFunSuite
     lazy val head: Parser[Any] = "!" | new Lazy(head) ~ "#"
 
     val input = "@@"
-    val parseResult = head.getWholeInputParser.parse(new StringReader(input))
+    val parseResult = head.getWholeInputParser.parse(input)
     assert(!parseResult.successful)
     assertResult("expected '!'")(parseResult.errors.head.message)
   }
@@ -31,7 +31,7 @@ class ErrorReportingAndFixTest extends AnyFunSuite
 
   test("Correctly fixes and reports on partial keyword") {
     val input = "someKey"
-    val result = keywordParser.getWholeInputParser.parse(new StringReader(input))
+    val result = keywordParser.getWholeInputParser.parse(input)
     assert(result.errors.size == 2)
     val error = result.errors.head
     val edit = TextEdit(SourceRange(Position(0, 0), Position(0, 0)), "someKeyword")
@@ -45,7 +45,7 @@ class ErrorReportingAndFixTest extends AnyFunSuite
 
   test("Correctly fixes and reports on missing keyword") {
     val input = ""
-    val result = keywordParser.getWholeInputParser.parse(new StringReader(input))
+    val result = keywordParser.getWholeInputParser.parse(input)
     assert(result.errors.size == 1)
     val error = result.errors.head
     val edit = TextEdit(SourceRange(Position(0, 0), Position(0, 0)), "someKeyword")
@@ -60,7 +60,7 @@ class ErrorReportingAndFixTest extends AnyFunSuite
   val regexInsideParenthesis = "(" ~ parseIdentifier ~ ")"
   test("Correctly fixes and reports regex ") {
     val input = ""
-    val result = keywordParser.getWholeInputParser.parse(new StringReader(input))
+    val result = keywordParser.getWholeInputParser.parse(input)
     assert(result.errors.size == 1)
     val error = result.errors.head
     val edit = TextEdit(SourceRange(Position(0, 0), Position(0, 0)), "someKeyword")

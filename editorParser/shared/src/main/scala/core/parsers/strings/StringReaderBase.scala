@@ -5,7 +5,7 @@ import core.parsers.editorParsers.Position
 abstract class StringReaderBase[Input <: StringReaderBase[Input]](val offset: Int, val position: Position)
   extends StringReaderLike[Input] {
 
-  override def end(array: ArrayCharSequence) = drop(array.length() - offset)
+  override def end(array: ArrayCharSequence) = drop(array, array.length() - offset)
 
   //val sequence: CharSequence = array
 
@@ -15,7 +15,7 @@ abstract class StringReaderBase[Input <: StringReaderBase[Input]](val offset: In
 
   override def head(array: ArrayCharSequence): Char = array.charAt(offset)
 
-  override def tail: Input = drop(1)
+  override def tail(array: ArrayCharSequence): Input = drop(array, 1)
 
   override def hashCode(): Int = offset
 

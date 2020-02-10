@@ -5,7 +5,7 @@ import core.parsers.editorParsers.Position
 
 trait SequenceInput[Input, Elem] extends ParseInput {
   def head(array: ArrayCharSequence): Elem
-  def tail: Input
+  def tail(array: ArrayCharSequence): Input
 
   def drop(array: ArrayCharSequence, amount: Int): Input
   def safeIncrement(array: ArrayCharSequence): Input =

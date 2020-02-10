@@ -2,6 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, CustomGrammarWithoutChildren, Keyword, Labelled, MapGrammar, Print, ValueGrammar}
+import core.parsers.core.Container
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, Position}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase}

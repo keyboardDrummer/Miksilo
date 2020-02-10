@@ -1,5 +1,6 @@
 package core.parsers
 
+import _root_.core.parsers.core.Container
 import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
@@ -175,7 +176,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
     val input = """doesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatch"""
     lazy val parser: Parser[Any] = "{" ~ parser | "!"
     val detectValueParser = new DetectValueParser(("{",("{", ("{", "!"))), parser)
-    val result = detectValueParser.getWholeInputParser.parse(new StringReader(input))
+    val result = detectValueParser.getWholeInputParser.parse(input)
     assert(!detectValueParser.detected)
     assertResult(2)(result.errors.size)
     assert(result.resultOption.nonEmpty)
@@ -185,9 +186,9 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   class DetectValueParser[Result](valueToDetect: Result, val original: ParserBuilder[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     var detected = false
 
-    override def getParser(recursive: ParseJson.GetParser) = {
+    override def getParser(text: Container[ArrayCharSequence], recursive: ParseJson.GetParser) = {
       val parseOriginal = recursive(original)
-      (input, state) => {
+      (input: Input, state: ParseState) => {
         val result = parseOriginal(input, state)
         result.map(resultValue => {
           if (resultValue == valueToDetect) {
@@ -203,7 +204,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
   private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
-    val result = jsonParser.getWholeInputParser.parse(new StringReader(input), UntilBestAndXStepsStopFunction(steps))
+    val result = jsonParser.getWholeInputParser.parse(input, UntilBestAndXStepsStopFunction(steps))
     System.out.println(result.errors.toString())
     assertResult(expectation)(result.resultOption.get)
     assertResult(errorCount)(result.errors.size)

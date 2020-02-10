@@ -8,11 +8,11 @@ class AmbiguityTest extends AnyFunSuite with CommonStringReaderParser with LeftR
 
   val optional_a: SequenceParserExtensions[Any] =  Literal("!").*
   val optionalCopy: SequenceParserExtensions[Any] = Literal("!").*
-  def aesReader = new StringReader("!#@")
+  def aesReader = "!#@"
 
   test("Basic ambiguity test") {
     lazy val expression: Parser[Any] = ("!@" | "!") ~ "@#"
-    val result = expression.getWholeInputParser.parse(new StringReader("!@#"))
+    val result = expression.getWholeInputParser.parse("!@#")
     assert(result.successful, result.toString)
   }
 

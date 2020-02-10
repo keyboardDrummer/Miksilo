@@ -6,6 +6,7 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
+import core.parsers.core.Container
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
 
@@ -49,7 +50,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
   class WithContextParser[Result](update: YamlContext => YamlContext, val original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: BiGrammarToParser.GetParser) = {
+    override def getParser(text: Container[ArrayCharSequence], recursive: BiGrammarToParser.GetParser) = {
       val parseOriginal = recursive(original)
 
       def apply(input: Reader, state: ParseState): ParseResult[Result] = {

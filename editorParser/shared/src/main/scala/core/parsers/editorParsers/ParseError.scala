@@ -1,5 +1,6 @@
 package core.parsers.editorParsers
 
+import core.parsers.core.Container
 import core.parsers.editorParsers.Position.PositionOrdering
 
 case class TextEdit(range: SourceRange, newText: String)
@@ -35,6 +36,7 @@ object Position {
 }
 
 trait ParseError[Input] {
+  //def array: ArrayCharSequence
   def fix: Option[Fix] = None
   def message: String
   def from: Input

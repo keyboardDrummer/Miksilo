@@ -85,8 +85,6 @@ trait OptimizingParserWriter extends ParserWriter {
         override def debugName = Lazy.this.debugName
 
         override def toString = if (debugName != null) debugName.toString else super.toString
-
-        override def textContainer = parseOriginal.textContainer
       }
     }
 
@@ -133,7 +131,7 @@ trait OptimizingParserWriter extends ParserWriter {
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
-  case class ParserAndCaches[Result](parser: BuiltParser[Result], caches: ArrayBuffer[CacheLike[_]])
+  case class ParserAndCaches[Result](textContainer: Container[ArrayCharSequence], parser: BuiltParser[Result], caches: ArrayBuffer[CacheLike[_]])
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
@@ -157,7 +155,7 @@ trait OptimizingParserWriter extends ParserWriter {
       }
 
       val wrappedRoot = recursive(root)
-      ParserAndCaches(wrappedRoot, caches)
+      ParserAndCaches(textContainer, wrappedRoot, caches)
     }
   }
 

@@ -1,8 +1,7 @@
 package core.parsers.strings
 
 import core.parsers.core.Container
-import core.parsers.editorParsers.{History, ParseError}
-
+import core.parsers.editorParsers.History
 
 trait IndentationSensitiveParserWriter extends StringParserWriter {
   type Input <: IndentationReaderLike
@@ -16,7 +15,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   case class WithIndentation[Result](original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result]{
 
-    override def getParser(recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(textContainer: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
       def apply(input: Input, state: ParseState) = {
@@ -44,11 +43,11 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   def equal[Result](inner: Parser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
   def greaterThan[Result](inner: Parser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
 
-  case class IndentationError(from: Input, property: String) extends NextCharError {
+  case class IndentationError(array: ArrayCharSequence, from: Input, property: String) extends NextCharError {
     override def penalty = History.indentationErrorPenalty
 
     override def message =
-      s"indentation ${from.position.character} of character '${from.head}' must be $property ${from.indentation}"
+      s"indentation ${from.position.character} of character '${from.head(array)}' must be $property ${from.indentation}"
   }
 
   case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: Parser[Result])
@@ -59,10 +58,10 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
 
       def apply(input: Input, state: ParseState) = {
         val delta = input.position.character - input.indentation
-        if (input.atEnd || deltaPredicate(delta)) {
+        if (input.atEnd(text.value) || deltaPredicate(delta)) {
           parseOriginal(input, state)
         } else {
-          newFailure(None, input, History.error(IndentationError(input, property)))
+          newFailure(None, input, History.error(IndentationError(text.value, input, property)))
         }
       }
       apply

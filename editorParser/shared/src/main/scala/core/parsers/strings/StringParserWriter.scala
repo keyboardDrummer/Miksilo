@@ -44,8 +44,8 @@ trait StringParserWriter extends SequenceParserWriter {
           val array = text.value
           while (index < value.length) {
             val arrayIndex = index + input.offset
-            val remainder = input.drop(index)
-            val errorHistory = History.error(new MissingInput(remainder, value.substring(index), value.substring(index), penalty))
+            val remainder = input.drop(text.value, index)
+            val errorHistory = History.error(new MissingInput(text.value, remainder, value.substring(index), value.substring(index), penalty))
             if (array.length <= arrayIndex) {
               return singleResult(ReadyParseResult(Some(value), remainder, errorHistory))
             } else if (array.charAt(arrayIndex) != value.charAt(index)) {
@@ -53,7 +53,7 @@ trait StringParserWriter extends SequenceParserWriter {
             }
             index += 1
           }
-          val remainder = input.drop(value.length)
+          val remainder = input.drop(text.value, value.length)
           singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value)))
         }
       }
@@ -77,13 +77,11 @@ trait StringParserWriter extends SequenceParserWriter {
             if (ready.resultOption.contains(value)) {
               ready
             } else {
-              val insertError = new MissingInput(input, value, value + " ")
+              val insertError = new MissingInput(text.value, input, value, value + " ")
               ReadyParseResult(Some(value), input, History.error(insertError))
             }
           }, uniform = false)
         }
-
-        override def textContainer = text
       }
     }
 
@@ -91,8 +89,9 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   trait NextCharError extends ParseError[Input] {
-    def to: Input = if (this.from.atEnd) this.from else this.from.drop(1)
-    def range = SourceRange(from.position, to.position)
+    def array: ArrayCharSequence
+    def to: Input = if (this.from.atEnd(array)) this.from else this.from.drop(array, 1)
+    def range(array: ArrayCharSequence) = SourceRange(from.position, to.position)
   }
 
   def parseRegex(regex: Regex, regexName: String,
@@ -120,11 +119,11 @@ trait StringParserWriter extends SequenceParserWriter {
           regex.findPrefixMatchOf(new SubSequence(textContainer.value, input.offset)) match {
             case Some(matched) =>
               val value = textContainer.value.subSequence(input.offset, input.offset + matched.end).toString
-              val remainder = input.drop(matched.end)
+              val remainder = input.drop(textContainer.value, matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
               penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
-                val history = History.error(new MissingInput(input, s"<$regexName>", defaultValue.getOrElse(""), penalty))
+                val history = History.error(new MissingInput(textContainer.value, input, s"<$regexName>", defaultValue.getOrElse(""), penalty))
                 singleResult(ReadyParseResult(defaultValue, input, history))
               })
 

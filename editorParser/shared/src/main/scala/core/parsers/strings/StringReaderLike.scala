@@ -8,7 +8,7 @@ trait StringReaderLike[Input] extends SequenceInput[Input, Char] {
   def position: Position
   def offset: Int
   //def array: ArrayCharSequence
-  def drop(amount: Int): Input
+  def drop(array: ArrayCharSequence, amount: Int): Input
   def remaining(array: ArrayCharSequence) = array.length() - offset
 
   def move(array: ArrayCharSequence, increase: Int): Position = {

@@ -53,7 +53,6 @@ object Language extends LazyLogging {
   }
 
   def getParsePhaseFromParser[Program](parserWriter: StringParserWriter)(
-    getInput: String => parserWriter.Input,
     getSourceElement: (Program, String) => SourceElement,
     parserBuilder: parserWriter.Parser[Program],
     stopFunction: StopFunction = new TimeRatioStopFunction): Phase = {
@@ -66,7 +65,7 @@ object Language extends LazyLogging {
       val parsersPerFile = builtParser(compilation).getOrElseUpdate(uri, {
         parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser
       })
-      val parseResult = parsersPerFile.parse(getInput(input), stopFunction, compilation.metrics)
+      val parseResult = parsersPerFile.parse(input.toCharArray, stopFunction, compilation.metrics)
       parseResult.resultOption.foreach(program => {
         compilation.program = getSourceElement(program, uri)
       })
