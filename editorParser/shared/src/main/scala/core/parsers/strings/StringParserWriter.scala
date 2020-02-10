@@ -1,5 +1,6 @@
 package core.parsers.strings
 
+import core.parsers.core.Container
 import core.parsers.editorParsers.{History, ParseError, ReadyParseResult, SREmpty, SourceRange}
 import core.parsers.sequences.SequenceParserWriter
 
@@ -35,12 +36,12 @@ trait StringParserWriter extends SequenceParserWriter {
 
   case class Literal(value: String, penalty: Double = History.missingInputPenalty) extends ParserBuilderBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: GetParser): BuiltParser[String] = {
+    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[String] = {
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
         def apply(input: Input, state: ParseState): ParseResult[String] = {
           var index = 0
-          val array = input.array
+          val array = text.value
           while (index < value.length) {
             val arrayIndex = index + input.offset
             val remainder = input.drop(index)
@@ -68,17 +69,21 @@ trait StringParserWriter extends SequenceParserWriter {
     * Don't wrap KeywordParser in a Drop. Since it wraps identifier, it already has a drop.
     */
   case class KeywordParser(value: String) extends ParserBuilderBase[String] with ParserWrapper[String] {
-    override def getParser(recursive: GetParser): BuiltParser[String] = {
+    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[String] = {
       val identifierParser = recursive(parseIdentifier)
-      (input, state) => {
-        identifierParser(input, state).mapReady(ready => {
-          if (ready.resultOption.contains(value)) {
-            ready
-          } else {
-            val insertError = new MissingInput(input, value, value + " ")
-            ReadyParseResult(Some(value), input, History.error(insertError))
-          }
-        }, uniform = false)
+      new BuiltParser[String] {
+        override def apply(input: Input, state: ParseState) = {
+          identifierParser(input, state).mapReady(ready => {
+            if (ready.resultOption.contains(value)) {
+              ready
+            } else {
+              val insertError = new MissingInput(input, value, value + " ")
+              ReadyParseResult(Some(value), input, History.error(insertError))
+            }
+          }, uniform = false)
+        }
+
+        override def textContainer = text
       }
     }
 
@@ -107,14 +112,14 @@ trait StringParserWriter extends SequenceParserWriter {
                          penaltyOption: Option[Double] = Some(History.missingInputPenalty))
     extends ParserBuilderBase[String] with LeafParser[String] {
 
-    override def getParser(recursive: GetParser): BuiltParser[String] = {
+    override def getParser(textContainer: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[String] = {
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
 
         def apply(input: Input, state: ParseState): ParseResult[String] = {
-          regex.findPrefixMatchOf(new SubSequence(input.array, input.offset)) match {
+          regex.findPrefixMatchOf(new SubSequence(textContainer.value, input.offset)) match {
             case Some(matched) =>
-              val value = input.array.subSequence(input.offset, input.offset + matched.end).toString
+              val value = textContainer.value.subSequence(input.offset, input.offset + matched.end).toString
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
@@ -125,6 +130,8 @@ trait StringParserWriter extends SequenceParserWriter {
 
           }
         }
+
+        //override def textContainer = textContainer
       }
 
       result

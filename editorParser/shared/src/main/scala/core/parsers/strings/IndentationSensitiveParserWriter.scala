@@ -1,5 +1,6 @@
 package core.parsers.strings
 
+import core.parsers.core.Container
 import core.parsers.editorParsers.{History, ParseError}
 
 
@@ -53,7 +54,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParser) = {
+    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser) = {
       val parseOriginal = recursive(original).asInstanceOf[BuiltParser[Result]]
 
       def apply(input: Input, state: ParseState) = {

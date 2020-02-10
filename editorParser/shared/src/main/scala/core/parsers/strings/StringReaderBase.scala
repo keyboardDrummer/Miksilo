@@ -2,18 +2,18 @@ package core.parsers.strings
 
 import core.parsers.editorParsers.Position
 
-abstract class StringReaderBase[Input <: StringReaderBase[Input]](val array: ArrayCharSequence, val offset: Int, val position: Position)
+abstract class StringReaderBase[Input <: StringReaderBase[Input]](val offset: Int, val position: Position)
   extends StringReaderLike[Input] {
 
-  override def end = drop(array.length() - offset)
+  override def end(array: ArrayCharSequence) = drop(array.length() - offset)
 
-  val sequence: CharSequence = array
+  //val sequence: CharSequence = array
 
-  override def printRange(end: Input) = array.subSequence(offset, end.offset).toString
+  override def printRange(array: ArrayCharSequence, end: Input) = array.subSequence(offset, end.offset).toString
 
-  override def atEnd: Boolean = offset == array.length
+  override def atEnd(array: ArrayCharSequence): Boolean = offset == array.length
 
-  override def head: Char = array.charAt(offset)
+  override def head(array: ArrayCharSequence): Char = array.charAt(offset)
 
   override def tail: Input = drop(1)
 
@@ -24,8 +24,12 @@ abstract class StringReaderBase[Input <: StringReaderBase[Input]](val array: Arr
     case _ => false
   }
 
-  override def toString: String = {
+  def print(array: ArrayCharSequence): String = {
     s"(${position.line}, ${position.character})" +
       array.subSequence(Math.max(0, offset - 10), offset) + " | " + array.subSequence(offset, Math.min(array.length, offset + 10))
+  }
+
+  override def toString: String = {
+    s"(${position.line}, ${position.character})"
   }
 }
