@@ -11,6 +11,6 @@ trait CommonStringReaderParser extends CommonParserWriter {
   class StringReader(offset: Int, position: Position)
     extends StringReaderBase[Input](offset, position) {
 
-    def drop(text: ArrayCharSequence, amount: Int): StringReader = new StringReader(offset + amount, move(text, amount))
+    def drop(text: ArrayCharSequence, amount: Int): StringReader = new StringReader(offset + amount, movePosition(text, amount))
   }
 }

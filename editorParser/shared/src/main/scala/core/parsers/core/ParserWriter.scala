@@ -6,7 +6,7 @@ import scala.language.{existentials, higherKinds}
 
 trait ParserWriter {
 
-  type Input <: ParseInput
+  type Input <: ParseInput[Input]
   type Parser[+Result]
 
   def succeed[Result](result: Result): Parser[Result]

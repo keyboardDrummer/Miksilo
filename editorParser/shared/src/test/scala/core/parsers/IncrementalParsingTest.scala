@@ -38,8 +38,6 @@ class IncrementalParsingTest extends AnyFunSuite {
     assertResult(List(1,2,3))(result.resultOption.get)
   }
 
-  // TODO add test where the text moves because of an insertion/deletion, and the cache indices should be updated.
-
   def getParser = {
     jsonParser.getWholeInputParser
   }

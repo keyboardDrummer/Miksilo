@@ -1,5 +1,7 @@
 package core.parsers.editorParsers
 
+import core.parsers.core.Container
+
 import scala.collection.mutable
 
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
@@ -21,7 +23,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  case class DetectFixPointAndCache[Result](parser: BuiltParser[Result]) extends CheckCache[Result](parser) {
+  case class DetectFixPointAndCache[Result](textContainer: Container[ArrayCharSequence],
+                                            parser: BuiltParser[Result])
+    extends CheckCache[Result](textContainer, parser) {
 
     override def apply(input: Input, state: ParseState): ParseResult[Result] = {
       val key = (input, state)
@@ -83,16 +87,17 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  override def wrapParser[Result](parser: BuiltParser[Result],
+  override def wrapParser[Result](textContainer: Container[ArrayCharSequence],
+                                  parser: BuiltParser[Result],
                                   shouldCache: Boolean,
                                   shouldDetectLeftRecursion: Boolean): BuiltParser[Result] = {
       if (!shouldCache && !shouldDetectLeftRecursion) {
         return parser
       }
       if (shouldDetectLeftRecursion) {
-        return new DetectFixPointAndCache[Result](parser)
+        return new DetectFixPointAndCache[Result](textContainer, parser)
       }
-      new CheckCache[Result](parser)
+      new CheckCache[Result](textContainer, parser)
   }
 
   // TODO: replace List with something that has constant concat operation.
@@ -138,9 +143,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     override def latestRemainder = tail.latestRemainder
+
+    override def move(array: ArrayCharSequence, offset: Int) = throw new Exception("cannot move Recursive results")
   }
 
-  class CheckCache[Result](parser: BuiltParser[Result]) extends CacheLike[Result] {
+  class CheckCache[Result](textContainer: Container[ArrayCharSequence], parser: BuiltParser[Result]) extends CacheLike[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
     val cache = mutable.HashMap[(Input, ParseState), ParseResult[Result]]()
 
@@ -158,14 +165,30 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def clear(): Unit = cache.clear()
 
-    override def clearForRange(changeStart: Int, changeEnd: Int): Unit = {
+    override def insertRange(changeStart: Int, changeEnd: Int): Unit = {
       val entries = cache.toList
+
+      val insertionLength = changeEnd - changeStart
+      def updateInput(input: Input): Input = {
+        if (input.offset >= changeStart) {
+          input.drop(textContainer.value, insertionLength).asInstanceOf[Input]
+        } else {
+          input
+        }
+      }
       for(entry <- entries) {
         val entryStart = entry._1._1.offset
         val entryEnd = Math.max(entryStart, entry._2.latestRemainder) // TODO consider adding +1 to entryStart
         val entryIntersectsWithChange = changeStart <= entryEnd && entryStart <= changeEnd
         if (entryIntersectsWithChange) {
           cache.remove(entry._1)
+        } else {
+          if (entryStart >= changeStart) {
+            cache.remove(entry._1)
+            val newKey = (updateInput(entry._1._1), FixPointState(updateInput(entry._1._2.input), entry._1._2.parsers))
+            val newValue = entry._2.move(textContainer.value, insertionLength)
+            cache.put(newKey, newValue)
+          }
         }
       }
     }

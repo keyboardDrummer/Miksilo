@@ -12,7 +12,8 @@ trait OptimizingParserWriter extends ParserWriter {
   type ParseState
   type ParseResult[+Result]
 
-  def wrapParser[Result](parser: BuiltParser[Result],
+  def wrapParser[Result](textContainer: Container[ArrayCharSequence],
+                         parser: BuiltParser[Result],
                          shouldCache: Boolean,
                          shouldDetectLeftRecursion: Boolean): BuiltParser[Result]
 
@@ -144,7 +145,7 @@ trait OptimizingParserWriter extends ParserWriter {
           cacheOfParses.getOrElseUpdate(_parser, {
             val parser = _parser.asInstanceOf[ParserBuilder[SomeResult]]
             val result = parser.getParser(textContainer, recursive)
-            val wrappedParser = wrapParser(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
+            val wrappedParser = wrapParser(textContainer, result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
             wrappedParser match {
               case check: CacheLike[_] => caches.addOne(check)
               case _ =>
@@ -183,7 +184,7 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait CacheLike[Result] extends BuiltParser[Result] {
-    def clearForRange(start: Int, end: Int): Unit
+    def insertRange(start: Int, end: Int): Unit
     def clear(): Unit
   }
 }

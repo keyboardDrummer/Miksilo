@@ -1,6 +1,6 @@
 package core.parsers.sequences
 
-import core.parsers.core.{Container, Metrics, NoMetrics, ParseInput, Processor}
+import core.parsers.core.{Container, Metrics, NoMetrics, Processor}
 import core.parsers.editorParsers._
 
 trait SequenceParserWriter extends CorrectingParserWriter {
@@ -317,7 +317,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       val parserAndCaches = compile(this.parser).buildParser(this.parser)
       new SingleResultParser[Result, Input] {
         override def applyChange(start: Int, end: Int): Unit = {
-          parserAndCaches.caches.foreach(cache => cache.clearForRange(start, end))
+          parserAndCaches.caches.foreach(cache => cache.insertRange(start, end))
         }
 
         override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {

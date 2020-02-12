@@ -30,7 +30,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
     def withState(newState: State): Reader = new Reader(offset, position, newState)
 
-    override def drop(array: ArrayCharSequence, amount: Int) = new Reader(offset + amount, move(array, amount), state)
+    override def drop(array: ArrayCharSequence, amount: Int) = new Reader(offset + amount, movePosition(array, amount), state)
 
     override def hashCode(): Int = offset
 

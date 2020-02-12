@@ -10,7 +10,7 @@ trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter
   class IndentationReader(offset: Int, position: Position, val indentation: Int)
     extends StringReaderBase[Input](offset, position) with IndentationReaderLike {
 
-    def drop(text: ArrayCharSequence, amount: Int): IndentationReader = new IndentationReader(offset + amount, move(text, amount), indentation)
+    def drop(text: ArrayCharSequence, amount: Int): IndentationReader = new IndentationReader(offset + amount, movePosition(text, amount), indentation)
 
     override def hashCode(): Int = offset ^ indentation
 

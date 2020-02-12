@@ -3,11 +3,11 @@ package core.parsers.editorParsers
 import ParseResults._
 import core.parsers.core.ParseInput
 
-case class RecursionsList[Input <: ParseInput, SeedResult, +Result](
+case class RecursionsList[Input <: ParseInput[Input], SeedResult, +Result](
   recursions: List[RecursiveParseResult[Input, SeedResult, Result]],
   rest: ParseResults[Input, Result])
 
-trait LazyParseResult[Input <: ParseInput, +Result] {
+trait LazyParseResult[Input <: ParseInput[Input], +Result] {
   def offset: Int
 
   def flatMapReady[NewResult](f: ReadyParseResult[Input, Result] => ParseResults[Input, NewResult],
@@ -24,7 +24,7 @@ trait LazyParseResult[Input <: ParseInput, +Result] {
                                 oldHistory: History[Input]): LazyParseResult[Input, NewResult]
 }
 
-class DelayedParseResult[Input <: ParseInput, Result](val remainder: Input, val history: History[Input], _getResults: () => ParseResults[Input, Result])
+class DelayedParseResult[Input <: ParseInput[Input], Result](val remainder: Input, val history: History[Input], _getResults: () => ParseResults[Input, Result])
   extends LazyParseResult[Input, Result] {
 
   override def toString = s"$score delayed: $history"
@@ -56,7 +56,7 @@ class DelayedParseResult[Input <: ParseInput, Result](val remainder: Input, val 
   override def offset = remainder.offset
 }
 
-case class RecursiveParseResult[Input <: ParseInput, SeedResult, +Result](
+case class RecursiveParseResult[Input <: ParseInput[Input], SeedResult, +Result](
   get: ParseResults[Input, SeedResult] => ParseResults[Input, Result]) {
 
   def compose[NewResult](f: ParseResults[Input, Result] => ParseResults[Input, NewResult]):
@@ -66,7 +66,7 @@ case class RecursiveParseResult[Input <: ParseInput, SeedResult, +Result](
   }
 }
 
-case class ReadyParseResult[Input <: ParseInput, +Result](resultOption: Option[Result], remainder: Input, history: History[Input])
+case class ReadyParseResult[Input <: ParseInput[Input], +Result](resultOption: Option[Result], remainder: Input, history: History[Input])
   extends LazyParseResult[Input, Result] {
 
   val originalScore = (if (history.flawed) 0 else 10000) + history.score

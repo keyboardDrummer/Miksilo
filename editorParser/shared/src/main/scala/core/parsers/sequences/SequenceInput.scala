@@ -3,11 +3,10 @@ package core.parsers.sequences
 import core.parsers.core.ParseInput
 import core.parsers.editorParsers.Position
 
-trait SequenceInput[Input, Elem] extends ParseInput {
+trait SequenceInput[Input, Elem] extends ParseInput[Input] {
   def head(array: ArrayCharSequence): Elem
   def tail(array: ArrayCharSequence): Input
 
-  def drop(array: ArrayCharSequence, amount: Int): Input
   def safeIncrement(array: ArrayCharSequence): Input =
     if (atEnd(array)) this.asInstanceOf[Input]
     else drop(array, 1)

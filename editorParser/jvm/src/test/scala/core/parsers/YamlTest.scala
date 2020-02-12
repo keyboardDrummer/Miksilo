@@ -67,7 +67,7 @@ class YamlTest extends AnyFunSuite
 
     def withContext(newState: YamlContext): IndentationReader = new IndentationReader(offset, position, newState, indentation)
 
-    override def drop(array: ArrayCharSequence, amount: Int) = new IndentationReader(offset + amount, move(array, amount), context, indentation)
+    override def drop(array: ArrayCharSequence, amount: Int) = new IndentationReader(offset + amount, movePosition(array, amount), context, indentation)
 
     override def hashCode(): Int = offset ^ indentation ^ context.hashCode()
 

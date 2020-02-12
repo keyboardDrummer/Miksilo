@@ -3,12 +3,14 @@ package core.parsers.editorParsers
 import ParseResults._
 import core.parsers.core.ParseInput
 
-trait ParseResults[Input <: ParseInput, +Result] {
+trait ParseResults[Input <: ParseInput[Input], +Result] {
   def latestRemainder: Int
   def nonEmpty: Boolean
   def pop(): (LazyParseResult[Input, Result], ParseResults[Input, Result])
   def toList: List[LazyParseResult[Input, Result]]
   def tailDepth: Int
+
+  def move(array: ArrayCharSequence, offset: Int): ParseResults[Input, Result]
 
   def merge[Other >: Result](other: ParseResults[Input, Other], depth: Int = 0,
                              bests: Map[Input, Double] = Map.empty): ParseResults[Input, Other]
@@ -47,11 +49,11 @@ trait ParseResults[Input <: ParseInput, +Result] {
 }
 
 object ParseResults {
-  def singleResult[Input <: ParseInput, Result](parseResult: LazyParseResult[Input, Result]): ParseResults[Input, Result] =
+  def singleResult[Input <: ParseInput[Input], Result](parseResult: LazyParseResult[Input, Result]): ParseResults[Input, Result] =
     new SRCons(parseResult, parseResult.offset,0, SREmpty.empty[Input])
 }
 
-final class SRCons[Input <: ParseInput, +Result](
+final class SRCons[Input <: ParseInput[Input], +Result](
   val head: LazyParseResult[Input, Result],
   val latestRemainder: Int,
   var tailDepth: Int,
@@ -137,14 +139,17 @@ final class SRCons[Input <: ParseInput, +Result](
   override def nonEmpty = true
 
   override def pop(): (LazyParseResult[Input, Result], ParseResults[Input, Result]) = (head, tail)
+
+  override def move(array: ArrayCharSequence, offset: Int) = new SRCons(head, latestRemainder + offset, tailDepth + 1,
+    _tail.updateRemainder(i => i.drop(array, offset)))
 }
 
 object SREmpty {
   private val value = new SREmpty[Nothing]
-  def empty[Input <: ParseInput]: SREmpty[Input] = value.asInstanceOf[SREmpty[Input]]
+  def empty[Input <: ParseInput[Input]]: SREmpty[Input] = value.asInstanceOf[SREmpty[Input]]
 }
 
-class SREmpty[Input <: ParseInput] extends ParseResults[Input, Nothing] {
+class SREmpty[Input <: ParseInput[Input]] extends ParseResults[Input, Nothing] {
   override def merge[Other >: Nothing](other: ParseResults[Input, Other], depth: Int,
                                        bests: Map[Input, Double] = Map.empty) = other
 
@@ -163,4 +168,6 @@ class SREmpty[Input <: ParseInput] extends ParseResults[Input, Nothing] {
   override def pop() = throw new Exception("Can't pop empty results")
 
   override def latestRemainder = Int.MinValue
+
+  override def move(array: ArrayCharSequence, offset: Int) = this
 }

@@ -11,7 +11,7 @@ trait StringReaderLike[Input] extends SequenceInput[Input, Char] {
   def drop(array: ArrayCharSequence, amount: Int): Input
   def remaining(array: ArrayCharSequence) = array.length() - offset
 
-  def move(array: ArrayCharSequence, increase: Int): Position = {
+  def movePosition(array: ArrayCharSequence, increase: Int): Position = {
     var column = position.character
     var row = position.line
     for(index <- offset.until(offset + increase)) {
