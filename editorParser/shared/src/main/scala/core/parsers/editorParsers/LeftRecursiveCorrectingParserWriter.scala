@@ -200,7 +200,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       val insertionLength = until - from
       def updateInput(input: Input): Input = {
         if (input.offset >= from) {
-          input.decrease(textContainer.value, insertionLength)
+          input.drop(textContainer.value, -insertionLength)
         } else {
           input
         }
@@ -215,7 +215,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           if (entryStart >= from) {
             cache.remove(entry._1)
             val newKey = (updateInput(entry._1._1), FixPointState(updateInput(entry._1._2.input), entry._1._2.parsers))
-            val newValue = entry._2.move(textContainer.value, insertionLength)
+            val newValue = entry._2.move(textContainer.value, -insertionLength)
             cache.put(newKey, newValue)
           }
         }

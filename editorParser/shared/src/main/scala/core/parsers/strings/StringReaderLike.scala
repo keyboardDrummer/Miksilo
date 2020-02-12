@@ -7,11 +7,15 @@ import core.parsers.sequences.SequenceInput
 trait StringReaderLike[Input] extends SequenceInput[Input, Char] {
   def position: Position
   def offset: Int
-  //def array: ArrayCharSequence
+
   def drop(array: ArrayCharSequence, amount: Int): Input
   def remaining(array: ArrayCharSequence) = array.length() - offset
 
   def movePosition(array: ArrayCharSequence, increase: Int): Position = {
+    if (increase < 0) {
+      return decreasePosition(array, -increase)
+    }
+
     var column = position.character
     var row = position.line
     for(index <- offset.until(offset + increase)) {
@@ -29,7 +33,7 @@ trait StringReaderLike[Input] extends SequenceInput[Input, Char] {
   def decreasePosition(array: ArrayCharSequence, decrease: Int): Position = {
     var column = position.character
     var row = position.line
-    for(index <- (offset - decrease).until(offset)) {
+    for(index <- (offset - 1).to(offset - decrease, -1)) {
       val character = array.charAt(index)
       if (character == '\n') {
         row -= 1

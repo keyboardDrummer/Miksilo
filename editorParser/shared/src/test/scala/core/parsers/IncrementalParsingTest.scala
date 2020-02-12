@@ -23,8 +23,6 @@ class IncrementalParsingTest extends AnyFunSuite {
     val input2 = """{}"""
     val parser = getParser
     val result = parser.parse(input)
-    val result2 = parser.parse(input2)
-    assertResult(result)(result2)
     parser.removeRange(1,14, input2.toCharArray)
     val result3 = parser.parse(input2)
     assertResult(List())(result3.resultOption.get)
@@ -38,7 +36,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     parser.removeRange(1,4, input2.toCharArray)
     parser.insertRange(1,4, input2.toCharArray)
     val result = parser.parse(input2)
-    assertResult(List("foo" -> "foo"))(result.resultOption.get)
+    assertResult(List("bar" -> "bar"))(result.resultOption.get)
   }
 
   test("inserts work") {
