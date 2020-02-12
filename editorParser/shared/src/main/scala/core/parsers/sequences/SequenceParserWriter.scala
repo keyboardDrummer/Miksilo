@@ -319,7 +319,6 @@ trait SequenceParserWriter extends CorrectingParserWriter {
         override def insertRange(from: Int, until: Int, text: ArrayCharSequence): Unit = {
           parserAndCaches.textContainer.value = text
           parserAndCaches.caches.foreach(cache => cache.insertRange(from, until))
-          System.out.append("")
         }
 
         override def removeRange(from: Int, until: Int, text: ArrayCharSequence): Unit = {
