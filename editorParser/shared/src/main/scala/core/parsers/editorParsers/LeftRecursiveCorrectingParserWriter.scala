@@ -178,9 +178,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
       for(entry <- entries) {
         val entryStart = entry._1._1.offset
-        val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder) // TODO consider adding +1 to entryStart
-        val entryIntersectsWithChange = entryStart < from && from < entryEnd
-        if (entryIntersectsWithChange) {
+        val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder)
+        val insertionInsideEntry = entryStart < from && from < entryEnd
+        if (insertionInsideEntry) {
           cache.remove(entry._1)
         } else {
           if (entryStart >= from) {
@@ -200,7 +200,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       val insertionLength = until - from
       def updateInput(input: Input): Input = {
         if (input.offset >= from) {
-          input.drop(textContainer.value, insertionLength)
+          input.decrease(textContainer.value, insertionLength)
         } else {
           input
         }
@@ -208,16 +208,16 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       for(entry <- entries) {
         val entryStart = entry._1._1.offset
         val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder)
-        val entryIntersectsWithChange = from <= entryEnd && entryStart < until
-        if (entryIntersectsWithChange) {
+        val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
+        if (entryIntersectsWithRemoval) {
           cache.remove(entry._1)
         } else {
-//          if (entryStart >= from) {
-//            cache.remove(entry._1)
-//            val newKey = (updateInput(entry._1._1), FixPointState(updateInput(entry._1._2.input), entry._1._2.parsers))
-//            val newValue = entry._2.move(textContainer.value, insertionLength)
-//            cache.put(newKey, newValue)
-//          }
+          if (entryStart >= from) {
+            cache.remove(entry._1)
+            val newKey = (updateInput(entry._1._1), FixPointState(updateInput(entry._1._2.input), entry._1._2.parsers))
+            val newValue = entry._2.move(textContainer.value, insertionLength)
+            cache.put(newKey, newValue)
+          }
         }
       }
     }
