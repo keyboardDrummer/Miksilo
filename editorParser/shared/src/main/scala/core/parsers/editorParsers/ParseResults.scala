@@ -140,8 +140,10 @@ final class SRCons[Input <: ParseInput[Input], +Result](
 
   override def pop(): (LazyParseResult[Input, Result], ParseResults[Input, Result]) = (head, tail)
 
-  override def move(array: ArrayCharSequence, offset: Int) = new SRCons(head, latestRemainder + offset, tailDepth + 1,
-    _tail.updateRemainder(i => i.drop(array, offset)))
+  override def move(array: ArrayCharSequence, offset: Int) = {
+    val newCons = this.updateRemainder(i => i.drop(array, offset)).asInstanceOf[SRCons[Input, Result]]
+    new SRCons(newCons.head, latestRemainder + offset, newCons.tailDepth, newCons.tail)
+  }
 }
 
 object SREmpty {

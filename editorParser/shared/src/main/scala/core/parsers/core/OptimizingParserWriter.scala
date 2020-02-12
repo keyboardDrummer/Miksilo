@@ -185,6 +185,7 @@ trait OptimizingParserWriter extends ParserWriter {
 
   trait CacheLike[Result] extends BuiltParser[Result] {
     def insertRange(start: Int, end: Int): Unit
+    def removeRange(from: Int, until: Int): Unit
     def clear(): Unit
   }
 }
