@@ -43,10 +43,22 @@ class IncrementalParsingTest extends AnyFunSuite {
     val input = """[1,3]"""
     val input2 = """[1,2,4]"""
     val parser = getParser
-    val result1 = parser.parse(input)
+    parser.parse(input)
     parser.insertRange(2,4, input2.toCharArray)
     val result = parser.parse(input2)
     assertResult(List(1,2,3))(result.resultOption.get)
+  }
+
+  test("multiple inserts work") {
+    val input = """[1,3,5]"""
+    val input2 = """[0,2,0,0]"""
+    val input3 = """[0,2,0,4,0]"""
+    val parser = getParser
+    parser.parse(input)
+    parser.insertRange(2,4, input2.toCharArray)
+    parser.insertRange(6,8, input3.toCharArray)
+    val result = parser.parse(input3)
+    assertResult(List(1,2,3,4,5))(result.resultOption.get)
   }
 
   def getParser = {
