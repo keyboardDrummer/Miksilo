@@ -316,14 +316,6 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def getSingleResultParser: SingleResultParser[Result, Input] = {
       val parserAndCaches = compile(this.parser).buildParser(this.parser)
       new SingleResultParser[Result, Input] {
-        override def insertRange(from: Int, until: Int, text: ArrayCharSequence): Unit = {
-          parserAndCaches.textContainer.value = text
-          parserAndCaches.caches.foreach(cache => cache.insertRange(from, until))
-        }
-
-        override def removeRange(from: Int, until: Int, text: ArrayCharSequence): Unit = {
-          parserAndCaches.caches.foreach(cache => cache.removeRange(from, until))
-        }
 
         override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
           parserAndCaches.textContainer.value = text.toCharArray
@@ -332,6 +324,13 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
         override def reset(): Unit = {
           parserAndCaches.caches.foreach(cache => cache.clear())
+        }
+
+        override def changeRange(from: Int, until: Int, insertionLength: Int, text: ArrayCharSequence): Unit = {
+          if (insertionLength - (until - from) > 0) {
+            parserAndCaches.textContainer.value = text
+          }
+          parserAndCaches.caches.foreach(cache => cache.change(from, until, insertionLength))
         }
       }
     }
@@ -348,8 +347,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
 trait SingleResultParser[+Result, Input] {
   def reset(): Unit
-  def removeRange(start: Int, end: Int, text: ArrayCharSequence): Unit
-  def insertRange(start: Int, end: Int, text: ArrayCharSequence): Unit
+  def changeRange(start: Int, end: Int, insertionLength: Int, text: ArrayCharSequence): Unit
   def parse(text: String,
             mayStop: StopFunction = StopImmediately,
             metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]

@@ -1,14 +1,14 @@
 package languageServer
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
-import core.language.FileSystem
+import core.language.{FileSystem, TextChangeHandler}
 import jsonRpc.LazyLogging
 import lsp.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 
-import scala.collection.JavaConverters.collectionAsScalaIterable
+import scala.collection.mutable
 import scala.jdk.CollectionConverters
 
 /**
@@ -19,6 +19,7 @@ import scala.jdk.CollectionConverters
 class TextDocumentManager extends LazyLogging with FileSystem {
 
   private val docs: ConcurrentMap[String, InMemoryTextDocument] = new ConcurrentHashMap
+  private val handlers: mutable.HashMap[String, TextChangeHandler] = new mutable.HashMap
 
   def getOpenDocumentForUri(uri: String): Option[InMemoryTextDocument] =
     Option(docs.get(uri))
@@ -36,7 +37,7 @@ class TextDocumentManager extends LazyLogging with FileSystem {
         // we assume full text sync
         docs.put(documentIdentifier.uri, new InMemoryTextDocument(documentIdentifier.uri, changes.head.text))
       case doc =>
-        docs.get(documentIdentifier.uri).applyUnsafeChanges(changes)
+        docs.get(documentIdentifier.uri).applyUnsafeChanges(changes, handlers.get(documentIdentifier.uri))
     }
   }
 
@@ -50,5 +51,12 @@ class TextDocumentManager extends LazyLogging with FileSystem {
 
   // TODO remove this method and let FileSystem stop using InputStream
   def stringToStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
+
+  override def setTextChangedHandler(uri: String, handler: TextChangeHandler): Unit = {
+    if (handlers.contains(uri)) {
+      throw new Exception("uri already had a handler")
+    }
+    handlers.put(uri, handler)
+  }
 }
 

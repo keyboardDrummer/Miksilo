@@ -165,10 +165,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def clear(): Unit = cache.clear()
 
-    override def insertRange(from: Int, until: Int): Unit = {
+    override def change(from: Int, until: Int, inserted: Int): Unit = {
+
       val entries = cache.toList
 
-      val insertionLength = until - from
+      val insertionLength = inserted - (until - from)
       def updateInput(input: Input): Input = {
         if (input.offset >= from) {
           input.drop(textContainer.value, insertionLength)
@@ -179,43 +180,14 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       for(entry <- entries) {
         val entryStart = entry._1._1.offset
         val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder)
-        val insertionInsideEntry = entryStart < from && from < entryEnd
-        if (insertionInsideEntry) {
-          cache.remove(entry._1)
-        } else {
-          if (entryStart >= from) {
-            cache.remove(entry._1)
-            val newKey = (updateInput(entry._1._1), FixPointState(updateInput(entry._1._2.input), entry._1._2.parsers))
-            val newValue = entry._2.move(textContainer.value, insertionLength)
-            cache.put(newKey, newValue)
-          }
-        }
-      }
-    }
-
-    override def removeRange(from: Int, until: Int): Unit = {
-
-      val entries = cache.toList
-
-      val insertionLength = until - from
-      def updateInput(input: Input): Input = {
-        if (input.offset >= from) {
-          input.drop(textContainer.value, -insertionLength)
-        } else {
-          input
-        }
-      }
-      for(entry <- entries) {
-        val entryStart = entry._1._1.offset
-        val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder)
-        val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
+        val entryIntersectsWithRemoval = from < entryEnd && entryStart < until // entryStart < from && from < entryEnd
         if (entryIntersectsWithRemoval) {
           cache.remove(entry._1)
         } else {
           if (entryStart >= from) {
             cache.remove(entry._1)
             val newKey = (updateInput(entry._1._1), FixPointState(updateInput(entry._1._2.input), entry._1._2.parsers))
-            val newValue = entry._2.move(textContainer.value, -insertionLength)
+            val newValue = entry._2.move(textContainer.value, insertionLength)
             cache.put(newKey, newValue)
           }
         }

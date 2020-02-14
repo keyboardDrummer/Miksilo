@@ -1,18 +1,16 @@
 package core.language
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
 import core.language.exceptions.BadInputException
-import core.parsers.core.{Metrics, NoMetrics}
-import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, StopFunction, TimeRatioStopFunction}
-import core.parsers.sequences.{SequenceParserWriter, SingleResultParser}
-import core.parsers.strings.{StringParserWriter, StringReaderLike}
+import core.parsers.editorParsers.{StopFunction, TimeRatioStopFunction}
+import core.parsers.sequences.SingleResultParser
+import core.parsers.strings.StringParserWriter
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
 import jsonRpc.LazyLogging
 
 import scala.collection.mutable
-import scala.reflect.io.File
 import scala.util.{Failure, Success}
 
 case class ConstraintException(solveException: SolveException) extends BadInputException {
@@ -62,9 +60,18 @@ object Language extends LazyLogging {
     Phase("parse", "parse the source code", compilation => {
       val uri = compilation.rootFile.get
       val input = compilation.fileSystem.getFile(uri)
-      val parsersPerFile = builtParser(compilation).getOrElseUpdate(uri, {
-        parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser
-      })
+
+      def createParser(): SingleResultParser[Program, parserWriter.Input] = {
+        val result = parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser
+        compilation.fileSystem.setTextChangedHandler(uri, new TextChangeHandler {
+          override def handleChange(from: Int, until: Int, text: String): Unit = {
+            result.changeRange(from, until, text.size, compilation.fileSystem.getFile(uri).toCharArray)
+          }
+        })
+        result
+      }
+
+      val parsersPerFile = builtParser(compilation).getOrElseUpdate(uri, createParser())
       val parseResult = parsersPerFile.parse(input, stopFunction, compilation.metrics)
       parseResult.resultOption.foreach(program => {
         compilation.program = getSourceElement(program, uri)
@@ -79,6 +86,7 @@ object Language extends LazyLogging {
     })
 
   }
+
 }
 
 class Language extends LazyLogging {

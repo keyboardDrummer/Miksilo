@@ -1,5 +1,6 @@
 package languageServer
 
+import core.language.TextChangeHandler
 import core.parsers.editorParsers.{Position, SourceRange}
 import jsonRpc.LazyLogging
 import languageServer.InMemoryTextDocument._
@@ -24,22 +25,32 @@ class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) 
       contents.split(newLine, -1).view.map(line => line.toArray).toSeq: _*))
   }
 
-  def applyUnsafeChanges(changes: Seq[TextDocumentContentChangeEvent]): Unit = {
+  def applyUnsafeChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler]): Unit = {
     try {
-      applyChanges(changes)
+      applyChanges(changes, handlerOption)
     } catch {
       case error: IllegalArgumentException =>
         logger.error("Failed to apply changes because: " + error.getMessage)
     }
   }
 
-  def applyChanges(changes: Seq[TextDocumentContentChangeEvent]): Unit = {
+  def positionToOffset(position: Position): Int = {
+    var result = position.character
+    for(line <- 0.until(position.line)) {
+      result += contents(line).length
+    }
+    result
+  }
+
+  def applyChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler]): Unit = {
     for(change <- changes) {
       change.range match {
         case None =>
           contents = new InMemoryTextDocument(uri, changes.head.text).contents
         case Some(range) =>
-          applyRangeChange(change, range)
+          applyRangeChange(change.text, range)
+          handlerOption.foreach(handler =>
+            handler.handleChange(positionToOffset(range.start), positionToOffset(range.end), change.text))
       }
     }
   }
@@ -49,12 +60,12 @@ class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) 
       position.character < 0 || position.character > contents(position.line).length
   }
 
-  private def applyRangeChange(change: TextDocumentContentChangeEvent, range: SourceRange): Unit = {
+  private def applyRangeChange(newText: String, range: SourceRange): Unit = {
     if (outOfBounds(range.start) || outOfBounds(range.end)) {
       throw new IllegalArgumentException(s"range '$range' is out of bounds")
     }
 
-    val newLines: Array[Array[Char]] = change.text.split(newLine, -1).map(line => line.toCharArray)
+    val newLines: Array[Array[Char]] = newText.split(newLine, -1).map(line => line.toCharArray)
     newLines(0) = contents(range.start.line).take(range.start.character) ++ newLines(0)
     newLines(newLines.length - 1) = newLines(newLines.length - 1) ++ contents(range.end.line).drop(range.end.character)
 

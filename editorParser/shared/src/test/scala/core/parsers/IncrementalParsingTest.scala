@@ -13,7 +13,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     val result = parser.parse(input)
     val result2 = parser.parse(input2)
     assertResult(result)(result2)
-    parser.insertRange(1,14, input2.toCharArray)
+    parser.changeRange(1, 1, 13, input2.toCharArray)
     val result3 = parser.parse(input2)
     assertResult(List("hello" -> "bla"))(result3.resultOption.get)
   }
@@ -23,7 +23,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     val input2 = """{}"""
     val parser = getParser
     val result = parser.parse(input)
-    parser.removeRange(1,14, input2.toCharArray)
+    parser.changeRange(1,14, 0, input2.toCharArray)
     val result3 = parser.parse(input2)
     assertResult(List())(result3.resultOption.get)
   }
@@ -33,18 +33,17 @@ class IncrementalParsingTest extends AnyFunSuite {
     val input2 = """{"bar":"foo"}"""
     val parser = getParser
     parser.parse(input)
-    parser.removeRange(1,4, input2.toCharArray)
-    parser.insertRange(1,4, input2.toCharArray)
+    parser.changeRange(1,4, 3, input2.toCharArray)
     val result = parser.parse(input2)
     assertResult(List("bar" -> "bar"))(result.resultOption.get)
   }
 
   test("inserts work") {
     val input = """[1,3]"""
-    val input2 = """[1,2,4]"""
+    val input2 = """[0,2,0]"""
     val parser = getParser
     parser.parse(input)
-    parser.insertRange(2,4, input2.toCharArray)
+    parser.changeRange(2,2,2, input2.toCharArray)
     val result = parser.parse(input2)
     assertResult(List(1,2,3))(result.resultOption.get)
   }
@@ -55,11 +54,13 @@ class IncrementalParsingTest extends AnyFunSuite {
     val input3 = """[0,2,0,4,0]"""
     val parser = getParser
     parser.parse(input)
-    parser.insertRange(2,4, input2.toCharArray)
-    parser.insertRange(6,8, input3.toCharArray)
+    parser.changeRange(2,2,2, input2.toCharArray)
+    parser.changeRange(6,6,2, input3.toCharArray)
     val result = parser.parse(input3)
     assertResult(List(1,2,3,4,5))(result.resultOption.get)
   }
+
+  // TODO add tests with linebreaks.
 
   def getParser = {
     jsonParser.getSingleResultParser
