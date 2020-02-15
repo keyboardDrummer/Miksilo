@@ -65,13 +65,14 @@ object Language extends LazyLogging {
         val result = parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser
         compilation.fileSystem.setTextChangedHandler(uri, new TextChangeHandler {
           override def handleChange(from: Int, until: Int, text: String): Unit = {
-            result.changeRange(from, until, text.size, compilation.fileSystem.getFile(uri).toCharArray)
+            result.changeRange(from, until, text.length, compilation.fileSystem.getFile(uri).toCharArray)
           }
         })
         result
       }
 
-      val parsersPerFile = builtParser(compilation).getOrElseUpdate(uri, createParser())
+      val parsers = builtParser(compilation)
+      val parsersPerFile = parsers.getOrElseUpdate(uri, createParser())
       val parseResult = parsersPerFile.parse(input, stopFunction, compilation.metrics)
       parseResult.resultOption.foreach(program => {
         compilation.program = getSourceElement(program, uri)

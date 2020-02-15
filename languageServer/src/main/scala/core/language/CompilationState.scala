@@ -1,9 +1,9 @@
 package core.language
 
-class CompilationState[T](default: Compilation => T = null) {
+class CompilationState[T <: AnyRef](getDefault: Compilation => T = (_: Compilation) => null.asInstanceOf[T]) {
 
   private def map(compilation: Compilation): T =
-    compilation.state.getOrElseUpdate(this, default).asInstanceOf[T]
+    compilation.state.getOrElseUpdate(this, getDefault(compilation)).asInstanceOf[T]
 
   def apply(compilation: Compilation): T = map(compilation)
 

@@ -8,7 +8,7 @@ trait TextChangeHandler {
 
 trait FileSystem {
   def getFile(path: String): String
-  def setTextChangedHandler(uri: String, handler: TextChangeHandler)
+  def setTextChangedHandler(uri: String, handler: TextChangeHandler): Unit
 }
 
 object EmptyFileSystem extends FileSystem {

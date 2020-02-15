@@ -9,12 +9,12 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
 
   test("removes incorrect b at start") {
     val input = """b{"hello":3}"""
-    parseJson(input, List(("hello","3")), 1)
+    parseJson(input, List(("hello",3)), 1)
   }
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    parseJson(input, List(("person","3")), 0)
+    parseJson(input, List(("person",3)), 0)
   }
 
   test("object with single member with string value") {
@@ -26,7 +26,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   // Even [ [ [ [ has a better score than -10.
   test("garbage after number") {
     val input = """3blaa"""
-    parseJson(input, "3", 1)
+    parseJson(input, 3, 1)
   }
 
   test("nothing as input") {
@@ -64,13 +64,13 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
 
   test("object with a single member and comma") {
     val input = """{"person":3,"""
-    val expectation = List("person" -> "3", "" -> UnknownExpression)
+    val expectation = List("person" -> 3, "" -> UnknownExpression)
     parseJson(input, expectation, 1)
   }
 
   test("object with a single member and half second member") {
     val input = """{"person":3,"second""""
-    val expectation = List(("person", "3"), ("second", UnknownExpression))
+    val expectation = List(("person", 3), ("second", UnknownExpression))
     parseJson(input, expectation, 1)
   }
 

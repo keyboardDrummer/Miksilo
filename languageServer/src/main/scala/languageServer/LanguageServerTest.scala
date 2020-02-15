@@ -8,8 +8,6 @@ import scala.util.Random
 
 trait LanguageServerTest {
 
-  val itemUri = "helloWorld"
-
   def documentSymbols(server: LanguageServer, program: String): Seq[SymbolInformation] = {
     val document = openDocument(server, program)
     server.asInstanceOf[DocumentSymbolProvider].documentSymbols(DocumentSymbolParams(document))
@@ -57,7 +55,7 @@ trait LanguageServerTest {
   }
 
   val random = new Random()
-  def openDocument(server: LanguageServer, content: String, uri: String = itemUri): TextDocumentIdentifier = {
+  def openDocument(server: LanguageServer, content: String, uri: String = Random.nextInt().toString): TextDocumentIdentifier = {
     val item = new TextDocumentItem(uri, "", 1, content)
     server.didOpen(item)
     TextDocumentIdentifier(item.uri)

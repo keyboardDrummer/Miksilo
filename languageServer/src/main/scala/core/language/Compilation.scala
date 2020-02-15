@@ -7,11 +7,17 @@ import core.smarts.{Constraint, FileDiagnostic, Proofs}
 import lsp.{CodeAction, Diagnostic}
 
 import scala.collection.mutable
+import scala.language.implicitConversions
 
-class Compilation(val language: Language, val fileSystem: FileSystem, val rootFile: Option[String],
-                  val metrics: Metrics = NoMetrics) {
+class Compilation(val language: Language, val fileSystem: FileSystem, var rootFile: Option[String],
+                  var metrics: Metrics = NoMetrics) {
 
   var program: SourceElement = _
+  var isDirty: Boolean = false
+
+  // TODO separate re-usable state 'cache' and one-time state: program/diagnostics/stopped
+
+  private var _isDirty = true
   var proofs: Proofs = _
   var remainingConstraints: Seq[Constraint] = _
   var diagnostics: Set[FileDiagnostic] = Set.empty
@@ -49,8 +55,7 @@ object Compilation
   val singleFileDefaultName = "singleFileDefault"
   def singleFile(language: Language, input: String): Compilation = {
     val filePath = singleFileDefaultName
-    val result = new Compilation(language, (path: String) => if (path == filePath) input
-    else throw new IllegalArgumentException(s"no file for path $path"), Some(filePath))
+    val result = new Compilation(language, InMemoryFileSystem(Map(filePath -> input)), Some(filePath))
 
     result
   }

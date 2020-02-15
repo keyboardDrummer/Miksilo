@@ -2,14 +2,11 @@ package languageServer
 
 import core.language.exceptions.BadInputException
 import core.language.{Compilation, Language, SourceElement}
-import core.parsers.core.{Metrics, NoMetrics}
 import core.parsers.editorParsers.TextEdit
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
 import jsonRpc.LazyLogging
 import lsp._
-
-import scala.collection.mutable
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider
@@ -22,13 +19,13 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   var client: LanguageClient = _
   private val documentManager = new TextDocumentManager()
-  var currentDocumentId: TextDocumentIdentifier = _
-  var compilation: Option[Compilation] = None
+  var compilation: Compilation = new Compilation(language, documentManager, None)
 
   override def textDocumentSync = TextDocumentSyncKind.Incremental
 
   override def didOpen(parameters: TextDocumentItem): Unit = {
-    compilation = None
+    compilation.isDirty = true
+    compilation.rootFile = Some(parameters.uri)
     documentManager.onOpenTextDocument(parameters)
   }
 
@@ -37,25 +34,23 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   override def didSave(parameters: DidSaveTextDocumentParams): Unit = {}
 
   override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
-    compilation = None
-    if (parameters.contentChanges.nonEmpty)
+    compilation.isDirty = true
+    if (parameters.contentChanges.nonEmpty) {
       documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
-    if (diagnosticsAreDirty)
-    diagnosticsAreDirty = true
+    }
     if (client != null) {
-      currentDocumentId = TextDocumentIdentifier(parameters.textDocument.uri)
+      compilation.rootFile = Some(parameters.textDocument.uri)
       val diagnostics = getCompilation.diagnosticsForFile(parameters.textDocument.uri)
       client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, diagnostics))
     }
   }
 
-  var diagnosticsAreDirty: Boolean = false
-
   def compile(): Unit = {
-    val compilation = new Compilation(language, documentManager, Some(currentDocumentId.uri), metrics)
-    this.compilation = Some(compilation)
+    compilation.diagnostics = Set.empty
+    compilation.stopped = false
     try {
       compilation.runPhases()
+      compilation.isDirty = false
     } catch {
       case e: BadInputException => //TODO move to diagnostics.
         logger.debug(e.toString)
@@ -63,9 +58,9 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def getCompilation: Compilation = {
-    if (compilation.isEmpty)
+    if (compilation.isDirty)
       compile()
-    compilation.get
+    compilation
   }
 
   def getProofs: Option[Proofs] = {
@@ -81,7 +76,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   override def initialized(): Unit = {}
 
   override def gotoDefinition(parameters: DocumentPosition): Seq[FileRange] = {
-    currentDocumentId = parameters.textDocument
     logger.debug("Went into gotoDefinition")
     val fileRange = for {
       proofs <- getProofs
@@ -93,7 +87,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   override def complete(params: DocumentPosition): CompletionList = {
-    currentDocumentId = params.textDocument
     val position = params.position
     logger.debug("Went into complete")
     val completions: Seq[CompletionItem] = for {
@@ -119,7 +112,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   override def references(parameters: ReferencesParams): collection.Seq[FileRange] = {
-    currentDocumentId = parameters.textDocument
     logger.debug("Went into references")
     val maybeResult = for {
       proofs <- getProofs
@@ -141,15 +133,12 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     maybeResult.getOrElse(Seq.empty)
   }
 
-  var metrics: Metrics = NoMetrics // Change to buffered metrics?
-
   override def setClient(client: LanguageClient): Unit = {
     this.client = client
-    metrics = client.trackMetric
+    compilation.metrics = client.trackMetric
   }
 
   override def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation] = {
-    currentDocumentId = params.textDocument
     val proofs = getCompilation.proofs
     if (proofs == null)
       return Seq.empty
@@ -178,8 +167,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   override def getCodeActions(parameters: CodeActionParams): Seq[CodeAction] = {
-    currentDocumentId = parameters.textDocument
-
     val diagnostics = parameters.context.diagnostics.map(d => d.identifier).toSet
     val compilation = getCompilation
     compilation.fixesPerDiagnostics.

@@ -4,7 +4,7 @@ import deltas.json.JsonLanguage
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
-class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
+class ModularErrorCorrectionUsingJsonTest extends AnyFunSuite {
 
   test("test whether correct inputs always return a ready in one go") {
     val input = """{ "VpcId" : {

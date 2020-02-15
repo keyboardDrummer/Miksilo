@@ -25,7 +25,7 @@ class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) 
       contents.split(newLine, -1).view.map(line => line.toArray).toSeq: _*))
   }
 
-  def applyUnsafeChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler]): Unit = {
+  def applyUnsafeChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler] = None): Unit = {
     try {
       applyChanges(changes, handlerOption)
     } catch {
@@ -42,7 +42,7 @@ class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) 
     result
   }
 
-  def applyChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler]): Unit = {
+  def applyChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler] = None): Unit = {
     for(change <- changes) {
       change.range match {
         case None =>
