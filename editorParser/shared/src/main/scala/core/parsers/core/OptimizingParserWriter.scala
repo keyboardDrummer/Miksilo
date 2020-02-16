@@ -18,7 +18,7 @@ trait OptimizingParserWriter extends ParserWriter {
   type ParseState
   type ParseResult[+Result]
 
-  def wrapParser[Result](textContainer: ParseText,
+  def wrapParser[Result](text: ParseText,
                          parser: BuiltParser[Result],
                          shouldCache: Boolean,
                          shouldDetectLeftRecursion: Boolean): BuiltParser[Result]
@@ -26,7 +26,6 @@ trait OptimizingParserWriter extends ParserWriter {
   trait BuiltParser[+Result] {
     def apply(input: Input, state: ParseState): ParseResult[Result]
     def debugName: Any = null
-    //def textContainer: ParseText
   }
 
   trait GetParser {
@@ -34,7 +33,7 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait ParserBuilder[+Result] {
-    def getParser(textContainer: ParseText, recursive: GetParser): BuiltParser[Result]
+    def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result]
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[ParserBuilder[_]]
@@ -82,7 +81,7 @@ trait OptimizingParserWriter extends ParserWriter {
     lazy val original: Parser[Result] = _original
     def getOriginal = original
 
-    override def getParser(textContainer: ParseText, recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       lazy val parseOriginal = recursive(original)
       new BuiltParser[Result] {
         override def apply(input: Input, state: ParseState) = {
@@ -138,20 +137,20 @@ trait OptimizingParserWriter extends ParserWriter {
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
-  case class ParserAndCaches[Result](textContainer: ParseText, parser: BuiltParser[Result], caches: ArrayBuffer[CacheLike[_]])
+  case class ParserAndCaches[Result](text: ParseText, parser: BuiltParser[Result], caches: ArrayBuffer[CacheLike[_]])
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
     def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
-      val textContainer = new ParseText(null)
+      val text = new ParseText(null)
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
       val caches = ArrayBuffer.empty[CacheLike[_]]
       def recursive: GetParser = new GetParser {
         override def apply[SomeResult](_parser: Parser[SomeResult]): BuiltParser[SomeResult] = {
           cacheOfParses.getOrElseUpdate(_parser, {
             val parser = _parser.asInstanceOf[ParserBuilder[SomeResult]]
-            val result = parser.getParser(textContainer, recursive)
-            val wrappedParser = wrapParser(textContainer, result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
+            val result = parser.getParser(text, recursive)
+            val wrappedParser = wrapParser(text, result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
             wrappedParser match {
               case check: CacheLike[_] => caches.addOne(check)
               case _ =>
@@ -162,7 +161,7 @@ trait OptimizingParserWriter extends ParserWriter {
       }
 
       val wrappedRoot = recursive(root)
-      ParserAndCaches(textContainer, wrappedRoot, caches)
+      ParserAndCaches(text, wrappedRoot, caches)
     }
   }
 

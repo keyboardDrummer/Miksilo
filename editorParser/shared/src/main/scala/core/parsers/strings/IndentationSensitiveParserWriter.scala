@@ -15,7 +15,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   case class WithIndentation[Result](original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result]{
 
-    override def getParser(textContainer: ParseText, recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
       def apply(input: Input, state: ParseState) = {

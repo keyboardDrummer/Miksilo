@@ -163,7 +163,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class ParseWholeInput[Result](original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(textContainer: ParseText, recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
       new BuiltParser[Result] {
@@ -171,11 +171,11 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           val result = parseOriginal(input, state)
           result.mapReady(parseResult => {
             val remainder = parseResult.remainder
-            if (remainder.atEnd(textContainer))
+            if (remainder.atEnd(text))
               parseResult
             else {
-              val error = DropError(textContainer, remainder, remainder.end(textContainer))
-              ReadyParseResult(parseResult.resultOption, remainder.end(textContainer), parseResult.history.addError(error))
+              val error = DropError(text, remainder, remainder.end(text))
+              ReadyParseResult(parseResult.resultOption, remainder.end(text), parseResult.history.addError(error))
             }
           }, uniform = false)
         }
@@ -246,7 +246,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
                                             getMessage: Other => String)
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(textContainer: ParseText, recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         val originalResult = parseOriginal(input, state)
@@ -318,7 +318,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       new SingleResultParser[Result, Input] {
 
         override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
-          parserAndCaches.textContainer.arrayOfChars = text.toCharArray
+          parserAndCaches.text.arrayOfChars = text.toCharArray
           findBestParseResult(parserAndCaches.parser, mayStop, metrics)
         }
 
@@ -328,7 +328,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
         override def changeRange(from: Int, until: Int, insertionLength: Int, text: String): Unit = {
           if (insertionLength - (until - from) > 0) {
-            parserAndCaches.textContainer.arrayOfChars = text.toCharArray
+            parserAndCaches.text.arrayOfChars = text.toCharArray
           }
           parserAndCaches.caches.foreach(cache => cache.change(from, until, insertionLength))
         }

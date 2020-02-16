@@ -129,8 +129,6 @@ trait StringParserWriter extends SequenceParserWriter {
 
           }
         }
-
-        //override def textContainer = textContainer
       }
 
       result

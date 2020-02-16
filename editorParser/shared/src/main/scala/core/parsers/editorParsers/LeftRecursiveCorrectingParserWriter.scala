@@ -23,9 +23,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  case class DetectFixPointAndCache[Result](textContainer: ParseText,
+  case class DetectFixPointAndCache[Result](text: ParseText,
                                             parser: BuiltParser[Result])
-    extends CheckCache[Result](textContainer, parser) {
+    extends CheckCache[Result](text, parser) {
 
     override def apply(input: Input, state: ParseState): ParseResult[Result] = {
       val key = (input, state)
@@ -87,7 +87,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  override def wrapParser[Result](textContainer: ParseText,
+  override def wrapParser[Result](text: ParseText,
                                   parser: BuiltParser[Result],
                                   shouldCache: Boolean,
                                   shouldDetectLeftRecursion: Boolean): BuiltParser[Result] = {
@@ -95,9 +95,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         return parser
       }
       if (shouldDetectLeftRecursion) {
-        return new DetectFixPointAndCache[Result](textContainer, parser)
+        return new DetectFixPointAndCache[Result](text, parser)
       }
-      new CheckCache[Result](textContainer, parser)
+      new CheckCache[Result](text, parser)
   }
 
   // TODO: replace List with something that has constant concat operation.
