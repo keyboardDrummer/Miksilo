@@ -1,16 +1,11 @@
 package languageServer
 
+import core.parsers.editorParsers.SourceRange
 import core.{SourceUtils, TestUtils}
-import core.language.Language
-import core.parsers.{ParseJson, PerformanceTest}
-import core.parsers.ParseJson.jsonParser
-import core.parsers.PerformanceTest.manyRepetitionsTargetTime
-import core.parsers.editorParsers.{Position, SourceRange}
-import lsp.{DidChangeTextDocumentParams, HumanPosition, LanguageClient, PublishDiagnostics, TextDocumentChangeEvent, TextDocumentContentChangeEvent, TextDocumentItem, VersionedTextDocumentIdentifier}
+import lsp._
 import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingPerformanceTest extends AnyFunSuite with LanguageServerTest {
-  import ParseJson._
 
   val server = new MiksiloLanguageServer(JsonLanguage)
 

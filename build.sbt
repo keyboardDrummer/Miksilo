@@ -93,7 +93,7 @@ lazy val LSPProtocol = crossProject(JVMPlatform, JSPlatform).
   dependsOn(editorParser)
 
 lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
-  crossType(CrossType.Pure).
+  crossType(CrossType.Full).
   in(file("languageServer")).
   settings(commonSettings: _*).
   jvmSettings(
