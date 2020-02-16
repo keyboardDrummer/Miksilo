@@ -16,14 +16,14 @@ class PerformanceTest extends AnyFunSuite {
   import PerformanceTest._
   import ParseJson._
 
-  val jsonParser2 = jsonParser.getWholeInputParser
+  val jsonFileParser = jsonParser.getWholeInputParser
 
   test("Correct JSON small file performance") {
 
     val source = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
 
     TestUtils.runPerformanceTest(manyRepetitionsTargetTime, 100, () => {
-      val result = jsonParser2.parse(source)
+      val result = jsonFileParser.resetAndParse(source)
       assert(result.successful)
     })
   }
@@ -34,15 +34,15 @@ class PerformanceTest extends AnyFunSuite {
     val manySources = s"[${1.to(manySourcesCount).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     TestUtils.runPerformanceTest(manySourcesTargetTime, 10, () => {
-      val result = jsonParser2.parse(manySources)
-      assert(result.successful)
+      val result = jsonFileParser.resetAndParse(manySources)
+      assert(result.successful, result.errors)
     })
   }
 
   test("JSON with small errors performance") {
     val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     TestUtils.runPerformanceTest(smallErrorsTargetTime, 300, () => {
-      val result = jsonParser2.parse(program, UntilBestAndXStepsStopFunction())
+      val result = jsonFileParser.resetAndParse(program, UntilBestAndXStepsStopFunction())
       assert(result.errors.size == 2)
       assert(result.resultOption.head.asInstanceOf[List[_]].size == 6)
     })

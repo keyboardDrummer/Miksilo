@@ -10,12 +10,9 @@ import lsp.{DidChangeTextDocumentParams, HumanPosition, LanguageClient, PublishD
 import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingPerformanceTest extends AnyFunSuite with LanguageServerTest {
-
-  import PerformanceTest._
   import ParseJson._
 
   val server = new MiksiloLanguageServer(JsonLanguage)
-  val jsonParser2 = jsonParser.getWholeInputParser
 
   test("Make small edit performance") {
 

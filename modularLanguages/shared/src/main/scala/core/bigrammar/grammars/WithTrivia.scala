@@ -3,7 +3,7 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.bigrammar.printer.Printer.NodePrinter
-import core.parsers.core.Container
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.{ParseResults, ReadyParseResult, SREmpty}
 import core.responsiveDocument.ResponsiveDocument
 import util.Utility
@@ -33,7 +33,7 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
 
   import BiGrammarToParser._
 
-  override def getParser(textContainer: Container[ArrayCharSequence], recursive: BiGrammarToParser.GetParser): BuiltParser[Result] = {
+  override def getParser(textContainer: ParseText, recursive: BiGrammarToParser.GetParser): BuiltParser[Result] = {
     val parseTrivias = recursive(triviasParserBuilder)
     val parseOriginal = recursive(original)
 

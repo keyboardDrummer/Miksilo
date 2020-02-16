@@ -1,6 +1,6 @@
 package core.parsers
 
-import _root_.core.parsers.core.Container
+import _root_.core.parsers.core.ParseText
 import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
@@ -186,7 +186,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   class DetectValueParser[Result](valueToDetect: Result, val original: ParserBuilder[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     var detected = false
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: ParseJson.GetParser) = {
+    override def getParser(text: ParseText, recursive: ParseJson.GetParser) = {
       val parseOriginal = recursive(original)
       (input: Input, state: ParseState) => {
         val result = parseOriginal(input, state)

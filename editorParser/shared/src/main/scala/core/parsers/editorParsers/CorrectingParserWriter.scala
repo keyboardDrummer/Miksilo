@@ -1,6 +1,6 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{Container, Metrics, OptimizingParserWriter}
+import core.parsers.core.{Metrics, OptimizingParserWriter, ParseText}
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
@@ -80,7 +80,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     lazy val right: Parser[Result] = _right
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseLeft = recursive(left)
       lazy val parseRight = recursive(right)
 
@@ -108,7 +108,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }
 
           val withoutLeft = parseRight(input, state)
-          if (input.atEnd(text.value))
+          if (input.atEnd(text))
             return withoutLeft
 
           val withLeft = parseLeft(input, state).flatMapReady(rightFromLeftReady, uniform = false)
@@ -130,7 +130,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     lazy val right: Parser[Right] = _right
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseLeft = recursive(left)
       lazy val parseRight = recursive(right)
 
@@ -168,7 +168,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
@@ -192,7 +192,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
@@ -208,7 +208,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   object PositionParser extends ParserBuilderBase[Input] with LeafParser[Input] {
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Input] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Input] = {
       (input, _) => {
         singleResult(ReadyParseResult(Some(input), input, History.empty))
       }
@@ -220,7 +220,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   case class WithRangeParser[Result, NewResult](original: Parser[Result], addRange: (Input, Input, Result) => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[NewResult] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[NewResult] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         parseOriginal(input, state).mapReady(ready => {
@@ -238,7 +238,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       (input: Input, _) => newSuccess(value, input, 0)
     }
 
@@ -248,7 +248,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   case class MapParser[Result, NewResult](original: Parser[Result], f: Result => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[NewResult] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[NewResult] = {
       val parseOriginal = recursive(original)
       (input, state) => parseOriginal(input, state).map(f)
     }

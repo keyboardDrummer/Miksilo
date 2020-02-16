@@ -1,6 +1,6 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.Container
+import core.parsers.core.ParseText
 
 import scala.collection.mutable
 
@@ -23,7 +23,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  case class DetectFixPointAndCache[Result](textContainer: Container[ArrayCharSequence],
+  case class DetectFixPointAndCache[Result](textContainer: ParseText,
                                             parser: BuiltParser[Result])
     extends CheckCache[Result](textContainer, parser) {
 
@@ -87,7 +87,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  override def wrapParser[Result](textContainer: Container[ArrayCharSequence],
+  override def wrapParser[Result](textContainer: ParseText,
                                   parser: BuiltParser[Result],
                                   shouldCache: Boolean,
                                   shouldDetectLeftRecursion: Boolean): BuiltParser[Result] = {
@@ -144,10 +144,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def latestRemainder = tail.latestRemainder
 
-    override def move(array: ArrayCharSequence, offset: Int) = throw new Exception("cannot move Recursive results")
+    override def move(array: ParseText, offset: Int) = throw new Exception("cannot move Recursive results")
   }
 
-  class CheckCache[Result](textContainer: Container[ArrayCharSequence], parser: BuiltParser[Result]) extends CacheLike[Result] {
+  class CheckCache[Result](text: ParseText, parser: BuiltParser[Result]) extends CacheLike[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
     val cache = mutable.HashMap[(Input, ParseState), ParseResult[Result]]()
 
@@ -172,7 +172,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       val insertionLength = inserted - (until - from)
       def updateInput(input: Input): Input = {
         if (input.offset >= from) {
-          input.drop(textContainer.value, insertionLength)
+          input.drop(text, insertionLength)
         } else {
           input
         }
@@ -187,7 +187,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           if (entryStart >= from) {
             cache.remove(entry._1)
             val newKey = (updateInput(entry._1._1), FixPointState(updateInput(entry._1._2.input), entry._1._2.parsers))
-            val newValue = entry._2.move(textContainer.value, insertionLength)
+            val newValue = entry._2.move(text, insertionLength)
             cache.put(newKey, newValue)
           }
         }

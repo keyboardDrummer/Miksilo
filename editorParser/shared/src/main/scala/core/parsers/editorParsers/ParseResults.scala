@@ -1,7 +1,7 @@
 package core.parsers.editorParsers
 
 import ParseResults._
-import core.parsers.core.ParseInput
+import core.parsers.core.{ParseInput, ParseText}
 
 trait ParseResults[Input <: ParseInput[Input], +Result] {
   def latestRemainder: Int
@@ -10,7 +10,7 @@ trait ParseResults[Input <: ParseInput[Input], +Result] {
   def toList: List[LazyParseResult[Input, Result]]
   def tailDepth: Int
 
-  def move(array: ArrayCharSequence, offset: Int): ParseResults[Input, Result]
+  def move(array: ParseText, offset: Int): ParseResults[Input, Result]
 
   def merge[Other >: Result](other: ParseResults[Input, Other], depth: Int = 0,
                              bests: Map[Input, Double] = Map.empty): ParseResults[Input, Other]
@@ -140,7 +140,7 @@ final class SRCons[Input <: ParseInput[Input], +Result](
 
   override def pop(): (LazyParseResult[Input, Result], ParseResults[Input, Result]) = (head, tail)
 
-  override def move(array: ArrayCharSequence, offset: Int) = {
+  override def move(array: ParseText, offset: Int) = {
     val newCons = this.updateRemainder(i => i.drop(array, offset)).asInstanceOf[SRCons[Input, Result]]
     new SRCons(newCons.head, latestRemainder + offset, newCons.tailDepth, newCons.tail)
   }
@@ -171,5 +171,5 @@ class SREmpty[Input <: ParseInput[Input]] extends ParseResults[Input, Nothing] {
 
   override def latestRemainder = Int.MinValue
 
-  override def move(array: ArrayCharSequence, offset: Int) = this
+  override def move(array: ParseText, offset: Int) = this
 }

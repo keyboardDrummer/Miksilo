@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.core.Container
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.Position
 
 trait CommonStringReaderParser extends CommonParserWriter {
@@ -11,6 +11,6 @@ trait CommonStringReaderParser extends CommonParserWriter {
   class StringReader(offset: Int, position: Position)
     extends StringReaderBase[Input](offset, position) {
 
-    def drop(text: ArrayCharSequence, amount: Int): StringReader = new StringReader(offset + amount, movePosition(text, amount))
+    def drop(text: ParseText, amount: Int): StringReader = new StringReader(offset + amount, movePosition(text, amount))
   }
 }

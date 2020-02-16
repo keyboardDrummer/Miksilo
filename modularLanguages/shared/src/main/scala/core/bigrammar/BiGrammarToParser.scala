@@ -2,6 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, Position}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase}
@@ -30,7 +31,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
     def withState(newState: State): Reader = new Reader(offset, position, newState)
 
-    override def drop(array: ArrayCharSequence, amount: Int) = new Reader(offset + amount, movePosition(array, amount), state)
+    override def drop(array: ParseText, amount: Int) = new Reader(offset + amount, movePosition(array, amount), state)
 
     override def hashCode(): Int = offset
 

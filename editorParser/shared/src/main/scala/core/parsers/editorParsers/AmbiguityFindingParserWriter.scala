@@ -1,6 +1,6 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{Container, Metrics}
+import core.parsers.core.{Metrics, ParseText}
 
 trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
@@ -75,7 +75,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
@@ -97,7 +97,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(text: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 

@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.core.ParseInput
+import core.parsers.core.{ParseInput, ParseText}
 import core.parsers.editorParsers.Position
 import core.parsers.sequences.SequenceInput
 
@@ -8,10 +8,10 @@ trait StringReaderLike[Input] extends SequenceInput[Input, Char] {
   def position: Position
   def offset: Int
 
-  def drop(array: ArrayCharSequence, amount: Int): Input
-  def remaining(array: ArrayCharSequence) = array.length() - offset
+  def drop(array: ParseText, amount: Int): Input
+  def remaining(array: ParseText) = array.length() - offset
 
-  def movePosition(array: ArrayCharSequence, increase: Int): Position = {
+  def movePosition(array: ParseText, increase: Int): Position = {
     if (increase < 0) {
       return decreasePosition(array, -increase)
     }
@@ -34,7 +34,7 @@ trait StringReaderLike[Input] extends SequenceInput[Input, Char] {
     Position(row, column)
   }
 
-  def decreasePosition(array: ArrayCharSequence, decrease: Int): Position = {
+  def decreasePosition(array: ParseText, decrease: Int): Position = {
     var column = position.character
     var row = position.line
     for(index <- (offset - 1).to(offset - decrease, -1)) {

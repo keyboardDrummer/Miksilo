@@ -65,7 +65,7 @@ object Language extends LazyLogging {
         val result = parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser
         compilation.fileSystem.setTextChangedHandler(uri, new TextChangeHandler {
           override def handleChange(from: Int, until: Int, text: String): Unit = {
-            result.changeRange(from, until, text.length, compilation.fileSystem.getFile(uri).toCharArray)
+            result.changeRange(from, until, text.length, compilation.fileSystem.getFile(uri))
           }
         })
         result

@@ -1,6 +1,6 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.Container
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.Position.PositionOrdering
 
 case class TextEdit(range: SourceRange, newText: String)

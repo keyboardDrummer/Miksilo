@@ -1,7 +1,7 @@
 
 package core.parsers
 
-import _root_.core.parsers.core.Container
+import _root_.core.parsers.core.ParseText
 import _root_.core.SourceUtils
 import _root_.core.responsiveDocument._
 import _root_.core.parsers.editorParsers.Position
@@ -67,7 +67,8 @@ class YamlTest extends AnyFunSuite
 
     def withContext(newState: YamlContext): IndentationReader = new IndentationReader(offset, position, newState, indentation)
 
-    override def drop(array: ArrayCharSequence, amount: Int) = new IndentationReader(offset + amount, movePosition(array, amount), context, indentation)
+    override def drop(array: ParseText, amount: Int) =
+      new IndentationReader(offset + amount, movePosition(array, amount), context, indentation)
 
     override def hashCode(): Int = offset ^ indentation ^ context.hashCode()
 
@@ -79,7 +80,7 @@ class YamlTest extends AnyFunSuite
 
   class IfContext[Result](inners: Map[YamlContext, Parser[Result]]) extends ParserBuilderBase[Result] {
 
-    override def getParser(textContainer: Container[ArrayCharSequence], recursive: GetParser) = {
+    override def getParser(textContainer: ParseText, recursive: GetParser) = {
       val innerParsers = inners.view.mapValues(p => recursive(p)).toMap
       (input, state) => innerParsers(input.context)(input, state)
     }
@@ -94,7 +95,7 @@ class YamlTest extends AnyFunSuite
   class WithContext[Result](update: YamlContext => YamlContext, val original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(textContainer: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(textContainer: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
       def apply(input: IndentationReader, state: ParseState): ParseResult[Result] = {
@@ -177,15 +178,7 @@ class YamlTest extends AnyFunSuite
     }))
   }
 
-//  test("plainStyleMultineLineInFlowCollection") {
-//    val input =
-//      """/cloudformation_graphic.png" alt="AWS CloudFormation
-//        |         Logo"/""".stripMargin
-//    val result = plainStyleMultiLineString.getWholeInputParser.parse(input.withContext(FlowIn))
-//    assert(result.successful)
-//  }
-
-  test("plainStyleMultineLineInFlowCollection2") {
+  test("plainStyleMultineLineInFlowCollection") {
     val input = """                  [<img src=", !FindInMap [Region2Examples, !Ref 'AWS::Region',
                   |                                              Examples], /cloudformation_graphic.png" alt="AWS CloudFormation
                   |                                                           Logo"/>, '<h1>Congratulations, you have successfully launched

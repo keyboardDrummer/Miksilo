@@ -4,7 +4,13 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.language.higherKinds
 
-class Container[T](var value: T)
+final class ParseText(var arrayOfChars: Array[Char]) extends CharSequence {
+  def length: Int                                     = arrayOfChars.length
+  def charAt(index: Int): Char                        = arrayOfChars(index)
+  def subSequence(start: Int, end: Int): CharSequence = new runtime.ArrayCharSequence(arrayOfChars, start, end)
+  override def toString                               = arrayOfChars.mkString
+}
+
 trait OptimizingParserWriter extends ParserWriter {
 
   type Parser[+Result] = ParserBuilder[Result]
@@ -12,7 +18,7 @@ trait OptimizingParserWriter extends ParserWriter {
   type ParseState
   type ParseResult[+Result]
 
-  def wrapParser[Result](textContainer: Container[ArrayCharSequence],
+  def wrapParser[Result](textContainer: ParseText,
                          parser: BuiltParser[Result],
                          shouldCache: Boolean,
                          shouldDetectLeftRecursion: Boolean): BuiltParser[Result]
@@ -20,7 +26,7 @@ trait OptimizingParserWriter extends ParserWriter {
   trait BuiltParser[+Result] {
     def apply(input: Input, state: ParseState): ParseResult[Result]
     def debugName: Any = null
-    //def textContainer: Container[ArrayCharSequence]
+    //def textContainer: ParseText
   }
 
   trait GetParser {
@@ -28,7 +34,7 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait ParserBuilder[+Result] {
-    def getParser(textContainer: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result]
+    def getParser(textContainer: ParseText, recursive: GetParser): BuiltParser[Result]
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[ParserBuilder[_]]
@@ -76,7 +82,7 @@ trait OptimizingParserWriter extends ParserWriter {
     lazy val original: Parser[Result] = _original
     def getOriginal = original
 
-    override def getParser(textContainer: Container[ArrayCharSequence], recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(textContainer: ParseText, recursive: GetParser): BuiltParser[Result] = {
       lazy val parseOriginal = recursive(original)
       new BuiltParser[Result] {
         override def apply(input: Input, state: ParseState) = {
@@ -132,12 +138,12 @@ trait OptimizingParserWriter extends ParserWriter {
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
-  case class ParserAndCaches[Result](textContainer: Container[ArrayCharSequence], parser: BuiltParser[Result], caches: ArrayBuffer[CacheLike[_]])
+  case class ParserAndCaches[Result](textContainer: ParseText, parser: BuiltParser[Result], caches: ArrayBuffer[CacheLike[_]])
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
     def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
-      val textContainer = new Container[ArrayCharSequence](null)
+      val textContainer = new ParseText(null)
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
       val caches = ArrayBuffer.empty[CacheLike[_]]
       def recursive: GetParser = new GetParser {

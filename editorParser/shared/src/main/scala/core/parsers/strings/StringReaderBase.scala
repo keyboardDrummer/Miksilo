@@ -1,21 +1,22 @@
 package core.parsers.strings
 
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.Position
 
 abstract class StringReaderBase[Input <: StringReaderBase[Input]](val offset: Int, val position: Position)
   extends StringReaderLike[Input] {
 
-  override def end(array: ArrayCharSequence) = drop(array, array.length() - offset)
+  override def end(array: ParseText) = drop(array, array.length() - offset)
 
   //val sequence: CharSequence = array
 
-  override def printRange(array: ArrayCharSequence, end: Input) = array.subSequence(offset, end.offset).toString
+  override def printRange(array: ParseText, end: Input) = array.subSequence(offset, end.offset).toString
 
-  override def atEnd(array: ArrayCharSequence): Boolean = offset == array.length
+  override def atEnd(array: ParseText): Boolean = offset == array.length
 
-  override def head(array: ArrayCharSequence): Char = array.charAt(offset)
+  override def head(array: ParseText): Char = array.charAt(offset)
 
-  override def tail(array: ArrayCharSequence): Input = drop(array, 1)
+  override def tail(array: ParseText): Input = drop(array, 1)
 
   override def hashCode(): Int = offset
 
