@@ -19,12 +19,16 @@ trait StringReaderLike[Input] extends SequenceInput[Input, Char] {
     var column = position.character
     var row = position.line
     for(index <- offset.until(offset + increase)) {
-      val character = array.charAt(index)
-      if (character == '\n') {
-        row += 1
-        column = 0
-      } else {
+      if (index == array.length()) {
         column += 1
+      } else {
+        val character = array.charAt(index)
+        if (character == '\n') {
+          row += 1
+          column = 0
+        } else {
+          column += 1
+        }
       }
     }
     Position(row, column)
