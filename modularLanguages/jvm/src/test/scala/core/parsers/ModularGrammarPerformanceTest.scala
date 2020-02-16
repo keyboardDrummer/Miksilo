@@ -35,10 +35,10 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
     })
   }
 
-  val smallEditsTargetTime = PerformanceTest.smallEditsTargetTime * modularGrammarSlowdown // We only allow the small edits to make the parsing 5ms slower
+  val smallErrorsTargetTime = PerformanceTest.smallErrorsTargetTime * modularGrammarSlowdown // We only allow the small errors to make the parsing 5ms slower
   test("JSON with small errors bigrammar performance") {
     val source = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications_edited.json")
-    TestUtils.runPerformanceTest(smallEditsTargetTime, 300, () => {
+    TestUtils.runPerformanceTest(smallErrorsTargetTime, 300, () => {
       val result = json.compileString(source)
       assert(result.program.childElements.size == 6)
       assert(result.diagnostics.size == 2)
