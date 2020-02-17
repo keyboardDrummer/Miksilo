@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.core.{ParseInput, ParseText}
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.Position
 import core.parsers.sequences.SequenceInput
 
