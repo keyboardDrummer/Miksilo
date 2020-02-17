@@ -1,18 +1,18 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{Metrics, OptimizingParserWriter, ParseText}
+import core.parsers.core.{Metrics, OptimizingParserWriter, ParseInput, ParseText}
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
   type ParseResult[+Result] = ParseResults[Input, Result]
 
   def startInput: Input
-  def findBestParseResult[Result](parser: BuiltParser[Result], mayStop: StopFunction,
+  def findBestParseResult[Result](text: ParseText, parser: BuiltParser[Result], mayStop: StopFunction,
                                   metrics: Metrics): SingleParseResult[Result, Input] = {
 
     val start = System.currentTimeMillis()
     val zero: Input = startInput
-    val noResultFound = ReadyParseResult(None, zero, History.error(FatalError(zero, "Grammar is always recursive")))
+    val noResultFound = ReadyParseResult(None, zero, History.error(FatalError(text, zero, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Input, Result] = noResultFound
 
     mayStop.reset()
@@ -217,14 +217,14 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class WithRangeParser[Result, NewResult](original: Parser[Result], addRange: (Input, Input, Result) => NewResult)
+  case class WithRangeParser[Result, NewResult](original: Parser[Result], addRange: (ParseText, Input, Input, Result) => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[NewResult] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         parseOriginal(input, state).mapReady(ready => {
-          val newValue = ready.resultOption.map(v => addRange(input, ready.remainder, v))
+          val newValue = ready.resultOption.map(v => addRange(text, input, ready.remainder, v))
           ReadyParseResult(newValue, ready.remainder, ready.history)
         }, uniform = true)
       }
@@ -260,7 +260,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   type MyParseError = ParseError[Input]
   type MyHistory = History[Input]
 
-  case class FatalError(location: Input, message: String, penalty: Double = History.failPenalty) extends MyParseError {
+  case class FatalError(text: ParseText, location: Input, message: String, penalty: Double = History.failPenalty) extends MyParseError {
     override def append(other: MyParseError): Option[MyParseError] = None
 
     override def from = location
@@ -269,7 +269,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 }
 
-case class SingleParseResult[+Result, Input](resultOption: Option[Result], errors: List[ParseError[Input]]) {
+case class SingleParseResult[+Result, Input <: ParseInput[Input]](resultOption: Option[Result], errors: List[ParseError[Input]]) {
   def successful = errors.isEmpty
   def get: Result = resultOption.get
 }

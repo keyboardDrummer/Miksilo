@@ -21,8 +21,8 @@ case class As(var inner: BiGrammar, field: NodeField, changePosition: SourceRang
   override def createPrinter(recursive: BiGrammar => NodePrinter): NodePrinter = new AsPrinter(recursive(inner), field)
 
   override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
-    recursive(inner).withRange[Result]((left, right, result: Result) => {
-      var range = SourceRange(left.position, right.position)
+    recursive(inner).withRange[Result]((text, left, right, result: Result) => {
+      var range = SourceRange(text.getPosition(left.offset), text.getPosition(right.offset))
       if (changePosition != null)
         range = changePosition(range)
       WithMap[Any]((), result.namedValues + (field -> result.value) + (FieldPosition(field) -> range))

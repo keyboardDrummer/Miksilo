@@ -1,6 +1,6 @@
 package core.parsers.sequences
 
-import core.parsers.core.{ParseText, Metrics, NoMetrics, Processor}
+import core.parsers.core.{Metrics, NoMetrics, ParseInput, ParseText, Processor}
 import core.parsers.editorParsers._
 
 trait SequenceParserWriter extends CorrectingParserWriter {
@@ -11,7 +11,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     extends ParserBuilderBase[Result] with LeafParser[Result] {
 
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
-      (input, _) => newFailure(value, input, History.error(FatalError(input, message, penalty)))
+      (input, _) => newFailure(value, input, History.error(FatalError(text, input, message, penalty)))
     }
 
     override def getMustConsume(cache: ConsumeCache) = false
@@ -67,7 +67,10 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   case class DropError(text: ParseText, from: Input, to: Input) extends ParseError[Input] {
     def this(text: ParseText, from: Input, expectation: String) = this(text, from, from.drop(text, 1))
 
-    override def fix = Some(Fix("Remove unexpected symbols", TextEdit(SourceRange(from.position, to.position), "")))
+    override def fix = {
+      val range = SourceRange(text.getPosition(from.offset), text.getPosition(to.offset))
+      Some(Fix("Remove unexpected symbols", TextEdit(range, "")))
+    }
 
     override def append(next: MyParseError): Option[MyParseError] = {
       next match {
@@ -155,8 +158,10 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       val trimmed = insertFix.trim
       if (trimmed == "")
         None
-      else
-        Some(Fix("Insert missing symbols", TextEdit(SourceRange(from.position, from.position), trimmed)))
+      else {
+        val position = text.getPosition(from.offset)
+        Some(Fix("Insert missing symbols", TextEdit(SourceRange(position, position), trimmed)))
+      }
     }
   }
 
@@ -209,7 +214,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = true
   }
 
-  case class FilterError[Result](from: Input, to: Input, message: String) extends ParseError[Input] {
+  case class FilterError[Result](text: ParseText, from: Input, to: Input, message: String) extends ParseError[Input] {
     override def penalty = History.missingInputPenalty
   }
 
@@ -229,7 +234,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
               newResultOption match {
                 case Left(message) =>
                   ReadyParseResult(None, ready.remainder,
-                    ready.history.addError(FilterError(input, ready.remainder, message)))
+                    ready.history.addError(FilterError(text, input, ready.remainder, message)))
                 case Right(value) =>
                   ReadyParseResult(Some(value), ready.remainder, ready.history)
               }
@@ -256,7 +261,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
               if (predicate(result))
                 ready
               else ReadyParseResult(None, ready.remainder,
-                ready.history.addError(FilterError(input, ready.remainder, getMessage(result))))
+                ready.history.addError(FilterError(text, input, ready.remainder, getMessage(result))))
             case None => ready
           }
         }, uniform = false)
@@ -319,7 +324,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
         override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
           parserAndCaches.text.arrayOfChars = text.toCharArray
-          findBestParseResult(parserAndCaches.parser, mayStop, metrics)
+          findBestParseResult(parserAndCaches.text, parserAndCaches.parser, mayStop, metrics)
         }
 
         override def reset(): Unit = {
@@ -339,13 +344,13 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       ParseWholeInput(parser).getSingleResultParser
     }
 
-    def withRange[Other](addRange: (Input, Input, Result) => Other): Parser[Other] = {
+    def withRange[Other](addRange: (ParseText, Input, Input, Result) => Other): Parser[Other] = {
       WithRangeParser(parser, addRange)
     }
   }
 }
 
-trait SingleResultParser[+Result, Input] {
+trait SingleResultParser[+Result, Input <: ParseInput[Input]] {
   def reset(): Unit
   def changeRange(start: Int, end: Int, insertionLength: Int, text: String): Unit
   def resetAndParse(text: String,

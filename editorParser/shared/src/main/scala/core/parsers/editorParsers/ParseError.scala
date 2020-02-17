@@ -1,6 +1,6 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.ParseText
+import core.parsers.core.{ParseInput, ParseText}
 import core.parsers.editorParsers.Position.PositionOrdering
 
 case class TextEdit(range: SourceRange, newText: String)
@@ -35,12 +35,14 @@ object Position {
   }
 }
 
-trait ParseError[Input] {
+trait ParseError[Input <: ParseInput[Input]] {
   //def array: ArrayCharSequence
   def fix: Option[Fix] = None
   def message: String
   def from: Input
   def to: Input
+  def text: ParseText
+  def range = SourceRange(text.getPosition(from.offset), text.getPosition(to.offset))
 
   def canMerge: Boolean = false
   def penalty: Double

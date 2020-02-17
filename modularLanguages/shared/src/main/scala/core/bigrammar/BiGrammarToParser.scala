@@ -23,15 +23,15 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
   object IndentationKey
 
-  override def startInput = new Reader(0, Position(0, 0), Map.empty)
+  override def startInput = new Reader(0, Map.empty)
 
-  class Reader(offset: Int, position: Position, val state: State)
-    extends StringReaderBase[Reader](offset, position)
+  class Reader(offset: Int, val state: State)
+    extends StringReaderBase[Reader](offset)
     with IndentationReaderLike {
 
-    def withState(newState: State): Reader = new Reader(offset, position, newState)
+    def withState(newState: State): Reader = new Reader(offset, newState)
 
-    override def drop(array: ParseText, amount: Int) = new Reader(offset + amount, movePosition(array, amount), state)
+    override def drop(text: ParseText, amount: Int) = new Reader(offset + amount, state)
 
     override def hashCode(): Int = offset
 

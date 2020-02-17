@@ -89,9 +89,9 @@ trait StringParserWriter extends SequenceParserWriter {
   }
 
   trait NextCharError extends ParseError[Input] {
-    def array: ParseText
-    def to: Input = if (this.from.atEnd(array)) this.from else this.from.drop(array, 1)
-    def range(array: ArrayCharSequence) = SourceRange(from.position, to.position)
+    def text: ParseText
+    def to: Input = if (this.from.atEnd(text)) this.from else this.from.drop(text, 1)
+    def range(text: ParseText) = SourceRange(text.getPosition(from.offset), text.getPosition(to.offset))
   }
 
   def parseRegex(regex: Regex, regexName: String,
@@ -140,7 +140,7 @@ trait StringParserWriter extends SequenceParserWriter {
   implicit class StringParserExtensions[Result](parser: Parser[Result]) {
 
     def withSourceRange[Other](addRange: (SourceRange, Result) => Other): Parser[Other] = {
-      parser.withRange((l,r,v) => addRange(SourceRange(l.position, r.position), v))
+      parser.withRange((text, l,r,v) => addRange(SourceRange(text.getPosition(l.offset), text.getPosition(r.offset)), v))
     }
   }
 }

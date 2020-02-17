@@ -46,7 +46,7 @@ class WhiteSpaceTest extends AnyFunSuite {
   }
 
   def assertError(error: ParseError[ExpressionParser.Input], range: SourceRange, message: String): Unit = {
-    assertResult(range)(SourceRange(error.from.position,error.to.position))
+    assertResult(range)(error.range)
     assertResult("expected '<expression>'")(message)
   }
 }

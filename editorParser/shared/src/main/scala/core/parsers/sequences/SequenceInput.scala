@@ -1,7 +1,6 @@
 package core.parsers.sequences
 
 import core.parsers.core.{ParseInput, ParseText}
-import core.parsers.editorParsers.Position
 
 trait SequenceInput[Input, Elem] extends ParseInput[Input] {
   def head(array: ParseText): Elem
@@ -11,6 +10,5 @@ trait SequenceInput[Input, Elem] extends ParseInput[Input] {
     if (atEnd(array)) this.asInstanceOf[Input]
     else drop(array, 1)
   def end(array: ParseText): Input
-  def printRange(array: ParseText, end: Input): String
-  def position: Position
+  def printRange(text: ParseText, end: Input): String
 }

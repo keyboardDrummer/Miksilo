@@ -39,7 +39,7 @@ class ErrorReportingAndFixTest extends AnyFunSuite
 
     val diagnosticRange = SourceRange(Position(0, 0), Position(0, 1))
     val diagnosticMessage = "expected 'someKeyword'"
-    assertResult(diagnosticRange)(SourceRange(error.from.position, error.to.position))
+    assertResult(diagnosticRange)(error.range)
     assertResult(diagnosticMessage)(error.message)
   }
 
@@ -53,7 +53,7 @@ class ErrorReportingAndFixTest extends AnyFunSuite
 
     val diagnosticRange = SourceRange(Position(0, 0), Position(0, 0))
     val diagnosticMessage = "expected 'someKeyword'"
-    assertResult(diagnosticRange)(SourceRange(error.from.position, error.to.position))
+    assertResult(diagnosticRange)(error.range)
     assertResult(diagnosticMessage)(error.message)
   }
 
@@ -68,7 +68,7 @@ class ErrorReportingAndFixTest extends AnyFunSuite
 
     val diagnosticRange = SourceRange(Position(0, 0), Position(0, 0))
     val diagnosticMessage = "expected 'someKeyword'"
-    assertResult(diagnosticRange)(SourceRange(error.from.position, error.to.position))
+    assertResult(diagnosticRange)(error.range)
     assertResult(diagnosticMessage)(error.message)
   }
 }

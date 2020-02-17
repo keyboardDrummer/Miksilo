@@ -62,6 +62,10 @@ class IncrementalParsingTest extends AnyFunSuite {
 
   // TODO add tests with linebreaks.
 
+  // TODO add test that checks whether positions in the AST have been updated.
+
+  // TODO add test with indentation sensitive parsing.
+
   def getParser = {
     jsonParser.getSingleResultParser
   }

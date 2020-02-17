@@ -58,17 +58,17 @@ class YamlTest extends AnyFunSuite
   type Input = IndentationReader
 
 
-  override def startInput = new IndentationReader(0, new Position(0,0), BlockOut, 0)
+  override def startInput = new IndentationReader(0, BlockOut, 0)
 
-  class IndentationReader(offset: Int, position: Position, val context: YamlContext, val indentation: Int)
-    extends StringReaderBase[IndentationReader](offset, position) with IndentationReaderLike {
+  class IndentationReader(offset: Int, val context: YamlContext, val indentation: Int)
+    extends StringReaderBase[IndentationReader](offset) with IndentationReaderLike {
 
-    override def withIndentation(value: Int) = new IndentationReader(offset, position, context, value)
+    override def withIndentation(value: Int) = new IndentationReader(offset, context, value)
 
-    def withContext(newState: YamlContext): IndentationReader = new IndentationReader(offset, position, newState, indentation)
+    def withContext(newState: YamlContext): IndentationReader = new IndentationReader(offset, newState, indentation)
 
-    override def drop(array: ParseText, amount: Int) =
-      new IndentationReader(offset + amount, movePosition(array, amount), context, indentation)
+    override def drop(text: ParseText, amount: Int) =
+      new IndentationReader(offset + amount, context, indentation)
 
     override def hashCode(): Int = offset ^ indentation ^ context.hashCode()
 

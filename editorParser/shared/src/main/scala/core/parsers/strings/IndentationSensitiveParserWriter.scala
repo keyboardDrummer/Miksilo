@@ -20,7 +20,8 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
 
       def apply(input: Input, state: ParseState) = {
         val previous = input.indentation
-        val newInput = input.withIndentation(input.position.character)
+        val position = text.getPosition(input.offset)
+        val newInput = input.withIndentation(position.character)
         val result: ParseResult[Result] = parseOriginal(newInput, state)
         result.updateRemainder(remainder => {
           remainder.withIndentation(previous)
@@ -43,11 +44,13 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   def equal[Result](inner: Parser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
   def greaterThan[Result](inner: Parser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
 
-  case class IndentationError(array: ParseText, from: Input, property: String) extends NextCharError {
+  case class IndentationError(text: ParseText, from: Input, property: String) extends NextCharError {
     override def penalty = History.indentationErrorPenalty
 
-    override def message =
-      s"indentation ${from.position.character} of character '${from.head(array)}' must be $property ${from.indentation}"
+    override def message = {
+      val position = text.getPosition(from.offset)
+      s"indentation ${position.character} of character '${from.head(text)}' must be $property ${from.indentation}"
+    }
   }
 
   case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: Parser[Result])
@@ -57,7 +60,8 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
       val parseOriginal = recursive(original).asInstanceOf[BuiltParser[Result]]
 
       def apply(input: Input, state: ParseState) = {
-        val delta = input.position.character - input.indentation
+        val position = text.getPosition(input.offset)
+        val delta = position.character - input.indentation
         if (input.atEnd(text) || deltaPredicate(delta)) {
           parseOriginal(input, state)
         } else {
