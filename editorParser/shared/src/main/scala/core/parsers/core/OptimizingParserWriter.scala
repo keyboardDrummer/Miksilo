@@ -49,10 +49,56 @@ final class ParseText extends CharSequence {
 
 trait OptimizingParserWriter extends ParserWriter {
 
+  trait ParseInput2 extends ParseInput {
+    def drop(amount: Int): Input
+    def atEnd(array: ParseText): Boolean
+  }
+
+  type Input <: ParseInput2
+
   type Parser[+Result] = ParserBuilder[Result]
   def newParseState(input: Input): ParseState
   type ParseState
   type ParseResult[+Result]
+
+  trait OffsetManager {
+    def getOffsetNode(offset: Int): OffsetNode
+    def changeText(from: Int, until: Int, insertedText: String): Unit
+  }
+
+  trait OffsetNode {
+    def getAbsoluteOffset(): Int
+    def drop(amount: Int): OffsetNode
+    def cache: mutable.HashMap[(Input, ParseState), ParseResult[_]]
+  }
+
+  class AbsoluteOffsetNode(val manager: ArrayOffsetManager, var offset: Int) extends OffsetNode {
+    override def getAbsoluteOffset() = offset
+
+    override val cache = new mutable.HashMap[(Input, ParseState), ParseResult[_]]
+
+    override def drop(amount: Int) = manager.getOffsetNode(amount + offset)
+  }
+
+  // Will I use relative offset in the cache??
+  class ArrayOffsetManager extends OffsetManager {
+    val offsets = mutable.ArrayBuffer.empty[AbsoluteOffsetNode]
+    override def getOffsetNode(offset: Int) = {
+      val result = new AbsoluteOffsetNode(this, offset)
+      offsets.addOne(result)
+      result
+    }
+
+    override def changeText(from: Int, until: Int, insertedText: String): Unit = {
+      val delta = insertedText.length - (from - until)
+      for(offset <- offsets) {
+        val absoluteOffset = offset.getAbsoluteOffset()
+        if (absoluteOffset >= from) {
+          offset.offset += delta
+        }
+      }
+    }
+  }
 
   def wrapParser[Result](text: ParseText,
                          parser: BuiltParser[Result],
@@ -69,7 +115,7 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait ParserBuilder[+Result] {
-    def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result]
+    def getParser(offsettext: ParseText, recursive: GetParser): BuiltParser[Result]
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[ParserBuilder[_]]
@@ -173,12 +219,15 @@ trait OptimizingParserWriter extends ParserWriter {
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
-  case class ParserAndCaches[Result](text: ParseText, parser: BuiltParser[Result], caches: ArrayBuffer[CacheLike[_]])
+  case class ParserAndCaches[Result](text: ParseText,
+                                     offsetManager: OffsetManager,
+                                     parser: BuiltParser[Result], caches: ArrayBuffer[CacheLike[_]])
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
     def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
       val text = new ParseText()
+      val offsetManager = new ArrayOffsetManager
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
       val caches = ArrayBuffer.empty[CacheLike[_]]
       def recursive: GetParser = new GetParser {
@@ -197,7 +246,7 @@ trait OptimizingParserWriter extends ParserWriter {
       }
 
       val wrappedRoot = recursive(root)
-      ParserAndCaches(text, wrappedRoot, caches)
+      ParserAndCaches(text, offsetManager, wrappedRoot, caches)
     }
   }
 

@@ -4,10 +4,10 @@ import core.parsers.core.{Metrics, ParseText}
 
 trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
-  override def findBestParseResult[Result](text: ParseText, parser: BuiltParser[Result],
+  override def findBestParseResult[Result](text: ParseText, offsetManager: OffsetManager, parser: BuiltParser[Result],
                                            mayStop: StopFunction, metrics: Metrics): SingleParseResult[Result, Input] = {
 
-    val start = startInput
+    val start = startInput(offsetManager)
     val noResultFound = ReadyParseResult(None, start, History.error(FatalError(text, start, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Input, Result] = noResultFound
 

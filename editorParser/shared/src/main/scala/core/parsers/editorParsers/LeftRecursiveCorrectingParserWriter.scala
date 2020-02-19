@@ -143,8 +143,6 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     override def latestRemainder = tail.latestRemainder
-
-    override def move(array: ParseText, offset: Int) = throw new Exception("cannot move Recursive results")
   }
 
   class CheckCache[Result](text: ParseText, parser: BuiltParser[Result]) extends CacheLike[Result] {
@@ -172,7 +170,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       val insertionLength = inserted - (until - from)
       def updateInput(input: Input): Input = {
         if (input.offset >= from) {
-          input.drop(text, insertionLength)
+          input.drop(insertionLength)
         } else {
           input
         }
@@ -187,8 +185,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           if (entryStart >= from) {
             cache.remove(entry._1)
             val newKey = (updateInput(entry._1._1), FixPointState(updateInput(entry._1._2.input), entry._1._2.parsers))
-            val newValue = entry._2.move(text, insertionLength)
-            cache.put(newKey, newValue)
+            //val newValue = entry._2.move(text, insertionLength)
+            //cache.put(newKey, newValue)
           }
         }
       }

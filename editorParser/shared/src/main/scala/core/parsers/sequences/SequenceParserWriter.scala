@@ -4,8 +4,20 @@ import core.parsers.core.{Metrics, NoMetrics, ParseInput, ParseText, Processor}
 import core.parsers.editorParsers._
 
 trait SequenceParserWriter extends CorrectingParserWriter {
+
+  trait SequenceInput[Elem] extends ParseInput2 {
+    def head(array: ParseText): Elem
+    def tail(array: ParseText): Input
+
+    def safeIncrement(array: ParseText): Input =
+      if (atEnd(array)) this.asInstanceOf[Input]
+      else drop(1)
+    def end(array: ParseText): Input
+    def printRange(text: ParseText, end: Input): String
+  }
+
   type Elem
-  type Input <: SequenceInput[Input, Elem]
+  type Input <: SequenceInput[Elem]
 
   case class Fail[Result](value: Option[Result], message: String, penalty: Double)
     extends ParserBuilderBase[Result] with LeafParser[Result] {
@@ -46,7 +58,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
             }, uniform = true)
           }
 
-          val droppedInput = input.drop(text, 1)
+          val droppedInput = input.drop(1)
           val dropError = DropError(text, input, droppedInput)
           val dropHistory = History.error(dropError)
           val withDrop = singleResult(new DelayedParseResult(input, dropHistory , () => {
@@ -65,7 +77,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 
   case class DropError(text: ParseText, from: Input, to: Input) extends ParseError[Input] {
-    def this(text: ParseText, from: Input, expectation: String) = this(text, from, from.drop(text, 1))
+    def this(text: ParseText, from: Input, expectation: String) = this(text, from, from.drop(1))
 
     override def fix = {
       val range = SourceRange(text.getPosition(from.offset), text.getPosition(to.offset))
@@ -324,7 +336,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
         override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
           parserAndCaches.text.arrayOfChars = text.toCharArray
-          findBestParseResult(parserAndCaches.text, parserAndCaches.parser, mayStop, metrics)
+          findBestParseResult(parserAndCaches.text, parserAndCaches.offsetManager, parserAndCaches.parser, mayStop, metrics)
         }
 
         override def reset(): Unit = {
@@ -350,7 +362,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 }
 
-trait SingleResultParser[+Result, Input <: ParseInput[Input]] {
+trait SingleResultParser[+Result, Input <: ParseInput] {
   def reset(): Unit
   def changeRange(start: Int, end: Int, insertionLength: Int, text: String): Unit
   def resetAndParse(text: String,

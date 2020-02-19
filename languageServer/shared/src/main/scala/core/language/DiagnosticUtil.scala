@@ -1,13 +1,13 @@
 package core.language
 
+import core.parsers.core.ParseInput
 import core.parsers.editorParsers.{ParseError, SourceRange}
-import core.parsers.strings.StringReaderLike
 import core.smarts.FileDiagnostic
 import lsp._
 
 object DiagnosticUtil {
 
-  def getDiagnosticsFromParseFailures[Input <: StringReaderLike[Input]](file: String, errors: Seq[ParseError[Input]]): Map[FileDiagnostic, Seq[CodeAction]] = {
+  def getDiagnosticsFromParseFailures[Input <: ParseInput](file: String, errors: Seq[ParseError[Input]]): Map[FileDiagnostic, Seq[CodeAction]] = {
     var result = Map.empty[FileDiagnostic, Seq[CodeAction]]
 
     for((diagnostic, codeActionOption) <- errors.map(error => getDiagnosticsFromParseFailure(file, error))) {
@@ -17,7 +17,7 @@ object DiagnosticUtil {
     result
   }
 
-  def getDiagnosticsFromParseFailure[Input <: StringReaderLike[Input]](uri: String, error: ParseError[Input]): (FileDiagnostic, Option[CodeAction]) = {
+  def getDiagnosticsFromParseFailure[Input <: ParseInput](uri: String, error: ParseError[Input]): (FileDiagnostic, Option[CodeAction]) = {
     val range = error.range
     val diagnostic = Diagnostic(range, Some(DiagnosticSeverity.Error), error.message, None, None)
     val codeAction = error.fix.map(fix =>

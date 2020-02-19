@@ -6,7 +6,7 @@ import core.parsers.editorParsers.History
 trait IndentationSensitiveParserWriter extends StringParserWriter {
   type Input <: IndentationReaderLike
 
-  trait IndentationReaderLike extends StringReaderLike[Input] {
+  trait IndentationReaderLike extends StringReaderLike {
     def indentation: Int
 
     def withIndentation(value: Int): Input

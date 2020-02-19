@@ -58,7 +58,7 @@ class YamlTest extends AnyFunSuite
   type Input = IndentationReader
 
 
-  override def startInput = new IndentationReader(0, BlockOut, 0)
+  override def startInput(offsetManager: OffsetManager) = new IndentationReader(0, BlockOut, 0)
 
   class IndentationReader(offset: Int, val context: YamlContext, val indentation: Int)
     extends StringReaderBase[IndentationReader](offset) with IndentationReaderLike {

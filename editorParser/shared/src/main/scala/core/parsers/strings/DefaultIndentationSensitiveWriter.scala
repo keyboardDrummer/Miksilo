@@ -1,17 +1,14 @@
 package core.parsers.strings
 
-import core.parsers.core.ParseText
-import core.parsers.editorParsers.Position
-
 trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter {
   type Input = IndentationReader
 
-  override def startInput = new IndentationReader(0, 0)
+  override def startInput(offsetManager: OffsetManager) = new IndentationReader(offsetManager.getOffsetNode(0), 0)
 
-  class IndentationReader(offset: Int, val indentation: Int)
-    extends StringReaderBase[Input](offset) with IndentationReaderLike {
+  class IndentationReader(offsetNode: OffsetNode, val indentation: Int)
+    extends StringReaderBase(offsetNode) with IndentationReaderLike {
 
-    def drop(text: ParseText, amount: Int): IndentationReader = new IndentationReader(offset + amount, indentation)
+    def drop(amount: Int): IndentationReader = new IndentationReader(offsetNode.drop(amount), indentation)
 
     override def hashCode(): Int = offset ^ indentation
 
@@ -20,6 +17,6 @@ trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter
       case _ => false
     }
 
-    override def withIndentation(value: Int) = new IndentationReader(offset, value)
+    override def withIndentation(value: Int) = new IndentationReader(offsetNode, value)
   }
 }

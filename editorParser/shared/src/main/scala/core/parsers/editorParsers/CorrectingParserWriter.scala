@@ -6,12 +6,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   type ParseResult[+Result] = ParseResults[Input, Result]
 
-  def startInput: Input
-  def findBestParseResult[Result](text: ParseText, parser: BuiltParser[Result], mayStop: StopFunction,
+  def startInput(offsetManager: OffsetManager): Input
+
+  def findBestParseResult[Result](text: ParseText, offsetManager: OffsetManager, parser: BuiltParser[Result], mayStop: StopFunction,
                                   metrics: Metrics): SingleParseResult[Result, Input] = {
 
     val start = System.currentTimeMillis()
-    val zero: Input = startInput
+    val zero: Input = startInput(offsetManager)
     val noResultFound = ReadyParseResult(None, zero, History.error(FatalError(text, zero, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Input, Result] = noResultFound
 
@@ -269,7 +270,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 }
 
-case class SingleParseResult[+Result, Input <: ParseInput[Input]](resultOption: Option[Result], errors: List[ParseError[Input]]) {
+case class SingleParseResult[+Result, Input <: ParseInput](resultOption: Option[Result], errors: List[ParseError[Input]]) {
   def successful = errors.isEmpty
   def get: Result = resultOption.get
 }

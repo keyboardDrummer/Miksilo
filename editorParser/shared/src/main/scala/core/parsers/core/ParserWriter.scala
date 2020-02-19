@@ -1,12 +1,15 @@
 package core.parsers.core
 
-import core.parsers.editorParsers.ParseResults
-
 import scala.language.{existentials, higherKinds}
+
+trait ParseInput {
+  def offset: Int
+}
 
 trait ParserWriter {
 
-  type Input <: ParseInput[Input]
+
+  type Input <: ParseInput
   type Parser[+Result]
 
   def succeed[Result](result: Result): Parser[Result]

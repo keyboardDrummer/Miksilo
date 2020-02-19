@@ -2,10 +2,9 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers.core.ParseText
-import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, Position}
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.sequences.SingleResultParser
-import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase}
+import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.textMate.TextMateGeneratingParserWriter
 import util.Utility
 
@@ -23,15 +22,15 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
   object IndentationKey
 
-  override def startInput = new Reader(0, Map.empty)
+  override def startInput(offsetManager: BiGrammarToParser.OffsetManager) = new Reader(offsetManager.getOffsetNode(0), Map.empty)
 
-  class Reader(offset: Int, val state: State)
-    extends StringReaderBase[Reader](offset)
+  class Reader(offsetNode: OffsetNode, val state: State)
+    extends StringReaderBase(offsetNode)
     with IndentationReaderLike {
 
-    def withState(newState: State): Reader = new Reader(offset, newState)
+    def withState(newState: State): Reader = new Reader(offsetNode, newState)
 
-    override def drop(text: ParseText, amount: Int) = new Reader(offset + amount, state)
+    override def drop(amount: Int) = new Reader(offsetNode.drop(amount), state)
 
     override def hashCode(): Int = offset
 
