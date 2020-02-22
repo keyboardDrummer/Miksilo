@@ -1,9 +1,9 @@
 package core.parsers.editorParsers
 
 import ParseResults._
-import core.parsers.core.{ParseInput}
+import core.parsers.core.{OptimizingParseResult, ParseInput}
 
-trait ParseResults[Input <: ParseInput, +Result] {
+trait ParseResults[Input <: ParseInput, +Result] extends OptimizingParseResult {
   def latestRemainder: Int
   def nonEmpty: Boolean
   def pop(): (LazyParseResult[Input, Result], ParseResults[Input, Result])

@@ -340,14 +340,11 @@ trait SequenceParserWriter extends CorrectingParserWriter {
         }
 
         override def reset(): Unit = {
-          parserAndCaches.caches.foreach(cache => cache.clear())
+          parserAndCaches.offsetManager.clear()
         }
 
-        override def changeRange(from: Int, until: Int, insertionLength: Int, text: String): Unit = {
-          if (insertionLength - (until - from) > 0) {
-            parserAndCaches.text.arrayOfChars = text.toCharArray
-          }
-          parserAndCaches.caches.foreach(cache => cache.change(from, until, insertionLength))
+        override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
+          parserAndCaches.offsetManager.changeText(from, until, insertionLength)
         }
       }
     }
@@ -364,7 +361,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
 trait SingleResultParser[+Result, Input <: ParseInput] {
   def reset(): Unit
-  def changeRange(start: Int, end: Int, insertionLength: Int, text: String): Unit
+  def changeRange(start: Int, end: Int, insertionLength: Int): Unit
   def resetAndParse(text: String,
                     mayStop: StopFunction = StopImmediately,
                     metrics: Metrics = NoMetrics): SingleParseResult[Result, Input] = {

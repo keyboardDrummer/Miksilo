@@ -2,15 +2,11 @@ package core.parsers.editorParsers
 
 import core.parsers.core.ParseText
 
-import scala.collection.mutable
-
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
-  type ParseState = FixPointState
 
-  override def newParseState(input: Input) = FixPointState(input, Set.empty)
+  override def newParseState(input: Input) = FixPointState(input.offset, Set.empty)
 
-  case class FixPointState(input: Input, parsers: Set[BuiltParser[Any]])
 
   def recursionsFor[Result, SeedResult](parseResults: ParseResults[Input, Result], parser: BuiltParser[SeedResult]) = {
     parseResults match {
@@ -28,24 +24,24 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     extends CheckCache[Result](text, parser) {
 
     override def apply(input: Input, state: ParseState): ParseResult[Result] = {
-      val key = (input, state)
-      cache.get(key) match {
+      val newState = if (state.offset == input.offset) {
+        if (state.parsers.contains(parser))
+          throw new Exception("recursion should have been detected.")
+        FixPointState(input.offset, state.parsers + parser)
+      } else {
+        FixPointState(input.offset, Set(parser))
+      }
+
+      val key = (parser, newState)
+      input.offsetNode.cache.get(key) match {
         case Some(value) =>
-          value
+          value.asInstanceOf[ParseResult[Result]]
         case None =>
           getPreviousResult(input, state) match {
             case Some(intermediate) =>
               intermediate
 
             case None =>
-
-              val newState = if (state.input == input) {
-                  if (state.parsers.contains(parser))
-                    throw new Exception("recursion should have been detected.")
-                FixPointState(input, state.parsers + parser)
-              } else {
-                FixPointState(input, Set(parser))
-              }
               val initialResult = parser(input, newState)
 
               val RecursionsList(recursions, resultWithoutRecursion) = recursionsFor(initialResult, parser)
@@ -56,7 +52,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               else
                 resultWithoutRecursion
 
-              cache.put(key, result)
+              input.offsetNode.cache.put(key, result)
               result
           }
       }
@@ -80,7 +76,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     def getPreviousResult(input: Input, state: ParseState): Option[ParseResult[Result]] = {
-      if (state.input == input && state.parsers.contains(parser))
+      if (state.offset == input.offset && state.parsers.contains(parser))
           Some(RecursiveResults(Map(parser -> List(RecursiveParseResult[Input, Result, Result](x => x))), SREmpty.empty))
       else
         None
@@ -145,51 +141,22 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     override def latestRemainder = tail.latestRemainder
   }
 
-  class CheckCache[Result](text: ParseText, parser: BuiltParser[Result]) extends CacheLike[Result] {
+  class CheckCache[Result](text: ParseText, parser: BuiltParser[Result]) extends BuiltParser[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
-    val cache = mutable.HashMap[(Input, ParseState), ParseResult[Result]]()
 
     def apply(input: Input, state: ParseState): ParseResult[Result] = {
-      val key = (input, state)
-      cache.get(key) match {
+      val newState = if (state.offset == input.offset) state else FixPointState(input.offset, Set.empty)
+      val key = (parser, newState)
+
+      input.offsetNode.cache.get(key) match {
         case Some(value) =>
-          value
+          value.asInstanceOf[ParseResult[Result]]
         case _ =>
-          val value: ParseResult[Result] = parser(input, state)
-          cache.put(key, value)
+          val value: ParseResult[Result] = parser(input, newState)
+          input.offsetNode.cache.put(key, value)
           value
       }
     }
 
-    override def clear(): Unit = cache.clear()
-
-    override def change(from: Int, until: Int, inserted: Int): Unit = {
-
-      val entries = cache.toList
-
-      val insertionLength = inserted - (until - from)
-      def updateInput(input: Input): Input = {
-        if (input.offset >= from) {
-          input.drop(insertionLength)
-        } else {
-          input
-        }
-      }
-      for(entry <- entries) {
-        val entryStart = entry._1._1.offset
-        val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder)
-        val entryIntersectsWithRemoval = from < entryEnd && entryStart < until // entryStart < from && from < entryEnd
-        if (entryIntersectsWithRemoval) {
-          cache.remove(entry._1)
-        } else {
-          if (entryStart >= from) {
-            cache.remove(entry._1)
-            val newKey = (updateInput(entry._1._1), FixPointState(updateInput(entry._1._2.input), entry._1._2.parsers))
-            //val newValue = entry._2.move(text, insertionLength)
-            //cache.put(newKey, newValue)
-          }
-        }
-      }
-    }
   }
 }

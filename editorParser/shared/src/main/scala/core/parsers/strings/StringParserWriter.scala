@@ -14,7 +14,7 @@ trait StringParserWriter extends SequenceParserWriter {
   abstract class StringReaderBase(val offsetNode: OffsetNode)
     extends StringReaderLike {
 
-    val offset = offsetNode.getAbsoluteOffset()
+    def offset = offsetNode.getAbsoluteOffset()
 
     override def end(array: ParseText) = drop(array.length() - offset)
 

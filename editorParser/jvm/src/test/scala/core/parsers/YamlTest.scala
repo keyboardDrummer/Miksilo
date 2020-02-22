@@ -1,14 +1,12 @@
 
 package core.parsers
 
-import _root_.core.parsers.core.ParseText
 import _root_.core.SourceUtils
-import _root_.core.responsiveDocument._
-import _root_.core.parsers.editorParsers.Position
 import _root_.core.document.Empty
-import _root_.core.parsers.core.Processor
+import _root_.core.parsers.core.{ParseText, Processor}
 import _root_.core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
-import _root_.core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase, WhitespaceParserWriter}
+import _root_.core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
+import _root_.core.responsiveDocument._
 import org.scalatest.funsuite.AnyFunSuite
 
 trait YamlExpression {
@@ -58,17 +56,17 @@ class YamlTest extends AnyFunSuite
   type Input = IndentationReader
 
 
-  override def startInput(offsetManager: OffsetManager) = new IndentationReader(0, BlockOut, 0)
+  override def startInput(offsetManager: OffsetManager) = new IndentationReader(offsetManager.getOffsetNode(0), BlockOut, 0)
 
-  class IndentationReader(offset: Int, val context: YamlContext, val indentation: Int)
-    extends StringReaderBase[IndentationReader](offset) with IndentationReaderLike {
+  class IndentationReader(offsetNode: OffsetNode, val context: YamlContext, val indentation: Int)
+    extends StringReaderBase(offsetNode) with IndentationReaderLike {
 
-    override def withIndentation(value: Int) = new IndentationReader(offset, context, value)
+    override def withIndentation(value: Int) = new IndentationReader(offsetNode, context, value)
 
-    def withContext(newState: YamlContext): IndentationReader = new IndentationReader(offset, newState, indentation)
+    def withContext(newState: YamlContext): IndentationReader = new IndentationReader(offsetNode, newState, indentation)
 
-    override def drop(text: ParseText, amount: Int) =
-      new IndentationReader(offset + amount, context, indentation)
+    override def drop(amount: Int) =
+      new IndentationReader(offsetNode.drop(amount), context, indentation)
 
     override def hashCode(): Int = offset ^ indentation ^ context.hashCode()
 
