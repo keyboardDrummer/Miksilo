@@ -32,7 +32,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         FixPointState(input.offset, Set(parser))
       }
 
-      val key = (parser, newState)
+      val key = (parser, newState.parsers)
       input.offsetNode.cache.get(key) match {
         case Some(value) =>
           value.asInstanceOf[ParseResult[Result]]
@@ -146,7 +146,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     def apply(input: Input, state: ParseState): ParseResult[Result] = {
       val newState = if (state.offset == input.offset) state else FixPointState(input.offset, Set.empty)
-      val key = (parser, newState)
+      val key = (parser, newState.parsers)
 
       input.offsetNode.cache.get(key) match {
         case Some(value) =>

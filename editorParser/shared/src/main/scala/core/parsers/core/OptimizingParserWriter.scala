@@ -33,14 +33,14 @@ trait OptimizingParserWriter extends ParserWriter {
 
   trait OffsetNode extends OffsetNodeBase {
     def drop(amount: Int): OffsetNode
-    def cache: mutable.HashMap[(BuiltParser[_], ParseState), ParseResult[_]]
-    def cache_=(value: mutable.HashMap[(BuiltParser[_], ParseState), ParseResult[_]]): Unit
+    def cache: mutable.HashMap[(BuiltParser[_], Set[BuiltParser[Any]]), ParseResult[_]]
+    def cache_=(value: mutable.HashMap[(BuiltParser[_], Set[BuiltParser[Any]]), ParseResult[_]]): Unit
   }
 
   class AbsoluteOffsetNode(val manager: ArrayOffsetManager, var offset: Int) extends OffsetNode {
     override def getAbsoluteOffset() = offset
 
-    override var cache = new mutable.HashMap[(BuiltParser[_], ParseState), ParseResult[_]]
+    override var cache = new mutable.HashMap[(BuiltParser[_], Set[BuiltParser[Any]]), ParseResult[_]]
 
     override def drop(amount: Int) = manager.getOffsetNode(amount + offset)
 
@@ -83,12 +83,8 @@ trait OptimizingParserWriter extends ParserWriter {
         }
         if (absoluteOffset == from) {
           val newNode = getOffsetNode(offset.offset + delta)
-          for(entry <- offset.cache) {
-            val fixPointState = entry._1._2.asInstanceOf[FixPointState]
-            val key = (entry._1._1, FixPointState(newNode.getAbsoluteOffset(), fixPointState.parsers))
-            newNode.cache.put(key, entry._2)
-          }
-          offset.cache = new mutable.HashMap[(BuiltParser[_], ParseState), ParseResult[_]]()
+          newNode.cache = offset.cache
+          offset.cache = new mutable.HashMap[(BuiltParser[_], Set[BuiltParser[Any]]), ParseResult[_]]()
         }
       }
     }
