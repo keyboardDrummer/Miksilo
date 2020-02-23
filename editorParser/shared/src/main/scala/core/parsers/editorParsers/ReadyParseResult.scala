@@ -1,14 +1,14 @@
 package core.parsers.editorParsers
 
 import ParseResults._
-import core.parsers.core.ParseInput
+import core.parsers.core.{OffsetNodeBase, ParseInput}
 
 case class RecursionsList[Input <: ParseInput, SeedResult, +Result](
   recursions: List[RecursiveParseResult[Input, SeedResult, Result]],
   rest: ParseResults[Input, Result])
 
 trait LazyParseResult[Input <: ParseInput, +Result] {
-  def offset: Int
+  def offset: OffsetNodeBase
 
   def flatMapReady[NewResult](f: ReadyParseResult[Input, Result] => ParseResults[Input, NewResult],
                               uniform: Boolean): ParseResults[Input, NewResult]
@@ -53,7 +53,7 @@ class DelayedParseResult[Input <: ParseInput, Result](val remainder: Input, val 
       intermediate.flatMapReady(f, uniform)
     }))
 
-  override def offset = remainder.offset
+  override def offset = remainder.offsetNode
 }
 
 case class RecursiveParseResult[Input <: ParseInput, SeedResult, +Result](
@@ -86,5 +86,5 @@ case class ReadyParseResult[Input <: ParseInput, +Result](resultOption: Option[R
 
   override def flatMapReady[NewResult](f: ReadyParseResult[Input, Result] => ParseResults[Input, NewResult], uniform: Boolean) = f(this)
 
-  override def offset = remainder.offset
+  override def offset = remainder.offsetNode
 }

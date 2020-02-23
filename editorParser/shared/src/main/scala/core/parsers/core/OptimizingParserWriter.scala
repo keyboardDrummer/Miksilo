@@ -3,7 +3,11 @@ package core.parsers.core
 import scala.collection.mutable
 
 trait OptimizingParseResult {
-  def latestRemainder: Int
+  def latestRemainder: OffsetNodeBase
+}
+
+trait OffsetNodeBase {
+  def getAbsoluteOffset(): Int
 }
 
 trait OptimizingParserWriter extends ParserWriter {
@@ -27,8 +31,7 @@ trait OptimizingParserWriter extends ParserWriter {
     def clear(): Unit
   }
 
-  trait OffsetNode {
-    def getAbsoluteOffset(): Int
+  trait OffsetNode extends OffsetNodeBase {
     def drop(amount: Int): OffsetNode
     def cache: mutable.HashMap[(BuiltParser[_], ParseState), ParseResult[_]]
     def cache_=(value: mutable.HashMap[(BuiltParser[_], ParseState), ParseResult[_]]): Unit
@@ -69,7 +72,7 @@ trait OptimizingParserWriter extends ParserWriter {
         val entries = offset.cache.toList
         for(entry <- entries) {
           val entryStart = offset.getAbsoluteOffset()
-          val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder)
+          val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder.getAbsoluteOffset())
           val entryIntersectsWithRemoval = from < entryEnd && entryStart < until
           if (entryIntersectsWithRemoval) {
             offset.cache.remove(entry._1)

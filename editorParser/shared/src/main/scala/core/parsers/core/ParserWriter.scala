@@ -3,7 +3,8 @@ package core.parsers.core
 import scala.language.{existentials, higherKinds}
 
 trait ParseInput {
-  def offset: Int
+  def offsetNode: OffsetNodeBase
+  def offset = offsetNode.getAbsoluteOffset()
 }
 
 trait ParserWriter {
