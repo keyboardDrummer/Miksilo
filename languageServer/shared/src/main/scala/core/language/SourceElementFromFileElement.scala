@@ -1,6 +1,6 @@
 package core.language
 
-import core.parsers.editorParsers.SourceRange
+import core.parsers.editorParsers.{OffsetRange, SourceRange}
 
 case class SourceElementFromFileElement(uri: String, element: FileElement) extends SourceElement {
   override def range = Some(element.range)
@@ -13,7 +13,7 @@ case class SourceElementFromFileElement(uri: String, element: FileElement) exten
 }
 
 trait FileElement {
-  def range: SourceRange
+  def range: OffsetRange
 
   def childElements: Seq[FileElement]
 

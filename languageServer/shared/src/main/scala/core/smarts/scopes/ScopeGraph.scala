@@ -1,6 +1,7 @@
 package core.smarts.scopes
 
 import core.language.SourceElement
+import core.parsers.editorParsers.FileOffsetRange
 import core.smarts.objects.{NamedDeclaration, Reference}
 import core.smarts.scopes.objects.ConcreteScope
 import lsp.FileRange
@@ -42,7 +43,7 @@ A declaration can declare a scope.
 class ScopeGraph extends
 {
   val nodes = mutable.Map.empty[GraphNode, mutable.Set[GraphEdge]]
-  val rangeToNode = mutable.Map.empty[FileRange, GraphNode]
+  val rangeToNode = mutable.Map.empty[FileOffsetRange, GraphNode]
   val elementToNode = mutable.Map.empty[SourceElement, GraphNode]
   var declarationsPerFile = mutable.Map.empty[String, mutable.HashSet[NamedDeclaration]]
 

@@ -1,5 +1,7 @@
 package core.parsers.core
 
+import core.parsers.editorParsers.Position
+
 import scala.collection.mutable
 
 trait OptimizingParseResult {
@@ -7,7 +9,9 @@ trait OptimizingParseResult {
 }
 
 trait OffsetNodeBase {
+  def drop(amount: Int): OffsetNodeBase
   def getAbsoluteOffset(): Int
+  def toPosition(text: ParseText): Position = text.getPosition(getAbsoluteOffset())
 }
 
 trait OptimizingParserWriter extends ParserWriter {

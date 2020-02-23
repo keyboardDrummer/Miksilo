@@ -1,20 +1,20 @@
 package core.language
 
-import core.parsers.editorParsers.SourceRange
-import lsp.{FilePosition, FileRange}
+import core.parsers.editorParsers.{FileOffsetRange, OffsetRange, SourceRange}
+import lsp.{FileOffset, FilePosition, FileRange}
 
 trait SourceElement {
   /*
   A None value means the element is not part of the source.
    */
-  def range: Option[SourceRange]
+  def range: Option[OffsetRange]
 
   def childElements: Seq[SourceElement] = Seq.empty
 
   /*
   A None value means the element is not part of the source.
    */
-  def fileRange: Option[FileRange] = range.flatMap(p => uriOption.map(u => FileRange(u, p)))
+  def fileRange: Option[FileOffsetRange] = range.flatMap(p => uriOption.map(u => FileOffsetRange(u, p)))
 
   def uriOption: Option[String]
 
@@ -25,11 +25,11 @@ trait SourceElement {
     }
   }
 
-  def getChildForPosition(filePosition: FilePosition): Option[SourceElement] = {
+  def getChildForPosition(filePosition: FileOffset): Option[SourceElement] = {
     if (isInAnotherFile(filePosition.uri))
       return None
 
-    if (!range.exists(r => r.contains(filePosition.position)))
+    if (!range.exists(r => r.contains(filePosition.offset)))
       return None
 
     val childResults = childElements.flatMap(child => child.getChildForPosition(filePosition))

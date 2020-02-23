@@ -1,6 +1,7 @@
 package languageServer
 
 import core.language.TextChangeHandler
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.{Position, SourceRange}
 import jsonRpc.LazyLogging
 import languageServer.InMemoryTextDocument._
@@ -20,6 +21,7 @@ object InMemoryTextDocument {
 }
 
 class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) extends LazyLogging {
+  val parseText = new ParseText
   def this(uri: String, contents: String) = {
     this(uri, ArrayBuffer[Array[Char]](
       contents.split(newLine, -1).view.map(line => line.toArray).toSeq: _*))

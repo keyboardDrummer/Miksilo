@@ -218,14 +218,14 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class WithRangeParser[Result, NewResult](original: Parser[Result], addRange: (ParseText, Input, Input, Result) => NewResult)
+  case class WithRangeParser[Result, NewResult](original: Parser[Result], addRange: (OffsetNode, OffsetNode, Result) => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[NewResult] = {
       val parseOriginal = recursive(original)
       (input, state) => {
         parseOriginal(input, state).mapReady(ready => {
-          val newValue = ready.resultOption.map(v => addRange(text, input, ready.remainder, v))
+          val newValue = ready.resultOption.map(v => addRange(input.offsetNode, ready.remainder.offsetNode, v))
           ReadyParseResult(newValue, ready.remainder, ready.history)
         }, uniform = true)
       }

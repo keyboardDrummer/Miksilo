@@ -46,7 +46,7 @@ object Language extends LazyLogging {
         compilation.stopped = true
       }
       compilation.diagnostics ++= compilation.remainingConstraints.flatMap(
-        constraint => constraint.getDiagnostic)
+        constraint => constraint.getDiagnostic(compilation))
     })
   }
 

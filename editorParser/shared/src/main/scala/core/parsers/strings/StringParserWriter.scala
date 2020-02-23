@@ -1,7 +1,7 @@
 package core.parsers.strings
 
 import core.parsers.core.ParseText
-import core.parsers.editorParsers.{History, ParseError, ReadyParseResult, SREmpty, SourceRange}
+import core.parsers.editorParsers.{History, OffsetNodeRange, OffsetRange, ParseError, ReadyParseResult, SREmpty, SourceRange}
 import core.parsers.sequences.SequenceParserWriter
 
 import scala.language.implicitConversions
@@ -128,7 +128,6 @@ trait StringParserWriter extends SequenceParserWriter {
   trait NextCharError extends ParseError[Input] {
     def text: ParseText
     def to: Input = if (this.from.atEnd(text)) this.from else this.from.drop(1)
-    def range(text: ParseText) = SourceRange(text.getPosition(from.offset), text.getPosition(to.offset))
   }
 
   def parseRegex(regex: Regex, regexName: String,
@@ -176,8 +175,8 @@ trait StringParserWriter extends SequenceParserWriter {
 
   implicit class StringParserExtensions[Result](parser: Parser[Result]) {
 
-    def withSourceRange[Other](addRange: (SourceRange, Result) => Other): Parser[Other] = {
-      parser.withRange((text, l,r,v) => addRange(SourceRange(text.getPosition(l.offset), text.getPosition(r.offset)), v))
+    def withSourceRange[Other](addRange: (OffsetNodeRange, Result) => Other): Parser[Other] = {
+      parser.withRange((l,r,v) => addRange(OffsetNodeRange(l, r), v))
     }
   }
 }

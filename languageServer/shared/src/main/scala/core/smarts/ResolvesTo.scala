@@ -1,5 +1,7 @@
 package core.smarts
 
+import core.language.Compilation
+import core.parsers.core.ParseText
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.ResolutionConstraint
 import lsp.{Diagnostic, DiagnosticSeverity}
@@ -31,12 +33,13 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
       false
   }
 
-  override def getDiagnostic: Option[FileDiagnostic] = {
+  override def getDiagnostic(compilation: Compilation): Option[FileDiagnostic] = {
     // TODO give specific message if it couldn't resolve because it found multiple definitions
     for {
       fileRange <- reference.origin.flatMap(e => e.fileRange)
     } yield {
-      val diagnostic = Diagnostic(fileRange.range, Some(DiagnosticSeverity.Error), s"Could not find definition of ${reference.name}", None, None)
+      val text = compilation.fileSystem.getFileParseText(fileRange.uri)
+      val diagnostic = Diagnostic(fileRange.range.toRange(text), Some(DiagnosticSeverity.Error), s"Could not find definition of ${reference.name}", None, None)
       FileDiagnostic(fileRange.uri, diagnostic)
     }
   }

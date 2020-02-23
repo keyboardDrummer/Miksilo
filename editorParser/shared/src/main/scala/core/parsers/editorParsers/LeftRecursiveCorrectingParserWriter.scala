@@ -25,8 +25,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def apply(input: Input, state: ParseState): ParseResult[Result] = {
       val newState = if (state.offset == input.offset) {
-        if (state.parsers.contains(parser))
-          throw new Exception("recursion should have been detected.")
+//        if (state.parsers.contains(parser))
+//          throw new Exception("recursion should have been detected.")
         FixPointState(input.offset, state.parsers + parser)
       } else {
         FixPointState(input.offset, Set(parser))

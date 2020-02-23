@@ -2,6 +2,7 @@ package languageServer
 
 import core.language.exceptions.BadInputException
 import core.language.{Compilation, Language, SourceElement}
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.TextEdit
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
@@ -67,8 +68,9 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     Option(getCompilation.proofs)
   }
 
-  def getSourceElement(position: FilePosition): Option[SourceElement] = {
-    getCompilation.program.getChildForPosition(position)
+  def getSourceElement(text: ParseText, position: FilePosition): Option[SourceElement] = {
+    val fileOffset = FileOffset(position.uri, text.getOffset(position.position))
+    getCompilation.program.getChildForPosition(fileOffset)
   }
 
   override def initialize(parameters: InitializeParams): Unit = {}
@@ -77,24 +79,27 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def gotoDefinition(parameters: DocumentPosition): Seq[FileRange] = {
     logger.debug("Went into gotoDefinition")
+    val text: ParseText = documentManager.getFileParseText(parameters.textDocument.uri)
     val fileRange = for {
       proofs <- getProofs
-      element <- getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
+      element <- getSourceElement(text, FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- proofs.gotoDefinition(element)
-      fileRange <- definition.origin.flatMap(o => o.fileRange)
+      fileRange <- definition.origin.flatMap(o => o.fileRange.map(fr => FileRange.fromOffsetRange(text, fr)))
     } yield fileRange //TODO misschien de Types file kopieren en Location vervangen door FileRange?
     fileRange.toSeq
   }
 
   override def complete(params: DocumentPosition): CompletionList = {
+    val text: ParseText = documentManager.getFileParseText(params.textDocument.uri)
     val position = params.position
+    val offset = text.getOffset(position)
     logger.debug("Went into complete")
     val completions: Seq[CompletionItem] = for {
       proofs <- getProofs.toSeq
       scopeGraph = proofs.scopeGraph
-      element <- getSourceElement(FilePosition(params.textDocument.uri, position)).toSeq
+      element <- getSourceElement(text, FilePosition(params.textDocument.uri, position)).toSeq
       reference <- scopeGraph.getReferenceFromSourceElement(element).toSeq
-      prefixLength = position.character - reference.origin.get.range.get.start.character
+      prefixLength = offset - reference.origin.get.range.get.from
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
         filter(declaration => declaration.name.startsWith(prefix))
@@ -113,20 +118,21 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def references(parameters: ReferencesParams): collection.Seq[FileRange] = {
     logger.debug("Went into references")
+    val text: ParseText = documentManager.getFileParseText(parameters.textDocument.uri)
     val maybeResult = for {
       proofs <- getProofs
-      element <- getSourceElement(FilePosition(parameters.textDocument.uri, parameters.position))
+      element <- getSourceElement(text, FilePosition(parameters.textDocument.uri, parameters.position))
       definition <- getDefinitionFromDefinitionOrReferencePosition(proofs, element)
     } yield {
 
       val referencesRanges: collection.Seq[FileRange] = for {
         references <- proofs.findReferences(definition)
-        range <- references.origin.flatMap(e => e.fileRange).toSeq
+        range <- references.origin.flatMap(e => e.fileRange.map(FileRange.fromOffsetRange(text, _))).toSeq
       } yield range
 
       var fileRanges: collection.Seq[FileRange] = referencesRanges
       if (parameters.context.includeDeclaration)
-        fileRanges = definition.origin.flatMap(o => o.fileRange).toSeq ++ fileRanges
+        fileRanges = definition.origin.flatMap(o => o.fileRange.map(FileRange.fromOffsetRange(text, _))).toSeq ++ fileRanges
 
       fileRanges
     }
@@ -143,6 +149,8 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     if (proofs == null)
       return Seq.empty
 
+    val text = documentManager.getFileParseText(params.textDocument.uri)
+
     val declarations = getCompilation.proofs.scopeGraph.declarationsPerFile.getOrElse(params.textDocument.uri, Seq.empty).toSeq
     declarations.
       filter(declaration => declaration.name.nonEmpty && {
@@ -156,7 +164,10 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
           true
         }
       }).
-      map(declaration => SymbolInformation(declaration.name, SymbolKind.Variable, declaration.origin.get.fileRange.get, None))
+      map(declaration => {
+        val fileRange = FileRange.fromOffsetRange(text, declaration.origin.get.fileRange.get)
+        SymbolInformation(declaration.name, SymbolKind.Variable, fileRange, None)
+      })
   }
 
   override def rename(params: RenameParams): WorkspaceEdit = {

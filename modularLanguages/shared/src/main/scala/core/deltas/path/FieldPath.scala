@@ -1,11 +1,11 @@
 package core.deltas.path
 
 import core.language.node.{Node, NodeField}
-import core.parsers.editorParsers.SourceRange
+import core.parsers.editorParsers.{OffsetRange, SourceRange}
 
 class NodeFieldPath(parent: NodePath, field: NodeField) extends FieldPath(parent, field) with NodeChildPath {
   override lazy val current: Node = super[FieldPath].current.asInstanceOf[Node]
-  override def range: Option[SourceRange] = super[FieldPath].range.orElse(super[NodeChildPath].range)
+  override def range: Option[OffsetRange] = super[FieldPath].range.orElse(super[NodeChildPath].range)
 }
 
 case class FieldPath(parent: NodePath, field: NodeField) extends ChildPath {
@@ -24,7 +24,7 @@ case class FieldPath(parent: NodePath, field: NodeField) extends ChildPath {
   override def replaceWith(replacement: Any): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
 
 
-  override def range: Option[SourceRange] = parent.current.sources.get(field)
+  override def range: Option[OffsetRange] = parent.current.sources.get(field)
 
   override def current = parent.current(field)
 }

@@ -58,5 +58,7 @@ class TextDocumentManager extends LazyLogging with FileSystem {
     }
     handlers.put(uri, handler)
   }
+
+  override def getFileParseText(path: String) = docs.get(path).parseText
 }
 

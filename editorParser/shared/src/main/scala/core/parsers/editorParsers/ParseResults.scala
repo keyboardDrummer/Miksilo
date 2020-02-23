@@ -166,4 +166,6 @@ class SREmpty[Input <: ParseInput] extends ParseResults[Input, Nothing] {
 
 object EmptyRemainder extends OffsetNodeBase {
   override def getAbsoluteOffset() = Int.MinValue
+
+  override def drop(amount: Int) = this
 }
