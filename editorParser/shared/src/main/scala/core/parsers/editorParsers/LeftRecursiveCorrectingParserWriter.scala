@@ -25,7 +25,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def apply(input: Input, state: ParseState): ParseResult[Result] = {
       val newState = moveState(input, state)
-      val key = (input, newState)
+      val key = (input, newState.parsers)
       cache.get(key) match {
         case Some(value) =>
           value
@@ -137,11 +137,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   def moveState(input: Input, state: FixPointState) = if (state.input == input) state else FixPointState(input, Set.empty)
   class CheckCache[Result](parser: BuiltParser[Result]) extends CacheLike[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
-    val cache = mutable.HashMap[(Input, ParseState), ParseResult[Result]]()
+    val cache = mutable.HashMap[(Input, Set[BuiltParser[Any]]), ParseResult[Result]]()
 
     def apply(input: Input, state: ParseState): ParseResult[Result] = {
       val newState = moveState(input, state)
-      val key = (input, newState)
+      val key = (input, newState.parsers)
       cache.get(key) match {
         case Some(value) =>
           value
