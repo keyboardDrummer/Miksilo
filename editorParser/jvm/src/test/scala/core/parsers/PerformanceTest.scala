@@ -6,7 +6,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
 object PerformanceTest {
-  val manyRepetitionsTargetTime = 200
+  val manyRepetitionsTargetTime = 150 // Note that Travis is about 3 times as slow as macbook.
   val smallEditsTargetTime = manyRepetitionsTargetTime + 5 // We only allow the small edits to make the parsing 5ms slower
   val manySourcesCount = 10
   val manySourcesTargetTime = manyRepetitionsTargetTime * manySourcesCount * 1.50 // Sadly, the larger file is relatively slower at the moment
