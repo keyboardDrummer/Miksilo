@@ -13,6 +13,7 @@ case class Position(line: Int, character: Int)
 
 case class OffsetNodeRange(from: OffsetNodeBase, until: OffsetNodeBase) {
   def toSourceRange(text: ParseText) = SourceRange(from.toPosition(text), until.toPosition(text))
+  def toOffsetRange = OffsetRange(from.getAbsoluteOffset(), until.getAbsoluteOffset())
 }
 
 case class OffsetRange(from: Int, until: Int) {
@@ -54,7 +55,7 @@ trait ParseError[Input <: ParseInput] {
   def from: Input
   def to: Input
   def text: ParseText
-  def range = OffsetNodeRange(from.offsetNode, to.offsetNode)
+  def range = OffsetNodeRange(from.offsetNode, to.offsetNode).toSourceRange(text)
 
   def canMerge: Boolean = false
   def penalty: Double

@@ -3,6 +3,7 @@ package deltas.json
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.Node
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.{Position, UntilBestAndXStepsStopFunction}
 import deltas.expression.ExpressionDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
@@ -70,13 +71,16 @@ class JsonTest extends AnyFunSuite {
 
     val result: ObjectLiteral[NodePath] = PathRoot(utils.parse(example).asInstanceOf[Node])
     val member = result.members.head
-    assertResult(Position(1, 7))(member.getField(MemberValue).range.get.start)
-    assertResult(Position(1, 20))(member.getField(MemberValue).range.get.end)
+    val offsetRange = member.getField(MemberValue).range.get
+    val text = new ParseText(example)
+    val sourceRange = offsetRange.toRange(text)
+    assertResult(Position(1, 7))(sourceRange.start)
+    assertResult(Position(1, 20))(sourceRange.end)
 
     val stringValue = member.value
-    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value)
-    assertResult(Position(1, 8))(stringLocation.range.get.start)
-    assertResult(Position(1, 19))(stringLocation.range.get.end)
+    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value).range.get.toRange(text)
+    assertResult(Position(1, 8))(stringLocation.start)
+    assertResult(Position(1, 19))(stringLocation.end)
   }
 
   test("missing object member key") {

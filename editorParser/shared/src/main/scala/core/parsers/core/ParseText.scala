@@ -6,6 +6,11 @@ import scala.collection.Searching
 
 final class ParseText extends CharSequence {
 
+  def this(text: String) = {
+    this()
+    arrayOfChars = text.toCharArray
+  }
+
   private var _arrayOfChars: Array[Char] = _
   private var lineStarts: Array[Int] = _
 

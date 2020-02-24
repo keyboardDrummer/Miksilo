@@ -95,7 +95,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   test("intertwined small garbage and success") {
     val input = """{g"person"hj:nh"remy"}"""
     val expectation = List("person" -> "remy")
-    parseJson(input, expectation, 3)
+    parseJson(input, expectation, 3, 1000)
   }
 
   // Partially Parse tests start

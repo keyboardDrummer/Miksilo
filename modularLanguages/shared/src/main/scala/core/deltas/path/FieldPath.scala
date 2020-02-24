@@ -23,8 +23,7 @@ case class FieldPath(parent: NodePath, field: NodeField) extends ChildPath {
 
   override def replaceWith(replacement: Any): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
 
-
-  override def range: Option[OffsetRange] = parent.current.sources.get(field)
+  override def range: Option[OffsetRange] = parent.current.sources.get(field).map(r => r.toOffsetRange)
 
   override def current = parent.current(field)
 }

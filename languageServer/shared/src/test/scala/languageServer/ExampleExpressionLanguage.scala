@@ -1,7 +1,7 @@
 package languageServer
 
 import core.language.{FileElement, Language, SourceElementFromFileElement}
-import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, SourceRange}
+import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
 import core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -14,7 +14,7 @@ trait Expression extends FileElement {
 }
 
 // Syntax: let x = 3 in x + 2
-case class Let(range: SourceRange,
+case class Let(range: OffsetNodeRange,
                variable: VariableDeclaration, // let _x_
                variableValue: Expression, // 3
                value: Expression // x + 2
@@ -31,7 +31,7 @@ case class Let(range: SourceRange,
 }
 
 // Syntax: some_identifier_name
-case class Identifier(range: SourceRange, name: String) extends Expression {
+case class Identifier(range: OffsetNodeRange, name: String) extends Expression {
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
     builder.resolve(name, scope, this.addFile(uri))
   }
@@ -41,18 +41,18 @@ case class Identifier(range: SourceRange, name: String) extends Expression {
   override def childElements = Seq.empty
 }
 
-case class VariableDeclaration(range: SourceRange, name: String) extends FileElement {
+case class VariableDeclaration(range: OffsetNodeRange, name: String) extends FileElement {
   override def childElements = Seq.empty
 }
 
-case class Number(range: SourceRange, value: Int) extends Expression {
+case class Number(range: OffsetNodeRange, value: Int) extends Expression {
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
   }
 
   override def childElements: Seq[Nothing] = Seq.empty
 }
 
-case class ExpressionHole(range: SourceRange) extends Expression {
+case class ExpressionHole(range: OffsetNodeRange) extends Expression {
 
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
     builder.refer("", scope, Some(this.addFile(uri)))
@@ -62,7 +62,7 @@ case class ExpressionHole(range: SourceRange) extends Expression {
 }
 
 // 3 + 2
-case class Addition(range: SourceRange, left: Expression, right: Expression) extends Expression {
+case class Addition(range: OffsetNodeRange, left: Expression, right: Expression) extends Expression {
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
     left.collectConstraints(builder, uri, scope)
     right.collectConstraints(builder, uri, scope)

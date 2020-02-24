@@ -93,7 +93,10 @@ trait OptimizingParserWriter extends ParserWriter {
       }
     }
 
-    override def clear(): Unit = ???
+    override def clear(): Unit = {
+      offsets.clear()
+      offsetCache.clear()
+    }
   }
 
   def wrapParser[Result](text: ParseText,
