@@ -4,9 +4,7 @@ import core.parsers.core.ParseText
 
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
-
   override def newParseState(input: Input) = FixPointState(input.offset, Set.empty)
-
 
   def recursionsFor[Result, SeedResult](parseResults: ParseResults[Input, Result], parser: BuiltParser[SeedResult]) = {
     parseResults match {
@@ -24,11 +22,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     extends CheckCache[Result](text, parser) {
 
     override def apply(input: Input, state: FixPointState): ParseResult[Result] = {
-      val newState = if (state.offset == input.offset) {
-        state
-      } else {
-        FixPointState(input.offset, Set.empty)
-      }
+      val newState = moveState(input, state)
 
       val key = input.createCacheKey(parser, newState.parsers)
       input.offsetNode.cache.get(key) match {
@@ -42,8 +36,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
             case None =>
               if (newState.parsers.contains(parser))
                 throw new Exception("recursion should have been detected.")
-              val state2 = FixPointState(newState.offset, newState.parsers + parser)
-              val initialResult = parser(input, state2)
+              val nextState = FixPointState(newState.offset, newState.parsers + parser)
+              val initialResult = parser(input, nextState)
 
               val RecursionsList(recursions, resultWithoutRecursion) = recursionsFor(initialResult, parser)
               val foundRecursion = recursions.nonEmpty
@@ -142,11 +136,13 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     override def latestRemainder = tail.latestRemainder
   }
 
+  def moveState(input: Input, state: FixPointState) = if (state.offset == input.offset) state else FixPointState(input.offset, Set.empty)
+
   class CheckCache[Result](text: ParseText, parser: BuiltParser[Result]) extends BuiltParser[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
 
     def apply(input: Input, state: FixPointState): ParseResult[Result] = {
-      val newState = if (state.offset == input.offset) state else FixPointState(input.offset, Set.empty)
+      val newState =  moveState(input, state)
       val key = input.createCacheKey(parser, newState.parsers)
 
       input.offsetNode.cache.get(key) match {
