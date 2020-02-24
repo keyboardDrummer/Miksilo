@@ -79,7 +79,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      (input: Input, state: ParseState) => {
+      (input: Input, state: FixPointState) => {
         val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input -> first)))
         val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input -> second)))
         firstResult match {
@@ -101,7 +101,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      (input: Input, state: ParseState) => {
+      (input: Input, state: FixPointState) => {
         val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input -> first)))
         val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input -> second)))
         val merged = firstResult.merge(secondResult)

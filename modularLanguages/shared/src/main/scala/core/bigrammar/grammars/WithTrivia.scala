@@ -38,7 +38,7 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
     val parseOriginal = recursive(original)
 
     new BuiltParser[Result] {
-      override def apply(input: Input, state: ParseState): ParseResults[Input, Result] = {
+      override def apply(input: Input, state: FixPointState): ParseResults[Input, Result] = {
         val leftResults = parseTrivias(input, state)
 
         def rightFromLeftReady(leftReady: ReadyParseResult[Input, Result]): ParseResults[Input, Result] = {

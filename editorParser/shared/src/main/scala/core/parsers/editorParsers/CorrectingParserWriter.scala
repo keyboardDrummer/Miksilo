@@ -87,7 +87,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
       class LeftIfRightParser extends BuiltParser[Result] {
 
-        def parse(input: Input, state: ParseState, mayFail: Boolean): ParseResult[Result] = {
+        def parse(input: Input, state: FixPointState, mayFail: Boolean): ParseResult[Result] = {
 
           def rightFromLeftReady(leftReady: ReadyParseResult[Input, Left]): ParseResults[Input, Result] = {
 
@@ -116,7 +116,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           withoutLeft.merge(withLeft)
         }
 
-        override def apply(input: Input, state: ParseState): ParseResult[Result] = {
+        override def apply(input: Input, state: FixPointState): ParseResult[Result] = {
           parse(input, state, mayFail = true)
         }
       }
@@ -136,7 +136,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       lazy val parseRight = recursive(right)
 
       new BuiltParser[Result] {
-        override def apply(input: Input, state: ParseState) = {
+        override def apply(input: Input, state: FixPointState) = {
           val leftResults = parseLeft(input, state)
 
           val delayedLeftResults: ParseResults[Input, Left] = leftResults.mapResult({
@@ -174,7 +174,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       lazy val parseSecond = recursive(second)
 
       new BuiltParser[Result] {
-        override def apply(input: Input, state: ParseState): ParseResults[Input, Result] = {
+        override def apply(input: Input, state: FixPointState): ParseResults[Input, Result] = {
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
           firstResult match {
@@ -198,7 +198,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       lazy val parseSecond = recursive(second)
 
       new BuiltParser[Result] {
-        override def apply(input: Input, state: ParseState): ParseResults[Input, Result] = {
+        override def apply(input: Input, state: FixPointState): ParseResults[Input, Result] = {
           val firstResult = parseFirst(input, state)
           val secondResult = parseSecond(input, state)
           firstResult.merge(secondResult)

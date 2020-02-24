@@ -44,7 +44,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
       class DroppingParser extends BuiltParser[Result] {
 
-        def parse(input: Input, state: ParseState, mayFail: Boolean): ParseResult[Result] = {
+        def parse(input: Input, state: FixPointState, mayFail: Boolean): ParseResult[Result] = {
           var originalResult = parseOriginal(input, state)
           if (input.atEnd(text))
             return originalResult
@@ -67,7 +67,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           originalResult.merge(withDrop)
         }
 
-        override def apply(input: Input, state: ParseState): ParseResult[Result] = {
+        override def apply(input: Input, state: FixPointState): ParseResult[Result] = {
           parse(input, state, mayFail = true)
         }
       }
@@ -184,7 +184,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       val parseOriginal = recursive(original)
 
       new BuiltParser[Result] {
-        override def apply(input: Input, state: ParseState) = {
+        override def apply(input: Input, state: FixPointState) = {
           val result = parseOriginal(input, state)
           result.mapReady(parseResult => {
             val remainder = parseResult.remainder
@@ -207,7 +207,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Elem] = {
 
-      def apply(input: Input, state: ParseState): ParseResult[Elem] = {
+      def apply(input: Input, state: FixPointState): ParseResult[Elem] = {
         if (input.atEnd(text)) {
           return newFailure(new MissingInput(text, input, kind, "", History.missingInputPenalty))
         }

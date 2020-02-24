@@ -25,8 +25,7 @@ trait OptimizingParserWriter extends ParserWriter {
   type Input <: ParseInput2
 
   type Parser[+Result] = ParserBuilder[Result]
-  def newParseState(input: Input): ParseState
-  type ParseState = FixPointState
+  def newParseState(input: Input): FixPointState
   type ParseResult[+Result] <: OptimizingParseResult
 
   trait OffsetManager {
@@ -105,7 +104,7 @@ trait OptimizingParserWriter extends ParserWriter {
                          shouldDetectLeftRecursion: Boolean): BuiltParser[Result]
 
   trait BuiltParser[+Result] {
-    def apply(input: Input, state: ParseState): ParseResult[Result]
+    def apply(input: Input, state: FixPointState): ParseResult[Result]
     def debugName: Any = null
   }
 
@@ -165,7 +164,7 @@ trait OptimizingParserWriter extends ParserWriter {
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       lazy val parseOriginal = recursive(original)
       new BuiltParser[Result] {
-        override def apply(input: Input, state: ParseState) = {
+        override def apply(input: Input, state: FixPointState) = {
           parseOriginal(input, state)
         }
 

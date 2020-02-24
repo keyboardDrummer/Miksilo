@@ -23,7 +23,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                                             parser: BuiltParser[Result])
     extends CheckCache[Result](text, parser) {
 
-    override def apply(input: Input, state: ParseState): ParseResult[Result] = {
+    override def apply(input: Input, state: FixPointState): ParseResult[Result] = {
       val newState = if (state.offset == input.offset) {
 //        if (state.parsers.contains(parser))
 //          throw new Exception("recursion should have been detected.")
@@ -75,7 +75,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }, uniform = false)) // The uniform = false here is because applying recursion is similar to a Sequence
     }
 
-    def getPreviousResult(input: Input, state: ParseState): Option[ParseResult[Result]] = {
+    def getPreviousResult(input: Input, state: FixPointState): Option[ParseResult[Result]] = {
       if (state.offset == input.offset && state.parsers.contains(parser))
           Some(RecursiveResults(Map(parser -> List(RecursiveParseResult[Input, Result, Result](x => x))), SREmpty.empty))
       else
@@ -144,7 +144,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   class CheckCache[Result](text: ParseText, parser: BuiltParser[Result]) extends BuiltParser[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
 
-    def apply(input: Input, state: ParseState): ParseResult[Result] = {
+    def apply(input: Input, state: FixPointState): ParseResult[Result] = {
       val newState = if (state.offset == input.offset) state else FixPointState(input.offset, Set.empty)
       val key = (parser, newState.parsers)
 

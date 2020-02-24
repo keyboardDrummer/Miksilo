@@ -77,7 +77,7 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[String] = {
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
-        def apply(input: Input, state: ParseState): ParseResult[String] = {
+        def apply(input: Input, state: FixPointState): ParseResult[String] = {
           var index = 0
           while (index < value.length) {
             val arrayIndex = index + input.offset
@@ -109,7 +109,7 @@ trait StringParserWriter extends SequenceParserWriter {
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[String] = {
       val identifierParser = recursive(parseIdentifier)
       new BuiltParser[String] {
-        override def apply(input: Input, state: ParseState) = {
+        override def apply(input: Input, state: FixPointState) = {
           identifierParser(input, state).mapReady(ready => {
             if (ready.resultOption.contains(value)) {
               ready
@@ -151,7 +151,7 @@ trait StringParserWriter extends SequenceParserWriter {
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
 
-        def apply(input: Input, state: ParseState): ParseResult[String] = {
+        def apply(input: Input, state: FixPointState): ParseResult[String] = {
           regex.findPrefixMatchOf(new SubSequence(text, input.offset)) match {
             case Some(matched) =>
               val value = text.subSequence(input.offset, input.offset + matched.end).toString
