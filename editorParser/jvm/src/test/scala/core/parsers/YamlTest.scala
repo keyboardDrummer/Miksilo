@@ -58,6 +58,7 @@ class YamlTest extends AnyFunSuite
 
   override def startInput(offsetManager: OffsetManager) = new IndentationReader(offsetManager.getOffsetNode(0), BlockOut, 0)
 
+  type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], Int, YamlContext)
   class IndentationReader(offsetNode: OffsetNode, val context: YamlContext, val indentation: Int)
     extends StringReaderBase(offsetNode) with IndentationReaderLike {
 
@@ -74,6 +75,8 @@ class YamlTest extends AnyFunSuite
       case other: IndentationReader => offset == other.offset && indentation == other.indentation && context == other.context
       case _ => false
     }
+
+    override def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]) = (parser, state, indentation, context)
   }
 
   class IfContext[Result](inners: Map[YamlContext, Parser[Result]]) extends ParserBuilderBase[Result] {
@@ -96,10 +99,10 @@ class YamlTest extends AnyFunSuite
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
-      def apply(input: IndentationReader, state: ParseState): ParseResult[Result] = {
+      def apply(input: IndentationReader, state: FixPointState): ParseResult[Result] = {
         val context: YamlContext = input.context
-        val result = parseOriginal(input.withContext(update(input.context)), state)
-        result.updateRemainder(r => r.withContext(input.context))
+        val result = parseOriginal(input.withContext(update(context)), state)
+        result.updateRemainder(r => r.withContext(context))
       }
 
       apply

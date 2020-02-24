@@ -188,7 +188,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
 
     override def getParser(text: ParseText, recursive: ParseJson.GetParser) = {
       val parseOriginal = recursive(original)
-      (input: Input, state: ParseState) => {
+      (input: Input, state: FixPointState) => {
         val result = parseOriginal(input, state)
         result.map(resultValue => {
           if (resultValue == valueToDetect) {

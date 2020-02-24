@@ -9,7 +9,6 @@ trait ParseInput {
 
 trait ParserWriter {
 
-
   type Input <: ParseInput
   type Parser[+Result]
 

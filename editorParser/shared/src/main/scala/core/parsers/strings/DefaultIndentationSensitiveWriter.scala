@@ -5,6 +5,8 @@ trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter
 
   override def startInput(offsetManager: OffsetManager) = new IndentationReader(offsetManager.getOffsetNode(0), 0)
 
+  type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], Int)
+
   class IndentationReader(offsetNode: OffsetNode, val indentation: Int)
     extends StringReaderBase(offsetNode) with IndentationReaderLike {
 
@@ -18,5 +20,7 @@ trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter
     }
 
     override def withIndentation(value: Int) = new IndentationReader(offsetNode, value)
+
+    override def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]) = (parser, state, indentation)
   }
 }

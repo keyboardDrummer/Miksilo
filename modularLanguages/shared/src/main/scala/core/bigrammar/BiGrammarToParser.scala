@@ -24,6 +24,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
   override def startInput(offsetManager: BiGrammarToParser.OffsetManager) = new Reader(offsetManager.getOffsetNode(0), Map.empty)
 
+  type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], State)
   class Reader(offsetNode: OffsetNode, val state: State)
     extends StringReaderBase(offsetNode)
     with IndentationReaderLike {
@@ -42,6 +43,8 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     override def indentation = state.getOrElse(IndentationKey, 0).asInstanceOf[Int]
 
     override def withIndentation(value: Int) = withState(state + (IndentationKey -> value))
+
+    override def createCacheKey(parser: BiGrammarToParser.BuiltParser[_], state: Set[BiGrammarToParser.BuiltParser[Any]]) = (parser, state, this.state)
   }
 
   def valueToResult(value: Any): Result = WithMap(value, Map.empty)

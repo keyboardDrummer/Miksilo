@@ -25,14 +25,12 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def apply(input: Input, state: FixPointState): ParseResult[Result] = {
       val newState = if (state.offset == input.offset) {
-//        if (state.parsers.contains(parser))
-//          throw new Exception("recursion should have been detected.")
-        FixPointState(input.offset, state.parsers + parser)
+        state
       } else {
-        FixPointState(input.offset, Set(parser))
+        FixPointState(input.offset, Set.empty)
       }
 
-      val key = (parser, newState.parsers)
+      val key = input.createCacheKey(parser, newState.parsers)
       input.offsetNode.cache.get(key) match {
         case Some(value) =>
           value.asInstanceOf[ParseResult[Result]]
@@ -42,7 +40,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               intermediate
 
             case None =>
-              val initialResult = parser(input, newState)
+              if (newState.parsers.contains(parser))
+                throw new Exception("recursion should have been detected.")
+              val state2 = FixPointState(newState.offset, newState.parsers + parser)
+              val initialResult = parser(input, state2)
 
               val RecursionsList(recursions, resultWithoutRecursion) = recursionsFor(initialResult, parser)
               val foundRecursion = recursions.nonEmpty
@@ -146,7 +147,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     def apply(input: Input, state: FixPointState): ParseResult[Result] = {
       val newState = if (state.offset == input.offset) state else FixPointState(input.offset, Set.empty)
-      val key = (parser, newState.parsers)
+      val key = input.createCacheKey(parser, newState.parsers)
 
       input.offsetNode.cache.get(key) match {
         case Some(value) =>
