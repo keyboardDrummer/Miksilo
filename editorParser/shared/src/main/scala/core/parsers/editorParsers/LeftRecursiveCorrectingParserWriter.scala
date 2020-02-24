@@ -24,7 +24,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   case class DetectFixPointAndCache[Result](parser: BuiltParser[Result]) extends CheckCache[Result](parser) {
 
     override def apply(input: Input, state: ParseState): ParseResult[Result] = {
-      val key = (input, state)
+      val newState = moveState(input, state)
+      val key = (input, newState)
       cache.get(key) match {
         case Some(value) =>
           value
@@ -35,14 +36,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
             case None =>
 
-              val newState = if (state.input == input) {
-                  if (state.parsers.contains(parser))
-                    throw new Exception("recursion should have been detected.")
-                FixPointState(input, state.parsers + parser)
-              } else {
-                FixPointState(input, Set(parser))
-              }
-              val initialResult = parser(input, newState)
+              if (newState.parsers.contains(parser))
+                throw new Exception("recursion should have been detected.")
+              val nextState = FixPointState(input, newState.parsers + parser)
+              val initialResult = parser(input, nextState)
 
               val RecursionsList(recursions, resultWithoutRecursion) = recursionsFor(initialResult, parser)
               val foundRecursion = recursions.nonEmpty
@@ -137,17 +134,19 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
+  def moveState(input: Input, state: FixPointState) = if (state.input == input) state else FixPointState(input, Set.empty)
   class CheckCache[Result](parser: BuiltParser[Result]) extends CacheLike[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
     val cache = mutable.HashMap[(Input, ParseState), ParseResult[Result]]()
 
     def apply(input: Input, state: ParseState): ParseResult[Result] = {
-      val key = (input, state)
+      val newState = moveState(input, state)
+      val key = (input, newState)
       cache.get(key) match {
         case Some(value) =>
           value
         case _ =>
-          val value: ParseResult[Result] = parser(input, state)
+          val value: ParseResult[Result] = parser(input, newState)
           cache.put(key, value)
           value
       }
