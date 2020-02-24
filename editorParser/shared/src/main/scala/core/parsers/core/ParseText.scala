@@ -33,7 +33,9 @@ final class ParseText extends CharSequence {
     }
   }
 
-  def getOffset(position: Position): Int = ???
+  def getOffset(position: Position): Int = {
+    lineStarts(position.line) + position.character
+  }
 
   def getPosition(offset: Int): Position = {
     import Searching._
