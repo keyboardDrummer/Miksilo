@@ -18,7 +18,7 @@ case class OffsetNodeRange(from: OffsetNodeBase, until: OffsetNodeBase) {
 
 case class OffsetRange(from: Int, until: Int) {
   def contains(offset: Int): Boolean = {
-    from <= offset && offset < until
+    from <= offset && offset <= until
   }
   def toRange(text: ParseText) = SourceRange(text.getPosition(from), text.getPosition(until))
 }

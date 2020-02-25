@@ -20,6 +20,9 @@ final class ParseText extends CharSequence {
   def applyRangeChange(newText: String, range: SourceRange): Unit = {
     val start = getOffset(range.start)
     val end = getOffset(range.end)
+    if (start > end || start < 0 || end > _arrayOfChars.length) {
+      throw new IllegalArgumentException(s"Range ${range} is outside of the document bounds")
+    }
     val newArray = new Array[Char](_arrayOfChars.length + newText.length - (end - start))
     _arrayOfChars.copyToArray(newArray, 0, start)
     Array.copy(_arrayOfChars, end, newArray, start + newText.length, _arrayOfChars.length - end)
@@ -47,7 +50,11 @@ final class ParseText extends CharSequence {
   }
 
   def getOffset(position: Position): Int = {
-    lineStarts(position.line) + position.character
+    try {
+      lineStarts(position.line) + position.character
+    } catch {
+      case e: IndexOutOfBoundsException => throw new IllegalArgumentException(s"Line ${position.line} is not in the document.")
+    }
   }
 
   def getPosition(offset: Int): Position = {
