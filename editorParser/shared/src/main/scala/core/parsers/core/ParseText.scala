@@ -1,9 +1,12 @@
 package core.parsers.core
 
-import core.parsers.editorParsers.Position
+import core.parsers.editorParsers.{Position, SourceRange}
 
 import scala.collection.Searching
 
+// Moet de parser een abstracte position bijhouden? zodat die kan samenwerken met een efficient updatebare document.
+// deze position zou wschijnlijk een node in een bidirectional tree zijn.
+// Een skiplist is ook een optie
 final class ParseText extends CharSequence {
 
   def this(text: String) = {
@@ -13,6 +16,16 @@ final class ParseText extends CharSequence {
 
   private var _arrayOfChars: Array[Char] = _
   private var lineStarts: Array[Int] = _
+
+  def applyRangeChange(newText: String, range: SourceRange): Unit = {
+    val start = getOffset(range.start)
+    val end = getOffset(range.end)
+    val newArray = new Array[Char](_arrayOfChars.length + newText.length - (end - start))
+    _arrayOfChars.copyToArray(newArray, 0, start)
+    Array.copy(_arrayOfChars, end, newArray, start + newText.length, _arrayOfChars.length - end)
+    newText.copyToArray(newArray, start, end)
+    arrayOfChars = newArray
+  }
 
   def arrayOfChars: Array[Char] = _arrayOfChars
   def arrayOfChars_=(arrayOfChars: Array[Char]): Unit = {

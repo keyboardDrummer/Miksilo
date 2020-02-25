@@ -20,11 +20,12 @@ object InMemoryTextDocument {
   val newLine = "\n"
 }
 
-class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) extends LazyLogging {
+class InMemoryTextDocument(uri: String) extends LazyLogging {
   val parseText = new ParseText
+
   def this(uri: String, contents: String) = {
-    this(uri, ArrayBuffer[Array[Char]](
-      contents.split(newLine, -1).view.map(line => line.toArray).toSeq: _*))
+    this(uri)
+    parseText.arrayOfChars = contents.toCharArray
   }
 
   def applyUnsafeChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler] = None): Unit = {
@@ -36,56 +37,18 @@ class InMemoryTextDocument(uri: String, var contents: ArrayBuffer[Array[Char]]) 
     }
   }
 
-  def positionToOffset(position: Position): Int = {
-    var result = position.character
-    for(line <- 0.until(position.line)) {
-      result += contents(line).length
-    }
-    result
-  }
-
   def applyChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler] = None): Unit = {
     for(change <- changes) {
       change.range match {
         case None =>
-          contents = new InMemoryTextDocument(uri, changes.head.text).contents
+          parseText.arrayOfChars = changes.head.text.toCharArray
         case Some(range) =>
-          applyRangeChange(change.text, range)
+          parseText.applyRangeChange(change.text, range)
           handlerOption.foreach(handler =>
-            handler.handleChange(positionToOffset(range.start), positionToOffset(range.end), change.text))
+            handler.handleChange(parseText.getOffset(range.start), parseText.getOffset(range.end), change.text))
       }
     }
   }
 
-  def outOfBounds(position: Position): Boolean = {
-    position.line < 0 || position.line >= contents.length ||
-      position.character < 0 || position.character > contents(position.line).length
-  }
-
-  private def applyRangeChange(newText: String, range: SourceRange): Unit = {
-    if (outOfBounds(range.start) || outOfBounds(range.end)) {
-      throw new IllegalArgumentException(s"range '$range' is out of bounds")
-    }
-
-    val newLines: Array[Array[Char]] = newText.split(newLine, -1).map(line => line.toCharArray)
-    newLines(0) = contents(range.start.line).take(range.start.character) ++ newLines(0)
-    newLines(newLines.length - 1) = newLines(newLines.length - 1) ++ contents(range.end.line).drop(range.end.character)
-
-    val rangeLineDifference = range.end.line - range.start.line + 1
-    val lineReuseLength = Math.min(newLines.length, rangeLineDifference)
-    for (newLineIndex <- 0.until(lineReuseLength)) {
-      contents(range.start.line + newLineIndex) = newLines(newLineIndex)
-    }
-    val diff = newLines.length - rangeLineDifference
-    val currentLine = range.start.line + lineReuseLength
-    if (diff > 0) {
-      contents.insertAll(currentLine, newLines.drop(lineReuseLength))
-    } else {
-      contents.remove(currentLine, -diff)
-    }
-  }
-
-  def mkString = {
-    contents.map(line => new String(line)).mkString(newLine)
-  }
+  def mkString = new String(parseText.arrayOfChars)
 }
