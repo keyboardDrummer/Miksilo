@@ -5,7 +5,9 @@ import core.parsers.editorParsers._
 
 trait SequenceParserWriter extends CorrectingParserWriter {
 
-  trait SequenceInput[Elem] extends ParseInput2 {
+  trait SequenceInput[Elem] extends CorrectingInput {
+
+    def drop(amount: Int): Input
 
     def head(array: ParseText): Elem
     def tail(array: ParseText): Input

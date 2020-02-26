@@ -7,6 +7,12 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   type ParseResult[+Result] = ParseResults[Input, Result]
 
 
+  trait CorrectingInput extends ParseInput {
+    def atEnd(array: ParseText): Boolean
+  }
+
+  type Input <: CorrectingInput
+
   def findBestParseResult[Result](text: ParseText, startInput: Input, parser: BuiltParser[Result], mayStop: StopFunction,
                                   metrics: Metrics): SingleParseResult[Result, Input] = {
 
@@ -107,6 +113,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }
 
           val withoutLeft = parseRight(input, state)
+
+          // TODO determine if we can delete or comment about the next two lines
           if (input.atEnd(text))
             return withoutLeft
 

@@ -19,15 +19,6 @@ trait OffsetNodeBase {
 
 trait OptimizingParserWriter extends ParserWriter {
 
-  trait ParseInput2 extends ParseInput {
-    def drop(amount: Int): Input
-    def atEnd(array: ParseText): Boolean
-    def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]): CacheKey
-  }
-
-  type Input <: ParseInput2
-  type CacheKey //(BuiltParser[_], Set[BuiltParser[Any]])
-
   type Parser[+Result] = ParserBuilder[Result]
   def newParseState(input: Input): FixPointState
   type ParseResult[+Result] <: OptimizingParseResult

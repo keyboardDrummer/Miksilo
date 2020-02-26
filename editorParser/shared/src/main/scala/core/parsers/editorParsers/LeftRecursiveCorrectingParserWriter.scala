@@ -10,9 +10,11 @@ import scala.collection.mutable
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   type Input <: CachingInput
+  type CacheKey
 
-  trait CachingInput extends ParseInput2 {
+  trait CachingInput extends CorrectingInput {
     def offsetNode: OffsetNode
+    def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]): CacheKey
   }
 
   trait OffsetNode extends OffsetNodeBase {
@@ -20,7 +22,6 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     def cache: mutable.HashMap[CacheKey, ParseResult[_]]
     def cache_=(value: mutable.HashMap[CacheKey, ParseResult[_]]): Unit
   }
-
 
   trait OffsetManager {
     def getOffsetNode(offset: Int): OffsetNode
