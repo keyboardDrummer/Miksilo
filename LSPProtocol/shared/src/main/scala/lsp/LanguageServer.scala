@@ -115,7 +115,6 @@ case class FileRange(uri: String, range: SourceRange) {
   def contains(filePosition: FilePosition): Boolean = {
     uri == filePosition.uri && range.contains(filePosition.position)
   }
-
 }
 
 object FileRange {
