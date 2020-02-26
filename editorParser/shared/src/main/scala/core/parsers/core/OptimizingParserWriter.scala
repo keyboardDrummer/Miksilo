@@ -4,8 +4,7 @@ import core.parsers.editorParsers.Position
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
-import scala.collection.{Searching, mutable}
-import scala.math.Ordering
+import scala.collection.mutable
 
 trait OptimizingParseResult {
   def latestRemainder: OffsetNodeBase
@@ -55,7 +54,9 @@ trait OptimizingParserWriter extends ParserWriter {
     override def toString = offset.toString
   }
 
-  case class FixPointState(offset: Int, parsers: Set[BuiltParser[Any]])
+  case class FixPointState(offset: Int, // TODO try to remove this offset, since we can also clear the callStack whenever we move forward.
+                           callStack: Set[BuiltParser[Any]])
+
   class ArrayOffsetManager extends OffsetManager {
     val offsets = mutable.ArrayBuffer.empty[AbsoluteOffsetNode]
     val offsetCache = mutable.HashMap.empty[Int, OffsetNode]
@@ -132,7 +133,7 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait ParserBuilder[+Result] {
-    def getParser(offsettext: ParseText, recursive: GetParser): BuiltParser[Result]
+    def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result]
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[ParserBuilder[_]]

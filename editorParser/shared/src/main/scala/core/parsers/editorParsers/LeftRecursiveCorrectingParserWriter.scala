@@ -24,7 +24,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     override def apply(input: Input, state: FixPointState): ParseResult[Result] = {
       val newState = moveState(input, state)
 
-      val key = input.createCacheKey(parser, newState.parsers)
+      val key = input.createCacheKey(parser, newState.callStack)
       input.offsetNode.cache.get(key) match {
         case Some(value) =>
           value.asInstanceOf[ParseResult[Result]]
@@ -34,9 +34,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               intermediate
 
             case None =>
-              if (newState.parsers.contains(parser))
+              if (newState.callStack.contains(parser))
                 throw new Exception("recursion should have been detected.")
-              val nextState = FixPointState(newState.offset, newState.parsers + parser)
+              val nextState = FixPointState(newState.offset, newState.callStack + parser)
               val initialResult = parser(input, nextState)
 
               val RecursionsList(recursions, resultWithoutRecursion) = recursionsFor(initialResult, parser)
@@ -71,7 +71,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     def getPreviousResult(input: Input, state: FixPointState): Option[ParseResult[Result]] = {
-      if (state.offset == input.offset && state.parsers.contains(parser))
+      if (state.offset == input.offset && state.callStack.contains(parser))
           Some(RecursiveResults(Map(parser -> List(RecursiveParseResult[Input, Result, Result](x => x))), SREmpty.empty))
       else
         None
@@ -143,7 +143,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     def apply(input: Input, state: FixPointState): ParseResult[Result] = {
       val newState =  moveState(input, state)
-      val key = input.createCacheKey(parser, newState.parsers)
+      val key = input.createCacheKey(parser, newState.callStack)
 
       input.offsetNode.cache.get(key) match {
         case Some(value) =>
