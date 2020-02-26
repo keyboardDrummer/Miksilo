@@ -16,6 +16,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   type Input <: CachingInput
   type ParseResult[+Result] <: CachingParseResult
+
+  // TODO CacheKey en Input als abstract types is dubbelop. Beter een State abstract type.
   type CacheKey
 
   trait CachingInput extends CorrectingInput {

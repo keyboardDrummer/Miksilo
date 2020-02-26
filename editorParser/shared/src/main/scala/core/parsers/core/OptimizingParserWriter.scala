@@ -11,10 +11,17 @@ trait OffsetNode {
   def toPosition(text: ParseText): Position = text.getPosition(getAbsoluteOffset())
 }
 
+trait ParseInput {
+  def offsetNode: OffsetNode
+  def offset = offsetNode.getAbsoluteOffset()
+}
+
 trait OptimizingParserWriter extends ParserWriter {
 
+  type Input <: ParseInput
   type ParseResult[+Result]
   type Parser[+Result] = ParserBuilder[Result]
+
   def newParseState(input: Input): FixPointState
 
   case class FixPointState(offset: Int, // TODO try to remove this offset, since we can also clear the callStack whenever we move forward.
@@ -186,4 +193,8 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
+
+  case class Success[+Result](result: Result, remainder: Input) {
+    def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)
+  }
 }
