@@ -1,5 +1,7 @@
 package core.parsers.core
 
+import core.parsers.sequences.SingleResultParser
+
 import scala.language.{existentials, higherKinds}
 
 trait ParseInput {

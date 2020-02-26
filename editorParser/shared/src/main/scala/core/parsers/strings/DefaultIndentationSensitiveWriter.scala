@@ -1,6 +1,8 @@
 package core.parsers.strings
 
-trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter {
+import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
+
+trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter with LeftRecursiveCorrectingParserWriter {
   type Input = IndentationReader
 
   override def startInput(offsetManager: OffsetManager) = new IndentationReader(offsetManager.getOffsetNode(0), 0)

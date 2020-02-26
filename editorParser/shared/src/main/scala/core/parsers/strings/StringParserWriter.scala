@@ -1,13 +1,13 @@
 package core.parsers.strings
 
 import core.parsers.core.ParseText
-import core.parsers.editorParsers.{History, OffsetNodeRange, OffsetRange, ParseError, ReadyParseResult, SREmpty, SourceRange}
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetNodeRange, OffsetRange, ParseError, ReadyParseResult, SREmpty, SourceRange}
 import core.parsers.sequences.SequenceParserWriter
 
 import scala.language.implicitConversions
 import scala.util.matching.Regex
 
-trait StringParserWriter extends SequenceParserWriter {
+trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrectingParserWriter {
   type Elem = Char
   type Input <: StringReaderLike
 
@@ -42,7 +42,7 @@ trait StringParserWriter extends SequenceParserWriter {
     }
   }
 
-  trait StringReaderLike extends SequenceInput[Char] {
+  trait StringReaderLike extends SequenceInput[Char] with CachingInput {
 
     def drop(amount: Int): Input
     def remaining(array: ParseText) = array.length() - offset

@@ -1,25 +1,23 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{Metrics, OptimizingParserWriter, ParseInput, ParseText}
+import core.parsers.core._
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
   type ParseResult[+Result] = ParseResults[Input, Result]
 
-  def startInput(offsetManager: OffsetManager): Input
 
-  def findBestParseResult[Result](text: ParseText, offsetManager: OffsetManager, parser: BuiltParser[Result], mayStop: StopFunction,
+  def findBestParseResult[Result](text: ParseText, startInput: Input, parser: BuiltParser[Result], mayStop: StopFunction,
                                   metrics: Metrics): SingleParseResult[Result, Input] = {
 
     val start = System.currentTimeMillis()
-    val zero: Input = startInput(offsetManager)
-    val noResultFound = ReadyParseResult(None, zero, History.error(FatalError(text, zero, "Grammar is always recursive")))
+    val noResultFound = ReadyParseResult(None, startInput, History.error(FatalError(text, startInput, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Input, Result] = noResultFound
 
     mayStop.reset()
 
     var cycles = 0
-    var queue = parser(zero, newParseState(zero))
+    var queue = parser(startInput, newParseState(startInput))
     while(queue.nonEmpty) {
       cycles += 1
       val (parseResult, tail) = queue.pop()
@@ -218,7 +216,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class WithRangeParser[Result, NewResult](original: Parser[Result], addRange: (OffsetNode, OffsetNode, Result) => NewResult)
+  case class WithRangeParser[Result, NewResult](original: Parser[Result], addRange: (OffsetNodeBase, OffsetNodeBase, Result) => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[NewResult] = {

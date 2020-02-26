@@ -1,6 +1,7 @@
 package core.parsers.core
 
 import core.parsers.editorParsers.Position
+import core.parsers.sequences.SingleResultParser
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
@@ -19,7 +20,6 @@ trait OffsetNodeBase {
 trait OptimizingParserWriter extends ParserWriter {
 
   trait ParseInput2 extends ParseInput {
-    def offsetNode: OffsetNode
     def drop(amount: Int): Input
     def atEnd(array: ParseText): Boolean
     def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]): CacheKey
@@ -32,91 +32,8 @@ trait OptimizingParserWriter extends ParserWriter {
   def newParseState(input: Input): FixPointState
   type ParseResult[+Result] <: OptimizingParseResult
 
-  trait OffsetManager {
-    def getOffsetNode(offset: Int): OffsetNode
-    def changeText(from: Int, until: Int, insertLenght: Int): Unit
-    def clear(): Unit
-  }
-
-  trait OffsetNode extends OffsetNodeBase {
-    def drop(amount: Int): OffsetNode
-    def cache: mutable.HashMap[CacheKey, ParseResult[_]]
-    def cache_=(value: mutable.HashMap[CacheKey, ParseResult[_]]): Unit
-  }
-
-  class AbsoluteOffsetNode(val manager: ArrayOffsetManager, var offset: Int) extends OffsetNode {
-    override def getAbsoluteOffset() = offset
-
-    override var cache = new mutable.HashMap[CacheKey, ParseResult[_]]
-
-    override def drop(amount: Int) = manager.getOffsetNode(amount + offset)
-
-    override def toString = offset.toString
-  }
-
   case class FixPointState(offset: Int, // TODO try to remove this offset, since we can also clear the callStack whenever we move forward.
                            callStack: Set[BuiltParser[Any]])
-
-  class ArrayOffsetManager extends OffsetManager {
-    val offsets = mutable.ArrayBuffer.empty[AbsoluteOffsetNode]
-    val offsetCache = mutable.HashMap.empty[Int, OffsetNode]
-    override def getOffsetNode(offset: Int) = {
-      offsetCache.getOrElseUpdate(offset, {
-        binarySearch(offset) match {
-          case Found(index) => offsets(index)
-          case InsertionPoint(insertionPoint) =>
-            val result = new AbsoluteOffsetNode(this, offset)
-            offsets.insert(insertionPoint, result)
-            result
-        }
-      })
-    }
-
-    @tailrec
-    private[this] def binarySearch(offset: Int, from: Int = 0, to: Int = offsets.length): SearchResult = {
-      if (to <= from) InsertionPoint(from)
-      else {
-        val idx = from + (to - from - 1) / 2
-        Integer.compare(offset, offsets(idx).getAbsoluteOffset()) match {
-          case -1 => binarySearch(offset, from, idx)
-          case  1 => binarySearch(offset, idx + 1, to)
-          case  _ => Found(idx)
-        }
-      }
-    }
-
-    override def changeText(from: Int, until: Int, insertLength: Int): Unit = {
-      offsetCache.clear()
-
-      val delta = insertLength - (until - from)
-      for(offset <- offsets.sortBy(o => -o.getAbsoluteOffset())) {
-        val absoluteOffset = offset.getAbsoluteOffset()
-
-        val entries = offset.cache.toList
-        for(entry <- entries) {
-          val entryStart = offset.getAbsoluteOffset()
-          val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder.getAbsoluteOffset())
-          val entryIntersectsWithRemoval = from < entryEnd && entryStart < until
-          if (entryIntersectsWithRemoval) {
-            offset.cache.remove(entry._1)
-          }
-        }
-        if (absoluteOffset > from) {
-          offset.offset += delta
-        }
-        if (absoluteOffset == from) {
-          val newNode = getOffsetNode(offset.offset + delta)
-          newNode.cache = offset.cache
-          offset.cache = new mutable.HashMap[CacheKey, ParseResult[_]]()
-        }
-      }
-    }
-
-    override def clear(): Unit = {
-      offsets.clear()
-      offsetCache.clear()
-    }
-  }
 
   def wrapParser[Result](text: ParseText,
                          parser: BuiltParser[Result],
@@ -238,14 +155,12 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   case class ParserAndCaches[Result](text: ParseText,
-                                     offsetManager: OffsetManager,
                                      parser: BuiltParser[Result])
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
     def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
       val text = new ParseText()
-      val offsetManager = new ArrayOffsetManager
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
       def recursive: GetParser = new GetParser {
         override def apply[SomeResult](_parser: Parser[SomeResult]): BuiltParser[SomeResult] = {
@@ -258,7 +173,7 @@ trait OptimizingParserWriter extends ParserWriter {
       }
 
       val wrappedRoot = recursive(root)
-      ParserAndCaches(text, offsetManager, wrappedRoot)
+      ParserAndCaches(text, wrappedRoot)
     }
   }
 
@@ -284,4 +199,6 @@ trait OptimizingParserWriter extends ParserWriter {
       result
     }
   }
+
+  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
 }

@@ -1,8 +1,103 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.ParseText
+import core.parsers.core.{Metrics, OffsetNodeBase, ParseText}
+import core.parsers.sequences.SingleResultParser
+
+import scala.annotation.tailrec
+import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
+import scala.collection.mutable
 
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
+
+  type Input <: CachingInput
+
+  trait CachingInput extends ParseInput2 {
+    def offsetNode: OffsetNode
+  }
+
+  trait OffsetNode extends OffsetNodeBase {
+    def drop(amount: Int): OffsetNode
+    def cache: mutable.HashMap[CacheKey, ParseResult[_]]
+    def cache_=(value: mutable.HashMap[CacheKey, ParseResult[_]]): Unit
+  }
+
+
+  trait OffsetManager {
+    def getOffsetNode(offset: Int): OffsetNode
+    def changeText(from: Int, until: Int, insertLenght: Int): Unit
+    def clear(): Unit
+  }
+
+  class AbsoluteOffsetNode(val manager: ArrayOffsetManager, var offset: Int) extends OffsetNode {
+    override def getAbsoluteOffset() = offset
+
+    override var cache = new mutable.HashMap[CacheKey, ParseResult[_]]
+
+    override def drop(amount: Int) = manager.getOffsetNode(amount + offset)
+
+    override def toString = offset.toString
+  }
+
+  class ArrayOffsetManager extends OffsetManager {
+    val offsets = mutable.ArrayBuffer.empty[AbsoluteOffsetNode]
+    val offsetCache = mutable.HashMap.empty[Int, OffsetNode]
+    override def getOffsetNode(offset: Int) = {
+      offsetCache.getOrElseUpdate(offset, {
+        binarySearch(offset) match {
+          case Found(index) => offsets(index)
+          case InsertionPoint(insertionPoint) =>
+            val result = new AbsoluteOffsetNode(this, offset)
+            offsets.insert(insertionPoint, result)
+            result
+        }
+      })
+    }
+
+    @tailrec
+    private[this] def binarySearch(offset: Int, from: Int = 0, to: Int = offsets.length): SearchResult = {
+      if (to <= from) InsertionPoint(from)
+      else {
+        val idx = from + (to - from - 1) / 2
+        Integer.compare(offset, offsets(idx).getAbsoluteOffset()) match {
+          case -1 => binarySearch(offset, from, idx)
+          case  1 => binarySearch(offset, idx + 1, to)
+          case  _ => Found(idx)
+        }
+      }
+    }
+
+    override def changeText(from: Int, until: Int, insertLength: Int): Unit = {
+      offsetCache.clear()
+
+      val delta = insertLength - (until - from)
+      for(offset <- offsets.sortBy(o => -o.getAbsoluteOffset())) {
+        val absoluteOffset = offset.getAbsoluteOffset()
+
+        val entries = offset.cache.toList
+        for(entry <- entries) {
+          val entryStart = offset.getAbsoluteOffset()
+          val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder.getAbsoluteOffset())
+          val entryIntersectsWithRemoval = from < entryEnd && entryStart < until
+          if (entryIntersectsWithRemoval) {
+            offset.cache.remove(entry._1)
+          }
+        }
+        if (absoluteOffset > from) {
+          offset.offset += delta
+        }
+        if (absoluteOffset == from) {
+          val newNode = getOffsetNode(offset.offset + delta)
+          newNode.cache = offset.cache
+          offset.cache = new mutable.HashMap[CacheKey, ParseResult[_]]()
+        }
+      }
+    }
+
+    override def clear(): Unit = {
+      offsets.clear()
+      offsetCache.clear()
+    }
+  }
 
   override def newParseState(input: Input) = FixPointState(input.offset, Set.empty)
 
@@ -155,5 +250,27 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
     }
 
+  }
+
+  def startInput(offsetManager: OffsetManager): Input
+  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input] = {
+    val parserAndCaches = compile(parser).buildParser(parser)
+    val offsetManager = new ArrayOffsetManager
+    new SingleResultParser[Result, Input] {
+
+      override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
+        parserAndCaches.text.arrayOfChars = text.toCharArray
+        val zero: Input = startInput(offsetManager)
+        findBestParseResult(parserAndCaches.text, zero, parserAndCaches.parser, mayStop, metrics)
+      }
+
+      override def reset(): Unit = {
+        offsetManager.clear()
+      }
+
+      override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
+        offsetManager.changeText(from, until, insertionLength)
+      }
+    }
   }
 }

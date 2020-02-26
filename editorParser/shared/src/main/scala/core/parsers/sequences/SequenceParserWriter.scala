@@ -1,11 +1,12 @@
 package core.parsers.sequences
 
-import core.parsers.core.{Metrics, NoMetrics, ParseInput, ParseText, Processor}
+import core.parsers.core._
 import core.parsers.editorParsers._
 
 trait SequenceParserWriter extends CorrectingParserWriter {
 
   trait SequenceInput[Elem] extends ParseInput2 {
+
     def head(array: ParseText): Elem
     def tail(array: ParseText): Input
 
@@ -331,32 +332,18 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       Filter(parser, predicate, getMessage)
 
     def getSingleResultParser: SingleResultParser[Result, Input] = {
-      val parserAndCaches = compile(this.parser).buildParser(this.parser)
-      new SingleResultParser[Result, Input] {
-
-        override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
-          parserAndCaches.text.arrayOfChars = text.toCharArray
-          findBestParseResult(parserAndCaches.text, parserAndCaches.offsetManager, parserAndCaches.parser, mayStop, metrics)
-        }
-
-        override def reset(): Unit = {
-          parserAndCaches.offsetManager.clear()
-        }
-
-        override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
-          parserAndCaches.offsetManager.changeText(from, until, insertionLength)
-        }
-      }
+      SequenceParserWriter.this.getSingleResultParser(this.parser)
     }
 
     def getWholeInputParser: SingleResultParser[Result, Input] = {
       ParseWholeInput(parser).getSingleResultParser
     }
 
-    def withRange[Other](addRange: (OffsetNode, OffsetNode, Result) => Other): Parser[Other] = {
+    def withRange[Other](addRange: (OffsetNodeBase, OffsetNodeBase, Result) => Other): Parser[Other] = {
       WithRangeParser(parser, addRange)
     }
   }
+
 }
 
 trait SingleResultParser[+Result, Input <: ParseInput] {
