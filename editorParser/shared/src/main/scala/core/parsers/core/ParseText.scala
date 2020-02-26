@@ -4,9 +4,7 @@ import core.parsers.editorParsers.{Position, SourceRange}
 
 import scala.collection.Searching
 
-// Moet de parser een abstracte position bijhouden? zodat die kan samenwerken met een efficient updatebare document.
-// deze position zou wschijnlijk een node in een bidirectional tree zijn.
-// Een skiplist is ook een optie
+// TODO Merge the position and the document state, so that the position in a zipper over the document state data structure.
 final class ParseText extends CharSequence {
 
   def this(text: String) = {
