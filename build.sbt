@@ -73,8 +73,7 @@ lazy val editorParser = crossProject(JVMPlatform, JSPlatform).
     assemblySettings,
   ).
   jsSettings(
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
-    skip in test := true).
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   jvmSettings(
     // Only used for SourceUtils, should get rid of it.
     // https://mvnrepository.com/artifact/org.scala-lang/scala-reflect
@@ -92,8 +91,7 @@ lazy val LSPProtocol = crossProject(JVMPlatform, JSPlatform).
     libraryDependencies += "com.typesafe.play" %%% "play-json" % "2.8.1",
   ).
   jsSettings(
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
-    skip in test := true).
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   dependsOn(editorParser)
 
 lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
@@ -104,8 +102,7 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
     assemblySettings
   ).
   jsSettings(
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
-    skip in test := true).
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
 def languageServerCommonTask(assemblyFile: String) = {
@@ -130,7 +127,6 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
     },
   ).
   jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault",
-    skip in test := true,
     vscode := {
       val assemblyFile: String = (fastOptJS in Compile).value.data.getAbsolutePath
       languageServerCommonTask(assemblyFile).run
