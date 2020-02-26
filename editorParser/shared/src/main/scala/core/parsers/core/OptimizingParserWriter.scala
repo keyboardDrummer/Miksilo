@@ -2,7 +2,10 @@ package core.parsers.core
 
 import core.parsers.editorParsers.Position
 
-import scala.collection.mutable
+import scala.annotation.tailrec
+import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
+import scala.collection.{Searching, mutable}
+import scala.math.Ordering
 
 trait OptimizingParseResult {
   def latestRemainder: OffsetNodeBase
@@ -58,13 +61,27 @@ trait OptimizingParserWriter extends ParserWriter {
     val offsetCache = mutable.HashMap.empty[Int, OffsetNode]
     override def getOffsetNode(offset: Int) = {
       offsetCache.getOrElseUpdate(offset, {
-        val existing = offsets.find(o => o.getAbsoluteOffset() == offset)
-        existing.getOrElse({
-          val result = new AbsoluteOffsetNode(this, offset)
-          offsets.addOne(result)
-          result
-        })
+        binarySearch(offset) match {
+          case Found(index) => offsets(index)
+          case InsertionPoint(insertionPoint) =>
+            val result = new AbsoluteOffsetNode(this, offset)
+            offsets.insert(insertionPoint, result)
+            result
+        }
       })
+    }
+
+    @tailrec
+    private[this] def binarySearch(offset: Int, from: Int = 0, to: Int = offsets.length): SearchResult = {
+      if (to <= from) InsertionPoint(from)
+      else {
+        val idx = from + (to - from - 1) / 2
+        Integer.compare(offset, offsets(idx).getAbsoluteOffset()) match {
+          case -1 => binarySearch(offset, from, idx)
+          case  1 => binarySearch(offset, idx + 1, to)
+          case  _ => Found(idx)
+        }
+      }
     }
 
     override def changeText(from: Int, until: Int, insertLength: Int): Unit = {
