@@ -15,7 +15,7 @@ lazy val miksilo = project
     LSPProtocol.jvm,
     LSPProtocol.js,
     languageServer.jvm,
-    languageServer.js,
+    //languageServer.js,
     modularLanguages.jvm,
     modularLanguages.js,
     playground
