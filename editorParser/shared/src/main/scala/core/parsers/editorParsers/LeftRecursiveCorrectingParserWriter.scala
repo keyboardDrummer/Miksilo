@@ -1,35 +1,41 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{Metrics, OffsetNodeBase, ParseText}
+import core.parsers.core.{Metrics, OffsetNode, ParseText}
 import core.parsers.sequences.SingleResultParser
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
 import scala.collection.mutable
 
+trait CachingParseResult {
+  def latestRemainder: OffsetNode
+}
+
+// TODO consider pushing down the caching part into another ParsingWriter
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   type Input <: CachingInput
+  type ParseResult[+Result] <: CachingParseResult
   type CacheKey
 
   trait CachingInput extends CorrectingInput {
-    def offsetNode: OffsetNode
+    def offsetNode: CachingOffsetNode
     def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]): CacheKey
   }
 
-  trait OffsetNode extends OffsetNodeBase {
-    def drop(amount: Int): OffsetNode
+  trait CachingOffsetNode extends OffsetNode {
+    def drop(amount: Int): CachingOffsetNode
     def cache: mutable.HashMap[CacheKey, ParseResult[_]]
     def cache_=(value: mutable.HashMap[CacheKey, ParseResult[_]]): Unit
   }
 
   trait OffsetManager {
-    def getOffsetNode(offset: Int): OffsetNode
+    def getOffsetNode(offset: Int): CachingOffsetNode
     def changeText(from: Int, until: Int, insertLenght: Int): Unit
     def clear(): Unit
   }
 
-  class AbsoluteOffsetNode(val manager: ArrayOffsetManager, var offset: Int) extends OffsetNode {
+  class AbsoluteOffsetNode(val manager: ArrayOffsetManager, var offset: Int) extends CachingOffsetNode {
     override def getAbsoluteOffset() = offset
 
     override var cache = new mutable.HashMap[CacheKey, ParseResult[_]]
@@ -41,7 +47,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   class ArrayOffsetManager extends OffsetManager {
     val offsets = mutable.ArrayBuffer.empty[AbsoluteOffsetNode]
-    val offsetCache = mutable.HashMap.empty[Int, OffsetNode]
+    val offsetCache = mutable.HashMap.empty[Int, CachingOffsetNode]
     override def getOffsetNode(offset: Int) = {
       offsetCache.getOrElseUpdate(offset, {
         binarySearch(offset) match {

@@ -1,9 +1,9 @@
 package core.parsers.editorParsers
 
 import ParseResults._
-import core.parsers.core.{OffsetNodeBase, OptimizingParseResult, ParseInput}
+import core.parsers.core.{OffsetNode, ParseInput}
 
-trait ParseResults[Input <: ParseInput, +Result] extends OptimizingParseResult {
+trait ParseResults[Input <: ParseInput, +Result] extends CachingParseResult {
   def nonEmpty: Boolean
   def pop(): (LazyParseResult[Input, Result], ParseResults[Input, Result])
   def toList: List[LazyParseResult[Input, Result]]
@@ -52,7 +52,7 @@ object ParseResults {
 
 final class SRCons[Input <: ParseInput, +Result](
                                                   val head: LazyParseResult[Input, Result],
-                                                  val latestRemainder: OffsetNodeBase,
+                                                  val latestRemainder: OffsetNode,
                                                   var tailDepth: Int,
                                                   _tail: => ParseResults[Input, Result])
   extends ParseResults[Input, Result] {
@@ -102,7 +102,7 @@ final class SRCons[Input <: ParseInput, +Result](
     if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
       return SREmpty.empty[Input]
 
-    def getResult(head: LazyParseResult[Input, Other], latestRemainder: OffsetNodeBase, tailDepth: Int,
+    def getResult(head: LazyParseResult[Input, Other], latestRemainder: OffsetNode, tailDepth: Int,
                   getTail: Map[Input, Double] => ParseResults[Input, Other]): ParseResults[Input, Other] = {
       head match {
         case ready: ReadyParseResult[Input, Other] =>
@@ -129,7 +129,7 @@ final class SRCons[Input <: ParseInput, +Result](
     }
   }
 
-  def getLatest(one: OffsetNodeBase, other: OffsetNodeBase): OffsetNodeBase = {
+  def getLatest(one: OffsetNode, other: OffsetNode): OffsetNode = {
     if (one.getAbsoluteOffset() > other.getAbsoluteOffset()) one else other
   }
 
@@ -164,7 +164,7 @@ class SREmpty[Input <: ParseInput] extends ParseResults[Input, Nothing] {
   override def latestRemainder = EmptyRemainder
 }
 
-object EmptyRemainder extends OffsetNodeBase {
+object EmptyRemainder extends OffsetNode {
   override def getAbsoluteOffset() = Int.MinValue
 
   override def drop(amount: Int) = this

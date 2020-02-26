@@ -6,7 +6,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   type ParseResult[+Result] = ParseResults[Input, Result]
 
-
   trait CorrectingInput extends ParseInput {
     def atEnd(array: ParseText): Boolean
   }
@@ -224,7 +223,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class WithRangeParser[Result, NewResult](original: Parser[Result], addRange: (OffsetNodeBase, OffsetNodeBase, Result) => NewResult)
+  case class WithRangeParser[Result, NewResult](original: Parser[Result], addRange: (OffsetNode, OffsetNode, Result) => NewResult)
     extends ParserBuilderBase[NewResult] with ParserWrapper[NewResult] {
 
     override def getParser(text: ParseText, recursive: GetParser): BuiltParser[NewResult] = {

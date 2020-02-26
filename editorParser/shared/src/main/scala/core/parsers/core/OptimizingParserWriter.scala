@@ -3,25 +3,19 @@ package core.parsers.core
 import core.parsers.editorParsers.Position
 import core.parsers.sequences.SingleResultParser
 
-import scala.annotation.tailrec
-import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
 import scala.collection.mutable
 
-trait OptimizingParseResult {
-  def latestRemainder: OffsetNodeBase
-}
-
-trait OffsetNodeBase {
-  def drop(amount: Int): OffsetNodeBase
+trait OffsetNode {
+  def drop(amount: Int): OffsetNode
   def getAbsoluteOffset(): Int
   def toPosition(text: ParseText): Position = text.getPosition(getAbsoluteOffset())
 }
 
 trait OptimizingParserWriter extends ParserWriter {
 
+  type ParseResult[+Result]
   type Parser[+Result] = ParserBuilder[Result]
   def newParseState(input: Input): FixPointState
-  type ParseResult[+Result] <: OptimizingParseResult
 
   case class FixPointState(offset: Int, // TODO try to remove this offset, since we can also clear the callStack whenever we move forward.
                            callStack: Set[BuiltParser[Any]])

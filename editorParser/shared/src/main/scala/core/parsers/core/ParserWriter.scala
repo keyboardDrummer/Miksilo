@@ -5,7 +5,7 @@ import core.parsers.sequences.SingleResultParser
 import scala.language.{existentials, higherKinds}
 
 trait ParseInput {
-  def offsetNode: OffsetNodeBase
+  def offsetNode: OffsetNode
   def offset = offsetNode.getAbsoluteOffset()
 }
 

@@ -1,6 +1,6 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{OffsetNodeBase, ParseInput, ParseText}
+import core.parsers.core.{OffsetNode, ParseInput, ParseText}
 import core.parsers.editorParsers.Position.PositionOrdering
 
 case class TextEdit(range: SourceRange, newText: String)
@@ -11,7 +11,7 @@ case class Fix(title: String, edit: TextEdit)
   */
 case class Position(line: Int, character: Int)
 
-case class OffsetNodeRange(from: OffsetNodeBase, until: OffsetNodeBase) {
+case class OffsetNodeRange(from: OffsetNode, until: OffsetNode) {
   def toSourceRange(text: ParseText) = SourceRange(from.toPosition(text), until.toPosition(text))
   def toOffsetRange = OffsetRange(from.getAbsoluteOffset(), until.getAbsoluteOffset())
 }
