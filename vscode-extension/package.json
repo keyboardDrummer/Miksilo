@@ -21,7 +21,9 @@
 		"onLanguage:cloudFormation",
 		"onLanguage:java",
 		"onLanguage:yamlCloudFormation",
-		"onLanguage:smithy"
+		"onLanguage:smithy",
+		"onLanguage:miksiloJson",
+		"onLanguage:miksiloYaml"
 	],
 	"main": "./out/extension",
 	"contributes": {
@@ -68,6 +70,24 @@
 				"extensions": [
 					".java"
 				]
+			},
+			{
+				"id": "miksiloJson",
+				"aliases": [
+					"miksiloJson"
+				],
+				"extensions": [
+					".miksilo.json"
+				]
+			},
+			{
+				"id": "miksiloYaml",
+				"aliases": [
+					"miksiloYaml"
+				],
+				"extensions": [
+					".miksilo.yaml"
+				]
 			}
 		],
 		"snippets": [
@@ -91,6 +111,16 @@
 				"language": "solidity",
 				"scopeName": "source.solidity",
 				"path": "./src/solidity/tmLanguage.json"
+			},
+			{
+				"language": "miksiloYaml",
+				"scopeName": "source.yaml",
+				"path": "./src/yaml/yaml-tmLanguage.json"
+			},
+			{
+				"language": "miksiloJson",
+				"scopeName": "source.cloudFormation",
+				"path": "./src/json/json-tmLanguage.json"
 			}
 		],
 		"commands": [
