@@ -60,6 +60,16 @@ class IncrementalParsingTest extends AnyFunSuite {
     assertResult(List(1,2,3,4,5))(result.resultOption.get)
   }
 
+  test("inserting at the end workds") {
+    val input = """1"""
+    val input2 = """135"""
+    val parser = getParser
+    parser.parse(input)
+    parser.changeRange(1,1,2)
+    val result = parser.parse(input2)
+    assertResult(135)(result.resultOption.get)
+  }
+
   // TODO add tests with linebreaks.
 
   // TODO add test that checks whether positions in the AST have been updated.

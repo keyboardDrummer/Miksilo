@@ -2,7 +2,7 @@ package languageServer
 
 import core.language.Language
 import core.parsers.editorParsers.{Position, SourceRange}
-import lsp.{Diagnostic, DiagnosticSeverity, HumanPosition}
+import lsp.{Diagnostic, DiagnosticSeverity, DidChangeTextDocumentParams, HumanPosition, TextDocumentContentChangeEvent, VersionedTextDocumentIdentifier}
 import org.scalatest.funsuite.AnyFunSuite
 
 class ExampleExpressionLanguageTest extends AnyFunSuite with LanguageServerTest {
@@ -101,5 +101,30 @@ class ExampleExpressionLanguageTest extends AnyFunSuite with LanguageServerTest 
     val diagnostic = Diagnostic(SourceRange(Position(0,9), Position(0,15)), Some(DiagnosticSeverity.Error), "expected '<expression>'")
     val result = getDiagnostics(server, program)
     assertResult(Seq(diagnostic))(result)
+  }
+
+  test("replace program edit") {
+    val program = "let abc = 3 in a"
+
+    val document = openDocument(server, program)
+    val change = DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, 0L), Seq(TextDocumentContentChangeEvent(None, None, "3")))
+    val result = getDiagnostics(server, change)
+    assertResult(Seq.empty)(result)
+  }
+
+  test("incremental edits") {
+    val program = "let abc = 3 in a"
+
+    val document = openDocument(server, program)
+    val change = DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, 0L),
+      Seq(TextDocumentContentChangeEvent(Some(SourceRange(Position(0,5), Position(0,7))), Some(2), "")))
+    val result = getDiagnostics(server, change)
+    assertResult(Seq.empty)(result)
+
+    val change2 = DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, 0L),
+      Seq(TextDocumentContentChangeEvent(Some(SourceRange(Position(0,5), Position(0,5))), Some(0), "a")))
+    val result2 = getDiagnostics(server, change2)
+    assert(result2.size == 1)
+    assertResult("Could not find definition of a")(result2.head.message)
   }
 }

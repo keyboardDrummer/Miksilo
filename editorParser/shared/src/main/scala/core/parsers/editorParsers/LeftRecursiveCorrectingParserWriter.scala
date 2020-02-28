@@ -86,7 +86,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         for(entry <- entries) {
           val entryStart = offset.getAbsoluteOffset()
           val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder.getAbsoluteOffset())
-          val entryIntersectsWithRemoval = from < entryEnd && entryStart < until
+          val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
           if (entryIntersectsWithRemoval) {
             offset.cache.remove(entry._1)
           }

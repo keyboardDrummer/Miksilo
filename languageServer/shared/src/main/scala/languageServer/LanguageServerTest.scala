@@ -40,6 +40,19 @@ trait LanguageServerTest {
     server.asInstanceOf[CompletionProvider].complete(DocumentPosition(document, position))
   }
 
+  def getDiagnostics(server: LanguageServer, change: DidChangeTextDocumentParams): Seq[Diagnostic] = {
+    var result: Seq[Diagnostic] = null
+    server.setClient(new LanguageClient {
+      override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {
+        result = diagnostics.diagnostics
+      }
+
+      override def trackMetric(name: String, value: Double): Unit = {}
+    })
+    server.didChange(change)
+    result
+  }
+
   def getDiagnostics(server: LanguageServer, program: String): Seq[Diagnostic] = {
     var result: Seq[Diagnostic] = null
     val document = openDocument(server, program)

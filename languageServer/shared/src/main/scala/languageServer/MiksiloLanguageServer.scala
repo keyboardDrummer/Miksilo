@@ -20,7 +20,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   var client: LanguageClient = _
   private val documentManager = new TextDocumentManager()
-  var compilation: Compilation = new Compilation(language, documentManager, None)
+  val compilation: Compilation = new Compilation(language, documentManager, None)
 
   override def textDocumentSync = TextDocumentSyncKind.Incremental
 
