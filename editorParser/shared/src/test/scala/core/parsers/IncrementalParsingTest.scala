@@ -32,30 +32,30 @@ class IncrementalParsingTest extends AnyFunSuite {
     val change = getChange
     change(0,0, input)
     change.setText(input2)
-    val result = chddddange(1,4, "bar")
+    val result = change(2,5, "bar")
     assertResult(List("bar" -> "bar"))(result.resultOption.get)
   }
 
   test("inserts work") {
     val input = """[1,3]"""
-    val input2 = """[0,2,0]"""
+    val input2 = """[1,2,0]"""
     val change = getChange
     change(0,0,input)
     change.setText(input2)
-    val result = change(2,2, "2,")
+    val result = change(2,2, ",2")
     assertResult(List(1,2,3))(result.resultOption.get)
   }
 
   test("multiple inserts work") {
     val input = """[1,3,5]"""
-    val input2 = """[0,2,0,0]"""
-    val input3 = """[0,2,0,4,0]"""
+    val input2 = """[1,2,0,0]"""
+    val input3 = """[0,2,3,4,0]"""
     val change = getChange
     change(0,0,"[1,3,5]")
     change.setText(input2)
-    change(2,2,"2,")
+    change(2,2,",2")
     change.setText(input3)
-    val result = change(6,6,"4,")
+    val result = change(6,6,",4")
     assertResult(List(1,2,3,4,5))(result.resultOption.get)
   }
 
