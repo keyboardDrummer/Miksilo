@@ -49,7 +49,6 @@ object Position {
 }
 
 trait ParseError[Input <: ParseInput] {
-  //def array: ArrayCharSequence
   def fix: Option[Fix] = None
   def message: String
   def from: Input
