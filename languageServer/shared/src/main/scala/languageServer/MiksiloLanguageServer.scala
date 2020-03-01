@@ -1,12 +1,12 @@
 package languageServer
 
+import core.LazyLogging
 import core.language.exceptions.BadInputException
 import core.language.{Compilation, Language, SourceElement}
 import core.parsers.core.ParseText
 import core.parsers.editorParsers.TextEdit
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
-import jsonRpc.LazyLogging
 import lsp._
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer

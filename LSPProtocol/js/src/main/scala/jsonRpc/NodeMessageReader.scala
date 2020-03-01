@@ -1,5 +1,7 @@
 package jsonRpc
 
+import core.LazyLogging
+
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import scala.scalajs.js

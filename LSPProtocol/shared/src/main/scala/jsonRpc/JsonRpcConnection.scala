@@ -4,6 +4,7 @@ import java.nio.charset.Charset
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NoCorrelationId}
 import com.dhpcs.jsonrpc._
+import core.LazyLogging
 import play.api.libs.json.{Format, JsError, Json}
 
 import scala.concurrent.{ExecutionContext, Future, Promise}

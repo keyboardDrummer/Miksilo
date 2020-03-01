@@ -1,4 +1,4 @@
-package jsonRpc
+package core
 
 object LazyLogging {
   var logger: Logger = VoidLogger

@@ -1,5 +1,7 @@
 package jsonRpc
 
+import core.Logger
+
 import scala.concurrent.ExecutionContext
 import scala.scalajs.js.Dynamic.{global => g}
 

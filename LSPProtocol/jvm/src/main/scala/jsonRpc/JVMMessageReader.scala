@@ -2,6 +2,8 @@ package jsonRpc
 
 import java.io.InputStream
 
+import core.LazyLogging
+
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 

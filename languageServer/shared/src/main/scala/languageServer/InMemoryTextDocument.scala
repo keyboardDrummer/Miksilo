@@ -1,9 +1,9 @@
 package languageServer
 
+import core.LazyLogging
 import core.language.TextChangeHandler
 import core.parsers.core.ParseText
 import core.parsers.editorParsers.{Position, SourceRange}
-import jsonRpc.LazyLogging
 import languageServer.InMemoryTextDocument._
 import lsp.TextDocumentContentChangeEvent
 

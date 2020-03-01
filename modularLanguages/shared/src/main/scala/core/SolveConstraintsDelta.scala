@@ -8,7 +8,6 @@ import core.language.node.TypedChildField
 import core.language.{Compilation, Language, Phase}
 import core.smarts.objects.NamedDeclaration
 import core.smarts.{ConstraintBuilder, SolveException}
-import jsonRpc.LazyLogging
 
 trait ConstraintCollector {
   def build(compilation: Compilation, builder: ConstraintBuilder): Unit

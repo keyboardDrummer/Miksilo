@@ -4,8 +4,8 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
+import core.LazyLogging
 import core.language.{FileSystem, TextChangeHandler}
-import jsonRpc.LazyLogging
 import lsp.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 
 import scala.collection.mutable

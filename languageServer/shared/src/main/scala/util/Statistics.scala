@@ -1,6 +1,6 @@
 package util
 
-import jsonRpc.LazyLogging
+import core.LazyLogging
 
 import scala.collection.mutable
 

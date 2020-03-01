@@ -1,5 +1,6 @@
 package core.parsers.editorParsers
 
+import core.LazyLogging
 import core.parsers.core.{Metrics, OffsetNode, ParseText}
 import core.parsers.sequences.SingleResultParser
 

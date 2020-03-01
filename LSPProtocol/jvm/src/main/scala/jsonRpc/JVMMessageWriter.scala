@@ -2,6 +2,8 @@ package jsonRpc
 
 import java.io.OutputStream
 
+import core.LazyLogging
+
 /**
   * A class to write Json RPC messages on an output stream, following the Language Server Protocol.
   * It produces the following format:
