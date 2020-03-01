@@ -122,7 +122,7 @@ class JsonTest extends AnyFunSuite {
 class JsonServerTest extends AnyFunSuite with LanguageServerTest {
 
   test("regression2") {
-    val input = """[]"""
+    val input = """[]"""  // [1,2,3,4]     [1,2,[],3]     [{"name":"Remy", age: 31}, {"name":"Tzeni",age:29}]
 
     val jsonLanguage = JsonLanguage.language
     val server = new MiksiloLanguageServer(jsonLanguage)

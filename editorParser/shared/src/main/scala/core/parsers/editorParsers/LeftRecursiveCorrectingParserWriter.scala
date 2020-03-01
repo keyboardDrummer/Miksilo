@@ -1,8 +1,6 @@
 package core.parsers.editorParsers
 
-import core.LazyLogging
-import core.parsers.core.{Metrics, OffsetNode, ParseText}
-import core.parsers.sequences.SingleResultParser
+import core.parsers.core.{Metrics, NoMetrics, OffsetNode, ParseInput, ParseText}
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
@@ -275,13 +273,16 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     val offsetManager = new ArrayOffsetManager
     new SingleResultParser[Result, Input] {
 
-      override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
+      override def parse(mayStop: StopFunction, metrics: Metrics) = {
         val zero: Input = startInput(offsetManager)
         findBestParseResult(parseText, zero, parserAndCaches.parser, mayStop, metrics)
       }
 
-      override def reset(): Unit = {
+      override def resetAndParse(text: String, mayStop: StopFunction, metrics: Metrics) = {
+        parseText.arrayOfChars = text.toCharArray
         offsetManager.clear()
+        val zero: Input = startInput(offsetManager)
+        findBestParseResult(parseText, zero, parserAndCaches.parser, mayStop, metrics)
       }
 
       override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
@@ -290,3 +291,14 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 }
+
+trait SingleResultParser[+Result, Input <: ParseInput] {
+  def changeRange(start: Int, end: Int, insertionLength: Int): Unit
+  def resetAndParse(text: String,
+                    mayStop: StopFunction = StopImmediately,
+                    metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]
+
+  def parse(mayStop: StopFunction = StopImmediately,
+            metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]
+}
+

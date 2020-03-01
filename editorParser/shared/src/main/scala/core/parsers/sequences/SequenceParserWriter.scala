@@ -347,18 +347,3 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   }
 
 }
-
-trait SingleResultParser[+Result, Input <: ParseInput] {
-  def reset(): Unit
-  def changeRange(start: Int, end: Int, insertionLength: Int): Unit
-  def resetAndParse(text: String,
-                    mayStop: StopFunction = StopImmediately,
-                    metrics: Metrics = NoMetrics): SingleParseResult[Result, Input] = {
-    reset()
-    parse(text, mayStop, metrics)
-  }
-
-  def parse(text: String,
-            mayStop: StopFunction = StopImmediately,
-            metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]
-}

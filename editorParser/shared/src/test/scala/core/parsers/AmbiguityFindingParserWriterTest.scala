@@ -13,6 +13,6 @@ class AmbiguityFindingParserWriterTest extends AnyFunSuite
   test("detects trivial ambiguity") {
     val ambiguis = Literal("a") | Literal("a")
     val input = "a"
-    assertThrows[Exception](ambiguis.getWholeInputParser().parse(input, NeverStop))
+    assertThrows[Exception](ambiguis.getWholeInputParser().resetAndParse(input, NeverStop))
   }
 }

@@ -2,20 +2,19 @@ package core.deltas
 
 import core.LazyLogging
 import core.bigrammar.BiGrammarToParser
-import core.bigrammar.BiGrammarToParser.{Reader, _}
+import core.bigrammar.BiGrammarToParser._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.language.node.Node
-import core.language.{Compilation, CompilationState, Language, Phase}
-import core.parsers.editorParsers.{SingleParseResult, StopFunction, TimeRatioStopFunction}
-import core.parsers.sequences.SingleResultParser
+import core.language.{Compilation, Language}
+import core.parsers.editorParsers.{SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
 
 case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction)
   extends Delta with LazyLogging {
 
   def parseStream[T](compilation: Compilation, parser: SingleResultParser[T, BiGrammarToParser.Input], input: String):
     SingleParseResult[T, BiGrammarToParser.Input] = {
-    parser.parse(input, stopFunction, compilation.metrics)
+    parser.resetAndParse(input, stopFunction, compilation.metrics)
   }
 
   override def inject(language: Language): Unit = {

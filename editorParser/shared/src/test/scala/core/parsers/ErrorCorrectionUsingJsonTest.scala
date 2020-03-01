@@ -176,7 +176,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
     val input = """doesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatch"""
     lazy val parser: Parser[Any] = "{" ~ parser | "!"
     val detectValueParser = new DetectValueParser(("{",("{", ("{", "!"))), parser)
-    val result = detectValueParser.getWholeInputParser().parse(input)
+    val result = detectValueParser.getWholeInputParser().resetAndParse(input)
     assert(!detectValueParser.detected)
     assertResult(2)(result.errors.size)
     assert(result.resultOption.nonEmpty)
@@ -204,7 +204,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
   private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
-    val result = jsonParser.getWholeInputParser().parse(input, UntilBestAndXStepsStopFunction(steps))
+    val result = jsonParser.getWholeInputParser().resetAndParse(input, UntilBestAndXStepsStopFunction(steps))
     System.out.println(result.errors.toString())
     assertResult(expectation)(result.resultOption.get)
     assertResult(errorCount)(result.errors.size)

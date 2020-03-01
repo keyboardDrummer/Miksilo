@@ -3,8 +3,7 @@ package core.bigrammar
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
 import core.parsers.core.ParseText
-import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
-import core.parsers.sequences.SingleResultParser
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, SingleResultParser}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.textMate.TextMateGeneratingParserWriter
 import util.Utility

@@ -27,7 +27,7 @@ class TestClassFileDecompiler extends AnyFunSuite {
 
     val grammar = LanguageGrammars.grammars.get(language).find(TypeAbstraction.AbstractMethodTypeGrammar)
     val parser = toParser(grammar)
-    val parseResult = parser.parse(signature)
+    val parseResult = parser.resetAndParse(signature)
     parseResult.get.asInstanceOf[Node]
   }
 
@@ -37,7 +37,7 @@ class TestClassFileDecompiler extends AnyFunSuite {
     val language = compiler.language
 
     val parser = toParser(LanguageGrammars.grammars.get(language).find(TypeSkeleton.ByteCodeTypeGrammar))
-    val result = parser.parse(signature).get.asInstanceOf[Node]
+    val result = parser.resetAndParse(signature).get.asInstanceOf[Node]
   }
 
   test("TypeVariable2") {
@@ -46,7 +46,7 @@ class TestClassFileDecompiler extends AnyFunSuite {
     val language = compiler.language
 
     val parser = toParser(LanguageGrammars.grammars.get(language).find(TypeSkeleton.ByteCodeTypeGrammar))
-    val result = parser.parse(signature).get.asInstanceOf[Node]
+    val result = parser.resetAndParse(signature).get.asInstanceOf[Node]
   }
 
   test("TypeVariable3") {
@@ -54,7 +54,7 @@ class TestClassFileDecompiler extends AnyFunSuite {
     val compiler = testingLanguage
 
     val parser = toParser(LanguageGrammars.grammars.get(compiler.language).find(TypeSkeleton.ByteCodeTypeGrammar))
-    val result = parser.parse(signature).get.asInstanceOf[Node]
+    val result = parser.resetAndParse(signature).get.asInstanceOf[Node]
   }
 
   ignore("decompileRuntimeJar") {

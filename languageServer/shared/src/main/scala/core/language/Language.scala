@@ -5,8 +5,7 @@ import java.nio.charset.StandardCharsets
 
 import core.LazyLogging
 import core.language.exceptions.BadInputException
-import core.parsers.editorParsers.{StopFunction, TimeRatioStopFunction}
-import core.parsers.sequences.SingleResultParser
+import core.parsers.editorParsers.{SingleResultParser, StopFunction, TimeRatioStopFunction}
 import core.parsers.strings.StringParserWriter
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
 
@@ -76,7 +75,7 @@ object Language extends LazyLogging {
 
       val parsersPerFile = parsers.getOrElseUpdate(uri, createParser())
 
-      val parseResult = parsersPerFile.parse(input, stopFunction, compilation.metrics)
+      val parseResult = parsersPerFile.parse(stopFunction, compilation.metrics)
       parseResult.resultOption.foreach(program => {
         compilation.program = getSourceElement(program, uri)
       })

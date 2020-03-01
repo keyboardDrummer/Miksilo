@@ -6,6 +6,7 @@ import core.deltas.path.PathRoot
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.{Language, Phase}
 import core.language.node.Node
+import core.parsers.editorParsers.UntilTimeStopFunction
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.expression._
 import deltas.javac.expressions.literals.BooleanLiteralDelta
@@ -14,8 +15,7 @@ import deltas.json.JsonObjectLiteralDelta.{ObjectLiteral, ObjectLiteralMember}
 object JsonLanguage {
   val deltas: Seq[Delta] = Seq[Delta](ExpressionLanguageDelta, BooleanLiteralDelta, JsonObjectLiteralDelta,
     ArrayLiteralDelta, SingleQuotedStringLiteralDelta, JsonStringLiteralDelta, IntLiteralDelta, ExpressionDelta)
-  val language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar()) ++ deltas)
-
+  val language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar(UntilTimeStopFunction(200))) ++ deltas)
 }
 
 object PrintJson extends Delta  {

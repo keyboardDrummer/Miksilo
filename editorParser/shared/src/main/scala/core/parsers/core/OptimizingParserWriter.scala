@@ -1,7 +1,6 @@
 package core.parsers.core
 
-import core.parsers.editorParsers.Position
-import core.parsers.sequences.SingleResultParser
+import core.parsers.editorParsers.{Position, SingleResultParser}
 
 import scala.collection.mutable
 
