@@ -7,7 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class WhiteSpaceTest extends AnyFunSuite {
 
-  val parser = ExpressionParser.root.getWholeInputParser
+  val parser = ExpressionParser.root.getWholeInputParser()
 
   test("diagnostics placement in whitespace 1") {
     val program = "    "

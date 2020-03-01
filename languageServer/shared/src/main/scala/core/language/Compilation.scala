@@ -32,7 +32,7 @@ class Compilation(val language: Language, val fileSystem: FileSystem, var rootFi
   }
 
   var output: String = _
-  val state: mutable.Map[Any,Any] = mutable.Map.empty
+  val state: mutable.Map[Any, Any] = mutable.Map.empty
   var stopped: Boolean = false
 
   def runPhases(): Unit = {

@@ -3,6 +3,7 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammarToParser.Reader
 import core.bigrammar.printer.{Printer, TryState}
 import core.bigrammar.{BiGrammar, WithMap}
+import core.parsers.core.ParseText
 import core.responsiveDocument.ResponsiveDocument
 
 /**
@@ -13,7 +14,7 @@ import core.responsiveDocument.ResponsiveDocument
 abstract class StringGrammar(verifyWhenPrinting: Boolean = false)
   extends CustomGrammarWithoutChildren with BiGrammarWithoutChildren
 {
-  lazy val parser = getParserBuilder(Set.empty).getWholeInputParser //TODO hacky Set.empty
+  lazy val parser = getParserBuilder(Set.empty).getWholeInputParser(new ParseText()) //TODO hacky Set.empty
 
   override def containsParser(recursive: BiGrammar => Boolean): Boolean = true
 

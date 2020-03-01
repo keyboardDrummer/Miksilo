@@ -112,6 +112,19 @@ class ExampleExpressionLanguageTest extends AnyFunSuite with LanguageServerTest 
     assertResult(Seq.empty)(result)
   }
 
+  test("insert single character") {
+    val program = ""
+
+    val initial = getDiagnostics(server, program)
+    assert(initial.nonEmpty)
+    val document = openDocument(server, program)
+    val change = DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, 0L),
+      Seq(TextDocumentContentChangeEvent(Some(SourceRange(Position(0,0), Position(0,0))),
+        Some(0), "3")))
+    val result = getDiagnostics(server, change)
+    assertResult(Seq.empty)(result)
+  }
+
   test("incremental edits") {
     val program = "let abc = 3 in a"
 

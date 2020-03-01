@@ -117,3 +117,21 @@ class JsonTest extends AnyFunSuite {
     assertResult(expected)(printResult)
   }
 }
+
+class JsonServerTest extends AnyFunSuite with LanguageServerTest {
+
+  test("regression2") {
+    val input = """[]"""
+
+    val jsonLanguage = JsonLanguage.language
+    val server = new MiksiloLanguageServer(jsonLanguage)
+
+    val document = this.openDocument(server, input)
+    val results1 = applyChange(server, document, 1,1, "{") // [{]
+    val results2 = applyChange(server, document, 2,2, "}") // [{}]
+    assert(results2.isEmpty)
+    val results3 = applyChange(server, document, 2,3, "")  // [{]
+    val results4 = applyChange(server, document, 2,2, "}") // [{}]
+    assert(results4.isEmpty)
+  }
+}

@@ -61,8 +61,11 @@ object Language extends LazyLogging {
       val uri = compilation.rootFile.get
       val input = compilation.fileSystem.getFile(uri)
 
+      val parsers = builtParser(compilation)
+
       def createParser(): SingleResultParser[Program, parserWriter.Input] = {
-        val result = parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser
+        val parseText = compilation.fileSystem.getFileParseText(uri)
+        val result = parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser(parseText)
         compilation.fileSystem.setTextChangedHandler(uri, new TextChangeHandler {
           override def handleChange(from: Int, until: Int, text: String): Unit = {
             result.changeRange(from, until, text.length)
@@ -71,8 +74,8 @@ object Language extends LazyLogging {
         result
       }
 
-      val parsers = builtParser(compilation)
       val parsersPerFile = parsers.getOrElseUpdate(uri, createParser())
+
       val parseResult = parsersPerFile.parse(input, stopFunction, compilation.metrics)
       parseResult.resultOption.foreach(program => {
         compilation.program = getSourceElement(program, uri)

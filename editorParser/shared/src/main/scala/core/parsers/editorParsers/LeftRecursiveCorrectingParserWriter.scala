@@ -151,7 +151,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               else
                 resultWithoutRecursion
 
-              input.offsetNode.cache.put(key, result)
+              if (result.latestRemainder.getAbsoluteOffset() > input.offset) {
+                input.offsetNode.cache.put(key, result)
+              }
+
               result
           }
       }
@@ -254,7 +257,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           value.asInstanceOf[ParseResult[Result]]
         case _ =>
           val value: ParseResult[Result] = parser(input, newState)
-          input.offsetNode.cache.put(key, value)
+
+          // Do not cache length zero results, since they cannot be corrected moved if something is inserted where they start.
+          if (value.latestRemainder.getAbsoluteOffset() > input.offset) {
+            input.offsetNode.cache.put(key, value)
+          }
           value
       }
     }
@@ -262,15 +269,14 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   }
 
   def startInput(offsetManager: OffsetManager): Input
-  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input] = {
-    val parserAndCaches = compile(parser).buildParser(parser)
+  def getSingleResultParser[Result](parseText: ParseText, parser: ParserBuilder[Result]): SingleResultParser[Result, Input] = {
+    val parserAndCaches = compile(parser).buildParser(parseText, parser)
     val offsetManager = new ArrayOffsetManager
     new SingleResultParser[Result, Input] {
 
       override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
-        parserAndCaches.text.arrayOfChars = text.toCharArray
         val zero: Input = startInput(offsetManager)
-        findBestParseResult(parserAndCaches.text, zero, parserAndCaches.parser, mayStop, metrics)
+        findBestParseResult(parseText, zero, parserAndCaches.parser, mayStop, metrics)
       }
 
       override def reset(): Unit = {

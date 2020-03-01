@@ -2,6 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.sequences.SingleResultParser
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
@@ -50,7 +51,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   def valueToResult(value: Any): Result = WithMap(value, Map.empty)
 
   def toParser(grammar: BiGrammar): SingleResultParser[Any, Input] = {
-    toParserBuilder(grammar).getWholeInputParser
+    toParserBuilder(grammar).getWholeInputParser(new ParseText())
   }
 
   def toParserBuilder(grammar: BiGrammar): Parser[Any] = {

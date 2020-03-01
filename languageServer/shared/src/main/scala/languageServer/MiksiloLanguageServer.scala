@@ -28,6 +28,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     compilation.isDirty = true
     compilation.rootFile = Some(parameters.uri)
     documentManager.onOpenTextDocument(parameters)
+    sendDiagnostics(parameters.uri)
   }
 
   override def didClose(parameters: TextDocumentIdentifier): Unit = documentManager.onCloseTextDocument(parameters)
@@ -39,10 +40,15 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     if (parameters.contentChanges.nonEmpty) {
       documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
     }
+    sendDiagnostics(parameters.textDocument.uri)
+  }
+
+  private def sendDiagnostics(uri: String): Unit = {
     if (client != null) {
-      compilation.rootFile = Some(parameters.textDocument.uri)
-      val diagnostics = getCompilation.diagnosticsForFile(parameters.textDocument.uri)
-      client.sendDiagnostics(PublishDiagnostics(parameters.textDocument.uri, diagnostics))
+      compilation.rootFile = Some(uri)
+      val diagnostics = getCompilation.diagnosticsForFile(uri)
+      logger.info("Sending diagnostics: " + diagnostics)
+      client.sendDiagnostics(PublishDiagnostics(uri, diagnostics))
     }
   }
 

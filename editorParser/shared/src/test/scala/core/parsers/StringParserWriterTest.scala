@@ -10,7 +10,7 @@ class StringParserWriterTest extends AnyFunSuite
   test("keywordParser cannot parse start of identifier") {
     val parser = "keyword" ~> parseIdentifier
     val input = "keywordAsIdentifierPrefix"
-    val result = parser.getWholeInputParser.parse(input)
+    val result = parser.getWholeInputParser().parse(input)
     assertResult("keywordAsIdentifierPrefix")(result.resultOption.get)
     assertResult("expected 'keyword'")(result.errors.head.message)
   }
@@ -18,7 +18,7 @@ class StringParserWriterTest extends AnyFunSuite
   test("keyword errors merge correctly") {
     val parser = "keyword" ~> "secondKeyword" ~> parseIdentifier
     val input = "keywordAsIdentifierPrefix"
-    val result = parser.getWholeInputParser.parse(input)
+    val result = parser.getWholeInputParser().parse(input)
     assert(result.errors.size == 1)
     assertResult("keywordAsIdentifierPrefix")(result.resultOption.get)
     assertResult("expected 'keywordsecondKeyword'")(result.errors.head.message)

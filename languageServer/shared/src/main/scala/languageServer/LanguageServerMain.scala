@@ -17,8 +17,8 @@ class LanguageServerMain(builders: Seq[LanguageBuilder],
 
   val languageMap = builders.map(l => (l.key, l)).toMap
 
+  LazyLogging.logger = new LambdaLogger(s => System.err.println(s))
   def main(args: Array[String]): Unit = {
-
     val languageOption = getLanguage(args)
     languageOption.foreach(language => {
       logger.debug(s"Starting server in ${System.getenv("PWD")}")

@@ -10,6 +10,8 @@ import core.parsers.sequences.SingleResultParser
 import core.smarts.FileDiagnostic
 import deltas.FileWithMembersDelta.FileWithMembers
 import core.bigrammar.BiGrammarToParser._
+import core.parsers.core.ParseText
+
 import scala.reflect.io.Path
 
 object IncludeDelta extends DirectiveDelta {
@@ -39,7 +41,7 @@ object IncludeDelta extends DirectiveDelta {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    parserProp.add(language, toParserBuilder(LanguageGrammars.grammars.get(language).root).getWholeInputParser)
+    parserProp.add(language, toParserBuilder(LanguageGrammars.grammars.get(language).root).getWholeInputParser(new ParseText()))
   }
 
   override def dependencies: Set[Contract] = Set(PreprocessorDelta)

@@ -184,7 +184,7 @@ class YamlTest extends AnyFunSuite
                   |                                              Examples], /cloudformation_graphic.png" alt="AWS CloudFormation
                   |                                                           Logo"/>, '<h1>Congratulations, you have successfully launched
                   |                    the AWS CloudFormation sample.</h1>']""".stripMargin
-    val result = parseValue.getWholeInputParser.parse(input)
+    val result = parseValue.getWholeInputParser().parse(input)
     assert(result.successful)
   }
 
@@ -206,7 +206,7 @@ class YamlTest extends AnyFunSuite
                   |
                   |            ']
                   |""".stripMargin
-    val result = parseYaml.getWholeInputParser.parse(input)
+    val result = parseYaml.getWholeInputParser().parse(input)
     assert(result.successful)
   }
 
@@ -214,14 +214,14 @@ class YamlTest extends AnyFunSuite
   test("string") {
     val program = "'hello'"
 
-    val result = parseStringLiteral.getWholeInputParser.parse(program)
+    val result = parseStringLiteral.getWholeInputParser().parse(program)
     assertResult(StringLiteral("hello"))(result.get)
   }
 
   test("number") {
     val program = "3"
 
-    val result = parseNumber.getWholeInputParser.parse(program)
+    val result = parseNumber.getWholeInputParser().parse(program)
     assertResult(Number(3))(result.get)
   }
 
@@ -229,7 +229,7 @@ class YamlTest extends AnyFunSuite
     val program =
       """minecraft: 2""".stripMargin
 
-    val result = parseValue.getWholeInputParser.parse(program)
+    val result = parseValue.getWholeInputParser().parse(program)
     val expectation = Object(Map(StringLiteral("minecraft") -> Number(2)))
     assertResult(expectation)(result.get)
   }
@@ -239,7 +239,7 @@ class YamlTest extends AnyFunSuite
       """minecraft: 2
         |cancelled: 3""".stripMargin
 
-    val result = parseValue.getWholeInputParser.parse(program)
+    val result = parseValue.getWholeInputParser().parse(program)
     val expectation = Object(Map(StringLiteral("minecraft") -> Number(2), StringLiteral("cancelled") -> Number(3)))
     assertResult(expectation)(result.get)
   }
@@ -249,7 +249,7 @@ class YamlTest extends AnyFunSuite
       """- 2
         |- 3""".stripMargin
 
-    val result = parseValue.getWholeInputParser.parse(program)
+    val result = parseValue.getWholeInputParser().parse(program)
     val expectation = YamlArray(Seq(Number(2), Number(3)))
     assertResult(expectation)(result.get)
   }
@@ -259,7 +259,7 @@ class YamlTest extends AnyFunSuite
       """- x: 3
         |  y: 4""".stripMargin
 
-    val result = parseValue.getWholeInputParser.parse(program)
+    val result = parseValue.getWholeInputParser().parse(program)
     val expectation = YamlArray(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
@@ -270,7 +270,7 @@ class YamlTest extends AnyFunSuite
         |  y: 4
         |- 2""".stripMargin
 
-    val result = parseValue.getWholeInputParser.parse(program)
+    val result = parseValue.getWholeInputParser().parse(program)
     val expectation = YamlArray(Seq(Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4))), Number(2)))
     assertResult(expectation)(result.get)
   }
@@ -281,7 +281,7 @@ class YamlTest extends AnyFunSuite
         |- x: 3
         |  y: 4""".stripMargin
 
-    val result = parseValue.getWholeInputParser.parse(program)
+    val result = parseValue.getWholeInputParser().parse(program)
     val expectation = YamlArray(Seq(Number(2), Object(Map(StringLiteral("x") -> Number(3), StringLiteral("y") -> Number(4)))))
     assertResult(expectation)(result.get)
   }
@@ -291,7 +291,7 @@ class YamlTest extends AnyFunSuite
       """- a: - 1
         |- b: - 2""".stripMargin
 
-    val result = parseValue.getWholeInputParser.parse(program)
+    val result = parseValue.getWholeInputParser().parse(program)
     val expectation = YamlArray(Seq(
       Object(Map(
         StringLiteral("a") -> YamlArray(Seq(Number(1))))),
@@ -314,7 +314,7 @@ class YamlTest extends AnyFunSuite
         |     - 8
         |  r: 9""".stripMargin
 
-    val result = parseValue.getWholeInputParser.parse(program)
+    val result = parseValue.getWholeInputParser().parse(program)
     val expectation =
       YamlArray(Seq(
         Number(2),
@@ -331,7 +331,7 @@ class YamlTest extends AnyFunSuite
 
   test("big yaml file") {
     val contents = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.yaml")
-    val result = parseValue.getWholeInputParser.parse(contents)
+    val result = parseValue.getWholeInputParser().parse(contents)
     assert(result.successful, result.toString)
   }
 }

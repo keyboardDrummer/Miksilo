@@ -146,13 +146,11 @@ trait OptimizingParserWriter extends ParserWriter {
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
-  case class ParserAndCaches[Result](text: ParseText,
-                                     parser: BuiltParser[Result])
+  case class ParserAndCaches[Result](parser: BuiltParser[Result])
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
-    def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
-      val text = new ParseText()
+    def buildParser[Result](text: ParseText, root: Parser[Result]): ParserAndCaches[Result] = {
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
       def recursive: GetParser = new GetParser {
         override def apply[SomeResult](_parser: Parser[SomeResult]): BuiltParser[SomeResult] = {
@@ -165,7 +163,7 @@ trait OptimizingParserWriter extends ParserWriter {
       }
 
       val wrappedRoot = recursive(root)
-      ParserAndCaches(text, wrappedRoot)
+      ParserAndCaches(wrappedRoot)
     }
   }
 
@@ -192,7 +190,7 @@ trait OptimizingParserWriter extends ParserWriter {
     }
   }
 
-  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
+  def getSingleResultParser[Result](text: ParseText, parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
 
   case class Success[+Result](result: Result, remainder: Input) {
     def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)

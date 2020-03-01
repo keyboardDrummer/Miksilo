@@ -1,5 +1,6 @@
 package core.parsers
 
+import _root_.core.parsers.core.ParseText
 import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingTest extends AnyFunSuite {
@@ -70,6 +71,52 @@ class IncrementalParsingTest extends AnyFunSuite {
     assertResult(135)(result.resultOption.get)
   }
 
+  test("success parser caching") {
+    val input = """[]"""
+    val input2 = """[{]"""
+    val input3 = """[{}]"""
+    val parser = getParser
+    parser.parse(input)
+    parser.changeRange(1,1,1)
+    parser.parse(input2)
+    parser.changeRange(2,2,1)
+    val result = parser.parse(input3)
+    assertResult(List(List.empty))(result.resultOption.get)
+  }
+
+  test("regression") {
+    val input = """[{}]"""
+    val input2 = """[{]"""
+    val input3 = """[{}]"""
+    val parser = getParser
+    parser.parse(input)
+    parser.changeRange(2,3,0)
+    val result2 = parser.parse(input2)
+    parser.changeRange(2,2,1)
+    val result3 = parser.parse(input3)
+    assertResult(List(List.empty))(result3.resultOption.get)
+  }
+
+  test("regression2") {
+    val input = """[]"""
+    val input2 = """[{"""
+    val input3 = """[{}"""
+    val input4 = """[{"""
+    val input5 = """[{}"""
+    val parser = getParser
+    parser.parse(input)
+    parser.changeRange(1,1,1)
+    parser.parse(input2)
+    parser.changeRange(2,2,1)
+    parser.parse(input3)
+    parser.changeRange(2,3,0)
+    parser.parse(input4)
+    parser.changeRange(2,2,1)
+    parser.parse(input5)
+    val result = parser.parse(input5)
+    assertResult(List(List.empty))(result.resultOption.get)
+  }
+
   // TODO add tests with linebreaks.
 
   // TODO add test that checks whether positions in the AST have been updated.
@@ -77,7 +124,7 @@ class IncrementalParsingTest extends AnyFunSuite {
   // TODO add test with indentation sensitive parsing.
 
   def getParser = {
-    jsonParser.getSingleResultParser
+    jsonParser.getSingleResultParser(new ParseText())
   }
 
 }

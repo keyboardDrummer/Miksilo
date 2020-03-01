@@ -80,7 +80,7 @@ final class SRCons[Input <: ParseInput, +Result](
         {
           new SRCons(
             cons.head,
-            cons.latestRemainder, // TODO is this correct?
+            getLatest(tail.latestRemainder, cons.latestRemainder), // TODO is this correct?
             1 + Math.max(this.tailDepth, cons.tailDepth),
             cons.tail.merge(tail.flatMap(f, uniform)))
         }

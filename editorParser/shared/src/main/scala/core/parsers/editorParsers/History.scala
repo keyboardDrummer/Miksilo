@@ -39,7 +39,7 @@ trait History[Input <: ParseInput] {
 
   def errors: Iterable[ParseError[Input]]
 
-  override def toString = errors.toString()
+  override def toString = s"score: $score, errors: $errors"
 }
 
 case class SpotlessHistory[Input <: ParseInput](score: Double = 0) extends History[Input] {

@@ -16,7 +16,7 @@ class PerformanceTest extends AnyFunSuite {
   import PerformanceTest._
   import ParseJson._
 
-  val jsonFileParser = jsonParser.getWholeInputParser
+  val jsonFileParser = jsonParser.getWholeInputParser()
 
   test("Correct JSON small file performance") {
 

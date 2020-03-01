@@ -1,7 +1,7 @@
 package languageServer
 
 import core.language.Language
-import core.parsers.editorParsers.Position
+import core.parsers.editorParsers.{Position, SourceRange}
 import lsp._
 
 import scala.util.Random
@@ -40,6 +40,11 @@ trait LanguageServerTest {
     server.asInstanceOf[CompletionProvider].complete(DocumentPosition(document, position))
   }
 
+  def applyChange(server: MiksiloLanguageServer, document: TextDocumentIdentifier, from: Int, until: Int, newText: String): Seq[Diagnostic] = {
+    getDiagnostics(server, DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(document.uri, 0L),
+      Seq(TextDocumentContentChangeEvent(Some(SourceRange(Position(0, from), Position(0, until))), Some(until - from), newText))))
+  }
+
   def getDiagnostics(server: LanguageServer, change: DidChangeTextDocumentParams): Seq[Diagnostic] = {
     var result: Seq[Diagnostic] = null
     server.setClient(new LanguageClient {
@@ -70,6 +75,11 @@ trait LanguageServerTest {
   val random = new Random()
   def openDocument(server: LanguageServer, content: String, uri: String = Random.nextInt().toString): TextDocumentIdentifier = {
     val item = new TextDocumentItem(uri, "", 1, content)
+    server.setClient(new LanguageClient {
+      override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {}
+
+      override def trackMetric(name: String, value: Double): Unit = {}
+    })
     server.didOpen(item)
     TextDocumentIdentifier(item.uri)
   }

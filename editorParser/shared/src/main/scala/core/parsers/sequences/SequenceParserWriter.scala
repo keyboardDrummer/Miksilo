@@ -333,12 +333,12 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) =
       Filter(parser, predicate, getMessage)
 
-    def getSingleResultParser: SingleResultParser[Result, Input] = {
-      SequenceParserWriter.this.getSingleResultParser(this.parser)
+    def getSingleResultParser(parseText: ParseText): SingleResultParser[Result, Input] = {
+      SequenceParserWriter.this.getSingleResultParser(parseText, this.parser)
     }
 
-    def getWholeInputParser: SingleResultParser[Result, Input] = {
-      ParseWholeInput(parser).getSingleResultParser
+    def getWholeInputParser(parseText: ParseText = new ParseText()): SingleResultParser[Result, Input] = {
+      ParseWholeInput(parser).getSingleResultParser(parseText)
     }
 
     def withRange[Other](addRange: (OffsetNode, OffsetNode, Result) => Other): Parser[Other] = {
