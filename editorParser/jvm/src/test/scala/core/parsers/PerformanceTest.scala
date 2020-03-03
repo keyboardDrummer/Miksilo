@@ -9,7 +9,7 @@ object PerformanceTest {
   val manyRepetitionsTargetTime = 200
   val smallErrorsTargetTime = manyRepetitionsTargetTime + 5 // We only allow the small errors to make the parsing 5ms slower
   val manySourcesCount = 10
-  val manySourcesTargetTime = manyRepetitionsTargetTime * manySourcesCount * 1.50 // Sadly, the larger file is relatively slower at the moment
+  val manySourcesTargetTime = manyRepetitionsTargetTime * manySourcesCount * 1.75 // Sadly, the larger file is relatively slower at the moment
 }
 
 class PerformanceTest extends AnyFunSuite {
