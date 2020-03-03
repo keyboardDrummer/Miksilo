@@ -42,7 +42,7 @@ object Language extends LazyLogging {
       compilation.metrics.measure("Constraint solving time", solveDuration)
       compilation.proofs = solver.proofs
       if (compilation.remainingConstraints.nonEmpty) {
-        compilation.stopped = true
+        compilation.stop()
       }
       compilation.diagnostics ++= compilation.remainingConstraints.flatMap(
         constraint => constraint.getDiagnostic(compilation))
@@ -54,11 +54,10 @@ object Language extends LazyLogging {
     parserBuilder: parserWriter.Parser[Program],
     stopFunction: StopFunction = new TimeRatioStopFunction): Phase = {
 
-    val builtParser = new CompilationState[mutable.HashMap[String, SingleResultParser[Program, parserWriter.Input]]](_ => mutable.HashMap.empty)
+    val builtParser = new CachedCompilationField[mutable.HashMap[String, SingleResultParser[Program, parserWriter.Input]]](_ => mutable.HashMap.empty)
 
     Phase("parse", "parse the source code", compilation => {
       val uri = compilation.rootFile.get
-      val input = compilation.fileSystem.getFile(uri)
 
       val parsers = builtParser(compilation)
 
@@ -80,7 +79,7 @@ object Language extends LazyLogging {
         compilation.program = getSourceElement(program, uri)
       })
       if (compilation.program == null) {
-        compilation.stopped = true
+        compilation.stop()
       }
       if (!parseResult.successful) {
         val diagnostics = DiagnosticUtil.getDiagnosticsFromParseFailures(uri, parseResult.errors)
@@ -119,7 +118,7 @@ class Language extends LazyLogging {
   }
 
   def compile(): Compilation = {
-    val compilation = new Compilation(this, EmptyFileSystem, None)
+    val compilation = new Compilation(new CompilationCache(this, EmptyFileSystem), None)
     compilation.runPhases()
     compilation
   }

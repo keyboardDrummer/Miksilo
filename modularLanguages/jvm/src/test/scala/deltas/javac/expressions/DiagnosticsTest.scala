@@ -18,7 +18,7 @@ class DiagnosticsTest extends AnyFunSuite with LanguageServerTest {
       Diagnostic(SourceRange(HumanPosition(10,98), HumanPosition(10,104)), Some(1), "Could not find definition of index3", None, None))
     val (diagnostics, document) = openAndCheckDocument(server, program)
     assertResult(expectedResults)(diagnostics)
-    server.compilation.state.clear()
+
     val diagnostics2 = getDiagnostics(server, DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, 0L), Seq.empty))
     assertResult(diagnostics2)(diagnostics)
   }

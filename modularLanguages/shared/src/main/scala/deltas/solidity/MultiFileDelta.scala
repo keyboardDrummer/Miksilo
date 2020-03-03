@@ -2,7 +2,7 @@ package deltas.solidity
 
 import core.deltas.path.{NodePath, PathRoot}
 import core.deltas.{DeltaWithPhase, ShapeProperty}
-import core.language.Compilation
+import core.language.{Compilation, CompilationCache}
 import core.language.node._
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
@@ -20,7 +20,7 @@ object MultiFileDelta extends DeltaWithPhase with HasConstraintsDelta {
     val phases = compilation.language.compilerPhases.takeWhile(p => p.key != this)
 
     def compileFile(fileReference: String): Node = {
-      val fileCompilation = new Compilation(compilation.language, compilation.fileSystem, Some(fileReference))
+      val fileCompilation = new Compilation(new CompilationCache(compilation.language, compilation.fileSystem), Some(fileReference))
       for(phase <- phases) {
         phase.action(fileCompilation)
       }

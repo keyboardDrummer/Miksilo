@@ -2,7 +2,7 @@ package languageServer
 
 import core.LazyLogging
 import core.language.exceptions.BadInputException
-import core.language.{Compilation, Language, SourceElement}
+import core.language.{Compilation, CompilationCache, Language, NotStarted, SourceElement}
 import core.parsers.core.ParseText
 import core.parsers.editorParsers.TextEdit
 import core.smarts.Proofs
@@ -20,15 +20,15 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   var client: LanguageClient = _
   private val documentManager = new TextDocumentManager()
-  val compilation: Compilation = new Compilation(language, documentManager, None)
+  val compilationCache: CompilationCache = new CompilationCache(language, documentManager)
+  var compilation: Compilation = _
 
   override def textDocumentSync = TextDocumentSyncKind.Incremental
 
   override def didOpen(parameters: TextDocumentItem): Unit = {
-    compilation.isDirty = true
-    compilation.rootFile = Some(parameters.uri)
+    compilation = new Compilation(compilationCache, Some(parameters.uri))
     documentManager.onOpenTextDocument(parameters)
-    sendDiagnostics(parameters.uri)
+    sendDiagnostics()
   }
 
   override def didClose(parameters: TextDocumentIdentifier): Unit = documentManager.onCloseTextDocument(parameters)
@@ -36,16 +36,16 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   override def didSave(parameters: DidSaveTextDocumentParams): Unit = {}
 
   override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
-    compilation.isDirty = true
+    compilation = new Compilation(compilationCache, Some(parameters.textDocument.uri))
     if (parameters.contentChanges.nonEmpty) {
       documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
     }
-    sendDiagnostics(parameters.textDocument.uri)
+    sendDiagnostics()
   }
 
-  private def sendDiagnostics(uri: String): Unit = {
+  private def sendDiagnostics(): Unit = {
     if (client != null) {
-      compilation.rootFile = Some(uri)
+      val uri = compilation.rootFile.get
       val diagnostics = getCompilation.diagnosticsForFile(uri)
       logger.info("Sending diagnostics: " + diagnostics)
       client.sendDiagnostics(PublishDiagnostics(uri, diagnostics))
@@ -53,11 +53,8 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def compile(): Unit = {
-    compilation.diagnostics = Set.empty
-    compilation.stopped = false
     try {
       compilation.runPhases()
-      compilation.isDirty = false
     } catch {
       case e: BadInputException => //TODO move to diagnostics.
         logger.debug(e.toString)
@@ -65,7 +62,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   }
 
   def getCompilation: Compilation = {
-    if (compilation.isDirty)
+    if (!compilation.isStarted)
       compile()
     compilation
   }
@@ -147,7 +144,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def setClient(client: LanguageClient): Unit = {
     this.client = client
-    compilation.metrics = client.trackMetric
+    compilationCache.metrics = client.trackMetric
   }
 
   override def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation] = {

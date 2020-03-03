@@ -7,7 +7,7 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodeChildPath, NodePath}
 import core.document.BlankLine
 import core.language.node._
-import core.language.{Compilation, CompilationState, Language}
+import core.language.{Compilation, CompilationField, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.{Declaration, NamedDeclaration}
 import core.smarts.scopes.objects.{Scope, ScopeVariable}
@@ -95,7 +95,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
   val importToClassMap = new ShapeProperty[(Compilation, Node) => Map[String, QualifiedClassName]]
 
-  val state = new CompilationState[State](_ => new State())
+  val state = new CompilationField[State](_ => new State())
   class State {
     var classCompiler: ClassCompiler = _
     val javaCompiler: JavaCompiler = new JavaCompiler()

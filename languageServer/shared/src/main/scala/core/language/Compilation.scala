@@ -1,7 +1,5 @@
 package core.language
 
-import java.io.InputStream
-
 import core.parsers.core.{Metrics, NoMetrics}
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
 import lsp.{CodeAction, Diagnostic}
@@ -9,15 +7,24 @@ import lsp.{CodeAction, Diagnostic}
 import scala.collection.mutable
 import scala.language.implicitConversions
 
-class Compilation(val language: Language, val fileSystem: FileSystem, var rootFile: Option[String],
-                  var metrics: Metrics = NoMetrics) {
+class CompilationCache(val language: Language, val fileSystem: FileSystem,
+                       var metrics: Metrics = NoMetrics) {
+  val state: mutable.Map[Any, Any] = mutable.Map.empty
+}
+
+trait CompilationState
+object Stopped extends CompilationState
+object Started extends CompilationState
+object NotStarted extends CompilationState
+
+class Compilation(val cache: CompilationCache, var rootFile: Option[String]) {
+
+  def metrics = cache.metrics
+  def fileSystem = cache.fileSystem
+  def language = cache.language
 
   var program: SourceElement = _
-  var isDirty: Boolean = false
 
-  // TODO separate re-usable state 'cache' and one-time state: program/diagnostics/stopped
-
-  private var _isDirty = true
   var proofs: Proofs = _
   var remainingConstraints: Seq[Constraint] = _
   var diagnostics: Set[FileDiagnostic] = Set.empty
@@ -32,12 +39,17 @@ class Compilation(val language: Language, val fileSystem: FileSystem, var rootFi
   }
 
   var output: String = _
-  val state: mutable.Map[Any, Any] = mutable.Map.empty
-  var stopped: Boolean = false
+  val data: mutable.Map[Any, Any] = mutable.Map.empty
+  private var state: CompilationState = NotStarted
+
+  def isStarted: Boolean = state != NotStarted
+  def hasStopped = state == Stopped
+  def stop() = state = Stopped
 
   def runPhases(): Unit = {
-    for(phase <- language.compilerPhases) {
-      if (stopped)
+    state = Started
+    for(phase <- cache.language.compilerPhases) {
+      if (hasStopped)
         return
       phase.action(this)
     }
@@ -55,17 +67,15 @@ object Compilation
   val singleFileDefaultName = "singleFileDefault"
   def singleFile(language: Language, input: String): Compilation = {
     val filePath = singleFileDefaultName
-    val result = new Compilation(language, InMemoryFileSystem(Map(filePath -> input)), Some(filePath))
-
-    result
+    new Compilation(new CompilationCache(language, InMemoryFileSystem(Map(filePath -> input))), Some(filePath))
   }
 
   def fromAst(language: Language, root: SourceElement): Compilation = {
-    val result = new Compilation(language, EmptyFileSystem, None)
+    val result = new Compilation(new CompilationCache(language, EmptyFileSystem), None)
     result.program = root
     result
   }
-  implicit def toLanguage(compilation: Compilation): Language = compilation.language
+  implicit def toLanguage(compilation: Compilation): Language = compilation.cache.language
 }
 
 

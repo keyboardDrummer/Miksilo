@@ -3,7 +3,7 @@ package deltas.verilog
 import core.SourceUtils
 import core.deltas.path.PathRoot
 import core.language.node.NodeComparer
-import core.language.{Compilation, InMemoryFileSystem}
+import core.language.{Compilation, CompilationCache, InMemoryFileSystem}
 import core.parsers.editorParsers.SourceRange
 import deltas.expression.VariableDelta.Variable
 import deltas.expression.{IntLiteralDelta, VariableDelta}
@@ -101,7 +101,7 @@ class VerilogTest extends AnyFunSuite with LanguageServerTest {
     val fileSystem = InMemoryFileSystem(Map(
       "./Bus_pkg.sv" -> SourceUtils.getResourceFileContents(Path("verilog") / "Bus_pkg.sv"),
       "testbench.sv" -> SourceUtils.getResourceFileContents(Path("verilog") / "testbench.sv")))
-    val compilation = new Compilation(language.language, fileSystem, Some("testbench.sv"))
+    val compilation = new Compilation(new CompilationCache(language.language, fileSystem), Some("testbench.sv"))
     compilation.runPhases()
     assert(compilation.diagnostics.isEmpty, compilation.diagnostics)
   }

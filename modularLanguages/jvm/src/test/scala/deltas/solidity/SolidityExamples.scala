@@ -1,6 +1,6 @@
 package deltas.solidity
 
-import core.language.{Compilation, InMemoryFileSystem}
+import core.language.{Compilation, CompilationCache, InMemoryFileSystem}
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
@@ -200,9 +200,9 @@ class SolidityExamples extends AnyFunSuite {
                     |    }
                     |}""".stripMargin
 
-    val compilation = new Compilation(solidity.language, InMemoryFileSystem(Map(
+    val compilation = new Compilation(new CompilationCache(solidity.language, InMemoryFileSystem(Map(
       "testLibrary.sol" -> program,
-      "browser/library.sol" -> library)), Some("testLibrary.sol"))
+      "browser/library.sol" -> library))), Some("testLibrary.sol"))
 
     compilation.runPhases()
     assertResult(Seq.empty)(compilation.diagnostics)

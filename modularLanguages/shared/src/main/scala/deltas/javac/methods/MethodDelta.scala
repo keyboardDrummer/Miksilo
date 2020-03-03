@@ -5,7 +5,7 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node._
-import core.language.{Compilation, CompilationState, Language}
+import core.language.{Compilation, CompilationField, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.Declaration
 import core.smarts.scopes.objects.{ConcreteScope, Scope}
@@ -116,7 +116,7 @@ object MethodDelta extends DeltaWithGrammar
       TypeParameters -> typeParameters)
   }
 
-  val state = new CompilationState[MethodCompiler](null)
+  val state = new CompilationField[MethodCompiler](null)
 
   object Shape extends NodeShape
 
