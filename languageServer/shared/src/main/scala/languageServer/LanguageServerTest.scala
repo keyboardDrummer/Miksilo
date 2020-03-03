@@ -59,8 +59,13 @@ trait LanguageServerTest {
   }
 
   def getDiagnostics(server: LanguageServer, program: String): Seq[Diagnostic] = {
+    openAndCheckDocument(server, program)._1
+  }
+
+  val random = new Random()
+  def openAndCheckDocument(server: LanguageServer, content: String, uri: String = Random.nextInt().toString): (Seq[Diagnostic],TextDocumentIdentifier) = {
+
     var result: Seq[Diagnostic] = null
-    val document = openDocument(server, program)
     server.setClient(new LanguageClient {
       override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {
         result = diagnostics.diagnostics
@@ -68,19 +73,13 @@ trait LanguageServerTest {
 
       override def trackMetric(name: String, value: Double): Unit = {}
     })
-    server.didChange(DidChangeTextDocumentParams(VersionedTextDocumentIdentifier(document.uri, 0), Seq.empty))
-    result
+
+    val item = new TextDocumentItem(uri, "", 1, content)
+    server.didOpen(item)
+    (result, TextDocumentIdentifier(item.uri))
   }
 
-  val random = new Random()
   def openDocument(server: LanguageServer, content: String, uri: String = Random.nextInt().toString): TextDocumentIdentifier = {
-    val item = new TextDocumentItem(uri, "", 1, content)
-    server.setClient(new LanguageClient {
-      override def sendDiagnostics(diagnostics: PublishDiagnostics): Unit = {}
-
-      override def trackMetric(name: String, value: Double): Unit = {}
-    })
-    server.didOpen(item)
-    TextDocumentIdentifier(item.uri)
+    openAndCheckDocument(server, content, uri)._2
   }
 }
