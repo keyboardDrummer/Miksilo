@@ -2,11 +2,15 @@ package core
 
 object TestUtils {
 
+  val maxTime = 60 * 1000
+
   def runPerformanceTest(targetTime: Double, maxRepetitions: Integer, action: () => Unit): Unit = {
     var repetition = 0
     var success = false
     var bestTime = Double.MaxValue
-    while(!success && repetition < maxRepetitions) {
+    val startTime = System.currentTimeMillis()
+    val endTime = startTime + maxTime
+    while(!success && repetition < maxRepetitions && (System.currentTimeMillis() < endTime)) {
       val before = System.currentTimeMillis()
       action()
       val after = System.currentTimeMillis()
