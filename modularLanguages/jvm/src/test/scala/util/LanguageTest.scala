@@ -42,7 +42,7 @@ object LanguageTest {
 class LanguageTest(val language: TestingLanguage) extends AnyFunSuite with BeforeAndAfterAllConfigMap {
 
   override protected def afterAll(configMap: ConfigMap): Unit = {
-    TestLanguageBuilder.statistics.printAll()
+    //TestLanguageBuilder.statistics.printAll()
   }
 
   def toFile(fileName: String, program: String): Path = {
