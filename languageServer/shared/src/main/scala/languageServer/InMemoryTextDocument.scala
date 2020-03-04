@@ -34,7 +34,10 @@ class InMemoryTextDocument(uri: String) extends LazyLogging {
     for(change <- changes) {
       change.range match {
         case None =>
+          val previousLength = parseText.arrayOfChars.length
           parseText.arrayOfChars = changes.head.text.toCharArray
+          handlerOption.foreach(handler =>
+            handler.handleChange(0, previousLength, changes.head.text))
         case Some(range) =>
           parseText.applyRangeChange(change.text, range)
           handlerOption.foreach(handler =>
