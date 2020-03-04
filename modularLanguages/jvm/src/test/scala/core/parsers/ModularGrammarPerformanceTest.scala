@@ -10,7 +10,7 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
 
   val json = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas, UntilBestAndXStepsStopFunction())
 
-  val modularGrammarSlowdown = 2.8
+  val modularGrammarSlowdown = 1.4
   val manyRepetitionsTargetTime = PerformanceTest.manyRepetitionsTargetTime * modularGrammarSlowdown
   val manySourcesCount = 10
   val manySourcesTargetTime = PerformanceTest.manySourcesTargetTime * modularGrammarSlowdown
