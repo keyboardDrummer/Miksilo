@@ -3,8 +3,8 @@ package deltas.bytecode.readJar
 import java.io.InputStream
 
 import core.deltas.Delta
+import deltas.bytecode.ByteCodeLanguage
 import deltas.bytecode.attributes.{ByteCodeAttribute, SignatureAttribute, UnParsedAttribute}
-import deltas.javac.ByteCodeLanguage
 
 object ClassFileSignatureDecompiler {
 

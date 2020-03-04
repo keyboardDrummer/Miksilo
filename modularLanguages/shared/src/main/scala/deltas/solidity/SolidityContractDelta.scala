@@ -14,9 +14,10 @@ import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.ConstraintSkeleton
 import deltas.HasNameDelta.{HasName, Name}
 import deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta}
+import deltas.classes.ClassDelta
+import deltas.classes.ClassDelta.ClassImports
 import deltas.expression.ExpressionDelta
-import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
-import deltas.javac.classes.skeleton.JavaClassDelta.ClassImports
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -31,8 +32,8 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
     def imports = node(ClassImports).asInstanceOf[Seq[T]]
     def imports_=(value: Seq[T]): Unit = node(ClassImports) = value
 
-    def members = node(JavaClassDelta.Members).asInstanceOf[Seq[T]]
-    def members_=(value: Seq[T]): Unit = node(JavaClassDelta.Members) = value
+    def members = node(ClassDelta.Members).asInstanceOf[Seq[T]]
+    def members_=(value: Seq[T]): Unit = node(ClassDelta.Members) = value
 
     def parents: Seq[T] = node(SuperContracts).asInstanceOf[Seq[T]]
     def parents_=(value: Seq[T]): Unit = node(SuperContracts) = value
@@ -49,9 +50,9 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val inheritanceSpecifier: BiGrammar = objectType.as(SuperName) ~
       (expression.someSeparated("," ~ printSpace).inParenthesis | value(Seq.empty)).as(SuperArguments) asNode SuperShape
     val inheritance = (printSpace ~ "is" ~~ inheritanceSpecifier.someSeparated("," ~ printSpace) | value(Seq.empty)).as(SuperContracts)
-    val member = create(JavaClassDelta.Members)
-    val members = member.manySeparatedVertical(BlankLine).as(JavaClassDelta.Members)
-    val contract = contractType ~~ identifier.as(Name) ~ inheritance ~ "{" % members % "}" asNode JavaClassDelta.Shape
+    val member = create(ClassDelta.Members)
+    val members = member.manySeparatedVertical(BlankLine).as(ClassDelta.Members)
+    val contract = contractType ~~ identifier.as(Name) ~ inheritance ~ "{" % members % "}" asNode ClassDelta.Shape
     find(FileWithMembersDelta.Members).addAlternative(contract)
   }
 
@@ -59,7 +60,7 @@ object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
   override def dependencies = Set(FileWithMembersDelta, UnqualifiedObjectTypeDelta)
 
-  override def shape = JavaClassDelta.Shape
+  override def shape = ClassDelta.Shape
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
     val contractLike: ContractLike[NodePath] = path

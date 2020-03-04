@@ -6,6 +6,7 @@ import core.deltas.{DeltaWithGrammar, DeltaWithPhase}
 import core.language.node.Node
 import core.language.{Compilation, Language}
 import deltas.HasNameDelta.Name
+import deltas.classes.ClassDelta
 import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.constructor.ConstructorDelta
 import deltas.javac.constructor.ConstructorDelta.ClassName
@@ -33,7 +34,7 @@ object SolidityConstructorDelta extends DeltaWithGrammar with DeltaWithPhase { /
     val blockGrammar: BiGrammar = find(BlockDelta.BlockGrammar)
     val body = blockGrammar.as(MethodDelta.Body)
     val grammar = "constructor" ~ parameterList.as(MethodDelta.Parameters) ~ modifiers ~~ body asNode ConstructorDelta.Shape
-    find(JavaClassDelta.Members).addAlternative(grammar)
+    find(ClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Adds solidity constructors"

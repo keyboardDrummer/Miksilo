@@ -8,7 +8,7 @@ import core.language.{Compilation, Language}
 import deltas.bytecode.types.VoidTypeDelta
 import deltas.statement.BlockDelta
 import deltas.HasNameDelta.Name
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
+import deltas.classes.ClassDelta.JavaClass
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
 import deltas.javac.methods.MethodDelta.{Body, Method, Parameters}

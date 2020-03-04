@@ -4,9 +4,9 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{Compilation, Language}
+import deltas.classes.ClassDelta.JavaClass
 import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.methods.MethodDelta.ReturnType
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, ReturnExpressionDelta}
 import deltas.statement.BlockDelta

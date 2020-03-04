@@ -1,7 +1,7 @@
 package application.graphing.model.simplifications
 
 import core.deltas.Contract
-import deltas.javac.ByteCodeLanguage
+import deltas.bytecode.ByteCodeLanguage
 
 object ByteCode extends DeltaGroup {
 

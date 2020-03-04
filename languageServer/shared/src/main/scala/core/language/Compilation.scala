@@ -9,7 +9,7 @@ import scala.language.implicitConversions
 
 class CompilationCache(val language: Language, val fileSystem: FileSystem,
                        var metrics: Metrics = NoMetrics) {
-  val state: mutable.Map[Any, Any] = mutable.Map.empty
+  val state = new mutable.HashMap[Any, Any]
 }
 
 trait CompilationState
@@ -39,7 +39,7 @@ class Compilation(val cache: CompilationCache, var rootFile: Option[String]) {
   }
 
   var output: String = _
-  val data: mutable.Map[Any, Any] = mutable.Map.empty
+  val data: mutable.Map[Any, Any] = new mutable.HashMap
   private var state: CompilationState = NotStarted
 
   def isStarted: Boolean = state != NotStarted

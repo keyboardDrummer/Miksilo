@@ -3,8 +3,9 @@ package deltas.bytecode.simpleBytecode
 import core.SourceUtils
 import core.deltas.Delta
 import deltas.PrettyPrint
+import deltas.bytecode.ByteCodeLanguage
 import deltas.bytecode.simpleBytecode.{InlineConstantPool, LabelledLocations}
-import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
+import deltas.javac.JavaToByteCodeLanguage
 import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
 

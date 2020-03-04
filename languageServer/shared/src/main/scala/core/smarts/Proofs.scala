@@ -17,7 +17,7 @@ class Proofs {
   val typeGraph = new TypeGraph
   var environment = Map.empty[Declaration, Type]
   var references = Map.empty[Reference, NamedDeclaration]
-  var referencesPerDeclaration = mutable.Map.empty[NamedDeclaration, ArrayBuffer[Reference]]
+  var referencesPerDeclaration = new mutable.HashMap[NamedDeclaration, ArrayBuffer[Reference]]
 
   def resolveDeclaration(declaration: Declaration): Declaration = declaration match {
     case v: DeclarationVariable => mappedDeclarationVariables.get(v) match

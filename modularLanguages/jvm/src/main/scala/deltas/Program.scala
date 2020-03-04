@@ -1,18 +1,9 @@
 package deltas
 
+import core.{LambdaLogger, LazyLogging}
 import deltas.javac.JavaLanguage
-import deltas.json.JsonLanguage
-import deltas.smithy.SmithyLanguage
-import deltas.solidity.SolidityLanguage
-import deltas.verilog.VerilogLanguage
-import deltas.yaml.YamlLanguage
-import jsonRpc.{JVMMessageReader, JVMMessageWriter, JVMQueue, JsonRpcConnection, WorkItem}
+import jsonRpc._
 import languageServer.{LanguageBuilder, LanguageServerMain}
-
-object VerilogLanguageBuilder extends LanguageBuilder {
-  override def key = "verilog"
-  override def build(arguments: collection.Seq[String]) = VerilogLanguage.language
-}
 
 object JavaLanguageBuilder extends LanguageBuilder {
   override def key = "java"
@@ -20,37 +11,10 @@ object JavaLanguageBuilder extends LanguageBuilder {
   override def build(arguments: collection.Seq[String]) = JavaLanguage.java
 }
 
-object SolidityLanguageBuilder extends LanguageBuilder {
-  override def key = "solidity"
+object Program extends LanguageServerMain(Languages.languages ++ Seq(JavaLanguageBuilder),
+  new JsonRpcConnection(new JVMMessageReader(System.in), new JVMMessageWriter(System.out)),
+  new JVMQueue[WorkItem]) {
 
-  override def build(arguments: collection.Seq[String]) = SolidityLanguage.language
+  LazyLogging.logger = new LambdaLogger(s => System.err.println(s))
 }
-
-object SmithyLanguageBuilder extends LanguageBuilder {
-  override def key = "smithy"
-
-  override def build(arguments: collection.Seq[String]) = SmithyLanguage.language
-}
-
-object JsonLanguageBuilder extends LanguageBuilder {
-  override def key = "json"
-
-  override def build(arguments: collection.Seq[String]) = JsonLanguage.language
-}
-
-object YamlLanguageBuilder extends LanguageBuilder {
-  override def key = "yaml"
-
-  override def build(arguments: collection.Seq[String]) = YamlLanguage.language
-}
-
-object Program extends LanguageServerMain(Seq(
-  VerilogLanguageBuilder,
-  JavaLanguageBuilder,
-  SolidityLanguageBuilder,
-  SmithyLanguageBuilder,
-  JsonLanguageBuilder,
-  YamlLanguageBuilder
-), new JsonRpcConnection(new JVMMessageReader(System.in), new JVMMessageWriter(System.out)),
-  new JVMQueue[WorkItem])
 

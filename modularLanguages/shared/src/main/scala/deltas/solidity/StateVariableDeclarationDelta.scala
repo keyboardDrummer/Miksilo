@@ -12,7 +12,8 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.expression.ExpressionDelta
 import deltas.statement.LocalDeclarationDelta
 import deltas.HasNameDelta.Name
-import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.classes.ClassDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta}
 
 object StateVariableDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -27,7 +28,7 @@ object StateVariableDeclarationDelta extends DeltaWithGrammar with HasConstraint
     val modifiers = (printSpace ~> ("public" | "internal" | "private" | "constant")).many.as(Modifiers)
     val initializer = (printSpace ~> "=" ~~> expression).option.as(Initializer)
     val grammar = typeGrammar.as(LocalDeclarationDelta.Type) ~ modifiers ~~ find(Name) ~ initializer ~ ";" asNode Shape
-    find(JavaClassDelta.Members).addAlternative(grammar)
+    find(ClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Introduce contract fields"

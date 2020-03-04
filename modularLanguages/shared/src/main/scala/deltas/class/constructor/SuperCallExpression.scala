@@ -11,9 +11,9 @@ import core.smarts.scopes.ReferenceInScope
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 import deltas.bytecode.types.VoidTypeDelta
+import deltas.classes.ClassDelta
+import deltas.classes.ClassDelta.{ClassParent, JavaClass}
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
-import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta.{ClassParent, JavaClass}
 import deltas.javac.methods.MethodDelta
 import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.call.CallDelta
@@ -25,7 +25,7 @@ object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance {
 
   override val shape = Shape
 
-  override def dependencies: Set[Contract] = Set(MethodDelta, JavaClassDelta, ExpressionDelta) ++ super.dependencies
+  override def dependencies: Set[Contract] = Set(MethodDelta, ExpressionDelta) ++ super.dependencies
 
   def superCall(arguments: Seq[Node] = Seq()) = new Node(Shape, CallDelta.Arguments -> arguments)
 
@@ -42,7 +42,7 @@ object SuperCallExpression extends DeltaWithGrammar with ExpressionInstance {
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, _call: NodePath, _type: Type, parentScope: Scope): Unit = {
     val call: Call[NodePath] = _call
     val method: Method[NodePath] = _call.findAncestorShape(MethodDelta.Shape)
-    val clazz: JavaClass[NodePath] = _call.findAncestorShape(JavaClassDelta.Shape)
+    val clazz: JavaClass[NodePath] = _call.findAncestorShape(ClassDelta.Shape)
     val parentName = clazz.parent.get
     val superClass = builder.resolve(parentName, parentScope, _call.getField(ClassParent))
     val superScope = builder.getDeclaredScope(superClass)

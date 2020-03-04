@@ -4,8 +4,8 @@ import core.deltas.{Contract, Delta, DeltaWithPhase, LanguageFromDeltas}
 import core.language.node.Node
 import core.language.{Compilation, Language}
 import deltas.PrettyPrint
+import deltas.classes.ClassDelta.JavaClass
 import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import lsp.LanguageServer

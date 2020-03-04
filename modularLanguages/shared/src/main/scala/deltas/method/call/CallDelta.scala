@@ -12,9 +12,10 @@ import core.smarts.{ConstraintBuilder, ResolvesToType}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.constants.{ClassInfoConstant, MethodRefConstant, NameAndTypeConstant, Utf8ConstantDelta}
 import deltas.bytecode.extraConstants.TypeConstant
+import deltas.classes.ClassDelta
+import deltas.classes.ClassDelta.JavaClass
 import deltas.expression.{ExpressionDelta, ExpressionInstance}
 import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.methods.MethodDelta
 import deltas.javac.methods.MethodDelta.Method
 
@@ -93,7 +94,7 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
 
   def getMethodRefIndexFromMethod(method: Method[NodePath]): Node = {
     val methodType = MethodDelta.getMethodType(method)
-    val constructorClass: JavaClass[NodePath] = method.ancestors.find(a => a.shape == JavaClassDelta.Shape || a.shape == ByteCodeSkeleton.Shape).get
+    val constructorClass: JavaClass[NodePath] = method.ancestors.find(a => a.shape == ClassDelta.Shape || a.shape == ByteCodeSkeleton.Shape).get
     getMethodRefIndex(JavaClassDelta.getQualifiedClassName(constructorClass), method.name, methodType)
   }
 

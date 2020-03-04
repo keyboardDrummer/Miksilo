@@ -13,7 +13,8 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.solidity.SolidityContractDelta.ContractLike
 import deltas.solidity.SolidityFunctionDelta.ReturnValues
 import core.deltas.path.ConstraintBuilderExtension._
-import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.classes.ClassDelta
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters
 import deltas.javac.methods.MethodParameters.MethodParameter
@@ -38,7 +39,7 @@ object UsingForDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelt
     val typeGrammar = find(TypeSkeleton.JavaTypeGrammar)
     val grammar = "using" ~~ identifier.as(LibraryName) ~~ "for" ~~
       ("*" ~> value(Wildcard) | typeGrammar).as(Type) ~ ";" asNode Shape
-    find(JavaClassDelta.Members).addAlternative(grammar)
+    find(ClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Add a using-for namespace member"

@@ -8,7 +8,6 @@ import deltas.bytecode.coreInstructions.integers.integerCompare.IfIntegerCompare
 import deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta, SmallIntegerConstantDelta, StoreIntegerDelta}
 import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import deltas.bytecode.types.IntTypeDelta
-import deltas.javac.ByteCodeLanguage
 import deltas.javac.classes.ConstantPool
 import org.scalatest.funsuite.AnyFunSuite
 import util.{LanguageTest, TestLanguageBuilder}

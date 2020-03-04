@@ -24,7 +24,7 @@ object BiGrammarToPrinter {
 
 class BiGrammarToPrinter {
 
-  val printerCache: mutable.Map[BiGrammar, NodePrinter] = mutable.Map.empty
+  val printerCache: mutable.Map[BiGrammar, NodePrinter] = new mutable.HashMap
 
   def toPrinterCached(grammar: BiGrammar): NodePrinter = {
 

@@ -55,7 +55,8 @@ final class ParseText extends CharSequence {
     try {
       lineStarts(position.line) + position.character
     } catch {
-      case _: ArrayIndexOutOfBoundsException => throw new IllegalArgumentException(s"Line ${position.line} is not in the document.")
+      case _: ArrayIndexOutOfBoundsException =>
+        throw new IllegalArgumentException(s"Line ${position.line} is not in the document.")
     }
   }
 

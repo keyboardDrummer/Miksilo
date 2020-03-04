@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.{Contract, DeltaWithGrammar, HasShape}
 import core.language.Language
-import core.language.node.{Node, NodeField, NodeShape}
+import core.language.node.{Node, NodeField}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.HasBytes
 import deltas.bytecode.readJar.ClassFileParser

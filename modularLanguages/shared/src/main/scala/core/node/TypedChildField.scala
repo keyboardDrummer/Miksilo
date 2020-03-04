@@ -11,7 +11,7 @@ class TypedChildField[T](name: String) extends NodeField {
   private def getFieldData(path: AnyPath): mutable.Map[NodeField, Any] = {
     path match {
       case nodePath: NodePath => nodePath.data
-      case childPath: ChildPath => childPath.parent.current.fieldData.getOrElseUpdate(childPath.field, mutable.Map.empty)
+      case childPath: ChildPath => childPath.parent.current.fieldData.getOrElseUpdate(childPath.field, new mutable.HashMap)
     }
   }
 

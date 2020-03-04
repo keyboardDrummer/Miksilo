@@ -15,7 +15,8 @@ import deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
 import deltas.expression.{ExpressionDelta, IsExpression}
 import deltas.statement.{BlockDelta, LabelStatementDelta}
 import core.deltas.path.ConstraintBuilderExtension._
-import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.classes.ClassDelta
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 import deltas.javac.methods.{MethodDelta, MethodParameters}
 import deltas.javac.methods.MethodDelta.Method
 import deltas.javac.methods.MethodParameters.MethodParameter
@@ -33,7 +34,7 @@ object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val optionalParameters = (parameterList | value(Seq.empty)).as(MethodDelta.Parameters)
     val grammar = "modifier" ~~ find(Name) ~
       optionalParameters ~~ body asNode Shape
-    find(JavaClassDelta.Members).addAlternative(grammar)
+    find(ClassDelta.Members).addAlternative(grammar)
 
     val underscoreGrammar = keywordGrammar("_") asNode UnderScoreShape
     find(ExpressionDelta.LastPrecedenceGrammar).addAlternative(underscoreGrammar)

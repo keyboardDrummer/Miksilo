@@ -10,8 +10,8 @@ import core.language.node.{Node, NodeComparer}
 import deltas.PrettyPrint
 import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
-import deltas.bytecode.PrintByteCode
-import deltas.javac.{ByteCodeLanguage, JavaToByteCodeLanguage}
+import deltas.bytecode.{ByteCodeLanguage, PrintByteCode}
+import deltas.javac.JavaToByteCodeLanguage
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap}
 import util.JavaSourceUtils.LineProcessLogger

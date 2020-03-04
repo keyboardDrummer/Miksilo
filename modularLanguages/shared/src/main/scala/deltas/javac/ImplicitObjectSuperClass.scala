@@ -3,7 +3,7 @@ package deltas.javac
 import core.language.node.Node
 import core.deltas.{Contract, DeltaWithPhase}
 import core.language.Compilation
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
+import deltas.classes.ClassDelta.JavaClass
 import deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 
 object ImplicitObjectSuperClass extends DeltaWithPhase {

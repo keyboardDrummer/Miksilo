@@ -1,4 +1,4 @@
-package deltas.javac
+package deltas.bytecode
 
 import core.deltas.{Delta, DeltaWithGrammar}
 import deltas.bytecode.attributes._
@@ -12,7 +12,6 @@ import deltas.bytecode.coreInstructions.longs._
 import deltas.bytecode.coreInstructions.objects._
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types._
-import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
 import deltas.javac.types._
 
 object ByteCodeLanguage {

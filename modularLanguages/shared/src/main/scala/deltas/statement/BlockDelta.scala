@@ -3,14 +3,11 @@ package deltas.statement
 import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
-import core.document.BlankLine
 import core.language.node._
 import core.language.{Compilation, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
-import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
-import deltas.statement.BlockDelta.BlockStatement
 
 object BlockDelta extends DeltaWithGrammar with StatementInstance {
 

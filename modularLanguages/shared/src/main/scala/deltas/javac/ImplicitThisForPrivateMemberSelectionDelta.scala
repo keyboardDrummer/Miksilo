@@ -6,10 +6,10 @@ import core.deltas.path._
 import core.language.{Compilation, Language, Phase}
 import core.language.node.Node
 import core.smarts.types.objects.TypeFromDeclaration
+import deltas.classes.ClassDelta.JavaClass
 import deltas.expression.{ExpressionDelta, VariableDelta}
 import deltas.javac.classes.{FieldDeclarationDelta, ThisVariableDelta}
 import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 import deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
 
