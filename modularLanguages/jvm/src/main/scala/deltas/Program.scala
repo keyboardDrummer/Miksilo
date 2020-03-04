@@ -1,9 +1,11 @@
 package deltas
 
 import deltas.javac.JavaLanguage
+import deltas.json.JsonLanguage
 import deltas.smithy.SmithyLanguage
 import deltas.solidity.SolidityLanguage
 import deltas.verilog.VerilogLanguage
+import deltas.yaml.YamlLanguage
 import jsonRpc.{JVMMessageReader, JVMMessageWriter, JVMQueue, JsonRpcConnection, WorkItem}
 import languageServer.{LanguageBuilder, LanguageServerMain}
 
@@ -30,11 +32,25 @@ object SmithyLanguageBuilder extends LanguageBuilder {
   override def build(arguments: collection.Seq[String]) = SmithyLanguage.language
 }
 
+object JsonLanguageBuilder extends LanguageBuilder {
+  override def key = "json"
+
+  override def build(arguments: collection.Seq[String]) = JsonLanguage.language
+}
+
+object YamlLanguageBuilder extends LanguageBuilder {
+  override def key = "yaml"
+
+  override def build(arguments: collection.Seq[String]) = YamlLanguage.language
+}
+
 object Program extends LanguageServerMain(Seq(
   VerilogLanguageBuilder,
   JavaLanguageBuilder,
   SolidityLanguageBuilder,
-  SmithyLanguageBuilder
+  SmithyLanguageBuilder,
+  JsonLanguageBuilder,
+  YamlLanguageBuilder
 ), new JsonRpcConnection(new JVMMessageReader(System.in), new JVMMessageWriter(System.out)),
   new JVMQueue[WorkItem])
 

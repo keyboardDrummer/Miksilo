@@ -1,12 +1,12 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.{History, ParseError}
-
+import core.parsers.core.ParseText
+import core.parsers.editorParsers.History
 
 trait IndentationSensitiveParserWriter extends StringParserWriter {
   type Input <: IndentationReaderLike
 
-  trait IndentationReaderLike extends StringReaderLike[Input] {
+  trait IndentationReaderLike extends StringReaderLike {
     def indentation: Int
 
     def withIndentation(value: Int): Input
@@ -15,12 +15,13 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   case class WithIndentation[Result](original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result]{
 
-    override def getParser(recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
-      def apply(input: Input, state: ParseState) = {
+      def apply(input: Input, state: FixPointState) = {
         val previous = input.indentation
-        val newInput = input.withIndentation(input.position.character)
+        val position = text.getPosition(input.offset)
+        val newInput = input.withIndentation(position.character)
         val result: ParseResult[Result] = parseOriginal(newInput, state)
         result.updateRemainder(remainder => {
           remainder.withIndentation(previous)
@@ -43,25 +44,28 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
   def equal[Result](inner: Parser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
   def greaterThan[Result](inner: Parser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
 
-  case class IndentationError(from: Input, property: String) extends NextCharError {
+  case class IndentationError(text: ParseText, from: Input, property: String) extends NextCharError {
     override def penalty = History.indentationErrorPenalty
 
-    override def message =
-      s"indentation ${from.position.character} of character '${from.head}' must be $property ${from.indentation}"
+    override def message = {
+      val position = text.getPosition(from.offset)
+      s"indentation ${position.character} of character '${from.head(text)}' must be $property ${from.indentation}"
+    }
   }
 
   case class CheckIndentation[Result](deltaPredicate: Int => Boolean, property: String, original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(recursive: GetParser) = {
+    override def getParser(text: ParseText, recursive: GetParser) = {
       val parseOriginal = recursive(original).asInstanceOf[BuiltParser[Result]]
 
-      def apply(input: Input, state: ParseState) = {
-        val delta = input.position.character - input.indentation
-        if (input.atEnd || deltaPredicate(delta)) {
+      def apply(input: Input, state: FixPointState) = {
+        val position = text.getPosition(input.offset)
+        val delta = position.character - input.indentation
+        if (input.atEnd(text) || deltaPredicate(delta)) {
           parseOriginal(input, state)
         } else {
-          newFailure(None, input, History.error(IndentationError(input, property)))
+          newFailure(None, input, History.error(IndentationError(text, input, property)))
         }
       }
       apply

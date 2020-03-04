@@ -3,7 +3,7 @@ package deltas.verilog
 import core.SourceUtils
 import core.deltas.path.PathRoot
 import core.language.node.NodeComparer
-import core.language.{Compilation, InMemoryFileSystem}
+import core.language.{Compilation, CompilationCache, InMemoryFileSystem}
 import core.parsers.editorParsers.SourceRange
 import deltas.expression.VariableDelta.Variable
 import deltas.expression.{IntLiteralDelta, VariableDelta}
@@ -88,20 +88,20 @@ class VerilogTest extends AnyFunSuite with LanguageServerTest {
   test("Goto definition") {
     val server = new MiksiloLanguageServer(VerilogLanguage.language)
     val first: Seq[FileRange] = gotoDefinition(server, code, new HumanPosition(10, 10))
-    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(2,2), new HumanPosition(2, 7)))))(first)
+    assertResult(SourceRange(new HumanPosition(2,2), new HumanPosition(2, 7)))(first.head.range)
 
     val second: Seq[FileRange] = gotoDefinition(server, code, new HumanPosition(15, 21))
-    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(2,2), new HumanPosition(2, 7)))))(second)
+    assertResult(SourceRange(new HumanPosition(2,2), new HumanPosition(2, 7)))(second.head.range)
 
     val third: Seq[FileRange] = gotoDefinition(server, code, new HumanPosition(20, 6))
-    assertResult(Seq(FileRange(itemUri, SourceRange(new HumanPosition(6,2), new HumanPosition(6, 7)))))(third)
+    assertResult(SourceRange(new HumanPosition(6,2), new HumanPosition(6, 7)))(third.head.range)
   }
 
   test("can compile multiple files") {
     val fileSystem = InMemoryFileSystem(Map(
       "./Bus_pkg.sv" -> SourceUtils.getResourceFileContents(Path("verilog") / "Bus_pkg.sv"),
       "testbench.sv" -> SourceUtils.getResourceFileContents(Path("verilog") / "testbench.sv")))
-    val compilation = new Compilation(language.language, fileSystem, Some("testbench.sv"))
+    val compilation = new Compilation(new CompilationCache(language.language, fileSystem), Some("testbench.sv"))
     compilation.runPhases()
     assert(compilation.diagnostics.isEmpty, compilation.diagnostics)
   }

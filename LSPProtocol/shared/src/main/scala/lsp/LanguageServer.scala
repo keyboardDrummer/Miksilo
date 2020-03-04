@@ -1,7 +1,8 @@
 package lsp
 
+import core.parsers.core.ParseText
 import play.api.libs.json._
-import core.parsers.editorParsers.{Position, SourceRange, TextEdit}
+import core.parsers.editorParsers.{FileOffsetRange, Position, SourceRange, TextEdit}
 trait DocumentSymbolProvider {
   def documentSymbols(params: DocumentSymbolParams): Seq[SymbolInformation]
 }
@@ -119,6 +120,7 @@ case class FileRange(uri: String, range: SourceRange) {
 object FileRange {
   implicit val rangeFormat = SourceRangeFormat.format
   implicit val format = Json.format[FileRange]
+  def fromOffsetRange(text: ParseText, offsetRange: FileOffsetRange) = FileRange(offsetRange.uri, offsetRange.range.toRange(text))
 }
 
 object DiagnosticSeverity {

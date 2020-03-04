@@ -48,7 +48,7 @@ object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def description: String = "Adds the Verilog module"
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Unit = {
-    val moduleScope = builder.newScope(Some(parentScope), "moduleScope")
+    val moduleScope = builder.newScope(parentScope, "moduleScope")
     val module: Module[NodePath] = path
     for(port <- module.ports) {
       builder.declare(port.name, moduleScope, port, None)

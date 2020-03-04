@@ -1,9 +1,11 @@
 package core.parsers.editorParsers
 
+import core.parsers.core.ParseInput
+
 object History {
-  def empty[Input] = SpotlessHistory[Input](0)
-  def error[Input](error: ParseError[Input]) = SingleError(0, error)
-  def success[Input](start: Input, end: Input, value: Any,
+  def empty[Input <: ParseInput] = SpotlessHistory[Input](0)
+  def error[Input <: ParseInput](error: ParseError[Input]) = SingleError(0, error)
+  def success[Input <: ParseInput](start: Input, end: Input, value: Any,
               successScore: Double = History.successValue): History[Input] = SpotlessHistory(successScore)
 
   val successValue = 1.0
@@ -24,7 +26,7 @@ object History {
   val dropReduction: Double = (dropMaxPenalty - dropLength1Penalty) * (1 + dropLengthShift)
 }
 
-trait History[Input] {
+trait History[Input <: ParseInput] {
   def canMerge: Boolean
   def spotless: Boolean = !flawed
   def flawed: Boolean
@@ -37,10 +39,10 @@ trait History[Input] {
 
   def errors: Iterable[ParseError[Input]]
 
-  override def toString = errors.toString()
+  override def toString = s"score: $score, errors: $errors"
 }
 
-case class SpotlessHistory[Input](score: Double = 0) extends History[Input] {
+case class SpotlessHistory[Input <: ParseInput](score: Double = 0) extends History[Input] {
 
   override def addError(newHead: ParseError[Input]) = SingleError(score, newHead)
 
@@ -57,7 +59,7 @@ case class SpotlessHistory[Input](score: Double = 0) extends History[Input] {
   override def canMerge = false
 }
 
-case class SingleError[Input](successScore: Double, error: ParseError[Input]) extends History[Input] {
+case class SingleError[Input <: ParseInput](successScore: Double, error: ParseError[Input]) extends History[Input] {
   override def flawed = true
 
   override def addError(newHead: ParseError[Input]) = error.append(newHead) match {
@@ -100,7 +102,7 @@ case class Node[+Value](children: Rose[Value]*) extends Rose[Value] {
   override def map[NewValue](f: Value => NewValue) = Node(children.map(r => r.map(f)):_*)
 }
 
-case class FlawedHistory[Input](score: Double,
+case class FlawedHistory[Input <: ParseInput](score: Double,
                                 lastError: ParseError[Input],
                                 middleErrors: Rose[ParseError[Input]],
                                 firstError: ParseError[Input])
@@ -140,7 +142,7 @@ case class FlawedHistory[Input](score: Double,
   override def canMerge = lastError.canMerge
 }
 
-case class HistoryWithChoices[Input](choices: Seq[(Input, Any)], inner: History[Input] = History.empty[Input]) extends History[Input] {
+case class HistoryWithChoices[Input <: ParseInput](choices: Seq[(Input, Any)], inner: History[Input] = History.empty[Input]) extends History[Input] {
 
   override def canMerge = true
 

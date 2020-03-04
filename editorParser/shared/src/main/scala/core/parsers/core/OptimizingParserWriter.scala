@@ -1,21 +1,38 @@
 package core.parsers.core
 
+import core.parsers.editorParsers.{Position, SingleResultParser}
+
 import scala.collection.mutable
-import scala.language.higherKinds
+
+trait OffsetNode {
+  def drop(amount: Int): OffsetNode
+  def getAbsoluteOffset(): Int
+  def toPosition(text: ParseText): Position = text.getPosition(getAbsoluteOffset())
+}
+
+trait ParseInput {
+  def offsetNode: OffsetNode
+  def offset = offsetNode.getAbsoluteOffset()
+}
 
 trait OptimizingParserWriter extends ParserWriter {
 
-  type Parser[+Result] = ParserBuilder[Result]
-  def newParseState(input: Input): ParseState
-  type ParseState
+  type Input <: ParseInput
   type ParseResult[+Result]
+  type Parser[+Result] = ParserBuilder[Result]
 
-  def wrapParser[Result](parser: BuiltParser[Result],
+  def newParseState(input: Input): FixPointState
+
+  case class FixPointState(offset: Int, // TODO try to remove this offset, since we can also clear the callStack whenever we move forward.
+                           callStack: Set[BuiltParser[Any]])
+
+  def wrapParser[Result](text: ParseText,
+                         parser: BuiltParser[Result],
                          shouldCache: Boolean,
                          shouldDetectLeftRecursion: Boolean): BuiltParser[Result]
 
   trait BuiltParser[+Result] {
-    def apply(input: Input, state: ParseState): ParseResult[Result]
+    def apply(input: Input, state: FixPointState): ParseResult[Result]
     def debugName: Any = null
   }
 
@@ -24,7 +41,7 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait ParserBuilder[+Result] {
-    def getParser(recursive: GetParser): BuiltParser[Result]
+    def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result]
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[ParserBuilder[_]]
@@ -72,10 +89,10 @@ trait OptimizingParserWriter extends ParserWriter {
     lazy val original: Parser[Result] = _original
     def getOriginal = original
 
-    override def getParser(recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       lazy val parseOriginal = recursive(original)
       new BuiltParser[Result] {
-        override def apply(input: Input, state: ParseState) = {
+        override def apply(input: Input, state: FixPointState) = {
           parseOriginal(input, state)
         }
 
@@ -128,32 +145,24 @@ trait OptimizingParserWriter extends ParserWriter {
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion)
   }
 
+  case class ParserAndCaches[Result](parser: BuiltParser[Result])
+
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
-    def buildParser[Result](root: Parser[Result]): BuiltParser[Result] = {
+    def buildParser[Result](text: ParseText, root: Parser[Result]): ParserAndCaches[Result] = {
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
-      var caches = List.empty[CacheLike[_]]
       def recursive: GetParser = new GetParser {
         override def apply[SomeResult](_parser: Parser[SomeResult]): BuiltParser[SomeResult] = {
           cacheOfParses.getOrElseUpdate(_parser, {
             val parser = _parser.asInstanceOf[ParserBuilder[SomeResult]]
-            val result = parser.getParser(recursive)
-            val wrappedParser = wrapParser(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
-            wrappedParser match {
-              case check: CacheLike[_] => caches ::= check
-              case _ =>
-            }
-            wrappedParser
+            val result = parser.getParser(text, recursive)
+            wrapParser(text, result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
           }).asInstanceOf[BuiltParser[SomeResult]]
         }
       }
 
       val wrappedRoot = recursive(root)
-      val reusableParser: BuiltParser[Result] = (input, state) => {
-        caches.foreach(cache => cache.clear())
-        wrappedRoot.apply(input, state)
-      }
-      reusableParser
+      ParserAndCaches(wrappedRoot)
     }
   }
 
@@ -180,7 +189,9 @@ trait OptimizingParserWriter extends ParserWriter {
     }
   }
 
-  trait CacheLike[Result] extends BuiltParser[Result] {
-    def clear(): Unit
+  def getSingleResultParser[Result](text: ParseText, parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
+
+  case class Success[+Result](result: Result, remainder: Input) {
+    def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)
   }
 }

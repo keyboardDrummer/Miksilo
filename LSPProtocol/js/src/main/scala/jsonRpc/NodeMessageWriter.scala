@@ -1,5 +1,7 @@
 package jsonRpc
 
+import core.LazyLogging
+
 import scala.scalajs.js
 
 class NodeMessageWriter(out: js.Dynamic) extends MessageWriter with LazyLogging {

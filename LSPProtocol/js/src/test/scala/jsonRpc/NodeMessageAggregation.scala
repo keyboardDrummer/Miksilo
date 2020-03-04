@@ -1,6 +1,7 @@
 package jsonRpc
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.ObjectParams
+import core.LazyLogging
 import lsp.{DidChangeTextDocumentParams, LSPProtocol, LSPServerMessagePreprocessor, VersionedTextDocumentIdentifier}
 import org.scalatest.Assertion
 import org.scalatest.funspec.AsyncFunSpec

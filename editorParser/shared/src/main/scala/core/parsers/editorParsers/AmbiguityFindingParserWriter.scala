@@ -1,17 +1,17 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.Metrics
+import core.parsers.core.{Metrics, ParseText}
 
 trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
-  override def findBestParseResult[Result](parser: BuiltParser[Result], input: Input,
+  override def findBestParseResult[Result](text: ParseText, startInput: Input, parser: BuiltParser[Result],
                                            mayStop: StopFunction, metrics: Metrics): SingleParseResult[Result, Input] = {
 
-    val noResultFound = ReadyParseResult(None, input, History.error(FatalError(input, "Grammar is always recursive")))
+    val noResultFound = ReadyParseResult(None, startInput, History.error(FatalError(text, startInput, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Input, Result] = noResultFound
 
     var resultsSeen = Map.empty[Any, ReadyParseResult[Input, Result]]
-    var queue: ParseResults[Input, Result] = parser(input, newParseState(input))
+    var queue: ParseResults[Input, Result] = parser(startInput, newParseState(startInput))
     while(queue.nonEmpty) {
       val (parseResult: LazyParseResult[Input, Result], tail) = queue.pop()
 
@@ -74,11 +74,11 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      (input: Input, state: ParseState) => {
+      (input: Input, state: FixPointState) => {
         val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input -> first)))
         val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input -> second)))
         firstResult match {
@@ -96,11 +96,11 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      (input: Input, state: ParseState) => {
+      (input: Input, state: FixPointState) => {
         val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input -> first)))
         val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input -> second)))
         val merged = firstResult.merge(secondResult)

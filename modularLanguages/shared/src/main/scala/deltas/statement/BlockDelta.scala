@@ -53,7 +53,7 @@ object BlockDelta extends DeltaWithGrammar with StatementInstance {
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, statement: NodePath, parentScope: Scope): Unit = {
     val block: BlockStatement[NodePath] = statement
-    val blockScope = builder.newScope(Some(parentScope), "blockScope")
+    val blockScope = builder.newScope(parentScope, "blockScope")
     block.statements.foreach(childStatement => ConstraintSkeleton.constraints(compilation, builder, childStatement, blockScope))
   }
 

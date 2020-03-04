@@ -7,7 +7,7 @@ import core.deltas._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.language.node.Node
-import core.language.{Compilation, Language}
+import core.language.{Compilation, Language, Stopped}
 
 import scala.reflect.io.File
 
@@ -61,7 +61,7 @@ class TestingLanguage(val deltas: Seq[Delta], compilerName: String) {
     statistics.profile("running phases", {
       for(phase <- language.compilerPhases) {
         statistics.profile("run " + phase.description, phase.action(compilation))
-        if (compilation.stopped)
+        if (compilation.hasStopped)
           return
       }
     })

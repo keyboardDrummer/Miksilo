@@ -2,6 +2,7 @@ package lsp
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.ObjectParams
 import com.dhpcs.jsonrpc.JsonRpcNotificationMessage
+import core.LazyLogging
 import jsonRpc._
 import play.api.libs.json.Json
 

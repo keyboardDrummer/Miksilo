@@ -7,7 +7,7 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.deltas.path.{NodeChildPath, NodePath}
 import core.document.BlankLine
 import core.language.node._
-import core.language.{Compilation, CompilationState, Language}
+import core.language.{Compilation, CompilationField, Language}
 import core.smarts.ConstraintBuilder
 import core.smarts.objects.{Declaration, NamedDeclaration}
 import core.smarts.scopes.objects.{Scope, ScopeVariable}
@@ -95,7 +95,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
   val importToClassMap = new ShapeProperty[(Compilation, Node) => Map[String, QualifiedClassName]]
 
-  val state = new CompilationState[State](new State())
+  val state = new CompilationField[State](_ => new State())
   class State {
     var classCompiler: ClassCompiler = _
     val javaCompiler: JavaCompiler = new JavaCompiler()
@@ -142,7 +142,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
       val fullPackage: String = packageParts.reduce[String]((a, b) => a + "." + b)
       state(compilation).packageScopes.getOrElseUpdate(fullPackage, {
         val packageDeclaration = builder.declare(fullPackage, defaultPackageScope, path)
-        builder.declareScope(packageDeclaration, Some(defaultPackageScope), fullPackage )
+        builder.declareScope(packageDeclaration, defaultPackageScope, fullPackage)
       })
     }
 
@@ -152,7 +152,7 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
     builder.add(DeclarationHasType(clazzDeclaration, clazzType))
     builder.assignSubType(TypeSkeleton.typeKind, clazzType)
 
-    val classScope = builder.declareScope(clazzDeclaration, Some(packageScope), clazz.name)
+    val classScope = builder.declareScope(clazzDeclaration, packageScope, clazz.name)
     staticDeclaration(path) = clazzDeclaration
 
     val members = clazz.members

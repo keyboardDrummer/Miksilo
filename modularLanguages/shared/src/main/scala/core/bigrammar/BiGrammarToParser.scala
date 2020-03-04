@@ -1,12 +1,11 @@
 package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
-import core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, CustomGrammarWithoutChildren, Keyword, Labelled, MapGrammar, Print, ValueGrammar}
-import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, Position}
-import core.parsers.sequences.SingleResultParser
-import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, StringReaderBase}
+import core.bigrammar.grammars._
+import core.parsers.core.ParseText
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, SingleResultParser}
+import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.textMate.TextMateGeneratingParserWriter
-import lsp.PositionFormat
 import util.Utility
 
 import scala.collection.mutable
@@ -22,17 +21,17 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   type Input = Reader
 
   object IndentationKey
-  class Reader(array: ArrayCharSequence, offset: Int, position: Position, val state: State)
-    extends StringReaderBase[Reader](array, offset, position)
+
+  override def startInput(offsetManager: BiGrammarToParser.OffsetManager) = new Reader(offsetManager.getOffsetNode(0), Map.empty)
+
+  type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], State)
+  class Reader(offsetNode: CachingOffsetNode, val state: State)
+    extends StringReaderBase(offsetNode)
     with IndentationReaderLike {
 
-    def withState(newState: State): Reader = new Reader(array, offset, position, newState)
+    def withState(newState: State): Reader = new Reader(offsetNode, newState)
 
-    def this(text: String) {
-      this(text.toCharArray, 0, Position(0, 0), Map.empty)
-    }
-
-    override def drop(amount: Int) = new Reader(array, offset + amount, move(amount), state)
+    override def drop(amount: Int) = new Reader(offsetNode.drop(amount), state)
 
     override def hashCode(): Int = offset
 
@@ -44,12 +43,14 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     override def indentation = state.getOrElse(IndentationKey, 0).asInstanceOf[Int]
 
     override def withIndentation(value: Int) = withState(state + (IndentationKey -> value))
+
+    override def createCacheKey(parser: BiGrammarToParser.BuiltParser[_], state: Set[BiGrammarToParser.BuiltParser[Any]]) = (parser, state, this.state)
   }
 
   def valueToResult(value: Any): Result = WithMap(value, Map.empty)
 
   def toParser(grammar: BiGrammar): SingleResultParser[Any, Input] = {
-    toParserBuilder(grammar).getWholeInputParser
+    toParserBuilder(grammar).getWholeInputParser(new ParseText())
   }
 
   def toParserBuilder(grammar: BiGrammar): Parser[Any] = {

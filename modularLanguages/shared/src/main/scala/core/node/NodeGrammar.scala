@@ -4,7 +4,7 @@ import core.bigrammar.{BiGrammar, WithMap}
 import core.bigrammar.BiGrammarToParser.AnyWithMap
 import core.bigrammar.grammars.{FieldPosition, MapGrammar}
 import core.bigrammar.printer.UndefinedDestructuringValue
-import core.parsers.editorParsers.SourceRange
+import core.parsers.editorParsers.{OffsetNodeRange, OffsetRange, SourceRange}
 
 class NodeGrammar(inner: BiGrammar, val shape: NodeShape)
   extends MapGrammar[AnyWithMap, AnyWithMap](inner,
@@ -39,7 +39,7 @@ object NodeGrammar {
   def construct(withMap: AnyWithMap, key: NodeShape): AnyWithMap = {
     val result = new Node(key)
     result.data ++= withMap.namedValues.collect { case (k: NodeField,v) => (k,v) } // TODO trivia should be stored in a separate array on Node.
-    result.sources ++= withMap.namedValues.collect { case (k: FieldPosition,v) => (k.field,v.asInstanceOf[SourceRange]) }
+    result.sources ++= withMap.namedValues.collect { case (k: FieldPosition,v) => (k.field,v.asInstanceOf[OffsetNodeRange]) }
     WithMap(result, Map.empty)
   }
 }

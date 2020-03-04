@@ -1,19 +1,18 @@
 package core.parsers.strings
 
-import core.parsers.editorParsers.Position
+import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 
-
-trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter {
+trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter with LeftRecursiveCorrectingParserWriter {
   type Input = IndentationReader
 
-  class IndentationReader(array: ArrayCharSequence, offset: Int, position: Position, val indentation: Int)
-    extends StringReaderBase[Input](array, offset, position) with IndentationReaderLike {
+  override def startInput(offsetManager: OffsetManager) = new IndentationReader(offsetManager.getOffsetNode(0), 0)
 
-    def this(value: String) {
-      this(value.toCharArray, 0, Position(0, 0), 0)
-    }
+  type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], Int)
 
-    def drop(amount: Int): IndentationReader = new IndentationReader(array, offset + amount, move(amount), indentation)
+  class IndentationReader(offsetNode: CachingOffsetNode, val indentation: Int)
+    extends StringReaderBase(offsetNode) with IndentationReaderLike {
+
+    def drop(amount: Int): IndentationReader = new IndentationReader(offsetNode.drop(amount), indentation)
 
     override def hashCode(): Int = offset ^ indentation
 
@@ -22,6 +21,8 @@ trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter
       case _ => false
     }
 
-    override def withIndentation(value: Int) = new IndentationReader(array, offset, position, value)
+    override def withIndentation(value: Int) = new IndentationReader(offsetNode, value)
+
+    override def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]) = (parser, state, indentation)
   }
 }

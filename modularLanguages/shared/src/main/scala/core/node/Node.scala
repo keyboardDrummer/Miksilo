@@ -2,8 +2,7 @@ package core.language.node
 
 import core.deltas.path.NodePath
 import core.language.node.Node._
-import core.parsers.editorParsers.SourceRange
-import lsp.PositionFormat.PositionOrdering
+import core.parsers.editorParsers.{OffsetNodeRange, OffsetRange}
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing
@@ -40,7 +39,7 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 
   var startOfUri: Option[String] = None
   val fieldData: mutable.Map[NodeField, mutable.Map[NodeField, Any]] = mutable.Map.empty
-  val sources: mutable.Map[NodeField, SourceRange] = mutable.Map.empty
+  val sources: mutable.Map[NodeField, OffsetNodeRange] = mutable.Map.empty
   val data: mutable.Map[NodeField, Any] = mutable.Map.empty
   data ++= entries
 
@@ -119,9 +118,11 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
 
   override def get(key: NodeField): Option[Any] = data.get(key)
 
-  def range: Option[SourceRange] =
+  def range: Option[OffsetRange] =
     if (sources.values.isEmpty) None
-    else Some(SourceRange(sources.values.map(p => p.start).min(PositionOrdering), sources.values.map(p => p.end).max))
+    else Some(OffsetRange(
+      sources.values.map(p => p.from.getAbsoluteOffset()).min,
+      sources.values.map(p => p.until.getAbsoluteOffset()).max))
 
   override def getValue(key: NodeField): Any = get(key).get
 }
@@ -130,6 +131,6 @@ object Node {
   val visitedToString = new ThreadLocal[mutable.Set[Int]]()
 }
 
-case class FieldData(value: Any, range: Option[SourceRange], fieldData: Option[mutable.Map[NodeField, Any]])
+case class FieldData(value: Any, range: Option[OffsetNodeRange], fieldData: Option[mutable.Map[NodeField, Any]])
 
 

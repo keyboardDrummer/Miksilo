@@ -1,6 +1,7 @@
 package jsonRpc
 
 import com.dhpcs.jsonrpc.{JsonRpcNotificationMessage, JsonRpcRequestMessage, JsonRpcResponseMessage}
+import core.LazyLogging
 
 import scala.concurrent.{ExecutionContext, Future, Promise}
 

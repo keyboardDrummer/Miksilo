@@ -3,9 +3,11 @@ package deltas.json
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.Node
+import core.parsers.core.ParseText
 import core.parsers.editorParsers.{Position, UntilBestAndXStepsStopFunction}
 import deltas.expression.ExpressionDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
+import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
@@ -70,13 +72,16 @@ class JsonTest extends AnyFunSuite {
 
     val result: ObjectLiteral[NodePath] = PathRoot(utils.parse(example).asInstanceOf[Node])
     val member = result.members.head
-    assertResult(Position(1, 7))(member.getField(MemberValue).range.get.start)
-    assertResult(Position(1, 20))(member.getField(MemberValue).range.get.end)
+    val offsetRange = member.getField(MemberValue).range.get
+    val text = new ParseText(example)
+    val sourceRange = offsetRange.toRange(text)
+    assertResult(Position(1, 7))(sourceRange.start)
+    assertResult(Position(1, 20))(sourceRange.end)
 
     val stringValue = member.value
-    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value)
-    assertResult(Position(1, 8))(stringLocation.range.get.start)
-    assertResult(Position(1, 19))(stringLocation.range.get.end)
+    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value).range.get.toRange(text)
+    assertResult(Position(1, 8))(stringLocation.start)
+    assertResult(Position(1, 19))(stringLocation.end)
   }
 
   test("missing object member key") {
@@ -111,5 +116,23 @@ class JsonTest extends AnyFunSuite {
     val ast = utils.parse(example)
     val printResult = utils.getPrintResult(ast)
     assertResult(expected)(printResult)
+  }
+}
+
+class JsonServerTest extends AnyFunSuite with LanguageServerTest {
+
+  test("regression2") {
+    val input = """[]"""  // [1,2,3,4]     [1,2,[],3]     [{"name":"Remy", age: 31}, {"name":"Tzeni",age:29}]
+
+    val jsonLanguage = JsonLanguage.language
+    val server = new MiksiloLanguageServer(jsonLanguage)
+
+    val document = this.openDocument(server, input)
+    val results1 = applyChange(server, document, 1,1, "{") // [{]
+    val results2 = applyChange(server, document, 2,2, "}") // [{}]
+    assert(results2.isEmpty)
+    val results3 = applyChange(server, document, 2,3, "")  // [{]
+    val results4 = applyChange(server, document, 2,2, "}") // [{}]
+    assert(results4.isEmpty)
   }
 }

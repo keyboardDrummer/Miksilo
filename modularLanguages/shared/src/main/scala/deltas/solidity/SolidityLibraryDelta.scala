@@ -3,7 +3,7 @@ package deltas.solidity
 import core.SolveConstraintsDelta
 import core.deltas.Delta
 import core.deltas.path.PathRoot
-import core.language.{CompilationState, Language}
+import core.language.{CompilationField, Language}
 import core.smarts.objects.NamedDeclaration
 import core.smarts.types.objects.{Type, TypeFromDeclaration}
 import deltas.ConstraintSkeleton
@@ -13,7 +13,7 @@ import deltas.javac.types.BooleanTypeDelta
 
 object SolidityLibraryDelta extends Delta {
 
-  val addressDeclaration = new CompilationState[NamedDeclaration]()
+  val addressDeclaration = new CompilationField[NamedDeclaration]()
   override def inject(language: Language): Unit = {
     SolveConstraintsDelta.constraintCollector.add(language, (compilation, builder) => {
       val rootScope = builder.newScope(debugName = "rootScope")
@@ -55,7 +55,7 @@ object SolidityLibraryDelta extends Delta {
       builder.declare("transfer", addressScope, null, Some(transferType))
 
       val msgType = builder.declare("<MSGDECLARATION>", rootScope) // TODO get rid of fake declarations
-      val msgScope = builder.declareScope(msgType, Some(rootScope), "msgScope")
+      val msgScope = builder.declareScope(msgType, rootScope, "msgScope")
       val message = builder.declare("msg", rootScope, _type = Some(TypeFromDeclaration(msgType)))
 
       builder.declare("data", msgScope)

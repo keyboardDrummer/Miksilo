@@ -1,5 +1,6 @@
 package core.parsers.editorParsers
 
+import core.parsers.core.{OffsetNode, ParseInput, ParseText}
 import core.parsers.editorParsers.Position.PositionOrdering
 
 case class TextEdit(range: SourceRange, newText: String)
@@ -9,6 +10,19 @@ case class Fix(title: String, edit: TextEdit)
   * Position in a text document expressed as zero-based line and character offset.
   */
 case class Position(line: Int, character: Int)
+
+case class OffsetNodeRange(from: OffsetNode, until: OffsetNode) {
+  def toSourceRange(text: ParseText) = SourceRange(from.toPosition(text), until.toPosition(text))
+  def toOffsetRange = OffsetRange(from.getAbsoluteOffset(), until.getAbsoluteOffset())
+}
+
+case class OffsetRange(from: Int, until: Int) {
+  def contains(offset: Int): Boolean = {
+    from <= offset && offset <= until
+  }
+  def toRange(text: ParseText) = SourceRange(text.getPosition(from), text.getPosition(until))
+}
+case class FileOffsetRange(uri: String, range: OffsetRange)
 
 /**
   * A range in a text document.
@@ -34,11 +48,13 @@ object Position {
   }
 }
 
-trait ParseError[Input] {
+trait ParseError[Input <: ParseInput] {
   def fix: Option[Fix] = None
   def message: String
   def from: Input
   def to: Input
+  def text: ParseText
+  def range = OffsetNodeRange(from.offsetNode, to.offsetNode).toSourceRange(text)
 
   def canMerge: Boolean = false
   def penalty: Double

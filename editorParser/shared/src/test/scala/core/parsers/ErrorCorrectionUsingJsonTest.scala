@@ -1,5 +1,6 @@
 package core.parsers
 
+import _root_.core.parsers.core.ParseText
 import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 
@@ -8,12 +9,12 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
 
   ignore("removes incorrect b at start") {
     val input = """b{"hello":3}"""
-    parseJson(input, List(("hello","3")), 1)
+    parseJson(input, List(("hello",3)), 1)
   }
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    parseJson(input, List(("person","3")), 0)
+    parseJson(input, List(("person",3)), 0)
   }
 
   test("object with single member with string value") {
@@ -25,7 +26,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   // Even [ [ [ [ has a better score than -10.
   test("garbage after number") {
     val input = """3blaa"""
-    parseJson(input, "3", 1)
+    parseJson(input, 3, 1)
   }
 
   test("nothing as input") {
@@ -63,13 +64,13 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
 
   test("object with a single member and comma") {
     val input = """{"person":3,"""
-    val expectation = List("person" -> "3", "" -> UnknownExpression)
+    val expectation = List("person" -> 3, "" -> UnknownExpression)
     parseJson(input, expectation, 1)
   }
 
   test("object with a single member and half second member") {
     val input = """{"person":3,"second""""
-    val expectation = List(("person", "3"), ("second", UnknownExpression))
+    val expectation = List(("person", 3), ("second", UnknownExpression))
     parseJson(input, expectation, 1)
   }
 
@@ -94,7 +95,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   ignore("intertwined small garbage and success") {
     val input = """{g"person"hj:nh"remy"}"""
     val expectation = List("person" -> "remy")
-    parseJson(input, expectation, 3)
+    parseJson(input, expectation, 3, 1000)
   }
 
   // Partially Parse tests start
@@ -175,7 +176,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
     val input = """doesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatch"""
     lazy val parser: Parser[Any] = "{" ~ parser | "!"
     val detectValueParser = new DetectValueParser(("{",("{", ("{", "!"))), parser)
-    val result = detectValueParser.getWholeInputParser.parse(new StringReader(input))
+    val result = detectValueParser.getWholeInputParser().resetAndParse(input)
     assert(!detectValueParser.detected)
     assertResult(2)(result.errors.size)
     assert(result.resultOption.nonEmpty)
@@ -185,9 +186,9 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   class DetectValueParser[Result](valueToDetect: Result, val original: ParserBuilder[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     var detected = false
 
-    override def getParser(recursive: ParseJson.GetParser) = {
+    override def getParser(text: ParseText, recursive: ParseJson.GetParser) = {
       val parseOriginal = recursive(original)
-      (input, state) => {
+      (input: Input, state: FixPointState) => {
         val result = parseOriginal(input, state)
         result.map(resultValue => {
           if (resultValue == valueToDetect) {
@@ -203,8 +204,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
   private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
-    val result = jsonParser.getWholeInputParser.parse(new StringReader(input), UntilBestAndXStepsStopFunction(steps))
-    System.out.println(result.errors.toString())
+    val result = jsonParser.getWholeInputParser().resetAndParse(input, UntilBestAndXStepsStopFunction(steps))
     assertResult(expectation)(result.resultOption.get)
     assertResult(errorCount)(result.errors.size)
   }

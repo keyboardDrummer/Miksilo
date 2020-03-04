@@ -32,6 +32,14 @@ const languages: Array<LanguageConfiguration> = [
     {
          vscodeName: "smithy",
          miksiloName: "smithy"
+    },
+    {
+         vscodeName: "miksiloJson",
+         miksiloName: "json"
+    },
+    {
+         vscodeName: "miksiloYaml",
+         miksiloName: "yaml"
     }
 ]
 

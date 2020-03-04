@@ -7,12 +7,12 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class WhiteSpaceTest extends AnyFunSuite {
 
-  val parser = ExpressionParser.root.getWholeInputParser
+  val parser = ExpressionParser.root.getWholeInputParser()
 
   test("diagnostics placement in whitespace 1") {
     val program = "    "
 
-    val result = parser.parse(new ExpressionParser.StringReader(program), UntilBestAndXStepsStopFunction())
+    val result = parser.resetAndParse(program, UntilBestAndXStepsStopFunction())
     assertError(result.errors.head, SourceRange(Position(0,0),Position(0,4)), "expected '<expression>'")
   }
 
@@ -20,33 +20,33 @@ class WhiteSpaceTest extends AnyFunSuite {
   ignore("diagnostics placement in whitespace 2") {
     val program = "   + 3"
 
-    val result = parser.parse(new ExpressionParser.StringReader(program))
+    val result = parser.resetAndParse(program)
     assertError(result.errors.head, SourceRange(Position(0,0),Position(0,3)), "expected '<expression>'")
   }
 
   test("diagnostics placement in whitespace 3") {
     val program = "3 +    "
 
-    val result = parser.parse(new ExpressionParser.StringReader(program), UntilBestAndXStepsStopFunction())
+    val result = parser.resetAndParse(program, UntilBestAndXStepsStopFunction())
     assertError(result.errors.head, SourceRange(Position(0,3),Position(0,7)), "expected '<expression>'")
   }
 
   test("diagnostics placement in whitespace 5") {
     val program = "let   = 3 in abc"
 
-    val result = parser.parse(new ExpressionParser.StringReader(program), UntilBestAndXStepsStopFunction())
+    val result = parser.resetAndParse(program, UntilBestAndXStepsStopFunction())
     assertError(result.errors.head, SourceRange(Position(0,3),Position(0,4)), "expected '<expression>'")
   }
 
   test("diagnostics placement in whitespace 6") {
     val program = "let abc =      in abc"
 
-    val result = parser.parse(new ExpressionParser.StringReader(program), UntilBestAndXStepsStopFunction())
+    val result = parser.resetAndParse(program, UntilBestAndXStepsStopFunction())
     assertError(result.errors.head, SourceRange(Position(0,9),Position(0,15)), "expected '<expression>'")
   }
 
   def assertError(error: ParseError[ExpressionParser.Input], range: SourceRange, message: String): Unit = {
-    assertResult(range)(SourceRange(error.from.position,error.to.position))
+    assertResult(range)(error.range)
     assertResult("expected '<expression>'")(message)
   }
 }

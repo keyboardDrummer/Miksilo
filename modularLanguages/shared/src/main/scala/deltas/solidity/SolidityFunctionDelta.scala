@@ -74,7 +74,7 @@ object SolidityFunctionDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
     builder.declare(method.name, parentScope, path.getField(Name), Some(methodType))
 
-    val bodyScope = builder.newScope(Some(parentScope))
+    val bodyScope = builder.newScope(parentScope)
     method.parameters.foreach(parameter => {
       MethodParameters.declare(compilation, builder, parameter, parentScope, bodyScope)
     })

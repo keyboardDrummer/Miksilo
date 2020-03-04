@@ -4,6 +4,7 @@ import java.io.{PrintWriter, StringWriter}
 
 import com.dhpcs.jsonrpc.JsonRpcMessage.{ArrayParams, CorrelationId, ObjectParams, Params}
 import com.dhpcs.jsonrpc._
+import core.LazyLogging
 import play.api.libs.json._
 
 import scala.collection.mutable

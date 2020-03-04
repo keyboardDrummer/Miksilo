@@ -21,7 +21,7 @@ object JavaStandardLibraryDelta extends Delta {
   override def inject(language: Language): Unit = {
 
     SolveConstraintsDelta.constraintCollector.add(language, (compilation, builder) => {
-      val defaultPackageScope = builder.newScope(None, "defaultPackageScope")
+      val defaultPackageScope = builder.newScope(debugName = "defaultPackageScope")
       val proofs = getProofs(compilation, builder.factory, defaultPackageScope)
       builder.proofs = proofs
 

@@ -11,13 +11,13 @@ lazy val miksilo = project
     skip in publish := true)
   .aggregate(
     editorParser.jvm,
-    editorParser.js,
+    //editorParser.js,
     LSPProtocol.jvm,
-    LSPProtocol.js,
+    //LSPProtocol.js,
     languageServer.jvm,
-    languageServer.js,
+    //languageServer.js,
     modularLanguages.jvm,
-    modularLanguages.js,
+    //modularLanguages.js,
     playground
   )
 
@@ -72,7 +72,8 @@ lazy val editorParser = crossProject(JVMPlatform, JSPlatform).
   jvmSettings(
     assemblySettings,
   ).
-  jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault").
+  jsSettings(
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   jvmSettings(
     // Only used for SourceUtils, should get rid of it.
     // https://mvnrepository.com/artifact/org.scala-lang/scala-reflect
@@ -89,17 +90,19 @@ lazy val LSPProtocol = crossProject(JVMPlatform, JSPlatform).
   settings(
     libraryDependencies += "com.typesafe.play" %%% "play-json" % "2.8.1",
   ).
-  jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault").
+  jsSettings(
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   dependsOn(editorParser)
 
 lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
-  crossType(CrossType.Pure).
+  crossType(CrossType.Full).
   in(file("languageServer")).
   settings(commonSettings: _*).
   jvmSettings(
     assemblySettings
   ).
-  jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault").
+  jsSettings(
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
 def languageServerCommonTask(assemblyFile: String) = {
