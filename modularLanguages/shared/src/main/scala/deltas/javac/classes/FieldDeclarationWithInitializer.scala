@@ -13,8 +13,8 @@ import deltas.statement.LocalDeclarationWithInitializerDelta.LocalDeclarationWit
 import deltas.statement.assignment.SimpleAssignmentDelta
 import deltas.statement.{BlockDelta, LocalDeclarationWithInitializerDelta}
 import deltas.HasNameDelta.Name
+import deltas.classes.ClassDelta.JavaClass
 import deltas.javac.classes.FieldDeclarationDelta.{Field, Type}
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
 import deltas.javac.methods.call.CallDelta
 

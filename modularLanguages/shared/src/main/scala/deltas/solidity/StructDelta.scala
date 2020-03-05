@@ -12,7 +12,8 @@ import deltas.HasNameDelta.HasName
 import deltas.bytecode.types.TypeSkeleton
 import deltas.statement.LocalDeclarationDelta
 import core.deltas.path.ConstraintBuilderExtension._
-import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.classes.ClassDelta
+import deltas.javac.classes.skeleton.HasConstraintsDelta
 
 object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
@@ -29,7 +30,7 @@ object StructDelta extends DeltaWithGrammar with HasConstraintsDelta {
 
     val declaration = find(LocalDeclarationDelta.Shape)
     val grammar = "struct" ~~ find(HasNameDelta.Name) ~ "{" % declaration.manyVertical.as(Members) % "}" asNode Shape
-    find(JavaClassDelta.Members).addAlternative(grammar)
+    find(ClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Adds solidity structs"

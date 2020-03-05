@@ -42,10 +42,10 @@ A declaration can declare a scope.
  */
 class ScopeGraph extends
 {
-  val nodes = mutable.Map.empty[GraphNode, mutable.Set[GraphEdge]]
-  val rangeToNode = mutable.Map.empty[FileOffsetRange, GraphNode]
-  val elementToNode = mutable.Map.empty[SourceElement, GraphNode]
-  var declarationsPerFile = mutable.Map.empty[String, mutable.HashSet[NamedDeclaration]]
+  val nodes = new mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
+  val rangeToNode = new mutable.HashMap[FileOffsetRange, GraphNode]
+  val elementToNode = new mutable.HashMap[SourceElement, GraphNode]
+  var declarationsPerFile = new mutable.HashMap[String, mutable.HashSet[NamedDeclaration]]
 
   def findDeclaration(location: SourceElement): Option[NamedDeclaration] = {
     val declarations = for {

@@ -15,6 +15,8 @@ import core.smarts.types.DeclarationHasType
 import core.smarts.types.objects.TypeFromDeclaration
 import deltas.ConstraintSkeleton
 import deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
+import deltas.classes.ClassDelta
+import deltas.classes.ClassDelta.{ClassImports, ClassPackage, ClassParent, JavaClass, Members, Shape}
 import deltas.javac.classes.{ClassCompiler, FieldDeclarationDelta}
 import deltas.javac.methods.MethodDelta
 import deltas.statement.BlockDelta
@@ -26,23 +28,9 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
   import deltas.HasNameDelta._
 
-  override def shape: NodeShape = Shape
+  override def shape: NodeShape = ClassDelta.Shape
 
   override def description: String = "Defines a skeleton for the Java class."
-
-  implicit class JavaClass[T <: NodeLike](val node: T) extends HasName[T] {
-    def _package: Seq[String] = node(ClassPackage).asInstanceOf[Seq[String]]
-    def _package_=(value: Seq[String]): Unit = node(ClassPackage) = value
-
-    def imports = node(ClassImports).asInstanceOf[Seq[T]]
-    def imports_=(value: Seq[T]): Unit = node(ClassImports) = value
-
-    def members = node(Members).asInstanceOf[Seq[T]]
-    def members_=(value: Seq[T]): Unit = node(Members) = value
-
-    def parent: Option[String] = node.getValue(ClassParent).asInstanceOf[Option[String]]
-    def parent_=(value: Option[String]): Unit = node(ClassParent) = value
-  }
 
   def getFields[T <: NodeLike](javaClass: JavaClass[T]): Seq[T] = {
     javaClass.members.filter(member => member.shape == Shape)
@@ -83,7 +71,6 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
 
 
   object ImportGrammar extends GrammarKey
-  object Shape extends NodeShape
 
   def neww(_package: Seq[String], name: String, members: Seq[Node] = Seq(), imports: List[Node] = List(), mbParent: Option[String] = None) =
     new Node(Shape,
@@ -99,18 +86,10 @@ object JavaClassDelta extends DeltaWithGrammar with Delta
   class State {
     var classCompiler: ClassCompiler = _
     val javaCompiler: JavaCompiler = new JavaCompiler()
-    var packageScopes: mutable.Map[String, Scope] = mutable.Map.empty
+    var packageScopes: mutable.Map[String, Scope] = new mutable.HashMap
   }
 
   object ClassGrammar
-
-  object ClassPackage extends NodeField
-
-  object ClassImports extends NodeField
-
-  object ClassParent extends NodeField
-
-  object Members extends NodeField
 
   override def collectConstraints(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, defaultPackageScope: Scope): Unit = {
     getClassScope(compilation, builder, path, defaultPackageScope)

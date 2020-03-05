@@ -4,6 +4,7 @@ import core.SolveConstraintsDelta
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
 import deltas.HasNameDelta
+import deltas.bytecode.ByteCodeLanguage
 import deltas.expression._
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.logical.LogicalNotDelta

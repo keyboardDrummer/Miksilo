@@ -98,7 +98,7 @@ trait OptimizingParserWriter extends ParserWriter {
 
         override def debugName = Lazy.this.debugName
 
-        override def toString = if (debugName != null) debugName.toString else super.toString
+        override def toString = Lazy.this.toString()
       }
     }
 
@@ -167,7 +167,7 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   class ConsumeCache {
-    var values = mutable.Map.empty[ParserBuilder[Any], Boolean]
+    var values = new mutable.HashMap[ParserBuilder[Any], Boolean]
 
     def apply[Result](parser: ParserBuilder[Any]): Boolean = {
       values.get(parser) match {

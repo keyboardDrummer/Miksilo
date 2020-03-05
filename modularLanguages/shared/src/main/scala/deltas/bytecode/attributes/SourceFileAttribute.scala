@@ -3,8 +3,8 @@ package deltas.bytecode.attributes
 import core.bigrammar.BiGrammar
 import core.deltas.Contract
 import core.deltas.grammars.LanguageGrammars
+import core.language.Compilation
 import core.language.node.{Node, NodeField, NodeShape}
-import core.language.{Compilation, Language}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.PrintByteCode._
 import deltas.bytecode.readJar.ClassFileParser

@@ -3,10 +3,10 @@ package deltas.bytecode.types
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.Delta
 import core.language.node.Node
+import deltas.bytecode.ByteCodeLanguage
 import deltas.bytecode.attributes.CodeAttributeDelta.CodeKey
 import deltas.bytecode.attributes.{CodeAttributeDelta, StackMapTableAttributeDelta}
 import deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
-import deltas.javac.ByteCodeLanguage
 import deltas.javac.classes.skeleton.QualifiedClassName
 import org.scalatest.funsuite.AnyFunSuite
 

@@ -12,7 +12,8 @@ import deltas.HasNameDelta
 import deltas.HasNameDelta.{HasName, Name}
 import deltas.bytecode.types.TypeSkeleton
 import core.deltas.path.ConstraintBuilderExtension._
-import deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta}
+import deltas.classes.ClassDelta
+import deltas.javac.classes.skeleton.{HasConstraintsDelta}
 import deltas.javac.methods.{MethodDelta, MethodParameters}
 import deltas.javac.methods.MethodParameters.MethodParameter
 
@@ -38,7 +39,7 @@ object EventDelta extends DeltaWithGrammar with HasConstraintsDelta {
     val parameterList = parameter.toParameterList.as(MethodDelta.Parameters)
 
     val grammar = "event" ~~ find(HasNameDelta.Name)  ~ parameterList ~~ "anonymous".option.as(Anonymous) ~ ";" asNode Shape
-    find(JavaClassDelta.Members).addAlternative(grammar)
+    find(ClassDelta.Members).addAlternative(grammar)
   }
 
   override def description = "Add events as contract members"

@@ -7,7 +7,7 @@ import core.language.node.Node
 import deltas.bytecode.constants._
 import deltas.bytecode.extraConstants.TypeConstant
 import deltas.bytecode.types.{QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
+import deltas.classes.ClassDelta.JavaClass
 import deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassDelta, PackageSignature, QualifiedClassName}
 import deltas.javac.methods.MethodDelta
 

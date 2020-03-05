@@ -1,7 +1,7 @@
 package application.graphing.model.simplifications
 
 import core.deltas.Contract
-import deltas.javac.ByteCodeLanguage
+import deltas.bytecode.ByteCodeLanguage
 
 object ByteCodeWithTypes extends DeltaGroup {
   override def dependants: Set[Contract] = Set(ByteCode)

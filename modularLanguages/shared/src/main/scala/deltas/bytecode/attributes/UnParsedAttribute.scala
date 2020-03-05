@@ -1,9 +1,9 @@
 package deltas.bytecode.attributes
 
 import core.deltas.grammars.LanguageGrammars
-import core.language.node.{Node, NodeField, NodeShape}
 import core.deltas.{Contract, DeltaWithGrammar}
 import core.language.Language
+import core.language.node.{Node, NodeField, NodeShape}
 import deltas.bytecode.ByteCodeSkeleton
 
 object UnParsedAttribute extends DeltaWithGrammar {

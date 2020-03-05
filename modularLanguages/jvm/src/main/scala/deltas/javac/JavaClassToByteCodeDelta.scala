@@ -7,9 +7,9 @@ import core.language.{Compilation, Language, Phase}
 import deltas.bytecode.ByteCodeSkeleton
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.constants.ClassInfoConstant
+import deltas.classes.ClassDelta.{JavaClass, Members}
 import deltas.javac.classes.{ClassCompiler, FieldToByteCode}
 import deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassDelta}
-import deltas.javac.classes.skeleton.JavaClassDelta.{JavaClass, Members}
 import deltas.javac.methods.{MethodDelta, MethodToByteCode}
 
 object JavaClassToByteCodeDelta extends Delta {

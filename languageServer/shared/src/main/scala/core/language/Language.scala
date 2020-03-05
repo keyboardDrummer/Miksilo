@@ -93,7 +93,7 @@ object Language extends LazyLogging {
 
 class Language extends LazyLogging {
 
-  val data: mutable.Map[Any, Any] = mutable.Map.empty
+  val data: mutable.HashMap[Any, Any] = new mutable.HashMap
   var compilerPhases: List[Phase] = List.empty
 
   def insertPhaseAfter(insert: Phase, phaseKey: Any): Unit = {

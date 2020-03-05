@@ -1,7 +1,9 @@
 import sbt.Keys.{homepage, scmInfo}
 
 import scala.sys.process._
-import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
+import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
+
+import scala.reflect.io.File
 
 lazy val miksilo = project
   .in(file("."))
@@ -11,13 +13,13 @@ lazy val miksilo = project
     skip in publish := true)
   .aggregate(
     editorParser.jvm,
-    //editorParser.js,
+    editorParser.js,
     LSPProtocol.jvm,
-    //LSPProtocol.js,
+    LSPProtocol.js,
     languageServer.jvm,
-    //languageServer.js,
+    languageServer.js,
     modularLanguages.jvm,
-    //modularLanguages.js,
+    modularLanguages.js,
     playground
   )
 
@@ -107,8 +109,8 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
 
 def languageServerCommonTask(assemblyFile: String) = {
   val extension = assemblyFile.split("\\.").last
-  val removePrevious = Process(Seq("rm", "-f", "./vscode-extension/out/LanguageServer.*"))
-  val copyJar = Process(Seq("cp", assemblyFile, s"./vscode-extension/out/LanguageServer.${extension}"))
+  val removePrevious = Process(Seq("rm", "-f", "./vscode-extension/out/LanguageServer.jar"))
+  val copyJar = Process(Seq("cp", assemblyFile, s"./vscode-extension/out/LanguageServer.$extension"))
   val yarn = Process(Seq("yarn", "compile"), file("./vscode-extension"))
   val extensionDirectory = file("./vscode-extension").getAbsolutePath
   val vscode = Process(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory"))
@@ -125,10 +127,15 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
       val assemblyFile: String = assembly.value.getAbsolutePath
       languageServerCommonTask(assemblyFile).run
     },
+
   ).
-  jsSettings(scalacOptions += "-P:scalajs:sjsDefinedByDefault",
+  jsSettings(
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSModuleKind := ModuleKind.CommonJSModule,
+
     vscode := {
-      val assemblyFile: String = (fastOptJS in Compile).value.data.getAbsolutePath
+      val assemblyFile: String = (fullOptJS in Compile).value.data.getAbsolutePath
       languageServerCommonTask(assemblyFile).run
     }).
   settings(
@@ -137,7 +144,7 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
     mainClass in Compile := Some("deltas.Program"),
 
     // byteCode parser
-    libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.2",
 
   ).dependsOn(languageServer,
   editorParser % "compile->compile;test->test" /* for bigrammar testing utils*/ )

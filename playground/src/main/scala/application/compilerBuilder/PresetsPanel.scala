@@ -10,6 +10,7 @@ import application.StyleSheet
 import application.compilerCockpit.MarkOutputGrammar
 import core.SolveConstraintsDelta
 import core.deltas.{Delta, ParseUsingTextualGrammar}
+import deltas.bytecode.ByteCodeLanguage
 import deltas.bytecode.simpleBytecode.LabelledLocations
 import deltas.javaPlus.ExpressionMethodDelta
 import deltas.javac.JavaToByteCodeLanguage.getJava

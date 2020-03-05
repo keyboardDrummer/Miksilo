@@ -17,7 +17,7 @@ class Statistics(parent: Statistics = null) extends LazyLogging {
     result
   }
 
-  val timingsPerKey: mutable.Map[Any, mutable.ArrayBuffer[Double]] = mutable.Map.empty
+  val timingsPerKey: mutable.Map[Any, mutable.ArrayBuffer[Double]] = new mutable.HashMap
 
   def add(key: Any, timing: Double): Double = {
     val existing = timingsPerKey.getOrElseUpdate(key, mutable.ArrayBuffer.empty)

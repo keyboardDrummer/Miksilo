@@ -10,8 +10,8 @@ Decorates each Shape in a language with a property of type T.
  */
 class ShapeProperty[T] {
 
-  private def map(language: Language): mutable.Map[NodeShape, T] =
-    language.data.getOrElseUpdate(this, mutable.Map.empty[NodeShape, T]).asInstanceOf[mutable.Map[NodeShape, T]]
+  private def map(language: Language): mutable.HashMap[NodeShape, T] =
+    language.data.getOrElseUpdate(this, new mutable.HashMap[NodeShape, T]).asInstanceOf[mutable.HashMap[NodeShape, T]]
 
   def get(language: Language): scala.collection.Map[NodeShape, T] = map(language)
 

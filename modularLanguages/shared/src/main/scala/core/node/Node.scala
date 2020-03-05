@@ -38,9 +38,9 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   }
 
   var startOfUri: Option[String] = None
-  val fieldData: mutable.Map[NodeField, mutable.Map[NodeField, Any]] = mutable.Map.empty
-  val sources: mutable.Map[NodeField, OffsetNodeRange] = mutable.Map.empty
-  val data: mutable.Map[NodeField, Any] = mutable.Map.empty
+  val fieldData = new mutable.HashMap[NodeField, mutable.HashMap[NodeField, Any]]
+  val sources = new mutable.HashMap[NodeField, OffsetNodeRange]
+  val data = new mutable.HashMap[NodeField, Any]
   data ++= entries
 
   def dataView: Map[NodeField, Any] = data.toMap
@@ -131,6 +131,6 @@ object Node {
   val visitedToString = new ThreadLocal[mutable.Set[Int]]()
 }
 
-case class FieldData(value: Any, range: Option[OffsetNodeRange], fieldData: Option[mutable.Map[NodeField, Any]])
+case class FieldData(value: Any, range: Option[OffsetNodeRange], fieldData: Option[mutable.HashMap[NodeField, Any]])
 
 

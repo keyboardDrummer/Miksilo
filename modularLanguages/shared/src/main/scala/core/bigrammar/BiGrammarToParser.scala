@@ -66,7 +66,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   }
 
   def toParserBuilder(grammar: BiGrammar, keywords: scala.collection.Set[String]): Parser[Any] = {
-    val cache: mutable.Map[BiGrammar, Parser[Result]] = mutable.Map.empty
+    val cache = new mutable.HashMap[BiGrammar, Parser[Result]]
     lazy val recursive: BiGrammar => Parser[Result] = grammar => {
       cache.getOrElseUpdate(grammar, toParser(keywords, recursive, grammar))
     }

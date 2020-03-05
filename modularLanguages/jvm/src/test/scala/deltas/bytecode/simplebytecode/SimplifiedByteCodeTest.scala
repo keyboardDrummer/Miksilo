@@ -3,7 +3,8 @@ package deltas.bytecode.simpleBytecode
 import core.SourceUtils
 import core.deltas.Delta
 import deltas.PrettyPrint
-import deltas.javac.{ByteCodeLanguage, ExtendedByteCode, JavaToByteCodeLanguage}
+import deltas.bytecode.ByteCodeLanguage
+import deltas.javac.{ExtendedByteCode, JavaToByteCodeLanguage}
 import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
 

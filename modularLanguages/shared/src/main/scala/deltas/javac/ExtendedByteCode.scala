@@ -1,6 +1,7 @@
 package deltas.javac
 
 import core.deltas.Delta
+import deltas.bytecode.ByteCodeLanguage
 import deltas.bytecode.additions.PoptimizeDelta
 import deltas.bytecode.extraBooleanInstructions._
 import deltas.bytecode.extraConstants.TypeConstant

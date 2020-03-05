@@ -22,7 +22,7 @@ object MethodBasedJsonRpcHandler {
 class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHandler with LazyLogging {
 
   private var requestHandlers: Map[String, JsonRpcRequestMessage => JsonRpcResponseMessage] = Map.empty
-  private val notificationHandlers: mutable.Map[String, ListBuffer[JsonRpcNotificationMessage => Unit]] = mutable.Map.empty
+  private val notificationHandlers: mutable.Map[String, ListBuffer[JsonRpcNotificationMessage => Unit]] = new mutable.HashMap
 
   def sendNotification[Notification](method: String, notification: Notification)(implicit format: OFormat[Notification]): Unit = {
     val json = format.writes(notification)

@@ -5,8 +5,8 @@ import core.language.Compilation
 import core.language.node.Node
 import deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import deltas.bytecode.coreInstructions.objects.LoadAddressDelta
+import deltas.classes.ClassDelta.JavaClass
 import deltas.javac.classes.skeleton.JavaClassDelta
-import deltas.javac.classes.skeleton.JavaClassDelta.JavaClass
 import deltas.javac.expressions.ConvertsToByteCodeDelta
 
 object ThisCallToByteCodeDelta extends ConvertsToByteCodeDelta {

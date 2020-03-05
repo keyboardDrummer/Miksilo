@@ -10,7 +10,7 @@ import scala.collection.mutable
 import scala.util.Failure
 
 class CachingPrinter(inner: NodePrinter) extends NodePrinter {
-  val valueCache: mutable.Map[(Any, State), Printer.Result] = mutable.Map.empty
+  val valueCache: mutable.Map[(Any, State), Printer.Result] = new mutable.HashMap
   val failure = Failure[(State, ResponsiveDocument)](NegativeDepthRootError(FoundDirectRecursionInLabel(inner), -1000))
 
   override def write(from: WithMap[Any]): TryState[ResponsiveDocument] = state => {

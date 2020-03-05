@@ -10,6 +10,7 @@ import deltas.bytecode.constants.FieldRefConstant
 import deltas.bytecode.coreInstructions.GetStaticDelta
 import deltas.bytecode.coreInstructions.objects.GetFieldDelta
 import deltas.bytecode.types.QualifiedObjectTypeDelta
+import deltas.classes.ClassDelta
 import deltas.expression.ExpressionDelta
 import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
@@ -24,7 +25,7 @@ object SelectFieldToByteCodeDelta extends ConvertsToByteCodeDelta {
 
     val targetType = ExpressionDelta.getCachedType(compilation, selector.target).asInstanceOf[TypeFromDeclaration]
     val targetDeclaration = compilation.proofs.resolveDeclaration(targetType.declaration).asInstanceOf[NamedDeclaration].origin.get.asInstanceOf[FieldPath].parent
-    val wasClass = targetDeclaration.shape == JavaClassDelta.Shape
+    val wasClass = targetDeclaration.shape == ClassDelta.Shape
 
     if (wasClass)
       Seq(GetStaticDelta.getStatic(fieldRefIndex))

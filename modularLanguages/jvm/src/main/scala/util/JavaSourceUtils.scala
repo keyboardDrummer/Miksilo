@@ -4,8 +4,7 @@ import core.SourceUtils
 import core.deltas._
 import core.language.Compilation
 import core.language.node.Node
-import deltas.bytecode.PrintByteCode
-import deltas.javac.ByteCodeLanguage
+import deltas.bytecode.{ByteCodeLanguage, PrintByteCode}
 
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}

@@ -2,6 +2,7 @@ package deltas.javac.classes.skeleton
 
 import core.language.node.Node
 import JavaClassDelta._
+import deltas.classes.ClassDelta.JavaClass
 
 import scala.collection.mutable
 

@@ -2,8 +2,9 @@ package core.bigrammar
 
 import core.deltas.Delta
 import core.{SolveConstraintsDelta, SourceUtils}
+import deltas.bytecode.ByteCodeLanguage
 import deltas.expression.ExpressionDelta
-import deltas.javac.ByteCodeLanguage.byteCodeDeltas
+import deltas.bytecode.ByteCodeLanguage.byteCodeDeltas
 import deltas.javac.JavaToByteCodeLanguage.spliceBeforeTransformations
 import deltas.javac._
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}

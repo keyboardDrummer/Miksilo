@@ -8,6 +8,7 @@ import core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import core.language.Language
 import core.language.node.{Node, NodeField, NodeGrammar, NodeShape}
 import deltas.PrettyPrint
+import deltas.bytecode.ByteCodeLanguage
 import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import deltas.expression.{ExpressionDelta, IntLiteralDelta}
 import deltas.statement.{BlockDelta, StatementDelta}

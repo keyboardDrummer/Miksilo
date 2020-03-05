@@ -5,7 +5,7 @@ import java.io.InputStream
 import core.deltas._
 import core.language.Language
 import deltas.RunWithJVM
-import deltas.javac.ByteCodeLanguage
+import deltas.bytecode.ByteCodeLanguage
 
 object CompileAndRunOption extends CompileOption {
 

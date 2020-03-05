@@ -15,7 +15,7 @@ class ConstraintBuilder(val factory: Factory) {
 
   var proofs: Proofs = _
 
-  val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = mutable.Map.empty   //TODO deze moeten nog resetten
+  val typeVariables: scala.collection.mutable.Map[String, TypeVariable] = new mutable.HashMap   //TODO deze moeten nog resetten
 
   def scopeVariable(parent: Option[Scope] = None): ScopeVariable = {
     val result = factory.scopeVariable()

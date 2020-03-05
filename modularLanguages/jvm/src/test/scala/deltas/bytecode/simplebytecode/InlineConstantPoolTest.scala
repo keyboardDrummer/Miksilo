@@ -2,9 +2,8 @@ package deltas.bytecode.simpleBytecode
 
 import core.bigrammar.TestLanguageGrammarUtils
 import deltas.PrettyPrint
-import deltas.bytecode.ConstantPoolIndices
+import deltas.bytecode.{ByteCodeLanguage, ConstantPoolIndices}
 import deltas.bytecode.simpleBytecode.InlineConstantPool
-import deltas.javac.ByteCodeLanguage
 import org.scalatest.funsuite.AnyFunSuite
 import util.{LanguageTest, TestLanguageBuilder}
 
