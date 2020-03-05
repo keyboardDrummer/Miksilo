@@ -7,7 +7,11 @@ import languageServer.LanguageServerMain
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 
-object Program extends LanguageServerMain(Languages.languages,
+object Program extends LanguageServerMain(Seq(
+  SmithyLanguageBuilder,
+  JsonLanguageBuilder,
+  YamlLanguageBuilder
+),
   new JsonRpcConnection(
     new NodeMessageReader(g.process.stdin),
     new NodeMessageWriter(g.process.stdout)),

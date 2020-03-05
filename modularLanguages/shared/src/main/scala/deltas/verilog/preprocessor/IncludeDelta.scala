@@ -1,16 +1,15 @@
 package deltas.verilog.preprocessor
 
+import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.grammars.StringLiteral
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.{NodePath, NodeSequenceElement}
 import core.deltas.{Contract, ParseUsingTextualGrammar, Property}
-import core.language.{DiagnosticUtil, Language}
 import core.language.node.{Node, NodeField, NodeShape}
-import core.smarts.FileDiagnostic
-import deltas.FileWithMembersDelta.FileWithMembers
-import core.bigrammar.BiGrammarToParser._
+import core.language.{DiagnosticUtil, Language}
 import core.parsers.core.ParseText
 import core.parsers.editorParsers.SingleResultParser
+import deltas.FileWithMembersDelta.FileWithMembers
 
 import scala.reflect.io.Path
 

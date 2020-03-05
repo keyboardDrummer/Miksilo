@@ -132,10 +132,9 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
   jsSettings(
     scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     scalaJSUseMainModuleInitializer := true,
-    scalaJSModuleKind := ModuleKind.CommonJSModule,
 
     vscode := {
-      val assemblyFile: String = (fullOptJS in Compile).value.data.getAbsolutePath
+      val assemblyFile: String = (fastOptJS in Compile).value.data.getAbsolutePath
       languageServerCommonTask(assemblyFile).run
     }).
   settings(
