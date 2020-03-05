@@ -52,12 +52,10 @@ final class ParseText extends CharSequence {
   }
 
   def getOffset(position: Position): Int = {
-    try {
-      lineStarts(position.line) + position.character
-    } catch {
-      case _: ArrayIndexOutOfBoundsException =>
-        throw new IllegalArgumentException(s"Line ${position.line} is not in the document.")
+    if (position.line < 0 || position.line >= lineStarts.length) {
+      throw new IllegalArgumentException(s"Line ${position.line} is not in the document.")
     }
+    lineStarts(position.line) + position.character
   }
 
   def getPosition(offset: Int): Position = {
