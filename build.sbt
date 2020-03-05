@@ -12,13 +12,13 @@ lazy val miksilo = project
     publishArtifact := false,
     skip in publish := true)
   .aggregate(
-    //editorParser.jvm,
+    editorParser.jvm,
     editorParser.js,
-    //LSPProtocol.jvm,
+    LSPProtocol.jvm,
     LSPProtocol.js,
-    //languageServer.jvm,
+    languageServer.jvm,
     languageServer.js,
-    //modularLanguages.jvm,
+    modularLanguages.jvm,
     modularLanguages.js,
     playground
   )
