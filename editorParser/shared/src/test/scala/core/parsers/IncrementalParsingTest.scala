@@ -2,7 +2,7 @@ package core.parsers
 
 import _root_.core.parsers.core.ParseText
 import _root_.core.parsers.editorParsers.SingleParseResult
-import languages.JsonParser
+import languages.json.JsonParser
 import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingTest extends AnyFunSuite {

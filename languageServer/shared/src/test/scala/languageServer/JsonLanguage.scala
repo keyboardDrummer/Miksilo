@@ -3,7 +3,7 @@ package languageServer
 import core.language.Language
 import core.parsers.editorParsers.{NeverStop, StopImmediately}
 import core.smarts.language.modules.FakeSourceElement
-import languages.JsonParser
+import languages.json.JsonParser
 
 object JsonLanguage extends Language {
 

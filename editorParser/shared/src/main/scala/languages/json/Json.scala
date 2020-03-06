@@ -1,4 +1,4 @@
-package languages
+package languages.json
 
 import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
 import core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
@@ -24,3 +24,5 @@ object JsonParser extends CommonStringReaderParser with LeftRecursiveCorrectingP
   val string = stringLiteral.withSourceRange((range, value) => StringLiteral(range, value))
   val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
 }
+
+

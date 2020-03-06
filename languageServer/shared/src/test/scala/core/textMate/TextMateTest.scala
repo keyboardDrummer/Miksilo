@@ -1,6 +1,6 @@
 package core.textMate
 
-import languages.JsonParser
+import languages.json.JsonParser
 import org.scalatest.funsuite.AnyFunSuite
 
 class TextMateTest extends AnyFunSuite {

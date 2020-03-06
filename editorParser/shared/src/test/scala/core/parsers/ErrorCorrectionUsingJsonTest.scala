@@ -4,7 +4,7 @@ import _root_.core.parsers.strings.CommonStringReaderParser
 import _root_.core.parsers.core.ParseText
 import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
-import languages.{JsonArray, JsonObject, JsonParser, JsonValue, NumberLiteral, StringLiteral, ValueHole}
+import languages.json.{JsonArray, JsonObject, JsonParser, JsonValue, NumberLiteral, StringLiteral, ValueHole}
 
 class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderParser {
 
@@ -212,11 +212,11 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
 
   def valueToPrimitive(value: JsonValue): Any = {
     value match {
-      case NumberLiteral(range, value) => value
-      case StringLiteral(range, value) => value
-      case JsonArray(range, elements) => elements.map(valueToPrimitive)
-      case JsonObject(range, members) => members.map(e => (e._1,valueToPrimitive(e._2)))
-      case ValueHole(range) => null
+      case NumberLiteral(_, value) => value
+      case StringLiteral(_, value) => value
+      case JsonArray(_, elements) => elements.map(valueToPrimitive)
+      case JsonObject(_, members) => members.map(e => (e._1,valueToPrimitive(e._2)))
+      case ValueHole(_) => null
     }
   }
 }
