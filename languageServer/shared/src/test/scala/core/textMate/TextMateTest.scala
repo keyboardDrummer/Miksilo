@@ -1,13 +1,13 @@
 package core.textMate
 
-import _root_.core.parsers.ParseJson
+import languages.JsonParser
 import org.scalatest.funsuite.AnyFunSuite
 
 class TextMateTest extends AnyFunSuite {
 
   test("json test") {
-    val jsonParser = ParseJson.jsonParser
-    val output = GenerateTextMateGrammar.toTextMate(ParseJson)(jsonParser)
+    val jsonParser = JsonParser.valueParser
+    val output = GenerateTextMateGrammar.toTextMate(JsonParser)(jsonParser)
     val expectation = """{
                         |  "patterns": [
                         |    {

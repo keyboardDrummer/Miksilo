@@ -4,6 +4,7 @@ import _root_.core.SourceUtils
 import _root_.core.TestUtils
 import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
+import languages.JsonParser
 
 object PerformanceTest {
   val manyRepetitionsTargetTime = 250
@@ -14,9 +15,8 @@ object PerformanceTest {
 
 class PerformanceTest extends AnyFunSuite {
   import PerformanceTest._
-  import ParseJson._
 
-  val jsonFileParser = jsonParser.getWholeInputParser()
+  val jsonFileParser = JsonParser.parser
 
   test("Correct JSON small file performance") {
 

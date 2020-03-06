@@ -2,11 +2,10 @@ package core.parsers
 
 import _root_.core.parsers.core.ParseText
 import _root_.core.parsers.editorParsers.SingleParseResult
+import languages.JsonParser
 import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingTest extends AnyFunSuite {
-
-  import ParseJson._
 
   test("inserting between two empty braces works") {
     val input = """{}"""
@@ -94,7 +93,7 @@ class IncrementalParsingTest extends AnyFunSuite {
 
   def getChange: Change = {
     val text = new ParseText()
-    val parser = jsonParser.getSingleResultParser(text)
+    val parser = JsonParser.parser
     new Change {
 
       override def apply(from: Int, until: Int, newText: String) = {
@@ -110,7 +109,7 @@ class IncrementalParsingTest extends AnyFunSuite {
   }
 
   trait Change {
-    def apply(from: Int, until: Int, newText: String): SingleParseResult[Any, Input]
+    def apply(from: Int, until: Int, newText: String): SingleParseResult[Any, JsonParser.Input]
     def setText(newText: String): Unit
   }
 
@@ -119,9 +118,5 @@ class IncrementalParsingTest extends AnyFunSuite {
   // TODO add test that checks whether positions in the AST have been updated.
 
   // TODO add test with indentation sensitive parsing.
-
-  def getParser = {
-    jsonParser.getSingleResultParser(new ParseText())
-  }
 
 }
