@@ -4,10 +4,10 @@ import core.parsers.core.{Metrics, ParseText}
 
 trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
-  override def findBestParseResult[Result](text: ParseText, startInput: Input, parser: BuiltParser[Result],
+  override def findBestParseResult[Result](startInput: Input, parser: BuiltParser[Result],
                                            mayStop: StopFunction, metrics: Metrics): SingleParseResult[Result, Input] = {
 
-    val noResultFound = ReadyParseResult(None, startInput, History.error(FatalError(text, startInput, "Grammar is always recursive")))
+    val noResultFound = ReadyParseResult(None, startInput, History.error(FatalError(startInput, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[Input, Result] = noResultFound
 
     var resultsSeen = Map.empty[Any, ReadyParseResult[Input, Result]]
@@ -74,7 +74,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
@@ -96,7 +96,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
     lazy val second = _second
 
-    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 

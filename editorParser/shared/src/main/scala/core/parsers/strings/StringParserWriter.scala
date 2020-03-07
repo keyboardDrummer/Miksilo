@@ -14,15 +14,15 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
   abstract class StringReaderBase(val offsetNode: CachingTextPointer)
     extends StringReaderLike {
 
-    override def end(array: ParseText) = drop(array.length() - offset)
+    override def end() = drop(offsetNode.length - offset)
 
-    override def printRange(text: ParseText, end: Input) = text.subSequence(offset, end.offset).toString
+    override def printRange(end: Input) = offsetNode.subSequence(end.offset - offset).toString
 
-    override def atEnd(array: ParseText): Boolean = offset == array.length
+    override def atEnd(): Boolean = offset == offsetNode.length
 
-    override def head(array: ParseText): Char = array.charAt(offset)
+    override def head(): Char = offsetNode.charAt(offset)
 
-    override def tail(array: ParseText): Input = drop(1)
+    override def tail(): Input = drop(1)
 
     override def hashCode(): Int = offset
 
@@ -74,18 +74,19 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
 
   case class Literal(value: String, penalty: Double = History.missingInputPenalty) extends ParserBuilderBase[String] with LeafParser[String] {
 
-    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[String] = {
+    override def getParser(recursive: GetParser): BuiltParser[String] = {
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
         def apply(input: Input, state: FixPointState): ParseResult[String] = {
           var index = 0
           while (index < value.length) {
+            input.offsetNode.charSequence
             val arrayIndex = index + input.offset
             val remainder = input.drop(index)
-            val errorHistory = History.error(new MissingInput(text, remainder, value.substring(index), value.substring(index), penalty))
-            if (text.length <= arrayIndex) {
+            val errorHistory = History.error(new MissingInput(remainder, value.substring(index), value.substring(index), penalty))
+            if (input.offsetNode.length <= arrayIndex) {
               return singleResult(ReadyParseResult(Some(value), remainder, errorHistory))
-            } else if (text.charAt(arrayIndex) != value.charAt(index)) {
+            } else if (input.offsetNode.charAt(arrayIndex) != value.charAt(index)) {
               return singleResult(ReadyParseResult(Some(value), remainder, errorHistory))
             }
             index += 1
@@ -106,7 +107,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
     * Don't wrap KeywordParser in a Drop. Since it wraps identifier, it already has a drop.
     */
   case class KeywordParser(value: String) extends ParserBuilderBase[String] with ParserWrapper[String] {
-    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[String] = {
+    override def getParser(recursive: GetParser): BuiltParser[String] = {
       val identifierParser = recursive(parseIdentifier)
       new BuiltParser[String] {
         override def apply(input: Input, state: FixPointState) = {
@@ -114,7 +115,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
             if (ready.resultOption.contains(value)) {
               ready
             } else {
-              val insertError = new MissingInput(text, input, value, value + " ")
+              val insertError = new MissingInput(input, value, value + " ")
               ReadyParseResult(Some(value), input, History.error(insertError))
             }
           }, uniform = false)
@@ -126,8 +127,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
   }
 
   trait NextCharError extends ParseError[Input] {
-    def text: ParseText
-    def to: Input = if (this.from.atEnd(text)) this.from else this.from.drop(1)
+    def to: Input = if (this.from.atEnd()) this.from else this.from.drop(1)
   }
 
   def parseRegex(regex: Regex, regexName: String,
@@ -147,19 +147,19 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
                          penaltyOption: Option[Double] = Some(History.missingInputPenalty))
     extends ParserBuilderBase[String] with LeafParser[String] {
 
-    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[String] = {
+    override def getParser(recursive: GetParser): BuiltParser[String] = {
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
 
         def apply(input: Input, state: FixPointState): ParseResult[String] = {
-          regex.findPrefixMatchOf(new SubSequence(text, input.offset)) match {
+          regex.findPrefixMatchOf(input.offsetNode.charSequence) match {
             case Some(matched) =>
-              val value = text.subSequence(input.offset, input.offset + matched.end).toString
+              val value = input.offsetNode.subSequence(matched.end).toString
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>
               penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
-                val history = History.error(new MissingInput(text, input, s"<$regexName>", defaultValue.getOrElse(""), penalty))
+                val history = History.error(new MissingInput(input, s"<$regexName>", defaultValue.getOrElse(""), penalty))
                 singleResult(ReadyParseResult(defaultValue, input, history))
               })
 

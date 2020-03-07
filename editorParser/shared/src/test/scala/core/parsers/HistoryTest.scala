@@ -8,18 +8,17 @@ import _root_.core.parsers.core.ParseText
 
 class HistoryTest extends AnyFunSuite with StringParserWriter {
   type Input = IndexInput
-  val text = new ParseText()
 
   test("Dropping , is worse than missing <object member key>:<value>") {
     val commaSpot = new IndexInput(0)
     val afterComma = new IndexInput(1)
     val dropHistory = History.empty.
-      addError(DropError(text, commaSpot, afterComma))
+      addError(DropError(commaSpot, afterComma))
 
     val missingHistory = History.empty.
-      addError(new MissingInput(text, afterComma, "key")).
-      addError(new MissingInput(text, afterComma, ":")).
-      addError(new MissingInput(text, afterComma, "<value>", penalty = History.insertFallbackPenalty))
+      addError(new MissingInput(afterComma, "key")).
+      addError(new MissingInput(afterComma, ":")).
+      addError(new MissingInput(afterComma, "<value>", penalty = History.insertFallbackPenalty))
 
     assert(dropHistory.score < missingHistory.score)
   }
@@ -28,33 +27,33 @@ class HistoryTest extends AnyFunSuite with StringParserWriter {
     val first = new IndexInput(0)
     val second = new IndexInput(1)
     val noBracesInserted = History.empty.
-      addError(new MissingInput(text, first, ":")).
-      addError(new MissingInput(text, first, "<value>", penalty = History.insertFallbackPenalty)).
-      addError(new MissingInput(text, first, ","))
+      addError(new MissingInput(first, ":")).
+      addError(new MissingInput(first, "<value>", penalty = History.insertFallbackPenalty)).
+      addError(new MissingInput(first, ","))
 
     val insertedBraces = History.empty.
-      addError(new MissingInput(text, first, ":")).
-      addError(new MissingInput(text, first, "{")).
-      addError(new MissingInput(text, second, "}"))
+      addError(new MissingInput(first, ":")).
+      addError(new MissingInput(first, "{")).
+      addError(new MissingInput(second, "}"))
 
     assert(insertedBraces.score < noBracesInserted.score)
   }
 
   test("two consecutive drops combine and become cheaper") {
     val splitDrops = History.empty.
-      addError(DropError(text, new IndexInput(0),new IndexInput(1))).
+      addError(DropError(new IndexInput(0),new IndexInput(1))).
       addSuccess(History.successValue).
-      addError(DropError(text, new IndexInput(2),new IndexInput(3)))
+      addError(DropError(new IndexInput(2),new IndexInput(3)))
 
     val dropsLeft = History.empty.
-      addError(DropError(text, new IndexInput(0),new IndexInput(1))).
-      addError(DropError(text, new IndexInput(1),new IndexInput(2))).
+      addError(DropError(new IndexInput(0),new IndexInput(1))).
+      addError(DropError(new IndexInput(1),new IndexInput(2))).
       addSuccess(History.successValue)
 
     val dropsRight = History.empty.
       addSuccess(History.successValue).
-      addError(DropError(text, new IndexInput(1),new IndexInput(2))).
-      addError(DropError(text, new IndexInput(2),new IndexInput(3)))
+      addError(DropError(new IndexInput(1),new IndexInput(2))).
+      addError(DropError(new IndexInput(2),new IndexInput(3)))
 
     assert(dropsRight.score == dropsLeft.score)
     assert(splitDrops.score < dropsRight.score)
@@ -65,11 +64,11 @@ class HistoryTest extends AnyFunSuite with StringParserWriter {
     val middle = new IndexInput(50)
     val middlePlusOne = new IndexInput(51)
     val end = new IndexInput(100)
-    val withoutSuccess = History.empty.addError(DropError(text, start, end))
+    val withoutSuccess = History.empty.addError(DropError(start, end))
     val withSuccess = History.empty.
-      addError(DropError(text, start, middle)).
+      addError(DropError(start, middle)).
       addSuccess(History.successValue).
-      addError(DropError(text, middlePlusOne, end))
+      addError(DropError(middlePlusOne, end))
 
     assert(withSuccess.score < withoutSuccess.score)
   }
@@ -78,11 +77,11 @@ class HistoryTest extends AnyFunSuite with StringParserWriter {
     val start = new IndexInput(0)
     val middle = new IndexInput(1)
     val end = new IndexInput(2)
-    val withoutSuccess = History.empty.addError(DropError(text, start, end))
+    val withoutSuccess = History.empty.addError(DropError(start, end))
     val withSuccess = History.empty.
-      addError(DropError(text, start, middle)).
+      addError(DropError(start, middle)).
       addSuccess(History.successValue).
-      addError(DropError(text, middle, end))
+      addError(DropError(middle, end))
 
     assert(withSuccess.score > withoutSuccess.score)
   }
@@ -91,8 +90,8 @@ class HistoryTest extends AnyFunSuite with StringParserWriter {
     val start = new IndexInput(0)
     val far = new IndexInput(40)
     val further = new IndexInput(far.offset + 1)
-    val farWithoutSuccess = History.empty.addError(DropError(text, start, far))
-    val furtherWithoutSuccess = History.empty.addError(DropError(text, start, further))
+    val farWithoutSuccess = History.empty.addError(DropError(start, far))
+    val furtherWithoutSuccess = History.empty.addError(DropError(start, further))
     val furtherWithSuccess = furtherWithoutSuccess.addSuccess(History.successValue)
     assert(farWithoutSuccess.score > furtherWithoutSuccess.score)
     assert(farWithoutSuccess.score < furtherWithSuccess.score)
@@ -101,7 +100,7 @@ class HistoryTest extends AnyFunSuite with StringParserWriter {
   //private val text = Array.fill(100)('a')
 
   type CacheKey = Unit
-  val arrayOffsetManager = new ArrayOffsetManager
+  val arrayOffsetManager = new ArrayOffsetManager(new ParseText())
   class IndexInput(offset: Int) extends StringReaderBase(arrayOffsetManager.getOffsetNode(offset)) {
     override def drop(amount: Int) = new IndexInput(offset + amount)
 

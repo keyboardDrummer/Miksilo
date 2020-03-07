@@ -187,7 +187,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
   class DetectValueParser[Result](valueToDetect: Result, val original: ParserBuilder[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     var detected = false
 
-    override def getParser(text: ParseText, recursive: GetParser) = {
+    override def getParser(recursive: GetParser) = {
       val parseOriginal = recursive(original)
       (input: Input, state: FixPointState) => {
         val result = parseOriginal(input, state)

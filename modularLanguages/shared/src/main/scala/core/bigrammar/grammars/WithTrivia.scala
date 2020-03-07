@@ -33,7 +33,7 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
 
   import BiGrammarToParser._
 
-  override def getParser(text: ParseText, recursive: BiGrammarToParser.GetParser): BuiltParser[Result] = {
+  override def getParser(recursive: BiGrammarToParser.GetParser): BuiltParser[Result] = {
     val parseTrivias = recursive(triviasParserBuilder)
     val parseOriginal = recursive(original)
 

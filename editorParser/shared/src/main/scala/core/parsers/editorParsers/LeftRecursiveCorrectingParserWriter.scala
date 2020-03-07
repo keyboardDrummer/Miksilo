@@ -1,6 +1,7 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{Metrics, NoMetrics, TextPointer, ParseInput, ParseText}
+import core.parsers.core.{Metrics, NoMetrics, ParseInput, ParseText, TextPointer}
+import core.parsers.strings.SubSequence
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
@@ -44,9 +45,20 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     override def drop(amount: Int) = manager.getOffsetNode(amount + offset)
 
     override def toString = offset.toString
+
+    override def charAt(index: Int) = manager.text.charAt(offset)
+
+    override def length = manager.text.length
+
+    override def charSequence = new SubSequence(manager.text, offset)
+
+    override def subSequence(offset: Int) = manager.text.subSequence(this.offset, this.offset + offset)
+
+    override def position = manager.text.getPosition(offset)
   }
 
-  class ArrayOffsetManager extends OffsetManager {
+  class ArrayOffsetManager(var text: ParseText) extends OffsetManager {
+
     val offsets = mutable.ArrayBuffer.empty[AbsoluteTextPointer]
     val offsetCache = mutable.HashMap.empty[Int, CachingTextPointer]
     override def getOffsetNode(offset: Int) = {
@@ -120,9 +132,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  case class DetectFixPointAndCache[Result](text: ParseText,
-                                            parser: BuiltParser[Result])
-    extends CheckCache[Result](text, parser) {
+  case class DetectFixPointAndCache[Result](parser: BuiltParser[Result])
+    extends CheckCache[Result](parser) {
 
     override def apply(input: Input, state: FixPointState): ParseResult[Result] = {
       val newState = moveState(input, state)
@@ -184,17 +195,16 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
   }
 
-  override def wrapParser[Result](text: ParseText,
-                                  parser: BuiltParser[Result],
+  override def wrapParser[Result](parser: BuiltParser[Result],
                                   shouldCache: Boolean,
                                   shouldDetectLeftRecursion: Boolean): BuiltParser[Result] = {
       if (!shouldCache && !shouldDetectLeftRecursion) {
         return parser
       }
       if (shouldDetectLeftRecursion) {
-        return new DetectFixPointAndCache[Result](text, parser)
+        return new DetectFixPointAndCache[Result](parser)
       }
-      new CheckCache[Result](text, parser)
+      new CheckCache[Result](parser)
   }
 
   // TODO: replace List with something that has constant concat operation.
@@ -244,7 +254,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   def moveState(input: Input, state: FixPointState) = if (state.offset == input.offset) state else FixPointState(input.offset, Set.empty)
 
-  class CheckCache[Result](text: ParseText, parser: BuiltParser[Result]) extends BuiltParser[Result] {
+  class CheckCache[Result](parser: BuiltParser[Result]) extends BuiltParser[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
 
     def apply(input: Input, state: FixPointState): ParseResult[Result] = {
@@ -269,20 +279,20 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   def startInput(offsetManager: OffsetManager): Input
   def getSingleResultParser[Result](parseText: ParseText, parser: ParserBuilder[Result]): SingleResultParser[Result, Input] = {
-    val parserAndCaches = compile(parser).buildParser(parseText, parser)
-    val offsetManager = new ArrayOffsetManager
+    val parserAndCaches = compile(parser).buildParser(parser)
+    val offsetManager = new ArrayOffsetManager(parseText)
     new SingleResultParser[Result, Input] {
 
       override def parse(mayStop: StopFunction, metrics: Metrics) = {
         val zero: Input = startInput(offsetManager)
-        findBestParseResult(parseText, zero, parserAndCaches.parser, mayStop, metrics)
+        findBestParseResult(zero, parserAndCaches.parser, mayStop, metrics)
       }
 
       override def resetAndParse(text: String, mayStop: StopFunction, metrics: Metrics) = {
-        parseText.arrayOfChars = text.toCharArray
+        offsetManager.text = new ParseText(text)
         offsetManager.clear()
         val zero: Input = startInput(offsetManager)
-        findBestParseResult(parseText, zero, parserAndCaches.parser, mayStop, metrics)
+        findBestParseResult(zero, parserAndCaches.parser, mayStop, metrics)
       }
 
       override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {

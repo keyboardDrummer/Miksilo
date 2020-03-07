@@ -168,4 +168,14 @@ object EmptyRemainder extends TextPointer {
   override def getAbsoluteOffset() = Int.MinValue
 
   override def drop(amount: Int) = this
+
+  override def charAt(index: Int) = ???
+
+  override def length = ???
+
+  override def charSequence = ???
+
+  override def subSequence(offset: Int) = ???
+
+  override def position = ???
 }
