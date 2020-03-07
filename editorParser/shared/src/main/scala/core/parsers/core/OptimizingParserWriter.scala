@@ -1,6 +1,6 @@
 package core.parsers.core
 
-import core.parsers.editorParsers.{CachingParser, Position, SingleResultParser}
+import core.parsers.editorParsers.{ArrayOffsetManager, CachingParser, Position, SingleResultParser, StopFunction}
 
 import scala.collection.mutable
 
@@ -197,7 +197,20 @@ trait OptimizingParserWriter extends ParserWriter {
 
   def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
 
-  def getCachingParser[Result](text: ParseText, parser: ParserBuilder[Result]): CachingParser[Result, Input]
+  def getCachingParser[Result](parseText: ParseText, parser: ParserBuilder[Result]): CachingParser[Result, Input] = {
+    val singleResultParser = getSingleResultParser(parser)
+    val offsetManager = new ArrayOffsetManager(parseText)
+    new CachingParser[Result, Input] {
+
+      override def parse(mayStop: StopFunction, metrics: Metrics) = {
+        singleResultParser.parse(offsetManager.getOffsetNode(0), mayStop, metrics)
+      }
+
+      override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
+        offsetManager.changeText(from, until, insertionLength)
+      }
+    }
+  }
 
   case class Success[+Result](result: Result, remainder: Input) {
     def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)

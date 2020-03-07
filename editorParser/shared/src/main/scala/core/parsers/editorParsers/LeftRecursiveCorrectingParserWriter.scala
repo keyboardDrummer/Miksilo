@@ -179,6 +179,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   }
 
   def startInput(zero: TextPointer): Input
+
   def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input] = {
     val parserAndCaches = compile(parser).buildParser(parser)
     new SingleResultParser[Result, Input] {
@@ -192,37 +193,5 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
     }
   }
-
-  def getCachingParser[Result](parseText: ParseText, parser: ParserBuilder[Result]): CachingParser[Result, Input] = {
-    val singleResultParser = getSingleResultParser(parser)
-    val offsetManager = new ArrayOffsetManager(parseText)
-    new CachingParser[Result, Input] {
-
-      override def parse(mayStop: StopFunction, metrics: Metrics) = {
-        singleResultParser.parse(offsetManager.getOffsetNode(0), mayStop, metrics)
-      }
-
-      override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
-        offsetManager.changeText(from, until, insertionLength)
-      }
-    }
-  }
-}
-
-trait SingleResultParser[+Result, Input <: ParseInput] {
-  def parse(text: String,
-            mayStop: StopFunction = StopImmediately,
-            metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]
-
-  def parse(zero: TextPointer,
-            mayStop: StopFunction,
-            metrics: Metrics): SingleParseResult[Result, Input]
-}
-
-trait CachingParser[+Result, Input <: ParseInput] {
-  def changeRange(start: Int, end: Int, insertionLength: Int): Unit
-
-  def parse(mayStop: StopFunction = StopImmediately,
-            metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]
 }
 
