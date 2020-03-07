@@ -1,13 +1,13 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{Metrics, NoMetrics, OffsetNode, ParseInput, ParseText}
+import core.parsers.core.{Metrics, NoMetrics, TextPointer, ParseInput, ParseText}
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
 import scala.collection.mutable
 
 trait CachingParseResult {
-  def latestRemainder: OffsetNode
+  def latestRemainder: TextPointer
 }
 
 // TODO consider pushing down the caching part into another ParsingWriter
@@ -20,23 +20,23 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   type CacheKey
 
   trait CachingInput extends CorrectingInput {
-    def offsetNode: CachingOffsetNode
+    def offsetNode: CachingTextPointer
     def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]): CacheKey
   }
 
-  trait CachingOffsetNode extends OffsetNode {
-    def drop(amount: Int): CachingOffsetNode
+  trait CachingTextPointer extends TextPointer {
+    def drop(amount: Int): CachingTextPointer
     def cache: mutable.HashMap[CacheKey, ParseResult[_]]
     def cache_=(value: mutable.HashMap[CacheKey, ParseResult[_]]): Unit
   }
 
   trait OffsetManager {
-    def getOffsetNode(offset: Int): CachingOffsetNode
+    def getOffsetNode(offset: Int): CachingTextPointer
     def changeText(from: Int, until: Int, insertLenght: Int): Unit
     def clear(): Unit
   }
 
-  class AbsoluteOffsetNode(val manager: ArrayOffsetManager, var offset: Int) extends CachingOffsetNode {
+  class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) extends CachingTextPointer {
     override def getAbsoluteOffset() = offset
 
     override var cache = new mutable.HashMap[CacheKey, ParseResult[_]]
@@ -47,14 +47,14 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   }
 
   class ArrayOffsetManager extends OffsetManager {
-    val offsets = mutable.ArrayBuffer.empty[AbsoluteOffsetNode]
-    val offsetCache = mutable.HashMap.empty[Int, CachingOffsetNode]
+    val offsets = mutable.ArrayBuffer.empty[AbsoluteTextPointer]
+    val offsetCache = mutable.HashMap.empty[Int, CachingTextPointer]
     override def getOffsetNode(offset: Int) = {
       offsetCache.getOrElseUpdate(offset, {
         binarySearch(offset) match {
           case Found(index) => offsets(index)
           case InsertionPoint(insertionPoint) =>
-            val result = new AbsoluteOffsetNode(this, offset)
+            val result = new AbsoluteTextPointer(this, offset)
             offsets.insert(insertionPoint, result)
             result
         }

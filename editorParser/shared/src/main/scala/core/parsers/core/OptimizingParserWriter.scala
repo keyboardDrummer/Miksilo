@@ -4,14 +4,14 @@ import core.parsers.editorParsers.{Position, SingleResultParser}
 
 import scala.collection.mutable
 
-trait OffsetNode {
-  def drop(amount: Int): OffsetNode
+trait TextPointer {
+  def drop(amount: Int): TextPointer
   def getAbsoluteOffset(): Int
   def toPosition(text: ParseText): Position = text.getPosition(getAbsoluteOffset())
 }
 
 trait ParseInput {
-  def offsetNode: OffsetNode
+  def offsetNode: TextPointer
   def offset = offsetNode.getAbsoluteOffset()
 }
 

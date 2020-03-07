@@ -11,7 +11,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
   type Elem = Char
   type Input <: StringReaderLike
 
-  abstract class StringReaderBase(val offsetNode: CachingOffsetNode)
+  abstract class StringReaderBase(val offsetNode: CachingTextPointer)
     extends StringReaderLike {
 
     override def end(array: ParseText) = drop(array.length() - offset)

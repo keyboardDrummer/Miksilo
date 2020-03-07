@@ -9,7 +9,7 @@ trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter
 
   type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], Int)
 
-  class IndentationReader(offsetNode: CachingOffsetNode, val indentation: Int)
+  class IndentationReader(offsetNode: CachingTextPointer, val indentation: Int)
     extends StringReaderBase(offsetNode) with IndentationReaderLike {
 
     def drop(amount: Int): IndentationReader = new IndentationReader(offsetNode.drop(amount), indentation)

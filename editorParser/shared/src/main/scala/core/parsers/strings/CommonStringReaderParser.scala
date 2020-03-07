@@ -9,7 +9,7 @@ trait CommonStringReaderParser extends CommonParserWriter {
   override def startInput(offsetManager: OffsetManager) = new StringReader(offsetManager.getOffsetNode(0))
 
   type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]])
-  class StringReader(offsetNode: CachingOffsetNode)
+  class StringReader(offsetNode: CachingTextPointer)
     extends StringReaderBase(offsetNode) {
 
     def drop(amount: Int): StringReader = new StringReader(offsetNode.drop(amount))

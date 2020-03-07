@@ -341,7 +341,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       ParseWholeInput(parser).getSingleResultParser(parseText)
     }
 
-    def withRange[Other](addRange: (OffsetNode, OffsetNode, Result) => Other): Parser[Other] = {
+    def withRange[Other](addRange: (TextPointer, TextPointer, Result) => Other): Parser[Other] = {
       WithRangeParser(parser, addRange)
     }
   }

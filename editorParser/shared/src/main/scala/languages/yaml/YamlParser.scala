@@ -61,7 +61,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
 
   type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], Int, YamlContext)
 
-  class IndentationReader(offsetNode: CachingOffsetNode, val context: YamlContext, val indentation: Int)
+  class IndentationReader(offsetNode: CachingTextPointer, val context: YamlContext, val indentation: Int)
     extends StringReaderBase(offsetNode) with IndentationReaderLike {
 
     override def withIndentation(value: Int) = new IndentationReader(offsetNode, context, value)
