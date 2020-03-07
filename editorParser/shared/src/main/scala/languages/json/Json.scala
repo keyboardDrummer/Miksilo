@@ -1,8 +1,6 @@
 package languages.json
 
-import core.parsers.core.ParseText
-import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
-import core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
+import core.parsers.editorParsers.OffsetNodeRange
 
 trait JsonValue
 

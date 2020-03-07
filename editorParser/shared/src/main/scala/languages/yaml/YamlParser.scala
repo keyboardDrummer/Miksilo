@@ -5,8 +5,6 @@ import core.parsers.core.{ParseText, Processor}
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
 import core.responsiveDocument.ResponsiveDocument
-import languages.json.JsonObject
-import languages.json.JsonParser.{literal, stringLiteral}
 
 trait YamlValue {
   def toDocument: ResponsiveDocument
@@ -22,7 +20,7 @@ case class YamlObject(range: OffsetNodeRange, members: Array[(YamlValue, YamlVal
   }
 }
 
-case class YamlArray(range: OffsetNodeRange, elements: Seq[YamlValue]) extends YamlValue {
+case class YamlArray(range: OffsetNodeRange, elements: Array[YamlValue]) extends YamlValue {
   override def toDocument: ResponsiveDocument = {
     elements.
       map(member => ResponsiveDocument.text("- ") ~~ member.toDocument).
@@ -116,7 +114,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
   val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
-  lazy val parseUntaggedFlowValue = parseBraceObject | parseBracketArray | parseStringLiteral
+  lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseStringLiteral
   lazy val parseFlowValue = (tag ~ parseUntaggedFlowValue).
     withSourceRange((range, v) => TaggedNode(range, v._1, v._2)) | parseUntaggedFlowValue
   lazy val parseUntaggedValue = new Lazy(parseBracketArray | parseArray | parseNumber | parseStringLiteral |
@@ -125,7 +123,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   lazy val parseValue: Parser[YamlValue] = (tag ~ parseUntaggedValue).
     withSourceRange((range, v) => TaggedNode(range, v._1, v._2)) | parseUntaggedValue
 
-  lazy val parseYaml = parseValue ~< trivias
+  lazy val parseYaml = trivias ~> parseValue ~< trivias
   def getParser(text: ParseText = new ParseText()) = parseYaml.getWholeInputParser(text)
 
   lazy val parseBlockMapping: Parser[YamlValue] = {
@@ -142,13 +140,13 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
 
   lazy val parseBracketArray: Parser[YamlValue] = {
     val inner = "[" ~> parseFlowValue.manySeparated(",", "array element").
-      withSourceRange((range, elements) => YamlArray(range, elements)) ~< "]"
+      withSourceRange((range, elements) => YamlArray(range, elements.toArray)) ~< "]"
     new WithContext(_ => FlowIn, inner)
   }
 
   lazy val parseArray: Parser[YamlValue] = {
     val element = literalOrKeyword("- ") ~> greaterThan(parseValue)
-    alignedList(element).withSourceRange((range, elements) => YamlArray(range, elements))
+    alignedList(element).withSourceRange((range, elements) => YamlArray(range, elements.toArray))
   }
 
   lazy val parseNumber: Parser[YamlValue] =

@@ -39,6 +39,11 @@ class YamlTest extends AnyFunSuite {
     assert(result.successful)
   }
 
+  test("tag string") {
+    val program = "!Taggy 'hello'"
+
+    parseAndCompare(program, "Taggy" -> "hello")
+  }
 
   test("string") {
     val program = "'hello'"
@@ -48,15 +53,17 @@ class YamlTest extends AnyFunSuite {
 
   def parseAndCompare(program: String, primitive: Any): Unit = {
     val result = parser.resetAndParse(program)
-    assertResult(primitive)(valueToPrimitive(result.resultOption.get))
+    val primitiveResult = valueToPrimitive(result.resultOption.get)
+    assertResult(primitive)(primitiveResult)
   }
 
   def valueToPrimitive(value: YamlValue): Any = {
     value match {
       case NumberLiteral(_, value) => value
       case StringLiteral(_, value) => value
-      case YamlArray(_, elements) => elements.map(valueToPrimitive)
-      case YamlObject(_, members) => members.map(e => (valueToPrimitive(e._1), valueToPrimitive(e._2)))
+      case YamlArray(_, elements) => elements.toList.map(e => valueToPrimitive(e))
+      case YamlObject(_, members) => members.toList.map(e => (valueToPrimitive(e._1), valueToPrimitive(e._2)))
+      case TaggedNode(_, tag, value) => tag -> valueToPrimitive(value)
       case ValueHole(_) => null
     }
   }
@@ -71,7 +78,7 @@ class YamlTest extends AnyFunSuite {
     val program =
       """minecraft: 2""".stripMargin
 
-    parseAndCompare(program, Map("minecraft" -> 2))
+    parseAndCompare(program, Seq("minecraft" -> 2))
   }
 
   test("object with 2 members") {
@@ -79,7 +86,7 @@ class YamlTest extends AnyFunSuite {
       """minecraft: 2
         |cancelled: 3""".stripMargin
 
-    parseAndCompare(program, Map("minecraft" -> 2, "cancelled" -> 3))
+    parseAndCompare(program, Seq("minecraft" -> 2, "cancelled" -> 3))
   }
 
   test("array") {
@@ -95,7 +102,7 @@ class YamlTest extends AnyFunSuite {
       """- x: 3
         |  y: 4""".stripMargin
 
-    val expectation = Seq(Map("x" -> 3, "y" -> 4))
+    val expectation = Seq(Seq("x" -> 3, "y" -> 4))
     parseAndCompare(program, expectation)
   }
 
@@ -105,7 +112,7 @@ class YamlTest extends AnyFunSuite {
         |  y: 4
         |- 2""".stripMargin
 
-    val expectation = Seq(Map("x" -> 3, "y" -> 4), 2)
+    val expectation = Seq(Seq("x" -> 3, "y" -> 4), 2)
     parseAndCompare(program, expectation)
   }
 
@@ -115,7 +122,7 @@ class YamlTest extends AnyFunSuite {
         |- x: 3
         |  y: 4""".stripMargin
 
-    val expectation = Seq(2, Map("x" -> 3, "y" -> 4))
+    val expectation = Seq(2, Seq("x" -> 3, "y" -> 4))
     parseAndCompare(program, expectation)
   }
 
@@ -125,9 +132,9 @@ class YamlTest extends AnyFunSuite {
         |- b: - 2""".stripMargin
 
     val expectation = Seq(
-      Map(
+      Seq(
         "a" -> Seq(1)),
-      Map(
+      Seq(
         "b" -> Seq(2)))
     parseAndCompare(program, expectation)
   }
@@ -148,11 +155,11 @@ class YamlTest extends AnyFunSuite {
     val expectation =
       Seq(
         2,
-        Map("x" -> 3,
-          "y" -> Map("a" -> 4, "b" -> 5),
+        Seq("x" -> 3,
+          "y" -> Seq("a" -> 4, "b" -> 5),
           "z" -> Seq(2, 4)),
         6,
-        Map(
+        Seq(
           "q" ->
             Seq(7, 8),
           "r" -> 9))
