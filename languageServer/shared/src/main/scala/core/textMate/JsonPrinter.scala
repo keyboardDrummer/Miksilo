@@ -5,7 +5,7 @@ case class JsArray(elements: Seq[JsExpression]) extends JsExpression
 case class JsObject(fields: Map[String, JsExpression]) extends JsExpression
 case class JsLiteral(value: String) extends JsExpression
 
-object Json {
+object JsonPrinter {
 
   def printJson(root: JsExpression): String = {
     val builder = new StringBuilder

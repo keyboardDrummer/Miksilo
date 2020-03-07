@@ -1,11 +1,12 @@
 package core.parsers
 
+import _root_.core.parsers.strings.CommonStringReaderParser
 import _root_.core.parsers.core.ParseText
 import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
+import languages.json.{JsonArray, JsonObject, JsonParser, JsonValue, NumberLiteral, StringLiteral, ValueHole}
 
-class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
-  import ParseJson._
+class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderParser {
 
   ignore("removes incorrect b at start") {
     val input = """b{"hello":3}"""
@@ -31,7 +32,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
 
   test("nothing as input") {
     val input = ""
-    parseJson(input, UnknownExpression, 1)
+    parseJson(input, null, 1)
   }
 
   test("object start with nothing else") {
@@ -41,19 +42,19 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
 
   test("object member with only the key") {
     val input = """{"person""""
-    val expectation = List(("""person""", UnknownExpression))
+    val expectation = List(("""person""", null))
     parseJson(input, expectation, 1)
   }
 
   test("object member with no expression") {
     val input = """{"person":"""
-    val expectation = List(("person", UnknownExpression))
+    val expectation = List(("person", null))
     parseJson(input, expectation, 1)
   }
 
   test("object member with only an unfinished key") {
     val input = """{"person"""
-    val expectation = List(("person", UnknownExpression))
+    val expectation = List(("person", null))
     parseJson(input, expectation, 1)
   }
 
@@ -64,25 +65,25 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
 
   test("object with a single member and comma") {
     val input = """{"person":3,"""
-    val expectation = List("person" -> 3, "" -> UnknownExpression)
+    val expectation = List("person" -> 3, "" -> null)
     parseJson(input, expectation, 1)
   }
 
   test("object with a single member and half second member") {
     val input = """{"person":3,"second""""
-    val expectation = List(("person", 3), ("second", UnknownExpression))
+    val expectation = List(("person", 3), ("second", null))
     parseJson(input, expectation, 1)
   }
 
   test("real life example missing :value") {
     val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subscription"}}}}"""
-    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription", UnknownExpression))))))))
+    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription", null))))))))
     parseJson(input, expectation, 1)
   }
 
   test("real life example 2") {
     val input = """{"Resources":{"NotificationTopic":{"Properties":{"Subsc"""
-    val expectation = List(("Resources",List(("NotificationTopic",List(("Properties",List(("Subsc", UnknownExpression))))))))
+    val expectation = List(("Resources",List(("NotificationTopic",List(("Properties",List(("Subsc", null))))))))
     parseJson(input, expectation, 1)
   }
 
@@ -186,7 +187,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
   class DetectValueParser[Result](valueToDetect: Result, val original: ParserBuilder[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     var detected = false
 
-    override def getParser(text: ParseText, recursive: ParseJson.GetParser) = {
+    override def getParser(text: ParseText, recursive: GetParser) = {
       val parseOriginal = recursive(original)
       (input: Input, state: FixPointState) => {
         val result = parseOriginal(input, state)
@@ -200,12 +201,14 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite {
     }
   }
 
+  val jsonParser = JsonParser.getParser()
+
   // Add test for left recursion and errors
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
   private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
-    val result = jsonParser.getWholeInputParser().resetAndParse(input, UntilBestAndXStepsStopFunction(steps))
-    assertResult(expectation)(result.resultOption.get)
+    val result = jsonParser.resetAndParse(input, UntilBestAndXStepsStopFunction(steps))
+    assertResult(expectation)(JsonTestUtils.valueToPrimitive(result.resultOption.get))
     assertResult(errorCount)(result.errors.size)
   }
 }

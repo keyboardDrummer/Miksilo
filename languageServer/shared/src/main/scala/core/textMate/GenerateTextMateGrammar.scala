@@ -10,7 +10,7 @@ object GenerateTextMateGrammar {
 
   def toTextMate(writer: CommonParserWriter)(grammar: writer.Parser[_]): String = {
     val textMate: JsExpression = createTextMateAstFromBiGrammar(writer)(grammar)
-    Json.printJson(textMate)
+    JsonPrinter.printJson(textMate)
   }
 
   def grammarToRegex[Result](writer: CommonParserWriter)(root: writer.Parser[Result]): Option[String] = {
