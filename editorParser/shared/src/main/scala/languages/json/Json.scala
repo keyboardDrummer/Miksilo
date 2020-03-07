@@ -1,7 +1,7 @@
 package languages.json
 
 import core.parsers.core.ParseText
-import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
 import core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
 
 trait JsonValue
@@ -17,7 +17,7 @@ object JsonParser extends CommonStringReaderParser with LeftRecursiveCorrectingP
   lazy val array = ("[" ~> valueParser.manySeparated(",", "value") ~< "]").
     withSourceRange((range, value) => JsonArray(range, value.toArray))
   lazy val objectMember = stringLiteral ~< ":" ~ valueParser
-  lazy val objectParser = ("{" ~> objectMember.manySeparated(",", "member") ~< "}").
+  lazy val objectParser = (literal("{", 2 * History.missingInputPenalty) ~> objectMember.manySeparated(",", "member") ~< "}").
     withSourceRange((range, value) => JsonObject(range, value.toArray))
   lazy val number = wholeNumber.withSourceRange((range, value) => NumberLiteral(range, Integer.parseInt(value)))
   lazy val string = stringLiteral.withSourceRange((range, value) => StringLiteral(range, value))
