@@ -17,7 +17,7 @@ object JsonParser extends CommonStringReaderParser with LeftRecursiveCorrectingP
   lazy val array = ("[" ~> valueParser.manySeparated(",", "value") ~< "]").
     withSourceRange((range, value) => JsonArray(range, value.toArray))
   lazy val objectMember = stringLiteral ~< ":" ~ valueParser
-  lazy val objectParser = ("{" ~> objectMember.manySeparated(":", "member") ~< "}").
+  lazy val objectParser = ("{" ~> objectMember.manySeparated(",", "member") ~< "}").
     withSourceRange((range, value) => JsonObject(range, value.toArray))
   lazy val number = wholeNumber.withSourceRange((range, value) => NumberLiteral(range, Integer.parseInt(value)))
   lazy val string = stringLiteral.withSourceRange((range, value) => StringLiteral(range, value))
