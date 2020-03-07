@@ -19,7 +19,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
     lazy val head: Parser[Any] = new Lazy(head) ~ "!" | "!"
 
     val input = "!!!"
-    val parseResult = head.getWholeInputParser().resetAndParse(input)
+    val parseResult = head.getWholeInputParser().parse(input)
     assert(parseResult.successful)
     val expectation = (("!","!"),"!")
     assertResult(expectation)(parseResult.get)
@@ -31,7 +31,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
     lazy val leftPath: Parser[Any] = new Lazy(leftMayNotCache | leftRec ~ "!" | "@")
 
     val input = "@@@"
-    val leftParseResult = leftPath.getWholeInputParser().resetAndParse(input)
+    val leftParseResult = leftPath.getWholeInputParser().parse(input)
     assert(leftParseResult.successful)
     val expectation = (("@","@"),"@")
     assertResult(expectation)(leftParseResult.get)
@@ -39,7 +39,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
     lazy val rightMayNotCache = rightRec ~ "@"
     lazy val rightRec = rightPath.map(x => x)
     lazy val rightPath: Parser[Any] = new Lazy(rightRec ~ "!" | rightMayNotCache | "@")
-    val rightParseResult = rightPath.getWholeInputParser().resetAndParse(input)
+    val rightParseResult = rightPath.getWholeInputParser().parse(input)
     assertResult(leftParseResult)(rightParseResult)
   }
 
@@ -56,18 +56,18 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
 
     val input = "#!!@@"
     val expectation = (((("#","!"),"!"),"@"),"@")
-    val headParseResult = head.getWholeInputParser().resetAndParse(input)
+    val headParseResult = head.getWholeInputParser().parse(input)
     assert(headParseResult.successful)
     assertResult(expectation)(headParseResult.get)
 
-    val secondParseResult = second.getWholeInputParser().resetAndParse(input)
+    val secondParseResult = second.getWholeInputParser().parse(input)
     assert(secondParseResult.successful)
     assertResult(expectation)(secondParseResult.get)
   }
 
   test("Optional before seed") {
     lazy val expression: Parser[Any] = new Lazy(expression) ~ "@" | optional_a ~ "#"
-    val result = expression.getWholeInputParser().resetAndParse(aesReader)
+    val result = expression.getWholeInputParser().parse(aesReader)
     assert(result.successful, result.toString)
   }
 
@@ -80,7 +80,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
   */
   test("Optional before recursive") {
     lazy val expression: Parser[Any] = optional_a ~ expression ~ "@" | "#"
-    val result = expression.getWholeInputParser().resetAndParse(aesReader)
+    val result = expression.getWholeInputParser().parse(aesReader)
     assert(result.successful, result.toString)
   }
 
@@ -89,7 +89,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
     lazy val parser = "!" ~ recursive
     val input = "c"
     val expectation = ("!", "@")
-    val result = parser.getWholeInputParser().resetAndParse(input)
+    val result = parser.getWholeInputParser().parse(input)
     assertResult(expectation)(result.resultOption.get)
   }
 
@@ -97,7 +97,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
   test("only recursive with sequence indirection") {
     lazy val first: Parser[Any] = new Lazy(first) ~ "!"
     val input = "aaa"
-    val parseResult = first.getWholeInputParser().resetAndParse(input)
+    val parseResult = first.getWholeInputParser().parse(input)
     val expectation = None
     assertResult(expectation)(parseResult.resultOption)
   }
@@ -106,7 +106,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
     "applies the default after failing the recursion") {
     lazy val first: Parser[Any] = (new Lazy(first) ~ "!" | "!")
     val input = "notavailable"
-    val parseResult = first.getWholeInputParser().resetAndParse(input)
+    val parseResult = first.getWholeInputParser().parse(input)
     assert(!parseResult.successful)
     val expectation = Some("!") //Could have been ("yes","!") with different implementation
     assertResult(expectation)(parseResult.resultOption)
@@ -121,7 +121,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
     lazy val relationalPrecedence = new Lazy(withGreaterThan | lessThan)
 
     val analysis = compile(relationalPrecedence)
-    relationalPrecedence.getWholeInputParser().resetAndParse("3")
+    relationalPrecedence.getWholeInputParser().parse("3")
   }
 
   test("fibonacci regression simplified (doesn't regress yet)") {
@@ -141,7 +141,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
     //val language = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(ClearPhases, ExpressionAsRoot) ++ JavaLanguage.fields ++ JavaLanguage.method))
 
     lazy val expression: Parser[Any] = assignment | memberSelector
-    val result = expression.getWholeInputParser().resetAndParse(input)
+    val result = expression.getWholeInputParser().parse(input)
     assert(result.successful)
   }
 

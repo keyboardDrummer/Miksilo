@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.core.ParseText
+import core.parsers.core.{ParseText, TextPointer}
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetNodeRange, OffsetRange, ParseError, ReadyParseResult, SREmpty, SourceRange}
 import core.parsers.sequences.SequenceParserWriter
 
@@ -11,7 +11,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
   type Elem = Char
   type Input <: StringReaderLike
 
-  abstract class StringReaderBase(val offsetNode: CachingTextPointer)
+  abstract class StringReaderBase(val offsetNode: TextPointer)
     extends StringReaderLike {
 
     override def end() = drop(offsetNode.length - offset)

@@ -1,10 +1,9 @@
 package core.parsers
 
+import _root_.core.parsers.core.{ParseText, TextPointer}
+import _root_.core.parsers.editorParsers.History
+import _root_.core.parsers.strings.StringParserWriter
 import org.scalatest.funsuite.AnyFunSuite
-import strings.StringParserWriter
-import editorParsers.History
-import _root_.core.parsers.editorParsers.Position
-import _root_.core.parsers.core.ParseText
 
 class HistoryTest extends AnyFunSuite with StringParserWriter {
   type Input = IndexInput
@@ -109,5 +108,5 @@ class HistoryTest extends AnyFunSuite with StringParserWriter {
 
   override def newParseState(input: IndexInput) = ???
 
-  override def startInput(offsetManager: OffsetManager) = ???
+  override def startInput(zero: TextPointer) = ???
 }

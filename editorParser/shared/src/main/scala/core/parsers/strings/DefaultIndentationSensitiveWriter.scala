@@ -1,15 +1,16 @@
 package core.parsers.strings
 
+import core.parsers.core.TextPointer
 import core.parsers.editorParsers.LeftRecursiveCorrectingParserWriter
 
 trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter with LeftRecursiveCorrectingParserWriter {
   type Input = IndentationReader
 
-  override def startInput(offsetManager: OffsetManager) = new IndentationReader(offsetManager.getOffsetNode(0), 0)
+  override def startInput(zero: TextPointer) = new IndentationReader(zero, 0)
 
   type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], Int)
 
-  class IndentationReader(offsetNode: CachingTextPointer, val indentation: Int)
+  class IndentationReader(offsetNode: TextPointer, val indentation: Int)
     extends StringReaderBase(offsetNode) with IndentationReaderLike {
 
     def drop(amount: Int): IndentationReader = new IndentationReader(offsetNode.drop(amount), indentation)

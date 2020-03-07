@@ -16,14 +16,14 @@ object PerformanceTest {
 class PerformanceTest extends AnyFunSuite {
   import PerformanceTest._
 
-  val jsonFileParser = JsonParser.getParser()
+  val jsonFileParser = JsonParser.parser
 
   test("Correct JSON small file performance") {
 
     val source = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
 
     TestUtils.runPerformanceTest(manyRepetitionsTargetTime, 100, () => {
-      val result = jsonFileParser.resetAndParse(source)
+      val result = jsonFileParser.parse(source)
       assert(result.successful)
     })
   }
@@ -34,7 +34,7 @@ class PerformanceTest extends AnyFunSuite {
     val manySources = s"[${1.to(manySourcesCount).map(_ => source).reduce((a,b) => a + "," + b)}]"
 
     TestUtils.runPerformanceTest(manySourcesTargetTime, 10, () => {
-      val result = jsonFileParser.resetAndParse(manySources)
+      val result = jsonFileParser.parse(manySources)
       assert(result.successful, result.errors)
     })
   }
@@ -42,7 +42,7 @@ class PerformanceTest extends AnyFunSuite {
   test("JSON with small errors performance") {
     val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     TestUtils.runPerformanceTest(smallErrorsTargetTime, 300, () => {
-      val result = jsonFileParser.resetAndParse(program, UntilBestAndXStepsStopFunction())
+      val result = jsonFileParser.parse(program, UntilBestAndXStepsStopFunction())
       assert(result.errors.size == 2)
       assert(result.resultOption.head.asInstanceOf[JsonObject].members.length == 6)
     })

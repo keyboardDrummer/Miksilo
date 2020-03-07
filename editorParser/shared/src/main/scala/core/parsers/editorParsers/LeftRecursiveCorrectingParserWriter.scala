@@ -21,26 +21,14 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   type CacheKey
 
   trait CachingInput extends CorrectingInput {
-    def offsetNode: CachingTextPointer
+    def offsetNode: TextPointer
     def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]): CacheKey
   }
 
-  trait CachingTextPointer extends TextPointer {
-    def drop(amount: Int): CachingTextPointer
-    def cache: mutable.HashMap[CacheKey, ParseResult[_]]
-    def cache_=(value: mutable.HashMap[CacheKey, ParseResult[_]]): Unit
-  }
-
-  trait OffsetManager {
-    def getOffsetNode(offset: Int): CachingTextPointer
-    def changeText(from: Int, until: Int, insertLenght: Int): Unit
-    def clear(): Unit
-  }
-
-  class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) extends CachingTextPointer {
+  class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) extends TextPointer {
     override def getAbsoluteOffset() = offset
 
-    override var cache = new mutable.HashMap[CacheKey, ParseResult[_]]
+    override var cache = new mutable.HashMap[Any, Any]
 
     override def drop(amount: Int) = manager.getOffsetNode(amount + offset)
 
@@ -57,11 +45,11 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     override def position = manager.text.getPosition(offset)
   }
 
-  class ArrayOffsetManager(var text: ParseText) extends OffsetManager {
+  class ArrayOffsetManager(var text: ParseText) {
 
     val offsets = mutable.ArrayBuffer.empty[AbsoluteTextPointer]
-    val offsetCache = mutable.HashMap.empty[Int, CachingTextPointer]
-    override def getOffsetNode(offset: Int) = {
+    val offsetCache = mutable.HashMap.empty[Int, TextPointer]
+    def getOffsetNode(offset: Int) = {
       offsetCache.getOrElseUpdate(offset, {
         binarySearch(offset) match {
           case Found(index) => offsets(index)
@@ -86,7 +74,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
     }
 
-    override def changeText(from: Int, until: Int, insertLength: Int): Unit = {
+    def changeText(from: Int, until: Int, insertLength: Int): Unit = {
       offsetCache.clear()
 
       val delta = insertLength - (until - from)
@@ -96,7 +84,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         val entries = offset.cache.toList
         for(entry <- entries) {
           val entryStart = offset.getAbsoluteOffset()
-          val entryEnd = Math.max(entryStart + 1, entry._2.latestRemainder.getAbsoluteOffset())
+          val parseResults = entry._2.asInstanceOf[ParseResult[_]]
+          val entryEnd = Math.max(entryStart + 1, parseResults.latestRemainder.getAbsoluteOffset())
           val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
           if (entryIntersectsWithRemoval) {
             offset.cache.remove(entry._1)
@@ -108,12 +97,12 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         if (absoluteOffset == from) {
           val newNode = getOffsetNode(offset.offset + delta)
           newNode.cache = offset.cache
-          offset.cache = new mutable.HashMap[CacheKey, ParseResult[_]]()
+          offset.cache = new mutable.HashMap[Any, Any]()
         }
       }
     }
 
-    override def clear(): Unit = {
+    def clear(): Unit = {
       offsets.clear()
       offsetCache.clear()
     }
@@ -277,22 +266,28 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   }
 
-  def startInput(offsetManager: OffsetManager): Input
-  def getSingleResultParser[Result](parseText: ParseText, parser: ParserBuilder[Result]): SingleResultParser[Result, Input] = {
+  def startInput(zero: TextPointer): Input
+  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input] = {
     val parserAndCaches = compile(parser).buildParser(parser)
-    val offsetManager = new ArrayOffsetManager(parseText)
     new SingleResultParser[Result, Input] {
 
-      override def parse(mayStop: StopFunction, metrics: Metrics) = {
-        val zero: Input = startInput(offsetManager)
-        findBestParseResult(zero, parserAndCaches.parser, mayStop, metrics)
+      override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
+        parse(new ArrayOffsetManager(new ParseText(text)).getOffsetNode(0), mayStop, metrics)
       }
 
-      override def resetAndParse(text: String, mayStop: StopFunction, metrics: Metrics) = {
-        offsetManager.text = new ParseText(text)
-        offsetManager.clear()
-        val zero: Input = startInput(offsetManager)
-        findBestParseResult(zero, parserAndCaches.parser, mayStop, metrics)
+      override def parse(zero: TextPointer, mayStop: StopFunction, metrics: Metrics) = {
+        findBestParseResult(startInput(zero), parserAndCaches.parser, mayStop, metrics)
+      }
+    }
+  }
+
+  def getCachingParser[Result](parseText: ParseText, parser: ParserBuilder[Result]): CachingParser[Result, Input] = {
+    val singleResultParser = getSingleResultParser(parser)
+    val offsetManager = new ArrayOffsetManager(parseText)
+    new CachingParser[Result, Input] {
+
+      override def parse(mayStop: StopFunction, metrics: Metrics) = {
+        singleResultParser.parse(offsetManager.getOffsetNode(0), mayStop, metrics)
       }
 
       override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
@@ -303,10 +298,17 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 }
 
 trait SingleResultParser[+Result, Input <: ParseInput] {
+  def parse(text: String,
+            mayStop: StopFunction = StopImmediately,
+            metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]
+
+  def parse(zero: TextPointer,
+            mayStop: StopFunction,
+            metrics: Metrics): SingleParseResult[Result, Input]
+}
+
+trait CachingParser[+Result, Input <: ParseInput] {
   def changeRange(start: Int, end: Int, insertionLength: Int): Unit
-  def resetAndParse(text: String,
-                    mayStop: StopFunction = StopImmediately,
-                    metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]
 
   def parse(mayStop: StopFunction = StopImmediately,
             metrics: Metrics = NoMetrics): SingleParseResult[Result, Input]

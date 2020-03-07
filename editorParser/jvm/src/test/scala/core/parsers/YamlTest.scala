@@ -13,7 +13,7 @@ class YamlTest extends AnyFunSuite {
                   |                                              Examples], /cloudformation_graphic.png" alt="AWS CloudFormation
                   |                                                           Logo"/>, '<h1>Congratulations, you have successfully launched
                   |                    the AWS CloudFormation sample.</h1>']""".stripMargin
-    val result = parser.resetAndParse(input)
+    val result = parser.parse(input)
     assert(result.successful)
   }
 
@@ -35,7 +35,7 @@ class YamlTest extends AnyFunSuite {
                   |
                   |            ']
                   |""".stripMargin
-    val result = parser.resetAndParse(input)
+    val result = parser.parse(input)
     assert(result.successful)
   }
 
@@ -52,7 +52,7 @@ class YamlTest extends AnyFunSuite {
   }
 
   def parseAndCompare(program: String, primitive: Any): Unit = {
-    val result = parser.resetAndParse(program)
+    val result = parser.parse(program)
     val primitiveResult = valueToPrimitive(result.resultOption.get)
     assertResult(primitive)(primitiveResult)
   }
@@ -168,7 +168,7 @@ class YamlTest extends AnyFunSuite {
 
   test("big yaml file") {
     val contents = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.yaml")
-    val result = parser.resetAndParse(contents)
+    val result = parser.parse(contents)
     assert(result.successful, result.toString)
   }
 }

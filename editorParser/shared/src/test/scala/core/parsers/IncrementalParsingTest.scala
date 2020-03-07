@@ -91,7 +91,7 @@ class IncrementalParsingTest extends AnyFunSuite {
 
   def getChange: Change = {
     val text = new ParseText()
-    val parser = JsonParser.getParser(text)
+    val parser = JsonParser.getCachingParser(text)
     new Change {
 
       override def apply(from: Int, until: Int, newText: String) = {

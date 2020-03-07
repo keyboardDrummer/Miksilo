@@ -8,7 +8,7 @@ import core.deltas.{Contract, ParseUsingTextualGrammar, Property}
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{DiagnosticUtil, Language}
 import core.parsers.core.ParseText
-import core.parsers.editorParsers.SingleResultParser
+import core.parsers.editorParsers.{CachingParser, SingleResultParser}
 import deltas.FileWithMembersDelta.FileWithMembers
 
 import scala.reflect.io.Path
@@ -40,7 +40,7 @@ object IncludeDelta extends DirectiveDelta {
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    parserProp.add(language, toParserBuilder(LanguageGrammars.grammars.get(language).root).getWholeInputParser(new ParseText()))
+    parserProp.add(language, toParserBuilder(LanguageGrammars.grammars.get(language).root).getWholeInputParser())
   }
 
   override def dependencies: Set[Contract] = Set(PreprocessorDelta)

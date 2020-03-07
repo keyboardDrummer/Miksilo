@@ -1,7 +1,9 @@
 package core.parsers.editorParsers
 
 import ParseResults._
-import core.parsers.core.{TextPointer, ParseInput}
+import core.parsers.core.{ParseInput, TextPointer}
+
+import scala.collection.mutable
 
 trait ParseResults[Input <: ParseInput, +Result] extends CachingParseResult {
   def nonEmpty: Boolean
@@ -178,4 +180,8 @@ object EmptyRemainder extends TextPointer {
   override def subSequence(offset: Int) = ???
 
   override def position = ???
+
+  override def cache = ???
+
+  override def cache_=(value: mutable.HashMap[Any, Any]): Unit = ???
 }

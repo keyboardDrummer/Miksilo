@@ -1,6 +1,6 @@
 package core.parsers.core
 
-import core.parsers.editorParsers.{Position, SingleResultParser}
+import core.parsers.editorParsers.{CachingParser, Position, SingleResultParser}
 
 import scala.collection.mutable
 
@@ -13,6 +13,8 @@ trait TextPointer {
   def drop(amount: Int): TextPointer
   def getAbsoluteOffset(): Int
   def toPosition(text: ParseText): Position = text.getPosition(getAbsoluteOffset())
+  def cache: mutable.HashMap[Any, Any]
+  def cache_=(value: mutable.HashMap[Any, Any]): Unit
 }
 
 trait ParseInput {
@@ -193,7 +195,9 @@ trait OptimizingParserWriter extends ParserWriter {
     }
   }
 
-  def getSingleResultParser[Result](text: ParseText, parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
+  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
+
+  def getCachingParser[Result](text: ParseText, parser: ParserBuilder[Result]): CachingParser[Result, Input]
 
   case class Success[+Result](result: Result, remainder: Input) {
     def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)

@@ -333,12 +333,20 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) =
       Filter(parser, predicate, getMessage)
 
-    def getSingleResultParser(parseText: ParseText): SingleResultParser[Result, Input] = {
-      SequenceParserWriter.this.getSingleResultParser(parseText, this.parser)
+    def getCachingParser(parseText: ParseText): CachingParser[Result, Input] = {
+      SequenceParserWriter.this.getCachingParser(parseText, this.parser)
     }
 
-    def getWholeInputParser(parseText: ParseText = new ParseText()): SingleResultParser[Result, Input] = {
-      ParseWholeInput(parser).getSingleResultParser(parseText)
+    def getSingleResultParser(): SingleResultParser[Result, Input] = {
+      SequenceParserWriter.this.getSingleResultParser(this.parser)
+    }
+
+    def getWholeInputParser(): SingleResultParser[Result, Input] = {
+      ParseWholeInput(parser).getSingleResultParser()
+    }
+
+    def getCachingWholeInputParser(parseText: ParseText = new ParseText()): CachingParser[Result, Input] = {
+      ParseWholeInput(parser).getCachingParser(parseText)
     }
 
     def withRange[Other](addRange: (TextPointer, TextPointer, Result) => Other): Parser[Other] = {
