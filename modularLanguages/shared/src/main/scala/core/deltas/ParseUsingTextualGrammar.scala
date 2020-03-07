@@ -7,14 +7,14 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.language.node.Node
 import core.language.{Compilation, Language}
-import core.parsers.editorParsers.{SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
+import core.parsers.editorParsers.{CachingParser, SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
 
 case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction)
   extends Delta with LazyLogging {
 
   def parseStream[T](compilation: Compilation, parser: SingleResultParser[T, BiGrammarToParser.Input], input: String):
     SingleParseResult[T, BiGrammarToParser.Input] = {
-    parser.resetAndParse(input, stopFunction, compilation.metrics)
+    parser.parse(input, stopFunction, compilation.metrics)
   }
 
   override def inject(language: Language): Unit = {

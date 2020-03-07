@@ -109,7 +109,7 @@ trait TextMateGeneratingParserWriter extends CommonParserWriter with OptimizingP
 
   case class Colorize[Result](original: Parser[Result], textMateScope: String) extends ParserBuilderBase[Result]
     with ParserWrapper[Result] with ColorizeLike {
-    override def getParser(text: ParseText, recursive: GetParser) = recursive(original)
+    override def getParser(recursive: GetParser) = recursive(original)
 
     override def getRegex: Option[String] = {
       GenerateTextMateGrammar.grammarToRegex(TextMateGeneratingParserWriter.this)(original)

@@ -12,7 +12,7 @@ class WhiteSpaceTest extends AnyFunSuite {
   test("diagnostics placement in whitespace 1") {
     val program = "    "
 
-    val result = parser.resetAndParse(program, UntilBestAndXStepsStopFunction())
+    val result = parser.parse(program, UntilBestAndXStepsStopFunction())
     assertError(result.errors.head, SourceRange(Position(0,0),Position(0,4)), "expected '<expression>'")
   }
 
@@ -20,28 +20,28 @@ class WhiteSpaceTest extends AnyFunSuite {
   ignore("diagnostics placement in whitespace 2") {
     val program = "   + 3"
 
-    val result = parser.resetAndParse(program)
+    val result = parser.parse(program)
     assertError(result.errors.head, SourceRange(Position(0,0),Position(0,3)), "expected '<expression>'")
   }
 
   test("diagnostics placement in whitespace 3") {
     val program = "3 +    "
 
-    val result = parser.resetAndParse(program, UntilBestAndXStepsStopFunction())
+    val result = parser.parse(program, UntilBestAndXStepsStopFunction())
     assertError(result.errors.head, SourceRange(Position(0,3),Position(0,7)), "expected '<expression>'")
   }
 
   test("diagnostics placement in whitespace 5") {
     val program = "let   = 3 in abc"
 
-    val result = parser.resetAndParse(program, UntilBestAndXStepsStopFunction())
+    val result = parser.parse(program, UntilBestAndXStepsStopFunction())
     assertError(result.errors.head, SourceRange(Position(0,3),Position(0,4)), "expected '<expression>'")
   }
 
   test("diagnostics placement in whitespace 6") {
     val program = "let abc =      in abc"
 
-    val result = parser.resetAndParse(program, UntilBestAndXStepsStopFunction())
+    val result = parser.parse(program, UntilBestAndXStepsStopFunction())
     assertError(result.errors.head, SourceRange(Position(0,9),Position(0,15)), "expected '<expression>'")
   }
 

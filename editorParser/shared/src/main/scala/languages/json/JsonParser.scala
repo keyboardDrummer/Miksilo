@@ -16,5 +16,6 @@ object JsonParser extends CommonStringReaderParser with LeftRecursiveCorrectingP
   lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
 
   lazy val valueParser: Parser[JsonValue] = new Lazy(array | objectParser | number | string | hole)
-  def getParser(text: ParseText = new ParseText()) = valueParser.getWholeInputParser(text)
+  val parser = valueParser.getWholeInputParser()
+  def getCachingParser(text: ParseText) = valueParser.getCachingWholeInputParser(text)
 }

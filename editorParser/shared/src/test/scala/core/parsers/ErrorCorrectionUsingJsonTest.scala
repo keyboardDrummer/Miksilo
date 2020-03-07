@@ -177,7 +177,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
     val input = """doesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatchdoesNotMatch"""
     lazy val parser: Parser[Any] = "{" ~ parser | "!"
     val detectValueParser = new DetectValueParser(("{",("{", ("{", "!"))), parser)
-    val result = detectValueParser.getWholeInputParser().resetAndParse(input)
+    val result = detectValueParser.getWholeInputParser().parse(input)
     assert(!detectValueParser.detected)
     assertResult(2)(result.errors.size)
     assert(result.resultOption.nonEmpty)
@@ -187,7 +187,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
   class DetectValueParser[Result](valueToDetect: Result, val original: ParserBuilder[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     var detected = false
 
-    override def getParser(text: ParseText, recursive: GetParser) = {
+    override def getParser(recursive: GetParser) = {
       val parseOriginal = recursive(original)
       (input: Input, state: FixPointState) => {
         val result = parseOriginal(input, state)
@@ -201,13 +201,13 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
     }
   }
 
-  val jsonParser = JsonParser.getParser()
+  val jsonParser = JsonParser.parser
 
   // Add test for left recursion and errors
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
   private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
-    val result = jsonParser.resetAndParse(input, UntilBestAndXStepsStopFunction(steps))
+    val result = jsonParser.parse(input, UntilBestAndXStepsStopFunction(steps))
     assertResult(expectation)(JsonTestUtils.valueToPrimitive(result.resultOption.get))
     assertResult(errorCount)(result.errors.size)
   }

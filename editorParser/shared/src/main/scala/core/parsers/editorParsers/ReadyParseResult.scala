@@ -1,14 +1,14 @@
 package core.parsers.editorParsers
 
 import ParseResults._
-import core.parsers.core.{OffsetNode, ParseInput}
+import core.parsers.core.{TextPointer, ParseInput}
 
 case class RecursionsList[Input <: ParseInput, SeedResult, +Result](
   recursions: List[RecursiveParseResult[Input, SeedResult, Result]],
   rest: ParseResults[Input, Result])
 
 trait LazyParseResult[Input <: ParseInput, +Result] {
-  def offset: OffsetNode
+  def offset: TextPointer
 
   def flatMapReady[NewResult](f: ReadyParseResult[Input, Result] => ParseResults[Input, NewResult],
                               uniform: Boolean): ParseResults[Input, NewResult]

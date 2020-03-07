@@ -2,8 +2,8 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers.core.ParseText
-import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, SingleResultParser}
+import core.parsers.core.{ParseText, TextPointer}
+import core.parsers.editorParsers.{CachingParser, History, LeftRecursiveCorrectingParserWriter, SingleResultParser}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.textMate.TextMateGeneratingParserWriter
 import util.Utility
@@ -22,10 +22,10 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
   object IndentationKey
 
-  override def startInput(offsetManager: BiGrammarToParser.OffsetManager) = new Reader(offsetManager.getOffsetNode(0), Map.empty)
+  override def startInput(zero: TextPointer) = new Reader(zero, Map.empty)
 
   type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], State)
-  class Reader(offsetNode: CachingOffsetNode, val state: State)
+  class Reader(offsetNode: TextPointer, val state: State)
     extends StringReaderBase(offsetNode)
     with IndentationReaderLike {
 
@@ -50,7 +50,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
   def valueToResult(value: Any): Result = WithMap(value, Map.empty)
 
   def toParser(grammar: BiGrammar): SingleResultParser[Any, Input] = {
-    toParserBuilder(grammar).getWholeInputParser(new ParseText())
+    toParserBuilder(grammar).getWholeInputParser()
   }
 
   def toParserBuilder(grammar: BiGrammar): Parser[Any] = {

@@ -1,7 +1,9 @@
 package core.parsers.editorParsers
 
 import ParseResults._
-import core.parsers.core.{OffsetNode, ParseInput}
+import core.parsers.core.{ParseInput, TextPointer}
+
+import scala.collection.mutable
 
 trait ParseResults[Input <: ParseInput, +Result] extends CachingParseResult {
   def nonEmpty: Boolean
@@ -52,7 +54,7 @@ object ParseResults {
 
 final class SRCons[Input <: ParseInput, +Result](
                                                   val head: LazyParseResult[Input, Result],
-                                                  val latestRemainder: OffsetNode,
+                                                  val latestRemainder: TextPointer,
                                                   var tailDepth: Int,
                                                   _tail: => ParseResults[Input, Result])
   extends ParseResults[Input, Result] {
@@ -102,7 +104,7 @@ final class SRCons[Input <: ParseInput, +Result](
     if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
       return SREmpty.empty[Input]
 
-    def getResult(head: LazyParseResult[Input, Other], latestRemainder: OffsetNode, tailDepth: Int,
+    def getResult(head: LazyParseResult[Input, Other], latestRemainder: TextPointer, tailDepth: Int,
                   getTail: Map[Input, Double] => ParseResults[Input, Other]): ParseResults[Input, Other] = {
       head match {
         case ready: ReadyParseResult[Input, Other] =>
@@ -129,7 +131,7 @@ final class SRCons[Input <: ParseInput, +Result](
     }
   }
 
-  def getLatest(one: OffsetNode, other: OffsetNode): OffsetNode = {
+  def getLatest(one: TextPointer, other: TextPointer): TextPointer = {
     if (one.getAbsoluteOffset() > other.getAbsoluteOffset()) one else other
   }
 
@@ -164,8 +166,22 @@ class SREmpty[Input <: ParseInput] extends ParseResults[Input, Nothing] {
   override def latestRemainder = EmptyRemainder
 }
 
-object EmptyRemainder extends OffsetNode {
+object EmptyRemainder extends TextPointer {
   override def getAbsoluteOffset() = Int.MinValue
 
   override def drop(amount: Int) = this
+
+  override def charAt(index: Int) = ???
+
+  override def length = ???
+
+  override def charSequence = ???
+
+  override def position = ???
+
+  override def cache = ???
+
+  override def cache_=(value: mutable.HashMap[Any, Any]): Unit = ???
+
+  override def subSequence(from: Int, until: Int) = ???
 }

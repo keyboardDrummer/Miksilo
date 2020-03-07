@@ -1,7 +1,7 @@
 package languages.yaml
 
 import core.document.Empty
-import core.parsers.core.{ParseText, Processor}
+import core.parsers.core.{ParseText, Processor, TextPointer}
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
 import core.responsiveDocument.ResponsiveDocument
@@ -57,11 +57,11 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
 
   type Input = IndentationReader
 
-  override def startInput(offsetManager: OffsetManager) = new IndentationReader(offsetManager.getOffsetNode(0), BlockOut, 0)
+  override def startInput(zero: TextPointer) = new IndentationReader(zero, BlockOut, 0)
 
   type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], Int, YamlContext)
 
-  class IndentationReader(offsetNode: CachingOffsetNode, val context: YamlContext, val indentation: Int)
+  class IndentationReader(offsetNode: TextPointer, val context: YamlContext, val indentation: Int)
     extends StringReaderBase(offsetNode) with IndentationReaderLike {
 
     override def withIndentation(value: Int) = new IndentationReader(offsetNode, context, value)
@@ -83,7 +83,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
 
   class IfContext[Result](inners: Map[YamlContext, Parser[Result]]) extends ParserBuilderBase[Result] {
 
-    override def getParser(text: ParseText, recursive: GetParser) = {
+    override def getParser(recursive: GetParser) = {
       val innerParsers = inners.view.mapValues(p => recursive(p)).toMap
       (input, state) => innerParsers(input.context)(input, state)
     }
@@ -98,7 +98,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   class WithContext[Result](update: YamlContext => YamlContext, val original: Parser[Result])
     extends ParserBuilderBase[Result] with ParserWrapper[Result] {
 
-    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
       def apply(input: IndentationReader, state: FixPointState): ParseResult[Result] = {
@@ -124,7 +124,8 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     withSourceRange((range, v) => TaggedNode(range, v._1, v._2)) | parseUntaggedValue
 
   lazy val parseYaml = trivias ~> parseValue ~< trivias
-  def getParser(text: ParseText = new ParseText()) = parseYaml.getWholeInputParser(text)
+  def getParser() = parseYaml.getWholeInputParser()
+  def getCachingParser(text: ParseText) = parseYaml.getCachingWholeInputParser(text)
 
   lazy val parseBlockMapping: Parser[YamlValue] = {
     val member = new WithContext(_ =>

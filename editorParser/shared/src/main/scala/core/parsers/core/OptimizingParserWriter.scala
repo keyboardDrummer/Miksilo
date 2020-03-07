@@ -1,17 +1,24 @@
 package core.parsers.core
 
-import core.parsers.editorParsers.{Position, SingleResultParser}
+import core.parsers.editorParsers.{CachingParser, Position, SingleResultParser}
 
 import scala.collection.mutable
 
-trait OffsetNode {
-  def drop(amount: Int): OffsetNode
+trait TextPointer {
+  def charAt(index: Int): Char
+  def length: Int
+  def charSequence: CharSequence
+  def subSequence(from: Int, until: Int): CharSequence
+  def position: Position
+  def drop(amount: Int): TextPointer
   def getAbsoluteOffset(): Int
   def toPosition(text: ParseText): Position = text.getPosition(getAbsoluteOffset())
+  def cache: mutable.HashMap[Any, Any]
+  def cache_=(value: mutable.HashMap[Any, Any]): Unit
 }
 
 trait ParseInput {
-  def offsetNode: OffsetNode
+  def offsetNode: TextPointer
   def offset = offsetNode.getAbsoluteOffset()
 }
 
@@ -26,8 +33,7 @@ trait OptimizingParserWriter extends ParserWriter {
   case class FixPointState(offset: Int, // TODO try to remove this offset, since we can also clear the callStack whenever we move forward.
                            callStack: Set[BuiltParser[Any]])
 
-  def wrapParser[Result](text: ParseText,
-                         parser: BuiltParser[Result],
+  def wrapParser[Result](parser: BuiltParser[Result],
                          shouldCache: Boolean,
                          shouldDetectLeftRecursion: Boolean): BuiltParser[Result]
 
@@ -41,7 +47,7 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   trait ParserBuilder[+Result] {
-    def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result]
+    def getParser(recursive: GetParser): BuiltParser[Result]
     def mustConsumeInput: Boolean
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[ParserBuilder[_]]
@@ -89,7 +95,7 @@ trait OptimizingParserWriter extends ParserWriter {
     lazy val original: Parser[Result] = _original
     def getOriginal = original
 
-    override def getParser(text: ParseText, recursive: GetParser): BuiltParser[Result] = {
+    override def getParser(recursive: GetParser): BuiltParser[Result] = {
       lazy val parseOriginal = recursive(original)
       new BuiltParser[Result] {
         override def apply(input: Input, state: FixPointState) = {
@@ -149,14 +155,14 @@ trait OptimizingParserWriter extends ParserWriter {
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]], nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]]) {
 
-    def buildParser[Result](text: ParseText, root: Parser[Result]): ParserAndCaches[Result] = {
+    def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
       def recursive: GetParser = new GetParser {
         override def apply[SomeResult](_parser: Parser[SomeResult]): BuiltParser[SomeResult] = {
           cacheOfParses.getOrElseUpdate(_parser, {
             val parser = _parser.asInstanceOf[ParserBuilder[SomeResult]]
-            val result = parser.getParser(text, recursive)
-            wrapParser(text, result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
+            val result = parser.getParser(recursive)
+            wrapParser(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
           }).asInstanceOf[BuiltParser[SomeResult]]
         }
       }
@@ -189,7 +195,9 @@ trait OptimizingParserWriter extends ParserWriter {
     }
   }
 
-  def getSingleResultParser[Result](text: ParseText, parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
+  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
+
+  def getCachingParser[Result](text: ParseText, parser: ParserBuilder[Result]): CachingParser[Result, Input]
 
   case class Success[+Result](result: Result, remainder: Input) {
     def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)

@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets
 
 import core.LazyLogging
 import core.language.exceptions.BadInputException
-import core.parsers.editorParsers.{SingleResultParser, StopFunction, TimeRatioStopFunction}
+import core.parsers.editorParsers.{CachingParser, StopFunction, TimeRatioStopFunction}
 import core.parsers.strings.StringParserWriter
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
 
@@ -54,16 +54,16 @@ object Language extends LazyLogging {
     parserBuilder: parserWriter.Parser[Program],
     stopFunction: StopFunction = new TimeRatioStopFunction): Phase = {
 
-    val builtParser = new CachedCompilationField[mutable.HashMap[String, SingleResultParser[Program, parserWriter.Input]]](_ => mutable.HashMap.empty)
+    val builtParser = new CachedCompilationField[mutable.HashMap[String, CachingParser[Program, parserWriter.Input]]](_ => mutable.HashMap.empty)
 
     Phase("parse", "parse the source code", compilation => {
       val uri = compilation.rootFile.get
 
       val parsers = builtParser(compilation)
 
-      def createParser(): SingleResultParser[Program, parserWriter.Input] = {
+      def createParser(): CachingParser[Program, parserWriter.Input] = {
         val parseText = compilation.fileSystem.getFileParseText(uri)
-        val result = parserWriter.SequenceParserExtensions[Program](parserBuilder).getSingleResultParser(parseText)
+        val result = parserWriter.SequenceParserExtensions[Program](parserBuilder).getCachingParser(parseText)
         compilation.fileSystem.setTextChangedHandler(uri, new TextChangeHandler {
           override def handleChange(from: Int, until: Int, text: String): Unit = {
             result.changeRange(from, until, text.length)
