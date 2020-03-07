@@ -16,13 +16,13 @@ class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) exte
 
   override def toString = offset.toString
 
-  override def charAt(index: Int) = manager.text.charAt(offset)
+  override def charAt(index: Int) = manager.text.charAt(index)
 
   override def length = manager.text.length
 
   override def charSequence = new SubSequence(manager.text, offset)
 
-  override def subSequence(offset: Int) = manager.text.subSequence(this.offset, this.offset + offset)
+  override def subSequence(from: Int, until: Int) = manager.text.subSequence(from, until)
 
   override def position = manager.text.getPosition(offset)
 }

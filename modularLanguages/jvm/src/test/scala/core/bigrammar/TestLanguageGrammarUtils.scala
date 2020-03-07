@@ -31,7 +31,8 @@ case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends AnyFunSuite {
 
   def parse(input: String, grammarTransformer: GrammarKey = null): Any = {
     val compiler = TestLanguageBuilder.buildWithParser(Seq(ClearPhases) ++ getDeltas(grammarTransformer))
-    val result = compiler.compileString(input).program.asInstanceOf[PathRoot].current
+    val compilation = compiler.compileString(input)
+    val result = compilation.program.asInstanceOf[PathRoot].current
     result.startOfUri = None
     result
   }

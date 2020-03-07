@@ -8,7 +8,7 @@ trait TextPointer {
   def charAt(index: Int): Char
   def length: Int
   def charSequence: CharSequence
-  def subSequence(offset: Int): CharSequence
+  def subSequence(from: Int, until: Int): CharSequence
   def position: Position
   def drop(amount: Int): TextPointer
   def getAbsoluteOffset(): Int

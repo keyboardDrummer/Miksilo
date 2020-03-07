@@ -1,7 +1,7 @@
 package core.parsers.strings
 
 import core.parsers.core.{ParseText, TextPointer}
-import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetNodeRange, OffsetRange, ParseError, ReadyParseResult, SREmpty, SourceRange}
+import core.parsers.editorParsers._
 import core.parsers.sequences.SequenceParserWriter
 
 import scala.language.implicitConversions
@@ -16,7 +16,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
 
     override def end() = drop(offsetNode.length - offset)
 
-    override def printRange(end: Input) = offsetNode.subSequence(end.offset - offset).toString
+    override def printRange(end: Input) = offsetNode.subSequence(offset, end.offset).toString
 
     override def atEnd(): Boolean = offset == offsetNode.length
 
@@ -31,14 +31,14 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
       case _ => false
     }
 
-    def print(text: ParseText): String = {
-      val position = text.getPosition(offset)
+    def print(): String = {
+      val position = offsetNode.position
       s"(${position.line}, ${position.character})" +
-        text.subSequence(Math.max(0, offset - 10), offset) + " | " + text.subSequence(offset, Math.min(text.length, offset + 10))
+        offsetNode.subSequence(Math.max(0, offset - 10), offset) + " | " + offsetNode.subSequence(offset, Math.min(offsetNode.length, offset + 10))
     }
 
     override def toString: String = {
-      offset.toString
+      print()
     }
   }
 
@@ -80,7 +80,6 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
         def apply(input: Input, state: FixPointState): ParseResult[String] = {
           var index = 0
           while (index < value.length) {
-            input.offsetNode.charSequence
             val arrayIndex = index + input.offset
             val remainder = input.drop(index)
             val errorHistory = History.error(new MissingInput(remainder, value.substring(index), value.substring(index), penalty))
@@ -154,7 +153,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
         def apply(input: Input, state: FixPointState): ParseResult[String] = {
           regex.findPrefixMatchOf(input.offsetNode.charSequence) match {
             case Some(matched) =>
-              val value = input.offsetNode.subSequence(matched.end).toString
+              val value = input.offsetNode.subSequence(input.offset, input.offset + matched.end).toString
               val remainder = input.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
             case None =>

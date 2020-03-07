@@ -177,11 +177,11 @@ object EmptyRemainder extends TextPointer {
 
   override def charSequence = ???
 
-  override def subSequence(offset: Int) = ???
-
   override def position = ???
 
   override def cache = ???
 
   override def cache_=(value: mutable.HashMap[Any, Any]): Unit = ???
+
+  override def subSequence(from: Int, until: Int) = ???
 }
