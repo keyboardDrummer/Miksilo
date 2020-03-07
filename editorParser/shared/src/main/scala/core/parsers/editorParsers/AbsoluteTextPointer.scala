@@ -66,7 +66,7 @@ class ArrayOffsetManager(var text: ParseText) {
       val entries = offset.cache.toList
       for(entry <- entries) {
         val entryStart = offset.getAbsoluteOffset()
-        val parseResults = entry._2.asInstanceOf[ParseResult[_]]
+        val parseResults = entry._2.asInstanceOf[CachingParseResult]
         val entryEnd = Math.max(entryStart + 1, parseResults.latestRemainder.getAbsoluteOffset())
         val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
         if (entryIntersectsWithRemoval) {
