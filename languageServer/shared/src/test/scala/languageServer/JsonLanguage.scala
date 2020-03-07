@@ -1,7 +1,7 @@
 package languageServer
 
 import core.language.Language
-import core.parsers.editorParsers.{NeverStop, StopImmediately}
+import core.parsers.editorParsers.NeverStop
 import core.smarts.language.modules.FakeSourceElement
 import languages.json.JsonParser
 
