@@ -1,7 +1,6 @@
 package core.parsers
 
 import _root_.core.parsers.core.ParseText
-import _root_.core.parsers.editorParsers.SingleParseResult
 import languages.json.JsonParser
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -9,11 +8,10 @@ class IncrementalParsingTest extends AnyFunSuite {
 
   test("inserting between two empty braces works") {
     val input = """{}"""
-    val input2 = """{}"""
     val change = getChange
-    change(0,0,input)
+    val result1 = change(0,0, input)
     val result3 = change(1,1, """"hello":"bla"""")
-    assertResult(List("hello" -> "bla"))(result3.resultOption.get)
+    assertResult(List("hello" -> "bla"))(result3)
   }
 
   test("removing works") {
@@ -22,7 +20,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     val change = getChange
     change(0,0, input)
     val result3 = change(1,14, "")
-    assertResult(List())(result3.resultOption.get)
+    assertResult(List())(result3)
   }
 
   test("partial clearing works") {
@@ -32,7 +30,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(0,0, input)
     change.setText(input2)
     val result = change(2,5, "bar")
-    assertResult(List("bar" -> "bar"))(result.resultOption.get)
+    assertResult(List("bar" -> "bar"))(result)
   }
 
   test("inserts work") {
@@ -42,7 +40,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(0,0,input)
     change.setText(input2)
     val result = change(2,2, ",2")
-    assertResult(List(1,2,3))(result.resultOption.get)
+    assertResult(Array(1,2,3))(result)
   }
 
   test("multiple inserts work") {
@@ -55,14 +53,14 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(2,2,",2")
     change.setText(input3)
     val result = change(6,6,",4")
-    assertResult(List(1,2,3,4,5))(result.resultOption.get)
+    assertResult(Array(1,2,3,4,5))(result)
   }
 
   test("inserting at the end workds") {
     val change = getChange
     change(0,0,"1")
     val result = change(1,1,"35")
-    assertResult(135)(result.resultOption.get)
+    assertResult(135)(result)
   }
 
   test("success parser caching") {
@@ -70,7 +68,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(0,0, "[]")
     change(1,1, "{")
     val result = change(2,2, "}")
-    assertResult(List(List.empty))(result.resultOption.get)
+    assertResult(Array(List.empty))(result)
   }
 
   test("regression") {
@@ -78,7 +76,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(0,0, "[{}]")
     change(2,3, "")
     val result3 = change(2,2, "}")
-    assertResult(List(List.empty))(result3.resultOption.get)
+    assertResult(List(List.empty))(result3)
   }
 
   test("regression2") {
@@ -88,18 +86,18 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(2, 2, "}")
     change(2, 3, "")
     val result = change(2,2, "}")
-    assertResult(List(List.empty))(result.resultOption.get)
+    assertResult(List(List.empty))(result)
   }
 
   def getChange: Change = {
     val text = new ParseText()
-    val parser = JsonParser.parser
+    val parser = JsonParser.getParser(text)
     new Change {
 
       override def apply(from: Int, until: Int, newText: String) = {
         text.applyRangeChange(newText = newText, start = from, end = until)
         parser.changeRange(from, until, newText.length)
-        parser.parse()
+        JsonTestUtils.valueToPrimitive(parser.parse().resultOption.get)
       }
 
       override def setText(newText: String): Unit = {
@@ -109,7 +107,7 @@ class IncrementalParsingTest extends AnyFunSuite {
   }
 
   trait Change {
-    def apply(from: Int, until: Int, newText: String): SingleParseResult[Any, JsonParser.Input]
+    def apply(from: Int, until: Int, newText: String): Any
     def setText(newText: String): Unit
   }
 

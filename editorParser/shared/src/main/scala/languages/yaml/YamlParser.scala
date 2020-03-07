@@ -124,7 +124,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     withSourceRange((range, v) => TaggedNode(range, v._1, v._2)) | parseUntaggedValue
 
   lazy val parseYaml = parseValue ~< trivias
-  val parser = parseYaml.getWholeInputParser()
+  def getParser(text: ParseText = new ParseText()) = parseYaml.getWholeInputParser(text)
 
   lazy val parseBlockMapping: Parser[YamlValue] = {
     val member = new WithContext(_ =>

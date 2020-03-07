@@ -201,23 +201,15 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
     }
   }
 
+  val jsonParser = JsonParser.getParser()
+
   // Add test for left recursion and errors
   // Add test with multiple errors in one branch "b" => "a" "b" "c"
   // Add test with three way branch with 0,1,2 errors, and 0,2,1 errors.
   private def parseJson(input: String, expectation: Any, errorCount: Int, steps: Int = 0) = {
-    val result = JsonParser.parser.resetAndParse(input, UntilBestAndXStepsStopFunction(steps))
-    assertResult(expectation)(valueToPrimitive(result.resultOption.get))
+    val result = jsonParser.resetAndParse(input, UntilBestAndXStepsStopFunction(steps))
+    assertResult(expectation)(JsonTestUtils.valueToPrimitive(result.resultOption.get))
     assertResult(errorCount)(result.errors.size)
-  }
-
-  def valueToPrimitive(value: JsonValue): Any = {
-    value match {
-      case NumberLiteral(_, value) => value
-      case StringLiteral(_, value) => value
-      case JsonArray(_, elements) => elements.map(valueToPrimitive)
-      case JsonObject(_, members) => members.map(e => (e._1,valueToPrimitive(e._2)))
-      case ValueHole(_) => null
-    }
   }
 }
 
