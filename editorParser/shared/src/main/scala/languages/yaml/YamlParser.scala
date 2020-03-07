@@ -2,9 +2,11 @@ package languages.yaml
 
 import core.document.Empty
 import core.parsers.core.{ParseText, Processor}
-import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
 import core.responsiveDocument.ResponsiveDocument
+import languages.json.JsonObject
+import languages.json.JsonParser.{literal, stringLiteral}
 
 trait YamlValue {
   def toDocument: ResponsiveDocument
@@ -12,7 +14,7 @@ trait YamlValue {
   override def toString: String = toDocument.renderString()
 }
 
-case class YamlObject(range: OffsetNodeRange, members: Map[YamlValue, YamlValue]) extends YamlValue {
+case class YamlObject(range: OffsetNodeRange, members: Array[(YamlValue, YamlValue)]) extends YamlValue {
   override def toDocument: ResponsiveDocument = {
     members.
       map(member => member._1.toDocument ~ ":" ~~ member._2.toDocument).
@@ -114,7 +116,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
   val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
-  lazy val parseUntaggedFlowValue = parseBracketArray | parseStringLiteral
+  lazy val parseUntaggedFlowValue = parseBraceObject | parseBracketArray | parseStringLiteral
   lazy val parseFlowValue = (tag ~ parseUntaggedFlowValue).
     withSourceRange((range, v) => TaggedNode(range, v._1, v._2)) | parseUntaggedFlowValue
   lazy val parseUntaggedValue = new Lazy(parseBracketArray | parseArray | parseNumber | parseStringLiteral |
@@ -130,9 +132,13 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     val member = new WithContext(_ =>
       BlockKey, parseFlowValue) ~< literalOrKeyword(":") ~ greaterThan(parseValue)
     alignedList(member).withSourceRange((range, values) => {
-      YamlObject(range, values.toMap)
+      YamlObject(range, values.toArray)
     })
   }
+
+  lazy val objectMember = parseFlowValue ~< ":" ~ parseFlowValue
+  lazy val parseBraceObject = (literal("{", 2 * History.missingInputPenalty) ~> objectMember.manySeparated(",", "member") ~< "}").
+    withSourceRange((range, value) => YamlObject(range, value.toArray))
 
   lazy val parseBracketArray: Parser[YamlValue] = {
     val inner = "[" ~> parseFlowValue.manySeparated(",", "array element").
