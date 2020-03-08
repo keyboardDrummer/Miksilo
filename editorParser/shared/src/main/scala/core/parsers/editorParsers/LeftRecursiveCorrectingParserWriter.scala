@@ -9,27 +9,20 @@ trait CachingParseResult {
 // TODO consider pushing down the caching part into another ParsingWriter
 trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
-  type Input <: CachingInput
   type ParseResult[+Result] <: CachingParseResult
 
   // TODO CacheKey and Input as type parameters is redundant. Better to have a single State type parameter.
-  type CacheKey
 
-  trait CachingInput extends CorrectingInput {
-    def offsetNode: TextPointer
-    def createCacheKey(parser: BuiltParser[_], state: Set[BuiltParser[Any]]): CacheKey
-  }
+  override def newParseState(input: Input) = FixPointState(input.position.getAbsoluteOffset(), Set.empty)
 
-  override def newParseState(input: Input) = FixPointState(input.offset, Set.empty)
-
-  def recursionsFor[Result, SeedResult](parseResults: ParseResults[Input, Result], parser: BuiltParser[SeedResult]) = {
+  def recursionsFor[Result, SeedResult](parseResults: ParseResults[State, Result], parser: BuiltParser[SeedResult]) = {
     parseResults match {
       case recursiveResults: RecursiveResults[Result] =>
         val remainder = recursiveResults.recursions - parser
         RecursionsList(
-          recursiveResults.recursions.getOrElse(parser, List.empty).asInstanceOf[List[RecursiveParseResult[Input, SeedResult, Result]]],
+          recursiveResults.recursions.getOrElse(parser, List.empty).asInstanceOf[List[RecursiveParseResult[State, SeedResult, Result]]],
           if (remainder.isEmpty) recursiveResults.tail else RecursiveResults(remainder, recursiveResults.tail))
-      case _ => RecursionsList[Input, SeedResult, Result](List.empty, parseResults)
+      case _ => RecursionsList[State, SeedResult, Result](List.empty, parseResults)
     }
   }
 
@@ -37,10 +30,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     extends CheckCache[Result](parser) {
 
     override def apply(input: Input, state: FixPointState): ParseResult[Result] = {
-      val newState = moveState(input, state)
+      val newState = moveState(input.position, state)
 
-      val key = input.createCacheKey(parser, newState.callStack)
-      input.offsetNode.cache.get(key) match {
+      val key = (input.state, parser, newState.callStack)
+      input.position.cache.get(key) match {
         case Some(value) =>
           value.asInstanceOf[ParseResult[Result]]
         case None =>
@@ -62,8 +55,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               else
                 resultWithoutRecursion
 
-              if (result.latestRemainder.getAbsoluteOffset() > input.offset) {
-                input.offsetNode.cache.put(key, result)
+              if (result.latestRemainder.getAbsoluteOffset() > input.position.getAbsoluteOffset()) {
+                input.position.cache.put(key, result)
               }
 
               result
@@ -71,16 +64,16 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
     }
 
-    def grow(recursions: List[RecursiveParseResult[Input, Result, Result]], previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
+    def grow(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
       // TODO Consider replacing the previous.merge by moving that inside the lambda.
       previous.merge(previous.flatMapReady(prev => {
         if (prev.history.flawed)
           SREmpty.empty // TODO consider growing this as well
         else {
-          val grown: ParseResult[Result] = recursions.map((recursive: RecursiveParseResult[Input, Result, Result]) => {
+          val grown: ParseResult[Result] = recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
             val results = recursive.get(singleResult(prev))
             results.flatMapReady(
-              ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else SREmpty.empty,
+              ready => if (ready.remainder.position.getAbsoluteOffset() > prev.remainder.position.getAbsoluteOffset()) singleResult(ready) else SREmpty.empty,
               uniform = false) // TODO maybe set this to uniform = true
           }).reduce((a,b) => a.merge(b))
           grow(recursions, grown, initialResults)
@@ -89,8 +82,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     def getPreviousResult(input: Input, state: FixPointState): Option[ParseResult[Result]] = {
-      if (state.offset == input.offset && state.callStack.contains(parser))
-          Some(RecursiveResults(Map(parser -> List(RecursiveParseResult[Input, Result, Result](x => x))), SREmpty.empty))
+      if (state.offset == input.position.getAbsoluteOffset() && state.callStack.contains(parser))
+          Some(RecursiveResults(Map(parser -> List(RecursiveParseResult[State, Result, Result](x => x))), SREmpty.empty))
       else
         None
     }
@@ -109,9 +102,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   }
 
   // TODO: replace List with something that has constant concat operation.
-  case class RecursiveResults[+Result](recursions: Map[BuiltParser[Any], List[RecursiveParseResult[Input, _, Result]]],
-                                       tail: ParseResults[Input, Result])
-    extends ParseResults[Input, Result] {
+  case class RecursiveResults[+Result](recursions: Map[BuiltParser[Any], List[RecursiveParseResult[State, _, Result]]],
+                                       tail: ParseResults[State, Result])
+    extends ParseResults[State, Result] {
 
     override def nonEmpty = false
 
@@ -121,8 +114,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def tailDepth = 0
 
-    override def merge[Other >: Result](other: ParseResults[Input, Other], depth: Int,
-                                        bests: Map[Input, Double] = Map.empty): RecursiveResults[Other] = other match {
+    override def merge[Other >: Result](other: ParseResults[State, Other], depth: Int,
+                                        bests: Map[InputGen[State], Double] = Map.empty): RecursiveResults[Other] = other match {
       case otherRecursions: RecursiveResults[Result] =>
         val merged = this.recursions.foldLeft(otherRecursions.recursions)((acc, entry) => {
           val value = acc.get(entry._1) match {
@@ -136,14 +129,14 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         RecursiveResults(this.recursions, tail.merge(other))
     }
 
-    override def flatMap[NewResult](f: LazyParseResult[Input, Result] => ParseResults[Input, NewResult], uniform: Boolean) = {
+    override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean) = {
       RecursiveResults(
         recursions.view.mapValues(s => s.map(r => r.compose(pr => pr.flatMap(f, uniform)))).toMap,
         tail.flatMap(f, uniform))
     }
 
-    override def mapWithHistory[NewResult](f: ReadyParseResult[Input, Result] => ReadyParseResult[Input, NewResult],
-                                           oldHistory: History[Input]) = {
+    override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult],
+                                           oldHistory: History) = {
       if (oldHistory.flawed)
         tail.mapWithHistory(f, oldHistory)
       else
@@ -153,43 +146,41 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     override def latestRemainder = tail.latestRemainder
   }
 
-  def moveState(input: Input, state: FixPointState) = if (state.offset == input.offset) state else FixPointState(input.offset, Set.empty)
+  def moveState(position: TextPointer, state: FixPointState) =
+    if (state.offset == position.getAbsoluteOffset()) state else FixPointState(position.getAbsoluteOffset(), Set.empty)
 
   class CheckCache[Result](parser: BuiltParser[Result]) extends BuiltParser[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
 
     def apply(input: Input, state: FixPointState): ParseResult[Result] = {
-      val newState =  moveState(input, state)
-      val key = input.createCacheKey(parser, newState.callStack)
+      val newState =  moveState(input.position, state)
+      val key = (input.state, parser, newState.callStack)
 
-      input.offsetNode.cache.get(key) match {
+      input.position.cache.get(key) match {
         case Some(value) =>
           value.asInstanceOf[ParseResult[Result]]
         case _ =>
           val value: ParseResult[Result] = parser(input, newState)
 
           // Do not cache length zero results, since they cannot be corrected moved if something is inserted where they start.
-          if (value.latestRemainder.getAbsoluteOffset() > input.offset) {
-            input.offsetNode.cache.put(key, value)
+          if (value.latestRemainder.getAbsoluteOffset() > input.position.getAbsoluteOffset()) {
+            input.position.cache.put(key, value)
           }
           value
       }
     }
-
   }
 
-  def startInput(zero: TextPointer): Input
-
-  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input] = {
+  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result] = {
     val parserAndCaches = compile(parser).buildParser(parser)
-    new SingleResultParser[Result, Input] {
+    new SingleResultParser[Result] {
 
       override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
         parse(new ArrayOffsetManager(new ParseText(text)).getOffsetNode(0), mayStop, metrics)
       }
 
       override def parse(zero: TextPointer, mayStop: StopFunction, metrics: Metrics) = {
-        findBestParseResult(startInput(zero), parserAndCaches.parser, mayStop, metrics)
+        findBestParseResult(zero, parserAndCaches.parser, mayStop, metrics)
       }
     }
   }

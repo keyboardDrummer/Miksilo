@@ -3,7 +3,7 @@ package deltas.bytecode.readJar
 import java.io
 
 import core.SourceUtils
-import core.bigrammar.BiGrammarToParser.{Reader, _}
+import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.grammars.LanguageGrammars
 import core.language.node.Node

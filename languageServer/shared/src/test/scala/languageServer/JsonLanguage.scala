@@ -8,9 +8,9 @@ import languages.json.JsonParser
 object JsonLanguage extends Language {
 
   object FakeSourceElement2 extends FakeSourceElement
-  private val parsePhase = Language.getParsePhaseFromParser[Any](JsonParser)(
+  private val parsePhase = Language.getParsePhaseFromParser[Any](
     (program, uri) => FakeSourceElement2,
-    JsonParser.ParseWholeInput(JsonParser.valueParser), NeverStop) // Change neverstop
+    JsonParser.valueParser.getWholeInputParser(), NeverStop) // Change neverstop
 
   compilerPhases = List(parsePhase)
 }

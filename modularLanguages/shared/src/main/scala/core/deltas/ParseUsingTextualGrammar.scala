@@ -1,30 +1,29 @@
 package core.deltas
 
 import core.LazyLogging
-import core.bigrammar.BiGrammarToParser
 import core.bigrammar.BiGrammarToParser._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.language.node.Node
 import core.language.{Compilation, Language}
-import core.parsers.editorParsers.{CachingParser, SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
+import core.parsers.editorParsers.{SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
 
 case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction)
   extends Delta with LazyLogging {
 
-  def parseStream[T](compilation: Compilation, parser: SingleResultParser[T, BiGrammarToParser.Input], input: String):
-    SingleParseResult[T, BiGrammarToParser.Input] = {
+  def parseStream[T](compilation: Compilation, parser: SingleResultParser[T], input: String):
+    SingleParseResult[T] = {
     parser.parse(input, stopFunction, compilation.metrics)
   }
 
   override def inject(language: Language): Unit = {
     super.inject(language)
-    val parserBuilder = ParseWholeInput(toParserBuilder(LanguageGrammars.grammars.get(language).root).map(r => r.asInstanceOf[Node]))
+    val parserBuilder = toParserBuilder(LanguageGrammars.grammars.get(language).root).map(r => r.asInstanceOf[Node])
 
-    val phase = Language.getParsePhaseFromParser[Node](BiGrammarToParser)((program, uri) => {
+    val phase = Language.getParsePhaseFromParser[Node]((program, uri) => {
       program.startOfUri = Some(uri)
       PathRoot(program)
-    }, parserBuilder, stopFunction)
+    }, parserBuilder.getWholeInputParser(), stopFunction)
     language.compilerPhases ::= phase
   }
 

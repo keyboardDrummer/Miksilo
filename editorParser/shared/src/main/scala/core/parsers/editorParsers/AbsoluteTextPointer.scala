@@ -1,11 +1,27 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{ParseText, TextPointer}
+import core.parsers.core.{Metrics, ParseText, TextPointer}
 import core.parsers.strings.SubSequence
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
 import scala.collection.mutable
+
+object AbsoluteTextPointer {
+  def getCachingParser[Result](parseText: ParseText, singleResultParser: SingleResultParser[Result]): CachingParser[Result] = {
+    val offsetManager = new ArrayOffsetManager(parseText)
+    new CachingParser[Result] {
+
+      override def parse(mayStop: StopFunction, metrics: Metrics) = {
+        singleResultParser.parse(offsetManager.getOffsetNode(0), mayStop, metrics)
+      }
+
+      override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
+        offsetManager.changeText(from, until, insertionLength)
+      }
+    }
+  }
+}
 
 class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) extends TextPointer {
   override def getAbsoluteOffset() = offset
@@ -24,7 +40,7 @@ class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) exte
 
   override def subSequence(from: Int, until: Int) = manager.text.subSequence(from, until)
 
-  override def position = manager.text.getPosition(offset)
+  override def lineCharacter = manager.text.getPosition(offset)
 }
 
 class ArrayOffsetManager(var text: ParseText) {

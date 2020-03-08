@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.core.{ParseText, TextPointer}
+import core.parsers.core.{InputGen, TextPointer}
 import core.parsers.editorParsers._
 import core.parsers.sequences.SequenceParserWriter
 
@@ -9,44 +9,6 @@ import scala.util.matching.Regex
 
 trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrectingParserWriter {
   type Elem = Char
-  type Input <: StringReaderLike
-
-  abstract class StringReaderBase(val offsetNode: TextPointer)
-    extends StringReaderLike {
-
-    override def end() = drop(offsetNode.length - offset)
-
-    override def printRange(end: Input) = offsetNode.subSequence(offset, end.offset).toString
-
-    override def atEnd(): Boolean = offset == offsetNode.length
-
-    override def head(): Char = offsetNode.charAt(offset)
-
-    override def tail(): Input = drop(1)
-
-    override def hashCode(): Int = offset
-
-    override def equals(obj: Any): Boolean = obj match {
-      case other: StringReaderBase => offset == other.offset
-      case _ => false
-    }
-
-    def print(): String = {
-      val position = offsetNode.position
-      s"(${position.line}, ${position.character})" +
-        offsetNode.subSequence(Math.max(0, offset - 10), offset) + " | " + offsetNode.subSequence(offset, Math.min(offsetNode.length, offset + 10))
-    }
-
-    override def toString: String = {
-      print()
-    }
-  }
-
-  trait StringReaderLike extends SequenceInput[Char] with CachingInput {
-
-    def drop(amount: Int): Input
-    def remaining(array: ParseText) = array.length() - offset
-  }
 
   val identifierRegex = """[_a-zA-Z][_a-zA-Z0-9]*""".r
   lazy val parseIdentifier = parseRegex(identifierRegex, "identifier")
@@ -78,20 +40,21 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
         def apply(input: Input, state: FixPointState): ParseResult[String] = {
+          val position = input.position
           var index = 0
           while (index < value.length) {
-            val arrayIndex = index + input.offset
-            val remainder = input.drop(index)
+            val arrayIndex = index + position.getAbsoluteOffset()
+            val remainder = position.drop(index)
             val errorHistory = History.error(new MissingInput(remainder, value.substring(index), value.substring(index), penalty))
-            if (input.offsetNode.length <= arrayIndex) {
-              return singleResult(ReadyParseResult(Some(value), remainder, errorHistory))
-            } else if (input.offsetNode.charAt(arrayIndex) != value.charAt(index)) {
-              return singleResult(ReadyParseResult(Some(value), remainder, errorHistory))
+            if (position.length <= arrayIndex) {
+              return singleResult(ReadyParseResult(Some(value), InputGen(remainder, input.state), errorHistory))
+            } else if (position.charAt(arrayIndex) != value.charAt(index)) {
+              return singleResult(ReadyParseResult(Some(value), InputGen(remainder, input.state), errorHistory))
             }
             index += 1
           }
-          val remainder = input.drop(value.length)
-          singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value)))
+          val remainder = position.drop(value.length)
+          singleResult(ReadyParseResult(Some(value), InputGen(remainder, input.state), History.success(position, remainder, value)))
         }
       }
       result
@@ -114,7 +77,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
             if (ready.resultOption.contains(value)) {
               ready
             } else {
-              val insertError = new MissingInput(input, value, value + " ")
+              val insertError = new MissingInput(input.position, value, value + " ")
               ReadyParseResult(Some(value), input, History.error(insertError))
             }
           }, uniform = false)
@@ -125,8 +88,8 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
     override def original: Parser[String] = parseIdentifier
   }
 
-  trait NextCharError extends ParseError[Input] {
-    def to: Input = if (this.from.atEnd()) this.from else this.from.drop(1)
+  trait NextCharError extends ParseError {
+    def to: TextPointer = if (this.from.atEnd()) this.from else this.from.drop(1)
   }
 
   def parseRegex(regex: Regex, regexName: String,
@@ -151,15 +114,16 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
 
         def apply(input: Input, state: FixPointState): ParseResult[String] = {
-          regex.findPrefixMatchOf(input.offsetNode.charSequence) match {
+          val position = input.position
+          regex.findPrefixMatchOf(position.charSequence) match {
             case Some(matched) =>
-              val value = input.offsetNode.subSequence(input.offset, input.offset + matched.end).toString
-              val remainder = input.drop(matched.end)
-              singleResult(ReadyParseResult(Some(value), remainder, History.success(input, remainder, value, score)))
+              val value = position.subSequence(position.getAbsoluteOffset(), position.getAbsoluteOffset() + matched.end).toString
+              val remainder = position.drop(matched.end)
+              singleResult(ReadyParseResult(Some(value), InputGen(remainder, input.state), History.success(position, remainder, value, score)))
             case None =>
               penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
-                val history = History.error(new MissingInput(input, s"<$regexName>", defaultValue.getOrElse(""), penalty))
-                singleResult(ReadyParseResult(defaultValue, input, history))
+                val history = History.error(new MissingInput(position, s"<$regexName>", defaultValue.getOrElse(""), penalty))
+                singleResult(ReadyParseResult[State, String](defaultValue, input, history))
               })
 
           }

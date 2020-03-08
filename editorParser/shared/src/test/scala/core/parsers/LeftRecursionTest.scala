@@ -2,11 +2,11 @@ package core.parsers
 
 import editorParsers.LeftRecursiveCorrectingParserWriter
 import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.concurrent.{TimeLimitedTests, TimeLimits}
-import org.scalatest.time.{Millis, Span}
-import _root_.core.parsers.strings.CommonStringReaderParser
+import org.scalatest.concurrent.TimeLimits
+import _root_.core.parsers.strings.{CommonParserWriter,NoStateParserWriter}
 
-class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
+class LeftRecursionTest extends AnyFunSuite with CommonParserWriter
+  with NoStateParserWriter
   with LeftRecursiveCorrectingParserWriter
   with TimeLimits
 {
@@ -104,7 +104,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonStringReaderParser
 
   test("recursive with sequence indirection and default, " +
     "applies the default after failing the recursion") {
-    lazy val first: Parser[Any] = (new Lazy(first) ~ "!" | "!")
+    lazy val first: Parser[Any] = new Lazy(first) ~ "!" | "!"
     val input = "notavailable"
     val parseResult = first.getWholeInputParser().parse(input)
     assert(!parseResult.successful)

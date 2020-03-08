@@ -1,10 +1,9 @@
 package core.parsers
 
-import _root_.core.parsers.strings.CommonStringReaderParser
-import _root_.core.parsers.core.ParseText
-import org.scalatest.funsuite.AnyFunSuite
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
-import languages.json.{JsonArray, JsonObject, JsonParser, JsonValue, NumberLiteral, StringLiteral, ValueHole}
+import _root_.core.parsers.strings.CommonStringReaderParser
+import languages.json.JsonParser
+import org.scalatest.funsuite.AnyFunSuite
 
 class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderParser {
 

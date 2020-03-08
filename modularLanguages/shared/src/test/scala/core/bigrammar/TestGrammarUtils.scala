@@ -1,6 +1,6 @@
 package core.bigrammar
 
-import core.bigrammar.BiGrammarToParser.{Input, Reader, toParserBuilder}
+import core.bigrammar.BiGrammarToParser.toParserBuilder
 import core.bigrammar.printer.BiGrammarToPrinter
 import core.parsers.editorParsers.{SingleParseResult, UntilBestAndXStepsStopFunction}
 import org.scalatest.funsuite.AnyFunSuite
@@ -27,7 +27,7 @@ object TestGrammarUtils extends AnyFunSuite {
     BiGrammarToPrinter.toDocument(result, grammarDocument).renderString()
   }
 
-  def parse(example: String, grammarDocument: BiGrammar): SingleParseResult[Any, Input] = {
+  def parse(example: String, grammarDocument: BiGrammar): SingleParseResult[Any] = {
     val parser = toParserBuilder(grammarDocument)
     parser.getWholeInputParser().parse(example, UntilBestAndXStepsStopFunction())
   }

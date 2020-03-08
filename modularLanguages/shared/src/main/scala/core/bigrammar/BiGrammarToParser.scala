@@ -1,9 +1,7 @@
 package core.bigrammar
 
-import core.bigrammar.BiGrammar.State
 import core.bigrammar.grammars._
-import core.parsers.core.{ParseText, TextPointer}
-import core.parsers.editorParsers.{CachingParser, History, LeftRecursiveCorrectingParserWriter, SingleResultParser}
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, SingleResultParser}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.textMate.TextMateGeneratingParserWriter
 import util.Utility
@@ -18,38 +16,22 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
   type AnyWithMap = WithMap[Any]
   type Result = AnyWithMap
-  type Input = Reader
+  type State = MyState
+
+  case class MyState(state: Map[Any, Any]) extends HasIndentation {
+    override def indentation = state.getOrElse(IndentationKey, 0).asInstanceOf[Int]
+
+    override def withIndentation(newIndentation: Int) = MyState(state + (IndentationKey -> newIndentation))
+  }
 
   object IndentationKey
 
-  override def startInput(zero: TextPointer) = new Reader(zero, Map.empty)
 
-  type CacheKey = (BuiltParser[_], Set[BuiltParser[Any]], State)
-  class Reader(offsetNode: TextPointer, val state: State)
-    extends StringReaderBase(offsetNode)
-    with IndentationReaderLike {
-
-    def withState(newState: State): Reader = new Reader(offsetNode, newState)
-
-    override def drop(amount: Int) = new Reader(offsetNode.drop(amount), state)
-
-    override def hashCode(): Int = offset
-
-    override def equals(obj: Any): Boolean = obj match {
-      case other: Reader => offset == other.offset && state.equals(other.state)
-      case _ => false
-    }
-
-    override def indentation = state.getOrElse(IndentationKey, 0).asInstanceOf[Int]
-
-    override def withIndentation(value: Int) = withState(state + (IndentationKey -> value))
-
-    override def createCacheKey(parser: BiGrammarToParser.BuiltParser[_], state: Set[BiGrammarToParser.BuiltParser[Any]]) = (parser, state, this.state)
-  }
+  override def startState = MyState(Map.empty)
 
   def valueToResult(value: Any): Result = WithMap(value, Map.empty)
 
-  def toParser(grammar: BiGrammar): SingleResultParser[Any, Input] = {
+  def toParser(grammar: BiGrammar): SingleResultParser[Any] = {
     toParserBuilder(grammar).getWholeInputParser()
   }
 

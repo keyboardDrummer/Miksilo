@@ -45,7 +45,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
   object TriviaCounter extends Key
   class ParseTriviaField(val input: Input) extends NodeField with CanMerge {
-    override lazy val toString = s"Trivia,${input.offset}"
+    override lazy val toString = s"Trivia,${input.position.getAbsoluteOffset()}"
     override def merge(first: Any, second: Any) = first.asInstanceOf[Seq[_]] ++ second.asInstanceOf[Seq[_]]
   }
 
@@ -116,7 +116,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
           }
         }
 
-        val fixedTrivias = trivias.sortBy(t => t._1.input.offset).
+        val fixedTrivias = trivias.sortBy(t => t._1.input.position.getAbsoluteOffset()).
           zipWithIndex.map(withIndex => (Trivia(withIndex._2), withIndex._1._2)).
           filter(v => v._2.asInstanceOf[Seq[_]].nonEmpty)
         WithMap(result.value, (rest ++ fixedTrivias).toMap)
