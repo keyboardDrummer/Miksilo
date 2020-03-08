@@ -13,7 +13,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   // TODO CacheKey and Input as type parameters is redundant. Better to have a single State type parameter.
 
-  override def newParseState(input: Input) = FixPointState(input.position.getAbsoluteOffset(), Set.empty)
+  override def newParseState(input: Input) = FixPointState(input.position.offset, Set.empty)
 
   def recursionsFor[Result, SeedResult](parseResults: ParseResults[State, Result], parser: BuiltParser[SeedResult]) = {
     parseResults match {
@@ -55,7 +55,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               else
                 resultWithoutRecursion
 
-              if (result.latestRemainder.getAbsoluteOffset() > input.position.getAbsoluteOffset()) {
+              if (result.latestRemainder.offset > input.position.offset) {
                 input.position.cache.put(key, result)
               }
 
@@ -73,7 +73,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           val grown: ParseResult[Result] = recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
             val results = recursive.get(singleResult(prev))
             results.flatMapReady(
-              ready => if (ready.remainder.position.getAbsoluteOffset() > prev.remainder.position.getAbsoluteOffset()) singleResult(ready) else SREmpty.empty,
+              ready => if (ready.remainder.position.offset > prev.remainder.position.offset) singleResult(ready) else SREmpty.empty,
               uniform = false) // TODO maybe set this to uniform = true
           }).reduce((a,b) => a.merge(b))
           grow(recursions, grown, initialResults)
@@ -82,7 +82,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     def getPreviousResult(input: Input, state: FixPointState): Option[ParseResult[Result]] = {
-      if (state.offset == input.position.getAbsoluteOffset() && state.callStack.contains(parser))
+      if (state.offset == input.position.offset && state.callStack.contains(parser))
           Some(RecursiveResults(Map(parser -> List(RecursiveParseResult[State, Result, Result](x => x))), SREmpty.empty))
       else
         None
@@ -147,7 +147,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   }
 
   def moveState(position: TextPointer, state: FixPointState) =
-    if (state.offset == position.getAbsoluteOffset()) state else FixPointState(position.getAbsoluteOffset(), Set.empty)
+    if (state.offset == position.offset) state else FixPointState(position.offset, Set.empty)
 
   class CheckCache[Result](parser: BuiltParser[Result]) extends BuiltParser[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
@@ -163,7 +163,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           val value: ParseResult[Result] = parser(input, newState)
 
           // Do not cache length zero results, since they cannot be corrected moved if something is inserted where they start.
-          if (value.latestRemainder.getAbsoluteOffset() > input.position.getAbsoluteOffset()) {
+          if (value.latestRemainder.offset > input.position.offset) {
             input.position.cache.put(key, value)
           }
           value

@@ -1,26 +1,26 @@
 package core.parsers.core
 
-import core.parsers.editorParsers.{ArrayOffsetManager, CachingParser, Position, SingleResultParser, StopFunction}
+import core.parsers.editorParsers.{Position, SingleResultParser}
 
 import scala.collection.mutable
 
 trait TextPointer {
   def safeIncrement: TextPointer = if (atEnd()) this else drop(1)
-  def atEnd(): Boolean = getAbsoluteOffset() == length
-  def head: Char = charAt(getAbsoluteOffset())
+  def atEnd(): Boolean = offset == length
+  def head: Char = charAt(offset)
   def charAt(index: Int): Char
   def length: Int
-  def end(): TextPointer = drop(length - getAbsoluteOffset())
+  def end(): TextPointer = drop(length - offset)
   def charSequence: CharSequence
   def subSequence(from: Int, until: Int): CharSequence
   def lineCharacter: Position
   def drop(amount: Int): TextPointer
-  def getAbsoluteOffset(): Int
-  def toPosition(text: ParseText): Position = text.getPosition(getAbsoluteOffset())
+  def offset: Int
+  def toPosition(text: ParseText): Position = text.getPosition(offset)
   def cache: mutable.HashMap[Any, Any]
   def cache_=(value: mutable.HashMap[Any, Any]): Unit
 
-  def printRange(end: TextPointer) = subSequence(getAbsoluteOffset(), end.getAbsoluteOffset()).toString
+  def printRange(end: TextPointer) = subSequence(offset, end.offset).toString
 }
 
 case class InputGen[State](position: TextPointer, state: State) {

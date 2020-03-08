@@ -43,7 +43,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
           val position = input.position
           var index = 0
           while (index < value.length) {
-            val arrayIndex = index + position.getAbsoluteOffset()
+            val arrayIndex = index + position.offset
             val remainder = position.drop(index)
             val errorHistory = History.error(new MissingInput(remainder, value.substring(index), value.substring(index), penalty))
             if (position.length <= arrayIndex) {
@@ -117,7 +117,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
           val position = input.position
           regex.findPrefixMatchOf(position.charSequence) match {
             case Some(matched) =>
-              val value = position.subSequence(position.getAbsoluteOffset(), position.getAbsoluteOffset() + matched.end).toString
+              val value = position.subSequence(position.offset, position.offset + matched.end).toString
               val remainder = position.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), InputGen(remainder, input.state), History.success(position, remainder, value, score)))
             case None =>

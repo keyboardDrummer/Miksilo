@@ -38,7 +38,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
             case tailCons: SRCons[State, _] =>
-              if (mayStop(bestResult.remainder.position.getAbsoluteOffset(), bestResult.originalScore, tailCons.head.score))
+              if (mayStop(bestResult.remainder.position.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty.empty
               else
                 tail

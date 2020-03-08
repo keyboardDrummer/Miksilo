@@ -24,7 +24,6 @@ object AbsoluteTextPointer {
 }
 
 class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) extends TextPointer {
-  override def getAbsoluteOffset() = offset
 
   override var cache = new mutable.HashMap[Any, Any]
 
@@ -64,7 +63,7 @@ class ArrayOffsetManager(var text: ParseText) {
     if (to <= from) InsertionPoint(from)
     else {
       val idx = from + (to - from - 1) / 2
-      Integer.compare(offset, offsets(idx).getAbsoluteOffset()) match {
+      Integer.compare(offset, offsets(idx).offset) match {
         case -1 => binarySearch(offset, from, idx)
         case  1 => binarySearch(offset, idx + 1, to)
         case  _ => Found(idx)
@@ -76,14 +75,14 @@ class ArrayOffsetManager(var text: ParseText) {
     offsetCache.clear()
 
     val delta = insertLength - (until - from)
-    for(offset <- offsets.sortBy(o => -o.getAbsoluteOffset())) {
-      val absoluteOffset = offset.getAbsoluteOffset()
+    for(offset <- offsets.sortBy(o => -o.offset)) {
+      val absoluteOffset = offset.offset
 
       val entries = offset.cache.toList
       for(entry <- entries) {
-        val entryStart = offset.getAbsoluteOffset()
+        val entryStart = offset.offset
         val parseResults = entry._2.asInstanceOf[CachingParseResult]
-        val entryEnd = Math.max(entryStart + 1, parseResults.latestRemainder.getAbsoluteOffset())
+        val entryEnd = Math.max(entryStart + 1, parseResults.latestRemainder.offset)
         val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
         if (entryIntersectsWithRemoval) {
           offset.cache.remove(entry._1)

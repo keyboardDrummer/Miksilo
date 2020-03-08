@@ -90,7 +90,7 @@ class HistoryTest extends AnyFunSuite with StringParserWriter with NoStateParser
   test("very long drops have small differences") {
     val start = pointer(0)
     val far = pointer(40)
-    val further = pointer(far.getAbsoluteOffset() + 1)
+    val further = pointer(far.offset + 1)
     val farWithoutSuccess = History.empty.addError(DropError(start, far))
     val furtherWithoutSuccess = History.empty.addError(DropError(start, further))
     val furtherWithSuccess = furtherWithoutSuccess.addSuccess(History.successValue)

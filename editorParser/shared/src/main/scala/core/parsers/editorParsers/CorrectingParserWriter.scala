@@ -28,7 +28,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
             case tailCons: SRCons[State, Result] =>
-              if (bestResult.history.spotless || mayStop(bestResult.remainder.position.getAbsoluteOffset(), bestResult.originalScore, tailCons.head.score))
+              if (bestResult.history.spotless || mayStop(bestResult.remainder.position.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty.empty[State]
               else
                 tail

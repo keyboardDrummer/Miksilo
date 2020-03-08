@@ -132,7 +132,7 @@ final class SRCons[State, +Result](
   }
 
   def getLatest(one: TextPointer, other: TextPointer): TextPointer = {
-    if (one.getAbsoluteOffset() > other.getAbsoluteOffset()) one else other
+    if (one.offset > other.offset) one else other
   }
 
   override def nonEmpty = true
@@ -167,7 +167,7 @@ class SREmpty[State] extends ParseResults[State, Nothing] {
 }
 
 object EmptyRemainder extends TextPointer {
-  override def getAbsoluteOffset() = Int.MinValue
+  override def offset() = Int.MinValue
 
   override def drop(amount: Int) = this
 

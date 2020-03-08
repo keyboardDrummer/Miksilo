@@ -13,7 +13,7 @@ case class Position(line: Int, character: Int)
 
 case class OffsetNodeRange(from: TextPointer, until: TextPointer) {
   def toSourceRange() = SourceRange(from.lineCharacter, until.lineCharacter)
-  def toOffsetRange = OffsetRange(from.getAbsoluteOffset(), until.getAbsoluteOffset())
+  def toOffsetRange = OffsetRange(from.offset, until.offset)
 }
 
 case class OffsetRange(from: Int, until: Int) {

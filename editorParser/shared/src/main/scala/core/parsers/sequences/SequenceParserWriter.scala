@@ -80,7 +80,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
 
     override def penalty = {
-      val length = to.getAbsoluteOffset() - from.getAbsoluteOffset()
+      val length = to.offset - from.offset
       History.dropMaxPenalty - History.dropReduction / (History.dropLengthShift + length)
     }
 
@@ -200,7 +200,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           return newFailure(input, new MissingInput(position, kind, "", History.missingInputPenalty))
         }
 
-        val char = position.charAt(position.getAbsoluteOffset())
+        val char = position.charAt(position.offset)
         if (predicate(char)) {
           newSuccess(char, InputGen(input.position.drop(1), input.state), History.successValue)
         }
