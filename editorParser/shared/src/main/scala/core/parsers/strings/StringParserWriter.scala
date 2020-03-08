@@ -138,8 +138,8 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
 
   implicit class StringParserExtensions[Result](parser: Parser[Result]) {
 
-    def withSourceRange[Other](addRange: (OffsetNodeRange, Result) => Other): Parser[Other] = {
-      parser.withRange((l,r,v) => addRange(OffsetNodeRange(l, r), v))
+    def withSourceRange[Other](addRange: (OffsetPointerRange, Result) => Other): Parser[Other] = {
+      parser.withRange((l,r,v) => addRange(OffsetPointerRange(l, r), v))
     }
   }
 }

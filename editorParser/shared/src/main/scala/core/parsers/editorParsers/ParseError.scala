@@ -11,7 +11,7 @@ case class Fix(title: String, edit: TextEdit)
   */
 case class Position(line: Int, character: Int)
 
-case class OffsetNodeRange(from: OffsetPointer, until: OffsetPointer) {
+case class OffsetPointerRange(from: OffsetPointer, until: OffsetPointer) {
   def toSourceRange = SourceRange(from.lineCharacter, until.lineCharacter)
   def toOffsetRange = OffsetRange(from.offset, until.offset)
 

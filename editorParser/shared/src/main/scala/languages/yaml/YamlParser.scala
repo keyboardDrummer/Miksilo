@@ -2,7 +2,7 @@ package languages.yaml
 
 import core.document.Empty
 import core.parsers.core.{InputGen, ParseText, Processor}
-import core.parsers.editorParsers.{AbsoluteTextPointer, History, LeftRecursiveCorrectingParserWriter, OffsetNodeRange}
+import core.parsers.editorParsers.{AbsoluteTextPointer, History, LeftRecursiveCorrectingParserWriter, OffsetPointerRange}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
 import core.responsiveDocument.ResponsiveDocument
 
@@ -12,7 +12,7 @@ trait YamlValue {
   override def toString: String = toDocument.renderString()
 }
 
-case class YamlObject(range: OffsetNodeRange, members: Array[(YamlValue, YamlValue)]) extends YamlValue {
+case class YamlObject(range: OffsetPointerRange, members: Array[(YamlValue, YamlValue)]) extends YamlValue {
   override def toDocument: ResponsiveDocument = {
     members.
       map(member => member._1.toDocument ~ ":" ~~ member._2.toDocument).
@@ -20,7 +20,7 @@ case class YamlObject(range: OffsetNodeRange, members: Array[(YamlValue, YamlVal
   }
 }
 
-case class YamlArray(range: OffsetNodeRange, elements: Array[YamlValue]) extends YamlValue {
+case class YamlArray(range: OffsetPointerRange, elements: Array[YamlValue]) extends YamlValue {
   override def toDocument: ResponsiveDocument = {
     elements.
       map(member => ResponsiveDocument.text("- ") ~~ member.toDocument).
@@ -28,19 +28,19 @@ case class YamlArray(range: OffsetNodeRange, elements: Array[YamlValue]) extends
   }
 }
 
-case class NumberLiteral(range: OffsetNodeRange, value: Int) extends YamlValue {
+case class NumberLiteral(range: OffsetPointerRange, value: Int) extends YamlValue {
   override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
 }
 
-case class StringLiteral(range: OffsetNodeRange, value: String) extends YamlValue {
+case class StringLiteral(range: OffsetPointerRange, value: String) extends YamlValue {
   override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
 }
 
-case class ValueHole(range: OffsetNodeRange) extends YamlValue {
+case class ValueHole(range: OffsetPointerRange) extends YamlValue {
   override def toDocument: ResponsiveDocument = "hole"
 }
 
-case class TaggedNode(range: OffsetNodeRange, tag: String, node: YamlValue) extends YamlValue {
+case class TaggedNode(range: OffsetPointerRange, tag: String, node: YamlValue) extends YamlValue {
   override def toDocument: ResponsiveDocument = ResponsiveDocument.text("!") ~ tag ~~ node.toDocument
 }
 

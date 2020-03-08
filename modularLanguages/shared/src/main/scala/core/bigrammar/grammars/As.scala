@@ -6,10 +6,10 @@ import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.{BiGrammar, PrintBiGrammar, WithMap}
 import core.language.node.NodeField
 import core.parsers.core.TextPointer
-import core.parsers.editorParsers.OffsetNodeRange
+import core.parsers.editorParsers.OffsetPointerRange
 import core.responsiveDocument.ResponsiveDocument
 
-case class As(var inner: BiGrammar, field: NodeField, changePosition: (TextPointer, TextPointer) => OffsetNodeRange = null) extends CustomGrammar
+case class As(var inner: BiGrammar, field: NodeField, changePosition: (TextPointer, TextPointer) => OffsetPointerRange = null) extends CustomGrammar
 {
   override def children: Seq[BiGrammar] = Seq(inner)
 
@@ -24,7 +24,7 @@ case class As(var inner: BiGrammar, field: NodeField, changePosition: (TextPoint
   override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
     recursive(inner).withRange[Result]((from, until, result: Result) => {
       val range =
-        if (changePosition == null) OffsetNodeRange(from, until)
+        if (changePosition == null) OffsetPointerRange(from, until)
         else changePosition(from, until)
       WithMap[Any]((), result.namedValues + (field -> result.value) + (FieldPosition(field) -> range))
     })
