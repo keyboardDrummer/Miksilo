@@ -95,9 +95,9 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     }
   }
 
-  val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
+  lazy val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
-  val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
+  lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
   lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseStringLiteral
   lazy val parseFlowValue = (tag ~ parseUntaggedFlowValue).
     withSourceRange((range, v) => TaggedNode(range, v._1, v._2)) | parseUntaggedFlowValue
@@ -108,7 +108,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     withSourceRange((range, v) => TaggedNode(range, v._1, v._2)) | parseUntaggedValue
 
   lazy val parseYaml = trivias ~> parseValue ~< trivias
-  val parser = parseYaml.getWholeInputParser()
+  lazy val parser = parseYaml.getWholeInputParser()
   def getCachingParser(text: ParseText) = AbsoluteTextPointer.getCachingParser(text, parser)
 
   lazy val parseBlockMapping: Parser[YamlValue] = {
