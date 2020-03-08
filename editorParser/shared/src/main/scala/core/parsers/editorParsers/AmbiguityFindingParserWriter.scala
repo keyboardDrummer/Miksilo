@@ -1,25 +1,24 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{InputGen, Metrics, ParseText, TextPointer}
+import core.parsers.core.{Metrics, TextPointer}
 
 trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
   override def findBestParseResult[Result](zero: TextPointer, parser: BuiltParser[Result],
                                            mayStop: StopFunction, metrics: Metrics): SingleParseResult[Result] = {
 
-    val startInput = InputGen(zero, startState)
-    val noResultFound = ReadyParseResult(None, startInput, History.error(FatalError(startInput.position, "Grammar is always recursive")))
+    val noResultFound = ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[State, Result] = noResultFound
 
     var resultsSeen = Map.empty[Any, ReadyParseResult[State, Result]]
-    var queue: ParseResults[State, Result] = parser(startInput, newParseState(startInput))
+    var queue: ParseResults[State, Result] = parser(zero, startState, newParseState(zero))
     while(queue.nonEmpty) {
       val (parseResult: LazyParseResult[State, Result], tail) = queue.pop()
 
       queue = parseResult match {
         case _parseResult: ReadyParseResult[State, _] =>
           val parseResult = _parseResult.asInstanceOf[ReadyParseResult[State, Result]]
-          val parseResultKey = ReadyParseResult(parseResult.resultOption, parseResult.remainder, getHistoryWithoutChoices(parseResult.history))
+          val parseResultKey = ReadyParseResult(parseResult.resultOption, parseResult.remainder, parseResult.state, getHistoryWithoutChoices(parseResult.history))
           if (resultsSeen.contains(parseResultKey)) {
             val previousResult = resultsSeen(parseResultKey)
             val oldChoices = getHistoryChoices(previousResult.history)
@@ -38,7 +37,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
             case tailCons: SRCons[State, _] =>
-              if (mayStop(bestResult.remainder.position.offset, bestResult.originalScore, tailCons.head.score))
+              if (mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty.empty
               else
                 tail
@@ -79,9 +78,9 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      (input: Input, state: FixPointState) => {
-        val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input.position -> first)))
-        val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input.position -> second)))
+      (position: TextPointer, state: State, fixPointState: FixPointState) => {
+        val firstResult = parseFirst(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> first)))
+        val secondResult = parseSecond(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> second)))
         firstResult match {
           case cons: SRCons[State, Result]
             if !cons.head.history.flawed => firstResult
@@ -101,9 +100,9 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      (input: Input, state: FixPointState) => {
-        val firstResult = parseFirst(input, state).addHistory(HistoryWithChoices(Seq(input.position -> first)))
-        val secondResult = parseSecond(input, state).addHistory(HistoryWithChoices(Seq(input.position -> second)))
+      (position: TextPointer, state: State, fixPointState: FixPointState) => {
+        val firstResult = parseFirst(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> first)))
+        val secondResult = parseSecond(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> second)))
         val merged = firstResult.merge(secondResult)
         merged
       }

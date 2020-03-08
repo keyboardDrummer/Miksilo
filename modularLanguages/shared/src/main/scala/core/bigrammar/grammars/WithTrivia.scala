@@ -3,6 +3,7 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
+import core.parsers.core.TextPointer
 import core.parsers.editorParsers.{ParseResults, ReadyParseResult, SREmpty}
 import core.responsiveDocument.ResponsiveDocument
 import util.Utility
@@ -37,16 +38,16 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
     val parseOriginal = recursive(original)
 
     new BuiltParser[Result] {
-      override def apply(input: Input, state: FixPointState): ParseResults[State, Result] = {
-        val leftResults = parseTrivias(input, state)
+      override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
+        val leftResults = parseTrivias(position, state, fixPointState)
 
         def rightFromLeftReady(leftReady: ReadyParseResult[State, Result]): ParseResults[State, Result] = {
           if (leftReady.history.flawed)
             return SREmpty.empty // Do not error correct Trivia.
 
-          val rightResult = parseOriginal(leftReady.remainder, state)
+          val rightResult = parseOriginal(leftReady.remainder, leftReady.state, fixPointState)
           rightResult.flatMapReady(rightReady => {
-            if (input != leftReady.remainder && leftReady.remainder == rightReady.remainder) {
+            if (position != leftReady.remainder && leftReady.remainder == rightReady.remainder) {
               SREmpty.empty // To avoid ambiguities, trivia may only occur before parsed input, not before inserted input.
             } else {
               val value = leftReady.resultOption.flatMap(leftValue =>
@@ -58,6 +59,7 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
 
               singleResult(ReadyParseResult(value,
                 rightReady.remainder,
+                rightReady.state,
                 rightReady.history ++ leftReady.history))
             }
           }, uniform = true)

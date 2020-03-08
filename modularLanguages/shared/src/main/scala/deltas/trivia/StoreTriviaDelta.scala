@@ -2,7 +2,7 @@ package deltas.trivia
 
 import core.bigrammar.{BiGrammar, WithMap}
 import core.bigrammar.BiGrammar.State
-import core.bigrammar.BiGrammarToParser.{CanMerge, Input}
+import core.bigrammar.BiGrammarToParser.CanMerge
 import core.bigrammar.grammars.CustomGrammar
 import core.bigrammar.printer.TryState
 import core.deltas.grammars.{LanguageGrammars, TriviasGrammar}
@@ -11,6 +11,7 @@ import core.language.Language
 import core.language.node.{Key, NodeField, NodeGrammar}
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.printer.Printer.NodePrinter
+import core.parsers.core.TextPointer
 import core.responsiveDocument.ResponsiveDocument
 
 object StoreTriviaDelta extends DeltaWithGrammar {
@@ -44,8 +45,8 @@ object StoreTriviaDelta extends DeltaWithGrammar {
   }
 
   object TriviaCounter extends Key
-  class ParseTriviaField(val input: Input) extends NodeField with CanMerge {
-    override lazy val toString = s"Trivia,${input.position.offset}"
+  class ParseTriviaField(val position: TextPointer) extends NodeField with CanMerge {
+    override lazy val toString = s"Trivia,${position.offset}"
     override def merge(first: Any, second: Any) = first.asInstanceOf[Seq[_]] ++ second.asInstanceOf[Seq[_]]
   }
 
@@ -64,7 +65,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
 
     override def toParser(recursive: BiGrammar => Parser[Result]): Parser[Result] = {
       val triviaParser = recursive(triviaGrammar)
-      leftRightSimple[Input, Result, Result](PositionParser, triviaParser, (position, triviasWithMap) => {
+      leftRightSimple[TextPointer, Result, Result](PositionParser, triviaParser, (position, triviasWithMap) => {
         val trivias = triviasWithMap.value.asInstanceOf[Seq[_]]
         val field = new ParseTriviaField(position)
         WithMap[Any]((), Map(field -> Seq(trivias)))
@@ -116,7 +117,7 @@ object StoreTriviaDelta extends DeltaWithGrammar {
           }
         }
 
-        val fixedTrivias = trivias.sortBy(t => t._1.input.position.offset).
+        val fixedTrivias = trivias.sortBy(t => t._1.position.offset).
           zipWithIndex.map(withIndex => (Trivia(withIndex._2), withIndex._1._2)).
           filter(v => v._2.asInstanceOf[Seq[_]].nonEmpty)
         WithMap(result.value, (rest ++ fixedTrivias).toMap)

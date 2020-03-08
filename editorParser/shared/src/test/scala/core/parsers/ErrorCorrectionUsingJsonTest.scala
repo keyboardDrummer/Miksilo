@@ -1,5 +1,6 @@
 package core.parsers
 
+import _root_.core.parsers.core.TextPointer
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import _root_.core.parsers.strings.CommonStringReaderParser
 import languages.json.JsonParser
@@ -188,8 +189,8 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
 
     override def getParser(recursive: GetParser) = {
       val parseOriginal = recursive(original)
-      (input: Input, state: FixPointState) => {
-        val result = parseOriginal(input, state)
+      (position: TextPointer, state: State, fixPointState: FixPointState) => {
+        val result = parseOriginal(position, state, fixPointState)
         result.map(resultValue => {
           if (resultValue == valueToDetect) {
             detected = true
