@@ -106,7 +106,7 @@ class PartiallyParseJsonTest extends AnyFunSuite with DefaultBiGrammarWriter {
     assertResult(expectation)(result.resultOption.get)
   }
 
-  private def getSuccessValue(result: SingleParseResult[Any, Input]) = {
+  private def getSuccessValue(result: SingleParseResult[Any]) = {
     assert(result.successful)
     result.resultOption.get
   }

@@ -1,6 +1,6 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{TextPointer, ParseInput, ParseText}
+import core.parsers.core.{TextPointer, ParseText}
 import core.parsers.editorParsers.Position.PositionOrdering
 
 case class TextEdit(range: SourceRange, newText: String)
@@ -12,8 +12,8 @@ case class Fix(title: String, edit: TextEdit)
 case class Position(line: Int, character: Int)
 
 case class OffsetNodeRange(from: TextPointer, until: TextPointer) {
-  def toSourceRange() = SourceRange(from.position, until.position)
-  def toOffsetRange = OffsetRange(from.getAbsoluteOffset(), until.getAbsoluteOffset())
+  def toSourceRange() = SourceRange(from.lineCharacter, until.lineCharacter)
+  def toOffsetRange = OffsetRange(from.offset, until.offset)
 }
 
 case class OffsetRange(from: Int, until: Int) {
@@ -48,17 +48,17 @@ object Position {
   }
 }
 
-trait ParseError[Input <: ParseInput] {
+trait ParseError {
   def fix: Option[Fix] = None
   def message: String
-  def from: Input
-  def to: Input
-  def range = OffsetNodeRange(from.offsetNode, to.offsetNode).toSourceRange()
+  def from: TextPointer
+  def to: TextPointer
+  def range = OffsetNodeRange(from, to).toSourceRange()
 
   def canMerge: Boolean = false
   def penalty: Double
   def score: Double = -penalty * 1
-  def append(other: ParseError[Input]): Option[ParseError[Input]] = None
+  def append(other: ParseError): Option[ParseError] = None
 
   override def toString = s"$message AT $from"
 }

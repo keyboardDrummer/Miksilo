@@ -1,30 +1,19 @@
 package core.parsers.core
 
-import core.parsers.editorParsers.{ArrayOffsetManager, CachingParser, Position, SingleResultParser, StopFunction}
+import core.parsers.editorParsers.{Position, SingleResultParser}
 
 import scala.collection.mutable
 
-trait TextPointer {
-  def charAt(index: Int): Char
-  def length: Int
-  def charSequence: CharSequence
-  def subSequence(from: Int, until: Int): CharSequence
-  def position: Position
-  def drop(amount: Int): TextPointer
-  def getAbsoluteOffset(): Int
-  def toPosition(text: ParseText): Position = text.getPosition(getAbsoluteOffset())
-  def cache: mutable.HashMap[Any, Any]
-  def cache_=(value: mutable.HashMap[Any, Any]): Unit
-}
-
-trait ParseInput {
-  def offsetNode: TextPointer
-  def offset = offsetNode.getAbsoluteOffset()
+case class InputGen[State](position: TextPointer, state: State) {
+  def withState(newState: State) = InputGen(position, newState)
 }
 
 trait OptimizingParserWriter extends ParserWriter {
 
-  type Input <: ParseInput
+  type Input = InputGen[State]
+  type State
+  def startState: State
+
   type ParseResult[+Result]
   type Parser[+Result] = ParserBuilder[Result]
 
@@ -195,22 +184,8 @@ trait OptimizingParserWriter extends ParserWriter {
     }
   }
 
-  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result, Input]
+  def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result]
 
-  def getCachingParser[Result](parseText: ParseText, parser: ParserBuilder[Result]): CachingParser[Result, Input] = {
-    val singleResultParser = getSingleResultParser(parser)
-    val offsetManager = new ArrayOffsetManager(parseText)
-    new CachingParser[Result, Input] {
-
-      override def parse(mayStop: StopFunction, metrics: Metrics) = {
-        singleResultParser.parse(offsetManager.getOffsetNode(0), mayStop, metrics)
-      }
-
-      override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
-        offsetManager.changeText(from, until, insertionLength)
-      }
-    }
-  }
 
   case class Success[+Result](result: Result, remainder: Input) {
     def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)

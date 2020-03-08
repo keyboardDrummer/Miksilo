@@ -36,7 +36,7 @@ object IncludeDelta extends DirectiveDelta {
     }
   }
 
-  val parserProp = new Property[SingleResultParser[Any, Input]](null)
+  val parserProp = new Property[SingleResultParser[Any]](null)
 
   override def inject(language: Language): Unit = {
     super.inject(language)

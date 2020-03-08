@@ -5,28 +5,11 @@ import core.parsers.editorParsers._
 
 trait SequenceParserWriter extends CorrectingParserWriter {
 
-  trait SequenceInput[Elem] extends CorrectingInput {
-
-    def drop(amount: Int): Input
-
-    def head(): Elem
-    def tail(): Input
-
-    def safeIncrement(): Input =
-      if (atEnd()) this.asInstanceOf[Input]
-      else drop(1)
-    def end(): Input
-    def printRange(end: Input): String
-  }
-
-  type Elem
-  type Input <: SequenceInput[Elem]
-
   case class Fail[Result](value: Option[Result], message: String, penalty: Double)
     extends ParserBuilderBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParser): BuiltParser[Result] = {
-      (input, _) => newFailure(value, input, History.error(FatalError(input, message, penalty)))
+      (input, _) => newFailure(value, input, History.error(FatalError(input.position, message, penalty)))
     }
 
     override def getMustConsume(cache: ConsumeCache) = false
@@ -49,7 +32,8 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
         def parse(input: Input, state: FixPointState, mayFail: Boolean): ParseResult[Result] = {
           var originalResult = parseOriginal(input, state)
-          if (input.atEnd())
+          val position = input.position
+          if (position.atEnd())
             return originalResult
 
           if (!mayFail) {
@@ -61,11 +45,11 @@ trait SequenceParserWriter extends CorrectingParserWriter {
             }, uniform = true)
           }
 
-          val droppedInput = input.drop(1)
-          val dropError = DropError(input, droppedInput)
+          val droppedInput = position.drop(1)
+          val dropError = DropError(position, droppedInput)
           val dropHistory = History.error(dropError)
-          val withDrop = singleResult(new DelayedParseResult(input, dropHistory , () => {
-            parse(droppedInput, state, mayFail = false).addHistory(dropHistory)
+          val withDrop = singleResult(new DelayedParseResult(position, dropHistory , () => {
+            parse(InputGen(droppedInput, input.state), state, mayFail = false).addHistory(dropHistory)
           }))
           originalResult.merge(withDrop)
         }
@@ -79,15 +63,15 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
   }
 
-  case class DropError(from: Input, to: Input) extends ParseError[Input] {
-    def this(from: Input, expectation: String) = this(from, from.drop(1))
+  case class DropError(from: TextPointer, to: TextPointer) extends ParseError {
+    def this(from: TextPointer, expectation: String) = this(from, from.drop(1))
 
     override def fix = {
-      val range = SourceRange(from.offsetNode.position, to.offsetNode.position)
+      val range = SourceRange(from.lineCharacter, to.lineCharacter)
       Some(Fix("Remove unexpected symbols", TextEdit(range, "")))
     }
 
-    override def append(next: MyParseError): Option[MyParseError] = {
+    override def append(next: ParseError): Option[ParseError] = {
       next match {
         case drop: DropError if drop.from == to =>
           Some(DropError(from, drop.to))
@@ -115,7 +99,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       (input, state) => {
         val originalResult = parseOriginal.apply(input, state)
         originalResult.mapReady(r => {
-          val history = History.error(MissingInput(input, r.remainder, s"<$name>", " ", History.insertFallbackPenalty))
+          val history = History.error(MissingInput(input.position, r.remainder.position, s"<$name>", " ", History.insertFallbackPenalty))
           ReadyParseResult(r.resultOption, r.remainder, history)
         }, uniform = true)
       }
@@ -124,24 +108,24 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  case class MissingInput(from: Input,
-                          to: Input,
+  case class MissingInput(from: TextPointer,
+                          to: TextPointer,
                           expectation: String,
                           insertFix: String = "",
                           penalty: Double = History.missingInputPenalty)
-    extends ParseError[Input] {
+    extends ParseError {
 
-    def this(from: Input, expectation: String, penalty: Double) {
-      this(from, from.safeIncrement(), expectation, "", penalty)
+    def this(from: TextPointer, expectation: String, penalty: Double) {
+      this(from, from.safeIncrement, expectation, "", penalty)
     }
 
-    def this(from: Input, expectation: String, insertFix: String, penalty: Double) {
-      this(from, from.safeIncrement(), expectation, insertFix, penalty)
+    def this(from: TextPointer, expectation: String, insertFix: String, penalty: Double) {
+      this(from, from.safeIncrement, expectation, insertFix, penalty)
     }
-    def this(from: Input, expectation: String, insertFix: String) {
+    def this(from: TextPointer, expectation: String, insertFix: String) {
       this(from, expectation, insertFix, History.missingInputPenalty)
     }
-    def this(from: Input, expectation: String) {
+    def this(from: TextPointer, expectation: String) {
       this(from, expectation, "")
     }
 
@@ -158,7 +142,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     override def canMerge: Boolean = true
 
-    override def append(next: ParseError[Input]) = {
+    override def append(next: ParseError) = {
       next match {
         case next: MissingInput if next.from == from =>
           val max = Math.max(penalty, next.penalty)
@@ -174,7 +158,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       if (trimmed == "")
         None
       else {
-        val position = from.offsetNode.position
+        val position = from.lineCharacter
         Some(Fix("Insert missing symbols", TextEdit(SourceRange(position, position), trimmed)))
       }
     }
@@ -191,11 +175,11 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           val result = parseOriginal(input, state)
           result.mapReady(parseResult => {
             val remainder = parseResult.remainder
-            if (remainder.atEnd())
+            if (remainder.position.atEnd())
               parseResult
             else {
-              val error = DropError(remainder, remainder.end())
-              ReadyParseResult(parseResult.resultOption, remainder.end(), parseResult.history.addError(error))
+              val error = DropError(remainder.position, remainder.position.end())
+              ReadyParseResult(parseResult.resultOption, InputGen(remainder.position.end(), remainder.state), parseResult.history.addError(error))
             }
           }, uniform = false)
         }
@@ -203,24 +187,25 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
   }
 
-  def elem(predicate: Elem => Boolean, kind: String) = ElemPredicate(predicate, kind)
+  def elem(predicate: Char => Boolean, kind: String) = ElemPredicate(predicate, kind)
 
-  case class ElemPredicate(predicate: Elem => Boolean, kind: String)
-    extends ParserBuilderBase[Elem] with LeafParser[Elem] {
+  case class ElemPredicate(predicate: Char => Boolean, kind: String)
+    extends ParserBuilderBase[Char] with LeafParser[Char] {
 
-    override def getParser(recursive: GetParser): BuiltParser[Elem] = {
+    override def getParser(recursive: GetParser): BuiltParser[Char] = {
 
-      def apply(input: Input, state: FixPointState): ParseResult[Elem] = {
-        if (input.atEnd()) {
-          return newFailure(new MissingInput(input, kind, "", History.missingInputPenalty))
+      def apply(input: Input, state: FixPointState): ParseResult[Char] = {
+        val position = input.position
+        if (position.atEnd()) {
+          return newFailure(input, new MissingInput(position, kind, "", History.missingInputPenalty))
         }
 
-        val char = input.head()
+        val char = position.charAt(position.offset)
         if (predicate(char)) {
-          newSuccess(char, input.tail(), History.successValue)
+          newSuccess(char, InputGen(input.position.drop(1), input.state), History.successValue)
         }
         else
-          newFailure(new MissingInput(input, kind, "", History.missingInputPenalty))
+          newFailure(input, new MissingInput(input.position, kind, "", History.missingInputPenalty))
       }
 
       apply
@@ -229,7 +214,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = true
   }
 
-  case class FilterError[Result](from: Input, to: Input, message: String) extends ParseError[Input] {
+  case class FilterError[Result](from: TextPointer, to: TextPointer, message: String) extends ParseError {
     override def penalty = History.missingInputPenalty
   }
 
@@ -249,12 +234,12 @@ trait SequenceParserWriter extends CorrectingParserWriter {
               newResultOption match {
                 case Left(message) =>
                   ReadyParseResult(None, ready.remainder,
-                    ready.history.addError(FilterError(input, ready.remainder, message)))
+                    ready.history.addError(FilterError(input.position, ready.remainder.position, message)))
                 case Right(value) =>
                   ReadyParseResult(Some(value), ready.remainder, ready.history)
               }
             case None =>
-              ready.asInstanceOf[ReadyParseResult[Input, NewResult]]
+              ready.asInstanceOf[ReadyParseResult[State, NewResult]]
           }
         }, uniform = false)
       }
@@ -276,7 +261,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
               if (predicate(result))
                 ready
               else ReadyParseResult(None, ready.remainder,
-                ready.history.addError(FilterError(input, ready.remainder, getMessage(result))))
+                ready.history.addError(FilterError(input.position, ready.remainder.position, getMessage(result))))
             case None => ready
           }
         }, uniform = false)
@@ -333,20 +318,12 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def filter[Other >: Result](predicate: Other => Boolean, getMessage: Other => String) =
       Filter(parser, predicate, getMessage)
 
-    def getCachingParser(parseText: ParseText): CachingParser[Result, Input] = {
-      SequenceParserWriter.this.getCachingParser(parseText, this.parser)
-    }
-
-    def getSingleResultParser(): SingleResultParser[Result, Input] = {
+    def getSingleResultParser(): SingleResultParser[Result] = {
       SequenceParserWriter.this.getSingleResultParser(this.parser)
     }
 
-    def getWholeInputParser(): SingleResultParser[Result, Input] = {
+    def getWholeInputParser(): SingleResultParser[Result] = {
       ParseWholeInput(parser).getSingleResultParser()
-    }
-
-    def getCachingWholeInputParser(parseText: ParseText = new ParseText()): CachingParser[Result, Input] = {
-      ParseWholeInput(parser).getCachingParser(parseText)
     }
 
     def withRange[Other](addRange: (TextPointer, TextPointer, Result) => Other): Parser[Other] = {

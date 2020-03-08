@@ -1,6 +1,16 @@
 package core.parsers.strings
 
-import core.parsers.core.Processor
+import core.parsers.core.{OptimizingParserWriter, Processor}
+
+trait NoStateParserWriter extends OptimizingParserWriter {
+  type State = Unit
+
+  override def startState: Unit = ()
+}
+
+trait CommonStringReaderParser extends CommonParserWriter with NoStateParserWriter {
+
+}
 
 trait CommonParserWriter extends StringParserWriter {
 

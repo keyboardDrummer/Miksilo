@@ -1,14 +1,29 @@
 package core.parsers.editorParsers
 
-import core.parsers.core.{ParseText, TextPointer}
+import core.parsers.core.{Metrics, ParseText, TextPointer}
 import core.parsers.strings.SubSequence
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
 import scala.collection.mutable
 
+object AbsoluteTextPointer {
+  def getCachingParser[Result](parseText: ParseText, singleResultParser: SingleResultParser[Result]): CachingParser[Result] = {
+    val offsetManager = new ArrayOffsetManager(parseText)
+    new CachingParser[Result] {
+
+      override def parse(mayStop: StopFunction, metrics: Metrics) = {
+        singleResultParser.parse(offsetManager.getOffsetNode(0), mayStop, metrics)
+      }
+
+      override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
+        offsetManager.changeText(from, until, insertionLength)
+      }
+    }
+  }
+}
+
 class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) extends TextPointer {
-  override def getAbsoluteOffset() = offset
 
   override var cache = new mutable.HashMap[Any, Any]
 
@@ -24,7 +39,7 @@ class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) exte
 
   override def subSequence(from: Int, until: Int) = manager.text.subSequence(from, until)
 
-  override def position = manager.text.getPosition(offset)
+  override def lineCharacter = manager.text.getPosition(offset)
 }
 
 class ArrayOffsetManager(var text: ParseText) {
@@ -48,7 +63,7 @@ class ArrayOffsetManager(var text: ParseText) {
     if (to <= from) InsertionPoint(from)
     else {
       val idx = from + (to - from - 1) / 2
-      Integer.compare(offset, offsets(idx).getAbsoluteOffset()) match {
+      Integer.compare(offset, offsets(idx).offset) match {
         case -1 => binarySearch(offset, from, idx)
         case  1 => binarySearch(offset, idx + 1, to)
         case  _ => Found(idx)
@@ -60,14 +75,14 @@ class ArrayOffsetManager(var text: ParseText) {
     offsetCache.clear()
 
     val delta = insertLength - (until - from)
-    for(offset <- offsets.sortBy(o => -o.getAbsoluteOffset())) {
-      val absoluteOffset = offset.getAbsoluteOffset()
+    for(offset <- offsets.sortBy(o => -o.offset)) {
+      val absoluteOffset = offset.offset
 
       val entries = offset.cache.toList
       for(entry <- entries) {
-        val entryStart = offset.getAbsoluteOffset()
+        val entryStart = offset.offset
         val parseResults = entry._2.asInstanceOf[CachingParseResult]
-        val entryEnd = Math.max(entryStart + 1, parseResults.latestRemainder.getAbsoluteOffset())
+        val entryEnd = Math.max(entryStart + 1, parseResults.latestRemainder.offset)
         val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
         if (entryIntersectsWithRemoval) {
           offset.cache.remove(entry._1)

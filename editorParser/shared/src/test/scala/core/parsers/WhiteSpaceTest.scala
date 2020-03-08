@@ -2,7 +2,7 @@ package core.parsers
 
 import _root_.core.parsers.editorParsers._
 import _root_.core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, ParseError, Position, SourceRange}
-import _root_.core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
+import _root_.core.parsers.strings.{NoStateParserWriter, CommonParserWriter, WhitespaceParserWriter}
 import org.scalatest.funsuite.AnyFunSuite
 
 class WhiteSpaceTest extends AnyFunSuite {
@@ -45,13 +45,13 @@ class WhiteSpaceTest extends AnyFunSuite {
     assertError(result.errors.head, SourceRange(Position(0,9),Position(0,15)), "expected '<expression>'")
   }
 
-  def assertError(error: ParseError[ExpressionParser.Input], range: SourceRange, message: String): Unit = {
+  def assertError(error: ParseError, range: SourceRange, message: String): Unit = {
     assertResult(range)(error.range)
     assertResult("expected '<expression>'")(message)
   }
 }
 
-object ExpressionParser extends CommonStringReaderParser
+object ExpressionParser extends CommonParserWriter with NoStateParserWriter
   with LeftRecursiveCorrectingParserWriter with WhitespaceParserWriter {
 
   lazy val expression: Parser[Any] = new Lazy(addition | numberParser | let | variable | hole)

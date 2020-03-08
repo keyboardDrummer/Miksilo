@@ -6,7 +6,7 @@ import languages.yaml._
 import org.scalatest.funsuite.AnyFunSuite
 
 class YamlTest extends AnyFunSuite {
-  val parser = YamlParser.getParser()
+  val parser = YamlParser.parser
 
   test("plainStyleMultineLineInFlowCollection") {
     val input = """                  [<img src=", !FindInMap [Region2Examples, !Ref 'AWS::Region',

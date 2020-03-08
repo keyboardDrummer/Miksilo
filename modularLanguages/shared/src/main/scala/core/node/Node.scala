@@ -121,8 +121,8 @@ class Node(var shape: NodeShape, entries: (NodeField, Any)*)
   def range: Option[OffsetRange] =
     if (sources.values.isEmpty) None
     else Some(OffsetRange(
-      sources.values.map(p => p.from.getAbsoluteOffset()).min,
-      sources.values.map(p => p.until.getAbsoluteOffset()).max))
+      sources.values.map(p => p.from.offset).min,
+      sources.values.map(p => p.until.offset).max))
 
   override def getValue(key: NodeField): Any = get(key).get
 }
