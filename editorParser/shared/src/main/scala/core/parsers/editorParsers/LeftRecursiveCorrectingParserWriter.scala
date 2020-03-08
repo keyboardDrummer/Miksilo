@@ -11,8 +11,6 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   type ParseResult[+Result] <: CachingParseResult
 
-  // TODO CacheKey and Input as type parameters is redundant. Better to have a single State type parameter.
-
   override def newParseState(input: Input) = FixPointState(input.position.offset, Set.empty)
 
   def recursionsFor[Result, SeedResult](parseResults: ParseResults[State, Result], parser: BuiltParser[SeedResult]) = {
