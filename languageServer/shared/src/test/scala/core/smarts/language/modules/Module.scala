@@ -7,7 +7,7 @@ import core.smarts.language.structs.TypeDefinition
 import core.smarts.scopes.objects.Scope
 
 trait FakeSourceElement extends SourceElement {
-  override def range: Option[OffsetRange] = None
+  override def range: Option[OffsetNodeRange] = None
 
   override def uriOption: Option[String] = None
 }

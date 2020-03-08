@@ -73,13 +73,12 @@ class JsonTest extends AnyFunSuite {
     val result: ObjectLiteral[NodePath] = PathRoot(utils.parse(example).asInstanceOf[Node])
     val member = result.members.head
     val offsetRange = member.getField(MemberValue).range.get
-    val text = new ParseText(example)
-    val sourceRange = offsetRange.toRange(text)
+    val sourceRange = offsetRange.toSourceRange
     assertResult(Position(1, 7))(sourceRange.start)
     assertResult(Position(1, 20))(sourceRange.end)
 
     val stringValue = member.value
-    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value).range.get.toRange(text)
+    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value).range.get.toSourceRange
     assertResult(Position(1, 8))(stringLocation.start)
     assertResult(Position(1, 19))(stringLocation.end)
   }

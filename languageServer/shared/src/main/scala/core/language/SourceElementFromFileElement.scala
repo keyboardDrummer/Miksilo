@@ -3,7 +3,7 @@ package core.language
 import core.parsers.editorParsers.{OffsetNodeRange, OffsetRange, SourceRange}
 
 case class SourceElementFromFileElement(uri: String, element: FileElement) extends SourceElement {
-  override def range = Some(element.range.toOffsetRange)
+  override def range = Some(element.range)
 
   override def uriOption = Some(uri)
 

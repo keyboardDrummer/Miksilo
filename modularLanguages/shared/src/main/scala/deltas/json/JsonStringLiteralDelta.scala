@@ -40,7 +40,7 @@ object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   def dropPrefix(grammars: LanguageGrammars, regex: BiGrammar, field: NodeField, prefix: String) = {
     import grammars._
     regex.map[String, String](r => r.substring(prefix.length), s => { prefix + s }).
-      as(field, p => OffsetNodeRange(p.from.drop(prefix.length), p.until))
+      as(field, (from, until) => OffsetNodeRange(from.drop(prefix.length), until))
   }
 
   def neww(value: String) = new Node(Shape, Value -> value)

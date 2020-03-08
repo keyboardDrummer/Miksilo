@@ -3,7 +3,7 @@ package core.parsers.editorParsers
 import core.parsers.core._
 
 trait CachingParseResult {
-  def latestRemainder: TextPointer
+  def latestRemainder: OffsetPointer
 }
 
 // TODO consider pushing down the caching part into another ParsingWriter
