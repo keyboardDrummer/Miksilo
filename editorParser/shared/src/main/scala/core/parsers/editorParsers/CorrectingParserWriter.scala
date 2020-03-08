@@ -69,7 +69,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   override def choice[Result](first: Parser[Result], other: => Parser[Result], firstIsLonger: Boolean = false): Parser[Result] =
     if (firstIsLonger) new FirstIsLonger(first, other) else new Choice(first, other)
 
-  override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult): Parser[NewResult] = new MapParser(original, f)
+  override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult): Parser[NewResult] = MapParser(original, f)
 
 
   class LeftIfRightMoved[+Left, Result](val left: Parser[Left],
@@ -142,7 +142,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           val delayedLeftResults: ParseResults[State, Left] = leftResults.mapResult({
             case ready: ReadyParseResult[State, Left] =>
               if (ready.history.flawed) {
-                new DelayedParseResult[State, Left](ready.remainder, ready.history, () => singleResult(ready))
+                new DelayedParseResult[State, Left](ready.remainder.position, ready.history, () => singleResult(ready))
               }
               else
                 ready

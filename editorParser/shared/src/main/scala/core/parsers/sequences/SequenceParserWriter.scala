@@ -48,7 +48,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           val droppedInput = position.drop(1)
           val dropError = DropError(position, droppedInput)
           val dropHistory = History.error(dropError)
-          val withDrop = singleResult(new DelayedParseResult(input, dropHistory , () => {
+          val withDrop = singleResult(new DelayedParseResult(position, dropHistory , () => {
             parse(InputGen(droppedInput, input.state), state, mayFail = false).addHistory(dropHistory)
           }))
           originalResult.merge(withDrop)

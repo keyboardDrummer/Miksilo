@@ -24,36 +24,34 @@ trait LazyParseResult[State, +Result] {
                                 oldHistory: History): LazyParseResult[State, NewResult]
 }
 
-class DelayedParseResult[State, Result](val remainder: InputGen[State], val history: History, _getResults: () => ParseResults[State, Result])
+class DelayedParseResult[State, Result](val offset: TextPointer, val history: History, _getResults: () => ParseResults[State, Result])
   extends LazyParseResult[State, Result] {
 
   override def toString = s"$score delayed: $history"
 
   override def map[NewResult](f: Result => NewResult): DelayedParseResult[State, NewResult] = {
-    new DelayedParseResult(remainder, history, () => results.map(f))
+    new DelayedParseResult(offset, history, () => results.map(f))
   }
 
   lazy val results: ParseResults[State, Result] = _getResults()
 
   override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], oldHistory: History) =
-    new DelayedParseResult(remainder, this.history ++ oldHistory, () => {
+    new DelayedParseResult(offset, this.history ++ oldHistory, () => {
       val intermediate = this.results
       intermediate.mapWithHistory(f, oldHistory)
     })
 
   override def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], uniform: Boolean): DelayedParseResult[State, NewResult] =
-    new DelayedParseResult(remainder, this.history, () => {
+    new DelayedParseResult(offset, this.history, () => {
       val intermediate = this.results
       intermediate.mapReady(f, uniform)
     })
 
   override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean) =
-    singleResult(new DelayedParseResult(remainder, this.history, () => {
+    singleResult(new DelayedParseResult(offset, this.history, () => {
       val intermediate = this.results
       intermediate.flatMapReady(f, uniform)
     }))
-
-  override def offset = remainder.position
 }
 
 case class RecursiveParseResult[State, SeedResult, +Result](
