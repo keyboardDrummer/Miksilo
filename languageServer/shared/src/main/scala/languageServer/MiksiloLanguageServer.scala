@@ -47,7 +47,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     if (client != null) {
       val uri = compilation.rootFile.get
       val diagnostics = getCompilation.diagnosticsForFile(uri)
-      logger.info("Sending diagnostics: " + diagnostics)
       client.sendDiagnostics(PublishDiagnostics(uri, diagnostics))
     }
   }

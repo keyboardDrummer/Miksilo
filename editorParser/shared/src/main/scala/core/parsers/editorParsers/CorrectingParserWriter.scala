@@ -272,4 +272,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 case class SingleParseResult[+Result](resultOption: Option[Result], errors: List[ParseError]) {
   def successful = errors.isEmpty
   def get: Result = resultOption.get
+  def map[NewResult](f: Result => NewResult): SingleParseResult[NewResult] = {
+    SingleParseResult(resultOption.map(f), errors)
+  }
 }
