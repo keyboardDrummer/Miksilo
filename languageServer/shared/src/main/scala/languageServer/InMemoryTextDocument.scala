@@ -1,7 +1,7 @@
 package languageServer
 
 import core.LazyLogging
-import core.language.TextChangeHandler
+import core.language.DocumentEventListener
 import core.parsers.core.ParseText
 import core.parsers.editorParsers.{Position, SourceRange}
 import languageServer.InMemoryTextDocument._
@@ -21,7 +21,7 @@ class InMemoryTextDocument(uri: String) extends LazyLogging {
     parseText.arrayOfChars = contents.toCharArray
   }
 
-  def applyUnsafeChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler] = None): Unit = {
+  def applyUnsafeChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[DocumentEventListener] = None): Unit = {
     try {
       applyChanges(changes, handlerOption)
     } catch {
@@ -30,7 +30,7 @@ class InMemoryTextDocument(uri: String) extends LazyLogging {
     }
   }
 
-  def applyChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[TextChangeHandler] = None): Unit = {
+  def applyChanges(changes: Seq[TextDocumentContentChangeEvent], handlerOption: Option[DocumentEventListener] = None): Unit = {
     for(change <- changes) {
       change.range match {
         case None =>
