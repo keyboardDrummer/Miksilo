@@ -25,7 +25,7 @@ lazy val miksilo = project
 
 lazy val commonSettings = Seq(
 
-  version := "0.0.6",
+  version := "0.0.7",
   resolvers += "dhpcs at bintray" at "https://dl.bintray.com/dhpcs/maven",
   logLevel := Level.Info,
   logBuffered in Test := false,

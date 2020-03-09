@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
 import core.LazyLogging
-import core.language.{FileSystem, TextChangeHandler}
+import core.language.{FileSystem, DocumentEventListener}
 import lsp.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 
 import scala.collection.mutable
@@ -19,7 +19,7 @@ import scala.jdk.CollectionConverters
 class TextDocumentManager extends LazyLogging with FileSystem {
 
   private val docs: ConcurrentMap[String, InMemoryTextDocument] = new ConcurrentHashMap
-  private val handlers: mutable.HashMap[String, TextChangeHandler] = new mutable.HashMap
+  private val handlers: mutable.HashMap[String, DocumentEventListener] = new mutable.HashMap
 
   def getOpenDocumentForUri(uri: String): Option[InMemoryTextDocument] =
     Option(docs.get(uri))
@@ -42,7 +42,9 @@ class TextDocumentManager extends LazyLogging with FileSystem {
   }
 
   def onCloseTextDocument(td: TextDocumentIdentifier): InMemoryTextDocument = {
-    docs.remove(td.uri)
+    val result = docs.remove(td.uri)
+    handlers.get(td.uri).foreach(h => h.handleClose())
+    result
   }
 
   override def getFile(path: String): String = {
@@ -52,7 +54,7 @@ class TextDocumentManager extends LazyLogging with FileSystem {
   // TODO remove this method and let FileSystem stop using InputStream
   def stringToStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
-  override def setTextChangedHandler(uri: String, handler: TextChangeHandler): Unit = {
+  override def setDocumentEventListener(uri: String, handler: DocumentEventListener): Unit = {
     if (handlers.contains(uri)) {
       throw new Exception("uri already had a handler")
     }
