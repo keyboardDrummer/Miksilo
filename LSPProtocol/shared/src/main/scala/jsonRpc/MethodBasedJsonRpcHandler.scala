@@ -49,7 +49,8 @@ class MethodBasedJsonRpcHandler(connection: JsonRpcConnection) extends JsonRpcHa
 
   override def handleNotification(notification: JsonRpcNotificationMessage): Unit = {
     notificationHandlers.get(notification.method) match {
-      case Some(handlers) => handlers.foreach(handler => {
+      case Some(handlers) =>
+        handlers.foreach(handler => {
         try {
           handler(notification)
         } catch {

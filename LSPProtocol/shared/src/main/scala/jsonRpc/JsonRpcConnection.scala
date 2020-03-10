@@ -42,6 +42,11 @@ class JsonRpcConnection(reader: MessageReader, writer: MessageWriter) extends La
     }
   }
 
+  private var stopped = false
+  def stop(): Unit = {
+    stopped = true
+  }
+
   def listen(): Unit = {
 
     def processItem(): Unit = {
@@ -49,6 +54,10 @@ class JsonRpcConnection(reader: MessageReader, writer: MessageWriter) extends La
         case null =>
           handler.dispose()
         case jsonString =>
+          if (stopped) {
+            handler.dispose()
+            return
+          }
           handleMessage(jsonString)
           processItem()
       })

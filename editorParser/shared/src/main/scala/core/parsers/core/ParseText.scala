@@ -1,11 +1,12 @@
 package core.parsers.core
 
+import core.LazyLogging
 import core.parsers.editorParsers.{Position, SourceRange}
 
 import scala.collection.Searching
 
 // TODO Merge the position and the document state, so that the position in a zipper over the document state data structure.
-final class ParseText extends CharSequence {
+final class ParseText extends CharSequence with LazyLogging {
 
   def this(text: String) = {
     this()
@@ -13,18 +14,9 @@ final class ParseText extends CharSequence {
   }
 
   private var _arrayOfChars: Array[Char] = Array.emptyCharArray
-  private var lineStarts: Array[Int] = Array.emptyIntArray
+  private var lineStarts: Array[Int] = _
 
-  def applyRangeChange(newText: String, range: SourceRange): Unit = {
-    val start = getOffset(range.start)
-    val end = getOffset(range.end)
-    if (start > end || start < 0 || end > _arrayOfChars.length) {
-      throw new IllegalArgumentException(s"Range $range is outside of the document bounds")
-    }
-    applyRangeChange(newText, start, end)
-  }
-
-  def applyRangeChange(newText: String, start: Int, end: Int) = {
+  def applyRangeChange(start: Int, end: Int, newText: String): Unit = {
     val newArray = new Array[Char](_arrayOfChars.length + newText.length - (end - start))
     _arrayOfChars.copyToArray(newArray, 0, start)
     Array.copy(_arrayOfChars, end, newArray, start + newText.length, _arrayOfChars.length - end)

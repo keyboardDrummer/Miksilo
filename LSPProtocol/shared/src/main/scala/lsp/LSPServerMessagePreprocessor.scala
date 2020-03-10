@@ -11,10 +11,10 @@ class LSPServerMessagePreprocessor(original: JsonRpcHandler, workQueue: SerialWo
 
   val changeParamsFormat = Json.format[DidChangeTextDocumentParams]
   override def aggregate(messages: CircularArrayBuffer[WorkItem]): Unit = {
-    logger.info(s"Aggregating ${messages.size} messages: ${messages.map(m => m.method).reduce((a,b) => a + ", " + b)}")
     if (messages.size < 2) {
       return
     }
+    logger.info(s"Aggregating ${messages.size} messages: ${messages.map(m => m.method).reduce((a,b) => a + ", " + b)}")
 
     val firstSecond = messages.takeRight(2)
     val first = firstSecond.head

@@ -62,6 +62,7 @@ object Language extends LazyLogging {
       val parsers = builtParser(compilation)
 
       def createParser(): CachingParser[Program] = {
+        logger.info("Creating caching parser for uri " + uri)
         val parseText = compilation.fileSystem.getFileParseText(uri)
         val result = AbsoluteTextPointer.getCachingParser(parseText, parser)
         compilation.fileSystem.setDocumentEventListener(uri, new DocumentEventListener {
@@ -71,6 +72,7 @@ object Language extends LazyLogging {
 
           override def handleClose(): Unit = {
             parsers.remove(uri)
+            compilation.fileSystem.setDocumentEventListener(uri, null)
           }
         })
         result

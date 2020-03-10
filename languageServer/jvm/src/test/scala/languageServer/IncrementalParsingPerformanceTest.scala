@@ -35,4 +35,5 @@ class IncrementalParsingPerformanceTest extends AnyFunSuite with LanguageServerT
       assert(diagnostics.diagnostics.isEmpty)
     })
   }
+
 }

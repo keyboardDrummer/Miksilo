@@ -102,13 +102,36 @@ class IncrementalParsingTest extends AnyFunSuite {
     assert(result3.errors.isEmpty)
   }
 
+  test("regression4") {
+    val program = """{
+                    |  "a" : {
+                    |    "b" : "c",
+                    |    "d" : {
+                    |      "e" : "f"
+                    |    }
+                    |  }
+                    |}""".stripMargin
+
+    val insert = """
+                   |    "b" : "c",
+                   |    "d" : {
+                   |      "e" : "f"
+                   |    }""".stripMargin
+
+    val change = getChange
+    val result0 = change(0, 0, program)
+    val result1 = change(11, 60, "")
+    val result2 = change(11, 11, insert)
+    assert(result1.errors.isEmpty)
+  }
+
   def getChange: Change = {
     val text = new ParseText()
     val parser = JsonParser.getCachingParser(text)
     new Change {
 
       override def apply(from: Int, until: Int, newText: String) = {
-        text.applyRangeChange(newText = newText, start = from, end = until)
+        text.applyRangeChange(start = from, end = until, newText = newText)
         parser.changeRange(from, until, newText.length)
         val parseResult = parser.parse()
         parseResult.map(JsonTestUtils.valueToPrimitive)

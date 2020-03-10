@@ -15,5 +15,7 @@ object LSPProtocol {
   val rename = "textDocument/rename"
   val initialized = "initialized"
   val initialize = "initialize"
+  val shutdown = "shutdown"
+  val exit = "exit"
   val codeAction = "textDocument/codeAction"
 }
