@@ -3,11 +3,7 @@ package languageServer
 import core.LazyLogging
 import core.language.DocumentEventListener
 import core.parsers.core.ParseText
-import core.parsers.editorParsers.{Position, SourceRange}
-import languageServer.InMemoryTextDocument._
 import lsp.TextDocumentContentChangeEvent
-
-import scala.collection.mutable.ArrayBuffer
 
 object InMemoryTextDocument {
   val newLine = "\n"
@@ -39,9 +35,13 @@ class InMemoryTextDocument(uri: String) extends LazyLogging {
           handlerOption.foreach(handler =>
             handler.handleChange(0, previousLength, changes.head.text))
         case Some(range) =>
-          parseText.applyRangeChange(change.text, range)
-          handlerOption.foreach(handler =>
-            handler.handleChange(parseText.getOffset(range.start), parseText.getOffset(range.end), change.text))
+          val from = parseText.getOffset(range.start)
+          val until = parseText.getOffset(range.end)
+          if (from > until || from < 0 || until > parseText.arrayOfChars.length) {
+            throw new IllegalArgumentException(s"Range $range is outside of the document bounds")
+          }
+          parseText.applyRangeChange(from, until, change.text)
+          handlerOption.foreach(handler => handler.handleChange(from, until, change.text))
       }
     }
   }

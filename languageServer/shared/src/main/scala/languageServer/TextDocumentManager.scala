@@ -55,6 +55,11 @@ class TextDocumentManager extends LazyLogging with FileSystem {
   def stringToStream(input: String) = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8))
 
   override def setDocumentEventListener(uri: String, handler: DocumentEventListener): Unit = {
+    if (handler == null) {
+      handlers.remove(uri)
+      return
+    }
+
     if (handlers.contains(uri)) {
       throw new Exception("uri already had a handler")
     }
