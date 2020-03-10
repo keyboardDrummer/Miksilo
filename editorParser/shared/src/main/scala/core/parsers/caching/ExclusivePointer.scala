@@ -48,5 +48,9 @@ class ExclusivePointer(val manager: ArrayOffsetManager, var offset: Int) extends
   override def subSequence(from: Int, until: Int) = manager.text.subSequence(from, until)
 
   override def lineCharacter = manager.text.getPosition(offset)
+
+  override def equals(obj: Any) = {
+    throw new Exception("don't compare text pointers, compare their offsets instead.")
+  }
 }
 

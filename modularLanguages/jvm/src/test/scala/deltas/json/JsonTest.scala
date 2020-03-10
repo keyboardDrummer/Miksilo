@@ -126,7 +126,8 @@ class JsonServerTest extends AnyFunSuite with LanguageServerTest {
     val jsonLanguage = JsonLanguage.language
     val server = new MiksiloLanguageServer(jsonLanguage)
 
-    val document = this.openDocument(server, input)
+    val (results0, document) = this.openAndCheckDocument(server, input)
+    assert(results0.isEmpty)
     val results1 = applyChange(server, document, 1,1, "{") // [{]
     val results2 = applyChange(server, document, 2,2, "}") // [{}]
     assert(results2.isEmpty)

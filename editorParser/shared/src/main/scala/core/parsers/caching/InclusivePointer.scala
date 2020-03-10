@@ -27,4 +27,8 @@ class InclusivePointer(var leftSide: ExclusivePointer) extends TextPointer {
   override def offset = leftSide.offset
 
   override def lineCharacter = leftSide.lineCharacter
+
+  override def equals(obj: Any) = {
+    throw new Exception("don't compare text pointers, compare their offsets instead.")
+  }
 }

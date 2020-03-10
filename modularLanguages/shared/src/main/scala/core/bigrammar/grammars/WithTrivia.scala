@@ -47,7 +47,7 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
 
           val rightResult = parseOriginal(leftReady.remainder, leftReady.state, fixPointState)
           rightResult.flatMapReady(rightReady => {
-            if (position != leftReady.remainder && leftReady.remainder == rightReady.remainder) {
+            if (position.offset != leftReady.remainder.offset && leftReady.remainder.offset == rightReady.remainder.offset) {
               SREmpty.empty // To avoid ambiguities, trivia may only occur before parsed input, not before inserted input.
             } else {
               val value = leftReady.resultOption.flatMap(leftValue =>

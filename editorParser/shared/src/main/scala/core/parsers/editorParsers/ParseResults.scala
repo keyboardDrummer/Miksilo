@@ -12,7 +12,7 @@ trait ParseResults[State, +Result] extends CachingParseResult {
   def tailDepth: Int
 
   def merge[Other >: Result](other: ParseResults[State, Other], depth: Int = 0,
-                             bests: Map[TextPointer, Double] = Map.empty): ParseResults[State, Other]
+                             bests: Map[Int, Double] = Map.empty): ParseResults[State, Other]
 
   def map[NewResult](f: Result => NewResult): ParseResults[State, NewResult] = {
     flatMap(lazyParseResult => singleResult(lazyParseResult.map(f)), uniform = true)
@@ -103,19 +103,19 @@ final class SRCons[State, +Result](
    */
   override def merge[Other >: Result](other: ParseResults[State, Other],
                                       mergeDepth: Int,
-                                      bests: Map[TextPointer, Double] = Map.empty): ParseResults[State, Other] = {
+                                      bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
     if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
       return SREmpty.empty[State]
 
     def getResult(head: LazyParseResult[State, Other], latestRemainder: OffsetPointer, tailDepth: Int,
-                  getTail: Map[TextPointer, Double] => ParseResults[State, Other]): ParseResults[State, Other] = {
+                  getTail: Map[Int, Double] => ParseResults[State, Other]): ParseResults[State, Other] = {
       head match {
         case ready: ReadyParseResult[State, Other] =>
-          bests.get(ready.remainder) match {
+          bests.get(ready.remainder.offset) match {
             case Some(previousBest) if previousBest >= ready.score =>
               getTail(bests)
             case _ =>
-              new SRCons(head, latestRemainder, tailDepth, getTail(bests + (ready.remainder -> ready.score)))
+              new SRCons(head, latestRemainder, tailDepth, getTail(bests + (ready.remainder.offset -> ready.score)))
           }
         case _ =>
           new SRCons(head, latestRemainder, tailDepth, getTail(bests))
@@ -150,7 +150,7 @@ object SREmpty {
 
 class SREmpty[State] extends ParseResults[State, Nothing] {
   override def merge[Other >: Nothing](other: ParseResults[State, Other], depth: Int,
-                                       bests: Map[TextPointer, Double] = Map.empty) = other
+                                       bests: Map[Int, Double] = Map.empty) = other
 
   override def mapResult[NewResult](f: LazyParseResult[State, Nothing] => LazyParseResult[State, NewResult], uniform: Boolean) = this
 

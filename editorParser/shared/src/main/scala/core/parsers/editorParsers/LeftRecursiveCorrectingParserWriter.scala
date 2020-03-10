@@ -112,7 +112,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     override def tailDepth = 0
 
     override def merge[Other >: Result](other: ParseResults[State, Other], depth: Int,
-                                        bests: Map[TextPointer, Double] = Map.empty): RecursiveResults[Other] = other match {
+                                        bests: Map[Int, Double] = Map.empty): RecursiveResults[Other] = other match {
       case otherRecursions: RecursiveResults[Result] =>
         val merged = this.recursions.foldLeft(otherRecursions.recursions)((acc, entry) => {
           val value = acc.get(entry._1) match {
