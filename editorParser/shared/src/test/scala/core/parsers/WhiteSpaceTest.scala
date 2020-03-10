@@ -2,12 +2,27 @@ package core.parsers
 
 import _root_.core.parsers.editorParsers._
 import _root_.core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, ParseError, Position, SourceRange}
-import _root_.core.parsers.strings.{NoStateParserWriter, CommonParserWriter, WhitespaceParserWriter}
+import _root_.core.parsers.strings.{CommonParserWriter, NoStateParserWriter, WhitespaceParserWriter}
+import languages.json.JsonParser
 import org.scalatest.funsuite.AnyFunSuite
 
 class WhiteSpaceTest extends AnyFunSuite {
 
   val parser = ExpressionParser.root.getWholeInputParser()
+
+  test("empty JSON object") {
+    val program = "{ }"
+
+    val result = JsonParser.parser.parse(program)
+    assert(result.errors.isEmpty)
+  }
+
+  test("empty nested JSON object") {
+    val program = """{ "bla": { }}"""
+
+    val result = JsonParser.parser.parse(program)
+    assert(result.errors.isEmpty)
+  }
 
   test("diagnostics placement in whitespace 1") {
     val program = "    "

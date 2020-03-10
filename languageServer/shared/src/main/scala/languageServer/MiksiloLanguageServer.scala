@@ -47,7 +47,6 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     if (client != null) {
       val uri = compilation.rootFile.get
       val diagnostics = getCompilation.diagnosticsForFile(uri)
-      logger.info("Sending diagnostics: " + diagnostics)
       client.sendDiagnostics(PublishDiagnostics(uri, diagnostics))
     }
   }
@@ -102,7 +101,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       scopeGraph = proofs.scopeGraph
       element <- getSourceElement(text, FilePosition(params.textDocument.uri, position)).toSeq
       reference <- scopeGraph.getReferenceFromSourceElement(element).toSeq
-      prefixLength = offset - reference.origin.get.range.get.from
+      prefixLength = offset - reference.origin.get.range.get.from.offset
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
         filter(declaration => declaration.name.startsWith(prefix))

@@ -1,20 +1,20 @@
 package core.language
 
-import core.parsers.editorParsers.{FileOffsetRange, OffsetRange, SourceRange}
+import core.parsers.editorParsers.{FileOffsetRange, OffsetPointerRange, OffsetRange, SourceRange}
 import lsp.{FileOffset, FilePosition, FileRange}
 
 trait SourceElement {
   /*
   A None value means the element is not part of the source.
    */
-  def range: Option[OffsetRange]
+  def range: Option[OffsetPointerRange]
 
   def childElements: Seq[SourceElement] = Seq.empty
 
   /*
   A None value means the element is not part of the source.
    */
-  def fileRange: Option[FileOffsetRange] = range.flatMap(p => uriOption.map(u => FileOffsetRange(u, p)))
+  def fileRange: Option[FileOffsetRange] = range.flatMap(p => uriOption.map(u => FileOffsetRange(u, p.toOffsetRange)))
 
   def uriOption: Option[String]
 

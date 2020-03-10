@@ -74,6 +74,13 @@ class ArrayOffsetManager(var text: ParseText) {
   def changeText(from: Int, until: Int, insertLength: Int): Unit = {
     offsetCache.clear()
 
+    offsets.zipWithIndex.reverse.foreach(t => {
+      val (offset, index) = t
+      if (from <= offset.offset && offset.offset < until) {
+        offsets.remove(index)
+      }
+    })
+
     val delta = insertLength - (until - from)
     for(offset <- offsets.sortBy(o => -o.offset)) {
       val absoluteOffset = offset.offset

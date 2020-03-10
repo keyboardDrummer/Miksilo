@@ -1,7 +1,7 @@
 package core.parsers.editorParsers
 
 import ParseResults._
-import core.parsers.core.{TextPointer}
+import core.parsers.core.{OffsetPointer, TextPointer}
 
 import scala.collection.mutable
 
@@ -57,7 +57,7 @@ object ParseResults {
 
 final class SRCons[State, +Result](
                                     val head: LazyParseResult[State, Result],
-                                    val latestRemainder: TextPointer,
+                                    val latestRemainder: OffsetPointer,
                                     var tailDepth: Int,
                                     _tail: => ParseResults[State, Result])
   extends ParseResults[State, Result] {
@@ -107,7 +107,7 @@ final class SRCons[State, +Result](
     if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
       return SREmpty.empty[State]
 
-    def getResult(head: LazyParseResult[State, Other], latestRemainder: TextPointer, tailDepth: Int,
+    def getResult(head: LazyParseResult[State, Other], latestRemainder: OffsetPointer, tailDepth: Int,
                   getTail: Map[TextPointer, Double] => ParseResults[State, Other]): ParseResults[State, Other] = {
       head match {
         case ready: ReadyParseResult[State, Other] =>
@@ -134,7 +134,7 @@ final class SRCons[State, +Result](
     }
   }
 
-  def getLatest(one: TextPointer, other: TextPointer): TextPointer = {
+  def getLatest(one: OffsetPointer, other: OffsetPointer): OffsetPointer = {
     if (one.offset > other.offset) one else other
   }
 
@@ -169,22 +169,7 @@ class SREmpty[State] extends ParseResults[State, Nothing] {
   override def latestRemainder = EmptyRemainder
 }
 
-object EmptyRemainder extends TextPointer {
+object EmptyRemainder extends OffsetPointer {
   override def offset() = Int.MinValue
-
-  override def drop(amount: Int) = this
-
-  override def charAt(index: Int) = ???
-
-  override def length = ???
-
-  override def charSequence = ???
-
-  override def lineCharacter = ???
-
-  override def cache = ???
-
-  override def cache_=(value: mutable.HashMap[Any, Any]): Unit = ???
-
-  override def subSequence(from: Int, until: Int) = ???
+  override def lineCharacter = Position(Int.MinValue, Int.MinValue)
 }
