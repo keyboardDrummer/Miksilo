@@ -1,7 +1,8 @@
 package core.parsers
 
+import _root_.core.parsers.caching.ArrayOffsetManager
 import _root_.core.parsers.core.ParseText
-import _root_.core.parsers.editorParsers.{ArrayOffsetManager, History}
+import _root_.core.parsers.editorParsers.History
 import _root_.core.parsers.strings.{NoStateParserWriter, StringParserWriter}
 import org.scalatest.funsuite.AnyFunSuite
 

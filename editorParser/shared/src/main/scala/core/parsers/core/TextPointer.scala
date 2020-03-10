@@ -36,7 +36,6 @@ trait TextPointer extends OffsetPointer {
   def subSequence(from: Int, until: Int): CharSequence
   def drop(amount: Int): TextPointer
   def cache: mutable.HashMap[Any, Any]
-  def cache_=(value: mutable.HashMap[Any, Any]): Unit
 
   def printRange(end: TextPointer) = subSequence(offset, end.offset).toString
 }

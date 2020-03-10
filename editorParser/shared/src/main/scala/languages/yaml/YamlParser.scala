@@ -1,8 +1,9 @@
 package languages.yaml
 
 import core.document.Empty
+import core.parsers.caching.ExclusivePointer
 import core.parsers.core.{ParseText, Processor, TextPointer}
-import core.parsers.editorParsers.{AbsoluteTextPointer, History, LeftRecursiveCorrectingParserWriter, OffsetPointerRange}
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetPointerRange}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
 import core.responsiveDocument.ResponsiveDocument
 
@@ -109,7 +110,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
 
   lazy val parseYaml = trivias ~> parseValue ~< trivias
   lazy val parser = parseYaml.getWholeInputParser()
-  def getCachingParser(text: ParseText) = AbsoluteTextPointer.getCachingParser(text, parser)
+  def getCachingParser(text: ParseText) = ExclusivePointer.getCachingParser(text, parser)
 
   lazy val parseBlockMapping: Parser[YamlValue] = {
     val member = new WithContext(_ =>

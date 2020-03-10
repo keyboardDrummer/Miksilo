@@ -1,57 +1,23 @@
-package core.parsers.editorParsers
+package core.parsers.caching
 
-import core.parsers.core.{Metrics, ParseText, TextPointer}
-import core.parsers.strings.SubSequence
+import core.parsers.core.ParseText
+import core.parsers.editorParsers.CachingParseResult
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
 import scala.collection.mutable
 
-object AbsoluteTextPointer {
-  def getCachingParser[Result](parseText: ParseText, singleResultParser: SingleResultParser[Result]): CachingParser[Result] = {
-    val offsetManager = new ArrayOffsetManager(parseText)
-    new CachingParser[Result] {
-
-      override def parse(mayStop: StopFunction, metrics: Metrics) = {
-        singleResultParser.parse(offsetManager.getOffsetNode(0), mayStop, metrics)
-      }
-
-      override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
-        offsetManager.changeText(from, until, insertionLength)
-      }
-    }
-  }
-}
-
-class AbsoluteTextPointer(val manager: ArrayOffsetManager, var offset: Int) extends TextPointer {
-
-  override var cache = new mutable.HashMap[Any, Any]
-
-  override def drop(amount: Int) = manager.getOffsetNode(amount + offset)
-
-  override def toString = offset.toString
-
-  override def charAt(index: Int) = manager.text.charAt(index)
-
-  override def length = manager.text.length
-
-  override def charSequence = new SubSequence(manager.text, offset)
-
-  override def subSequence(from: Int, until: Int) = manager.text.subSequence(from, until)
-
-  override def lineCharacter = manager.text.getPosition(offset)
-}
-
 class ArrayOffsetManager(var text: ParseText) {
 
-  val offsets = mutable.ArrayBuffer.empty[AbsoluteTextPointer]
-  val offsetCache = mutable.HashMap.empty[Int, TextPointer]
-  def getOffsetNode(offset: Int) = {
+  val offsets = mutable.ArrayBuffer.empty[ExclusivePointer]
+  val offsetCache = mutable.HashMap.empty[Int, ExclusivePointer]
+
+  def getOffsetNode(offset: Int): ExclusivePointer = {
     offsetCache.getOrElseUpdate(offset, {
       binarySearch(offset) match {
         case Found(index) => offsets(index)
         case InsertionPoint(insertionPoint) =>
-          val result = new AbsoluteTextPointer(this, offset)
+          val result = new ExclusivePointer(this, offset)
           offsets.insert(insertionPoint, result)
           result
       }
@@ -59,7 +25,7 @@ class ArrayOffsetManager(var text: ParseText) {
   }
 
   @tailrec
-  private[this] def binarySearch(offset: Int, from: Int = 0, to: Int = offsets.length): SearchResult = {
+  private[this] def binarySearch[T](offset: Int, from: Int = 0, to: Int = offsets.length): SearchResult = {
     if (to <= from) InsertionPoint(from)
     else {
       val idx = from + (to - from - 1) / 2
@@ -99,9 +65,10 @@ class ArrayOffsetManager(var text: ParseText) {
         offset.offset += delta
       }
       if (absoluteOffset == from) {
-        val newNode = getOffsetNode(offset.offset + delta)
-        newNode.cache = offset.cache
-        offset.cache = new mutable.HashMap[Any, Any]()
+        val newLeftSide = getOffsetNode(offset.offset + delta)
+        offset.rightSide.leftSide = newLeftSide
+        newLeftSide.rightSide = offset.rightSide
+        offset.rightSide = new InclusivePointer(offset)
       }
     }
   }

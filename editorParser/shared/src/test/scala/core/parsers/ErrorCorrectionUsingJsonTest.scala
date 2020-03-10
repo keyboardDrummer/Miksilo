@@ -212,7 +212,3 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
     assertResult(errorCount)(result.errors.size)
   }
 }
-
-
-
-

@@ -1,5 +1,6 @@
 package core.parsers.editorParsers
 
+import core.parsers.caching.ArrayOffsetManager
 import core.parsers.core._
 
 trait CachingParseResult {
@@ -53,9 +54,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               else
                 resultWithoutRecursion
 
-              if (result.latestRemainder.offset > position.offset) {
-                position.cache.put(key, result)
-              }
+              position.cache.put(key, result)
 
               result
           }
@@ -113,7 +112,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     override def tailDepth = 0
 
     override def merge[Other >: Result](other: ParseResults[State, Other], depth: Int,
-                                        bests: Map[TextPointer, Double] = Map.empty): RecursiveResults[Other] = other match {
+                                        bests: Map[Int, Double] = Map.empty): RecursiveResults[Other] = other match {
       case otherRecursions: RecursiveResults[Result] =>
         val merged = this.recursions.foldLeft(otherRecursions.recursions)((acc, entry) => {
           val value = acc.get(entry._1) match {
@@ -160,10 +159,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         case _ =>
           val value: ParseResult[Result] = parser(position, state, newFixPointState)
 
-          // Do not cache length zero results, since they cannot be corrected moved if something is inserted where they start.
-          if (value.latestRemainder.offset > position.offset) {
-            position.cache.put(key, value)
-          }
+          position.cache.put(key, value)
           value
       }
     }

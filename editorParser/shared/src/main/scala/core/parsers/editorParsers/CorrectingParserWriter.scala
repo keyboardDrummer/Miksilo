@@ -97,7 +97,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             val rightResult = parseRight(leftReady.remainder, leftReady.state, fixPointState)
             rightResult.flatMap({
               case rightReady: ReadyParseResult[State, Result] =>
-                if (rightReady.remainder == leftReady.remainder)
+                if (rightReady.remainder.offset == leftReady.remainder.offset)
                   SREmpty.empty
                 else {
                   singleResult(rightReady.mapWithHistory(mapRightResult, leftReady.history))
@@ -236,7 +236,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   override def succeed[Result](result: Result): Parser[Result] = Succeed(result)
 
   def newSuccess[Result](result: Result, remainder: TextPointer, state: State, score: Double): SRCons[State, Result] =
-    singleResult(ReadyParseResult(Some(result), remainder, state, History.success(remainder, remainder, result, score)))
+    singleResult(ReadyParseResult(Some(result), remainder.drop(0), state, History.success(remainder, remainder, result, score)))
 
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {
 
