@@ -72,7 +72,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     override def append(next: ParseError): Option[ParseError] = {
       next match {
-        case drop: DropError if drop.from == to =>
+        case drop: DropError if drop.from.offset == to.offset =>
           Some(DropError(from, drop.to))
         case _ => None
       }
