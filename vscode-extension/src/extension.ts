@@ -114,8 +114,9 @@ let previousMode: Mode | undefined = undefined;
 function activateJar(context: ExtensionContext) {
 
 	const mode = getMode()
-	if (mode === previousMode)
+	if (mode?.toString() === previousMode?.toString())
 		return;
+
 	previousMode = mode;
 	if (!mode) {
 		window.showErrorMessage("Could not locate a language server. Please configure \"miksilo.jar\" in settings.");
