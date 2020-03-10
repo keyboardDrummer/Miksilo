@@ -38,7 +38,9 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
   override def didChange(parameters: DidChangeTextDocumentParams): Unit = {
     compilation = new Compilation(compilationCache, Some(parameters.textDocument.uri))
     if (parameters.contentChanges.nonEmpty) {
+      val start = System.currentTimeMillis()
       documentManager.onChangeTextDocument(parameters.textDocument, parameters.contentChanges)
+      compilation.metrics.measure("Apply change time", System.currentTimeMillis() - start)
     }
     sendDiagnostics()
   }
