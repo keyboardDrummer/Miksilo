@@ -97,7 +97,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             val rightResult = parseRight(leftReady.remainder, leftReady.state, fixPointState)
             rightResult.flatMap({
               case rightReady: ReadyParseResult[State, Result] =>
-                if (rightReady.remainder == leftReady.remainder)
+                if (rightReady.remainder.offset == leftReady.remainder.offset)
                   SREmpty.empty
                 else {
                   singleResult(rightReady.mapWithHistory(mapRightResult, leftReady.history))
