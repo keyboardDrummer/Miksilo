@@ -1,5 +1,6 @@
 package core.parsers.editorParsers
 
+import core.parsers.caching.ArrayOffsetManager
 import core.parsers.core._
 
 trait CachingParseResult {
