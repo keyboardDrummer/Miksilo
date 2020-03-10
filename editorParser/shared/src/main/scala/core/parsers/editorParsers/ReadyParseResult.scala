@@ -1,7 +1,7 @@
 package core.parsers.editorParsers
 
 import ParseResults._
-import core.parsers.core.{InputGen, TextPointer}
+import core.parsers.core.TextPointer
 
 case class RecursionsList[State, SeedResult, +Result](
   recursions: List[RecursiveParseResult[State, SeedResult, Result]],
@@ -64,19 +64,19 @@ case class RecursiveParseResult[State, SeedResult, +Result](
   }
 }
 
-case class ReadyParseResult[State, +Result](resultOption: Option[Result], remainder: InputGen[State], history: History)
+case class ReadyParseResult[State, +Result](resultOption: Option[Result], remainder: TextPointer, state: State, history: History)
   extends LazyParseResult[State, Result] {
 
   val originalScore = (if (history.flawed) 0 else 10000) + history.score
   override val score = 10000 + originalScore
 
   override def map[NewResult](f: Result => NewResult): ReadyParseResult[State, NewResult] = {
-    ReadyParseResult(resultOption.map(f), remainder, history)
+    ReadyParseResult(resultOption.map(f), remainder, state, history)
   }
 
   override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], oldHistory: History) = {
     val newReady = f(this)
-    ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.history ++ oldHistory)
+    ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.state, newReady.history ++ oldHistory)
   }
 
   override def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], uniform: Boolean):
@@ -84,5 +84,5 @@ case class ReadyParseResult[State, +Result](resultOption: Option[Result], remain
 
   override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean) = f(this)
 
-  override def offset = remainder.position
+  override def offset = remainder
 }

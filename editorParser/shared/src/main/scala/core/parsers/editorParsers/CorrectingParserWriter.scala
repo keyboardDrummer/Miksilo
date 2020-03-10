@@ -10,14 +10,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                                   metrics: Metrics): SingleParseResult[Result] = {
 
     val start = System.currentTimeMillis()
-    val startInput = InputGen(zero, startState)
-    val noResultFound = ReadyParseResult(None, startInput, History.error(FatalError(zero, "Grammar is always recursive")))
+    val noResultFound = ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[State, Result] = noResultFound
 
     mayStop.reset()
 
     var cycles = 0
-    var queue = parser(startInput, newParseState(startInput))
+    var queue = parser(zero, startState, newParseState(zero))
     while(queue.nonEmpty) {
       cycles += 1
       val (parseResult, tail) = queue.pop()
@@ -28,7 +27,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
             case tailCons: SRCons[State, Result] =>
-              if (bestResult.history.spotless || mayStop(bestResult.remainder.position.offset, bestResult.originalScore, tailCons.head.score))
+              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty.empty[State]
               else
                 tail
@@ -49,8 +48,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   def singleResult[Result](parseResult: LazyParseResult[State, Result]) =
     new SRCons(parseResult, parseResult.offset, 0, SREmpty.empty)
 
-  def newFailure[Result](input: Input, error: ParseError): SRCons[State, Result] =
-    singleResult(ReadyParseResult(None, input, History.error(error)))
+  def newFailure[Result](position: TextPointer, state: State, error: ParseError): SRCons[State, Result] =
+    singleResult(ReadyParseResult(None, position, state, History.error(error)))
 
   def leftRightSimple[Left, Right, Result](left: Parser[Left],
                                            right: => Parser[Right],
@@ -85,16 +84,17 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
       class LeftIfRightParser extends BuiltParser[Result] {
 
-        def parse(input: Input, state: FixPointState, mayFail: Boolean): ParseResult[Result] = {
+        def parse(position: TextPointer, state: State, fixPointState: FixPointState, mayFail: Boolean): ParseResult[Result] = {
 
           def rightFromLeftReady(leftReady: ReadyParseResult[State, Left]): ParseResults[State, Result] = {
 
             def mapRightResult(rightResult: ReadyParseResult[State, Result]): ReadyParseResult[State, Result] = ReadyParseResult(
               combine(leftReady.resultOption, rightResult.resultOption),
               rightResult.remainder,
+              rightResult.state,
               rightResult.history)
 
-            val rightResult = parseRight(leftReady.remainder, state)
+            val rightResult = parseRight(leftReady.remainder, leftReady.state, fixPointState)
             rightResult.flatMap({
               case rightReady: ReadyParseResult[State, Result] =>
                 if (rightReady.remainder == leftReady.remainder)
@@ -106,18 +106,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             }, uniform = !leftReady.history.canMerge)
           }
 
-          val withoutLeft = parseRight(input, state)
+          val withoutLeft = parseRight(position, state, fixPointState)
 
           // TODO determine if we can delete or comment about the next two lines
-          if (input.position.atEnd())
+          if (position.atEnd())
             return withoutLeft
 
-          val withLeft = parseLeft(input, state).flatMapReady(rightFromLeftReady, uniform = false)
+          val withLeft = parseLeft(position, state, fixPointState).flatMapReady(rightFromLeftReady, uniform = false)
           withoutLeft.merge(withLeft)
         }
 
-        override def apply(input: Input, state: FixPointState): ParseResult[Result] = {
-          parse(input, state, mayFail = true)
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
+          parse(position, state, fixPointState, mayFail = true)
         }
       }
       new LeftIfRightParser
@@ -136,13 +136,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       lazy val parseRight = recursive(right)
 
       new BuiltParser[Result] {
-        override def apply(input: Input, state: FixPointState) = {
-          val leftResults = parseLeft(input, state)
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
+          val leftResults = parseLeft(position, state, fixPointState)
 
           val delayedLeftResults: ParseResults[State, Left] = leftResults.mapResult({
             case ready: ReadyParseResult[State, Left] =>
               if (ready.history.flawed) {
-                new DelayedParseResult[State, Left](ready.remainder.position, ready.history, () => singleResult(ready))
+                new DelayedParseResult[State, Left](ready.remainder, ready.history, () => singleResult(ready))
               }
               else
                 ready
@@ -153,9 +153,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             def mapRightResult(rightResult: ReadyParseResult[State, Right]): ReadyParseResult[State, Result] = ReadyParseResult(
               combine(leftReady.resultOption, rightResult.resultOption),
               rightResult.remainder,
+              rightResult.state,
               rightResult.history)
 
-            val rightResult = parseRight(leftReady.remainder, state)
+            val rightResult = parseRight(leftReady.remainder, leftReady.state, fixPointState)
             rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
           }
           delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false)
@@ -174,9 +175,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       lazy val parseSecond = recursive(second)
 
       new BuiltParser[Result] {
-        override def apply(input: Input, state: FixPointState): ParseResults[State, Result] = {
-          val firstResult = parseFirst(input, state)
-          val secondResult = parseSecond(input, state)
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
+          val firstResult = parseFirst(position, state, fixPointState)
+          val secondResult = parseSecond(position, state, fixPointState)
           firstResult match {
             case cons: SRCons[State, Result]
               if !cons.head.history.flawed => firstResult
@@ -198,20 +199,20 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       lazy val parseSecond = recursive(second)
 
       new BuiltParser[Result] {
-        override def apply(input: Input, state: FixPointState): ParseResults[State, Result] = {
-          val firstResult = parseFirst(input, state)
-          val secondResult = parseSecond(input, state)
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
+          val firstResult = parseFirst(position, state, fixPointState)
+          val secondResult = parseSecond(position, state, fixPointState)
           firstResult.merge(secondResult)
         }
       }
     }
   }
 
-  object PositionParser extends ParserBuilderBase[Input] with LeafParser[Input] {
+  object PositionParser extends ParserBuilderBase[TextPointer] with LeafParser[TextPointer] {
 
-    override def getParser(recursive: GetParser): BuiltParser[Input] = {
-      (input, _) => {
-        singleResult(ReadyParseResult(Some(input), input, History.empty))
+    override def getParser(recursive: GetParser): BuiltParser[TextPointer] = {
+      (position, state, _) => {
+        singleResult(ReadyParseResult(Some(position), position, state, History.empty))
       }
     }
 
@@ -223,10 +224,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     override def getParser(recursive: GetParser): BuiltParser[NewResult] = {
       val parseOriginal = recursive(original)
-      (input, state) => {
-        parseOriginal(input, state).mapReady(ready => {
-          val newValue = ready.resultOption.map(v => addRange(input.position, ready.remainder.position, v))
-          ReadyParseResult(newValue, ready.remainder, ready.history)
+      (position, state, fixPointState) => {
+        parseOriginal(position, state, fixPointState).mapReady(ready => {
+          val newValue = ready.resultOption.map(v => addRange(position, ready.remainder, v))
+          ReadyParseResult(newValue, ready.remainder, ready.state, ready.history)
         }, uniform = true)
       }
     }
@@ -234,13 +235,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   override def succeed[Result](result: Result): Parser[Result] = Succeed(result)
 
-  def newSuccess[Result](result: Result, remainder: Input, score: Double): SRCons[State, Result] =
-    singleResult(ReadyParseResult(Some(result), remainder, History.success(remainder.position, remainder.position, result, score)))
+  def newSuccess[Result](result: Result, remainder: TextPointer, state: State, score: Double): SRCons[State, Result] =
+    singleResult(ReadyParseResult(Some(result), remainder, state, History.success(remainder, remainder, result, score)))
 
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParser): BuiltParser[Result] = {
-      (input: Input, _) => newSuccess(value, input, 0)
+      (position: TextPointer, state: State, _: FixPointState) => newSuccess(value, position, state, 0)
     }
 
     override def getMustConsume(cache: ConsumeCache) = false
@@ -251,12 +252,12 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     override def getParser(recursive: GetParser): BuiltParser[NewResult] = {
       val parseOriginal = recursive(original)
-      (input, state) => parseOriginal(input, state).map(f)
+      (input, state, fixPointState) => parseOriginal(input, state, fixPointState).map(f)
     }
   }
 
-  def newFailure[Result](partial: Option[Result], input: Input, errors: MyHistory) =
-    singleResult(ReadyParseResult(partial, input, errors))
+  def newFailure[Result](partial: Option[Result], position: TextPointer, state: State, errors: MyHistory) =
+    singleResult(ReadyParseResult(partial, position, state, errors))
 
   type MyHistory = History
 

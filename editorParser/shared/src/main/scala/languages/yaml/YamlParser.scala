@@ -1,7 +1,7 @@
 package languages.yaml
 
 import core.document.Empty
-import core.parsers.core.{InputGen, ParseText, Processor}
+import core.parsers.core.{ParseText, Processor, TextPointer}
 import core.parsers.editorParsers.{AbsoluteTextPointer, History, LeftRecursiveCorrectingParserWriter, OffsetPointerRange}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
 import core.responsiveDocument.ResponsiveDocument
@@ -69,7 +69,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
 
     override def getParser(recursive: GetParser) = {
       val innerParsers = inners.view.mapValues(p => recursive(p)).toMap
-      (input, state) => innerParsers(input.state.context)(input, state)
+      (position, state, fixPointState) => innerParsers(state.context)(position, state, fixPointState)
     }
 
     override def leftChildren = inners.values.toList
@@ -85,10 +85,10 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
-      def apply(input: Input, state: FixPointState): ParseResult[Result] = {
-        val context: YamlContext = input.state.context
-        val result = parseOriginal(InputGen(input.position, input.state.withContext(update(context))), state)
-        result.updateRemainder(r => InputGen(r.position, r.state.withContext(context)))
+      def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
+        val context: YamlContext = state.context
+        val result = parseOriginal(position, state.withContext(update(context)), fixPointState)
+        result.updateRemainder((position, state) => (position, state.withContext(context)))
       }
 
       apply

@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.core.{InputGen, TextPointer}
+import core.parsers.core.TextPointer
 import core.parsers.editorParsers._
 import core.parsers.sequences.SequenceParserWriter
 
@@ -39,22 +39,21 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
     override def getParser(recursive: GetParser): BuiltParser[String] = {
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
-        def apply(input: Input, state: FixPointState): ParseResult[String] = {
-          val position = input.position
+        def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[String] = {
           var index = 0
           while (index < value.length) {
             val arrayIndex = index + position.offset
             val remainder = position.drop(index)
             val errorHistory = History.error(new MissingInput(remainder, value.substring(index), value.substring(index), penalty))
             if (position.length <= arrayIndex) {
-              return singleResult(ReadyParseResult(Some(value), InputGen(remainder, input.state), errorHistory))
+              return singleResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
             } else if (position.charAt(arrayIndex) != value.charAt(index)) {
-              return singleResult(ReadyParseResult(Some(value), InputGen(remainder, input.state), errorHistory))
+              return singleResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
             }
             index += 1
           }
           val remainder = position.drop(value.length)
-          singleResult(ReadyParseResult(Some(value), InputGen(remainder, input.state), History.success(position, remainder, value)))
+          singleResult(ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value)))
         }
       }
       result
@@ -72,13 +71,13 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
     override def getParser(recursive: GetParser): BuiltParser[String] = {
       val identifierParser = recursive(parseIdentifier)
       new BuiltParser[String] {
-        override def apply(input: Input, state: FixPointState) = {
-          identifierParser(input, state).mapReady(ready => {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, String] = {
+          identifierParser(position, state, fixPointState).mapReady(ready => {
             if (ready.resultOption.contains(value)) {
               ready
             } else {
-              val insertError = new MissingInput(input.position, value, value + " ")
-              ReadyParseResult(Some(value), input, History.error(insertError))
+              val insertError = new MissingInput(position, value, value + " ")
+              ReadyParseResult(Some(value), position, state, History.error(insertError))
             }
           }, uniform = false)
         }
@@ -113,17 +112,16 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
 
-        def apply(input: Input, state: FixPointState): ParseResult[String] = {
-          val position = input.position
+        def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[String] = {
           regex.findPrefixMatchOf(position.charSequence) match {
             case Some(matched) =>
               val value = position.subSequence(position.offset, position.offset + matched.end).toString
               val remainder = position.drop(matched.end)
-              singleResult(ReadyParseResult(Some(value), InputGen(remainder, input.state), History.success(position, remainder, value, score)))
+              singleResult(ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value, score)))
             case None =>
               penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
                 val history = History.error(new MissingInput(position, s"<$regexName>", defaultValue.getOrElse(""), penalty))
-                singleResult(ReadyParseResult[State, String](defaultValue, input, history))
+                singleResult(ReadyParseResult[State, String](defaultValue, position, state, history))
               })
 
           }

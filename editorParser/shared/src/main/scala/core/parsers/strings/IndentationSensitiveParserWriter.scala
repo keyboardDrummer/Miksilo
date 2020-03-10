@@ -1,6 +1,6 @@
 package core.parsers.strings
 
-import core.parsers.core.{InputGen, TextPointer}
+import core.parsers.core.{TextPointer}
 import core.parsers.editorParsers.History
 
 trait DefaultIndentationSensitiveWriter extends IndentationSensitiveParserWriter {
@@ -27,13 +27,12 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
-      def apply(input: Input, state: FixPointState) = {
-        val previous = input.state
-        val lineCharacter = input.position.lineCharacter
-        val newInput = InputGen[State](input.position, input.state.withIndentation(lineCharacter.character))
-        val result: ParseResult[Result] = parseOriginal(newInput, state)
-        result.updateRemainder(remainder => {
-          InputGen(remainder.position, previous)
+      def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
+        val previous = state
+        val lineCharacter = position.lineCharacter
+        val result: ParseResult[Result] = parseOriginal(position, state.withIndentation(lineCharacter.character), fixPointState)
+        result.updateRemainder((remainder, _) => {
+          (remainder, previous)
         })
       }
 
@@ -68,13 +67,13 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     override def getParser(recursive: GetParser) = {
       val parseOriginal = recursive(original)
 
-      def apply(input: Input, state: FixPointState) = {
-        val lineCharacter = input.position.lineCharacter
-        val delta = lineCharacter.character - input.state.indentation
-        if (input.position.atEnd() || deltaPredicate(delta)) {
-          parseOriginal(input, state)
+      def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
+        val lineCharacter = position.lineCharacter
+        val delta = lineCharacter.character - state.indentation
+        if (position.atEnd() || deltaPredicate(delta)) {
+          parseOriginal(position, state, fixPointState)
         } else {
-          newFailure(None, input, History.error(IndentationError(input.position, lineCharacter.character, property)))
+          newFailure(None, position, state, History.error(IndentationError(position, lineCharacter.character, property)))
         }
       }
       apply

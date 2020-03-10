@@ -1,12 +1,12 @@
 package deltas.yaml
 
-import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.bigrammar.grammars.RegexGrammar
+import core.bigrammar.{BiGrammar, BiGrammarToParser}
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
-import core.parsers.core.ParseText
+import core.parsers.core.TextPointer
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
 
@@ -32,9 +32,9 @@ object YamlCoreDelta extends DeltaWithGrammar {
     override def getParser(recursive: BiGrammarToParser.GetParser): BuiltParser[Result] = {
       val innerParsers = inners.view.mapValues(p => recursive(p)).toMap
 
-      def apply(input: Input, state: FixPointState) = {
-        val context: YamlContext = input.state.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-        innerParsers(context)(input, state)
+      def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
+        val context: YamlContext = state.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
+        innerParsers(context)(position, state, fixPointState)
       }
 
       apply
@@ -53,10 +53,10 @@ object YamlCoreDelta extends DeltaWithGrammar {
     override def getParser(recursive: BiGrammarToParser.GetParser) = {
       val parseOriginal = recursive(original)
 
-      def apply(input: Input, state: FixPointState): ParseResult[Result] = {
-        val context: YamlContext = input.state.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-        val result = parseOriginal(input.withState(MyState(input.state.state + (ContextKey -> update(context)))), state)
-        result.updateRemainder(r => r.withState(MyState(r.state.state + (ContextKey -> context))))
+      def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
+        val context: YamlContext = state.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
+        val result = parseOriginal(position, MyState(state.state + (ContextKey -> update(context))), fixPointState)
+        result.updateRemainder((p, s) => (p, MyState(s.state + (ContextKey -> context))))
       }
 
       apply

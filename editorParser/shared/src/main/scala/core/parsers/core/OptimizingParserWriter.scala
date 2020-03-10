@@ -1,23 +1,18 @@
 package core.parsers.core
 
-import core.parsers.editorParsers.{Position, SingleResultParser}
+import core.parsers.editorParsers.SingleResultParser
 
 import scala.collection.mutable
 
-case class InputGen[State](position: TextPointer, state: State) {
-  def withState(newState: State) = InputGen(position, newState)
-}
-
 trait OptimizingParserWriter extends ParserWriter {
 
-  type Input = InputGen[State]
   type State
   def startState: State
 
   type ParseResult[+Result]
   type Parser[+Result] = ParserBuilder[Result]
 
-  def newParseState(input: Input): FixPointState
+  def newParseState(input: TextPointer): FixPointState
 
   case class FixPointState(offset: Int, // TODO try to remove this offset, since we can also clear the callStack whenever we move forward.
                            callStack: Set[BuiltParser[Any]])
@@ -27,7 +22,7 @@ trait OptimizingParserWriter extends ParserWriter {
                          shouldDetectLeftRecursion: Boolean): BuiltParser[Result]
 
   trait BuiltParser[+Result] {
-    def apply(input: Input, state: FixPointState): ParseResult[Result]
+    def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result]
     def debugName: Any = null
   }
 
@@ -87,8 +82,8 @@ trait OptimizingParserWriter extends ParserWriter {
     override def getParser(recursive: GetParser): BuiltParser[Result] = {
       lazy val parseOriginal = recursive(original)
       new BuiltParser[Result] {
-        override def apply(input: Input, state: FixPointState) = {
-          parseOriginal(input, state)
+        override def apply(input: TextPointer, state: State, fixPointState: FixPointState) = {
+          parseOriginal(input, state, fixPointState)
         }
 
         override def debugName = Lazy.this.debugName
@@ -185,9 +180,4 @@ trait OptimizingParserWriter extends ParserWriter {
   }
 
   def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result]
-
-
-  case class Success[+Result](result: Result, remainder: Input) {
-    def map[NewResult](f: Result => NewResult): Success[NewResult] = Success(f(result), remainder)
-  }
 }
