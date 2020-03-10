@@ -1,6 +1,6 @@
 package languages.json
 
-import core.parsers.caching.LeftSidePointer
+import core.parsers.caching.ExclusivePointer
 import core.parsers.core.ParseText
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.strings.{CommonParserWriter, NoStateParserWriter, WhitespaceParserWriter}
@@ -23,5 +23,5 @@ object JsonParser extends CommonParserWriter
   lazy val valueParser: Parser[JsonValue] = new Lazy(array | objectParser | number | string | hole)
   val parser = valueParser.getWholeInputParser()
   def getCachingParser(text: ParseText) =
-    LeftSidePointer.getCachingParser(text, valueParser.getWholeInputParser())
+    ExclusivePointer.getCachingParser(text, valueParser.getWholeInputParser())
 }

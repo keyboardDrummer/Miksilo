@@ -4,7 +4,11 @@ import core.parsers.core.TextPointer
 
 import scala.collection.mutable
 
-class RightSidePointer(var leftSide: LeftSidePointer) extends TextPointer {
+/**
+  * A position that includes everything up to and including a particular offset.
+  * This position changes if text is added/removed before or at the particular offset.
+  */
+class InclusivePointer(var leftSide: ExclusivePointer) extends TextPointer {
 
   override val cache = new mutable.HashMap[Any, Any]
 
@@ -17,8 +21,6 @@ class RightSidePointer(var leftSide: LeftSidePointer) extends TextPointer {
   override def subSequence(from: Int, until: Int) = leftSide.subSequence(from, until)
 
   override def drop(amount: Int) = {
-    if (amount == 0)
-      throw new Exception("what?")
     leftSide.drop(amount)
   }
 

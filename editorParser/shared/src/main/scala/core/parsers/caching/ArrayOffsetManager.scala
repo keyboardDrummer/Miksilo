@@ -1,6 +1,7 @@
 package core.parsers.caching
 
 import core.parsers.core.ParseText
+import core.parsers.editorParsers.CachingParseResult
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
@@ -8,15 +9,15 @@ import scala.collection.mutable
 
 class ArrayOffsetManager(var text: ParseText) {
 
-  val offsets = mutable.ArrayBuffer.empty[LeftSidePointer]
-  val offsetCache = mutable.HashMap.empty[Int, LeftSidePointer]
+  val offsets = mutable.ArrayBuffer.empty[ExclusivePointer]
+  val offsetCache = mutable.HashMap.empty[Int, ExclusivePointer]
 
-  def getOffsetNode(offset: Int): LeftSidePointer = {
+  def getOffsetNode(offset: Int): ExclusivePointer = {
     offsetCache.getOrElseUpdate(offset, {
       binarySearch(offset) match {
         case Found(index) => offsets(index)
         case InsertionPoint(insertionPoint) =>
-          val result = new LeftSidePointer(this, offset)
+          val result = new ExclusivePointer(this, offset)
           offsets.insert(insertionPoint, result)
           result
       }
@@ -67,7 +68,7 @@ class ArrayOffsetManager(var text: ParseText) {
         val newLeftSide = getOffsetNode(offset.offset + delta)
         offset.rightSide.leftSide = newLeftSide
         newLeftSide.rightSide = offset.rightSide
-        offset.rightSide = new RightSidePointer(offset)
+        offset.rightSide = new InclusivePointer(offset)
       }
     }
   }

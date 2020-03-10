@@ -54,9 +54,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               else
                 resultWithoutRecursion
 
-              if (result.latestRemainder.offset > position.offset) {
-                position.cache.put(key, result)
-              }
+              position.cache.put(key, result)
 
               result
           }
@@ -161,10 +159,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         case _ =>
           val value: ParseResult[Result] = parser(position, state, newFixPointState)
 
-          // Do not cache length zero results, since they cannot be corrected moved if something is inserted where they start.
-          if (value.latestRemainder.offset > position.offset) {
-            position.cache.put(key, value)
-          }
+          position.cache.put(key, value)
           value
       }
     }

@@ -4,7 +4,7 @@ import core.parsers.core.{Metrics, ParseText, TextPointer}
 import core.parsers.editorParsers.{CachingParser, SingleResultParser, StopFunction}
 import core.parsers.strings.SubSequence
 
-object LeftSidePointer {
+object ExclusivePointer {
   def getCachingParser[Result](parseText: ParseText, singleResultParser: SingleResultParser[Result]): CachingParser[Result] = {
     val offsetManager = new ArrayOffsetManager(parseText)
     new CachingParser[Result] {
@@ -20,11 +20,13 @@ object LeftSidePointer {
   }
 }
 
+/**
+  * A position that includes everything up to but not including a particular offset.
+  * This position changes if text is added/removed before the particular offset.
+  */
+class ExclusivePointer(val manager: ArrayOffsetManager, var offset: Int) extends TextPointer {
 
-
-class LeftSidePointer(val manager: ArrayOffsetManager, var offset: Int) extends TextPointer {
-
-  var rightSide: RightSidePointer = new RightSidePointer(this)
+  var rightSide: InclusivePointer = new InclusivePointer(this)
 
   override def cache = rightSide.cache
 

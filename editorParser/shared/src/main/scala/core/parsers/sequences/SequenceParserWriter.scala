@@ -143,7 +143,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     override def append(next: ParseError) = {
       next match {
-        case next: MissingInput if next.from == from =>
+        case next: MissingInput if next.from.offset == from.offset =>
           val max = Math.max(penalty, next.penalty)
           val min = Math.min(penalty, next.penalty)
           val newPenalty = max + min * 0.5

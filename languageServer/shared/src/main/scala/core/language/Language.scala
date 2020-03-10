@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets
 
 import core.LazyLogging
 import core.language.exceptions.BadInputException
-import core.parsers.caching.LeftSidePointer
+import core.parsers.caching.ExclusivePointer
 import core.parsers.editorParsers.{CachingParser, SingleResultParser, StopFunction, TimeRatioStopFunction}
 import core.parsers.strings.StringParserWriter
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
@@ -64,7 +64,7 @@ object Language extends LazyLogging {
 
       def createParser(): CachingParser[Program] = {
         val parseText = compilation.fileSystem.getFileParseText(uri)
-        val result = LeftSidePointer.getCachingParser(parseText, parser)
+        val result = ExclusivePointer.getCachingParser(parseText, parser)
         compilation.fileSystem.setDocumentEventListener(uri, new DocumentEventListener {
           override def handleChange(from: Int, until: Int, text: String): Unit = {
             result.changeRange(from, until, text.length)
