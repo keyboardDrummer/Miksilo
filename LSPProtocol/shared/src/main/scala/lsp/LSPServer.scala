@@ -39,6 +39,7 @@ class SharedLSPServer(languageServer: LanguageServer,
 
   def addRequestHandlers(): Unit = {
 
+    handler.addRequestHandler[Shutdown, ShutdownResult](LSPProtocol.shutdown, _ => ShutdownResult(0))(Shutdown.format, Json.format)
     handler.addRequestHandler[InitializeParams, InitializeResult](LSPProtocol.initialize, initialize)(Json.format, Json.format)
 
     def addProvider[Provider: ClassTag, Request, Response](method: String, getHandler: Provider => Request => Response)
@@ -68,6 +69,7 @@ class SharedLSPServer(languageServer: LanguageServer,
   }
 
   def addNotificationHandlers(): Unit = {
+    handler.addNotificationHandler(LSPProtocol.exit, (_: ExitNotification) => connection.stop())(ExitNotification.format)
     handler.addNotificationHandler(LSPProtocol.didOpen, (params: DidOpenTextDocumentParams) => languageServer.didOpen(params.textDocument))(Json.format)
     handler.addNotificationHandler(LSPProtocol.didChange, languageServer.didChange)(Json.format)
     handler.addNotificationHandler(LSPProtocol.didClose, (params: DidCloseTextDocumentParams) => languageServer.didClose(params.textDocument))(Json.format)

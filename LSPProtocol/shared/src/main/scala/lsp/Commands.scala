@@ -198,6 +198,12 @@ case class PublishDiagnostics(uri: String, diagnostics: Seq[Diagnostic]) extends
 // from client to server
 
 case class ExitNotification() extends Notification
+object ExitNotification {
+  implicit val format: OFormat[ExitNotification] = OFormat(
+    Reads(jsValue => JsSuccess(ExitNotification())),
+    OWrites[ExitNotification](s => Json.obj()))
+}
+
 case class DidCloseTextDocumentParams(textDocument: TextDocumentIdentifier) extends Notification
 case class DidOpenTextDocumentParams(textDocument: TextDocumentItem) extends Notification
 case class DidSaveTextDocumentParams(textDocument: TextDocumentIdentifier) extends Notification
