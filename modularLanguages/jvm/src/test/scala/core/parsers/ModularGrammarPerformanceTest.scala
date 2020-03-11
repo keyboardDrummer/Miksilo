@@ -49,7 +49,7 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
   val yaml = TestLanguageBuilder.buildWithParser(YamlLanguage.deltasWithoutParser, UntilBestAndXStepsStopFunction())
   test("YAML with small errors bigrammar performance") {
     val source = SourceUtils.getResourceFileContents("yaml/AutoScalingMultiAZWithNotifications_edited.yaml")
-    TestUtils.runPerformanceTest(smallErrorsTargetTime, 300, () => {
+    TestUtils.runPerformanceTest(smallErrorsTargetTime * 2, 300, () => {
       val result = yaml.compileString(source)
       assert(result.program.childElements.size == 7)
       assert(result.diagnostics.size == 2)

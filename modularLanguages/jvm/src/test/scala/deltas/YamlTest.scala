@@ -173,7 +173,7 @@ class YamlTest extends AnyFunSuite {
     val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(ExpressionDelta.FirstPrecedenceGrammar),
       PlainScalarDelta, ExpressionDelta))
     val compilation = language.compileString(contents)
-    assert(compilation.diagnostics.size == 1)
+    assert(compilation.diagnostics.nonEmpty)
   }
 
   val deltas = Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
@@ -187,7 +187,7 @@ class YamlTest extends AnyFunSuite {
         |  Comment""".stripMargin
 
     val compilation = blockLanguage.compileString(contents)
-    assert(compilation.diagnostics.size == 1)
+    assert(compilation.diagnostics.nonEmpty)
   }
 
   test("composite") {
