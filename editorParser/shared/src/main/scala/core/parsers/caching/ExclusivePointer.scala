@@ -37,8 +37,6 @@ class ExclusivePointer(val manager: ArrayOffsetManager, var offset: Int) extends
       manager.getOffsetNode(amount + offset)
   }
 
-  override def toString = offset.toString
-
   override def charAt(index: Int) = manager.text.charAt(index)
 
   override def length = manager.text.length

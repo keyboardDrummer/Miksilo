@@ -15,7 +15,7 @@ import deltas.json.JsonObjectLiteralDelta.{ObjectLiteral, ObjectLiteralMember}
 object JsonLanguage {
   val deltas: Seq[Delta] = Seq[Delta](ExpressionLanguageDelta, BooleanLiteralDelta, JsonObjectLiteralDelta,
     ArrayLiteralDelta, SingleQuotedStringLiteralDelta, JsonStringLiteralDelta, IntLiteralDelta, ExpressionDelta)
-  val language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar(UntilTimeStopFunction(200))) ++ deltas)
+  val language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar(UntilTimeStopFunction(100))) ++ deltas)
 }
 
 object PrintJson extends Delta  {

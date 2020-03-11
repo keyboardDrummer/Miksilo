@@ -16,6 +16,20 @@ class YamlTest extends AnyFunSuite {
 
   val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltas, stopFunction = UntilBestAndXStepsStopFunction())
 
+  test("error case") {
+    val program = """Foo: bar
+                    | yoo: hee""".stripMargin
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.size == 3 && compilation.diagnostics.head.diagnostic.message.contains("["))
+  }
+
+  test("array as key") {
+    val program = """Foo: [bar,
+                    | yoo]: hee""".stripMargin
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+  }
+
   test("compact array") {
     val input = """SecurityGroupIngress:
                   |- IpProtocol: tcp

@@ -7,6 +7,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
 import core.parsers.core.TextPointer
+import core.parsers.editorParsers.History
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
 
@@ -72,8 +73,8 @@ object YamlCoreDelta extends DeltaWithGrammar {
 
     //Should be 	ns-uri-char - “!” - c-flow-indicator
     val tag: BiGrammar = JsonStringLiteralDelta.dropPrefix(grammars,
-        RegexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name",
-          defaultValue = Some("!")), TagName, "!")
+        RegexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name", penaltyOption = Some(History.failPenalty),
+                     defaultValue = Some("!")), TagName, "!")
 
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
     val taggedFlowValue = tag ~ flowValue.as(TagNode) asLabelledNode TaggedNode

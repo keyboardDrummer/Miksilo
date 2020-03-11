@@ -5,6 +5,7 @@ import core.bigrammar.grammars.{BiSequence, Delimiter, RegexGrammar, SequenceBij
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
+import core.parsers.editorParsers.History
 import deltas.expression.{ExpressionDelta, StringLiteralDelta}
 import deltas.json.JsonStringLiteralDelta
 
@@ -35,7 +36,7 @@ object PlainScalarDelta extends DeltaWithGrammar {
 
     val plainStyleSingleLineString: BiGrammar = nsPlainSafe
     val plainStyleMultiLineString: BiGrammar = {
-      val lineSeparator = new BiSequence(Delimiter("\n", allowDrop = false), _grammars.trivia, BiSequence.ignoreLeft, true)
+      val lineSeparator = new BiSequence(Delimiter("\n", penalty = History.failPenalty, allowDrop = false), _grammars.trivia, BiSequence.ignoreLeft, true)
       val firstLine = new BiSequence(nsPlainSafe, lineSeparator, BiSequence.ignoreRight, false)
       val followingLine = CheckIndentationGrammar.equal(nsPlainSafe)
       val otherLines = CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(followingLine.someSeparated(lineSeparator)))
