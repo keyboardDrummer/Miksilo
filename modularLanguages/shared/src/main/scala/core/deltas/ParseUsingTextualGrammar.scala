@@ -5,10 +5,10 @@ import core.bigrammar.BiGrammarToParser._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.language.node.Node
-import core.language.{Compilation, Language}
+import core.language.{Compilation, Language, SourceElement}
 import core.parsers.editorParsers.{SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
 
-case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction)
+case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction, useCaching: Boolean = true)
   extends Delta with LazyLogging {
 
   def parseStream[T](compilation: Compilation, parser: SingleResultParser[T], input: String):
@@ -20,11 +20,18 @@ case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioSt
     super.inject(language)
     val parserBuilder = toParserBuilder(LanguageGrammars.grammars.get(language).root).map(r => r.asInstanceOf[Node])
 
-    val phase = Language.getParsePhaseFromParser[Node]((program, uri) => {
-      program.startOfUri = Some(uri)
-      PathRoot(program)
-    }, parserBuilder.getWholeInputParser(), stopFunction)
+    val parser = parserBuilder.getWholeInputParser()
+    val phase =
+      if (useCaching)
+        Language.getCachingParsePhase[Node](toSourceElement, parser, stopFunction)
+      else
+        Language.getParsePhase[Node](toSourceElement, parser, stopFunction)
     language.compilerPhases ::= phase
+  }
+
+  private def toSourceElement(program: Node, uri: String): SourceElement = {
+    program.startOfUri = Some(uri)
+    PathRoot(program)
   }
 
   override def description: String = "Parses the input file using a textual grammar."

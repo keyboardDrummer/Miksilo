@@ -38,4 +38,9 @@ trait TextPointer extends OffsetPointer {
   def cache: mutable.HashMap[Any, Any]
 
   def printRange(end: TextPointer) = subSequence(offset, end.offset).toString
+
+  override def toString: String = {
+    s"(${lineCharacter.line}, ${lineCharacter.character})" +
+      subSequence(Math.max(0, offset - 10), offset) + " | " + subSequence(offset, Math.min(length, offset + 10))
+  }
 }

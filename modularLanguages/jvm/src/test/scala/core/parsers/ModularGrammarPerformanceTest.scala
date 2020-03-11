@@ -3,6 +3,7 @@ package core.parsers
 import _root_.core.{SourceUtils, TestUtils}
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.json.JsonLanguage
+import deltas.yaml.YamlLanguage
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
@@ -41,6 +42,16 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
     TestUtils.runPerformanceTest(smallErrorsTargetTime, 300, () => {
       val result = json.compileString(source)
       assert(result.program.childElements.size == 6)
+      assert(result.diagnostics.size == 2)
+    })
+  }
+
+  val yaml = TestLanguageBuilder.buildWithParser(YamlLanguage.deltasWithoutParser, UntilBestAndXStepsStopFunction())
+  test("YAML with small errors bigrammar performance") {
+    val source = SourceUtils.getResourceFileContents("yaml/AutoScalingMultiAZWithNotifications_edited.yaml")
+    TestUtils.runPerformanceTest(smallErrorsTargetTime * 2, 300, () => {
+      val result = yaml.compileString(source)
+      assert(result.program.childElements.size == 7)
       assert(result.diagnostics.size == 2)
     })
   }

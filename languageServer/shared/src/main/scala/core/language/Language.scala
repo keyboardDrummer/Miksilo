@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets
 import core.LazyLogging
 import core.language.exceptions.BadInputException
 import core.parsers.caching.ExclusivePointer
-import core.parsers.editorParsers.{CachingParser, SingleResultParser, StopFunction, TimeRatioStopFunction}
+import core.parsers.editorParsers.{CachingParser, SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
 import core.parsers.strings.StringParserWriter
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
 
@@ -50,7 +50,18 @@ object Language extends LazyLogging {
     })
   }
 
-  def getParsePhaseFromParser[Program](
+  def getParsePhase[Program](getSourceElement: (Program, String) => SourceElement,
+                             parser: SingleResultParser[Program],
+                             stopFunction: StopFunction = new TimeRatioStopFunction): Phase = {
+    Phase("parse", "parse the source code", compilation => {
+      val uri = compilation.rootFile.get
+
+      val parseResult = parser.parse(compilation.fileSystem.getFile(uri), stopFunction, compilation.metrics)
+      processParseResult(getSourceElement, compilation, uri, parseResult)
+    })
+  }
+
+  def getCachingParsePhase[Program](
     getSourceElement: (Program, String) => SourceElement,
     parser: SingleResultParser[Program],
     stopFunction: StopFunction = new TimeRatioStopFunction): Phase = {
@@ -82,20 +93,24 @@ object Language extends LazyLogging {
       val parsersPerFile = parsers.getOrElseUpdate(uri, createParser())
 
       val parseResult = parsersPerFile.parse(stopFunction, compilation.metrics)
-      parseResult.resultOption.foreach(program => {
-        compilation.program = getSourceElement(program, uri)
-      })
-      if (compilation.program == null) {
-        compilation.stop()
-      }
-      if (!parseResult.successful) {
-        val diagnostics = DiagnosticUtil.getDiagnosticsFromParseFailures(uri, parseResult.errors)
-        compilation.addDiagnosticsWithFixes(diagnostics)
-      }
+      processParseResult(getSourceElement, compilation, uri, parseResult)
     })
-
   }
 
+  private def processParseResult[Program](getSourceElement: (Program, String) => SourceElement,
+                                          compilation: Compilation, uri: String,
+                                          parseResult: SingleParseResult[Program]): Unit = {
+    parseResult.resultOption.foreach(program => {
+      compilation.program = getSourceElement(program, uri)
+    })
+    if (compilation.program == null) {
+      compilation.stop()
+    }
+    if (!parseResult.successful) {
+      val diagnostics = DiagnosticUtil.getDiagnosticsFromParseFailures(uri, parseResult.errors)
+      compilation.addDiagnosticsWithFixes(diagnostics)
+    }
+  }
 }
 
 class Language extends LazyLogging {
