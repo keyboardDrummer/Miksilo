@@ -1,5 +1,5 @@
 
-package deltas
+package deltas.yaml
 
 import core.SourceUtils
 import core.bigrammar.SelectGrammar
@@ -8,7 +8,6 @@ import core.language.Compilation
 import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
-import deltas.yaml._
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 

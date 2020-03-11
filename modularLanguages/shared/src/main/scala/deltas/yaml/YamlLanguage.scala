@@ -5,7 +5,7 @@ import core.parsers.editorParsers.UntilTimeStopFunction
 import deltas.json.JsonLanguage
 
 object YamlLanguage {
-  val parserDelta = ParseUsingTextualGrammar(UntilTimeStopFunction(100), useCaching = false)
+  val parserDelta = ParseUsingTextualGrammar(UntilTimeStopFunction(100), useCaching = true)
   val deltasWithoutParser = Seq(YamlObjectDelta, YamlArrayDelta, PlainScalarDelta, YamlCoreDelta) ++ JsonLanguage.deltas
   val deltas = Seq(parserDelta) ++ deltasWithoutParser
   val language = LanguageFromDeltas(deltas)

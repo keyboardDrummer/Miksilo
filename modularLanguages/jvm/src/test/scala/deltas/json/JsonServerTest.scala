@@ -6,7 +6,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class JsonServerTest extends AnyFunSuite with LanguageServerTest {
 
   test("regression2") {
-    val input = """[]"""  // [1,2,3,4]     [1,2,[],3]     [{"name":"Remy", age: 31}, {"name":"Tzeni",age:29}]
+    val input = """[]"""
 
     val jsonLanguage = JsonLanguage.language
     val server = new MiksiloLanguageServer(jsonLanguage)
