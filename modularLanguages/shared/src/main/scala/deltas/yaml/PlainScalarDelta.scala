@@ -20,7 +20,7 @@ object PlainScalarDelta extends DeltaWithGrammar {
     val nonSpaceChars = """\n """
     val indicatorChars = """-\?:,\[\]\{\}#&*!\|>'"%@`"""
     val allowedInFirst = Set('?',':','-')
-    val nonPlainFirstChars = (nonSpaceChars + indicatorChars) // TODO enable this again but make sure "- Bar" cannot be parsed as a string // .filter(c => !allowedInFirst.contains(c))
+    val nonPlainFirstChars = (nonSpaceChars + indicatorChars).filter(c => !allowedInFirst.contains(c)) // TODO Make sure "- Bar" cannot be parsed as a string
     val plainSafeOutChars = s"""$nonBreakChars#'"""
     val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
     val doubleColonPlainSafeIn = RegexGrammar(s"""[^$nonPlainFirstChars]([^$plainSafeInChars:]|:[^$plainSafeInChars ])*""".r,
