@@ -35,7 +35,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
               SREmpty.empty[State]
           }
         case delayedResult: DelayedParseResult[State, Result] =>
-          val results = delayedResult.results
+          val results = delayedResult.getResults
           tail.merge(results)
       }
     }
@@ -46,7 +46,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 
   def singleResult[Result](parseResult: LazyParseResult[State, Result]) =
-    new SRCons(parseResult, parseResult.offset, 0, SREmpty.empty)
+    new SRCons(parseResult, 0, SREmpty.empty)
 
   def newFailure[Result](position: TextPointer, state: State, error: ParseError): SRCons[State, Result] =
     singleResult(ReadyParseResult(None, position, state, History.error(error)))

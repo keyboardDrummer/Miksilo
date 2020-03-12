@@ -1,13 +1,13 @@
 package deltas.yaml
 
 import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
-import core.parsers.editorParsers.{NeverStop, UntilBestAndXStepsStopFunction, UntilTimeStopFunction}
+import core.parsers.editorParsers.NeverStop
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.funsuite.AnyFunSuite
 
 class YamlServerTest extends AnyFunSuite with LanguageServerTest {
 
-  val yamlLanguage = LanguageFromDeltas(Seq(ParseUsingTextualGrammar(UntilBestAndXStepsStopFunction(), indentationSensitive = true)) ++ YamlLanguage.deltasWithoutParser)
+  val yamlLanguage = LanguageFromDeltas(Seq(ParseUsingTextualGrammar(NeverStop, indentationSensitive = true)) ++ YamlLanguage.deltasWithoutParser)
   test("regression") {
     val input =
       """Foo:

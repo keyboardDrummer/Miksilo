@@ -52,15 +52,19 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 
 object ParseResults {
   def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] =
-    new SRCons(parseResult, parseResult.offset,0, SREmpty.empty[State])
+    new SRCons(parseResult,0, SREmpty.empty[State])
 }
 
 final class SRCons[State, +Result](
                                     val head: LazyParseResult[State, Result],
-                                    val latestRemainder: OffsetPointer,
                                     var tailDepth: Int,
                                     _tail: => ParseResults[State, Result])
   extends ParseResults[State, Result] {
+
+
+  override def latestRemainder = {
+    getLatest(head.offset, tail.latestRemainder)
+  }
 
   // Used for debugging
   def toList: List[LazyParseResult[State, Result]] = head :: tail.toList
@@ -85,7 +89,6 @@ final class SRCons[State, +Result](
         {
           new SRCons(
             cons.head,
-            getLatest(tail.latestRemainder, cons.latestRemainder),
             1 + Math.max(this.tailDepth, cons.tailDepth),
             cons.tail.merge(tail.flatMap(f, uniform)))
         }
@@ -94,7 +97,7 @@ final class SRCons[State, +Result](
   }
 
   override def map[NewResult](f: Result => NewResult): SRCons[State, NewResult] = {
-    new SRCons(head.map(f), latestRemainder, tailDepth + 1, tail.map(f))
+    new SRCons(head.map(f), tailDepth + 1, tail.map(f))
   }
 
   /*
@@ -115,10 +118,10 @@ final class SRCons[State, +Result](
             case Some(previousBest) if previousBest >= ready.score =>
               getTail(bests)
             case _ =>
-              new SRCons(head, latestRemainder, tailDepth, getTail(bests + (ready.remainder.offset -> ready.score)))
+              new SRCons(head, tailDepth, getTail(bests + (ready.remainder.offset -> ready.score)))
           }
         case _ =>
-          new SRCons(head, latestRemainder, tailDepth, getTail(bests))
+          new SRCons(head, tailDepth, getTail(bests))
       }
     }
 
