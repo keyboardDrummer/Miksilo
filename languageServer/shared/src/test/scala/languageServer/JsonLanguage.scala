@@ -10,7 +10,7 @@ object JsonLanguage extends Language {
   object FakeSourceElement2 extends FakeSourceElement
   private val parsePhase = Language.getCachingParsePhase[Any](
     (program, uri) => FakeSourceElement2,
-    JsonParser.valueParser.getWholeInputParser(), NeverStop) // Change neverstop
+    JsonParser.valueParser.getWholeInputParser(), NeverStop, indentationSensitive = false) // Change neverstop
 
   compilerPhases = List(parsePhase)
 }

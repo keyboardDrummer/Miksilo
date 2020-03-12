@@ -8,7 +8,7 @@ import core.language.node.Node
 import core.language.{Compilation, Language, SourceElement}
 import core.parsers.editorParsers.{SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
 
-case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction, useCaching: Boolean = true)
+case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction, indentationSensitive: Boolean = false)
   extends Delta with LazyLogging {
 
   def parseStream[T](compilation: Compilation, parser: SingleResultParser[T], input: String):
@@ -21,11 +21,7 @@ case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioSt
     val parserBuilder = toParserBuilder(LanguageGrammars.grammars.get(language).root).map(r => r.asInstanceOf[Node])
 
     val parser = parserBuilder.getWholeInputParser()
-    val phase =
-      if (useCaching)
-        Language.getCachingParsePhase[Node](toSourceElement, parser, stopFunction)
-      else
-        Language.getParsePhase[Node](toSourceElement, parser, stopFunction)
+    val phase = Language.getCachingParsePhase[Node](toSourceElement, parser, stopFunction, indentationSensitive)
     language.compilerPhases ::= phase
   }
 

@@ -32,8 +32,12 @@ object ArrayLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     expression.addAlternative(grammar)
   }
 
-  object Members extends NodeField
-  object Shape extends NodeShape
+  object Members extends NodeField  {
+    override def toString = "Members"
+  }
+  object Shape extends NodeShape {
+    override def toString = "Array"
+  }
   override def shape: NodeShape = Shape
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {

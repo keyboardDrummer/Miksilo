@@ -22,6 +22,4 @@ object JsonParser extends CommonParserWriter
 
   lazy val valueParser: Parser[JsonValue] = new Lazy(array | objectParser | number | string | hole)
   val parser = valueParser.getWholeInputParser()
-  def getCachingParser(text: ParseText) =
-    ExclusivePointer.getCachingParser(text, valueParser.getWholeInputParser())
 }

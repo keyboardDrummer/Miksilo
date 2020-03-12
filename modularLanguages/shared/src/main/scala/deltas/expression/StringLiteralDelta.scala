@@ -29,9 +29,13 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   def getValue(literal: Node): String = literal(Value).asInstanceOf[String]
 
-  object Shape extends NodeShape
+  object Shape extends NodeShape {
+    override def toString = "String"
+  }
 
-  object Value extends NodeField
+  object Value extends NodeField {
+    override def toString = "Value"
+  }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     builder.typesAreEqual(_type, PrimitiveType("String"))

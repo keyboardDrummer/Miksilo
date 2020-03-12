@@ -170,7 +170,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     new SingleResultParser[Result] {
 
       override def parse(text: String, mayStop: StopFunction, metrics: Metrics) = {
-        parse(new ArrayOffsetManager(new ParseText(text)).getOffsetNode(0), mayStop, metrics)
+        parse(new ArrayOffsetManager(new ParseText(text), false).getOffsetNode(0), mayStop, metrics)
       }
 
       override def parse(zero: TextPointer, mayStop: StopFunction, metrics: Metrics) = {

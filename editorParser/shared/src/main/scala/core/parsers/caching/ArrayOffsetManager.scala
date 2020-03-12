@@ -1,13 +1,29 @@
 package core.parsers.caching
 
-import core.parsers.core.ParseText
-import core.parsers.editorParsers.CachingParseResult
+import core.parsers.core.{Metrics, ParseText}
+import core.parsers.editorParsers.{CachingParseResult, CachingParser, SingleResultParser, StopFunction}
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
 import scala.collection.mutable
 
-class ArrayOffsetManager(var text: ParseText) {
+object ArrayOffsetManager {
+  def getCachingParser[Result](parseText: ParseText, singleResultParser: SingleResultParser[Result], indentationSensitive: Boolean): CachingParser[Result] = {
+    val offsetManager = new ArrayOffsetManager(parseText, indentationSensitive)
+    new CachingParser[Result] {
+
+      override def parse(mayStop: StopFunction, metrics: Metrics) = {
+        singleResultParser.parse(offsetManager.getOffsetNode(0), mayStop, metrics)
+      }
+
+      override def changeRange(from: Int, until: Int, insertionLength: Int): Unit = {
+        offsetManager.changeText(from, until, insertionLength)
+      }
+    }
+  }
+}
+
+class ArrayOffsetManager(var text: ParseText, indentationSensitive: Boolean) {
 
   val offsets = mutable.ArrayBuffer.empty[ExclusivePointer]
   val offsetCache = mutable.HashMap.empty[Int, ExclusivePointer]
@@ -59,6 +75,12 @@ class ArrayOffsetManager(var text: ParseText) {
         val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
         if (entryIntersectsWithRemoval) {
           offset.cache.remove(entry._1)
+        }
+      }
+      if (indentationSensitive && absoluteOffset >= from) {
+        val newPosition = text.getPosition(offset.offset + delta)
+        if (newPosition.character != offset.lineCharacter.character) {
+          offset.cache.clear()
         }
       }
       if (absoluteOffset > from) {

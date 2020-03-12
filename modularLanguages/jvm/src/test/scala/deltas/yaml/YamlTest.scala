@@ -13,7 +13,24 @@ import util.TestLanguageBuilder
 
 class YamlTest extends AnyFunSuite {
 
-  val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltas, stopFunction = UntilBestAndXStepsStopFunction())
+  val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltasWithoutParser,
+    stopFunction = UntilBestAndXStepsStopFunction(), indentationSensitive = true)
+
+  test("regression") {
+    val program =
+      """- Bar:
+        |   Joo
+        |- 2""".stripMargin
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("regression 2") {
+    val program = "- Bar:\n   \n- 2"
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+    assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains("expected '<value'"))
+  }
 
   test("error case") {
     val program = """Foo: bar
@@ -177,7 +194,8 @@ class YamlTest extends AnyFunSuite {
 
   val deltas = Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
     YamlObjectDelta, YamlArrayDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta)
-  val blockLanguage = TestLanguageBuilder.buildWithParser(deltas, stopFunction = UntilBestAndXStepsStopFunction())
+  val blockLanguage = TestLanguageBuilder.buildWithParser(deltas,
+    stopFunction = UntilBestAndXStepsStopFunction(), indentationSensitive = true)
 
   test("plain scalar 2") {
     val contents =

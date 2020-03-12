@@ -8,7 +8,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class HistoryTest extends AnyFunSuite with StringParserWriter with NoStateParserWriter {
   
-  val arrayOffsetManager = new ArrayOffsetManager(new ParseText())
+  val arrayOffsetManager = new ArrayOffsetManager(new ParseText(), false)
   def pointer(offset: Int) = arrayOffsetManager.getOffsetNode(offset)
   
   test("Dropping , is worse than missing <object member key>:<value>") {
