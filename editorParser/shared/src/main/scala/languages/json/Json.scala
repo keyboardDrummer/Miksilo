@@ -2,6 +2,8 @@ package languages.json
 
 import core.parsers.editorParsers.OffsetPointerRange
 
+case class JsonFile(uri: String, value: JsonValue)
+
 trait JsonValue
 
 case class JsonArray(range: OffsetPointerRange, elements: Array[JsonValue]) extends JsonValue

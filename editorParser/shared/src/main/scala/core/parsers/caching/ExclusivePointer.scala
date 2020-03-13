@@ -1,7 +1,6 @@
 package core.parsers.caching
 
-import core.parsers.core.{Metrics, ParseText, TextPointer}
-import core.parsers.editorParsers.{CachingParser, SingleResultParser, StopFunction}
+import core.parsers.core.TextPointer
 import core.parsers.strings.SubSequence
 
 /**
@@ -29,7 +28,7 @@ class ExclusivePointer(val manager: ArrayOffsetManager, var offset: Int) extends
 
   override def subSequence(from: Int, until: Int) = manager.text.subSequence(from, until)
 
-  override def lineCharacter = manager.text.getPosition(offset)
+  var lineCharacter = manager.text.getPosition(offset)
 
   override def equals(obj: Any) = {
     throw new Exception("don't compare text pointers, compare their offsets instead.")

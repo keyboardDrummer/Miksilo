@@ -77,15 +77,17 @@ class ArrayOffsetManager(var text: ParseText, indentationSensitive: Boolean) {
           offset.cache.remove(entry._1)
         }
       }
+      val oldLineCharacter = offset.lineCharacter
       if (indentationSensitive && absoluteOffset >= from) {
         val newPosition = text.getPosition(offset.offset + delta)
-        if (newPosition.character != offset.lineCharacter.character) {
+        if (newPosition.character != oldLineCharacter.character) {
           offset.cache.clear()
         }
       }
       if (absoluteOffset > from) {
         offset.offset += delta
       }
+      offset.lineCharacter = text.getPosition(offset.offset)
       if (absoluteOffset == from) {
         val newLeftSide = getOffsetNode(offset.offset + delta)
         offset.rightSide.leftSide = newLeftSide
