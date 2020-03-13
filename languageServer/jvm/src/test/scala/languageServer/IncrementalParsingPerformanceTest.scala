@@ -27,7 +27,7 @@ class IncrementalParsingPerformanceTest extends AnyFunSuite with LanguageServerT
     }
     server.setClient(client)
 
-    TestUtils.runPerformanceTest(30, 100, () => {
+    TestUtils.runPerformanceTest(45, 100, () => {
       server.didChange(DidChangeTextDocumentParams(documentId,
         Seq(TextDocumentContentChangeEvent(Some(SourceRange(position, position)), None, "2"))))
       assert(diagnostics.diagnostics.isEmpty)
