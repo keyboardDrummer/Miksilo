@@ -19,13 +19,12 @@ object PlainScalarDelta extends DeltaWithGrammar {
     val nonBreakChars = """\n"""
     val nonSpaceChars = """\n """
     val indicatorChars = """-\?:,\[\]\{\}#&*!\|>'"%@`"""
-    val allowedInFirst = Set('?',':','-')
-    val nonPlainFirstChars = (nonSpaceChars + indicatorChars).filter(c => !allowedInFirst.contains(c)) // TODO Make sure "- Bar" cannot be parsed as a string
+    val nonPlainFirstChars = nonSpaceChars + indicatorChars
     val plainSafeOutChars = s"""$nonBreakChars#'"""
     val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
-    val doubleColonPlainSafeIn = RegexGrammar(s"""[^$nonPlainFirstChars]([^$plainSafeInChars:]|:[^$plainSafeInChars ])*""".r,
+    val doubleColonPlainSafeIn = RegexGrammar(s"""[^$nonPlainFirstChars]([^$plainSafeInChars:]|[:?-][^$plainSafeInChars ])*""".r,
       "plain scalar", defaultValue = Some(""), allowDrop = false)
-    val doubleColonPlainSafeOut = RegexGrammar(s"""[^$nonPlainFirstChars]([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])*""".r,
+    val doubleColonPlainSafeOut = RegexGrammar(s"""[^$nonPlainFirstChars]([^$plainSafeOutChars:]|[:?-][^$plainSafeOutChars ])*""".r,
       "plain scalar", defaultValue = Some(""), allowDrop = false)
 
     val nsPlainSafe: BiGrammar = new IfContext(Map(

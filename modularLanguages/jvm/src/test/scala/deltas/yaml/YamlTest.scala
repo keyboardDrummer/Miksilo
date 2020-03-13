@@ -28,8 +28,7 @@ class YamlTest extends AnyFunSuite {
   test("regression 2") {
     val program = "- Bar:\n   \n- 2"
     val compilation = language.compileString(program)
-    assert(compilation.diagnostics.isEmpty)
-    assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains("expected '<value'"))
+    assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains("expected '<value>'"))
   }
 
   test("error case") {
