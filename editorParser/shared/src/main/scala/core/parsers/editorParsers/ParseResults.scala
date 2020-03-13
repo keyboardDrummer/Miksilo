@@ -1,9 +1,7 @@
 package core.parsers.editorParsers
 
-import ParseResults._
 import core.parsers.core.{OffsetPointer, TextPointer}
-
-import scala.collection.mutable
+import core.parsers.editorParsers.ParseResults._
 
 trait ParseResults[State, +Result] extends CachingParseResult {
   def nonEmpty: Boolean
@@ -61,9 +59,9 @@ final class SRCons[State, +Result](
                                     _tail: => ParseResults[State, Result])
   extends ParseResults[State, Result] {
 
-
   override def latestRemainder = {
-    getLatest(head.offset, tail.latestRemainder)
+    val tailRemainder = tail.latestRemainder
+    if (head.offset.offset > tailRemainder.offset) head.offset else tailRemainder
   }
 
   // Used for debugging
@@ -110,7 +108,7 @@ final class SRCons[State, +Result](
     if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
       return SREmpty.empty[State]
 
-    def getResult(head: LazyParseResult[State, Other], latestRemainder: OffsetPointer, tailDepth: Int,
+    def getResult(head: LazyParseResult[State, Other], tailDepth: Int,
                   getTail: Map[Int, Double] => ParseResults[State, Other]): ParseResults[State, Other] = {
       head match {
         case ready: ReadyParseResult[State, Other] =>
@@ -128,17 +126,12 @@ final class SRCons[State, +Result](
     other match {
       case _: SREmpty[State] => this
       case cons: SRCons[State, Other] =>
-        val latestRemainder = getLatest(this.latestRemainder, other.latestRemainder)
         if (head.score >= cons.head.score) {
-          getResult(head, latestRemainder,1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
+          getResult(head, 1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
         } else
-          getResult(cons.head, latestRemainder,1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
+          getResult(cons.head, 1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
       case earlier => earlier.merge(this)
     }
-  }
-
-  def getLatest(one: OffsetPointer, other: OffsetPointer): OffsetPointer = {
-    if (one.offset > other.offset) one else other
   }
 
   override def nonEmpty = true

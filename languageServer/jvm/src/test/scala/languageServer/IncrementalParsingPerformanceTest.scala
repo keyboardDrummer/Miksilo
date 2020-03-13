@@ -8,7 +8,6 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingPerformanceTest extends AnyFunSuite with LanguageServerTest {
 
-
   test("Make small edit performance JSON") {
 
     val server = new MiksiloLanguageServer(JsonLanguage)
@@ -24,7 +23,6 @@ class IncrementalParsingPerformanceTest extends AnyFunSuite with LanguageServerT
       override def sendDiagnostics(newDiagnostics: PublishDiagnostics): Unit = diagnostics = newDiagnostics
 
       override def trackMetric(name: String, value: Double): Unit =  {
-        System.out.println("name: " + name +", value: " + value)
       }
     }
     server.setClient(client)
@@ -55,7 +53,6 @@ class IncrementalParsingPerformanceTest extends AnyFunSuite with LanguageServerT
       override def sendDiagnostics(newDiagnostics: PublishDiagnostics): Unit = diagnostics = newDiagnostics
 
       override def trackMetric(name: String, value: Double): Unit =  {
-        System.out.println("name: " + name +", value: " + value)
       }
     }
     server.setClient(client)
