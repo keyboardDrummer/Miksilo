@@ -1,6 +1,5 @@
 package deltas.verilog
 
-import core.SourceUtils
 import core.deltas.path.PathRoot
 import core.language.node.NodeComparer
 import core.language.{Compilation, CompilationCache, InMemoryFileSystem}
@@ -11,6 +10,7 @@ import deltas.statement.{IfThenDelta, IfThenElseDelta}
 import deltas.{ClearPhases, FileWithMembersDelta}
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import lsp.{DocumentPosition, FileRange, HumanPosition, TextDocumentIdentifier}
+import miksilo.editorParser.SourceUtils
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 

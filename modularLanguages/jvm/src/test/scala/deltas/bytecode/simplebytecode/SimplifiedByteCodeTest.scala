@@ -1,10 +1,10 @@
 package deltas.bytecode.simpleBytecode
 
-import core.SourceUtils
 import core.deltas.Delta
 import deltas.PrettyPrint
 import deltas.bytecode.ByteCodeLanguage
 import deltas.javac.{ExtendedByteCode, JavaToByteCodeLanguage}
+import miksilo.editorParser.SourceUtils
 import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
 

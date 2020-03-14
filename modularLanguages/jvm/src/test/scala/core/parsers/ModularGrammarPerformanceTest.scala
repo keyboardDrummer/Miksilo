@@ -1,9 +1,10 @@
 package core.parsers
 
-import _root_.core.{SourceUtils, TestUtils}
+import _root_.core.TestUtils
 import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.json.ModularJsonLanguage
 import deltas.yaml.ModularYamlLanguage
+import miksilo.editorParser.SourceUtils
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 

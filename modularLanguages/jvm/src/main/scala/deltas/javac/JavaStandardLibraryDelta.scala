@@ -1,6 +1,6 @@
 package deltas.javac
 
-import core.{SolveConstraintsDelta, SourceUtils}
+import core.SolveConstraintsDelta
 import core.deltas.{Contract, Delta, LanguageFromDeltas}
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.{Compilation, Language}
@@ -10,6 +10,7 @@ import core.smarts.scopes.objects.Scope
 import deltas.ConstraintSkeleton
 import deltas.bytecode.readJar.ClassFileSignatureDecompiler
 import deltas.javac.classes.ClassCompiler
+import miksilo.editorParser.SourceUtils
 
 object JavaStandardLibraryDelta extends Delta {
 

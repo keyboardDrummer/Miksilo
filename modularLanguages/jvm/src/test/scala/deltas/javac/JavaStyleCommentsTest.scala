@@ -1,6 +1,5 @@
 package deltas.javac
 
-import core.SourceUtils
 import core.bigrammar._
 import core.bigrammar.grammars._
 import core.deltas._
@@ -13,6 +12,7 @@ import deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, Subtr
 import deltas.expression.{ExpressionDelta, IntLiteralDelta}
 import deltas.statement.{BlockDelta, StatementDelta}
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import miksilo.editorParser.SourceUtils
 import util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
 
 import scala.reflect.io.Path

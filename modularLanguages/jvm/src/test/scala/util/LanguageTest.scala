@@ -3,7 +3,6 @@ package util
 import java.io.{BufferedInputStream, InputStream}
 import java.nio.file.Files
 
-import core.SourceUtils
 import core.deltas.path.PathRoot
 import core.language.Compilation
 import core.language.node.{Node, NodeComparer}
@@ -12,6 +11,7 @@ import deltas.bytecode.ByteCodeMethodInfo.MethodInfo
 import deltas.bytecode.ByteCodeSkeleton.ClassFile
 import deltas.bytecode.{ByteCodeLanguage, PrintByteCode}
 import deltas.javac.JavaToByteCodeLanguage
+import miksilo.editorParser.SourceUtils
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap}
 import util.JavaSourceUtils.LineProcessLogger

@@ -2,8 +2,8 @@ package playground.application.compilerCockpit
 
 import java.awt.event.ActionEvent
 
-import core.SourceUtils
 import javax.swing.{DefaultComboBoxModel, JComboBox, JLabel, JPanel}
+import miksilo.editorParser.SourceUtils
 import util.JavaSourceUtils
 
 import scala.reflect.io.Path

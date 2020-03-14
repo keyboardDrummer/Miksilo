@@ -1,13 +1,13 @@
 
 package deltas.yaml
 
-import core.SourceUtils
 import core.bigrammar.SelectGrammar
 import core.deltas.path.{ChildPath, PathRoot}
 import core.language.Compilation
 import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
+import miksilo.editorParser.SourceUtils
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 

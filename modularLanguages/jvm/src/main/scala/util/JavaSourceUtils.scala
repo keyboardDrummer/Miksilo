@@ -1,10 +1,10 @@
 package util
 
-import core.SourceUtils
 import core.deltas._
 import core.language.Compilation
 import core.language.node.Node
 import deltas.bytecode.{ByteCodeLanguage, PrintByteCode}
+import miksilo.editorParser.SourceUtils
 
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}

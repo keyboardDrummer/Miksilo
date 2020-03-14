@@ -2,7 +2,6 @@ package deltas.bytecode.readJar
 
 import java.io
 
-import core.SourceUtils
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.grammars.LanguageGrammars
@@ -12,6 +11,7 @@ import deltas.bytecode.types.TypeSkeleton
 import deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import deltas.javac.JavaToByteCodeLanguage
 import deltas.javac.types.TypeAbstraction
+import miksilo.editorParser.SourceUtils
 import org.scalatest.funsuite.AnyFunSuite
 import util.{StreamUtils, TestLanguageBuilder}
 
