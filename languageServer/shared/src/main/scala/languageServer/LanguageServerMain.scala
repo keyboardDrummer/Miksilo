@@ -12,6 +12,11 @@ trait LanguageBuilder {
   def build(arguments: collection.Seq[String]): Language
 }
 
+case class SimpleLanguageBuilder(key: String, language: Language) extends LanguageBuilder {
+
+  override def build(arguments: collection.Seq[String]) = language
+}
+
 class LanguageServerMain(builders: Seq[LanguageBuilder],
                          connection: JsonRpcConnection,
                          workQueue: SerialWorkQueue[WorkItem]) extends LazyLogging {

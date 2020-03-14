@@ -113,11 +113,23 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
   crossType(CrossType.Full).
   in(file("languageServer")).
   settings(commonSettings: _*).
+  settings(
+    mainClass in Compile := Some("languageServer.Program")).
   jvmSettings(
-    assemblySettings
+    assemblySettings,
+    vscode := {
+      val assemblyFile: String = assembly.value.getAbsolutePath
+      languageServerCommonTask(assemblyFile).run
+    }
   ).
   jsSettings(
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
+
+    scalaJSUseMainModuleInitializer := true,
+    vscode := {
+      val assemblyFile: String = (fastOptJS in Compile).value.data.getAbsolutePath
+      languageServerCommonTask(assemblyFile).run
+    }).
   dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
 def languageServerCommonTask(assemblyFile: String) = {
