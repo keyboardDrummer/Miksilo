@@ -1,12 +1,12 @@
 package core.smarts.language.expressions
 
-import core.language.SourceElement
 import core.smarts.ConstraintBuilder
-import core.smarts.language.modules.FakeSourceElement
+import core.smarts.language.modules.FakeSourcePath
 import core.smarts.language.types.LanguageType
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.CheckSubType
 import core.smarts.types.objects.{ConstraintClosureType, ConstraintExpression, Type}
+import languageServer.SourcePath
 
 case class Lambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
@@ -15,8 +15,8 @@ case class Lambda(name: String, body: Expression, parameterDefinedType: Option[L
     builder.typesAreEqual(_type, ConstraintClosureType(parentScope, name, this, wrappedBody))
   }
 
-  class TypeCheckWrapper(name: String, location: SourceElement, original: ConstraintExpression, parameterType: Type)
-    extends ConstraintExpression with FakeSourceElement
+  class TypeCheckWrapper(name: String, location: SourcePath, original: ConstraintExpression, parameterType: Type)
+    extends ConstraintExpression with FakeSourcePath
   {
     override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {
       val declaration = builder.resolve(name, parentScope, location)

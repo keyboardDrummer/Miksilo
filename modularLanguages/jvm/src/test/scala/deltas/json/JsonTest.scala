@@ -12,7 +12,7 @@ import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
 class JsonTest extends AnyFunSuite {
-  val language = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas, UntilBestAndXStepsStopFunction())
+  val language = TestLanguageBuilder.buildWithParser(ModularJsonLanguage.deltas, UntilBestAndXStepsStopFunction())
 
   ignore("removes incorrect b at start") {
     val input = """b{"hello":"jo"}"""
@@ -62,7 +62,7 @@ class JsonTest extends AnyFunSuite {
     assert(compilation.diagnostics.size == 2)
   }
 
-  val utils = TestLanguageGrammarUtils(JsonLanguage.deltas)
+  val utils = TestLanguageGrammarUtils(ModularJsonLanguage.deltas)
 
   test("testStringValueSourceLocation") {
     val example =
@@ -72,13 +72,13 @@ class JsonTest extends AnyFunSuite {
 
     val result: ObjectLiteral[NodePath] = PathRoot(utils.parse(example).asInstanceOf[Node])
     val member = result.members.head
-    val offsetRange = member.getField(MemberValue).range.get
+    val offsetRange = member.getField(MemberValue).rangeOption.get
     val sourceRange = offsetRange.toSourceRange
     assertResult(Position(1, 7))(sourceRange.start)
     assertResult(Position(1, 20))(sourceRange.end)
 
     val stringValue = member.value
-    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value).range.get.toSourceRange
+    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value).rangeOption.get.toSourceRange
     assertResult(Position(1, 8))(stringLocation.start)
     assertResult(Position(1, 19))(stringLocation.end)
   }

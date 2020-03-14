@@ -1,9 +1,10 @@
 package core.smarts.types.objects
 
-import core.language.SourceElement
+import core.parsers.SourceElement
 import core.smarts._
 import core.smarts.objects.{DeclarationVariable, _}
 import core.smarts.scopes.objects.Scope
+import languageServer.SourcePath
 
 trait Type {
   def specialize(mapping: Map[TypeVariable, TypeVariable]): Type
@@ -34,7 +35,7 @@ trait ConcreteType extends Type
 The idea here is analogous to the machine closure type, where you store a reference to the concrete program in the type, and you type check that program
 each type you apply the closure type. In constraint terms, this means generating new constraints each time you apply the ConstraintClosureType.
  */
-case class ConstraintClosureType(parentScope: Scope, name: String, variableOrigin: SourceElement, body: ConstraintExpression) extends ConcreteType {
+case class ConstraintClosureType(parentScope: Scope, name: String, variableOrigin: SourcePath, body: ConstraintExpression) extends ConcreteType {
   override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = this
 
   override def variables: Set[TypeVariable] = Set.empty

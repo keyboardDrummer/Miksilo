@@ -1,19 +1,19 @@
 package core.smarts.language.modules
 
-import core.language.SourceElement
-import core.parsers.editorParsers.OffsetPointerRange
 import core.smarts.ConstraintBuilder
 import core.smarts.language.structs.TypeDefinition
 import core.smarts.scopes.objects.Scope
+import languageServer.SourcePath
 
-trait FakeSourceElement extends SourceElement {
-  override def range: Option[OffsetPointerRange] = None
+trait FakeSourcePath extends SourcePath {
 
   override def uriOption: Option[String] = None
+
+  override def rangeOption = None
 }
 
 case class Module(name: String, bindings: Seq[Binding], structs: Seq[TypeDefinition] = Seq.empty,
-                  imports: Seq[ModuleImport] = Seq.empty) extends FakeSourceElement
+                  imports: Seq[ModuleImport] = Seq.empty) extends FakeSourcePath
 {
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit = {
     val moduleDeclaration = builder.declare(name, parentScope, this)

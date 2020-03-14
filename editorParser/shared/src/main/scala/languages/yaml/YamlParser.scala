@@ -1,19 +1,19 @@
 package languages.yaml
 
 import core.document.Empty
-import core.parsers.caching.ExclusivePointer
-import core.parsers.core.{ParseText, Processor, TextPointer}
+import core.parsers.SourceElement
+import core.parsers.core.{Processor, TextPointer}
 import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetPointerRange}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
 import core.responsiveDocument.ResponsiveDocument
 
-trait YamlValue {
+trait YamlValue extends SourceElement {
   def toDocument: ResponsiveDocument
 
   override def toString: String = toDocument.renderString()
 }
 
-case class YamlObject(range: OffsetPointerRange, members: Array[(YamlValue, YamlValue)]) extends YamlValue {
+case class YamlObject(rangeOption: Option[OffsetPointerRange],members: Array[(YamlValue, YamlValue)]) extends YamlValue {
   override def toDocument: ResponsiveDocument = {
     members.
       map(member => member._1.toDocument ~ ":" ~~ member._2.toDocument).
@@ -21,7 +21,7 @@ case class YamlObject(range: OffsetPointerRange, members: Array[(YamlValue, Yaml
   }
 }
 
-case class YamlArray(range: OffsetPointerRange, elements: Array[YamlValue]) extends YamlValue {
+case class YamlArray(rangeOption: Option[OffsetPointerRange],elements: Array[YamlValue]) extends YamlValue {
   override def toDocument: ResponsiveDocument = {
     elements.
       map(member => ResponsiveDocument.text("- ") ~~ member.toDocument).
@@ -29,19 +29,21 @@ case class YamlArray(range: OffsetPointerRange, elements: Array[YamlValue]) exte
   }
 }
 
-case class NumberLiteral(range: OffsetPointerRange, value: Int) extends YamlValue {
+case class NumberLiteral(rangeOption: Option[OffsetPointerRange],value: Int) extends YamlValue {
   override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
 }
 
-case class StringLiteral(range: OffsetPointerRange, value: String) extends YamlValue {
+case class StringLiteral(rangeOption: Option[OffsetPointerRange],value: String) extends YamlValue {
   override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
 }
 
 case class ValueHole(range: OffsetPointerRange) extends YamlValue {
   override def toDocument: ResponsiveDocument = "hole"
+
+  override def rangeOption = Some(range)
 }
 
-case class TaggedNode(range: OffsetPointerRange, tag: String, node: YamlValue) extends YamlValue {
+case class TaggedNode(rangeOption: Option[OffsetPointerRange],tag: String, node: YamlValue) extends YamlValue {
   override def toDocument: ResponsiveDocument = ResponsiveDocument.text("!") ~ tag ~~ node.toDocument
 }
 
@@ -101,12 +103,12 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
   lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseStringLiteral
   lazy val parseFlowValue = (tag ~ parseUntaggedFlowValue).
-    withSourceRange((range, v) => TaggedNode(range, v._1, v._2)) | parseUntaggedFlowValue
+    withSourceRange((range, v) => TaggedNode(Some(range), v._1, v._2)) | parseUntaggedFlowValue
   lazy val parseUntaggedValue = new Lazy(parseBracketArray | parseArray | parseNumber | parseStringLiteral |
     parseBlockMapping | hole, "untagged value")
 
   lazy val parseValue: Parser[YamlValue] = (tag ~ parseUntaggedValue).
-    withSourceRange((range, v) => TaggedNode(range, v._1, v._2)) | parseUntaggedValue
+    withSourceRange((range, v) => TaggedNode(Some(range), v._1, v._2)) | parseUntaggedValue
 
   lazy val parseYaml = trivias ~> parseValue ~< trivias
   lazy val parser = parseYaml.getWholeInputParser()
@@ -115,30 +117,30 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     val member = new WithContext(_ =>
       BlockKey, parseFlowValue) ~< literalOrKeyword(":") ~ greaterThan(parseValue)
     alignedList(member).withSourceRange((range, values) => {
-      YamlObject(range, values.toArray)
+      YamlObject(Some(range), values.toArray)
     })
   }
 
   lazy val objectMember = parseFlowValue ~< ":" ~ parseFlowValue
   lazy val parseBraceObject = (literal("{", 2 * History.missingInputPenalty) ~> objectMember.manySeparated(",", "member") ~< "}").
-    withSourceRange((range, value) => YamlObject(range, value.toArray))
+    withSourceRange((range, value) => YamlObject(Some(range), value.toArray))
 
   lazy val parseBracketArray: Parser[YamlValue] = {
     val inner = "[" ~> parseFlowValue.manySeparated(",", "array element").
-      withSourceRange((range, elements) => YamlArray(range, elements.toArray)) ~< "]"
+      withSourceRange((range, elements) => YamlArray(Some(range), elements.toArray)) ~< "]"
     new WithContext(_ => FlowIn, inner)
   }
 
   lazy val parseArray: Parser[YamlValue] = {
     val element = literalOrKeyword("- ") ~> greaterThan(parseValue)
-    alignedList(element).withSourceRange((range, elements) => YamlArray(range, elements.toArray))
+    alignedList(element).withSourceRange((range, elements) => YamlArray(Some(range), elements.toArray))
   }
 
   lazy val parseNumber: Parser[YamlValue] =
-    wholeNumber.withSourceRange((range, n) => NumberLiteral(range, Integer.parseInt(n)))
+    wholeNumber.withSourceRange((range, n) => NumberLiteral(Some(range), Integer.parseInt(n)))
 
   lazy val parseStringLiteral: Parser[YamlValue] =
-    parseStringLiteralInner.withSourceRange((range, s) => StringLiteral(range, s))
+    parseStringLiteralInner.withSourceRange((range, s) => StringLiteral(Some(range), s))
   lazy val parseStringLiteralInner: Parser[String] =
     RegexParser("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
 

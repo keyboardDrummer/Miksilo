@@ -13,7 +13,7 @@ import util.TestLanguageBuilder
 
 class YamlTest extends AnyFunSuite {
 
-  val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltasWithoutParser,
+  val language = TestLanguageBuilder.buildWithParser(ModularYamlLanguage.deltasWithoutParser,
     stopFunction = UntilBestAndXStepsStopFunction(), indentationSensitive = true)
 
   test("plain scalar with -") {

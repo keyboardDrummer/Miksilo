@@ -5,7 +5,7 @@ import core.parsers.editorParsers.OffsetPointerRange
 
 class NodeFieldPath(parent: NodePath, field: NodeField) extends FieldPath(parent, field) with NodeChildPath {
   override lazy val current: Node = super[FieldPath].current.asInstanceOf[Node]
-  override def range: Option[OffsetPointerRange] = super[FieldPath].range.orElse(super[NodeChildPath].range)
+  override def rangeOption: Option[OffsetPointerRange] = super[FieldPath].rangeOption.orElse(super[NodeChildPath].rangeOption)
 }
 
 case class FieldPath(parent: NodePath, field: NodeField) extends ChildPath {
@@ -23,7 +23,7 @@ case class FieldPath(parent: NodePath, field: NodeField) extends ChildPath {
 
   override def replaceWith(replacement: Any): Unit = parent(field) = replacement //TODO hier hoort nog .obj. Hoezo compiled dit?
 
-  override def range: Option[OffsetPointerRange] = parent.current.sources.get(field)
+  override def rangeOption: Option[OffsetPointerRange] = parent.current.sources.get(field)
 
   override def current = parent.current(field)
 }

@@ -1,10 +1,10 @@
 package deltas
 
-import deltas.json.JsonLanguage
+import deltas.json.ModularJsonLanguage
 import deltas.smithy.SmithyLanguage
 import deltas.solidity.SolidityLanguage
 import deltas.verilog.VerilogLanguage
-import deltas.yaml.YamlLanguage
+import deltas.yaml.ModularYamlLanguage
 import languageServer.LanguageBuilder
 
 object Languages {
@@ -37,11 +37,11 @@ object SmithyLanguageBuilder extends LanguageBuilder {
 object JsonLanguageBuilder extends LanguageBuilder {
   override def key = "json"
 
-  override def build(arguments: collection.Seq[String]) = JsonLanguage.language
+  override def build(arguments: collection.Seq[String]) = ModularJsonLanguage.language
 }
 
 object YamlLanguageBuilder extends LanguageBuilder {
   override def key = "yaml"
 
-  override def build(arguments: collection.Seq[String]) = YamlLanguage.language
+  override def build(arguments: collection.Seq[String]) = ModularYamlLanguage.language
 }

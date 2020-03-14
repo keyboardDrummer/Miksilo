@@ -1,5 +1,9 @@
 package core.parsers.editorParsers
 
+object StopFunction {
+  val default = UntilTimeStopFunction(100)
+}
+
 trait StopFunction {
   def reset(): Unit = {}
   def apply(offset: Int, best: Double, second: Double): Boolean

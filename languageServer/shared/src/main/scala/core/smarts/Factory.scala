@@ -1,9 +1,10 @@
 package core.smarts
 
-import core.language.SourceElement
+import core.parsers.SourceElement
 import core.smarts.objects.DeclarationVariable
 import core.smarts.scopes.objects.{ConcreteScope, ScopeVariable}
 import core.smarts.types.objects.TypeVariable
+import languageServer.SourcePath
 
 /**
   */
@@ -22,7 +23,7 @@ class Factory
   }
 
   private var typeCounter = 0
-  def typeVariable(origin: Option[SourceElement] = None) : TypeVariable = {
+  def typeVariable(origin: Option[SourcePath] = None) : TypeVariable = {
     typeCounter += 1
     TypeVariable(typeCounter.toString, origin)
   }

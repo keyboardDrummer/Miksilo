@@ -2,9 +2,10 @@ package languageServer
 
 import core.LazyLogging
 import core.language.exceptions.BadInputException
-import core.language.{Compilation, CompilationCache, Language, NotStarted, SourceElement}
+import core.language.{Compilation, CompilationCache, Language, NotStarted}
+import core.parsers.SourceElement
 import core.parsers.core.ParseText
-import core.parsers.editorParsers.TextEdit
+import core.parsers.editorParsers.{FileOffsetRange, OffsetPointerRange, TextEdit}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
 import lsp._
@@ -72,7 +73,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
     Option(getCompilation.proofs)
   }
 
-  def getSourceElement(text: ParseText, position: FilePosition): Option[SourceElement] = {
+  def getSourceElement(text: ParseText, position: FilePosition): Option[SourcePath] = {
     val fileOffset = FileOffset(position.uri, text.getOffset(position.position))
     getCompilation.program.getChildForPosition(fileOffset)
   }
@@ -103,7 +104,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
       scopeGraph = proofs.scopeGraph
       element <- getSourceElement(text, FilePosition(params.textDocument.uri, position)).toSeq
       reference <- scopeGraph.getReferenceFromSourceElement(element).toSeq
-      prefixLength = offset - reference.origin.get.range.get.from.offset
+      prefixLength = offset - reference.origin.get.rangeOption.get.from.offset
       prefix = reference.name.take(prefixLength)
       declaration <- scopeGraph.resolveWithoutNameCheck(reference).
         filter(declaration => declaration.name.startsWith(prefix))
@@ -116,7 +117,7 @@ class MiksiloLanguageServer(val language: Language) extends LanguageServer
 
   override def getOptions: CompletionOptions = CompletionOptions(resolveProvider = false, Seq.empty)
 
-  def getDefinitionFromDefinitionOrReferencePosition(proofs: Proofs, element: SourceElement): Option[NamedDeclaration] = {
+  def getDefinitionFromDefinitionOrReferencePosition(proofs: Proofs, element: SourcePath): Option[NamedDeclaration] = {
     proofs.scopeGraph.findDeclaration(element).orElse(proofs.gotoDefinition(element))
   }
 

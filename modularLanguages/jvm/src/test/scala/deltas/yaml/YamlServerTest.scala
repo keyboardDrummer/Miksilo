@@ -7,7 +7,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 class YamlServerTest extends AnyFunSuite with LanguageServerTest {
 
-  val yamlLanguage = LanguageFromDeltas(Seq(ParseUsingTextualGrammar(UntilBestAndXStepsStopFunction(), indentationSensitive = true)) ++ YamlLanguage.deltasWithoutParser)
+  val yamlLanguage = LanguageFromDeltas(Seq(ParseUsingTextualGrammar(UntilBestAndXStepsStopFunction(), indentationSensitive = true)) ++ ModularYamlLanguage.deltasWithoutParser)
   test("regression") {
     val input =
       """Foo:

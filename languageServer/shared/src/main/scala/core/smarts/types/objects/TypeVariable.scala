@@ -1,8 +1,8 @@
 package core.smarts.types.objects
 
-import core.language.SourceElement
+import languageServer.SourcePath
 
-case class TypeVariable(name: String, origin: Option[SourceElement] = None) extends Type {
+case class TypeVariable(name: String, origin: Option[SourcePath] = None) extends Type {
   override def variables: Set[TypeVariable] = Set(this)
 
   override def specialize(mapping: Map[TypeVariable, TypeVariable]): Type = mapping(this)

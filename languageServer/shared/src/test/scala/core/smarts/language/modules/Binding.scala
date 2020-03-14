@@ -6,7 +6,7 @@ import core.smarts.language.types.LanguageType
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type
 
-case class Binding(name: String, body: Expression, bindingType: Option[LanguageType] = None) extends FakeSourceElement
+case class Binding(name: String, body: Expression, bindingType: Option[LanguageType] = None) extends FakeSourcePath
 {
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit = {
     val typeVariable = bindingType.fold[Type](builder.typeVariable())(t => t.constraints(builder, parentScope))

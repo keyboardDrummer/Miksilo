@@ -1,10 +1,11 @@
 package core.smarts
 
-import core.language.SourceElement
+import core.parsers.SourceElement
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.ScopeGraph
 import core.smarts.types.TypeGraph
 import core.smarts.types.objects.{Type, TypeFromDeclaration, TypeVariable}
+import languageServer.SourcePath
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -38,12 +39,12 @@ class Proofs {
     case _ => _type
   }
 
-  def gotoDefinition(location: SourceElement): Option[NamedDeclaration] = {
+  def gotoDefinition(location: SourcePath): Option[NamedDeclaration] = {
     val maybeReference = scopeGraph.getReferenceFromSourceElement(location)
     maybeReference.flatMap(reference => references.get(reference))
   }
 
-  def findReferences(location: SourceElement): Seq[Reference] = {
+  def findReferences(location: SourcePath): Seq[Reference] = {
     val maybeDeclaration = scopeGraph.findDeclaration(location)
     maybeDeclaration.toSeq.flatMap(declaration => findReferences(declaration))
   }
@@ -52,7 +53,7 @@ class Proofs {
     referencesPerDeclaration.getOrElse(declaration, Seq.empty)
   }
 
-  def getDeclarationsInScope(location: SourceElement): Seq[NamedDeclaration] = {
+  def getDeclarationsInScope(location: SourcePath): Seq[NamedDeclaration] = {
     val maybeReference = scopeGraph.getReferenceFromSourceElement(location)
     val declarations = maybeReference.map(reference => scopeGraph.resolveWithoutNameCheck(reference)).getOrElse(Seq.empty)
     declarations.filter(declaration => declaration.origin.nonEmpty)
