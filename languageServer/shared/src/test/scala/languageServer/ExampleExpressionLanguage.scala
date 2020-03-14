@@ -1,12 +1,12 @@
 package languageServer
 
-import core.language.{FileElement, Language, SourceElementFromFileElement}
+import core.language.{FileElement, Language, SourcePathFromElement}
 import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, OffsetPointerRange}
 import core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 
-// TODO add a constraintBuilder that's specific to a File, so you add a [Has]SourceRange instead of a SourceElement
+// TODO add a constraintBuilder that's specific to a File, so you add a SourceElement instead of a SourcePath
 // TODO compute the range based on the children, so only the leafs needs a Range.
 
 trait Expression extends FileElement {
@@ -98,12 +98,12 @@ object ExpressionParser extends CommonStringReaderParser with LeftRecursiveCorre
 
 object ExampleExpressionLanguage extends Language {
   private val parsePhase = Language.getCachingParsePhase[Expression](
-    (program, uri) => SourceElementFromFileElement(uri, program),
+    (program, uri) => SourcePathFromElement(uri, program),
     ExpressionParser.expression.getWholeInputParser(), indentationSensitive = false)
 
   private val constraintPhase = Language.getConstraintPhase((compilation, builder) => {
-    val rootElement = compilation.program.asInstanceOf[SourceElementFromFileElement]
-    val rootExpression = rootElement.element.asInstanceOf[Expression]
+    val rootElement = compilation.program.asInstanceOf[SourcePathFromElement]
+    val rootExpression = rootElement.sourceElement.asInstanceOf[Expression]
     rootExpression.collectConstraints(builder, rootElement.uri, builder.newScope(debugName = "rootScope"))
   })
 

@@ -19,7 +19,7 @@ import deltas.javac.classes.FieldDeclarationWithInitializer
 import deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import deltas.javac.methods.{BlockLanguageDelta, ImplicitReturnAtEndOfMethod}
 import deltas.javac.statements.ForLoopContinueDelta
-import deltas.json.JsonLanguage
+import deltas.json.ModularJsonLanguage
 import deltas.statement.assignment.AddAssignmentDelta
 import deltas.statement.{ForLoopDelta, LocalDeclarationWithInitializerDelta}
 
@@ -92,7 +92,7 @@ object PresetsPanel
 
   def getJsonFormatter = {
     Preset("Json",
-      JsonLanguage.language.topToBottom,
+      ModularJsonLanguage.language.topToBottom,
       "JSON")
   }
 

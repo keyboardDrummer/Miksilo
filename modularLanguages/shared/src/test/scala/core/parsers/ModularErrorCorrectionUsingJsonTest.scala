@@ -1,6 +1,6 @@
 package core.parsers
 
-import deltas.json.JsonLanguage
+import deltas.json.ModularJsonLanguage
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
@@ -10,7 +10,7 @@ class ModularErrorCorrectionUsingJsonTest extends AnyFunSuite {
     val input = """{ "VpcId" : {
                   |  "ConstraintDescription" : "must be the VPC Id of an existing Virtual Private Cloud."
                   |}}""".stripMargin
-    val result = TestLanguageBuilder.buildWithParser(JsonLanguage.deltas).compileString(input)
+    val result = TestLanguageBuilder.buildWithParser(ModularJsonLanguage.deltas).compileString(input)
     //parseJson(input, 3, 0)
   }
 }

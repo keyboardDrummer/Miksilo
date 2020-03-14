@@ -1,7 +1,7 @@
 package application.compilerCockpit
 
 import deltas.javac.JavaToByteCodeLanguage
-import deltas.json.JsonLanguage
+import deltas.json.ModularJsonLanguage
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.fife.ui.rsyntaxtextarea.TokenTypes
 import org.scalatest.funsuite.AnyFunSuite
@@ -73,7 +73,7 @@ class TokenMakerFromGrammarTest extends AnyFunSuite {
   }
 
   test("json") {
-    val grammar = TestLanguageBuilder.build(JsonLanguage.deltas).grammars.root
+    val grammar = TestLanguageBuilder.build(ModularJsonLanguage.deltas).grammars.root
     val tokenMaker = new TokenMakerFromGrammar(grammar)
 
     val text = """{"hello":3}""".stripMargin

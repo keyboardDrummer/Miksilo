@@ -1,14 +1,14 @@
 package core.deltas
 
 import core.parsers.editorParsers.{SourceRange, StopImmediately}
-import deltas.json.JsonLanguage
+import deltas.json.ModularJsonLanguage
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import lsp._
 import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingJsonServerTest extends AnyFunSuite with LanguageServerTest {
 
-  val server = new MiksiloLanguageServer(LanguageFromDeltas(Seq(ParseUsingTextualGrammar(StopImmediately)) ++ JsonLanguage.deltas))
+  val server = new MiksiloLanguageServer(LanguageFromDeltas(Seq(ParseUsingTextualGrammar(StopImmediately)) ++ ModularJsonLanguage.deltas))
 
   test("zero length caching") {
 

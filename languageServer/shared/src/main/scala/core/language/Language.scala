@@ -5,10 +5,10 @@ import java.nio.charset.StandardCharsets
 
 import core.LazyLogging
 import core.language.exceptions.BadInputException
-import core.parsers.caching.{ArrayOffsetManager, ExclusivePointer}
-import core.parsers.editorParsers.{CachingParser, SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
-import core.parsers.strings.StringParserWriter
+import core.parsers.caching.ArrayOffsetManager
+import core.parsers.editorParsers._
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
+import languageServer.SourcePath
 
 import scala.collection.mutable
 import scala.util.{Failure, Success}
@@ -50,7 +50,7 @@ object Language extends LazyLogging {
     })
   }
 
-  def getParsePhase[Program](getSourceElement: (Program, String) => SourceElement,
+  def getParsePhase[Program](getSourceElement: (Program, String) => SourcePath,
                              parser: SingleResultParser[Program],
                              stopFunction: StopFunction = new TimeRatioStopFunction): Phase = {
     Phase("parse", "parse the source code", compilation => {
@@ -62,9 +62,9 @@ object Language extends LazyLogging {
   }
 
   def getCachingParsePhase[Program](
-    getSourceElement: (Program, String) => SourceElement,
+    getSourceElement: (Program, String) => SourcePath,
     parser: SingleResultParser[Program],
-    stopFunction: StopFunction = new TimeRatioStopFunction,
+    stopFunction: StopFunction = StopFunction.default,
     indentationSensitive: Boolean): Phase = {
 
     val builtParser = new CachedCompilationField[mutable.HashMap[String, CachingParser[Program]]](_ => mutable.HashMap.empty)
@@ -98,7 +98,7 @@ object Language extends LazyLogging {
     })
   }
 
-  private def processParseResult[Program](getSourceElement: (Program, String) => SourceElement,
+  private def processParseResult[Program](getSourceElement: (Program, String) => SourcePath,
                                           compilation: Compilation, uri: String,
                                           parseResult: SingleParseResult[Program]): Unit = {
     parseResult.resultOption.foreach(program => {
@@ -125,7 +125,7 @@ class Language extends LazyLogging {
     compilerPhases = left ++ (insert :: right)
   }
 
-  def compileAst(program: SourceElement): Compilation = {
+  def compileAst(program: SourcePath): Compilation = {
     val compilation = Compilation.fromAst(this, program)
     compilation.program = program
     compilation.runPhases()

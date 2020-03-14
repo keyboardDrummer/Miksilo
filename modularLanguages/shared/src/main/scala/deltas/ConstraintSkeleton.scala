@@ -2,7 +2,7 @@ package deltas
 
 import core.deltas.ShapeProperty
 import core.deltas.path.NodePath
-import core.language.{Compilation, SourceElement}
+import core.language.Compilation
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import deltas.javac.classes.skeleton.{HasConstraints, HasDeclaration}

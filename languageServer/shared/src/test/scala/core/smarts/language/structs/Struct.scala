@@ -1,7 +1,7 @@
 package core.smarts.language.structs
 
 import core.smarts.ConstraintBuilder
-import core.smarts.language.modules.FakeSourceElement
+import core.smarts.language.modules.FakeSourcePath
 import core.smarts.objects.NamedDeclaration
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.{AssignSubType, DeclarationHasType}
@@ -13,7 +13,7 @@ trait TypeDefinition
 }
 
 case class Struct(name: String, fields: Seq[Field], maybeParent: Option[String] = None, typeParameter: Option[String] = None)
-  extends TypeDefinition with FakeSourceElement
+  extends TypeDefinition with FakeSourcePath
 {
   def constraints(builder: ConstraintBuilder, parentScope: Scope): Unit =
   {

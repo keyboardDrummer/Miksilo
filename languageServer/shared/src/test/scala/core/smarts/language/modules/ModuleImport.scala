@@ -4,7 +4,7 @@ import core.smarts.ConstraintBuilder
 import core.smarts.scopes.imports.ScopeImport
 import core.smarts.scopes.objects.Scope
 
-class ModuleImport(name: String) extends FakeSourceElement {
+class ModuleImport(name: String) extends FakeSourcePath {
 
   def constraints(builder: ConstraintBuilder, scope: Scope): Unit = {
     val importedDeclaration = builder.resolve(name, scope, this)

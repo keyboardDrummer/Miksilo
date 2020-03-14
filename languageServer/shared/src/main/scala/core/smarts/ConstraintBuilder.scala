@@ -1,12 +1,13 @@
 package core.smarts
 
-import core.language.SourceElement
+import core.parsers.SourceElement
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.imports.DeclarationOfScope
 import core.smarts.scopes.objects.{ConcreteScope, _}
 import core.smarts.scopes.{DeclarationInsideScope, ParentScope, ReferenceInScope}
 import core.smarts.types.objects.{Type, TypeFromDeclaration, TypeVariable}
 import core.smarts.types._
+import languageServer.SourcePath
 
 import scala.collection.mutable
 
@@ -23,7 +24,7 @@ class ConstraintBuilder(val factory: Factory) {
     result
   }
 
-  def typeVariable(origin: Option[SourceElement] = None): TypeVariable = factory.typeVariable(origin)
+  def typeVariable(origin: Option[SourcePath] = None): TypeVariable = factory.typeVariable(origin)
 
   var constraints: List[Constraint] = List.empty
 
@@ -35,7 +36,7 @@ class ConstraintBuilder(val factory: Factory) {
 
   def importScope(into: Scope, source: Scope): Unit = add(ParentScope(into, source))
 
-  def resolveToType(name: String, origin: SourceElement, scope: Scope, _type: Type) : DeclarationVariable = {
+  def resolveToType(name: String, origin: SourcePath, scope: Scope, _type: Type) : DeclarationVariable = {
     val declaration = declarationVariable()
     val reference = new Reference(name, Option(origin))
     add(ReferenceInScope(reference, scope))
@@ -43,24 +44,24 @@ class ConstraintBuilder(val factory: Factory) {
     declaration
   }
 
-  def resolve(name: String, scope: Scope, origin: SourceElement, _type: Option[Type] = None) = {
+  def resolve(name: String, scope: Scope, origin: SourcePath, _type: Option[Type] = None) = {
     resolveOption(name, Some(origin), scope, _type)
   }
 
-  def resolveOption(name: String, origin: Option[SourceElement], scope: Scope, _type: Option[Type] = None): DeclarationVariable = {
+  def resolveOption(name: String, origin: Option[SourcePath], scope: Scope, _type: Option[Type] = None): DeclarationVariable = {
     val declaration = _type.fold(declarationVariable())(t => declarationVariable(t))
     val reference = refer(name, scope, origin)
     constraints ::= ResolvesTo(reference, declaration)
     declaration
   }
 
-  def refer(hasName: String, scope: Scope, origin: Option[SourceElement]): Reference = {
+  def refer(hasName: String, scope: Scope, origin: Option[SourcePath]): Reference = {
     val result = new Reference(hasName, origin)
     constraints ::= ReferenceInScope(result, scope)
     result
   }
 
-  def declare(name: String, container: Scope, origin: SourceElement = null, _type: Option[Type] = None): NamedDeclaration = { //TODO the order here is inconsistent with resolve.
+  def declare(name: String, container: Scope, origin: SourcePath = null, _type: Option[Type] = None): NamedDeclaration = { //TODO the order here is inconsistent with resolve.
     val result = new NamedDeclaration(name, Option(origin))
     constraints ::= DeclarationInsideScope(result, container)
     _type.foreach(t => constraints ::= DeclarationHasType(result, t))

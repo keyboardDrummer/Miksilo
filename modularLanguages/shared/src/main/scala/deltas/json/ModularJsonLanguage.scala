@@ -12,7 +12,7 @@ import deltas.expression._
 import deltas.javac.expressions.literals.BooleanLiteralDelta
 import deltas.json.JsonObjectLiteralDelta.{ObjectLiteral, ObjectLiteralMember}
 
-object JsonLanguage {
+object ModularJsonLanguage {
   val deltas: Seq[Delta] = Seq[Delta](ExpressionLanguageDelta, BooleanLiteralDelta, JsonObjectLiteralDelta,
     ArrayLiteralDelta, SingleQuotedStringLiteralDelta, JsonStringLiteralDelta, IntLiteralDelta, ExpressionDelta)
   val language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar(UntilTimeStopFunction(100))) ++ deltas)
@@ -37,7 +37,7 @@ object PrintJson extends Delta  {
 }
 
 object JsonPrinter {
-  lazy val jsonPrinter = BiGrammarToPrinter.toPrinter(LanguageGrammars.grammars.get(JsonLanguage.language).root)
+  lazy val jsonPrinter = BiGrammarToPrinter.toPrinter(LanguageGrammars.grammars.get(ModularJsonLanguage.language).root)
 
   // TODO replace this with a JsonLanguage printer that actually works.
   def printJson(root: Node): String = {

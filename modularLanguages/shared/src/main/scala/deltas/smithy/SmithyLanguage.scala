@@ -3,7 +3,7 @@ package deltas.smithy
 import core.SolveConstraintsDelta
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.Language
-import deltas.json.JsonLanguage
+import deltas.json.ModularJsonLanguage
 import deltas.trivia.SlashSlashLineCommentsDelta
 import deltas.{FileWithMembersDelta, HasNameDelta}
 
@@ -12,7 +12,7 @@ object SmithyLanguage {
     OperationDelta, SimpleShapeDelta, ShapeStatementDelta, TraitDelta, ResourceDelta, ServiceDelta,
     GenericSmithyDelta, AbsoluteShapeIdentifierDelta, RelativeShapeIdentifierDelta,
     NamespaceDelta, FileWithMembersDelta, HasNameDelta, SlashSlashLineCommentsDelta, SolveConstraintsDelta) ++
-    JsonLanguage.deltas
+    ModularJsonLanguage.deltas
 
   val language: Language = LanguageFromDeltas(Seq(ParseUsingTextualGrammar()) ++ deltas)
 }

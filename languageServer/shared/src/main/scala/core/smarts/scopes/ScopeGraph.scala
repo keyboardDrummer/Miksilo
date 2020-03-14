@@ -1,15 +1,16 @@
 package core.smarts.scopes
 
-import core.language.SourceElement
+import core.parsers.SourceElement
 import core.parsers.editorParsers.FileOffsetRange
 import core.smarts.objects.{NamedDeclaration, Reference}
 import core.smarts.scopes.objects.ConcreteScope
+import languageServer.SourcePath
 import lsp.FileRange
 
 import scala.collection.mutable
 
 trait GraphNode {
-  def origin: Option[SourceElement]
+  def origin: Option[SourcePath]
 }
 
 trait GraphEdge {
@@ -44,10 +45,10 @@ class ScopeGraph extends
 {
   val nodes = new mutable.HashMap[GraphNode, mutable.Set[GraphEdge]]
   val rangeToNode = new mutable.HashMap[FileOffsetRange, GraphNode]
-  val elementToNode = new mutable.HashMap[SourceElement, GraphNode]
+  val elementToNode = new mutable.HashMap[SourcePath, GraphNode]
   var declarationsPerFile = new mutable.HashMap[String, mutable.HashSet[NamedDeclaration]]
 
-  def findDeclaration(location: SourceElement): Option[NamedDeclaration] = {
+  def findDeclaration(location: SourcePath): Option[NamedDeclaration] = {
     val declarations = for {
       elementRange <- location.fileRange
       result <- rangeToNode.get(elementRange)
@@ -56,7 +57,7 @@ class ScopeGraph extends
     declarations.collect({ case n: NamedDeclaration => n })
   }
 
-  def getReferenceFromSourceElement(location: SourceElement): Option[Reference] = {
+  def getReferenceFromSourceElement(location: SourcePath): Option[Reference] = {
     val references = for {
       elementRange <- location.fileRange
       result <- rangeToNode.get(elementRange)
@@ -128,7 +129,7 @@ class ScopeGraph extends
     edges.add(edge)
   }
 
-  private def addNode(node: GraphNode, element: SourceElement): Unit = {
+  private def addNode(node: GraphNode, element: SourcePath): Unit = {
     elementToNode(element) = node
     element.fileRange.foreach(position => rangeToNode(position) = node)
     node match {

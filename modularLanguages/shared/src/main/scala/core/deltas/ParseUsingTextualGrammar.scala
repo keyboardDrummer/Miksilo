@@ -5,8 +5,10 @@ import core.bigrammar.BiGrammarToParser._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.language.node.Node
-import core.language.{Compilation, Language, SourceElement}
+import core.language.{Compilation, Language}
+import core.parsers.SourceElement
 import core.parsers.editorParsers.{SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
+import languageServer.SourcePath
 
 case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction, indentationSensitive: Boolean = false)
   extends Delta with LazyLogging {
@@ -25,7 +27,7 @@ case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioSt
     language.compilerPhases ::= phase
   }
 
-  private def toSourceElement(program: Node, uri: String): SourceElement = {
+  private def toSourceElement(program: Node, uri: String): SourcePath = {
     program.startOfUri = Some(uri)
     PathRoot(program)
   }

@@ -1,13 +1,9 @@
 package core.deltas.path
 
-import core.language.SourceElement
 import core.language.node.{NodeLike, NodeShape}
-import core.smarts.ConstraintBuilder
-import core.smarts.objects.{DeclarationVariable, NamedDeclaration, Reference}
-import core.smarts.scopes.objects.Scope
-import core.smarts.types.objects.Type
+import languageServer.SourcePath
 
-trait AnyPath extends SourceElement {
+trait AnyPath extends SourcePath {
 
   def current: Any
   def uriOption: Option[String]
@@ -20,7 +16,7 @@ trait AnyPath extends SourceElement {
   override def toString = s"Path: $pathAsString\nCurrent: $current\nRoot: ${root.current}"
   def root: NodePath = ancestors.last
 
-  override def childElements: Seq[SourceElement] = {
+  override def childElements: Seq[SourcePath] = {
     this match {
       case path: NodePath =>
         path.dataView.values.flatMap((fieldValue: Any) => {
@@ -30,11 +26,11 @@ trait AnyPath extends SourceElement {
     }
   }
 
-  def getSourceElementsFromPath[Self <: NodeLike](value: Any): Seq[SourceElement] = value match {
-    case nodeLike: SourceElement =>
+  def getSourceElementsFromPath[Self <: NodeLike](value: Any): Seq[SourcePath] = value match {
+    case nodeLike: SourcePath =>
       Seq(nodeLike)
     case sequence: Seq[_] =>
-      sequence.collect({ case nodeLikeChild: SourceElement => nodeLikeChild })
+      sequence.collect({ case nodeLikeChild: SourcePath => nodeLikeChild })
     case _ => Seq.empty
   }
 }

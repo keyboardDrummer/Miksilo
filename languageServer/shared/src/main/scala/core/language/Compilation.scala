@@ -1,7 +1,9 @@
 package core.language
 
+import core.parsers.SourceElement
 import core.parsers.core.{Metrics, NoMetrics}
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
+import languageServer.SourcePath
 import lsp.{CodeAction, Diagnostic}
 
 import scala.collection.mutable
@@ -23,7 +25,7 @@ class Compilation(val cache: CompilationCache, var rootFile: Option[String]) {
   def fileSystem = cache.fileSystem
   def language = cache.language
 
-  var program: SourceElement = _
+  var program: SourcePath = _
 
   var proofs: Proofs = _
   var remainingConstraints: Seq[Constraint] = _
@@ -70,7 +72,7 @@ object Compilation
     new Compilation(new CompilationCache(language, InMemoryFileSystem(Map(filePath -> input))), Some(filePath))
   }
 
-  def fromAst(language: Language, root: SourceElement): Compilation = {
+  def fromAst(language: Language, root: SourcePath): Compilation = {
     val result = new Compilation(new CompilationCache(language, EmptyFileSystem), None)
     result.program = root
     result

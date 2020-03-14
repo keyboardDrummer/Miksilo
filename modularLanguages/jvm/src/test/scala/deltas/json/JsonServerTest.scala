@@ -8,7 +8,7 @@ class JsonServerTest extends AnyFunSuite with LanguageServerTest {
   test("regression2") {
     val input = """[]"""
 
-    val jsonLanguage = JsonLanguage.language
+    val jsonLanguage = ModularJsonLanguage.language
     val server = new MiksiloLanguageServer(jsonLanguage)
 
     val (results0, document) = this.openAndCheckDocument(server, input)

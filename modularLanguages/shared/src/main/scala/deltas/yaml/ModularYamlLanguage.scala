@@ -2,11 +2,11 @@ package deltas.yaml
 
 import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.parsers.editorParsers.UntilTimeStopFunction
-import deltas.json.JsonLanguage
+import deltas.json.ModularJsonLanguage
 
-object YamlLanguage {
+object ModularYamlLanguage {
   val parserDelta = ParseUsingTextualGrammar(UntilTimeStopFunction(100), indentationSensitive = true)
-  val deltasWithoutParser = Seq(YamlObjectDelta, YamlArrayDelta, PlainScalarDelta, YamlCoreDelta) ++ JsonLanguage.deltas
+  val deltasWithoutParser = Seq(YamlObjectDelta, YamlArrayDelta, PlainScalarDelta, YamlCoreDelta) ++ ModularJsonLanguage.deltas
   val deltas = Seq(parserDelta) ++ deltasWithoutParser
   val language = LanguageFromDeltas(deltas)
 }

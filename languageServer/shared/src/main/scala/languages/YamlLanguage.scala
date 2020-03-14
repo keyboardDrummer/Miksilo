@@ -1,13 +1,12 @@
 package languages
 
-import core.language.Language
+import core.language.{Language, SourcePathFromElement}
 import languages.yaml.{YamlParser, YamlValue}
 
 object YamlLanguage extends Language {
 
-  object FakeSourceElement2 extends FakeSourceElement2
   private val parsePhase = Language.getCachingParsePhase[YamlValue](
-    (program, uri) => FakeSourceElement2,
+    (program, uri) => SourcePathFromElement(uri, program),
     YamlParser.parser, indentationSensitive = true)
 
   compilerPhases = List(parsePhase)
