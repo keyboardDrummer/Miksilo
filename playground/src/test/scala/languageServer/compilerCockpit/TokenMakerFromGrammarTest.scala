@@ -5,6 +5,7 @@ import deltas.json.ModularJsonLanguage
 import deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import org.fife.ui.rsyntaxtextarea.TokenTypes
 import org.scalatest.funsuite.AnyFunSuite
+import playground.application.compilerCockpit.{MyToken, TokenMakerFromGrammar}
 import util.TestLanguageBuilder
 
 import scala.util.parsing.input.CharArrayReader
