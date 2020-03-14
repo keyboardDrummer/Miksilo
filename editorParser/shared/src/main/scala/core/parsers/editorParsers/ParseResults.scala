@@ -62,8 +62,8 @@ final class SRCons[State, +Result](
   override def latestRemainder: OffsetPointer = {
     var current = tail
     var latestRemainder = head.offset
-    while(latestRemainder != null) {
-      tail match {
+    while(current != null) {
+      current match {
         case cons: SRCons[State, Result] =>
           val newRemainder = cons.head.offset
           latestRemainder = if (newRemainder.offset > latestRemainder.offset) newRemainder else latestRemainder
