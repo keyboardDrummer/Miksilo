@@ -41,8 +41,8 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
     val source = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     TestUtils.runPerformanceTest(smallErrorsTargetTime, 300, () => {
       val result = json.compileString(source)
-      assert(result.program.childElements.size == 6)
       assert(result.diagnostics.size == 2)
+      assert(result.program.childElements.size == 6)
     })
   }
 
@@ -51,8 +51,8 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
     val source = SourceUtils.getResourceFileContents("yaml/AutoScalingMultiAZWithNotifications_edited.yaml")
     TestUtils.runPerformanceTest(smallErrorsTargetTime * 2, 300, () => {
       val result = yaml.compileString(source)
-      assert(result.program.childElements.size == 7)
       assert(result.diagnostics.size == 2)
+      assert(result.program.childElements.size == 7)
     })
   }
 }

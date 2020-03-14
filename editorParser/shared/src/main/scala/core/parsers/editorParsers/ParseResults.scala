@@ -59,9 +59,19 @@ final class SRCons[State, +Result](
                                     _tail: => ParseResults[State, Result])
   extends ParseResults[State, Result] {
 
-  override def latestRemainder = {
-    val tailRemainder = tail.latestRemainder
-    if (head.offset.offset > tailRemainder.offset) head.offset else tailRemainder
+  override def latestRemainder: OffsetPointer = {
+    var current = tail
+    var latestRemainder = head.offset
+    while(latestRemainder != null) {
+      tail match {
+        case cons: SRCons[State, Result] =>
+          val newRemainder = cons.head.offset
+          latestRemainder = if (newRemainder.offset > latestRemainder.offset) newRemainder else latestRemainder
+          current = cons.tail
+        case empty: SREmpty[State] => current = null
+      }
+    }
+    latestRemainder
   }
 
   // Used for debugging
