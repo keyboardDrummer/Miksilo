@@ -105,12 +105,13 @@ class ArrayOffsetManager(var text: ParseText, indentationSensitive: Boolean) {
     var current = parseResults
     var latestRemainder: OffsetPointer = EmptyRemainder
     while(current != null) {
+      val newRemainder = current.latestRemainder
+      latestRemainder = if (newRemainder.offset > latestRemainder.offset) newRemainder else latestRemainder
       if (current.nonEmpty) {
-        val newRemainder = current.latestRemainder
-        latestRemainder = if (newRemainder.offset > latestRemainder.offset) newRemainder else latestRemainder
         current = current.pop()._2
+      } else {
+        current = null
       }
-      current = null
     }
     latestRemainder
   }

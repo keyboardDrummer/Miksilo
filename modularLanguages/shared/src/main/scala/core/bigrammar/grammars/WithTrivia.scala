@@ -36,8 +36,8 @@ case class UpdateLatestRemainder[State, Result](remainder: OffsetPointer) extend
       case _: SREmpty[State] => this
       case cons: SRCons[State, Other] =>
         new SRCons(cons.head, cons.tailDepth + 1, this.merge(cons.tail, mergeDepth + 1, bests))
-      case latestRemainder2: UpdateLatestRemainder[State, Result] =>
-        if (latestRemainder2.remainder.offset > remainder.offset) latestRemainder2 else this
+      case latestRemainder: UpdateLatestRemainder[State, Result] =>
+        if (latestRemainder.remainder.offset > remainder.offset) latestRemainder else this
     }
   }
 
