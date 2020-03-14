@@ -3,8 +3,8 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
-import core.parsers.core.TextPointer
-import core.parsers.editorParsers.{History, ParseResults, ReadyParseResult, SREmpty}
+import core.parsers.core.{OffsetPointer, TextPointer}
+import core.parsers.editorParsers._
 import core.responsiveDocument.ResponsiveDocument
 import util.Utility
 
@@ -28,6 +28,39 @@ case class WithTrivia(var inner: BiGrammar, var trivia: BiGrammar = ParseWhiteSp
   override protected def getLeftChildren(recursive: BiGrammar => Seq[BiGrammar]) = recursive(inner)
 }
 
+case class UpdateLatestRemainder[State, Result](remainder: OffsetPointer) extends ParseResults[State, Result] {
+
+  override def merge[Other >: Result](other: ParseResults[State, Other], mergeDepth: Int,
+                                       bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
+    other match {
+      case _: SREmpty[State] => this
+      case cons: SRCons[State, Other] =>
+        new SRCons(cons.head, cons.tailDepth + 1, this.merge(cons.tail, mergeDepth + 1, bests))
+      case latestRemainder2: UpdateLatestRemainder[State, Result] =>
+        if (latestRemainder2.remainder.offset > remainder.offset) latestRemainder2 else this
+    }
+  }
+
+  override def latestRemainder: OffsetPointer = remainder
+
+  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult], uniform: Boolean) =
+    this.asInstanceOf[ParseResults[State, NewResult]]
+
+  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean) =
+    this.asInstanceOf[ParseResults[State, NewResult]]
+
+  override def map[NewResult](f: Result => NewResult) =
+    this.asInstanceOf[ParseResults[State, NewResult]]
+
+  override def tailDepth = 0
+
+  override def toList = List.empty
+
+  override def nonEmpty = false
+
+  override def pop() = throw new Exception("Can't pop empty results")
+}
+
 class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParserBuilder: BiGrammarToParser.ParserBuilder[Result])
   extends BiGrammarToParser.ParserBuilderBase[Result] {
 
@@ -47,11 +80,12 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
 
           val rightResult = parseOriginal(leftReady.remainder, leftReady.state, fixPointState)
           rightResult.flatMapReady(rightReady => {
-            if (position.offset != leftReady.remainder.offset && leftReady.remainder.offset == rightReady.remainder.offset) {
+            val rightWasInserted = leftReady.remainder.offset == rightReady.remainder.offset
+            val triviaWasParsed = position.offset != leftReady.remainder.offset
+            val failResult = triviaWasParsed && rightWasInserted
+            if (failResult) {
               // To avoid ambiguities, trivia may only occur before parsed input, not before inserted input,
-              // that's why we add a strong negative penalty here, so this result is never considered again.
-              // We still have to provide it instead of SREmpty, otherwise the caching won't recognize that we got this far.
-              singleResult(ReadyParseResult(rightReady.resultOption, rightReady.remainder, rightReady.state, rightReady.history.addSuccess(-History.failPenalty)))
+              UpdateLatestRemainder(rightReady.remainder)
             } else {
               val value = leftReady.resultOption.flatMap(leftValue =>
                 rightReady.resultOption.map(rightValue => {

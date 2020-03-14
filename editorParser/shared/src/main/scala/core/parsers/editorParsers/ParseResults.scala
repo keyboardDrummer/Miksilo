@@ -60,18 +60,7 @@ final class SRCons[State, +Result](
   extends ParseResults[State, Result] {
 
   override def latestRemainder: OffsetPointer = {
-    var current = tail
-    var latestRemainder = head.offset
-    while(current != null) {
-      current match {
-        case cons: SRCons[State, Result] =>
-          val newRemainder = cons.head.offset
-          latestRemainder = if (newRemainder.offset > latestRemainder.offset) newRemainder else latestRemainder
-          current = cons.tail
-        case empty: SREmpty[State] => current = null
-      }
-    }
-    latestRemainder
+    head.offset
   }
 
   // Used for debugging
@@ -172,7 +161,7 @@ class SREmpty[State] extends ParseResults[State, Nothing] {
 
   override def pop() = throw new Exception("Can't pop empty results")
 
-  override def latestRemainder = EmptyRemainder
+  override def latestRemainder: OffsetPointer = EmptyRemainder
 }
 
 object EmptyRemainder extends OffsetPointer {

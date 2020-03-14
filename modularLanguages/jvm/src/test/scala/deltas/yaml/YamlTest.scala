@@ -39,6 +39,18 @@ class YamlTest extends AnyFunSuite {
     // assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains("expected '<value>'"))
   }
 
+  test("regression 3") {
+    val program = """{
+                    |  "Parameters" : {
+                    |
+                    |    "BrokenParameter",
+                    |    "VpcId" : 3
+                    |  }
+                    |}""".stripMargin
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains("expected ':<value>'"))
+  }
+
   test("error case") {
     val program = """Foo: bar
                     | yoo: hee""".stripMargin

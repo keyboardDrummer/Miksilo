@@ -1,7 +1,7 @@
 package core.parsers.caching
 
-import core.parsers.core.{Metrics, ParseText}
-import core.parsers.editorParsers.{CachingParseResult, CachingParser, SingleResultParser, StopFunction}
+import core.parsers.core.{Metrics, OffsetPointer, ParseText}
+import core.parsers.editorParsers._
 
 import scala.annotation.tailrec
 import scala.collection.Searching.{Found, InsertionPoint, SearchResult}
@@ -70,8 +70,8 @@ class ArrayOffsetManager(var text: ParseText, indentationSensitive: Boolean) {
       val entries = offset.cache.toList
       for(entry <- entries) {
         val entryStart = offset.offset
-        val parseResults = entry._2.asInstanceOf[CachingParseResult]
-        val entryEnd = Math.max(entryStart + 1, parseResults.latestRemainder.offset)
+        val parseResults = entry._2.asInstanceOf[ParseResults[_, _]]
+        val entryEnd = Math.max(entryStart + 1, remainder(parseResults).offset)
         val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
         if (entryIntersectsWithRemoval) {
           offset.cache.remove(entry._1)
@@ -100,5 +100,18 @@ class ArrayOffsetManager(var text: ParseText, indentationSensitive: Boolean) {
   def clear(): Unit = {
     offsets.clear()
     offsetCache.clear()
+  }
+  def remainder(parseResults: ParseResults[_, _]): OffsetPointer = {
+    var current = parseResults
+    var latestRemainder: OffsetPointer = EmptyRemainder
+    while(current != null) {
+      if (current.nonEmpty) {
+        val newRemainder = current.latestRemainder
+        latestRemainder = if (newRemainder.offset > latestRemainder.offset) newRemainder else latestRemainder
+        current = current.pop()._2
+      }
+      current = null
+    }
+    latestRemainder
   }
 }
