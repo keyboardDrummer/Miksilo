@@ -59,7 +59,7 @@ class YamlTest extends AnyFunSuite {
 
   def valueToPrimitive(value: YamlValue): Any = {
     value match {
-      case NumberLiteral(_, value) => value
+      case NumberLiteral(_, value) => Integer.parseInt(value)
       case StringLiteral(_, value) => value
       case YamlArray(_, elements) => elements.toList.map(e => valueToPrimitive(e))
       case YamlObject(_, members) => members.toList.map(e => (valueToPrimitive(e._1), valueToPrimitive(e._2)))
