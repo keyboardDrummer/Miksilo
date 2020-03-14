@@ -1,14 +1,14 @@
 package languageServer
 
-import core.LazyLogging
+import miksilo.editorParser.LazyLogging
 import core.language.exceptions.BadInputException
 import core.language.{Compilation, CompilationCache, Language, NotStarted}
 import core.parsers.SourceElement
-import core.parsers.core.ParseText
-import core.parsers.editorParsers.{FileOffsetRange, OffsetPointerRange, TextEdit}
+import miksilo.editorParser.parsers.core.ParseText
+import miksilo.editorParser.parsers.editorParsers.{FileOffsetRange, OffsetPointerRange, TextEdit}
 import core.smarts.Proofs
 import core.smarts.objects.NamedDeclaration
-import lsp._
+import miksilo.lspprotocol.lsp._
 
 class MiksiloLanguageServer(val language: Language) extends LanguageServer
   with DefinitionProvider

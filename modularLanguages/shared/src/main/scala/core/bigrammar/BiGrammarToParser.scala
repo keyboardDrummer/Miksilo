@@ -1,7 +1,7 @@
 package core.bigrammar
 
 import core.bigrammar.grammars._
-import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, SingleResultParser}
+import miksilo.editorParser.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, SingleResultParser}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import core.textMate.TextMateGeneratingParserWriter
 import util.Utility

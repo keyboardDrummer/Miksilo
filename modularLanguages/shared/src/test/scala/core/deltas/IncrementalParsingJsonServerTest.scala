@@ -1,9 +1,9 @@
 package core.deltas
 
-import core.parsers.editorParsers.{SourceRange, StopImmediately}
+import miksilo.editorParser.parsers.editorParsers.{SourceRange, StopImmediately}
 import deltas.json.ModularJsonLanguage
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
-import lsp._
+import miksilo.lspprotocol.lsp._
 import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingJsonServerTest extends AnyFunSuite with LanguageServerTest {

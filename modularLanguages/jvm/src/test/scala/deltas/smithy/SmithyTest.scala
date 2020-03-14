@@ -1,7 +1,7 @@
 package deltas.smithy
 
 import _root_.lsp.HumanPosition
-import core.parsers.editorParsers.SourceRange
+import miksilo.editorParser.parsers.editorParsers.SourceRange
 import languageServer.{MiksiloLanguageServer, _}
 import miksilo.editorParser.SourceUtils
 import org.scalatest.funsuite.AnyFunSuite

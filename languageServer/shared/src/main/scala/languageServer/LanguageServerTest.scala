@@ -1,8 +1,8 @@
 package languageServer
 
 import core.language.Language
-import core.parsers.editorParsers.{Position, SourceRange}
-import lsp._
+import miksilo.editorParser.parsers.editorParsers.{Position, SourceRange}
+import miksilo.lspprotocol.lsp._
 
 import scala.util.Random
 

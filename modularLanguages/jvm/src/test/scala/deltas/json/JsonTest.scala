@@ -3,8 +3,8 @@ package deltas.json
 import core.bigrammar.TestLanguageGrammarUtils
 import core.deltas.path.{NodePath, PathRoot}
 import core.language.node.Node
-import core.parsers.core.ParseText
-import core.parsers.editorParsers.{Position, UntilBestAndXStepsStopFunction}
+import miksilo.editorParser.parsers.core.ParseText
+import miksilo.editorParser.parsers.editorParsers.{Position, UntilBestAndXStepsStopFunction}
 import deltas.expression.ExpressionDelta
 import deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}

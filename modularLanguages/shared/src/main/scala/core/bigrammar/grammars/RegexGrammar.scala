@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammarToParser
 
 import scala.util.matching.Regex
 import core.bigrammar.BiGrammarToParser._
-import core.parsers.editorParsers.History
+import miksilo.editorParser.parsers.editorParsers.History
 
 case class RegexGrammar(regex: Regex, name: String, verifyWhenPrinting: Boolean = false,
                         defaultValue: Option[String] = None,

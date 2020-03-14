@@ -1,8 +1,8 @@
 package core.deltas.path
 
 import core.language.node.{Key, Node}
-import core.parsers.core.{EndPointer, StartPointer}
-import core.parsers.editorParsers.{OffsetPointerRange, OffsetRange, Position, SourceRange}
+import miksilo.editorParser.parsers.{EndPointer, StartPointer}
+import miksilo.editorParser.parsers.editorParsers.{OffsetPointerRange, OffsetRange, Position, SourceRange}
 
 case class PathRoot(current: Node) extends NodePath with Key {
 

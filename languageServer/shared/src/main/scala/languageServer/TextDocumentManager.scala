@@ -4,9 +4,9 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.{ConcurrentHashMap, ConcurrentMap}
 
-import core.LazyLogging
+import miksilo.editorParser.LazyLogging
 import core.language.{FileSystem, DocumentEventListener}
-import lsp.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
+import miksilo.lspprotocol.lsp.{TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters

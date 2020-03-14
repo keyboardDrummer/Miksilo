@@ -1,13 +1,13 @@
 package core.deltas
 
-import core.LazyLogging
+import miksilo.editorParser.LazyLogging
 import core.bigrammar.BiGrammarToParser._
 import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.PathRoot
 import core.language.node.Node
 import core.language.{Compilation, Language}
 import core.parsers.SourceElement
-import core.parsers.editorParsers.{SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
+import miksilo.editorParser.parsers.editorParsers.{SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
 import languageServer.SourcePath
 
 case class ParseUsingTextualGrammar(stopFunction: StopFunction = new TimeRatioStopFunction, indentationSensitive: Boolean = false)

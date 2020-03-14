@@ -1,6 +1,6 @@
 package core.language
 
-import core.parsers.core.ParseText
+import miksilo.editorParser.parsers.core.ParseText
 
 trait DocumentEventListener {
   def handleChange(from: Int, until: Int, text: String): Unit

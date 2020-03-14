@@ -6,7 +6,7 @@ import core.deltas.grammars.LanguageGrammars
 import core.deltas.path.NodePath
 import core.language.node.{NodeField, NodeShape, _}
 import core.language.{Compilation, Language}
-import core.parsers.editorParsers.History
+import miksilo.editorParser.parsers.editorParsers.History
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type

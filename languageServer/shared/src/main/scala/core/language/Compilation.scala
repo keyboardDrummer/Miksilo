@@ -1,10 +1,9 @@
 package core.language
 
-import core.parsers.SourceElement
-import core.parsers.core.{Metrics, NoMetrics}
 import core.smarts.{Constraint, FileDiagnostic, Proofs}
 import languageServer.SourcePath
-import lsp.{CodeAction, Diagnostic}
+import miksilo.editorParser.parsers.core.{Metrics, NoMetrics}
+import miksilo.lspprotocol.lsp.{CodeAction, Diagnostic}
 
 import scala.collection.mutable
 import scala.language.implicitConversions

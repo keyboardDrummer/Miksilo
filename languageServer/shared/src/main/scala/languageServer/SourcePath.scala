@@ -1,8 +1,8 @@
 package languageServer
 
 import core.parsers.SourceElement
-import core.parsers.editorParsers.{FileOffsetRange, OffsetPointerRange}
-import lsp.FileOffset
+import miksilo.editorParser.parsers.editorParsers.{FileOffsetRange, OffsetPointerRange}
+import miksilo.lspprotocol.lsp.FileOffset
 
 trait SourcePath {
   def uriOption: Option[String]

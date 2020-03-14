@@ -1,6 +1,6 @@
 package util
 
-import core.LazyLogging
+import miksilo.editorParser.LazyLogging
 
 import scala.collection.mutable
 

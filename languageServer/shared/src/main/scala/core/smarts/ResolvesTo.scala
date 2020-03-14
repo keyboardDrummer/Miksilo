@@ -1,10 +1,10 @@
 package core.smarts
 
 import core.language.Compilation
-import core.parsers.core.ParseText
+import miksilo.editorParser.parsers.core.ParseText
 import core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import core.smarts.scopes.ResolutionConstraint
-import lsp.{Diagnostic, DiagnosticSeverity}
+import miksilo.lspprotocol.lsp.{Diagnostic, DiagnosticSeverity}
 
 case class ResolvesTo(reference: Reference, var declaration: Declaration) extends ResolutionConstraint
 {

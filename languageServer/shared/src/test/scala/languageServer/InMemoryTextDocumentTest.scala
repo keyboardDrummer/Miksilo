@@ -1,7 +1,7 @@
 package languageServer
 
-import core.parsers.editorParsers.{Position, SourceRange}
-import lsp.TextDocumentContentChangeEvent
+import miksilo.editorParser.parsers.editorParsers.{Position, SourceRange}
+import miksilo.lspprotocol.lsp.TextDocumentContentChangeEvent
 import org.scalatest.funsuite.AnyFunSuite
 
 class InMemoryTextDocumentTest extends AnyFunSuite {

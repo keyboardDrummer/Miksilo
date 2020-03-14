@@ -1,8 +1,8 @@
 package languageServer
 
-import core.parsers.editorParsers.SourceRange
+import miksilo.editorParser.parsers.editorParsers.SourceRange
 import languages.JsonLanguage
-import lsp._
+import miksilo.lspprotocol.lsp._
 import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingServerTest extends AnyFunSuite with LanguageServerTest {

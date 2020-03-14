@@ -1,9 +1,9 @@
 package deltas.javac.expressions
 
-import core.parsers.editorParsers.SourceRange
+import miksilo.editorParser.parsers.editorParsers.SourceRange
 import deltas.javac.JavaLanguage
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
-import lsp.HumanPosition
+import miksilo.lspprotocol.lsp.HumanPosition
 import org.scalatest.funsuite.AnyFunSuite
 import util.JavaSourceUtils
 

@@ -1,10 +1,10 @@
 package deltas.javac.expressions
 
-import core.parsers.editorParsers.SourceRange
+import miksilo.editorParser.parsers.editorParsers.SourceRange
 import deltas.javac.JavaLanguage
 import deltas.javac.methods.BlockLanguageDelta
 import languageServer.LanguageServerTest
-import lsp.{FileRange, HumanPosition}
+import miksilo.lspprotocol.lsp.{FileRange, HumanPosition}
 import org.scalatest.funsuite.AnyFunSuite
 import util.{JavaSourceUtils, TestLanguageBuilder}
 

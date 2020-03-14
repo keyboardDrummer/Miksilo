@@ -1,6 +1,6 @@
 package core.textMate
 
-import core.parsers.core.{OptimizingParserWriter, ParseText}
+import miksilo.editorParser.parsers.{OptimizingParserWriter, ParseText}
 import core.parsers.strings.CommonParserWriter
 import util.GraphBasics
 

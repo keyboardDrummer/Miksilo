@@ -2,8 +2,8 @@ package core.language.node
 
 import core.deltas.path.NodePath
 import core.language.node.Node._
-import core.parsers.core.OffsetPointer._
-import core.parsers.editorParsers.OffsetPointerRange
+import miksilo.editorParser.parsers.OffsetPointer._
+import miksilo.editorParser.parsers.editorParsers.OffsetPointerRange
 
 import scala.collection.mutable
 import scala.util.hashing.Hashing

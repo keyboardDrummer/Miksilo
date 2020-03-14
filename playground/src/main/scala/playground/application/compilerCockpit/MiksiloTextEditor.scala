@@ -2,7 +2,7 @@ package playground.application.compilerCockpit
 
 import java.awt.event
 
-import core.parsers.editorParsers.Position
+import miksilo.editorParser.parsers.editorParsers.Position
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JMenuItem, JPopupMenu}
 import languageServer._

@@ -4,11 +4,11 @@ import core.deltas._
 import core.deltas.path.PathRoot
 import core.language.Compilation
 import core.language.node.Node
-import core.parsers.editorParsers.SourceRange
+import miksilo.editorParser.parsers.editorParsers.SourceRange
 import core.smarts.FileDiagnostic
 import deltas.bytecode.attributes.UnParsedAttribute
 import deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import lsp.{Diagnostic, DiagnosticSeverity, HumanPosition}
+import miksilo.lspprotocol.lsp.{Diagnostic, DiagnosticSeverity, HumanPosition}
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream

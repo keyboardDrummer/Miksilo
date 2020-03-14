@@ -8,7 +8,7 @@ import deltas.classes.ClassDelta.JavaClass
 import deltas.javac.classes.skeleton.JavaClassDelta
 import deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 import deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
-import lsp.LanguageServer
+import miksilo.lspprotocol.lsp.LanguageServer
 
 // TODO this thing is broken. Add tests+fix or remove.
 object ReorderMembersDelta extends Delta {

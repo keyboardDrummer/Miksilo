@@ -1,7 +1,7 @@
 package languageServer
 
 import core.language.{FileElement, Language, SourcePathFromElement}
-import core.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, OffsetPointerRange}
+import miksilo.editorParser.parsers.editorParsers.{LeftRecursiveCorrectingParserWriter, OffsetPointerRange}
 import core.parsers.strings.{CommonStringReaderParser, WhitespaceParserWriter}
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope

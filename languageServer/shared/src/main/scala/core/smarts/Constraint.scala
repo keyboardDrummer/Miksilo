@@ -4,7 +4,7 @@ import core.language.Compilation
 import core.smarts.objects.{Declaration, DeclarationVariable}
 import core.smarts.scopes.objects.{Scope, ScopeVariable}
 import core.smarts.types.objects.{Type, TypeVariable}
-import lsp.Diagnostic
+import miksilo.lspprotocol.lsp.Diagnostic
 
 trait Constraint {
   def apply(solver: ConstraintSolver): Boolean

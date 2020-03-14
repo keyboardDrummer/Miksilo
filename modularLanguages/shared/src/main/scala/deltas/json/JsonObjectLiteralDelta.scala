@@ -7,7 +7,7 @@ import core.deltas.{Delta, DeltaWithGrammar}
 import core.language.exceptions.BadInputException
 import core.language.node._
 import core.language.{Compilation, Language}
-import core.parsers.editorParsers.History
+import miksilo.editorParser.parsers.editorParsers.History
 import core.smarts.ConstraintBuilder
 import core.smarts.scopes.objects.Scope
 import core.smarts.types.objects.Type

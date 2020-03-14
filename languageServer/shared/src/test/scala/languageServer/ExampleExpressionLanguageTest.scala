@@ -1,8 +1,8 @@
 package languageServer
 
 import core.language.Language
-import core.parsers.editorParsers.{Position, SourceRange}
-import lsp.{Diagnostic, DiagnosticSeverity, DidChangeTextDocumentParams, HumanPosition, TextDocumentContentChangeEvent, VersionedTextDocumentIdentifier}
+import miksilo.editorParser.parsers.editorParsers.{Position, SourceRange}
+import miksilo.lspprotocol.lsp.{Diagnostic, DiagnosticSeverity, DidChangeTextDocumentParams, HumanPosition, TextDocumentContentChangeEvent, VersionedTextDocumentIdentifier}
 import org.scalatest.funsuite.AnyFunSuite
 
 class ExampleExpressionLanguageTest extends AnyFunSuite with LanguageServerTest {

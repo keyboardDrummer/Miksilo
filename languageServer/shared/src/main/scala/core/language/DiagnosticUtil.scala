@@ -1,8 +1,8 @@
 package core.language
 
-import core.parsers.editorParsers.ParseError
+import miksilo.editorParser.parsers.editorParsers.ParseError
 import core.smarts.FileDiagnostic
-import lsp._
+import miksilo.lspprotocol.lsp._
 
 object DiagnosticUtil {
 

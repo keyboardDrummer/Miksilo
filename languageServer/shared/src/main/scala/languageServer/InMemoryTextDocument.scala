@@ -1,9 +1,9 @@
 package languageServer
 
-import core.LazyLogging
+import miksilo.editorParser.LazyLogging
 import core.language.DocumentEventListener
-import core.parsers.core.ParseText
-import lsp.TextDocumentContentChangeEvent
+import miksilo.editorParser.parsers.core.ParseText
+import miksilo.lspprotocol.lsp.TextDocumentContentChangeEvent
 
 object InMemoryTextDocument {
   val newLine = "\n"

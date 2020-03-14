@@ -3,8 +3,8 @@ package core.bigrammar.grammars
 import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
-import core.parsers.core.{OffsetPointer, TextPointer}
-import core.parsers.editorParsers._
+import miksilo.editorParser.parsers.{OffsetPointer, TextPointer}
+import miksilo.editorParser.parsers.editorParsers._
 import core.responsiveDocument.ResponsiveDocument
 import util.Utility
 

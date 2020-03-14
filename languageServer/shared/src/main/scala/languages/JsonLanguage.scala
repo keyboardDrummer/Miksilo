@@ -2,7 +2,7 @@ package languages
 
 import core.language.{Language, SourcePathFromElement}
 import core.parsers.SourceElement
-import core.parsers.editorParsers.{NeverStop, OffsetPointerRange}
+import miksilo.editorParser.parsers.editorParsers.{NeverStop, OffsetPointerRange}
 import languages.json.{JsonParser, JsonValue}
 
 object JsonLanguage extends Language {

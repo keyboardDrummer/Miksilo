@@ -1,7 +1,7 @@
 package deltas.yaml
 
 import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
-import core.parsers.editorParsers.UntilTimeStopFunction
+import miksilo.editorParser.parsers.editorParsers.UntilTimeStopFunction
 import deltas.json.ModularJsonLanguage
 
 object ModularYamlLanguage {

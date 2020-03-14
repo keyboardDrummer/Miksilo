@@ -3,8 +3,8 @@ package core.deltas
 import core.bigrammar.BiGrammar
 import core.bigrammar.grammars.As
 import core.language.node.{NodeField, NodeGrammar, NodeShape}
-import core.parsers.core.TextPointer
-import core.parsers.editorParsers.OffsetPointerRange
+import miksilo.editorParser.parsers.TextPointer
+import miksilo.editorParser.parsers.editorParsers.OffsetPointerRange
 
 class GrammarForAst(grammar: BiGrammar) {
   def asNode(key: NodeShape) = new NodeGrammar(grammar, key)

@@ -3,10 +3,10 @@ package core.language
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
-import core.LazyLogging
+import miksilo.editorParser.LazyLogging
 import core.language.exceptions.BadInputException
-import core.parsers.caching.ArrayOffsetManager
-import core.parsers.editorParsers._
+import miksilo.editorParser.parsers.caching.ArrayOffsetManager
+import miksilo.editorParser.parsers.editorParsers._
 import core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
 import languageServer.SourcePath
 

@@ -5,7 +5,7 @@ import core.bigrammar.grammars.{BiSequence, Delimiter, RegexGrammar, SequenceBij
 import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
-import core.parsers.editorParsers.History
+import miksilo.editorParser.parsers.editorParsers.History
 import deltas.expression.{ExpressionDelta, StringLiteralDelta}
 import deltas.json.JsonStringLiteralDelta
 

@@ -1,7 +1,7 @@
 package deltas.yaml
 
 import core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
-import core.parsers.editorParsers.{NeverStop, UntilBestAndXStepsStopFunction}
+import miksilo.editorParser.parsers.editorParsers.{NeverStop, UntilBestAndXStepsStopFunction}
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.funsuite.AnyFunSuite
 

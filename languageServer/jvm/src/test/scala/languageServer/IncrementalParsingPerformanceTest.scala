@@ -1,9 +1,9 @@
 package languageServer
 
-import core.parsers.editorParsers.SourceRange
+import miksilo.editorParser.parsers.editorParsers.SourceRange
 import core.TestUtils
 import languages.{JsonLanguage, YamlLanguage}
-import lsp._
+import miksilo.lspprotocol.lsp._
 import miksilo.editorParser.SourceUtils
 import org.scalatest.funsuite.AnyFunSuite
 

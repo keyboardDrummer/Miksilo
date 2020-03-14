@@ -1,9 +1,8 @@
 package languageServer
 
-import core.{LambdaLogger, LazyLogging}
 import core.language.Language
-import jsonRpc.{JsonRpcConnection, SerialWorkQueue, WorkItem}
-import lsp.SharedLSPServer
+import miksilo.editorParser.LazyLogging
+import miksilo.lspprotocol.lsp.SharedLSPServer
 
 import scala.util.Try
 

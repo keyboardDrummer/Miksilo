@@ -1,7 +1,7 @@
 package core.deltas.path
 
 import core.language.node.{Node, NodeField}
-import core.parsers.editorParsers.OffsetPointerRange
+import miksilo.editorParser.parsers.editorParsers.OffsetPointerRange
 
 class NodeFieldPath(parent: NodePath, field: NodeField) extends FieldPath(parent, field) with NodeChildPath {
   override lazy val current: Node = super[FieldPath].current.asInstanceOf[Node]

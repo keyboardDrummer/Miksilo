@@ -5,8 +5,8 @@ import core.bigrammar.printer.AsPrinter
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.{BiGrammar, PrintBiGrammar, WithMap}
 import core.language.node.NodeField
-import core.parsers.core.TextPointer
-import core.parsers.editorParsers.OffsetPointerRange
+import miksilo.editorParser.parsers.TextPointer
+import miksilo.editorParser.parsers.editorParsers.OffsetPointerRange
 import core.responsiveDocument.ResponsiveDocument
 
 case class As(var inner: BiGrammar, field: NodeField, changePosition: (TextPointer, TextPointer) => OffsetPointerRange = null) extends CustomGrammar

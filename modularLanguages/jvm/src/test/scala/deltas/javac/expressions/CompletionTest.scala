@@ -2,7 +2,7 @@ package deltas.javac.expressions
 
 import deltas.javac.JavaLanguage
 import languageServer.{LanguageServerTest, MiksiloLanguageServer}
-import lsp.{CompletionList, HumanPosition}
+import miksilo.lspprotocol.lsp.{CompletionList, HumanPosition}
 import org.scalatest.funsuite.AnyFunSuite
 import util.JavaSourceUtils
 

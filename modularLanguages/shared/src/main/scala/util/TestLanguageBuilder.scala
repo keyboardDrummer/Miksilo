@@ -2,7 +2,7 @@ package util
 
 import core.deltas._
 import core.language.Language
-import core.parsers.editorParsers.{StopFunction, StopImmediatelyFunction}
+import miksilo.editorParser.parsers.editorParsers.{StopFunction, StopImmediatelyFunction}
 
 object TestLanguageBuilder {
   val statistics = new Statistics()

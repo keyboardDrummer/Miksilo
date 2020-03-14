@@ -7,8 +7,8 @@ import core.deltas.path.{NodePath, NodeSequenceElement}
 import core.deltas.{Contract, ParseUsingTextualGrammar, Property}
 import core.language.node.{Node, NodeField, NodeShape}
 import core.language.{DiagnosticUtil, Language}
-import core.parsers.core.ParseText
-import core.parsers.editorParsers.{CachingParser, SingleResultParser}
+import miksilo.editorParser.parsers.core.ParseText
+import miksilo.editorParser.parsers.editorParsers.{CachingParser, SingleResultParser}
 import deltas.FileWithMembersDelta.FileWithMembers
 
 import scala.reflect.io.Path

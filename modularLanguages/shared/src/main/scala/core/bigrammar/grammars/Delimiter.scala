@@ -1,7 +1,7 @@
 package core.bigrammar.grammars
 
 import core.bigrammar.BiGrammarToParser
-import core.parsers.editorParsers.History
+import miksilo.editorParser.parsers.editorParsers.History
 
 case class Delimiter(value: String, penalty: Double = History.missingInputPenalty, allowDrop: Boolean = true) extends StringGrammar {
   if (value.length == 0)

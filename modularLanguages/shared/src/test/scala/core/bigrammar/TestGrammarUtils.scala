@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.BiGrammarToParser.toParserBuilder
 import core.bigrammar.printer.BiGrammarToPrinter
-import core.parsers.editorParsers.{SingleParseResult, UntilBestAndXStepsStopFunction}
+import miksilo.editorParser.parsers.editorParsers.{SingleParseResult, UntilBestAndXStepsStopFunction}
 import org.scalatest.funsuite.AnyFunSuite
 
 object TestGrammarUtils extends AnyFunSuite {

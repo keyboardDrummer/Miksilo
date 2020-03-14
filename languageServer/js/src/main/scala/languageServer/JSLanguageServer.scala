@@ -1,7 +1,6 @@
 package languageServer
 
 import core.{LambdaLogger, LazyLogging}
-import jsonRpc.{JSQueue, JsonRpcConnection, NodeMessageReader, NodeMessageWriter, WorkItem}
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}

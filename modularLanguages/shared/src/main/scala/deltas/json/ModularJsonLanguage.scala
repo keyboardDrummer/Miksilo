@@ -6,7 +6,7 @@ import core.deltas.path.PathRoot
 import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import core.language.{Language, Phase}
 import core.language.node.Node
-import core.parsers.editorParsers.UntilTimeStopFunction
+import miksilo.editorParser.parsers.editorParsers.UntilTimeStopFunction
 import deltas.expression.ArrayLiteralDelta.ArrayLiteral
 import deltas.expression._
 import deltas.javac.expressions.literals.BooleanLiteralDelta

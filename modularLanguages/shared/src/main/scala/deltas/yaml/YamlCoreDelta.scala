@@ -6,8 +6,8 @@ import core.deltas.DeltaWithGrammar
 import core.deltas.grammars.LanguageGrammars
 import core.language.Language
 import core.language.node.{GrammarKey, NodeField, NodeShape}
-import core.parsers.core.TextPointer
-import core.parsers.editorParsers.History
+import miksilo.editorParser.parsers.TextPointer
+import miksilo.editorParser.parsers.editorParsers.History
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
 

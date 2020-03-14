@@ -1,7 +1,7 @@
 package core.deltas.path
 
 import core.language.node.Node
-import core.parsers.editorParsers.{OffsetPointerRange, OffsetRange, SourceRange}
+import miksilo.editorParser.parsers.editorParsers.{OffsetPointerRange, OffsetRange, SourceRange}
 
 trait NodeChildPath extends NodePath with ChildPath {
   def current: Node

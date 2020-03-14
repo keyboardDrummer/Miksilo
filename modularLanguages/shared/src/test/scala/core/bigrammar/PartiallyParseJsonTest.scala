@@ -2,7 +2,7 @@ package core.bigrammar
 
 import core.bigrammar.grammars.{BiFallback, Labelled, NumberGrammar, StringLiteral}
 import core.language.node.GrammarKey
-import core.parsers.editorParsers.{SingleParseResult, UntilBestAndXStepsStopFunction}
+import miksilo.editorParser.parsers.editorParsers.{SingleParseResult, UntilBestAndXStepsStopFunction}
 import org.scalatest.funsuite.AnyFunSuite
 
 class PartiallyParseJsonTest extends AnyFunSuite with DefaultBiGrammarWriter {

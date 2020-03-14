@@ -11,7 +11,7 @@ import core.language.Language
 import core.language.node.{Key, NodeField, NodeGrammar}
 import core.bigrammar.BiGrammarToParser._
 import core.bigrammar.printer.Printer.NodePrinter
-import core.parsers.core.TextPointer
+import miksilo.editorParser.parsers.TextPointer
 import core.responsiveDocument.ResponsiveDocument
 
 object StoreTriviaDelta extends DeltaWithGrammar {
