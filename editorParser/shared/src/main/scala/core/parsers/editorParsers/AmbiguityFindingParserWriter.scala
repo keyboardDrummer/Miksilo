@@ -45,7 +45,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
               SREmpty.empty
           }
         case delayedResult: DelayedParseResult[State, _] =>
-          val results = delayedResult.results
+          val results = delayedResult.getResults
           tail.merge(results)
       }
     }

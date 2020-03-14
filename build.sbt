@@ -23,6 +23,19 @@ lazy val miksilo = project
     playground
   )
 
+lazy val jvm = project
+  .settings(commonSettings: _*)
+  .settings(
+    publishArtifact := false,
+    skip in publish := true)
+  .aggregate(
+    editorParser.jvm,
+    LSPProtocol.jvm,
+    languageServer.jvm,
+    modularLanguages.jvm,
+    playground
+  )
+
 lazy val commonSettings = Seq(
 
   version := "0.0.8",

@@ -1,5 +1,5 @@
 
-package deltas
+package deltas.yaml
 
 import core.SourceUtils
 import core.bigrammar.SelectGrammar
@@ -8,13 +8,48 @@ import core.language.Compilation
 import core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
-import deltas.yaml._
 import org.scalatest.funsuite.AnyFunSuite
 import util.TestLanguageBuilder
 
 class YamlTest extends AnyFunSuite {
 
-  val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltas, stopFunction = UntilBestAndXStepsStopFunction())
+  val language = TestLanguageBuilder.buildWithParser(YamlLanguage.deltasWithoutParser,
+    stopFunction = UntilBestAndXStepsStopFunction(), indentationSensitive = true)
+
+  test("plain scalar with -") {
+    val program = """AllowedPattern: ([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)"""
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("regression") {
+    val program =
+      """- Bar:
+        |   Joo
+        |- 2""".stripMargin
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("regression 2") {
+    val program = "- Bar:\n   \n- 2"
+    val compilation = language.compileString(program)
+    // TODO fix plain scalar so these asserts can be swapped.
+    assert(compilation.diagnostics.isEmpty)
+    // assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains("expected '<value>'"))
+  }
+
+  test("regression 3") {
+    val program = """{
+                    |  "Parameters" : {
+                    |
+                    |    "BrokenParameter",
+                    |    "VpcId" : 3
+                    |  }
+                    |}""".stripMargin
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.size == 1 && compilation.diagnostics.head.diagnostic.message.contains("expected ':<value>'"))
+  }
 
   test("error case") {
     val program = """Foo: bar
@@ -178,7 +213,8 @@ class YamlTest extends AnyFunSuite {
 
   val deltas = Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
     YamlObjectDelta, YamlArrayDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta)
-  val blockLanguage = TestLanguageBuilder.buildWithParser(deltas, stopFunction = UntilBestAndXStepsStopFunction())
+  val blockLanguage = TestLanguageBuilder.buildWithParser(deltas,
+    stopFunction = UntilBestAndXStepsStopFunction(), indentationSensitive = true)
 
   test("plain scalar 2") {
     val contents =

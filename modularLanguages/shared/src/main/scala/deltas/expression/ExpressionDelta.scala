@@ -15,7 +15,9 @@ object ExpressionDelta extends DeltaWithGrammar with ExpressionInstance {
 
   val value = DefaultShape.create()
 
-  object DefaultShape extends NodeShape
+  object DefaultShape extends NodeShape {
+    override def toString = "hole"
+  }
 
   override def shape: NodeShape = DefaultShape
 

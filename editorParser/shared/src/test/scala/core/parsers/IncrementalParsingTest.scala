@@ -1,5 +1,6 @@
 package core.parsers
 
+import _root_.core.parsers.caching.ArrayOffsetManager
 import _root_.core.parsers.core.ParseText
 import _root_.core.parsers.editorParsers.SingleParseResult
 import languages.json.JsonParser
@@ -127,7 +128,7 @@ class IncrementalParsingTest extends AnyFunSuite {
 
   def getChange: Change = {
     val text = new ParseText()
-    val parser = JsonParser.getCachingParser(text)
+    val parser = ArrayOffsetManager.getCachingParser(text, JsonParser.parser, indentationSensitive = false)
     new Change {
 
       override def apply(from: Int, until: Int, newText: String) = {

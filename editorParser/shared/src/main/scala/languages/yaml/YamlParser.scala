@@ -110,7 +110,6 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
 
   lazy val parseYaml = trivias ~> parseValue ~< trivias
   lazy val parser = parseYaml.getWholeInputParser()
-  def getCachingParser(text: ParseText) = ExclusivePointer.getCachingParser(text, parser)
 
   lazy val parseBlockMapping: Parser[YamlValue] = {
     val member = new WithContext(_ =>

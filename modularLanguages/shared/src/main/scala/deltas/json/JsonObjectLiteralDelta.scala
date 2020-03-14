@@ -42,12 +42,22 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     expressionGrammar.addAlternative(grammar)
   }
 
-  object MemberShape extends NodeShape
-  object MemberKey extends NodeField
-  object MemberValue extends NodeField
+  object MemberShape extends NodeShape {
+    override def toString = "Member"
+  }
+  object MemberKey extends NodeField {
+    override def toString = "Key"
+  }
+  object MemberValue extends NodeField {
+    override def toString = "Value"
+  }
 
-  object Members extends NodeField
-  object Shape extends NodeShape
+  object Members extends NodeField {
+    override def toString = "Member"
+  }
+  object Shape extends NodeShape {
+    override def toString = "Object"
+  }
   override def shape: NodeShape = Shape
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {

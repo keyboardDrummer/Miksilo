@@ -47,7 +47,9 @@ object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   def getValue(literal: Node): String = literal(Value).asInstanceOf[String]
 
-  object Value extends NodeField
+  object Value extends NodeField {
+    override def toString = "Value"
+  }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {
     builder.typesAreEqual(_type, PrimitiveType("String"))

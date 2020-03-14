@@ -1,9 +1,7 @@
 package core.parsers.editorParsers
 
-import ParseResults._
 import core.parsers.core.{OffsetPointer, TextPointer}
-
-import scala.collection.mutable
+import core.parsers.editorParsers.ParseResults._
 
 trait ParseResults[State, +Result] extends CachingParseResult {
   def nonEmpty: Boolean
@@ -52,15 +50,18 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 
 object ParseResults {
   def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] =
-    new SRCons(parseResult, parseResult.offset,0, SREmpty.empty[State])
+    new SRCons(parseResult,0, SREmpty.empty[State])
 }
 
 final class SRCons[State, +Result](
                                     val head: LazyParseResult[State, Result],
-                                    val latestRemainder: OffsetPointer,
                                     var tailDepth: Int,
                                     _tail: => ParseResults[State, Result])
   extends ParseResults[State, Result] {
+
+  override def latestRemainder: OffsetPointer = {
+    head.offset
+  }
 
   // Used for debugging
   def toList: List[LazyParseResult[State, Result]] = head :: tail.toList
@@ -85,7 +86,6 @@ final class SRCons[State, +Result](
         {
           new SRCons(
             cons.head,
-            getLatest(tail.latestRemainder, cons.latestRemainder),
             1 + Math.max(this.tailDepth, cons.tailDepth),
             cons.tail.merge(tail.flatMap(f, uniform)))
         }
@@ -94,7 +94,7 @@ final class SRCons[State, +Result](
   }
 
   override def map[NewResult](f: Result => NewResult): SRCons[State, NewResult] = {
-    new SRCons(head.map(f), latestRemainder, tailDepth + 1, tail.map(f))
+    new SRCons(head.map(f), tailDepth + 1, tail.map(f))
   }
 
   /*
@@ -107,7 +107,7 @@ final class SRCons[State, +Result](
     if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
       return SREmpty.empty[State]
 
-    def getResult(head: LazyParseResult[State, Other], latestRemainder: OffsetPointer, tailDepth: Int,
+    def getResult(head: LazyParseResult[State, Other], tailDepth: Int,
                   getTail: Map[Int, Double] => ParseResults[State, Other]): ParseResults[State, Other] = {
       head match {
         case ready: ReadyParseResult[State, Other] =>
@@ -115,27 +115,22 @@ final class SRCons[State, +Result](
             case Some(previousBest) if previousBest >= ready.score =>
               getTail(bests)
             case _ =>
-              new SRCons(head, latestRemainder, tailDepth, getTail(bests + (ready.remainder.offset -> ready.score)))
+              new SRCons(head, tailDepth, getTail(bests + (ready.remainder.offset -> ready.score)))
           }
         case _ =>
-          new SRCons(head, latestRemainder, tailDepth, getTail(bests))
+          new SRCons(head, tailDepth, getTail(bests))
       }
     }
 
     other match {
       case _: SREmpty[State] => this
       case cons: SRCons[State, Other] =>
-        val latestRemainder = getLatest(this.latestRemainder, other.latestRemainder)
         if (head.score >= cons.head.score) {
-          getResult(head, latestRemainder,1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
+          getResult(head, 1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
         } else
-          getResult(cons.head, latestRemainder,1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
+          getResult(cons.head, 1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
       case earlier => earlier.merge(this)
     }
-  }
-
-  def getLatest(one: OffsetPointer, other: OffsetPointer): OffsetPointer = {
-    if (one.offset > other.offset) one else other
   }
 
   override def nonEmpty = true
@@ -166,7 +161,7 @@ class SREmpty[State] extends ParseResults[State, Nothing] {
 
   override def pop() = throw new Exception("Can't pop empty results")
 
-  override def latestRemainder = EmptyRemainder
+  override def latestRemainder: OffsetPointer = EmptyRemainder
 }
 
 object EmptyRemainder extends OffsetPointer {

@@ -1,6 +1,7 @@
 package languageServer
 
 import core.parsers.editorParsers.SourceRange
+import languages.JsonLanguage
 import lsp._
 import org.scalatest.funsuite.AnyFunSuite
 

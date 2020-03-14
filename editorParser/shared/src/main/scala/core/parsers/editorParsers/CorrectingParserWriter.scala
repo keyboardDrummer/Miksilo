@@ -24,7 +24,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       queue = parseResult match {
         case parseResult: ReadyParseResult[State, Result] =>
 
-          bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
+          if (bestResult.score < parseResult.score) {
+            bestResult = parseResult
+          }
           tail match {
             case tailCons: SRCons[State, Result] =>
               if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
@@ -35,7 +37,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
               SREmpty.empty[State]
           }
         case delayedResult: DelayedParseResult[State, Result] =>
-          val results = delayedResult.results
+          val results = delayedResult.getResults
           tail.merge(results)
       }
     }
@@ -46,7 +48,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 
   def singleResult[Result](parseResult: LazyParseResult[State, Result]) =
-    new SRCons(parseResult, parseResult.offset, 0, SREmpty.empty)
+    new SRCons(parseResult, 0, SREmpty.empty)
 
   def newFailure[Result](position: TextPointer, state: State, error: ParseError): SRCons[State, Result] =
     singleResult(ReadyParseResult(None, position, state, History.error(error)))
