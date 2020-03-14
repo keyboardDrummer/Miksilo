@@ -38,7 +38,7 @@ lazy val jvm = project
 
 lazy val commonSettings = Seq(
 
-  version := "0.0.8",
+  version := "0.1.0",
   resolvers += "dhpcs at bintray" at "https://dl.bintray.com/dhpcs/maven",
   logLevel := Level.Info,
   logBuffered in Test := false,
