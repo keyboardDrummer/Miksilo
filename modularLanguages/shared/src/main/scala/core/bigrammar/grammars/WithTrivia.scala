@@ -4,7 +4,7 @@ import core.bigrammar.BiGrammarToParser.Result
 import core.bigrammar.printer.Printer.NodePrinter
 import core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import core.parsers.core.TextPointer
-import core.parsers.editorParsers.{ParseResults, ReadyParseResult, SREmpty}
+import core.parsers.editorParsers.{History, ParseResults, ReadyParseResult, SREmpty}
 import core.responsiveDocument.ResponsiveDocument
 import util.Utility
 
@@ -48,7 +48,10 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
           val rightResult = parseOriginal(leftReady.remainder, leftReady.state, fixPointState)
           rightResult.flatMapReady(rightReady => {
             if (position.offset != leftReady.remainder.offset && leftReady.remainder.offset == rightReady.remainder.offset) {
-              SREmpty.empty // To avoid ambiguities, trivia may only occur before parsed input, not before inserted input.
+              // To avoid ambiguities, trivia may only occur before parsed input, not before inserted input,
+              // that's why we add a strong negative penalty here, so this result is never considered again.
+              // We still have to provide it instead of SREmpty, otherwise the caching won't recognize that we got this far.
+              singleResult(ReadyParseResult(rightReady.resultOption, rightReady.remainder, rightReady.state, rightReady.history.addSuccess(-History.failPenalty)))
             } else {
               val value = leftReady.resultOption.flatMap(leftValue =>
                 rightReady.resultOption.map(rightValue => {

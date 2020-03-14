@@ -12,12 +12,24 @@ import deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
 import deltas.json.JsonStringLiteralDelta
 
 trait YamlContext
-object FlowIn extends YamlContext
-object FlowOut extends YamlContext
-object BlockIn extends YamlContext
-object BlockOut extends YamlContext
-object BlockKey extends YamlContext
-object FlowKey extends YamlContext
+object FlowIn extends YamlContext{
+  override def toString = "FlowIn"
+}
+object FlowOut extends YamlContext{
+  override def toString = "FlowOut"
+}
+object BlockIn extends YamlContext{
+  override def toString = "BlockIn"
+}
+object BlockOut extends YamlContext{
+  override def toString = "BlockOut"
+}
+object BlockKey extends YamlContext{
+  override def toString = "Block"
+}
+object FlowKey extends YamlContext{
+  override def toString = "Flow"
+}
 
 object YamlCoreDelta extends DeltaWithGrammar {
   import core.bigrammar.BiGrammarToParser._
@@ -26,7 +38,10 @@ object YamlCoreDelta extends DeltaWithGrammar {
   object TagName extends NodeField
   object TagNode extends NodeField
 
-  object ContextKey
+  object ContextKey {
+    override def toString = "Context"
+  }
+
   class IfContextParser(inners: Map[YamlContext, BiGrammarToParser.Parser[Result]])
     extends ParserBuilderBase[Result] {
 

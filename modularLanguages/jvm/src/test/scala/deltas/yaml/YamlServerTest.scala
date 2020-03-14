@@ -34,4 +34,19 @@ class YamlServerTest extends AnyFunSuite with LanguageServerTest {
     val results1 = applyChange(server, document, 10,10, "Joo")
     assert(results1.isEmpty)
   }
+
+  test("regression 3") {
+    val input = """Foo:
+                  |  Bar: 3
+                  |Faz:
+                  |  Far""".stripMargin
+    val server = new MiksiloLanguageServer(yamlLanguage)
+
+    val (results0, document) = this.openAndCheckDocument(server, input)
+    assert(results0.isEmpty)
+    val results1 = applyChange(server, document, 12,13, "")
+    assert(results1.nonEmpty)
+    val results2 = applyChange(server, document, 12,12, "3")
+    assert(results2.isEmpty)
+  }
 }

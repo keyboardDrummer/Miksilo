@@ -24,8 +24,9 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
     override def withIndentation(newIndentation: Int) = MyState(state + (IndentationKey -> newIndentation))
   }
 
-  object IndentationKey
-
+  object IndentationKey {
+    override def toString = "Indentation"
+  }
 
   override def startState = MyState(Map.empty)
 
