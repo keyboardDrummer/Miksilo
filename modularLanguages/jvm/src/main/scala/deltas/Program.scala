@@ -1,20 +1,9 @@
 package deltas
 
-import core.{LambdaLogger, LazyLogging}
 import deltas.javac.JavaLanguage
-import jsonRpc._
-import languageServer.{LanguageBuilder, LanguageServerMain}
+import languageServer.{JVMLanguageServer, SimpleLanguageBuilder}
 
-object JavaLanguageBuilder extends LanguageBuilder {
-  override def key = "java"
+object JavaLanguageBuilder extends SimpleLanguageBuilder("java", JavaLanguage.java)
 
-  override def build(arguments: collection.Seq[String]) = JavaLanguage.java
-}
-
-object Program extends LanguageServerMain(Languages.languages ++ Seq(JavaLanguageBuilder),
-  new JsonRpcConnection(new JVMMessageReader(System.in), new JVMMessageWriter(System.out)),
-  new JVMQueue[WorkItem]) {
-
-  LazyLogging.logger = new LambdaLogger(s => System.err.println(s))
-}
+object Program extends JVMLanguageServer(Languages.languages ++ Seq(JavaLanguageBuilder))
 

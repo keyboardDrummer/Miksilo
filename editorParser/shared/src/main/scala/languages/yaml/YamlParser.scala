@@ -1,51 +1,8 @@
 package languages.yaml
 
-import core.document.Empty
-import core.parsers.SourceElement
 import core.parsers.core.{Processor, TextPointer}
-import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, OffsetPointerRange}
+import core.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import core.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
-import core.responsiveDocument.ResponsiveDocument
-
-trait YamlValue extends SourceElement {
-  def toDocument: ResponsiveDocument
-
-  override def toString: String = toDocument.renderString()
-}
-
-case class YamlObject(rangeOption: Option[OffsetPointerRange],members: Array[(YamlValue, YamlValue)]) extends YamlValue {
-  override def toDocument: ResponsiveDocument = {
-    members.
-      map(member => member._1.toDocument ~ ":" ~~ member._2.toDocument).
-      reduce((t,b) => t % b)
-  }
-}
-
-case class YamlArray(rangeOption: Option[OffsetPointerRange],elements: Array[YamlValue]) extends YamlValue {
-  override def toDocument: ResponsiveDocument = {
-    elements.
-      map(member => ResponsiveDocument.text("- ") ~~ member.toDocument).
-      fold[ResponsiveDocument](Empty)((t: ResponsiveDocument, b: ResponsiveDocument) => t % b)
-  }
-}
-
-case class NumberLiteral(rangeOption: Option[OffsetPointerRange],value: Int) extends YamlValue {
-  override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
-}
-
-case class StringLiteral(rangeOption: Option[OffsetPointerRange],value: String) extends YamlValue {
-  override def toDocument: ResponsiveDocument = ResponsiveDocument.text(value.toString)
-}
-
-case class ValueHole(range: OffsetPointerRange) extends YamlValue {
-  override def toDocument: ResponsiveDocument = "hole"
-
-  override def rangeOption = Some(range)
-}
-
-case class TaggedNode(rangeOption: Option[OffsetPointerRange],tag: String, node: YamlValue) extends YamlValue {
-  override def toDocument: ResponsiveDocument = ResponsiveDocument.text("!") ~ tag ~~ node.toDocument
-}
 
 object YamlParser extends LeftRecursiveCorrectingParserWriter
   with IndentationSensitiveParserWriter with CommonParserWriter with WhitespaceParserWriter {
@@ -137,7 +94,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   }
 
   lazy val parseNumber: Parser[YamlValue] =
-    wholeNumber.withSourceRange((range, n) => NumberLiteral(Some(range), Integer.parseInt(n)))
+    wholeNumber.withSourceRange((range, n) => NumberLiteral(Some(range), n))
 
   lazy val parseStringLiteral: Parser[YamlValue] =
     parseStringLiteralInner.withSourceRange((range, s) => StringLiteral(Some(range), s))
