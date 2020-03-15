@@ -4,7 +4,7 @@ import miksilo.modularLanguages.core.bigrammar.grammars._
 import miksilo.editorParser.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter, SingleResultParser}
 import miksilo.editorParser.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter}
 import miksilo.languageServer.core.textMate.TextMateGeneratingParserWriter
-import util.Utility
+import miksilo.languageServer.util.Utility
 
 import scala.collection.mutable
 

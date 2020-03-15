@@ -7,6 +7,7 @@ import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.InvokeStaticDelta
 import miksilo.modularLanguages.deltas.javac.expressions.ConvertsToByteCodeDelta
 import miksilo.modularLanguages.deltas.method.call.CallDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta.Call
 
 object CallStaticDelta extends ConvertsToByteCodeDelta {
 

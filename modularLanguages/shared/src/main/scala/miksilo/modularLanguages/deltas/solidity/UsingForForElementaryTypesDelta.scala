@@ -8,7 +8,7 @@ import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.languageServer.core.smarts.types.objects.{Type, TypeFromDeclaration}
 import miksilo.modularLanguages.deltas.bytecode.types.{HasType, TypeSkeleton}
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraints
+import miksilo.modularLanguages.deltas.classes.HasConstraints
 import miksilo.modularLanguages.deltas.{ConstraintSkeleton, HasNameDelta}
 
 object UsingForForElementaryTypesDelta extends Delta {

@@ -7,7 +7,7 @@ import miksilo.modularLanguages.deltas.PrettyPrint
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
 import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
-import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta}
+import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta
 import miksilo.lspprotocol.lsp.LanguageServer
 import miksilo.modularLanguages.deltas.method.MethodDelta
 

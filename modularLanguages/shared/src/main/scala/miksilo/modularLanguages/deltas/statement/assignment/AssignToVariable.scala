@@ -12,7 +12,8 @@ import miksilo.modularLanguages.deltas.bytecode.types.IntTypeDelta.Shape
 import miksilo.modularLanguages.deltas.bytecode.types.{ArrayTypeDelta, LongTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton}
 import miksilo.modularLanguages.deltas.expression.VariableDelta
 import miksilo.modularLanguages.deltas.expression.VariableDelta.Variable
-import miksilo.modularLanguages.deltas.javac.methods.{AssignmentToByteCodeDelta, MethodDelta, VariableInfo}
+import miksilo.modularLanguages.deltas.javac.methods.{AssignmentToByteCodeDelta, VariableInfo}
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 object AssignToVariable extends DeltaWithGrammar {
 

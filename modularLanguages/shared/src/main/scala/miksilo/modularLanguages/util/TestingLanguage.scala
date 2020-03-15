@@ -8,9 +8,7 @@ import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.modularLanguages.core.node.Node
 import miksilo.languageServer.core.language.{Compilation, Language}
-import miksilo.modularLanguagesutil.TestLanguageBuilder
-import util.{Statistics, StreamUtils}
-
+import miksilo.languageServer.util.{Statistics, StreamUtils}
 import scala.reflect.io.File
 
 object TestingLanguage {

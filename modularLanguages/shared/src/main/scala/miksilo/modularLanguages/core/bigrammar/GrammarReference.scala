@@ -1,9 +1,8 @@
 package miksilo.modularLanguages.core.bigrammar
 
+import miksilo.languageServer.util.Property
 import miksilo.modularLanguages.core.bigrammar.grammars.{BiChoice, ValueGrammar}
 import miksilo.modularLanguages.core.bigrammar.printer.UndefinedDestructuringValue
-import util.Property
-
 import scala.util.hashing.Hashing
 
 class GrammarReference(val previous: GrammarPath, val property: Property[BiGrammar, BiGrammar]) extends GrammarPath

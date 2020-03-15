@@ -6,9 +6,9 @@ import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.{NodePath, NodeSequenceElement}
 import miksilo.modularLanguages.core.deltas.{Contract, ParseUsingTextualGrammar, Property}
 import miksilo.modularLanguages.core.node.{Node, NodeField, NodeShape}
-import core.language.{DiagnosticUtil, Language}
 import miksilo.editorParser.parsers.core.ParseText
 import miksilo.editorParser.parsers.editorParsers.{CachingParser, SingleResultParser}
+import miksilo.languageServer.core.language.{DiagnosticUtil, Language}
 import miksilo.modularLanguages.deltas.FileWithMembersDelta.FileWithMembers
 
 import scala.reflect.io.Path

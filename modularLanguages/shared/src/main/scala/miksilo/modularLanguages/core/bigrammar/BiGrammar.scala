@@ -2,8 +2,8 @@ package miksilo.modularLanguages.core.bigrammar
 
 import miksilo.modularLanguages.core.bigrammar.grammars.{BiChoice, BiSequence, Labelled, ValueMapGrammar}
 import miksilo.editorParser.document.WhiteSpace
+import miksilo.languageServer.util.{GraphBasics, Utility}
 import miksilo.modularLanguages.core.node.GrammarKey
-import util.{GraphBasics, Utility}
 
 import scala.reflect.ClassTag
 

@@ -1,8 +1,8 @@
 package miksilo.modularLanguages.deltas.verilog
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import miksilo.languageServer.core.language.Language
+import miksilo.modularLanguages.core.SolveConstraintsDelta
 import miksilo.modularLanguages.deltas.{FileWithMembersDelta, HasNameDelta}
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, IntLiteralDelta, VariableDelta}
 import miksilo.modularLanguages.deltas.trivia.{SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta}

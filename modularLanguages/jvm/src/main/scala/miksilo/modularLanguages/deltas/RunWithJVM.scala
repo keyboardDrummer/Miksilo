@@ -8,7 +8,7 @@ import miksilo.modularLanguages.deltas.bytecode.ByteCodeSkeleton.ClassFile
 import miksilo.modularLanguages.deltas.bytecode.constants.ClassInfoConstant.ClassInfoConstantWrapper
 import miksilo.modularLanguages.deltas.bytecode.constants.Utf8ConstantDelta.Utf8Constant
 import miksilo.modularLanguages.deltas.bytecode.constants.{ClassInfoConstant, Utf8ConstantDelta}
-import miksilo.modularLanguagesutil.JavaSourceUtils
+import miksilo.modularLanguages.util.JavaSourceUtils
 
 object RunWithJVM extends DeltaWithPhase
 {

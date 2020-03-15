@@ -1,10 +1,11 @@
-package miksilo.modularLanguagesutil
+package miksilo.modularLanguages.util
 
 import miksilo.modularLanguages.core.deltas._
 import miksilo.languageServer.core.language.Compilation
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.{ByteCodeLanguage, PrintByteCode}
 import miksilo.editorParser.SourceUtils
+import miksilo.languageServer.util.StreamUtils
 
 import scala.reflect.io.{File, Path}
 import scala.sys.process.{Process, ProcessLogger}

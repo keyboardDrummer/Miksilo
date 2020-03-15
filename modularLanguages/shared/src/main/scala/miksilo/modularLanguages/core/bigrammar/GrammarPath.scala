@@ -1,9 +1,9 @@
 package miksilo.modularLanguages.core.bigrammar
 
+import miksilo.languageServer.util.GraphBasics.{Continue, Halt}
+import miksilo.languageServer.util.{ExtendedType, GraphBasics, Property}
 import miksilo.modularLanguages.core.bigrammar.grammars.{As, Labelled}
 import miksilo.modularLanguages.core.node.{Key, NodeField, NodeGrammar, NodeShape}
-import util.GraphBasics.{Continue, Halt}
-import util.{ExtendedType, GraphBasics, Property}
 
 import scala.collection.concurrent._
 
