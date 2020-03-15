@@ -165,26 +165,26 @@ class InlineConstantPoolTest extends AnyFunSuite {
       |}""".stripMargin
 
   private val emptyByteCode =
-    """class 9 extends 5 with: ()
+    """class 9 extends 4 with: ()
       |ConstantPool:
-      |  Utf8 Empty
-      |  Utf8 java/lang/Object
       |  Utf8 <init>
       |  Utf8 ()V
-      |  Class 2
-      |  NameAndType 3 4
-      |  Methodref 5.6
+      |  Utf8 java/lang/Object
+      |  Class 3
+      |  NameAndType 1 2
+      |  Methodref 4.5
       |  Utf8 Code
-      |  Class 1
+      |  Utf8 Empty
+      |  Class 8
       |{
       |  Method;
-      |    name: 3
-      |    descriptor: 4
+      |    name: 1
+      |    descriptor: 2
       |    flags: ACC_PUBLIC
       |    Code:
-      |      name: 8, stack:1, locals:1
+      |      name: 7, stack:1, locals:1
       |        aload 0
-      |        invokespecial 7
+      |        invokespecial 6
       |        return
       |      Exceptions:
       |}""".stripMargin
