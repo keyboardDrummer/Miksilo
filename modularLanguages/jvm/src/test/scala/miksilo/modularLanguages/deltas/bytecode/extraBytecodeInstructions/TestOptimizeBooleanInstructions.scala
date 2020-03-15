@@ -4,7 +4,8 @@ import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.ByteCodeSkeleton.ClassFile
 import miksilo.modularLanguages.deltas.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsDelta
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
-import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
+import miksilo.modularLanguages.util.TestLanguageBuilder
+import miksilo.modularLanguagesutil.{JavaLanguageTest, LanguageTest}
 
 import scala.reflect.io.Path
 

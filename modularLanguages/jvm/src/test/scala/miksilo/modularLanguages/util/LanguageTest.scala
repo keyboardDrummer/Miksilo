@@ -12,10 +12,11 @@ import miksilo.modularLanguages.deltas.bytecode.ByteCodeSkeleton.ClassFile
 import miksilo.modularLanguages.deltas.bytecode.{ByteCodeLanguage, PrintByteCode}
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import miksilo.editorParser.SourceUtils
+import miksilo.modularLanguages.util.{JavaSourceUtils, TestingLanguage}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap}
-import util.JavaSourceUtils.LineProcessLogger
 
+import util.JavaSourceUtils.LineProcessLogger
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 

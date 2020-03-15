@@ -11,9 +11,8 @@ import miksilo.modularLanguages.deltas.bytecode.extraConstants.TypeConstant
 import miksilo.modularLanguages.deltas.bytecode.types._
 import miksilo.modularLanguages.deltas.javac.classes.ConstantPool
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.QualifiedClassName
-import miksilo.modularLanguages.deltas.javac.constructor.ConstructorDelta
 import miksilo.modularLanguages.deltas.javac.types.MethodTypeDelta
-import util.{JavaLanguageTest, LanguageTest}
+import miksilo.modularLanguagesutil.{JavaLanguageTest, LanguageTest}
 
 class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
 

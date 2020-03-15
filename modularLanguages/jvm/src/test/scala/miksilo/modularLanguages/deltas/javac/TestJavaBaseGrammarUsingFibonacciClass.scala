@@ -7,9 +7,10 @@ import miksilo.modularLanguages.deltas.expression.additive.{AdditionDelta, Subtr
 import miksilo.modularLanguages.deltas.expression.relational.LessThanDelta
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, IntLiteralDelta, TernaryDelta, VariableDelta}
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
-import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MemberSelectorDelta, MethodDelta, MethodParameters, ReturnExpressionDelta}
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta
+import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MemberSelectorDelta, MethodParameters, ReturnExpressionDelta}
 import miksilo.modularLanguages.deltas.javac.statements.ExpressionAsStatementDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 import miksilo.modularLanguages.deltas.statement.BlockDelta
 import miksilo.modularLanguages.deltas.statement.assignment.AddAssignmentDelta
 import miksilo.modularLanguages.deltas.trivia.SlashStarBlockCommentsDelta

@@ -1,17 +1,19 @@
 package miksilo.modularLanguages.core.parsers
 
-import _root_.core.bigrammar.SelectGrammar
+import miksilo.modularLanguages.core.bigrammar.SelectGrammar
 import miksilo.modularLanguages.deltas.ClearPhases
 import miksilo.modularLanguages.deltas.expression.relational.{EqualsComparisonDelta, RelationalPrecedenceDelta}
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, PostFixIncrementDelta, VariableDelta}
 import miksilo.modularLanguages.deltas.javac.classes.SelectFieldDelta
 import miksilo.modularLanguages.deltas.javac.methods.MemberSelectorDelta
-import miksilo.modularLanguages.deltas.javac.methods.call.{CallDelta, CallMemberDelta}
+import miksilo.modularLanguages.deltas.javac.methods.call.CallMemberDelta
 import miksilo.modularLanguages.deltas.javac.{CallVariableDelta, JavaLanguage}
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 import miksilo.modularLanguages.deltas.statement.assignment.{AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
 import miksilo.modularLanguages.deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import miksilo.modularLanguages.util.TestLanguageBuilder
+import miksilo.modularLanguagesutil.LanguageTest
 import org.scalatest.funsuite.AnyFunSuite
-import util.{LanguageTest, TestLanguageBuilder}
 
 class LeftRecursionTestBiGrammar extends AnyFunSuite {
 

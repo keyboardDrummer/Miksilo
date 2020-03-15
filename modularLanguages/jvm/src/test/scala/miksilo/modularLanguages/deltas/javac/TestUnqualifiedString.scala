@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.deltas.javac
 
-import util.JavaLanguageTest
+import miksilo.modularLanguagesutil.JavaLanguageTest
 
 class TestUnqualifiedString extends JavaLanguageTest {
 

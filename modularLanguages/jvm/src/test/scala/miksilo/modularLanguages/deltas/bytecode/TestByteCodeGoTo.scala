@@ -9,8 +9,9 @@ import miksilo.modularLanguages.deltas.bytecode.coreInstructions.integers.{Incre
 import miksilo.modularLanguages.deltas.bytecode.simpleBytecode.{LabelDelta, LabelledLocations}
 import miksilo.modularLanguages.deltas.bytecode.types.IntTypeDelta
 import miksilo.modularLanguages.deltas.javac.classes.ConstantPool
+import miksilo.modularLanguages.util.TestLanguageBuilder
+import miksilo.modularLanguagesutil.LanguageTest
 import org.scalatest.funsuite.AnyFunSuite
-import util.{LanguageTest, TestLanguageBuilder}
 
 class TestByteCodeGoTo extends AnyFunSuite {
 

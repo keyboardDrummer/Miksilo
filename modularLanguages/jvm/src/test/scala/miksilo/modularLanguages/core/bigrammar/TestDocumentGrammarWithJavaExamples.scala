@@ -1,19 +1,20 @@
 package miksilo.modularLanguages.core.bigrammar
 
 import miksilo.modularLanguages.core.deltas.Delta
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.deltas.bytecode.ByteCodeLanguage
 import miksilo.modularLanguages.deltas.expression.ExpressionDelta
 import miksilo.modularLanguages.deltas.bytecode.ByteCodeLanguage.byteCodeDeltas
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage.spliceBeforeTransformations
 import miksilo.modularLanguages.deltas.javac._
-import miksilo.modularLanguages.deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
-import miksilo.modularLanguages.deltas.javac.methods.{ImplicitReturnAtEndOfMethod, MethodDelta}
+import miksilo.modularLanguages.deltas.javac.methods.ImplicitReturnAtEndOfMethod
 import miksilo.modularLanguages.deltas.statement.BlockDelta
 import miksilo.modularLanguages.deltas.{PrettyPrint, RunWithJVM}
 import miksilo.editorParser.SourceUtils
+import miksilo.modularLanguages.core.SolveConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.util.{JavaSourceUtils, TestLanguageBuilder}
 import org.scalatest.funsuite.AnyFunSuite
-import util.{JavaSourceUtils, TestLanguageBuilder}
 
 import scala.reflect.io.Path
 

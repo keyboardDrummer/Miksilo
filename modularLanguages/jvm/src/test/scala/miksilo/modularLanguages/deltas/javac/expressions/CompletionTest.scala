@@ -1,10 +1,10 @@
 package miksilo.modularLanguages.deltas.javac.expressions
 
 import miksilo.modularLanguages.deltas.javac.JavaLanguage
-import languageServer.{LanguageServerTest, MiksiloLanguageServer}
+import miksilo.languageServer.server.{LanguageServerTest, MiksiloLanguageServer}
 import miksilo.lspprotocol.lsp.{CompletionList, HumanPosition}
+import miksilo.modularLanguages.util.JavaSourceUtils
 import org.scalatest.funsuite.AnyFunSuite
-import util.JavaSourceUtils
 
 class CompletionTest extends AnyFunSuite with LanguageServerTest {
 

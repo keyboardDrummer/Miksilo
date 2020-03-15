@@ -1,11 +1,11 @@
 package miksilo.modularLanguages.deltas.javac.expressions
 
 import miksilo.editorParser.parsers.editorParsers.SourceRange
+import miksilo.languageServer.server.{LanguageServerTest, MiksiloLanguageServer}
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
-import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import miksilo.lspprotocol.lsp.{Diagnostic, DidChangeTextDocumentParams, HumanPosition, VersionedTextDocumentIdentifier}
+import miksilo.modularLanguages.util.JavaSourceUtils
 import org.scalatest.funsuite.AnyFunSuite
-import util.JavaSourceUtils
 
 class DiagnosticsTest extends AnyFunSuite with LanguageServerTest {
 

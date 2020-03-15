@@ -6,8 +6,9 @@ import miksilo.modularLanguages.deltas.bytecode.ByteCodeLanguage
 import miksilo.modularLanguages.deltas.bytecode.simpleBytecode.{InlineConstantPool, LabelledLocations}
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import miksilo.editorParser.SourceUtils
+import miksilo.modularLanguages.util.{JavaSourceUtils, TestLanguageBuilder}
+import miksilo.modularLanguagesutil.LanguageTest
 import org.scalatest.funsuite.AnyFunSuite
-import util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
 
 class TestLabelledLocations extends AnyFunSuite {
 

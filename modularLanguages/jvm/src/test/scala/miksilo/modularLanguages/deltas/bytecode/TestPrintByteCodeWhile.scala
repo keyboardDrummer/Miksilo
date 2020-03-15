@@ -12,8 +12,8 @@ import miksilo.modularLanguages.deltas.bytecode.types.{IntTypeDelta, VoidTypeDel
 import miksilo.modularLanguages.deltas.javac.classes.ConstantPool
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.QualifiedClassName
 import miksilo.modularLanguages.deltas.javac.types.MethodTypeDelta
+import miksilo.modularLanguagesutil.LanguageTest
 import org.scalatest.funsuite.AnyFunSuite
-import util.LanguageTest
 
 class TestPrintByteCodeWhile extends AnyFunSuite {
 

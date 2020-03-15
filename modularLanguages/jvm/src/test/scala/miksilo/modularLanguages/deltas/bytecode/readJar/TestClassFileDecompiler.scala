@@ -12,8 +12,9 @@ import miksilo.modularLanguages.deltas.bytecode.types.TypeSkeleton.ByteCodeTypeG
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import miksilo.modularLanguages.deltas.javac.types.TypeAbstraction
 import miksilo.editorParser.SourceUtils
+import miksilo.languageServer.util.StreamUtils
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
-import util.{StreamUtils, TestLanguageBuilder}
 
 import scala.reflect.io.{File, Path}
 

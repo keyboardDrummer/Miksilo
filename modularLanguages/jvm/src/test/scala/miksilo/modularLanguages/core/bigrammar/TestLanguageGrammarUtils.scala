@@ -7,8 +7,8 @@ import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.modularLanguages.core.node.GrammarKey
 import miksilo.modularLanguages.deltas.ClearPhases
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
-import util.TestLanguageBuilder
 
 object TestLanguageGrammarUtils extends TestLanguageGrammarUtils(JavaToByteCodeLanguage.javaCompilerDeltas)
 

@@ -11,8 +11,8 @@ import miksilo.modularLanguages.deltas.bytecode.extraConstants.TypeConstant
 import miksilo.modularLanguages.deltas.bytecode.types.VoidTypeDelta
 import miksilo.modularLanguages.deltas.javac.classes.ConstantPool
 import miksilo.modularLanguages.deltas.javac.types.MethodTypeDelta
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
-import util.TestLanguageBuilder
 
 class TestPoptimize extends AnyFunSuite {
 

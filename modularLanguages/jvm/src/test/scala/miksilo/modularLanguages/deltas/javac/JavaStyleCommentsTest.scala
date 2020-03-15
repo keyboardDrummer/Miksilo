@@ -13,7 +13,8 @@ import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, IntLiteralDe
 import miksilo.modularLanguages.deltas.statement.{BlockDelta, StatementDelta}
 import miksilo.modularLanguages.deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import miksilo.editorParser.SourceUtils
-import util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
+import miksilo.modularLanguages.util.{JavaSourceUtils, TestLanguageBuilder}
+import miksilo.modularLanguagesutil.LanguageTest
 
 import scala.reflect.io.Path
 

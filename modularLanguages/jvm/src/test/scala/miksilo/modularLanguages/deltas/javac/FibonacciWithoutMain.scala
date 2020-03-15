@@ -7,14 +7,16 @@ import miksilo.modularLanguages.deltas.expression.additive.{AdditionDelta, Subtr
 import miksilo.modularLanguages.deltas.expression.relational.LessThanDelta
 import miksilo.modularLanguages.deltas.expression.{IntLiteralDelta, TernaryDelta, VariableDelta}
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
-import miksilo.modularLanguages.deltas.javac.methods.{MethodDelta, MethodParameters, ReturnExpressionDelta}
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta
+import miksilo.modularLanguages.deltas.javac.methods.{MethodParameters, ReturnExpressionDelta}
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 import miksilo.modularLanguages.deltas.statement.BlockDelta
-import util.{LanguageTest, TestLanguageBuilder}
+import miksilo.modularLanguages.util.TestLanguageBuilder
+import miksilo.modularLanguagesutil.LanguageTest
 
 class FibonacciWithoutMain {
   val className = "OnlyFibonacci"
-  val defaultpackage miksilo.modularLanguages= Seq("transformations", "bytecode", "testing")
+  val defaultPackage = Seq("transformations", "bytecode", "testing")
   val methodName = "fibonacci"
 
   def compileAndPrintFibonacciWithoutMain(): Unit = {

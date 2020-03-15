@@ -9,11 +9,13 @@ import miksilo.modularLanguages.deltas.bytecode.coreInstructions.{InvokeSpecialD
 import miksilo.modularLanguages.deltas.bytecode.extraConstants.TypeConstant
 import miksilo.modularLanguages.deltas.bytecode.types.VoidTypeDelta
 import miksilo.modularLanguages.deltas.bytecode.{ByteCodeMethodInfo, ByteCodeSkeleton}
+import miksilo.modularLanguages.deltas.classes.constructor.ConstructorDelta
 import miksilo.modularLanguages.deltas.javac.classes.ConstantPool
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
-import miksilo.modularLanguages.deltas.javac.constructor.ConstructorDelta
 import miksilo.modularLanguages.deltas.javac.types.MethodTypeDelta
-import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
+import miksilo.modularLanguages.util.TestLanguageBuilder
+import miksilo.modularLanguagesutil.{JavaLanguageTest, LanguageTest}
+
 
 class TestEmptyClassCompilation extends JavaLanguageTest {
   val className: String = "EmptyClass"

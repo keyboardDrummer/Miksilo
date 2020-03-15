@@ -1,12 +1,12 @@
 package miksilo.modularLanguages.core.parsers
 
-import _root_.core.TestUtils
-import _root_.core.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import miksilo.modularLanguages.deltas.json.ModularJsonLanguage
 import miksilo.modularLanguages.deltas.yaml.ModularYamlLanguage
-import miksilo.editorParser.SourceUtils
+import miksilo.editorParser.{SourceUtils, TestUtils}
+import miksilo.editorParser.parsers.PerformanceTest
+import miksilo.editorParser.parsers.editorParsers.UntilBestAndXStepsStopFunction
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
-import util.TestLanguageBuilder
 
 class ModularGrammarPerformanceTest extends AnyFunSuite {
 

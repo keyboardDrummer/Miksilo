@@ -3,8 +3,8 @@ package miksilo.modularLanguages.deltas.javaPlus
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import miksilo.modularLanguages.deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import miksilo.modularLanguages.deltas.{ClearPhases, PrettyPrint}
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
-import util.TestLanguageBuilder
 
 class ReorderMembersTest extends AnyFunSuite {
 
