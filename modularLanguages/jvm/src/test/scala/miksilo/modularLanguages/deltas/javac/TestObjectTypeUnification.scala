@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.deltas.javac
 
-import miksilo.modularLanguagesutil.JavaLanguageTest
+import miksilo.modularLanguages.util.JavaLanguageTest
 
 import scala.reflect.io.Path
 

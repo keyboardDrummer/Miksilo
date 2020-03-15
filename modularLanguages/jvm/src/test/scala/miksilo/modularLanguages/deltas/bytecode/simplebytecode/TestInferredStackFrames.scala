@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.deltas.bytecode.simpleBytecode
 
-import util.JavaLanguageTest
+import miksilo.modularLanguages.util.JavaLanguageTest
 
 class TestInferredStackFrames extends JavaLanguageTest {
 

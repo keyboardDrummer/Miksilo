@@ -3,11 +3,10 @@ package miksilo.modularLanguages.deltas.javac.expressions
 import miksilo.editorParser.parsers.editorParsers.SourceRange
 import miksilo.modularLanguages.deltas.javac.JavaLanguage
 import miksilo.modularLanguages.deltas.javac.methods.BlockLanguageDelta
-import languageServer.LanguageServerTest
+import miksilo.languageServer.server.LanguageServerTest
 import miksilo.lspprotocol.lsp.{FileRange, HumanPosition}
+import miksilo.modularLanguages.util.{JavaSourceUtils, TestLanguageBuilder}
 import org.scalatest.funsuite.AnyFunSuite
-import util.{JavaSourceUtils, TestLanguageBuilder}
-
 class GotoDefinitionTest extends AnyFunSuite with LanguageServerTest {
 
   private val blockLanguage = TestLanguageBuilder.buildWithParser(Seq(

@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.deltas.json
 
-import languageServer.{LanguageServerTest, MiksiloLanguageServer}
+import miksilo.languageServer.server.{LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.funsuite.AnyFunSuite
 
 class JsonServerTest extends AnyFunSuite with LanguageServerTest {

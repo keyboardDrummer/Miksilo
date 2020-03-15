@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.deltas.javac.statement
 
-import util.JavaLanguageTest
+import miksilo.modularLanguages.util.JavaLanguageTest
 
 class TestJavaGoto extends JavaLanguageTest {
 

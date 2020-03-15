@@ -1,7 +1,7 @@
 package miksilo.modularLanguages.deltas.javaPlus
 
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
-import miksilo.modularLanguages.util.TestLanguageBuilder
+import miksilo.modularLanguages.util.{LanguageTest, TestLanguageBuilder}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.reflect.io.Path

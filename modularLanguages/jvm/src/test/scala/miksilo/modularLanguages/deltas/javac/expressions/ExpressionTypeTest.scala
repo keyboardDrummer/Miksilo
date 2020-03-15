@@ -1,12 +1,11 @@
 package miksilo.modularLanguages.deltas.javac.expressions
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.SolveConstraintsDelta
 import miksilo.modularLanguages.deltas.ClearPhases
 import miksilo.modularLanguages.deltas.expression.ExpressionLanguageDelta
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import miksilo.modularLanguages.util.TestLanguageBuilder
-import miksilo.modularLanguagesutil.LanguageTest
+import miksilo.modularLanguages.util.LanguageTest
 
 class ExpressionTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
   Seq(SolveConstraintsDelta,

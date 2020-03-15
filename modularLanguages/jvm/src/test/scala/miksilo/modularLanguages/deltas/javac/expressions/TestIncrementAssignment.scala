@@ -1,7 +1,6 @@
 package miksilo.modularLanguages.deltas.javac.expressions
 
-import util.JavaLanguageTest
-
+import miksilo.modularLanguages.util.JavaLanguageTest
 import scala.reflect.io.Path
 
 class TestIncrementAssignment extends JavaLanguageTest {

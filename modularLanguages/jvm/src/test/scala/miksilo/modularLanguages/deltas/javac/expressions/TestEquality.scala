@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.deltas.javac.expressions
 
-import util.JavaLanguageTest
+import miksilo.modularLanguages.util.JavaLanguageTest
 
 class TestEquality extends JavaLanguageTest {
 

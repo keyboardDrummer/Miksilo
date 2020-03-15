@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.deltas.javac.classes
 
-import miksilo.modularLanguagesutil.JavaLanguageTest
+import miksilo.modularLanguages.util.JavaLanguageTest
 
 class TestFields extends JavaLanguageTest {
 

@@ -12,7 +12,7 @@ import miksilo.modularLanguages.deltas.method.MethodDelta
 import miksilo.modularLanguages.deltas.method.call.CallDelta
 import miksilo.modularLanguages.deltas.statement.BlockDelta
 import miksilo.modularLanguages.util.TestLanguageBuilder
-import miksilo.modularLanguagesutil.LanguageTest
+import miksilo.modularLanguages.util.LanguageTest
 
 class FibonacciWithoutMain {
   val className = "OnlyFibonacci"

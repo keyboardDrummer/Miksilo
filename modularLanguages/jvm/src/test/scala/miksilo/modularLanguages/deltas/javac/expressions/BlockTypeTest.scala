@@ -3,7 +3,7 @@ package miksilo.modularLanguages.deltas.javac.expressions
 import miksilo.modularLanguages.deltas.javac.JavaLanguage
 import miksilo.modularLanguages.deltas.javac.methods.BlockLanguageDelta
 import miksilo.modularLanguages.util.TestLanguageBuilder
-import miksilo.modularLanguagesutil.LanguageTest
+import miksilo.modularLanguages.util.LanguageTest
 
 class BlockTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
   Seq(DropPhases(1), BlockLanguageDelta) ++

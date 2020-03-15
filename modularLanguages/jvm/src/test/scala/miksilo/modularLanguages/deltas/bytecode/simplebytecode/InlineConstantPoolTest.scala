@@ -3,9 +3,8 @@ package miksilo.modularLanguages.deltas.bytecode.simpleBytecode
 import miksilo.modularLanguages.core.bigrammar.TestLanguageGrammarUtils
 import miksilo.modularLanguages.deltas.PrettyPrint
 import miksilo.modularLanguages.deltas.bytecode.{ByteCodeLanguage, ConstantPoolIndices}
-import miksilo.modularLanguages.deltas.bytecode.simpleBytecode.InlineConstantPool
+import miksilo.modularLanguages.util.{LanguageTest, TestLanguageBuilder}
 import org.scalatest.funsuite.AnyFunSuite
-import util.{LanguageTest, TestLanguageBuilder}
 
 class InlineConstantPoolTest extends AnyFunSuite {
 

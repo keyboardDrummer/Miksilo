@@ -5,8 +5,8 @@ import miksilo.modularLanguages.deltas.PrettyPrint
 import miksilo.modularLanguages.deltas.bytecode.ByteCodeLanguage
 import miksilo.modularLanguages.deltas.javac.{ExtendedByteCode, JavaToByteCodeLanguage}
 import miksilo.editorParser.SourceUtils
+import miksilo.modularLanguages.util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
 import org.scalatest.funsuite.AnyFunSuite
-import util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
 
 class SimplifiedByteCodeTest extends AnyFunSuite {
 

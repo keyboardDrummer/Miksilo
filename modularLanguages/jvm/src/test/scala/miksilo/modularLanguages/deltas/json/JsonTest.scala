@@ -7,9 +7,8 @@ import miksilo.editorParser.parsers.core.ParseText
 import miksilo.editorParser.parsers.editorParsers.{Position, UntilBestAndXStepsStopFunction}
 import miksilo.modularLanguages.deltas.expression.ExpressionDelta
 import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
-import languageServer.{LanguageServerTest, MiksiloLanguageServer}
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
-import util.TestLanguageBuilder
 
 class JsonTest extends AnyFunSuite {
   val language = TestLanguageBuilder.buildWithParser(ModularJsonLanguage.deltas, UntilBestAndXStepsStopFunction())

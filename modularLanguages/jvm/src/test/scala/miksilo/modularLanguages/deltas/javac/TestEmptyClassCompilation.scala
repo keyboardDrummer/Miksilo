@@ -14,7 +14,7 @@ import miksilo.modularLanguages.deltas.javac.classes.ConstantPool
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 import miksilo.modularLanguages.deltas.javac.types.MethodTypeDelta
 import miksilo.modularLanguages.util.TestLanguageBuilder
-import miksilo.modularLanguagesutil.{JavaLanguageTest, LanguageTest}
+import miksilo.modularLanguages.util.{JavaLanguageTest, LanguageTest}
 
 
 class TestEmptyClassCompilation extends JavaLanguageTest {

@@ -2,7 +2,7 @@ package miksilo.modularLanguages.deltas.javac.expressions
 
 import miksilo.modularLanguages.deltas.bytecode.additions.PoptimizeDelta
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
-import util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
+import miksilo.modularLanguages.util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
 
 class TestLong extends JavaLanguageTest {
 

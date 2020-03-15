@@ -9,10 +9,11 @@ import miksilo.modularLanguages.deltas.bytecode.coreInstructions.integers.intege
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import miksilo.modularLanguages.deltas.bytecode.extraConstants.TypeConstant
 import miksilo.modularLanguages.deltas.bytecode.types._
+import miksilo.modularLanguages.deltas.classes.constructor.ConstructorDelta
 import miksilo.modularLanguages.deltas.javac.classes.ConstantPool
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.QualifiedClassName
 import miksilo.modularLanguages.deltas.javac.types.MethodTypeDelta
-import miksilo.modularLanguagesutil.{JavaLanguageTest, LanguageTest}
+import miksilo.modularLanguages.util.{JavaLanguageTest, LanguageTest}
 
 class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
 

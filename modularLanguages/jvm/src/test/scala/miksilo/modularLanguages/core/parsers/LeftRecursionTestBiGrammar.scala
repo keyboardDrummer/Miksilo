@@ -12,7 +12,7 @@ import miksilo.modularLanguages.deltas.method.call.CallDelta
 import miksilo.modularLanguages.deltas.statement.assignment.{AssignToVariable, AssignmentPrecedence, SimpleAssignmentDelta}
 import miksilo.modularLanguages.deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import miksilo.modularLanguages.util.TestLanguageBuilder
-import miksilo.modularLanguagesutil.LanguageTest
+import miksilo.modularLanguages.util.LanguageTest
 import org.scalatest.funsuite.AnyFunSuite
 
 class LeftRecursionTestBiGrammar extends AnyFunSuite {

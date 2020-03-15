@@ -1,8 +1,8 @@
 package miksilo.modularLanguages.deltas.solidity
 
 import core.language.{Compilation, CompilationCache, InMemoryFileSystem}
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
-import util.TestLanguageBuilder
 
 class SolidityExamples extends AnyFunSuite {
   val solidity = TestLanguageBuilder.build(SolidityLanguage.deltas)

@@ -2,17 +2,17 @@ package miksilo.modularLanguages.deltas.verilog
 
 import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.modularLanguages.core.node.NodeComparer
-import core.language.{Compilation, CompilationCache, InMemoryFileSystem}
 import miksilo.editorParser.parsers.editorParsers.SourceRange
 import miksilo.modularLanguages.deltas.expression.VariableDelta.Variable
 import miksilo.modularLanguages.deltas.expression.{IntLiteralDelta, VariableDelta}
 import miksilo.modularLanguages.deltas.statement.{IfThenDelta, IfThenElseDelta}
 import miksilo.modularLanguages.deltas.{ClearPhases, FileWithMembersDelta}
-import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import miksilo.lspprotocol.lsp.{DocumentPosition, FileRange, HumanPosition, TextDocumentIdentifier}
 import miksilo.editorParser.SourceUtils
+import miksilo.languageServer.core.language.{Compilation, CompilationCache, InMemoryFileSystem}
+import miksilo.languageServer.server.{LanguageServerTest, MiksiloLanguageServer}
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
-import util.TestLanguageBuilder
 
 import scala.reflect.io.Path
 

@@ -10,7 +10,7 @@ import miksilo.modularLanguages.deltas.bytecode.simpleBytecode.{LabelDelta, Labe
 import miksilo.modularLanguages.deltas.bytecode.types.IntTypeDelta
 import miksilo.modularLanguages.deltas.javac.classes.ConstantPool
 import miksilo.modularLanguages.util.TestLanguageBuilder
-import miksilo.modularLanguagesutil.LanguageTest
+import miksilo.modularLanguages.util.LanguageTest
 import org.scalatest.funsuite.AnyFunSuite
 
 class TestByteCodeGoTo extends AnyFunSuite {
