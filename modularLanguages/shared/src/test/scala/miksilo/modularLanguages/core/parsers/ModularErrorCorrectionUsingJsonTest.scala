@@ -1,8 +1,8 @@
 package miksilo.modularLanguages.core.parsers
 
 import miksilo.modularLanguages.deltas.json.ModularJsonLanguage
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
-import util.TestLanguageBuilder
 
 class ModularErrorCorrectionUsingJsonTest extends AnyFunSuite {
 

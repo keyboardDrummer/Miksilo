@@ -3,7 +3,7 @@ package miksilo.modularLanguages.core.deltas
 import miksilo.modularLanguages.core.node.{Node, NodeField, NodeShape}
 import miksilo.modularLanguages.deltas.expression.{IntLiteralDelta, VariableDelta}
 import miksilo.modularLanguages.deltas.javac.methods.MemberSelectorDelta
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 import org.scalatest.funsuite.AnyFunSuite
 
 class TestMetaObject extends AnyFunSuite {

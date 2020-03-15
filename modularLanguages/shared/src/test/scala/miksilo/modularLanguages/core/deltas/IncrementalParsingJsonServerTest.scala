@@ -1,8 +1,8 @@
 package miksilo.modularLanguages.core.deltas
 
 import miksilo.editorParser.parsers.editorParsers.{SourceRange, StopImmediately}
+import miksilo.languageServer.server.{LanguageServerTest, MiksiloLanguageServer}
 import miksilo.modularLanguages.deltas.json.ModularJsonLanguage
-import languageServer.{LanguageServerTest, MiksiloLanguageServer}
 import miksilo.lspprotocol.lsp._
 import org.scalatest.funsuite.AnyFunSuite
 
