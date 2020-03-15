@@ -1,13 +1,12 @@
 package miksilo.languageServer.core.smarts
 
-import miksilo.languageServer.core.parsers.SourceElement
 import miksilo.languageServer.core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import miksilo.languageServer.core.smarts.scopes.imports.DeclarationOfScope
 import miksilo.languageServer.core.smarts.scopes.objects.{ConcreteScope, _}
 import miksilo.languageServer.core.smarts.scopes.{DeclarationInsideScope, ParentScope, ReferenceInScope}
 import miksilo.languageServer.core.smarts.types.objects.{Type, TypeFromDeclaration, TypeVariable}
 import miksilo.languageServer.core.smarts.types._
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
 
 import scala.collection.mutable
 

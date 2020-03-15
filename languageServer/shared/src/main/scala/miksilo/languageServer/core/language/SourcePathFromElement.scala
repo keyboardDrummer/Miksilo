@@ -1,7 +1,7 @@
 package miksilo.languageServer.core.language
 
-import miksilo.languageServer.core.parsers.{RealSourceElement, SourceElement}
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
+import miksilo.editorParser.parsers.{RealSourceElement, SourceElement}
 
 case class SourcePathFromElement(uri: String, sourceElement: SourceElement) extends SourcePath {
 

@@ -1,7 +1,7 @@
-package languages
+package miksilo.languageServer.languages
 
+import miksilo.editorParser.languages.yaml.{YamlParser, YamlValue}
 import miksilo.languageServer.core.language.{Language, SourcePathFromElement}
-import languages.yaml.{YamlParser, YamlValue}
 
 object YamlLanguage extends Language {
 

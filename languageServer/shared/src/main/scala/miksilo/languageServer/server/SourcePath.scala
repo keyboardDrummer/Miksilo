@@ -1,6 +1,5 @@
-package languageServer
+package miksilo.languageServer.server
 
-import miksilo.languageServer.core.parsers.SourceElement
 import miksilo.editorParser.parsers.editorParsers.{FileOffsetRange, OffsetPointerRange}
 import miksilo.lspprotocol.lsp.FileOffset
 

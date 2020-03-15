@@ -1,4 +1,4 @@
-package languageServer
+package miksilo.languageServer.server
 
 import languages.{JsonLanguage, YamlLanguage}
 

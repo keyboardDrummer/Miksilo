@@ -1,10 +1,10 @@
-package languageServer
+package miksilo.languageServer
 
 import miksilo.editorParser.parsers.editorParsers.SourceRange
-import miksilo.languageServer.core.TestUtils
-import languages.{JsonLanguage, YamlLanguage}
 import miksilo.lspprotocol.lsp._
-import miksilo.editorParser.SourceUtils
+import miksilo.editorParser.{SourceUtils, TestUtils}
+import miksilo.languageServer.languages.{JsonLanguage, YamlLanguage}
+import miksilo.languageServer.server.{LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.funsuite.AnyFunSuite
 
 class IncrementalParsingPerformanceTest extends AnyFunSuite with LanguageServerTest {

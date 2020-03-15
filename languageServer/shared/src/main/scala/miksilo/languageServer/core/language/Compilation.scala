@@ -1,7 +1,7 @@
 package miksilo.languageServer.core.language
 
 import miksilo.languageServer.core.smarts.{Constraint, FileDiagnostic, Proofs}
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
 import miksilo.editorParser.parsers.core.{Metrics, NoMetrics}
 import miksilo.lspprotocol.lsp.{CodeAction, Diagnostic}
 

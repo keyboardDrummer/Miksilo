@@ -1,4 +1,4 @@
-package languageServer
+package miksilo.languageServer.server
 
 import miksilo.editorParser.parsers.editorParsers.{Position, SourceRange}
 import miksilo.lspprotocol.lsp.TextDocumentContentChangeEvent

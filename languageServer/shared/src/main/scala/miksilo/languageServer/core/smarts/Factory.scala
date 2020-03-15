@@ -1,10 +1,9 @@
 package miksilo.languageServer.core.smarts
 
-import miksilo.languageServer.core.parsers.SourceElement
 import miksilo.languageServer.core.smarts.objects.DeclarationVariable
 import miksilo.languageServer.core.smarts.scopes.objects.{ConcreteScope, ScopeVariable}
 import miksilo.languageServer.core.smarts.types.objects.TypeVariable
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
 
 /**
   */

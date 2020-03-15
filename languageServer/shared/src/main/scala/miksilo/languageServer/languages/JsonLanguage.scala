@@ -1,9 +1,7 @@
-package languages
+package miksilo.languageServer.languages
 
+import miksilo.editorParser.languages.json.{JsonParser, JsonValue}
 import miksilo.languageServer.core.language.{Language, SourcePathFromElement}
-import miksilo.languageServer.core.parsers.SourceElement
-import miksilo.editorParser.parsers.editorParsers.{NeverStop, OffsetPointerRange}
-import languages.json.{JsonParser, JsonValue}
 
 object JsonLanguage extends Language {
 

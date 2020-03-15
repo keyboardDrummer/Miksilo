@@ -1,4 +1,4 @@
-package languageServer
+package miksilo.languageServer.server
 
 import miksilo.languageServer.core.language.Language
 import miksilo.editorParser.parsers.editorParsers.{Position, SourceRange}

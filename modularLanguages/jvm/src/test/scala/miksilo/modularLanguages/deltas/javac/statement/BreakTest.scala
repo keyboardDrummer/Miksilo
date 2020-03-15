@@ -1,0 +1,39 @@
+package miksilo.modularLanguages.deltas.javac.statement
+
+import util.JavaLanguageTest
+
+class BreakTest extends JavaLanguageTest {
+
+  test("BreakInWhile") {
+    val program =
+      """class BreakInWhile {
+        |  public static void main(String[] args) {
+        |    int x = 0;
+        |    while(x < 3) {
+        |      if (x == 2)
+        |        break;
+        |      x += 1;
+        |    }
+        |    System.out.print(x);
+        |  }
+        |}
+      """.stripMargin
+    compareWithJavacAfterRunning("BreakInWhile", program)
+  }
+
+  test("BreakInForLoop") {
+    val program =
+      """class BreakInWhile {
+        |  public static void main(String[] args) {
+        |    int x;
+        |    for(x = 0; x < 3; x += 1) {
+        |      if (x == 2)
+        |        break;
+        |    }
+        |    System.out.print(x);
+        |  }
+        |}
+      """.stripMargin
+    compareWithJavacAfterRunning("BreakInWhile", program)
+  }
+}

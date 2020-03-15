@@ -1,10 +1,9 @@
 package miksilo.languageServer.core.smarts.types.objects
 
-import miksilo.languageServer.core.parsers.SourceElement
 import miksilo.languageServer.core.smarts._
 import miksilo.languageServer.core.smarts.objects.{DeclarationVariable, _}
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
 
 trait Type {
   def specialize(mapping: Map[TypeVariable, TypeVariable]): Type

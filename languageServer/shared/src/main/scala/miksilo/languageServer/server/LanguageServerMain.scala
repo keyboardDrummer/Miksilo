@@ -1,8 +1,7 @@
-package miksilo.languageServer
+package miksilo.languageServer.server
 
-import languageServer.MiksiloLanguageServer
-import miksilo.languageServer.core.language.Language
 import miksilo.editorParser.LazyLogging
+import miksilo.languageServer.core.language.Language
 import miksilo.lspprotocol.jsonRpc.{JsonRpcConnection, SerialWorkQueue, WorkItem}
 import miksilo.lspprotocol.lsp.SharedLSPServer
 

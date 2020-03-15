@@ -1,11 +1,10 @@
 package miksilo.languageServer.core.smarts
 
-import miksilo.languageServer.core.parsers.SourceElement
 import miksilo.languageServer.core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import miksilo.languageServer.core.smarts.scopes.ScopeGraph
 import miksilo.languageServer.core.smarts.types.TypeGraph
 import miksilo.languageServer.core.smarts.types.objects.{Type, TypeFromDeclaration, TypeVariable}
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer

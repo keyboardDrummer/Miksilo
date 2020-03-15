@@ -1,7 +1,6 @@
 package miksilo.languageServer.core.smarts
 
 import miksilo.languageServer.core.language.Compilation
-import miksilo.editorParser.parsers.core.ParseText
 import miksilo.languageServer.core.smarts.objects.{Declaration, DeclarationVariable, NamedDeclaration, Reference}
 import miksilo.languageServer.core.smarts.scopes.ResolutionConstraint
 import miksilo.lspprotocol.lsp.{Diagnostic, DiagnosticSeverity}

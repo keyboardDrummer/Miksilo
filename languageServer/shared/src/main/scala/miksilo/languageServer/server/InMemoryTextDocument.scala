@@ -1,4 +1,4 @@
-package languageServer
+package miksilo.languageServer.server
 
 import miksilo.editorParser.LazyLogging
 import miksilo.languageServer.core.language.DocumentEventListener

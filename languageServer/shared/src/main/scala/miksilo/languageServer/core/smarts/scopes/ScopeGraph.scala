@@ -1,11 +1,9 @@
 package miksilo.languageServer.core.smarts.scopes
 
-import miksilo.languageServer.core.parsers.SourceElement
 import miksilo.editorParser.parsers.editorParsers.FileOffsetRange
 import miksilo.languageServer.core.smarts.objects.{NamedDeclaration, Reference}
 import miksilo.languageServer.core.smarts.scopes.objects.ConcreteScope
-import languageServer.SourcePath
-import miksilo.lspprotocol.lsp.FileRange
+import miksilo.languageServer.server.SourcePath
 
 import scala.collection.mutable
 

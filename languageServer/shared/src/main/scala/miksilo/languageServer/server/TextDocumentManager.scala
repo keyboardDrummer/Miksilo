@@ -1,4 +1,4 @@
-package languageServer
+package miksilo.languageServer.server
 
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets

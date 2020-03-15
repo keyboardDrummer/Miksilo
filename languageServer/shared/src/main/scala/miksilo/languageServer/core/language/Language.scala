@@ -8,7 +8,7 @@ import miksilo.languageServer.core.language.exceptions.BadInputException
 import miksilo.editorParser.parsers.caching.ArrayOffsetManager
 import miksilo.editorParser.parsers.editorParsers._
 import miksilo.languageServer.core.smarts.{ConstraintBuilder, CouldNotApplyConstraints, Factory, SolveException}
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
 
 import scala.collection.mutable
 import scala.util.{Failure, Success}

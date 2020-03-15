@@ -1,6 +1,6 @@
 package miksilo.languageServer.core.smarts.types.objects
 
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
 
 case class TypeVariable(name: String, origin: Option[SourcePath] = None) extends Type {
   override def variables: Set[TypeVariable] = Set(this)

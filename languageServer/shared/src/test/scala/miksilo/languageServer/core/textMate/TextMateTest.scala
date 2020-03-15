@@ -1,6 +1,6 @@
 package miksilo.languageServer.core.textMate
 
-import languages.json.JsonParser
+import miksilo.editorParser.languages.json.JsonParser
 import org.scalatest.funsuite.AnyFunSuite
 
 class TextMateTest extends AnyFunSuite {

@@ -3,7 +3,7 @@ package miksilo.languageServer.core.smarts.language.modules
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.language.structs.TypeDefinition
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
 
 trait FakeSourcePath extends SourcePath {
 

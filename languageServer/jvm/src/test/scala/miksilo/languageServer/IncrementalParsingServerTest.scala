@@ -1,7 +1,8 @@
-package languageServer
+package miksilo.languageServer
 
 import miksilo.editorParser.parsers.editorParsers.SourceRange
-import languages.JsonLanguage
+import miksilo.languageServer.languages.JsonLanguage
+import miksilo.languageServer.server.{LanguageServerTest, MiksiloLanguageServer}
 import miksilo.lspprotocol.lsp._
 import org.scalatest.funsuite.AnyFunSuite
 

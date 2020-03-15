@@ -1,7 +1,7 @@
 package miksilo.languageServer.core.textMate
 
-import miksilo.editorParser.parsers.{OptimizingParserWriter, ParseText}
-import miksilo.languageServer.core.parsers.strings.CommonParserWriter
+import miksilo.editorParser.parsers.core.OptimizingParserWriter
+import miksilo.editorParser.parsers.strings.CommonParserWriter
 import util.GraphBasics
 
 import scala.util.matching.Regex

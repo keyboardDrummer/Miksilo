@@ -1,4 +1,4 @@
-package deltas
+package miksilo.modularLanguages.deltas
 
 import languageServer.JSLanguageServer
 

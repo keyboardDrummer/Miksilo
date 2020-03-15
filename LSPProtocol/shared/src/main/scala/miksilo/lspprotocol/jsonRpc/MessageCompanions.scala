@@ -1,10 +1,9 @@
-package com.dhpcs.jsonrpc
+package  miksilo.lspprotocol.jsonRpc
 
 import miksilo.lspprotocol.jsonRpc.JsonRpcMessage._
 import play.api.libs.json._
 
-import scala.language.higherKinds
-import scala.language.existentials
+import scala.language.{existentials, higherKinds}
 import scala.reflect.ClassTag
 
 // TODO this whole file came from https://github.com/dhpiggott/scala-json-rpc/blob/master/scala-json-rpc/src/main/scala/com/dhpcs/jsonrpc/MessageCompanions.scala

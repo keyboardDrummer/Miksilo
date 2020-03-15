@@ -6,7 +6,7 @@ import miksilo.languageServer.core.smarts.language.types.LanguageType
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.languageServer.core.smarts.types.CheckSubType
 import miksilo.languageServer.core.smarts.types.objects.{ConstraintClosureType, ConstraintExpression, Type}
-import languageServer.SourcePath
+import miksilo.languageServer.server.SourcePath
 
 case class Lambda(name: String, body: Expression, parameterDefinedType: Option[LanguageType] = None) extends Expression {
   override def constraints(builder: ConstraintBuilder, _type: Type, parentScope: Scope): Unit = {

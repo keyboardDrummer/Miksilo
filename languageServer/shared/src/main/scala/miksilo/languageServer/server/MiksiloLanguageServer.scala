@@ -1,11 +1,10 @@
-package languageServer
+package miksilo.languageServer.server
 
 import miksilo.editorParser.LazyLogging
-import miksilo.languageServer.core.language.exceptions.BadInputException
-import miksilo.languageServer.core.language.{Compilation, CompilationCache, Language, NotStarted}
-import miksilo.languageServer.core.parsers.SourceElement
 import miksilo.editorParser.parsers.core.ParseText
-import miksilo.editorParser.parsers.editorParsers.{FileOffsetRange, OffsetPointerRange, TextEdit}
+import miksilo.editorParser.parsers.editorParsers.TextEdit
+import miksilo.languageServer.core.language.exceptions.BadInputException
+import miksilo.languageServer.core.language.{Compilation, CompilationCache, Language}
 import miksilo.languageServer.core.smarts.Proofs
 import miksilo.languageServer.core.smarts.objects.NamedDeclaration
 import miksilo.lspprotocol.lsp._
