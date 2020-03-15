@@ -1,5 +1,6 @@
 package miksilo.modularLanguages.deltas.solidity
 
+import miksilo.languageServer.core.language.{Compilation, CompilationCache, InMemoryFileSystem}
 import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
 
