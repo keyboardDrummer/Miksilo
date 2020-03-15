@@ -1,7 +1,7 @@
-package com.dhpcs.jsonrpc
+package miksilo.lspprotocol.jsonRpc
 
-import com.dhpcs.jsonrpc.JsonRpcMessage.ParamsOps._
-import com.dhpcs.jsonrpc.JsonRpcMessage._
+import miksilo.lspprotocol.jsonRpc.JsonRpcMessage.ParamsOps._
+import miksilo.lspprotocol.jsonRpc.JsonRpcMessage._
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Json.toJsFieldJsValueWrapper
 import play.api.libs.json.Reads._
@@ -388,7 +388,7 @@ object JsonRpcResponseMessageBatch {
   // otherwise be chosen during implicit resolution due to Writes being
   // contravariant, combined with https://issues.scala-lang.org/browse/SI-2509.
   // See also: https://github.com/playframework/play-json/issues/51.
-  import JsonRpcResponseMessage.JsonRpcResponseMessageFormat
+  import miksilo.lspprotocol.jsonRpc.JsonRpcResponseMessage.JsonRpcResponseMessageFormat
   implicit final lazy val JsonRpcResponseMessageBatchFormat
   : Format[JsonRpcResponseMessageBatch] = Format(
     Reads
