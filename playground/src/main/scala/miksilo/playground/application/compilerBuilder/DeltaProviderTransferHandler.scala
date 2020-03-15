@@ -1,11 +1,11 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import java.awt.datatransfer.{DataFlavor, Transferable}
 import java.awt.dnd.DnDConstants
 
 import javax.swing.{JComponent, JList, TransferHandler}
-import playground.application.compilerBuilder.DeltaInstance._
-import core.deltas.Delta
+import miksilo.modularLanguages.core.deltas.Delta
+import miksilo.playground.application.compilerBuilder.DeltaInstance._
 
 import scala.jdk.CollectionConverters
 

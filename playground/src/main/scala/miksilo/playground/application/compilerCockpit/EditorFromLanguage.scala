@@ -1,14 +1,14 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
 import java.awt.CardLayout
 import java.io.ByteArrayInputStream
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
-import core.deltas.LanguageFromDeltas
-import core.deltas.grammars.LanguageGrammars
 import javax.swing._
-import languageServer.MiksiloLanguageServer
+import miksilo.languageServer.server.MiksiloLanguageServer
+import miksilo.modularLanguages.core.deltas.LanguageFromDeltas
+import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import org.fife.ui.rsyntaxtextarea.parser._
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, SyntaxConstants}
 import org.fife.ui.rtextarea.RTextScrollPane

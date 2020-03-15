@@ -1,4 +1,4 @@
-package playground.application
+package miksilo.playground.application
 
 import java.awt.{Font, Insets}
 import javax.swing._

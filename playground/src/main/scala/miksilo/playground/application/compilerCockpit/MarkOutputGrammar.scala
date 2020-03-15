@@ -1,7 +1,7 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
-import core.deltas.{Contract, Delta}
 import miksilo.languageServer.core.language.Language
+import miksilo.modularLanguages.core.deltas.{Contract, Delta}
 
 object MarkOutputGrammar extends Delta {
   override def name = "pretty print"

@@ -1,4 +1,4 @@
-package core.layouts
+package miksilo.core.layouts
 
 import java.awt
 import java.awt.{Container, Dimension, LayoutManager}

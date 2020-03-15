@@ -1,11 +1,11 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import javax.swing.RowFilter.Entry
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.text.Document
 import javax.swing.{ListModel, RowFilter}
 
-import core.deltas.Delta
+import miksilo.modularLanguages.core.deltas.Delta
 import org.jdesktop.swingx.JXList
 
 

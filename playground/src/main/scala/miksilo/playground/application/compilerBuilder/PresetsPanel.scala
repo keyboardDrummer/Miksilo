@@ -1,4 +1,4 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import java.awt.event._
 import java.awt.{GridBagConstraints, GridBagLayout}
@@ -6,17 +6,17 @@ import java.awt.{GridBagConstraints, GridBagLayout}
 import javax.swing._
 import javax.swing.event.ListSelectionEvent
 import javax.swing.text.AbstractDocument
-import playground.application.StyleSheet
-import playground.application.compilerCockpit.MarkOutputGrammar
-import core.SolveConstraintsDelta
-import core.deltas.{Delta, ParseUsingTextualGrammar}
+import miksilo.modularLanguages.core.SolveConstraintsDelta
+import miksilo.modularLanguages.core.deltas.{Delta, ParseUsingTextualGrammar}
+import miksilo.playground.application.StyleSheet
+import miksilo.playground.application.compilerCockpit.MarkOutputGrammar
 import miksilo.modularLanguages.deltas.bytecode.ByteCodeLanguage
 import miksilo.modularLanguages.deltas.bytecode.simpleBytecode.LabelledLocations
+import miksilo.modularLanguages.deltas.classes.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import miksilo.modularLanguages.deltas.javaPlus.ExpressionMethodDelta
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage.getJava
 import miksilo.modularLanguages.deltas.javac._
 import miksilo.modularLanguages.deltas.javac.classes.FieldDeclarationWithInitializer
-import miksilo.modularLanguages.deltas.javac.constructor.{ConstructorDelta, DefaultConstructorDelta, ImplicitSuperConstructorCall}
 import miksilo.modularLanguages.deltas.javac.methods.{BlockLanguageDelta, ImplicitReturnAtEndOfMethod}
 import miksilo.modularLanguages.deltas.javac.statements.ForLoopContinueDelta
 import miksilo.modularLanguages.deltas.json.ModularJsonLanguage

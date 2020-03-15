@@ -1,4 +1,4 @@
-package playground.application.graphing.model
+package miksilo.playground.application.graphing.model
 
 import scala.collection.mutable
 

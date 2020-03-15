@@ -1,11 +1,11 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import java.awt.datatransfer.Transferable
 import java.awt.dnd.DnDConstants
 import javax.swing.TransferHandler.TransferSupport
 import javax.swing.{DefaultListModel, JComponent, JList}
 
-import core.deltas.Delta
+import miksilo.modularLanguages.core.deltas.Delta
 
 class SelectedDeltasTransferHandler(availableList: JList[_], val model: DefaultListModel[DeltaInstance])
   extends DeltaProviderTransferHandler(availableList) {

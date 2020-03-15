@@ -1,14 +1,14 @@
-package playground.application.graphing
+package miksilo.playground.application.graphing
 
 import java.util
 
-import playground.application.graphing.model.simplifications.DeltaGroup
-import playground.application.graphing.model.{DeltaGraph, DeltaVertex}
+import miksilo.playground.application.graphing.model.simplifications.DeltaGroup
+import miksilo.playground.application.graphing.model.{DeltaGraph, DeltaVertex}
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout
 import com.mxgraph.model.mxCell
 import com.mxgraph.util.mxConstants
 import com.mxgraph.view.{mxGraph, mxStylesheet}
-import core.deltas.{DeltaWithGrammar, DeltaWithPhase}
+import miksilo.modularLanguages.core.deltas.{DeltaWithGrammar, DeltaWithPhase}
 import org.jgrapht.traverse.TopologicalOrderIterator
 
 import scala.jdk.CollectionConverters

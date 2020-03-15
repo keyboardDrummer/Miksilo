@@ -1,4 +1,4 @@
-package playground.application
+package miksilo.playground.application
 
 import java.awt.{AWTEvent, EventQueue}
 import org.oxbow.swingbits.dialog.task.TaskDialogs

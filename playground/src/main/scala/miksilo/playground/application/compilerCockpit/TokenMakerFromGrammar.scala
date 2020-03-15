@@ -1,11 +1,11 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
 import miksilo.modularLanguages.core.bigrammar.grammars._
 import miksilo.modularLanguages.core.bigrammar.{BiGrammar, BiGrammarToParser}
-import core.textMate.GenerateTextMateGrammar
 import javax.swing.text.Segment
+import miksilo.languageServer.core.textMate.GenerateTextMateGrammar
+import miksilo.languageServer.util.GraphBasics
 import org.fife.ui.rsyntaxtextarea.{TokenTypes, _}
-import util.GraphBasics
 
 import scala.collection.mutable
 import scala.util.matching.Regex

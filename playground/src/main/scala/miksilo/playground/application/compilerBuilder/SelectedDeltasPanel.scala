@@ -1,13 +1,12 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import java.awt.BorderLayout
-import java.awt.event.{ActionEvent, MouseEvent}
+import java.awt.event.ActionEvent
+
 import javax.swing._
 import javax.swing.event.ListSelectionEvent
-
-import playground.application.StyleSheet
-import core.deltas.Delta
-import org.jdesktop.swingx.JXList
+import miksilo.modularLanguages.core.deltas.Delta
+import miksilo.playground.application.StyleSheet
 
 object DeltaInstance
 {

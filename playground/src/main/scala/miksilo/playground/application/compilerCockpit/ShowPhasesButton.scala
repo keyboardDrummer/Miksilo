@@ -1,9 +1,9 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
 import java.awt.event.ActionEvent
-import javax.swing.JButton
 
-import core.language.Phase
+import javax.swing.JButton
+import miksilo.languageServer.core.language.Phase
 
 class ShowPhasesButton(compilerCockpit: LanguageSandbox) extends JButton("Show phases") {
   addActionListener((e: ActionEvent) => {

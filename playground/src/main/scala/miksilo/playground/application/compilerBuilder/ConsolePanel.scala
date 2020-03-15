@@ -1,13 +1,13 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import java.awt.BorderLayout
 
 import javax.swing.event.{ListDataEvent, ListDataListener}
 import javax.swing.{BorderFactory, JPanel, JTextArea}
-import playground.application.StyleSheet
-import core.deltas.{Contract, Delta}
+import miksilo.playground.application.StyleSheet
 import miksilo.editorParser.document.Empty
 import miksilo.editorParser.responsiveDocument.ResponsiveDocument
+import miksilo.modularLanguages.core.deltas.{Contract, Delta}
 
 class ConsolePanel(val selectedParticles: DeltaInstanceList)  extends JPanel(new BorderLayout()) {
 

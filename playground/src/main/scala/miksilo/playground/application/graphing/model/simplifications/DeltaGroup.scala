@@ -1,6 +1,6 @@
-package playground.application.graphing.model.simplifications
+package miksilo.playground.application.graphing.model.simplifications
 
-import core.deltas.Contract
+import miksilo.modularLanguages.core.deltas.Contract
 
 trait DeltaGroup extends Contract {
   def dependants: Set[Contract]

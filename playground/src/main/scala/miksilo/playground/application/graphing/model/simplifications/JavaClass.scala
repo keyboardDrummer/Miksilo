@@ -1,6 +1,6 @@
-package playground.application.graphing.model.simplifications
+package miksilo.playground.application.graphing.model.simplifications
 
-import core.deltas.Contract
+import miksilo.modularLanguages.core.deltas.Contract
 import miksilo.modularLanguages.deltas.javac.{ImplicitJavaLangImport, ImplicitObjectSuperClass}
 
 object JavaClass extends DeltaGroup {

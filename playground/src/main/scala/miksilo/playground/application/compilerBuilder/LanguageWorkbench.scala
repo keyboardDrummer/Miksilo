@@ -1,14 +1,14 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import java.awt._
+
 import javax.swing._
 import javax.swing.border.BevelBorder
 import javax.swing.event.ListSelectionEvent
-
-import playground.application.compilerBuilder.DeltaInstance._
-import playground.application.compilerCockpit.MarkOutputGrammar
-import playground.application.{InjectorListCellRenderer, StyleSheet}
-import core.deltas.Delta
+import miksilo.playground.application.compilerBuilder.DeltaInstance._
+import miksilo.playground.application.compilerCockpit.MarkOutputGrammar
+import miksilo.playground.application.{InjectorListCellRenderer, StyleSheet}
+import miksilo.modularLanguages.core.deltas.Delta
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import org.jdesktop.swingx.JXList
 

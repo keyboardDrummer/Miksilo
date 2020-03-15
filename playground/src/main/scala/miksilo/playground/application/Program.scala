@@ -1,12 +1,12 @@
-package playground.application
+package miksilo.playground.application
 
 import java.awt.event.{FocusEvent, FocusListener}
 import java.awt.{AWTEvent, EventQueue, Toolkit}
 import javax.swing._
 
-import playground.application.compilerBuilder.LanguageWorkbench
-import playground.application.graphing.GraphView
-import playground.application.graphing.model.DeltaGraph
+import miksilo.playground.application.compilerBuilder.LanguageWorkbench
+import miksilo.playground.application.graphing.GraphView
+import miksilo.playground.application.graphing.model.DeltaGraph
 import com.mxgraph.swing.mxGraphComponent
 import org.oxbow.swingbits.dialog.task.TaskDialogs
 

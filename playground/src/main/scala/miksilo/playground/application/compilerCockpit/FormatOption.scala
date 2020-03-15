@@ -1,10 +1,8 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
-import java.io.InputStream
-
-import core.deltas.grammars.LanguageGrammars
-import core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import miksilo.languageServer.core.language.Language
+import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
+import miksilo.modularLanguages.core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import miksilo.modularLanguages.deltas.PrettyPrint
 import miksilo.modularLanguages.deltas.json.PrintJson
 

@@ -1,8 +1,8 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
 import java.io.InputStream
 
-import core.deltas.path.PathRoot
+import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.modularLanguages.deltas.bytecode.PrintByteCode
 
 object EmitByteCode extends CompileOption {

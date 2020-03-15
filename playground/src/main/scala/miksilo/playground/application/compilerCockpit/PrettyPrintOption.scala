@@ -1,9 +1,9 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
 import java.io.InputStream
 
-import core.deltas.{Delta, LanguageFromDeltas}
 import miksilo.languageServer.core.language.Language
+import miksilo.modularLanguages.core.deltas.{Delta, LanguageFromDeltas}
 import miksilo.modularLanguages.deltas.PrettyPrint
 
 object PrettyPrintOption extends CompileOption {

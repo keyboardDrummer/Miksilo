@@ -1,9 +1,7 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
-import java.io.InputStream
-
-import core.deltas._
 import miksilo.languageServer.core.language.Language
+import miksilo.modularLanguages.core.deltas.{Delta, LanguageFromDeltas}
 import miksilo.modularLanguages.deltas.RunWithJVM
 import miksilo.modularLanguages.deltas.bytecode.ByteCodeLanguage
 

@@ -1,6 +1,6 @@
-package playground.application.graphing.model
+package miksilo.playground.application.graphing.model
 
-import core.deltas.Contract
+import miksilo.modularLanguages.core.deltas.Contract
 
 object DeltaVertex {
   implicit def fromTransformation(transformation: Contract): DeltaVertex = new DeltaVertex(transformation)

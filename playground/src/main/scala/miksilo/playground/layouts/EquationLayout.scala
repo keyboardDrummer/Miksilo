@@ -1,4 +1,4 @@
-package core.layouts
+package miksilo.core.layouts
 
 import org.apache.commons.math3.linear.{DecompositionSolver, LUDecomposition, MatrixUtils, NonSquareMatrixException}
 

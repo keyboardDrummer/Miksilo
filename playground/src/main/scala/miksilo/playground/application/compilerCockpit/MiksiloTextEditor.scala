@@ -1,12 +1,12 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
 import java.awt.event
 
 import miksilo.editorParser.parsers.editorParsers.Position
 import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.{JMenuItem, JPopupMenu}
-import languageServer._
-import _root_.lsp.{LanguageServer, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier, _}
+import miksilo.languageServer.server.MiksiloLanguageServer
+import miksilo.lspprotocol.lsp.{DidChangeTextDocumentParams, DocumentPosition, LanguageServer, TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem, VersionedTextDocumentIdentifier}
 import org.fife.ui.rsyntaxtextarea.{RSyntaxDocument, RSyntaxTextArea}
 
 class MiksiloTextEditor(document: RSyntaxDocument) extends RSyntaxTextArea(document) {

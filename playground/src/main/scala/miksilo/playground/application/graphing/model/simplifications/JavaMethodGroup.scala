@@ -1,6 +1,6 @@
-package playground.application.graphing.model.simplifications
+package miksilo.playground.application.graphing.model.simplifications
 
-import core.deltas.Contract
+import miksilo.modularLanguages.core.deltas.Contract
 import miksilo.modularLanguages.deltas.expression.PostFixIncrementDelta
 import miksilo.modularLanguages.deltas.javac.ImplicitObjectSuperClass
 import miksilo.modularLanguages.deltas.javac.classes.{BasicImportDelta, FieldDeclarationDelta}

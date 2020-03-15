@@ -1,9 +1,8 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import javax.swing.JPanel
-
-import core.deltas.{Contract, Delta}
-import util.CachedValue
+import miksilo.languageServer.util.CachedValue
+import miksilo.modularLanguages.core.deltas.{Contract, Delta}
 
 import scala.collection.mutable
 

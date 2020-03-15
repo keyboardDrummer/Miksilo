@@ -1,6 +1,6 @@
-package playground.application.compilerBuilder;
+package miksilo.playground.application.compilerBuilder;
 
-import core.deltas.Delta;
+import miksilo.modularLanguages.core.deltas.Delta;
 import org.jdesktop.swingx.JXList;
 
 import java.awt.event.MouseEvent;

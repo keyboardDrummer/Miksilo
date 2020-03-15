@@ -1,4 +1,4 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
 import java.io.InputStream
 

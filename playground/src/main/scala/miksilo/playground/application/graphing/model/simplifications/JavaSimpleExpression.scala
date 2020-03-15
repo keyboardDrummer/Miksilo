@@ -1,6 +1,6 @@
-package playground.application.graphing.model.simplifications
+package miksilo.playground.application.graphing.model.simplifications
 
-import core.deltas.Contract
+import miksilo.modularLanguages.core.deltas.Contract
 import miksilo.modularLanguages.deltas.expression.additive.{AdditionDelta, SubtractionDelta}
 import miksilo.modularLanguages.deltas.expression.relational.{EqualsComparisonDelta, LessThanDelta}
 import miksilo.modularLanguages.deltas.expression.{IntLiteralDelta, ParenthesisInExpressionDelta, TernaryDelta}

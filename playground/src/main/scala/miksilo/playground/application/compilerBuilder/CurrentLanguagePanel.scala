@@ -1,13 +1,13 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import java.awt._
 import java.awt.event.ActionEvent
 
 import javax.swing._
 import javax.swing.text.PlainDocument
-import playground.application.StyleSheet
-import playground.application.compilerCockpit.LanguageSandbox
-import core.deltas.Delta
+import miksilo.modularLanguages.core.deltas.Delta
+import miksilo.playground.application.StyleSheet
+import miksilo.playground.application.compilerCockpit.LanguageSandbox
 
 import scala.jdk.CollectionConverters
 

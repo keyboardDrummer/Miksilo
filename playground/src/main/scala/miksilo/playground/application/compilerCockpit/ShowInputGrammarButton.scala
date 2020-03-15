@@ -1,10 +1,10 @@
-package playground.application.compilerCockpit
+package miksilo.playground.application.compilerCockpit
 
 import java.awt.event.ActionEvent
 
 import miksilo.modularLanguages.core.bigrammar.PrintBiGrammar
-import core.deltas.grammars.LanguageGrammars
 import javax.swing.JButton
+import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 
 class ShowInputGrammarButton(compilerCockpit: LanguageSandbox) extends JButton("Show input grammar") {
   addActionListener((e: ActionEvent) => {

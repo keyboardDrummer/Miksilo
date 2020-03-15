@@ -1,9 +1,9 @@
-package playground.application;
+package miksilo.playground.application;
 
-import playground.application.compilerBuilder.DeltaInstance;
-import playground.application.compilerBuilder.DeltaLabelPainter;
-import playground.application.compilerCockpit.MarkOutputGrammar$;
-import core.deltas.Delta;
+import miksilo.modularLanguages.core.deltas.Delta;
+import miksilo.playground.application.compilerBuilder.DeltaInstance;
+import miksilo.playground.application.compilerBuilder.DeltaLabelPainter;
+import miksilo.playground.application.compilerCockpit.MarkOutputGrammar$;
 import org.jdesktop.swingx.JXList;
 
 import javax.swing.*;

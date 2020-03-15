@@ -1,6 +1,6 @@
-package playground.application.graphing.model
+package miksilo.playground.application.graphing.model
 
-import core.deltas.Delta
+import miksilo.modularLanguages.core.deltas.Delta
 import org.jgrapht.graph.{DefaultDirectedGraph, DefaultEdge}
 
 class GraphFromDeltas(deltas: Set[Delta])

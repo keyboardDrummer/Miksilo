@@ -1,6 +1,6 @@
-package playground.application.graphing.model
+package miksilo.playground.application.graphing.model
 
-import playground.application.graphing.model.simplifications._
+import miksilo.playground.application.graphing.model.simplifications._
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import org.jgrapht.alg.{DijkstraShortestPath, StrongConnectivityInspector}
 import org.jgrapht.graph.DefaultEdge

@@ -1,13 +1,13 @@
-package playground.application.compilerBuilder
+package miksilo.playground.application.compilerBuilder
 
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
 import javax.swing._
 import javax.swing.event.{ListDataEvent, ListDataListener, ListSelectionEvent}
 
-import playground.application.StyleSheet
-import playground.application.graphing.model.DepthFirstTraversal
-import core.deltas.Delta
+import miksilo.playground.application.StyleSheet
+import miksilo.playground.application.graphing.model.DepthFirstTraversal
+import miksilo.modularLanguages.core.deltas.Delta
 
 object MissingDeltasPanel {
 
