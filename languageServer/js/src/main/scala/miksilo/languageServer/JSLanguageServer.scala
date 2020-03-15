@@ -1,6 +1,8 @@
-package miksilo.languageServer.server
+package miksilo.languageServer
 
-import miksilo.languageServer.core.{LambdaLogger, LazyLogging}
+import miksilo.editorParser.{LambdaLogger, LazyLogging}
+import miksilo.languageServer.server.{LanguageBuilder, LanguageServerMain}
+import miksilo.lspprotocol.jsonRpc.{JSQueue, JsonRpcConnection, NodeMessageReader, NodeMessageWriter, WorkItem}
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
