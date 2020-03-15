@@ -1,18 +1,18 @@
 class 4 extends 26 with: ()
 ConstantPool:
-  Utf8 Fibonacci
   Utf8 fibonacci
   Utf8 (I)I
-  Class 1
-  NameAndType 2 3
+  Utf8 Fibonacci
+  Class 3
+  NameAndType 1 2
   Methodref 4.5
   Utf8 StackMapTable
   Utf8 Code
-  Utf8 java/io/PrintStream
   Utf8 print
   Utf8 (I)V
-  Class 9
-  NameAndType 10 11
+  Utf8 java/io/PrintStream
+  Class 11
+  NameAndType 9 10
   Methodref 12.13
   Utf8 out
   Utf8 Ljava/io/PrintStream;
@@ -22,16 +22,16 @@ ConstantPool:
   Fieldref 18.19
   Utf8 main
   Utf8 ([Ljava/lang/String;)V
-  Utf8 java/lang/Object
   Utf8 <init>
   Utf8 ()V
-  Class 23
-  NameAndType 24 25
+  Utf8 java/lang/Object
+  Class 25
+  NameAndType 23 24
   Methodref 26.27
 {
   Method;
-    name: 24
-    descriptor: 25
+    name: 23
+    descriptor: 24
     flags: ACC_PUBLIC
     Code:
       name: 8, stack:1, locals:1
@@ -54,8 +54,8 @@ ConstantPool:
       Exceptions:
 
   Method;
-    name: 2
-    descriptor: 3
+    name: 1
+    descriptor: 2
     flags: ACC_STATIC, ACC_PUBLIC
     Code:
       name: 8, stack:3, locals:1
