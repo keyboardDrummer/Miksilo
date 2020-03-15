@@ -1,4 +1,4 @@
-package util.cache
+package miksilo.languageServer.util.cache
 
 trait Cache[Key, Value] {
   def get(key: Key): Option[Value]

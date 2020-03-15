@@ -9,7 +9,7 @@ import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.modularLanguages.deltas.expression.ExpressionDelta
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 import miksilo.modularLanguages.deltas.statement.StatementDelta
 
 object NonBlockingAssignmentDelta extends DeltaWithGrammar with HasConstraintsDelta { //TODO merge with AssignmentSkeleton

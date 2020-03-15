@@ -1,4 +1,4 @@
-package util.cache
+package miksilo.languageServer.util.cache
 
 import scala.collection.mutable
 

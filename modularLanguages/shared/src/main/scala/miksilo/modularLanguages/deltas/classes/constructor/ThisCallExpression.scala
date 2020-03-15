@@ -10,7 +10,7 @@ import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.languageServer.core.smarts.types.objects.Type
 import miksilo.modularLanguages.deltas.bytecode.types.VoidTypeDelta
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, ExpressionInstance}
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 
 object ThisCallExpression extends DeltaWithGrammar with ExpressionInstance {
 

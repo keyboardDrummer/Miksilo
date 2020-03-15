@@ -11,9 +11,9 @@ import miksilo.languageServer.core.smarts.scopes.ReferenceInScope
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.languageServer.core.smarts.types.objects.Type
 import miksilo.modularLanguages.deltas.bytecode.types.{TypeSkeleton, UnqualifiedObjectTypeDelta, VoidTypeDelta}
-import miksilo.modularLanguages.deltas.javac.constructor.ConstructorDelta
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta.Arguments
+import miksilo.modularLanguages.deltas.classes.constructor.ConstructorDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta.Arguments
 
 object NewDelta extends DeltaWithGrammar with ExpressionInstance {
 

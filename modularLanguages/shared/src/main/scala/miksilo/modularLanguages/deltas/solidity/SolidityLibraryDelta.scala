@@ -1,14 +1,14 @@
 package miksilo.modularLanguages.deltas.solidity
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas.Delta
 import miksilo.modularLanguages.core.deltas.path.PathRoot
-import core.language.{CompilationField, Language}
+import miksilo.languageServer.core.language.{CompilationField, Language}
 import miksilo.languageServer.core.smarts.objects.NamedDeclaration
 import miksilo.languageServer.core.smarts.types.objects.{Type, TypeFromDeclaration}
+import miksilo.modularLanguages.core.SolveConstraintsDelta
 import miksilo.modularLanguages.deltas.ConstraintSkeleton
 import miksilo.modularLanguages.deltas.bytecode.types.TypeSkeleton
-import miksilo.modularLanguages.deltas.javac.constructor.ConstructorDelta
+import miksilo.modularLanguages.deltas.classes.constructor.ConstructorDelta
 import miksilo.modularLanguages.deltas.javac.types.BooleanTypeDelta
 
 object SolidityLibraryDelta extends Delta {

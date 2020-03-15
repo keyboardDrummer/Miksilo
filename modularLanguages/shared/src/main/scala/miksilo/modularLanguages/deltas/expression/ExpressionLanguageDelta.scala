@@ -1,11 +1,11 @@
 package miksilo.modularLanguages.deltas.expression
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithGrammar}
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
+import miksilo.modularLanguages.core.SolveConstraintsDelta
 
 //TODO. This delta is WIP and currently just used for testing.
 object ExpressionLanguageDelta extends DeltaWithGrammar {

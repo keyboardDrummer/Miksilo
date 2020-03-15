@@ -5,7 +5,7 @@ import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.NodePath
 import miksilo.modularLanguages.core.node.{GrammarKey, Node}
 import miksilo.languageServer.core.language.{Compilation, Language}
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object StatementDelta extends DeltaWithGrammar {
 

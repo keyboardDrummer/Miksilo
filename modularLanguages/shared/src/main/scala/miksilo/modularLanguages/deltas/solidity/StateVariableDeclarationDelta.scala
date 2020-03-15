@@ -12,8 +12,7 @@ import miksilo.modularLanguages.deltas.bytecode.types.TypeSkeleton
 import miksilo.modularLanguages.deltas.expression.ExpressionDelta
 import miksilo.modularLanguages.deltas.statement.LocalDeclarationDelta
 import miksilo.modularLanguages.deltas.HasNameDelta.Name
-import miksilo.modularLanguages.deltas.classes.ClassDelta
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.{HasConstraintsDelta}
+import miksilo.modularLanguages.deltas.classes.{ClassDelta, HasConstraintsDelta}
 
 object StateVariableDeclarationDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

@@ -1,8 +1,8 @@
 package miksilo.modularLanguages.deltas.javac.classes
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas.path.{ChildPath, NodePath}
 import miksilo.languageServer.core.language.Compilation
+import miksilo.modularLanguages.core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.objects.NewByteCodeDelta
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.{DuplicateInstructionDelta, InvokeSpecialDelta}
@@ -10,8 +10,8 @@ import miksilo.modularLanguages.deltas.expression.NewDelta
 import miksilo.modularLanguages.deltas.expression.NewDelta.NewCall
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.{ClassSignature, JavaClassDelta}
 import miksilo.modularLanguages.deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta.Method
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta.Method
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 
 object NewToByteCodeDelta extends ConvertsToByteCodeDelta {
 

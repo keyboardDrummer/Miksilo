@@ -2,9 +2,9 @@ package miksilo.modularLanguages.deltas.javac.statements
 
 import miksilo.modularLanguages.core.deltas.path.{NodePath, PathRoot}
 import miksilo.languageServer.core.language.Language
+import miksilo.languageServer.util.DataFlowAnalysis
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.statement.ControlFlowGraph
-import util.DataFlowAnalysis
 
 abstract class StatementFlowAnalysis[State](language: Language, body: Node, initialState: State)
   extends DataFlowAnalysis[NodePath, State]

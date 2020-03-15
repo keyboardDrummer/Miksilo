@@ -1,8 +1,8 @@
 package miksilo.modularLanguages.deltas.smithy
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
 import miksilo.languageServer.core.language.Language
+import miksilo.modularLanguages.core.SolveConstraintsDelta
 import miksilo.modularLanguages.deltas.json.ModularJsonLanguage
 import miksilo.modularLanguages.deltas.trivia.SlashSlashLineCommentsDelta
 import miksilo.modularLanguages.deltas.{FileWithMembersDelta, HasNameDelta}

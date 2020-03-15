@@ -9,6 +9,7 @@ import miksilo.modularLanguages.deltas.bytecode.coreInstructions.longs.LongRetur
 import miksilo.modularLanguages.deltas.bytecode.types._
 import miksilo.modularLanguages.deltas.expression.ExpressionDelta
 import miksilo.modularLanguages.deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 object ReturnExpressionToByteCodeDelta extends ConvertsToByteCodeDelta {
 

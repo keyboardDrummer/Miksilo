@@ -8,7 +8,7 @@ import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.modularLanguages.deltas.HasNameDelta.HasName
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object VerilogClassDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def description: String = "Adds Verilog classes"

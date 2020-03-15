@@ -16,10 +16,11 @@ import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, IsExpression
 import miksilo.modularLanguages.deltas.statement.{BlockDelta, LabelStatementDelta}
 import miksilo.modularLanguages.core.deltas.path.ConstraintBuilderExtension._
 import miksilo.modularLanguages.deltas.classes.ClassDelta
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
-import miksilo.modularLanguages.deltas.javac.methods.{MethodDelta, MethodParameters}
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta.Method
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.javac.methods.MethodParameters
 import miksilo.modularLanguages.deltas.javac.methods.MethodParameters.MethodParameter
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta.Method
 
 object CustomModifierDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

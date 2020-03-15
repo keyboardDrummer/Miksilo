@@ -7,22 +7,22 @@ import miksilo.modularLanguages.core.node.{Node, NodeShape}
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.modularLanguages.deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, VariableDelta}
-import miksilo.modularLanguages.deltas.javac.constructor.{ConstructorDelta, SuperCallExpression}
 import miksilo.modularLanguages.deltas.javac.statements.ExpressionAsStatementDelta
 import miksilo.modularLanguages.deltas.statement.LocalDeclarationWithInitializerDelta.LocalDeclarationWithInitializer
 import miksilo.modularLanguages.deltas.statement.assignment.SimpleAssignmentDelta
 import miksilo.modularLanguages.deltas.statement.{BlockDelta, LocalDeclarationWithInitializerDelta}
 import miksilo.modularLanguages.deltas.HasNameDelta.Name
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
+import miksilo.modularLanguages.deltas.classes.constructor.{ConstructorDelta, SuperCallExpression}
 import miksilo.modularLanguages.deltas.javac.classes.FieldDeclarationDelta.{Field, Type}
-import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta
+import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 
 import scala.collection.immutable.ArraySeq
 import scala.collection.mutable.ArrayBuffer
 
 object FieldDeclarationWithInitializer extends DeltaWithGrammar with DeltaWithPhase {
-
 
   override def description: String = "Enables fields to have initializers."
 

@@ -1,25 +1,22 @@
 package miksilo.modularLanguages.deltas.bytecode.readJar
 
-import miksilo.modularLanguages.core.deltas._
-import miksilo.modularLanguages.core.node.Node
 import miksilo.languageServer.core.language.{Compilation, Language}
+import miksilo.modularLanguages.core.bigrammar.BiGrammarToParser._
+import miksilo.modularLanguages.core.deltas._
+import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
+import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.ByteCodeSkeleton._
 import miksilo.modularLanguages.deltas.bytecode.attributes.SignatureAttribute
 import miksilo.modularLanguages.deltas.bytecode.constants.ClassInfoConstant
 import miksilo.modularLanguages.deltas.bytecode.types.TypeSkeleton.ByteCodeTypeGrammar
 import miksilo.modularLanguages.deltas.bytecode.{ByteCodeFieldInfo, ByteCodeMethodInfo, ByteCodeSkeleton}
-import miksilo.modularLanguages.deltas.javac.types.{MethodTypeDelta, TypeAbstraction}
-import miksilo.modularLanguages.deltas.statement.BlockDelta
-
-import scala.collection.mutable.ArrayBuffer
-import miksilo.modularLanguages.core.bigrammar.BiGrammarToParser._
-import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
-import miksilo.modularLanguages.deltas.javac.classes.{ConstantPool, FieldDeclarationDelta}
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
+import miksilo.modularLanguages.deltas.javac.classes.{ConstantPool, FieldDeclarationDelta}
 import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta.{Static, Visibility, VisibilityField}
-import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, MethodParameters}
-
-import scala.collection.immutable.ArraySeq
+import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MethodParameters}
+import miksilo.modularLanguages.deltas.javac.types.{MethodTypeDelta, TypeAbstraction}
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.statement.BlockDelta
 
 object DecompileByteCodeSignature extends DeltaWithPhase {
 

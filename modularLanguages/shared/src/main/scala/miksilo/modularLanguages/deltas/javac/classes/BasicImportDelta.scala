@@ -7,7 +7,8 @@ import miksilo.modularLanguages.core.node.{Node, NodeField, NodeShape}
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.{HasConstraintsDelta, JavaClassDelta, QualifiedClassName}
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
 
 object BasicImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

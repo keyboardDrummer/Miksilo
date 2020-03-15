@@ -10,7 +10,7 @@ import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.modularLanguages.deltas.{ConstraintSkeleton, HasNameDelta}
 import miksilo.modularLanguages.core.deltas.path.ConstraintBuilderExtension._
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object SmithyListDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

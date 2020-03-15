@@ -1,4 +1,4 @@
-package util
+package miksilo.languageServer.util
 
 
 class CachedValue[T >: Null <: AnyRef](supplier: () => T) {

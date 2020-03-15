@@ -4,7 +4,7 @@ import miksilo.modularLanguages.core.bigrammar.printer.BiGrammarToPrinter
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.modularLanguages.core.deltas.{Delta, LanguageFromDeltas, ParseUsingTextualGrammar}
-import core.language.{Language, Phase}
+import miksilo.languageServer.core.language.{Language, Phase}
 import miksilo.modularLanguages.core.node.Node
 import miksilo.editorParser.parsers.editorParsers.UntilTimeStopFunction
 import miksilo.modularLanguages.deltas.expression.ArrayLiteralDelta.ArrayLiteral

@@ -5,7 +5,7 @@ import miksilo.modularLanguages.core.bigrammar.printer.{BiGrammarToPrinter, Prin
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.modularLanguages.core.deltas.{Contract, Delta}
-import core.language.{Language, Phase}
+import miksilo.languageServer.core.language.{Language, Phase}
 import miksilo.editorParser.responsiveDocument.ResponsiveDocument
 
 import scala.util.Try

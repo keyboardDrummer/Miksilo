@@ -4,6 +4,7 @@ import miksilo.modularLanguages.core.deltas._
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.languageServer.core.language.Language
 import miksilo.modularLanguages.deltas.javac.methods.MemberSelectorDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 
 object CallMemberDelta extends DeltaWithGrammar {
   override def dependencies: Set[Contract] = Set(CallDelta, MemberSelectorDelta)

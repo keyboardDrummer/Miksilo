@@ -1,6 +1,5 @@
 package miksilo.modularLanguages.deltas
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas.grammars.{BodyGrammar, LanguageGrammars}
 import miksilo.modularLanguages.core.deltas.path.{NodePath, PathRoot}
 import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithGrammar}
@@ -9,7 +8,8 @@ import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.modularLanguages.core.node.{NodeField, NodeLike, NodeShape, NodeWrapper}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.core.SolveConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object FileWithMembersDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def description: String = "Defines a file with members"

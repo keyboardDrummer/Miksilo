@@ -4,7 +4,7 @@ import miksilo.modularLanguages.core.deltas.path.NodePath
 import miksilo.languageServer.core.language.Compilation
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.javac.expressions.ToByteCodeSkeleton
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta.Call
+import miksilo.modularLanguages.deltas.method.call.CallDelta.Call
 
 object CallToByteCode {
 

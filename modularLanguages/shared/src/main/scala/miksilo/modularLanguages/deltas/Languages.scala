@@ -5,7 +5,7 @@ import miksilo.modularLanguages.deltas.smithy.SmithyLanguage
 import miksilo.modularLanguages.deltas.solidity.SolidityLanguage
 import miksilo.modularLanguages.deltas.verilog.VerilogLanguage
 import miksilo.modularLanguages.deltas.yaml.ModularYamlLanguage
-import languageServer.LanguageBuilder
+import miksilo.languageServer.server.LanguageBuilder
 
 object Languages {
   def languages: Seq[LanguageBuilder] = Seq(

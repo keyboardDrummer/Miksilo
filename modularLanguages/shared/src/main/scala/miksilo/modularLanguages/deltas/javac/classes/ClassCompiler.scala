@@ -9,7 +9,7 @@ import miksilo.modularLanguages.deltas.bytecode.extraConstants.TypeConstant
 import miksilo.modularLanguages.deltas.bytecode.types.{QualifiedObjectTypeDelta, UnqualifiedObjectTypeDelta}
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.{ClassMember, ClassSignature, JavaClassDelta, PackageSignature, QualifiedClassName}
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 case class FieldInfo(parent: ClassSignature, name: String, _static: Boolean, _type: Node) extends ClassMember
 

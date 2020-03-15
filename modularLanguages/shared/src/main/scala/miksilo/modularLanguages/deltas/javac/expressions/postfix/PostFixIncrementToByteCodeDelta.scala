@@ -7,7 +7,7 @@ import miksilo.modularLanguages.core.node.{Node, NodeShape}
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.integers.{IncrementIntegerDelta, LoadIntegerDelta}
 import miksilo.modularLanguages.deltas.expression.{PostFixIncrementDelta, VariableDelta}
 import miksilo.modularLanguages.deltas.javac.expressions.ConvertsToByteCodeDelta
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta
 import miksilo.modularLanguages.deltas.statement.assignment.SimpleAssignmentDelta
 
 object PostFixIncrementToByteCodeDelta extends ConvertsToByteCodeDelta {

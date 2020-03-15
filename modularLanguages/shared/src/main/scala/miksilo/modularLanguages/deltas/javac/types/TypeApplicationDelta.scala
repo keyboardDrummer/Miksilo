@@ -56,7 +56,7 @@ object TypeApplicationDelta extends DeltaWithGrammar with HasTypeDelta with HasS
   override def getType(compilation: Compilation, builder: ConstraintBuilder, _type: NodeLike, parentScope: Scope): Type = {
     val funcType = TypeSkeleton.getType(compilation, builder, _type.func, parentScope)
     val argumentTypes = _type.arguments.map(t => TypeSkeleton.getType(compilation, builder, t, parentScope))
-    core.smarts.types.objects.TypeApplication(funcType, argumentTypes, _type)
+    miksilo.languageServer.core.smarts.types.objects.TypeApplication(funcType, argumentTypes, _type)
   }
 
   override def shape: NodeShape = Shape

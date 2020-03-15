@@ -7,8 +7,9 @@ import miksilo.modularLanguages.deltas.PrettyPrint
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
 import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
-import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
+import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta}
 import miksilo.lspprotocol.lsp.LanguageServer
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 // TODO this thing is broken. Add tests+fix or remove.
 object ReorderMembersDelta extends Delta {

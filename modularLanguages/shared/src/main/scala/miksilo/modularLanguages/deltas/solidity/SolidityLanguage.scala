@@ -1,10 +1,11 @@
 package miksilo.modularLanguages.deltas.solidity
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas._
 import miksilo.languageServer.core.language.Language
+import miksilo.modularLanguages.core.SolveConstraintsDelta
 import miksilo.modularLanguages.deltas.HasNameDelta
 import miksilo.modularLanguages.deltas.bytecode.types.{ArrayTypeDelta, QualifiedObjectTypeDelta, TypeSkeleton, UnqualifiedObjectTypeDelta}
+import miksilo.modularLanguages.deltas.classes.constructor.DefaultConstructorDelta
 import miksilo.modularLanguages.deltas.expression._
 import miksilo.modularLanguages.deltas.expression.additive.{AdditionDelta, AdditivePrecedenceDelta, SubtractionDelta}
 import miksilo.modularLanguages.deltas.expression.bitwise._
@@ -14,12 +15,12 @@ import miksilo.modularLanguages.deltas.expression.prefix._
 import miksilo.modularLanguages.deltas.expression.relational._
 import miksilo.modularLanguages.deltas.javac.CallVariableDelta
 import miksilo.modularLanguages.deltas.javac.classes.{AssignToMemberDelta, SelectFieldDelta}
-import miksilo.modularLanguages.deltas.javac.constructor.DefaultConstructorDelta
 import miksilo.modularLanguages.deltas.javac.expressions.literals.BooleanLiteralDelta
 import miksilo.modularLanguages.deltas.javac.methods.{MemberSelectorDelta, ReturnExpressionDelta}
-import miksilo.modularLanguages.deltas.javac.methods.call.{CallDelta, CallMemberDelta}
+import miksilo.modularLanguages.deltas.javac.methods.call.CallMemberDelta
 import miksilo.modularLanguages.deltas.javac.statements.{ExpressionAsStatementDelta, ForLoopContinueDelta, WhileBreakDelta}
 import miksilo.modularLanguages.deltas.javac.types.BooleanTypeDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 import miksilo.modularLanguages.deltas.statement._
 import miksilo.modularLanguages.deltas.statement.assignment._
 import miksilo.modularLanguages.deltas.trivia.{SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta}

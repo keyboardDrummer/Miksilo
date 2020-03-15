@@ -1,17 +1,18 @@
 package miksilo.modularLanguages.deltas.javac.constructor
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas.path.NodePath
 import miksilo.languageServer.core.language.Compilation
+import miksilo.modularLanguages.core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.InvokeSpecialDelta
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.objects.LoadAddressDelta
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
+import miksilo.modularLanguages.deltas.classes.constructor.SuperCallExpression
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
 import miksilo.modularLanguages.deltas.javac.expressions.{ConvertsToByteCodeDelta, ToByteCodeSkeleton}
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta.Method
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta.Call
+import miksilo.modularLanguages.deltas.method.MethodDelta.Method
+import miksilo.modularLanguages.deltas.method.call.CallDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta.Call
 
 object SuperCallToByteCodeExpression extends ConvertsToByteCodeDelta {
   override def toByteCode(call: NodePath, compilation: Compilation): Seq[Node] = {

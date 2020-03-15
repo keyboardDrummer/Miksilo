@@ -1,4 +1,4 @@
-package miksilo.modularLanguages.deltas.javac.methods.call
+package miksilo.modularLanguages.deltas.method.call
 
 import miksilo.modularLanguages.core.deltas.DeltaWithGrammar
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
@@ -16,8 +16,9 @@ import miksilo.modularLanguages.deltas.classes.ClassDelta
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, ExpressionInstance}
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.{JavaClassDelta, QualifiedClassName}
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta.Method
+import miksilo.modularLanguages.deltas.javac.methods.call.ReferenceExpressionSkeleton
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta.Method
 
 object CallDelta extends DeltaWithGrammar with ExpressionInstance {
 

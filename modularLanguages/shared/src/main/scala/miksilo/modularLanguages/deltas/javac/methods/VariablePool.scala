@@ -1,7 +1,7 @@
 package miksilo.modularLanguages.deltas.javac.methods
 
 import miksilo.languageServer.core.language.Language
-import core.language.exceptions.BadInputException
+import miksilo.languageServer.core.language.exceptions.BadInputException
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.types.TypeSkeleton
 

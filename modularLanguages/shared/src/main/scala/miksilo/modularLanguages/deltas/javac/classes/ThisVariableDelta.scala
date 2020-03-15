@@ -14,9 +14,9 @@ import miksilo.modularLanguages.deltas.ConstraintSkeleton
 import miksilo.modularLanguages.deltas.expression.VariableDelta
 import miksilo.modularLanguages.deltas.expression.VariableDelta._
 import miksilo.modularLanguages.deltas.HasNameDelta.Name
-import miksilo.modularLanguages.deltas.classes.ClassDelta
+import miksilo.modularLanguages.deltas.classes.{ClassDelta, HasConstraints}
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.{HasConstraints, JavaClassDelta}
+import miksilo.modularLanguages.deltas.javac.classes.skeleton.{JavaClassDelta}
 
 object ThisVariableDelta extends DeltaWithGrammar
 {

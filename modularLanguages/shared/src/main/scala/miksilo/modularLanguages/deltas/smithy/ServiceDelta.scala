@@ -15,7 +15,7 @@ import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta.ObjectLiteral
 import miksilo.modularLanguages.deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import miksilo.modularLanguages.deltas.{FileWithMembersDelta, HasNameDelta}
 import miksilo.modularLanguages.core.deltas.path.ConstraintBuilderExtension._
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object ServiceDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

@@ -1,4 +1,4 @@
-package util
+package miksilo.languageServer.util
 
 import scala.reflect.ClassTag
 

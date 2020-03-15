@@ -1,8 +1,10 @@
-package miksilo.modularLanguages.deltas.javac.constructor
+package miksilo.modularLanguages.deltas.classes.constructor
 
 import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithPhase}
 import miksilo.languageServer.core.language.Compilation
 import miksilo.modularLanguages.core.node.Node
+import miksilo.modularLanguages.deltas.classes.constructor.ConstructorDelta
+import miksilo.modularLanguages.deltas.javac.constructor.{ThisCallExpression}
 import miksilo.modularLanguages.deltas.javac.statements.ExpressionAsStatementDelta
 
 object ImplicitSuperConstructorCall extends DeltaWithPhase {

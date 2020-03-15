@@ -7,10 +7,11 @@ import miksilo.modularLanguages.core.node.Node
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.modularLanguages.deltas.HasNameDelta.Name
 import miksilo.modularLanguages.deltas.classes.ClassDelta
+import miksilo.modularLanguages.deltas.classes.constructor.ConstructorDelta
+import miksilo.modularLanguages.deltas.classes.constructor.ConstructorDelta.ClassName
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
-import miksilo.modularLanguages.deltas.javac.constructor.ConstructorDelta
-import miksilo.modularLanguages.deltas.javac.constructor.ConstructorDelta.ClassName
-import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
+import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta}
+import miksilo.modularLanguages.deltas.method.MethodDelta
 import miksilo.modularLanguages.deltas.statement.BlockDelta
 
 object SolidityConstructorDelta extends DeltaWithGrammar with DeltaWithPhase { // TODO try to re-use other constructor delta's.

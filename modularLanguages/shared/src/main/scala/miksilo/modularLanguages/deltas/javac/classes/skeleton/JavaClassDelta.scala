@@ -18,7 +18,7 @@ import miksilo.modularLanguages.deltas.bytecode.types.{ArrayTypeDelta, Qualified
 import miksilo.modularLanguages.deltas.classes.{ClassDelta, HasConstraintsDelta}
 import miksilo.modularLanguages.deltas.classes.ClassDelta.{ClassImports, ClassPackage, ClassParent, JavaClass, Members, Shape}
 import miksilo.modularLanguages.deltas.javac.classes.{ClassCompiler, FieldDeclarationDelta}
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta
 import miksilo.modularLanguages.deltas.statement.BlockDelta
 
 import scala.collection.mutable

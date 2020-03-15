@@ -2,7 +2,7 @@ package miksilo.modularLanguages.deltas.bytecode.types
 
 import miksilo.modularLanguages.core.bigrammar.printer.BiGrammarToPrinter
 import miksilo.modularLanguages.core.deltas._
-import core.language.exceptions.BadInputException
+import miksilo.languageServer.core.language.exceptions.BadInputException
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.node._
 import miksilo.languageServer.core.language.{Compilation, Language}

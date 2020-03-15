@@ -1,4 +1,4 @@
-package util
+package miksilo.languageServer.util
 
 object FileNameUtils {
   private val EXTENSION_SEPARATOR = '.'

@@ -1,9 +1,9 @@
 package miksilo.modularLanguages.deltas.bytecode.simpleBytecode
 
+import miksilo.languageServer.util.DataFlowAnalysis
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.InstructionInstance.Instruction
 import miksilo.modularLanguages.deltas.bytecode.simpleBytecode.LabelDelta.Label
-import util.DataFlowAnalysis
 
 abstract class InstructionFlowAnalysis[State](instructions: Seq[Instruction[Node]])
   extends DataFlowAnalysis[Int, State] {

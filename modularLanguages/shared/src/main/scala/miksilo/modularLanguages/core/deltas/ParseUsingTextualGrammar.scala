@@ -6,7 +6,6 @@ import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.modularLanguages.core.node.Node
 import miksilo.languageServer.core.language.{Compilation, Language}
-import core.parsers.SourceElement
 import miksilo.editorParser.parsers.editorParsers.{SingleParseResult, SingleResultParser, StopFunction, TimeRatioStopFunction}
 import miksilo.languageServer.server.SourcePath
 

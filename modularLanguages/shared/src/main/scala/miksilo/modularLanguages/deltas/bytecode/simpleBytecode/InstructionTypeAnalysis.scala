@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.deltas.bytecode.simpleBytecode
 
-import core.language.exceptions.BadInputException
+import miksilo.languageServer.core.language.exceptions.BadInputException
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.InstructionInstance.Instruction
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.InstructionSignature

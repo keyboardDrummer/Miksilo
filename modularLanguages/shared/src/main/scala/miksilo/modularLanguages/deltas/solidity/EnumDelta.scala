@@ -13,7 +13,7 @@ import miksilo.modularLanguages.deltas.HasNameDelta
 import miksilo.modularLanguages.deltas.bytecode.types.TypeSkeleton
 import miksilo.modularLanguages.core.deltas.path.ConstraintBuilderExtension._
 import miksilo.modularLanguages.deltas.classes.ClassDelta
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object EnumDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

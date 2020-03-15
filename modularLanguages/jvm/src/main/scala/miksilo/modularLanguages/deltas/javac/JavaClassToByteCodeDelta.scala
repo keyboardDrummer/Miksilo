@@ -10,7 +10,8 @@ import miksilo.modularLanguages.deltas.bytecode.constants.ClassInfoConstant
 import miksilo.modularLanguages.deltas.classes.ClassDelta.{JavaClass, Members}
 import miksilo.modularLanguages.deltas.javac.classes.{ClassCompiler, FieldToByteCode}
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.{FullyQualifyTypeReferences, JavaClassDelta}
-import miksilo.modularLanguages.deltas.javac.methods.{MethodDelta, MethodToByteCode}
+import miksilo.modularLanguages.deltas.javac.methods.MethodToByteCode
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 object JavaClassToByteCodeDelta extends Delta {
 

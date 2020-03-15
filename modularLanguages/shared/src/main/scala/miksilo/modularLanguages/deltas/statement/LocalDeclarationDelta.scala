@@ -3,7 +3,7 @@ package miksilo.modularLanguages.deltas.statement
 import miksilo.modularLanguages.core.deltas._
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.NodePath
-import core.language.exceptions.BadInputException
+import miksilo.languageServer.core.language.exceptions.BadInputException
 import miksilo.modularLanguages.core.node._
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder

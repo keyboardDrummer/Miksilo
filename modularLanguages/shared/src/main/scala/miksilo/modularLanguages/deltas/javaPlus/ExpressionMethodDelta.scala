@@ -7,8 +7,9 @@ import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
 import miksilo.modularLanguages.deltas.expression.ExpressionDelta
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta.ReturnType
-import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta, ReturnExpressionDelta}
+import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, ReturnExpressionDelta}
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta.ReturnType
 import miksilo.modularLanguages.deltas.statement.BlockDelta
 
 object ExpressionMethodDelta extends DeltaWithGrammar with DeltaWithPhase {

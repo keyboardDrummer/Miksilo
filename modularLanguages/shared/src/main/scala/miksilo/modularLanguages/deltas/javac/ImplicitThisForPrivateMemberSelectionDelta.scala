@@ -1,17 +1,18 @@
 package miksilo.modularLanguages.deltas.javac
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas._
 import miksilo.modularLanguages.core.deltas.path._
 import miksilo.languageServer.core.language.{Compilation, Language, Phase}
 import miksilo.modularLanguages.core.node.Node
 import miksilo.languageServer.core.smarts.types.objects.TypeFromDeclaration
+import miksilo.modularLanguages.core.SolveConstraintsDelta
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, VariableDelta}
 import miksilo.modularLanguages.deltas.javac.classes.{FieldDeclarationDelta, ThisVariableDelta}
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
 import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
-import miksilo.modularLanguages.deltas.javac.methods.{MemberSelectorDelta, MethodDelta}
+import miksilo.modularLanguages.deltas.javac.methods.{MemberSelectorDelta}
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 object ImplicitThisForPrivateMemberSelectionDelta extends Delta {
 

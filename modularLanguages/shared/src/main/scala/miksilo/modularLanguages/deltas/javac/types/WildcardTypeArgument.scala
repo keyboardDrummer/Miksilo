@@ -6,7 +6,7 @@ import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithGrammar, HasShap
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
-import miksilo.languageServer.core.smarts.types.objects.Type
+import miksilo.languageServer.core.smarts.types.objects.{Type, TypeVariable}
 import miksilo.modularLanguages.deltas.bytecode.types.HasTypeDelta
 
 object WildcardTypeArgument extends DeltaWithGrammar with HasTypeDelta with HasShape {
@@ -24,7 +24,7 @@ object WildcardTypeArgument extends DeltaWithGrammar with HasTypeDelta with HasS
   }
 
   override def getType(compilation: Compilation, builder: ConstraintBuilder, path: NodeLike, parentScope: Scope): Type = {
-    core.smarts.types.objects.TypeVariable("?") //TODO not sure what to do here.
+    TypeVariable("?") //TODO not sure what to do here.
   }
 
   override def shape: NodeShape = Shape

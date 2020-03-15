@@ -5,7 +5,8 @@ import miksilo.modularLanguages.core.deltas.path.NodePath
 import miksilo.languageServer.core.language.Compilation
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.javac.expressions.ConvertsToByteCodeDelta
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta.Call
+import miksilo.modularLanguages.deltas.method.call.CallDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta.Call
 
 object CallStaticOrInstanceDelta extends ConvertsToByteCodeDelta {
 

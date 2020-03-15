@@ -1,7 +1,8 @@
 package miksilo.modularLanguages.deltas
 
 import miksilo.modularLanguages.deltas.javac.JavaLanguage
-import languageServer.{JVMLanguageServer, SimpleLanguageBuilder}
+import miksilo.languageServer.JVMLanguageServer
+import miksilo.languageServer.server.SimpleLanguageBuilder
 
 object JavaLanguageBuilder extends SimpleLanguageBuilder("java", JavaLanguage.java)
 

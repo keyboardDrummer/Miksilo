@@ -2,12 +2,13 @@ package miksilo.modularLanguages.deltas.javac.methods
 
 import miksilo.modularLanguages.core.deltas.path.{NodePath, PathRoot}
 import miksilo.languageServer.core.language.Compilation
-import core.language.exceptions.BadInputException
+import miksilo.languageServer.core.language.exceptions.BadInputException
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.bytecode.types.QualifiedObjectTypeDelta
 import miksilo.modularLanguages.deltas.javac.classes.ClassCompiler
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta.Method
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta.Method
 import miksilo.modularLanguages.deltas.statement.{LocalsAnalysis, StatementDelta}
 
 case class MethodCompiler(compilation: Compilation, method: Method[Node]) {

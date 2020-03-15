@@ -12,7 +12,7 @@ import miksilo.modularLanguages.deltas.{ConstraintSkeleton, FileWithMembersDelta
 import miksilo.modularLanguages.deltas.HasNameDelta.HasName
 import miksilo.modularLanguages.deltas.expression.VariableDelta
 import miksilo.modularLanguages.deltas.expression.VariableDelta.Variable
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object VerilogModuleDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

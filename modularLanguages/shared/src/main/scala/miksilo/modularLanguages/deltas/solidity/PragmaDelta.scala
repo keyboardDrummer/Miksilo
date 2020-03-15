@@ -9,7 +9,7 @@ import miksilo.modularLanguages.core.node.{NodeField, NodeShape}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.modularLanguages.deltas.expression.ExpressionDelta
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object PragmaDelta extends DeltaWithGrammar with HasConstraintsDelta {
   object Shape extends NodeShape

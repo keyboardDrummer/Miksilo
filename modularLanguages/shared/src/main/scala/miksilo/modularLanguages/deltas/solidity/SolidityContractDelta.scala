@@ -17,7 +17,7 @@ import miksilo.modularLanguages.deltas.bytecode.types.{TypeSkeleton, Unqualified
 import miksilo.modularLanguages.deltas.classes.ClassDelta
 import miksilo.modularLanguages.deltas.classes.ClassDelta.ClassImports
 import miksilo.modularLanguages.deltas.expression.ExpressionDelta
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object SolidityContractDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

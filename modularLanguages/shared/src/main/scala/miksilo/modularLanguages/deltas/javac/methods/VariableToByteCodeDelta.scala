@@ -12,6 +12,7 @@ import miksilo.modularLanguages.deltas.expression.VariableDelta
 import miksilo.modularLanguages.deltas.expression.VariableDelta._
 import miksilo.modularLanguages.deltas.javac.expressions.ConvertsToByteCodeDelta
 import miksilo.modularLanguages.deltas.javac.types.BooleanTypeDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 object VariableToByteCodeDelta extends Delta with ConvertsToByteCodeDelta {
 

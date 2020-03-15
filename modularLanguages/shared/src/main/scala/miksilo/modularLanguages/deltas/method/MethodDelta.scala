@@ -1,11 +1,11 @@
-package miksilo.modularLanguages.deltas.javac.methods
+package miksilo.modularLanguages.deltas.method
 
 import miksilo.modularLanguages.core.bigrammar.BiGrammar
 import miksilo.modularLanguages.core.deltas._
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.{NodePath, PathRoot}
 import miksilo.modularLanguages.core.node._
-import core.language.{Compilation, CompilationField, Language}
+import miksilo.languageServer.core.language.{Compilation, CompilationField, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.objects.Declaration
 import miksilo.languageServer.core.smarts.scopes.objects.{ConcreteScope, Scope}
@@ -13,8 +13,10 @@ import miksilo.modularLanguages.deltas.ConstraintSkeleton
 import miksilo.modularLanguages.deltas.bytecode.extraConstants.TypeConstant
 import miksilo.modularLanguages.deltas.bytecode.types.{TypeSkeleton, VoidTypeDelta}
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 import miksilo.modularLanguages.deltas.javac.classes.{ClassCompiler, MethodInfo}
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.{ClassSignature, HasConstraintsDelta, HasDeclarationDelta, JavaClassDelta, MethodClassKey}
+import miksilo.modularLanguages.deltas.javac.classes.skeleton.{ClassSignature, HasDeclarationDelta, JavaClassDelta, MethodClassKey}
+import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MethodCompiler, MethodParameters}
 import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta.{HasAccessibility, PrivateVisibility}
 import miksilo.modularLanguages.deltas.javac.methods.MethodParameters.MethodParameter
 import miksilo.modularLanguages.deltas.javac.types.{MethodTypeDelta, TypeAbstraction}

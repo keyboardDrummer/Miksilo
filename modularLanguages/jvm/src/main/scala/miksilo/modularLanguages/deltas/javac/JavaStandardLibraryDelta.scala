@@ -1,6 +1,5 @@
 package miksilo.modularLanguages.deltas.javac
 
-import core.SolveConstraintsDelta
 import miksilo.modularLanguages.core.deltas.{Contract, Delta, LanguageFromDeltas}
 import miksilo.modularLanguages.core.deltas.path.{NodePath, PathRoot}
 import miksilo.languageServer.core.language.{Compilation, Language}
@@ -11,6 +10,7 @@ import miksilo.modularLanguages.deltas.ConstraintSkeleton
 import miksilo.modularLanguages.deltas.bytecode.readJar.ClassFileSignatureDecompiler
 import miksilo.modularLanguages.deltas.javac.classes.ClassCompiler
 import miksilo.editorParser.SourceUtils
+import miksilo.modularLanguages.core.SolveConstraintsDelta
 
 object JavaStandardLibraryDelta extends Delta {
 

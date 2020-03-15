@@ -12,10 +12,10 @@ import miksilo.modularLanguages.deltas.HasNameDelta
 import miksilo.modularLanguages.deltas.HasNameDelta.{HasName, Name}
 import miksilo.modularLanguages.deltas.bytecode.types.TypeSkeleton
 import miksilo.modularLanguages.core.deltas.path.ConstraintBuilderExtension._
-import miksilo.modularLanguages.deltas.classes.ClassDelta
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.{HasConstraintsDelta}
-import miksilo.modularLanguages.deltas.javac.methods.{MethodDelta, MethodParameters}
+import miksilo.modularLanguages.deltas.classes.{ClassDelta, HasConstraintsDelta}
+import miksilo.modularLanguages.deltas.javac.methods.{MethodParameters}
 import miksilo.modularLanguages.deltas.javac.methods.MethodParameters.MethodParameter
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 object EventDelta extends DeltaWithGrammar with HasConstraintsDelta {
 

@@ -11,7 +11,8 @@ import miksilo.languageServer.core.smarts.types.objects.Type
 import miksilo.languageServer.core.smarts.{ConstraintBuilder, ResolvesTo}
 import miksilo.modularLanguages.deltas.HasNameDelta
 import miksilo.modularLanguages.deltas.javac.methods.call.ReferenceExpressionDelta
-import miksilo.modularLanguages.deltas.javac.methods.{MethodDelta, VariableInfo}
+import miksilo.modularLanguages.deltas.javac.methods.{VariableInfo}
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 object VariableDelta extends DeltaWithGrammar with ExpressionInstance with ReferenceExpressionDelta {
 

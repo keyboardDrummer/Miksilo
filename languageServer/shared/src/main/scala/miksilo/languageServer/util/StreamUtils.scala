@@ -1,4 +1,4 @@
-package util
+package miksilo.languageServer.util
 
 import java.io._
 import java.nio.charset.StandardCharsets

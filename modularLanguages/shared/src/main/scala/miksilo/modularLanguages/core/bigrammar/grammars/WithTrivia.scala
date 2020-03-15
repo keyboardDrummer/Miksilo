@@ -1,12 +1,12 @@
 package miksilo.modularLanguages.core.bigrammar.grammars
 
-import miksilo.editorParser.parsers.core.OffsetPointer
+import miksilo.editorParser.parsers.core.{OffsetPointer, TextPointer}
 import miksilo.modularLanguages.core.bigrammar.BiGrammarToParser.Result
 import miksilo.modularLanguages.core.bigrammar.printer.Printer.NodePrinter
 import miksilo.modularLanguages.core.bigrammar.{BiGrammar, BiGrammarToParser, WithMap}
 import miksilo.editorParser.parsers.editorParsers._
 import miksilo.editorParser.responsiveDocument.ResponsiveDocument
-import util.Utility
+import miksilo.languageServer.util.Utility
 
 case class WithTrivia(var inner: BiGrammar, var trivia: BiGrammar = ParseWhiteSpace, horizontal: Boolean = true) extends CustomGrammar {
   override def print(toDocumentInner: BiGrammar => ResponsiveDocument) = toDocumentInner(sequence)

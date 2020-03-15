@@ -1,4 +1,4 @@
-package miksilo.modularLanguagesutil
+package miksilo.modularLanguages.util
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
@@ -7,7 +7,9 @@ import miksilo.modularLanguages.core.deltas._
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.modularLanguages.core.node.Node
-import core.language.{Compilation, Language, Stopped}
+import miksilo.languageServer.core.language.{Compilation, Language}
+import miksilo.modularLanguagesutil.TestLanguageBuilder
+import util.{Statistics, StreamUtils}
 
 import scala.reflect.io.File
 

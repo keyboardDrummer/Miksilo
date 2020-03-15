@@ -94,7 +94,7 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
       case custom: CustomGrammar =>
         custom.toParser(recursive)
 
-      case many: core.bigrammar.grammars.Many =>
+      case many: miksilo.modularLanguages.core.bigrammar.grammars.Many =>
         val innerParser = recursive(many.inner)
         val parser = innerParser.many[WithMap[List[Any]]](
           WithMap(List.empty[Any], Map.empty[Any, Any]),

@@ -1,4 +1,4 @@
-package miksilo.modularLanguages.deltas.javac.constructor
+package miksilo.modularLanguages.deltas.classes.constructor
 
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithPhase}

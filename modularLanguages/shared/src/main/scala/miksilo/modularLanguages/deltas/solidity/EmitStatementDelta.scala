@@ -9,9 +9,10 @@ import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.languageServer.core.smarts.types.objects.TypeApplication
 import miksilo.languageServer.core.smarts.{ConstraintBuilder, ResolvesToType}
 import miksilo.modularLanguages.deltas.expression.ExpressionDelta
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
-import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta.Call
-import miksilo.modularLanguages.deltas.javac.methods.call.{CallDelta, ReferenceExpressionSkeleton}
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.javac.methods.call.{ReferenceExpressionSkeleton}
+import miksilo.modularLanguages.deltas.method.call.CallDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta.Call
 import miksilo.modularLanguages.deltas.statement.StatementDelta
 
 object EmitStatementDelta extends DeltaWithGrammar with HasConstraintsDelta {

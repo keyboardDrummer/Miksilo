@@ -11,7 +11,7 @@ import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.languageServer.core.smarts.types.objects.PrimitiveType
 import miksilo.modularLanguages.deltas.ConstraintSkeleton
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object FileWithMembersDelta extends DeltaWithGrammar with HasConstraintsDelta {
   object Shape extends NodeShape

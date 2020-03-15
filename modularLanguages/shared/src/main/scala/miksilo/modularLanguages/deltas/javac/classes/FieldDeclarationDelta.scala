@@ -11,7 +11,8 @@ import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.modularLanguages.deltas.HasNameDelta.HasName
 import miksilo.modularLanguages.deltas.bytecode.types.TypeSkeleton
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.{ClassSignature, HasConstraintsDelta, HasDeclarationDelta}
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.javac.classes.skeleton.{ClassSignature, HasDeclarationDelta}
 import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta
 import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta.HasAccessibility
 

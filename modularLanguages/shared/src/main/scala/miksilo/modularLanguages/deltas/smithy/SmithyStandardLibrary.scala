@@ -5,7 +5,7 @@ import miksilo.modularLanguages.core.deltas.path.NodePath
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraints
+import miksilo.modularLanguages.deltas.classes.HasConstraints
 import miksilo.modularLanguages.deltas.{ConstraintSkeleton, FileWithMembersDelta}
 
 object SmithyStandardLibrary extends Delta {

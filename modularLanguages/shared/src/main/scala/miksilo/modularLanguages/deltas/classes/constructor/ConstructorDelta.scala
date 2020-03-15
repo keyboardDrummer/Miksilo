@@ -1,17 +1,18 @@
-package miksilo.modularLanguages.deltas.javac.constructor
+package miksilo.modularLanguages.deltas.classes.constructor
 
 import miksilo.modularLanguages.core.deltas._
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
-import core.language.exceptions.BadInputException
+import miksilo.languageServer.core.language.exceptions.BadInputException
 import miksilo.modularLanguages.core.node._
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.modularLanguages.deltas.bytecode.types.VoidTypeDelta
 import miksilo.modularLanguages.deltas.statement.BlockDelta
 import miksilo.modularLanguages.deltas.HasNameDelta.Name
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
-import miksilo.modularLanguages.deltas.javac.methods.{AccessibilityFieldsDelta, MethodDelta}
+import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta
 import miksilo.modularLanguages.deltas.javac.methods.AccessibilityFieldsDelta.PublicVisibility
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta.{Body, Method, Parameters}
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta.{Body, Method, Parameters}
 
 object ConstructorDelta extends DeltaWithGrammar with DeltaWithPhase {
 

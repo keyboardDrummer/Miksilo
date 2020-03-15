@@ -4,7 +4,7 @@ import miksilo.modularLanguages.core.bigrammar.grammars.{Colorize, Delimiter, Ke
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.NodePath
 import miksilo.modularLanguages.core.deltas.{Delta, DeltaWithGrammar}
-import core.language.exceptions.BadInputException
+import miksilo.languageServer.core.language.exceptions.BadInputException
 import miksilo.modularLanguages.core.node._
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.editorParser.parsers.editorParsers.History

@@ -1,7 +1,6 @@
-package util.cache
+package miksilo.languageServer.util.cache
 
-import util.DoubleLinkedList
-
+import miksilo.languageServer.util.DoubleLinkedList
 import scala.collection.mutable
 
 class LeastRecentlyUsedCache[Key, Value](maximumSize: Int) extends Cache[Key, Value] {

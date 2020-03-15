@@ -13,7 +13,7 @@ import miksilo.modularLanguages.deltas.expression.ExpressionDelta
 import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta
 import miksilo.modularLanguages.deltas.{ConstraintSkeleton, FileWithMembersDelta, HasNameDelta}
 import miksilo.modularLanguages.core.deltas.path.ConstraintBuilderExtension._
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraints
+import miksilo.modularLanguages.deltas.classes.HasConstraints
 
 object TraitDelta extends DeltaWithGrammar {
 

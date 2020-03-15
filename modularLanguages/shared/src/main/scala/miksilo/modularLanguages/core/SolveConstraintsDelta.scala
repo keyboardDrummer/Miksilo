@@ -3,11 +3,12 @@ package miksilo.modularLanguages.core
 import miksilo.modularLanguages.core.deltas.path.{AnyPath, ChildPath, NodePath, PathRoot}
 import miksilo.modularLanguages.core.deltas.{Contract, Delta, Property}
 import miksilo.editorParser.LazyLogging
+import miksilo.languageServer.core.language.exceptions.BadInputException
 import miksilo.languageServer.core.language.{Compilation, Language, Phase}
 import miksilo.languageServer.core.smarts.objects.NamedDeclaration
 import miksilo.languageServer.core.smarts.{ConstraintBuilder, SolveException}
 import miksilo.modularLanguages.core.node.TypedChildField
-import miksilo.modularLanguagesdeltas.ConstraintSkeleton
+import miksilo.modularLanguages.deltas.ConstraintSkeleton
 
 trait ConstraintCollector {
   def build(compilation: Compilation, builder: ConstraintBuilder): Unit

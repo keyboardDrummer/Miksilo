@@ -1,8 +1,9 @@
-package miksilo.modularLanguagesutil
+package miksilo.modularLanguages.util
 
 import miksilo.modularLanguages.core.deltas._
 import miksilo.languageServer.core.language.Language
 import miksilo.editorParser.parsers.editorParsers.{StopFunction, StopImmediatelyFunction}
+import miksilo.languageServer.util.Statistics
 
 object TestLanguageBuilder {
   val statistics = new Statistics()

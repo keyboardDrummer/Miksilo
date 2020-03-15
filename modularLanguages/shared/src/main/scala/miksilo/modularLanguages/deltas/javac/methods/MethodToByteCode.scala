@@ -12,7 +12,8 @@ import miksilo.modularLanguages.deltas.bytecode.simpleBytecode.{InferredMaxStack
 import miksilo.modularLanguages.deltas.javac.classes.ClassCompiler
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.JavaClassDelta
 import miksilo.modularLanguages.deltas.javac.expressions.ToByteCodeSkeleton
-import miksilo.modularLanguages.deltas.javac.methods.MethodDelta.{Body, Method}
+import miksilo.modularLanguages.deltas.method.MethodDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta.{Body, Method}
 
 object MethodToByteCode {
 

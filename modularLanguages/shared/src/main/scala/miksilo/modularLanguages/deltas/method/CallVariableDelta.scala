@@ -5,6 +5,7 @@ import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.languageServer.core.language.Language
 import miksilo.modularLanguages.deltas.expression.VariableDelta
 import miksilo.modularLanguages.deltas.javac.methods.call.CallDelta
+import miksilo.modularLanguages.deltas.method.call.CallDelta
 
 object CallVariableDelta extends DeltaWithGrammar {
 

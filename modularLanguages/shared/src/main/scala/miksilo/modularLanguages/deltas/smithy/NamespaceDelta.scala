@@ -8,7 +8,7 @@ import miksilo.modularLanguages.core.node.{NodeField, NodeShape}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.modularLanguages.deltas.FileWithMembersDelta
-import miksilo.modularLanguages.deltas.javac.classes.skeleton.HasConstraintsDelta
+import miksilo.modularLanguages.deltas.classes.HasConstraintsDelta
 
 object NamespaceDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {

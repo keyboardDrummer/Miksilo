@@ -8,6 +8,7 @@ import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.modularLanguages.deltas.bytecode.coreInstructions.VoidReturnInstructionDelta
+import miksilo.modularLanguages.deltas.method.MethodDelta
 import miksilo.modularLanguages.deltas.statement.{StatementDelta, StatementInstance}
 
 object ReturnVoidDelta extends StatementInstance with DeltaWithGrammar  {

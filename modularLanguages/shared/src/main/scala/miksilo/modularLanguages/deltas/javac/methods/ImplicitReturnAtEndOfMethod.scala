@@ -4,6 +4,7 @@ import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithPhase}
 import miksilo.languageServer.core.language.Compilation
 import miksilo.modularLanguages.core.node.Node
 import miksilo.modularLanguages.deltas.classes.ClassDelta.JavaClass
+import miksilo.modularLanguages.deltas.method.MethodDelta
 
 object ImplicitReturnAtEndOfMethod extends DeltaWithPhase {
   override def dependencies: Set[Contract] = Set(ReturnVoidDelta, ReturnExpressionDelta)
