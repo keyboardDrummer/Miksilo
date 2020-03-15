@@ -20,7 +20,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
 {
 
   test("BasicClass") {
-    val input = "package miksilo.modularLanguagesbla; class Help {}"
+    val input = "package bla; class Help {}"
     val result = TestLanguageGrammarUtils.parse(input)
     val expectation = JavaClassDelta.neww(Seq("bla"), "Help")
     assertResult(expectation)(result)
