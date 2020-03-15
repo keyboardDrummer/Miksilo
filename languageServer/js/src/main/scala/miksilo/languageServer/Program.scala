@@ -1,6 +1,5 @@
 package miksilo.languageServer
 
-dd .
 import miksilo.languageServer.languages.{JsonLanguage, YamlLanguage}
 import miksilo.languageServer.server.SimpleLanguageBuilder
 
