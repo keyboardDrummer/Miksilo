@@ -3,10 +3,10 @@ package miksilo.languageServer.compilerCockpit
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import miksilo.modularLanguages.deltas.json.ModularJsonLanguage
 import miksilo.modularLanguages.deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.fife.ui.rsyntaxtextarea.TokenTypes
 import org.scalatest.funsuite.AnyFunSuite
 import miksilo.playground.application.compilerCockpit.{MyToken, TokenMakerFromGrammar}
-import util.TestLanguageBuilder
 
 import scala.util.parsing.input.CharArrayReader
 

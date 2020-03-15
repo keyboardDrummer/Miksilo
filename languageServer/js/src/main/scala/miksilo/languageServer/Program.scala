@@ -1,7 +1,8 @@
 package miksilo.languageServer
 
-import miksilo.languageServer.JSLanguageServer
+dd .
 import miksilo.languageServer.languages.{JsonLanguage, YamlLanguage}
+import miksilo.languageServer.server.SimpleLanguageBuilder
 
 object Program extends JSLanguageServer(Seq(
   SimpleLanguageBuilder("json", JsonLanguage),
