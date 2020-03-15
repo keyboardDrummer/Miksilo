@@ -2,7 +2,7 @@ package miksilo.modularLanguages.deltas.yaml
 
 import miksilo.modularLanguages.core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
 import miksilo.editorParser.parsers.editorParsers.{NeverStop, UntilBestAndXStepsStopFunction}
-import languageServer.{LanguageServerTest, MiksiloLanguageServer}
+import miksilo.languageServer.server.{LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.funsuite.AnyFunSuite
 
 class YamlServerTest extends AnyFunSuite with LanguageServerTest {
