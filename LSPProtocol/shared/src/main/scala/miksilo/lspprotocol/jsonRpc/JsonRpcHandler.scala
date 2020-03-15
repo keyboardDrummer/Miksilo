@@ -1,6 +1,6 @@
 package miksilo.lspprotocol.jsonRpc
 
-import com.dhpcs.jsonrpc.{JsonRpcNotificationMessage, JsonRpcRequestMessage, JsonRpcResponseMessage}
+import miksilo.lspprotocol.jsonRpc.{JsonRpcNotificationMessage, JsonRpcRequestMessage, JsonRpcResponseMessage}
 
 import scala.concurrent.Future
 

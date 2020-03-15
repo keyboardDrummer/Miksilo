@@ -1,6 +1,6 @@
 package miksilo.lspprotocol.lsp
 
-import com.dhpcs.jsonrpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
+import miksilo.lspprotocol.jsonRpc.JsonRpcMessage.{CorrelationId, NumericCorrelationId}
 import miksilo.lspprotocol.jsonRpc.{JsonRpcConnection, MethodBasedJsonRpcHandler}
 import play.api.libs.json.{Json, Reads}
 import miksilo.lspprotocol.lsp._

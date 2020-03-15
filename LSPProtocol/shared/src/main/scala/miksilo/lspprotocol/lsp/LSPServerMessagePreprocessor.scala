@@ -1,7 +1,7 @@
 package miksilo.lspprotocol.lsp
 
-import com.dhpcs.jsonrpc.JsonRpcMessage.ObjectParams
-import com.dhpcs.jsonrpc.JsonRpcNotificationMessage
+import miksilo.lspprotocol.jsonRpc.JsonRpcMessage.ObjectParams
+import miksilo.lspprotocol.jsonRpc.JsonRpcNotificationMessage
 import miksilo.editorParser.LazyLogging
 import miksilo.lspprotocol.jsonRpc.{CircularArrayBuffer, JsonRpcHandler, MessagePreprocessor, MethodBasedJsonRpcHandler, Notification, SerialWorkQueue, WorkItem}
 import play.api.libs.json.Json

@@ -1,7 +1,7 @@
 package miksilo.lspprotocol.lsp
 
-import com.dhpcs.jsonrpc.Message._
-import com.dhpcs.jsonrpc.CommandCompanion
+import miksilo.lspprotocol.jsonRpc.Message._
+import miksilo.lspprotocol.jsonRpc.CommandCompanion
 import miksilo.editorParser.parsers.editorParsers.{Position, SourceRange}
 import play.api.libs.json._
 

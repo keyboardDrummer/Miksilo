@@ -2,7 +2,7 @@ package miksilo.lspprotocol.jsonRpc
 
 import java.io.InputStream
 
-import miksilo.editorParser.LazyLogging
+import miksilo.git editorParser.LazyLogging
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future

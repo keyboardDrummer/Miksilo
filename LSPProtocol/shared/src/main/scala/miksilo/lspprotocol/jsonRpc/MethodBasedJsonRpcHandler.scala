@@ -2,8 +2,8 @@ package miksilo.lspprotocol.jsonRpc
 
 import java.io.{PrintWriter, StringWriter}
 
-import com.dhpcs.jsonrpc.JsonRpcMessage.{ArrayParams, CorrelationId, ObjectParams, Params}
-import com.dhpcs.jsonrpc._
+import miksilo.lspprotocol.jsonRpc.JsonRpcMessage.{ArrayParams, CorrelationId, ObjectParams, Params}
+import miksilo.lspprotocol.jsonRpc._
 import miksilo.editorParser.LazyLogging
 import play.api.libs.json._
 

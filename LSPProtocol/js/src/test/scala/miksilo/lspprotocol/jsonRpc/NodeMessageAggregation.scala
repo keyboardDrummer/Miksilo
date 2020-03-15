@@ -1,6 +1,6 @@
 package miksilo.lspprotocol.jsonRpc
 
-import com.dhpcs.jsonrpc.JsonRpcMessage.ObjectParams
+import miksilo.lspprotocol.jsonRpc.JsonRpcMessage.ObjectParams
 import miksilo.editorParser.LazyLogging
 import miksilo.lspprotocol.lsp.{DidChangeTextDocumentParams, LSPProtocol, LSPServerMessagePreprocessor, VersionedTextDocumentIdentifier}
 import org.scalatest.Assertion
@@ -20,7 +20,7 @@ class NodeMessageAggregation extends AsyncFunSpec {
   it("aggregates change messages") {
     var payloadCounter = 4
     var counter = 0
-    import com.dhpcs.jsonrpc._
+    import miksilo.lspprotocol.jsonRpc._
     val json = Json.format[DidChangeTextDocumentParams].writes(new DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier("someUri", 0), Seq.empty))
     val msg = Json.stringify(JsonRpcNotificationMessage.JsonRpcNotificationMessageFormat.writes(new JsonRpcNotificationMessage(LSPProtocol.didChange, ObjectParams(json))))
     val result = Promise[Assertion]()

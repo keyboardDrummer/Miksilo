@@ -1,6 +1,6 @@
 package com.dhpcs.jsonrpc
 
-import com.dhpcs.jsonrpc.JsonRpcMessage._
+import miksilo.lspprotocol.jsonRpc.JsonRpcMessage._
 import play.api.libs.json._
 
 import scala.language.higherKinds
