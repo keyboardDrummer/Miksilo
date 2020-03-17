@@ -21,8 +21,7 @@ object BlockScalar extends DeltaWithGrammar {
 
     val lines: BiGrammar = {
       val line = CheckIndentationGrammar.greaterThanOrEqualTo(nbChar)
-      CheckIndentationGrammar.greaterThan(new Withy
-        IndentationGrammar(line.someSeparated(lineSeparator)))
+      CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(line.someSeparated(lineSeparator)))
     }
 
     val literal = new WithIndentationGrammar(("|" | ">" ) ~ chompingIndicator ~ lineSeparator) ~> lines
