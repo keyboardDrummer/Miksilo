@@ -38,7 +38,7 @@ lazy val jvm = project
 
 lazy val commonSettings = Seq(
 
-  version := "0.1.2",
+  version := "0.1.3",
   resolvers += "dhpcs at bintray" at "https://dl.bintray.com/dhpcs/maven",
   logLevel := Level.Info,
   logBuffered in Test := false,
@@ -165,7 +165,7 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
   settings(
     name := "modularLanguages",
     assemblySettings,
-    mainClass in Compile := Some("deltas.Program"),
+    mainClass in Compile := Some("miksilo.modularLanguages.deltas.Program"),
 
     // byteCode parser
     libraryDependencies += "org.scala-lang.modules" %%% "scala-parser-combinators" % "1.1.2",

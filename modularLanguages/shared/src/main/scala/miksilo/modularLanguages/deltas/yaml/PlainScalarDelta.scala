@@ -59,7 +59,7 @@ object PlainScalarDelta extends DeltaWithGrammar {
 
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(plainScalar)
 
-    find(MemberKey).addAlternative(plainScalarNaked)
+    find(MemberKey).addAlternative(plainScalarNaked.as(MemberKey))
   }
 
   override def description = "Adds the YAML plain scalar"

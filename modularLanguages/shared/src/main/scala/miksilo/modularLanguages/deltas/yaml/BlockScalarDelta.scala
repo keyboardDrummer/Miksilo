@@ -10,7 +10,7 @@ import miksilo.modularLanguages.deltas.expression.StringLiteralDelta
 import miksilo.modularLanguages.deltas.json.JsonStringLiteralDelta
 import miksilo.modularLanguages.deltas.yaml.YamlCoreDelta.IndentationSensitiveExpression
 
-object BlockScalar extends DeltaWithGrammar {
+object BlockScalarDelta extends DeltaWithGrammar {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     val _grammars = grammars
     import grammars._

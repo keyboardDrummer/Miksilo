@@ -6,7 +6,7 @@ import miksilo.modularLanguages.deltas.json.ModularJsonLanguage
 
 object ModularYamlLanguage {
   val parserDelta = ParseUsingTextualGrammar(UntilTimeStopFunction(100), indentationSensitive = true)
-  val deltasWithoutParser = Seq(YamlObjectDelta, BlockScalar, HashLineCommentsDelta, YamlArrayDelta, PlainScalarDelta, YamlCoreDelta) ++ ModularJsonLanguage.deltas
+  val deltasWithoutParser = Seq(YamlObjectDelta, BlockScalarDelta, HashLineCommentsDelta, YamlArrayDelta, PlainScalarDelta, YamlCoreDelta) ++ ModularJsonLanguage.deltas
   val deltas = Seq(parserDelta) ++ deltasWithoutParser
   val language = LanguageFromDeltas(deltas)
 }
