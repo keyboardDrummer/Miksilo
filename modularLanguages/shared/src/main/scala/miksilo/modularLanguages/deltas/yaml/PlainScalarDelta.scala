@@ -7,7 +7,8 @@ import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.languageServer.core.language.Language
 import miksilo.editorParser.parsers.editorParsers.History
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, StringLiteralDelta}
-import miksilo.modularLanguages.deltas.json.JsonStringLiteralDelta
+import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta.MemberKey
+import miksilo.modularLanguages.deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 
 object PlainScalarDelta extends DeltaWithGrammar {
   def flowIndicatorChars = """,\[\]{}"""
@@ -47,19 +48,21 @@ object PlainScalarDelta extends DeltaWithGrammar {
         }, (value: Any) => Some(value, List.empty)), false))
     }
 
-    val plainScalar: BiGrammar = new WithContext({
+    val plainScalarNaked = new WithContext({
       case FlowIn => FlowIn
       case BlockKey => BlockKey
       case FlowKey => FlowKey
       case _ => FlowOut
-    }, plainStyleMultiLineString | plainStyleSingleLineString).
+    }, plainStyleMultiLineString | plainStyleSingleLineString)
+    val plainScalar: BiGrammar = plainScalarNaked.
       as(JsonStringLiteralDelta.Value).asLabelledNode(StringLiteralDelta.Shape)
 
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(plainScalar)
 
+    find(MemberKey).addAlternative(plainScalarNaked)
   }
 
   override def description = "Adds the YAML plain scalar"
 
-  override def dependencies = Set.empty
+  override def dependencies = Set(JsonObjectLiteralDelta)
 }
