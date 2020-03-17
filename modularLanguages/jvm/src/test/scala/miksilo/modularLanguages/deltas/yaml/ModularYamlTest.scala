@@ -11,10 +11,51 @@ import miksilo.editorParser.SourceUtils
 import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
 
-class YamlTest extends AnyFunSuite {
+class ModularYamlTest extends AnyFunSuite {
 
   val language = TestLanguageBuilder.buildWithParser(ModularYamlLanguage.deltasWithoutParser,
     stopFunction = UntilBestAndXStepsStopFunction(), indentationSensitive = true)
+
+  test("plain scalar in object value") {
+    val program = """{a: b}"""
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("explicit document") {
+    val program =
+      """---
+        |Joo
+        |""".stripMargin
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("literal scalar") {
+    val program = "|+\n     Joo\n     Joo2"
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("literal scalar 2") {
+    val program = "|+\n    {\n     \"Key\":\"Value\"\n    }"
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("nested literal scalar") {
+    val program =
+      """
+- |-
+    {
+      "Key": "Value"
+    }
+- {
+    "AnotherKey": "AnotherValue"
+  }"""
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.isEmpty)
+  }
 
   test("plain scalar with -") {
     val program = """AllowedPattern: ([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)"""
@@ -55,7 +96,7 @@ class YamlTest extends AnyFunSuite {
     val program = """Foo: bar
                     | yoo: hee""".stripMargin
     val compilation = language.compileString(program)
-    assert(compilation.diagnostics.size == 3 && compilation.diagnostics.head.diagnostic.message.contains("["))
+    assert(compilation.diagnostics.size == 2 && compilation.diagnostics.head.diagnostic.message.contains(":{"))
   }
 
   test("array as key") {
@@ -206,13 +247,13 @@ class YamlTest extends AnyFunSuite {
       """.stripMargin
 
     val language = TestLanguageBuilder.buildWithParser(Seq(new SelectGrammar(ExpressionDelta.FirstPrecedenceGrammar),
-      PlainScalarDelta, ExpressionDelta))
+      PlainScalarDelta, JsonObjectLiteralDelta, ExpressionDelta))
     val compilation = language.compileString(contents)
     assert(compilation.diagnostics.nonEmpty)
   }
 
   val deltas = Seq(new SelectGrammar(YamlCoreDelta.BlockValue),
-    YamlObjectDelta, YamlArrayDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, ExpressionDelta)
+    YamlObjectDelta, YamlArrayDelta, YamlCoreDelta, ArrayLiteralDelta, PlainScalarDelta, JsonObjectLiteralDelta, ExpressionDelta)
   val blockLanguage = TestLanguageBuilder.buildWithParser(deltas,
     stopFunction = UntilBestAndXStepsStopFunction(), indentationSensitive = true)
 
@@ -238,9 +279,8 @@ class YamlTest extends AnyFunSuite {
     assert(compilation.diagnostics.head.diagnostic.message.contains(":<value>"))
   }
 
-  // TODO if this test parses too many steps it gets a stack overflow, fix.
   test("big yaml file") {
-    val contents = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val contents = SourceUtils.getResourceFileContents("yaml/AutoScalingMultiAZWithNotifications.yaml")
 
     val compilation = language.compileString(contents)
     assert(compilation.diagnostics.isEmpty)

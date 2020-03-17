@@ -33,6 +33,9 @@ object CheckIndentationGrammar {
   }
 
   def equal[Result](inner: BiGrammar) = new CheckIndentationGrammar(delta => delta == 0, "equal to", inner)
+  def greaterThanOrEqualTo[Result](inner: BiGrammar) = new CheckIndentationGrammar(delta => {
+    delta >= 0
+  }, "greater than or equal to", inner)
   def greaterThan[Result](inner: BiGrammar) = new CheckIndentationGrammar(delta => {
     delta > 0
   }, "greater than", inner)

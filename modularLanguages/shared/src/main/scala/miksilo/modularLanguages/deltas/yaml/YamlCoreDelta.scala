@@ -1,15 +1,16 @@
 package miksilo.modularLanguages.deltas.yaml
 
-import miksilo.modularLanguages.core.bigrammar.grammars.RegexGrammar
+import miksilo.modularLanguages.core.bigrammar.grammars.{Colorize, Delimiter, RegexGrammar}
 import miksilo.modularLanguages.core.bigrammar.{BiGrammar, BiGrammarToParser}
-import miksilo.modularLanguages.core.deltas.DeltaWithGrammar
-import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
+import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithGrammar}
+import miksilo.modularLanguages.core.deltas.grammars.{LanguageGrammars, TriviaGrammar}
 import miksilo.languageServer.core.language.Language
 import miksilo.modularLanguages.core.node.{GrammarKey, NodeField, NodeShape}
 import miksilo.editorParser.parsers.core.TextPointer
 import miksilo.editorParser.parsers.editorParsers.History
 import miksilo.modularLanguages.deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
-import miksilo.modularLanguages.deltas.json.JsonStringLiteralDelta
+import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta.MemberKey
+import miksilo.modularLanguages.deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 
 trait YamlContext
 object FlowIn extends YamlContext{
@@ -94,15 +95,23 @@ object YamlCoreDelta extends DeltaWithGrammar {
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)
     val taggedFlowValue = tag ~ flowValue.as(TagNode) asLabelledNode TaggedNode
     flowValue.addAlternative(taggedFlowValue)
+    val flowInBlock = new WithContext(_ => FlowOut, flowValue)
 
-    val indentationSensitive = create(IndentationSensitiveExpression)
-    val indentationTag = tag ~ CheckIndentationGrammar.greaterThan(indentationSensitive.as(TagNode)) asLabelledNode TaggedNode
-    val blockValue = create(BlockValue, flowValue | indentationSensitive | indentationTag)
+    val blockInBlock = create(IndentationSensitiveExpression)
+    val indentationTag = tag ~ CheckIndentationGrammar.greaterThan(blockInBlock.as(TagNode)) asLabelledNode TaggedNode
+    val blockValue = create(BlockValue, flowInBlock | blockInBlock | indentationTag)
 
     val originalBracketArray = find(ArrayLiteralDelta.Shape).inner
     find(ArrayLiteralDelta.Shape).inner = new WithContext(_ => FlowIn, originalBracketArray)
+    val membersGrammar = find(JsonObjectLiteralDelta.Shape).findAs(JsonObjectLiteralDelta.Members)
+    membersGrammar.set(new WithContext({
+      case FlowOut => FlowIn
+      case BlockKey => FlowKey
+      case FlowIn => FlowIn
+      case FlowKey => FlowKey
+    }, membersGrammar.value))
 
-    grammars.bodyGrammar.inner = blockValue
+    grammars.bodyGrammar.inner = Delimiter("---").option ~> blockValue
   }
 
   override def description = "Adds the YAML language"
