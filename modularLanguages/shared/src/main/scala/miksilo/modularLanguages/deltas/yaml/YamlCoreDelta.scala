@@ -103,13 +103,13 @@ object YamlCoreDelta extends DeltaWithGrammar {
 
     val originalBracketArray = find(ArrayLiteralDelta.Shape).inner
     find(ArrayLiteralDelta.Shape).inner = new WithContext(_ => FlowIn, originalBracketArray)
-    val membersGrammar = find(JsonObjectLiteralDelta.Shape).findAs(JsonObjectLiteralDelta.Members)
-    membersGrammar.set(new WithContext({
+    val jsonObjectGrammar = find(JsonObjectLiteralDelta.Shape)
+    jsonObjectGrammar.inner = new WithContext({
       case FlowOut => FlowIn
       case BlockKey => FlowKey
       case FlowIn => FlowIn
       case FlowKey => FlowKey
-    }, membersGrammar.value))
+    }, jsonObjectGrammar.inner)
 
     grammars.bodyGrammar.inner = Delimiter("---").option ~> blockValue
   }
