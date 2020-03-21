@@ -62,16 +62,16 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     def grow(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): ParseResult[Result] = {
-      val (result: ParseResults[State, Result], delayedResult) = growStrict(recursions, previous)
+      val (result: ParseResults[State, Result], delayedResult) = growReadyResults(recursions, previous)
       result.merge(delayedResult.flatMapReady(prev => grow(recursions, growStep(recursions, prev)), uniform = false))
 
       result
     }
 
     /**
-      * Prevents a stack overflow
+      * Grows ready results without risking a stack overflow
       */
-    def growStrict(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): (ParseResults[State, Result], ParseResults[State, Result]) = {
+    def growReadyResults(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): (ParseResults[State, Result], ParseResults[State, Result]) = {
       var result: ParseResults[State, Result] = SREmpty.empty
       var current = previous
 
