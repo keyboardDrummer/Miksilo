@@ -44,7 +44,7 @@ class PerformanceTest extends AnyFunSuite {
     TestUtils.runPerformanceTest(smallErrorsTargetTime, 300, () => {
       val result = jsonFileParser.parse(program, UntilBestAndXStepsStopFunction())
       assert(result.errors.size == 2)
-      assert(result.resultOption.head.asInstanceOf[JsonObject].members.length == 6)
+      assert(result.resultOption.head.asInstanceOf[JsonObject].members.size == 6)
     })
   }
 
