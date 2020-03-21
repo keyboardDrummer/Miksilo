@@ -50,7 +50,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               val foundRecursion = recursions.nonEmpty
 
               val result = if (foundRecursion)
-                grow(recursions, resultWithoutRecursion, initialResult)
+                grow(recursions, resultWithoutRecursion)
               else
                 resultWithoutRecursion
 
@@ -61,21 +61,32 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
     }
 
-    def grow(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result], initialResults: ParseResult[Result]): ParseResult[Result] = {
+    def grow(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): ParseResult[Result] = {
       // TODO Consider replacing the previous.merge by moving that inside the lambda.
-      previous.merge(previous.flatMapReady(prev => {
+      var result: ParseResult[Result] = SREmpty.empty
+      var current = previous
+
+      while(current.isInstanceOf[SRCons[State, Result]] && current.asInstanceOf[SRCons[State, Result]].head.isInstanceOf[ReadyParseResult[_, Result]]) {
+        result = result.merge(current)
+        current = current.flatMapReady(updateCurrent, uniform = false)
+      }
+
+      result.merge(current.flatMapReady(prev => grow(recursions, updateCurrent(prev)), uniform = false))
+
+      def updateCurrent(prev: ReadyParseResult[State, Result]): ParseResult[Result] = {
         if (prev.history.flawed)
           SREmpty.empty // TODO consider growing this as well
         else {
-          val grown: ParseResult[Result] = recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
+          recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
             val results = recursive.get(singleResult(prev))
             results.flatMapReady(
               ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else SREmpty.empty,
               uniform = false) // TODO maybe set this to uniform = true
-          }).reduce((a,b) => a.merge(b))
-          grow(recursions, grown, initialResults)
+          }).reduce((a, b) => a.merge(b))
         }
-      }, uniform = false)) // The uniform = false here is because applying recursion is similar to a Sequence
+      }
+
+      result
     }
 
     def getPreviousResult(position: TextPointer, fixPointState: FixPointState): Option[ParseResult[Result]] = {
