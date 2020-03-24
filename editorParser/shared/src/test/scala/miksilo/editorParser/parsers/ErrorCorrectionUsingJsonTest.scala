@@ -6,21 +6,23 @@ import miksilo.editorParser.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import miksilo.editorParser.parsers.strings.CommonStringReaderParser
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.collection.immutable.ListMap
+
 class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderParser {
 
   ignore("removes incorrect b at start") {
     val input = """b{"hello":3}"""
-    parseJson(input, List(("hello",3)), 1)
+    parseJson(input, ListMap(("hello" -> 3)), 1)
   }
 
   test("object with single member with number value") {
     val input = """{"person":3}"""
-    parseJson(input, List(("person",3)), 0)
+    parseJson(input, ListMap(("person" -> 3)), 0)
   }
 
   test("object with single member with string value") {
     val input = """{"person":"remy"}"""
-    parseJson(input, List(("person","remy")), 0)
+    parseJson(input, ListMap(("person" -> "remy")), 0)
   }
 
   // Currently the correct result has quite a low score of -10, leading to a huge amount of crap results being tried,
@@ -37,126 +39,127 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
 
   test("object start with nothing else") {
     val input = """{"""
-    parseJson(input, List.empty, 1)
+    parseJson(input, ListMap.empty, 1)
   }
 
   test("object member with only the key") {
     val input = """{"person""""
-    val expectation = List(("""person""", null))
+    val expectation = ListMap(("""person""", null))
     parseJson(input, expectation, 1)
   }
 
   test("object member with no expression") {
     val input = """{"person":"""
-    val expectation = List(("person", null))
+    val expectation = ListMap(("person", null))
     parseJson(input, expectation, 1)
   }
 
   test("object member with only an unfinished key") {
     val input = """{"person"""
-    val expectation = List(("person", null))
+    val expectation = ListMap("person" -> null)
     parseJson(input, expectation, 1)
   }
 
   test("object member with an unfinished value") {
     val input = """{"person":"remy"""
-    parseJson(input, List(("person", "remy")), 1)
+    parseJson(input, ListMap(("person", "remy")), 1)
   }
 
   test("object with a single member and comma") {
     val input = """{"person":3,"""
-    val expectation = List("person" -> 3, "" -> null)
+    val expectation = ListMap("person" -> 3, "" -> null)
     parseJson(input, expectation, 1)
   }
 
   test("object with a single member and half second member") {
     val input = """{"person":3,"second""""
-    val expectation = List(("person", 3), ("second", null))
+    val expectation = ListMap(("person", 3), ("second", null))
     parseJson(input, expectation, 1)
   }
 
   test("real life example missing :value") {
     val input = """{"Resources":{"NotificationTopic":{"Type":"AWS::SNS::Topic","Properties":{"Subscription"}}}}"""
-    val expectation = List(("Resources",List(("NotificationTopic",List(("Type","AWS::SNS::Topic"), ("Properties",List(("Subscription", null))))))))
+    val expectation = ListMap(("Resources", ListMap(("NotificationTopic",
+      ListMap(("Type","AWS::SNS::Topic"), ("Properties", ListMap(("Subscription", null))))))))
     parseJson(input, expectation, 1)
   }
 
   test("real life example 2") {
     val input = """{"Resources":{"NotificationTopic":{"Properties":{"Subsc"""
-    val expectation = List(("Resources",List(("NotificationTopic",List(("Properties",List(("Subsc", null))))))))
+    val expectation = ListMap(("Resources", ListMap(("NotificationTopic", ListMap(("Properties", ListMap(("Subsc", null))))))))
     parseJson(input, expectation, 1)
   }
 
   ignore("garbage before key") {
     val input = """{g"person":"remy"}"""
-    val expectation = List("person" -> "remy")
+    val expectation = ListMap("person" -> "remy")
     parseJson(input, expectation, 1)
   }
 
   ignore("intertwined small garbage and success") {
     val input = """{g"person"hj:nh"remy"}"""
-    val expectation = List("person" -> "remy")
+    val expectation = ListMap("person" -> "remy")
     parseJson(input, expectation, 3, 1000)
   }
 
   // Partially Parse tests start
   test("object with single member with string value, where the colon is missing") {
     val input = """{"person""remy"}"""
-    val expectation = List(("person", "remy"))
+    val expectation = ListMap(("person" -> "remy"))
     parseJson(input, expectation, 1)
   }
 
   test("two members but the first misses a colon") {
     val input = """{"person""remy","friend":"jeroen"}"""
-    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    val expectation = ListMap(("person", "remy"), ("friend", "jeroen"))
     parseJson(input, expectation, 1)
   }
 
   test("two members but the comma is missing") {
     val input = """{"person":"remy""friend":"jeroen"}"""
-    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    val expectation = ListMap(("person", "remy"), ("friend", "jeroen"))
     parseJson(input, expectation, 1)
   }
 
   test("two members both missing colon") {
     val input = """{"person""remy","friend""jeroen"}"""
-    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    val expectation = ListMap(("person", "remy"), ("friend", "jeroen"))
     parseJson(input, expectation, 2)
   }
 
   test("two members, no first colon and comma") {
     val input = """{"person""remy""friend":"jeroen"}"""
-    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    val expectation = ListMap(("person", "remy"), ("friend", "jeroen"))
     parseJson(input, expectation, 2)
   }
 
   test("two members, no colons or comma") {
     val input = """{"person""remy""friend""jeroen"}"""
-    val expectation = List(("person", "remy"), ("friend", "jeroen"))
+    val expectation = ListMap(("person", "remy"), ("friend", "jeroen"))
     parseJson(input, expectation, 3)
   }
 
   test("nested two members without colons/comma") {
     val input = """{"directory"{"person""remy""friend""jeroen"}}"""
-    val expectation = List("directory" -> List("person" -> "remy", "friend" -> "jeroen"))
+    val expectation = ListMap("directory" -> ListMap("person" -> "remy", "friend" -> "jeroen"))
     parseJson(input, expectation, 4)
   }
 
   test("starting brace insertion") {
     val input = """{"person":"remy":"jeroen"}}"""
-    val expectation = List(("person",List(("remy","jeroen"))))
+    val expectation = ListMap(("person", ListMap(("remy","jeroen"))))
     parseJson(input, expectation, 1, 100)
   }
 
   test("starting brace insertion 2") {
     val input = """{"person""remy":"jeroen"}}"""
-    val expectation = List(("person",List(("remy","jeroen"))))
+    val expectation = ListMap(("person", ListMap(("remy","jeroen"))))
     parseJson(input, expectation, 1, 100)
   }
 
   test("starting brace insertion unambiguous") {
     val input = """{"person":"remy":"jeroen","remy":"jeroen"}}"""
-    val expectation = List(("person",List("remy" -> "jeroen", "remy" -> "jeroen")))
+    val expectation = ListMap(("person", ListMap("remy" -> "jeroen", "remy" -> "jeroen")))
     parseJson(input, expectation, 1, 100)
   }
 

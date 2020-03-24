@@ -6,6 +6,8 @@ import miksilo.editorParser.parsers.core.ParseText
 import miksilo.editorParser.parsers.editorParsers.SingleParseResult
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.collection.immutable.ListMap
+
 class IncrementalParsingTest extends AnyFunSuite {
 
   test("inserting between two empty braces works") {
@@ -13,7 +15,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     val change = getChange
     val result1 = change(0,0, input)
     val result3 = change(1,1, """"hello":"bla"""")
-    assertResult(List("hello" -> "bla"))(result3.resultOption.get)
+    assertResult(ListMap("hello" -> "bla"))(result3.resultOption.get)
   }
 
   test("removing works") {
@@ -22,7 +24,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     val change = getChange
     change(0,0, input)
     val result3 = change(1,14, "")
-    assertResult(List())(result3.resultOption.get)
+    assertResult(ListMap())(result3.resultOption.get)
   }
 
   test("partial clearing works") {
@@ -32,7 +34,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(0,0, input)
     change.setText(input2)
     val result = change(2,5, "bar")
-    assertResult(List("bar" -> "bar"))(result.resultOption.get)
+    assertResult(ListMap("bar" -> "bar"))(result.resultOption.get)
   }
 
   test("inserts work") {
@@ -70,7 +72,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(0,0, "[]")
     change(1,1, "{")
     val result = change(2,2, "}")
-    assertResult(Array(List.empty))(result.resultOption.get)
+    assertResult(Array(ListMap.empty))(result.resultOption.get)
   }
 
   test("regression") {
@@ -78,7 +80,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(0,0, "[{}]")
     change(2,3, "")
     val result3 = change(2,2, "}")
-    assertResult(List(List.empty))(result3.resultOption.get)
+    assertResult(List(ListMap.empty))(result3.resultOption.get)
   }
 
   test("regression2") {
@@ -88,7 +90,7 @@ class IncrementalParsingTest extends AnyFunSuite {
     change(2, 2, "}")
     change(2, 3, "")
     val result = change(2,2, "}")
-    assertResult(List(List.empty))(result.resultOption.get)
+    assertResult(List(ListMap.empty))(result.resultOption.get)
   }
 
   test("regression3") {
