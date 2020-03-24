@@ -90,6 +90,7 @@ object ExpressionParser extends CommonStringReaderParser with LeftRecursiveCorre
 
   val let: Parser[Expression] = ("let" ~> variableDeclaration ~< "=" ~ expression ~< "in" ~ expression).
     withSourceRange((range, args) => Let(range, args._1._1, args._1._2, args._2))
+
   val hole = Fallback(RegexParser(" *".r, "spaces").
     withSourceRange((range, _) => ExpressionHole(range)), "expression")
 
