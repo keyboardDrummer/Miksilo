@@ -6,6 +6,8 @@ import miksilo.editorParser.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import miksilo.editorParser.parsers.strings.CommonStringReaderParser
 import org.scalatest.funsuite.AnyFunSuite
 
+import scala.collection.immutable.ListMap
+
 class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderParser {
 
   ignore("removes incorrect b at start") {
@@ -156,7 +158,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
 
   test("starting brace insertion unambiguous") {
     val input = """{"person":"remy":"jeroen","remy":"jeroen"}}"""
-    val expectation = List(("person",List("remy" -> "jeroen", "remy" -> "jeroen")))
+    val expectation = ListMap(("person", ListMap("remy" -> "jeroen", "remy" -> "jeroen")))
     parseJson(input, expectation, 1, 100)
   }
 
