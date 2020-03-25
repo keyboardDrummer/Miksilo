@@ -12,7 +12,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   type ParseResult[+Result] <: CachingParseResult
 
-  override def newParseState(position: TextPointer) = FixPointState(position.offset, Set.empty)
+  override def newParseState(position: TextPointer) = FixPointState(position.offset, 0, Set.empty)
 
   def recursionsFor[Result, SeedResult](parseResults: ParseResults[State, Result], parser: BuiltParser[SeedResult]) = {
     parseResults match {
@@ -43,7 +43,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
             case None =>
               if (newState.callStack.contains(parser))
                 throw new Exception("recursion should have been detected.")
-              val nextState = FixPointState(newState.offset, newState.callStack + parser)
+              val nextState = FixPointState(newState.offset, newState.stackDepth, newState.callStack + parser)
               val initialResult = parser(position, state, nextState)
 
               val RecursionsList(recursions, resultWithoutRecursion) = recursionsFor(initialResult, parser)
@@ -106,14 +106,16 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   override def wrapParser[Result](parser: BuiltParser[Result],
                                   shouldCache: Boolean,
-                                  shouldDetectLeftRecursion: Boolean): BuiltParser[Result] = {
+                                  shouldDetectLeftRecursion: Boolean,
+                                  loopBreaker: Boolean): BuiltParser[Result] = {
       if (!shouldCache && !shouldDetectLeftRecursion) {
-        return parser
-      }
+        parser
+      } else
       if (shouldDetectLeftRecursion) {
-        return new DetectFixPointAndCache[Result](parser)
+        new DetectFixPointAndCache[Result](parser)
+      } else {
+        new CheckCache[Result](parser)
       }
-      new CheckCache[Result](parser)
   }
 
   // TODO: replace List with something that has constant concat operation.
@@ -162,7 +164,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
   }
 
   def moveState(position: TextPointer, state: FixPointState) =
-    if (state.offset == position.offset) state else FixPointState(position.offset, Set.empty)
+    if (state.offset == position.offset) state else FixPointState(position.offset, state.stackDepth, Set.empty)
 
   class CheckCache[Result](parser: BuiltParser[Result]) extends BuiltParser[Result] {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.

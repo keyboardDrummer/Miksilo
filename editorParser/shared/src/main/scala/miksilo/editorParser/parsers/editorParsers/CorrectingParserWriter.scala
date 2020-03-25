@@ -4,8 +4,6 @@ import miksilo.editorParser.parsers.core._
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
-  type ParseResult[+Result] = ParseResults[State, Result]
-
   def findBestParseResult[Result](zero: TextPointer, parser: BuiltParser[Result], mayStop: StopFunction,
                                   metrics: Metrics): SingleParseResult[Result] = {
 
@@ -46,6 +44,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     metrics.measure("Parse time", millisecondsSpent)
     SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
+
 
   def singleResult[Result](parseResult: LazyParseResult[State, Result]) =
     new SRCons(parseResult, 0, SREmpty.empty)
