@@ -14,11 +14,11 @@ trait OptimizingParserWriter extends ParserWriter {
 
   def newParseState(input: TextPointer): FixPointState
 
-  class LoopBreaker[Result](_original: => BuiltParser[Result])
+  class LoopBreaker[Result](_original: => BuiltParser[Result], maxStackDepth: Int)
     extends BuiltParser[Result] {
 
     override def apply(input: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
-      if (fixPointState.stackDepth > 100) {
+      if (fixPointState.stackDepth > maxStackDepth) {
         ParseResults.singleResult[State, Result](new DelayedParseResult(input, SpotlessHistory(100000000),
           () => _original.apply(input, state, FixPointState(fixPointState.offset, 0, fixPointState.callStack))))
       } else {
@@ -33,8 +33,7 @@ trait OptimizingParserWriter extends ParserWriter {
 
   def wrapParser[Result](parser: BuiltParser[Result],
                          shouldCache: Boolean,
-                         shouldDetectLeftRecursion: Boolean,
-                         loopBreaker: Boolean): BuiltParser[Result]
+                         shouldDetectLeftRecursion: Boolean): BuiltParser[Result]
 
   trait BuiltParser[+Result] {
     def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result]
@@ -156,7 +155,7 @@ trait OptimizingParserWriter extends ParserWriter {
                             nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]],
                             recursiveComponents: Seq[Set[ParserBuilder[_]]]) {
 
-    val loopBreakers = recursiveComponents.map(c => c.head).toSet
+    val loopBreakers = recursiveComponents.map(c => (c.head, 200 / c.size)).toMap
 
     def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
@@ -165,11 +164,10 @@ trait OptimizingParserWriter extends ParserWriter {
           cacheOfParses.getOrElseUpdate(_parser, {
             val parser = _parser.asInstanceOf[ParserBuilder[SomeResult]]
             val result = parser.getParser(recursive)
-            val loopBreaker = loopBreakers.contains(parser)
-            val wrappedParser = wrapParser(result, nodesThatShouldCache(parser),
-              nodesThatShouldDetectLeftRecursion(parser), loopBreaker)
+            val loopBreaker = loopBreakers.get(parser)
+            val wrappedParser = wrapParser(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
 
-            if (loopBreaker) new LoopBreaker(wrappedParser) else wrappedParser
+            if (loopBreaker.nonEmpty) new LoopBreaker(wrappedParser, loopBreaker.get) else wrappedParser
           }).asInstanceOf[BuiltParser[SomeResult]]
         }
       }

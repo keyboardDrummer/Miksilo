@@ -104,8 +104,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
   override def wrapParser[Result](parser: BuiltParser[Result],
                                   shouldCache: Boolean,
-                                  shouldDetectLeftRecursion: Boolean,
-                                  loopBreaker: Boolean): BuiltParser[Result] = {
+                                  shouldDetectLeftRecursion: Boolean): BuiltParser[Result] = {
       if (!shouldCache && !shouldDetectLeftRecursion) {
         parser
       } else
