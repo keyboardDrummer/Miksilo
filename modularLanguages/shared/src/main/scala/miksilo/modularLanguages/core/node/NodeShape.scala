@@ -1,5 +1,33 @@
 package miksilo.modularLanguages.core.node
 
+trait TypedShape extends NodeShape {
+
+  type Typed[T <: NodeLike] <: NodeWrapper[T]
+
+  def neww[T <: NodeLike](value: T): Typed[T]
+
+  def from[T <: NodeLike](value: T): Option[Typed[T]] = {
+    if (value.shape == this)
+      Some(neww(value))
+    else
+      None
+  }
+
+  def visit(root: NodeLike)(afterChildren: Typed[root.Self] => Unit = child => {},
+                            beforeChildren: Typed[root.Self] => Boolean = child => true): Unit = {
+    root.visit(afterChild => {
+      if (afterChild.shape == this) {
+        afterChildren(neww(afterChild))
+      }
+    }, beforeChild => {
+      if (beforeChild.shape == this)
+        beforeChildren(neww[root.Self](beforeChild))
+      else
+        true
+    })
+  }
+}
+
 /**
   * Defines a new Node class
   */

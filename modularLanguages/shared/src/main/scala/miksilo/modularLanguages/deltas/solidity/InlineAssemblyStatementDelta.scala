@@ -1,7 +1,7 @@
 package miksilo.modularLanguages.deltas.solidity
 
 import miksilo.modularLanguages.core.bigrammar.{BiGrammar, BiGrammarToParser}
-import miksilo.modularLanguages.core.bigrammar.grammars.{Keyword, StringGrammar, StringLiteral}
+import miksilo.modularLanguages.core.bigrammar.grammars.{Keyword, StringGrammar, StringLiteralGrammar}
 import miksilo.modularLanguages.core.deltas.DeltaWithGrammar
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.NodePath
@@ -35,7 +35,7 @@ object InlineAssemblyStatementDelta extends DeltaWithGrammar with HasConstraints
     val decimalLiteral: BiGrammar = new StringGrammar {
       override def getParserBuilder(keywords: collection.Set[String]) = BiGrammarToParser.floatingPointNumber
     }
-    val assemblyLiteral: BiGrammar = StringLiteral | hexLiteral | decimalLiteral | hexNumber
+    val assemblyLiteral: BiGrammar = StringLiteralGrammar | hexLiteral | decimalLiteral | hexNumber
     assemblyExpression.addAlternative(assemblyLiteral)
     val assemblyLocalDefinition: BiGrammar = "let" ~~ assemblyIdentifierOrList ~ (":=" ~> assemblyExpression).option
     val assemblyAssignment: BiGrammar = assemblyIdentifierOrList ~ ":=" ~ assemblyExpression
@@ -49,7 +49,7 @@ object InlineAssemblyStatementDelta extends DeltaWithGrammar with HasConstraints
       assemblyLocalDefinition |
       assemblyAssignment |
       assemblyStackAssignment | labelDefinition |
-      breakKeyword | continueKeyword | number | StringLiteral | hexLiteral)
+      breakKeyword | continueKeyword | number | StringLiteralGrammar | hexLiteral)
     val assemblyBlock = "{" ~> assemblyItem.manyVertical ~< "}"
     val subAssembly: BiGrammar = "assembly" ~~ identifier ~~ assemblyBlock
     assemblyItem.addAlternative(subAssembly)
@@ -72,7 +72,7 @@ object InlineAssemblyStatementDelta extends DeltaWithGrammar with HasConstraints
     assemblyItem.addAlternative(assemblySwitch)
 
     assemblyItem.addAlternative(assemblyBlock)
-    val grammar = "assembly" ~~ StringLiteral.option ~ assemblyBlock asNode Shape
+    val grammar = "assembly" ~~ StringLiteralGrammar.option ~ assemblyBlock asNode Shape
     find(StatementDelta.Grammar).addAlternative(grammar)
   }
 

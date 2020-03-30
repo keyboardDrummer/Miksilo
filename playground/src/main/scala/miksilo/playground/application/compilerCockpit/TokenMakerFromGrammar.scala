@@ -38,7 +38,7 @@ class TokenMakerFromGrammar(grammar: BiGrammar) extends AbstractTokenMaker
       case _: Identifier => ident.filter(s => !keywords.contains(s)) ^^ (s => MyToken(TokenTypes.IDENTIFIER, s))
       case NumberGrammar =>
         wholeNumber ^^ (s => MyToken(TokenTypes.LITERAL_NUMBER_DECIMAL_INT, s)) //TODO should support other numbers as well.
-      case StringLiteral =>
+      case StringLiteralGrammar =>
         stringLiteral ^^ (s => MyToken(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, s))
       case Colorize(inner, textMateScope) =>
         val theRegex = GenerateTextMateGrammar.grammarToRegex(BiGrammarToParser)(BiGrammarToParser.toParserBuilder(inner)).get.r

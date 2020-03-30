@@ -1,15 +1,14 @@
 package miksilo.modularLanguages.deltas.yaml
 
-import miksilo.modularLanguages.core.bigrammar.grammars.{Colorize, Delimiter, RegexGrammar}
-import miksilo.modularLanguages.core.bigrammar.{BiGrammar, BiGrammarToParser}
-import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithGrammar}
-import miksilo.modularLanguages.core.deltas.grammars.{LanguageGrammars, TriviaGrammar}
-import miksilo.languageServer.core.language.Language
-import miksilo.modularLanguages.core.node.{GrammarKey, NodeField, NodeShape}
 import miksilo.editorParser.parsers.core.TextPointer
 import miksilo.editorParser.parsers.editorParsers.History
+import miksilo.languageServer.core.language.Language
+import miksilo.modularLanguages.core.bigrammar.grammars.{Delimiter, RegexGrammar}
+import miksilo.modularLanguages.core.bigrammar.{BiGrammar, BiGrammarToParser}
+import miksilo.modularLanguages.core.deltas.DeltaWithGrammar
+import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
+import miksilo.modularLanguages.core.node.{GrammarKey, NodeField, NodeShape}
 import miksilo.modularLanguages.deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
-import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta.MemberKey
 import miksilo.modularLanguages.deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 
 trait YamlContext

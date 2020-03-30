@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.core.bigrammar
 
-import miksilo.modularLanguages.core.bigrammar.grammars.{BiFailure, BiSequence, Delimiter, Identifier, Keyword, NumberGrammar, Print, RegexGrammar, SequenceBijective, StringLiteral, ValueGrammar, ValueMapGrammar}
+import miksilo.modularLanguages.core.bigrammar.grammars.{BiFailure, BiSequence, Delimiter, Identifier, Keyword, NumberGrammar, Print, RegexGrammar, SequenceBijective, StringLiteralGrammar, ValueGrammar, ValueMapGrammar}
 import miksilo.editorParser.document.{Document, WhiteSpace}
 import miksilo.editorParser.responsiveDocument.ResponsiveDocument
 
@@ -16,7 +16,7 @@ trait BiGrammarWriter {
   def identifier = getIdentifier()
   def getIdentifier(verifyWhenPrinting: Boolean = false): BiGrammar = Identifier(verifyWhenPrinting)
 
-  def stringLiteral: BiGrammar = StringLiteral
+  def stringLiteral: BiGrammar = StringLiteralGrammar
 
   def number: BiGrammar = NumberGrammar
 

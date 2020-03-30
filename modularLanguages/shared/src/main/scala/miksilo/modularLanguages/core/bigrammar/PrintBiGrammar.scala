@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.core.bigrammar
 
-import miksilo.modularLanguages.core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, Delimiter, Identifier, Keyword, Labelled, Many, ManyHorizontal, ManyVertical, MapGrammar, NumberGrammar, ParseWhiteSpace, Print, RegexGrammar, StringLiteral, ValueGrammar}
+import miksilo.modularLanguages.core.bigrammar.grammars.{BiChoice, BiFailure, BiSequence, CustomGrammar, Delimiter, Identifier, Keyword, Labelled, Many, ManyHorizontal, ManyVertical, MapGrammar, NumberGrammar, ParseWhiteSpace, Print, RegexGrammar, StringLiteralGrammar, ValueGrammar}
 import miksilo.editorParser.document.Empty
 import miksilo.modularLanguages.core.node.GrammarKey
 import miksilo.editorParser.responsiveDocument.ResponsiveDocument
@@ -45,7 +45,7 @@ object PrintBiGrammar {
     case BiFailure(message) => message
     case labelled: Labelled => grammarKeyToName(labelled.name)
     case NumberGrammar => "number"
-    case StringLiteral => "string"
+    case StringLiteralGrammar => "string"
     case print: Print => Empty //("print(": ResponsiveDocument) ~ print.document ~ ")"
     case map: MapGrammar[_, _] => toDocumentInner(map.inner) //("Map": ResponsiveDocument) ~ toDocumentInner(map.inner).inParenthesis
     case ParseWhiteSpace => ""
