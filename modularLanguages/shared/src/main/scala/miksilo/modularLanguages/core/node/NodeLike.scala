@@ -33,8 +33,8 @@ trait NodeLike {
     })
   }
 
-  def visit(afterChildren: (Self) => Unit = _ => {},
-            beforeChildren: (Self) => Boolean = _ => true,
+  def visit(afterChildren: Self => Unit = _ => {},
+            beforeChildren: Self => Boolean = _ => true,
             visited: mutable.Set[Self] = new mutable.HashSet[Self]()): Unit = {
 
     visitNode(this.asInstanceOf[Self])

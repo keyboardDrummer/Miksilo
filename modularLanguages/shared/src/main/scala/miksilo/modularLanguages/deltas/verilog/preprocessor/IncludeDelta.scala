@@ -1,7 +1,7 @@
 package miksilo.modularLanguages.deltas.verilog.preprocessor
 
 import miksilo.modularLanguages.core.bigrammar.BiGrammarToParser._
-import miksilo.modularLanguages.core.bigrammar.grammars.StringLiteral
+import miksilo.modularLanguages.core.bigrammar.grammars.StringLiteralGrammar
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.{NodePath, NodeSequenceElement}
 import miksilo.modularLanguages.core.deltas.{Contract, ParseUsingTextualGrammar, Property}
@@ -50,7 +50,7 @@ object IncludeDelta extends DirectiveDelta {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
 
-    val grammar = "include" ~~> StringLiteral.as(FileName).asNode(Shape)
+    val grammar = "include" ~~> StringLiteralGrammar.as(FileName).asNode(Shape)
     find(PreprocessorDelta.BodyGrammar).addAlternative(grammar)
   }
 

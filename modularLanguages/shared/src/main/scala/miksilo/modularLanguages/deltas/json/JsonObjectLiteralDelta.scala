@@ -12,6 +12,7 @@ import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.languageServer.core.smarts.types.objects.Type
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, ExpressionInstance}
+import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta.ObjectLiteralMember
 import miksilo.modularLanguages.deltas.json.JsonStringLiteralDelta.{dropPrefix, stringInnerRegex}
 
 case class DuplicateObjectLiteralKeys(duplicates: Seq[String]) extends BadInputException
@@ -42,9 +43,14 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
     expressionGrammar.addAlternative(grammar)
   }
 
-  object MemberShape extends NodeShape {
+  object MemberShape extends TypedShape {
+    type Typed[T <: NodeLike] = ObjectLiteralMember[T]
+
+    override def neww[T <: NodeLike](value: T) = ObjectLiteralMember(value)
+
     override def toString = "Member"
   }
+
   object MemberKey extends NodeField {
     override def toString = "Key"
   }
@@ -55,9 +61,15 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
   object Members extends NodeField {
     override def toString = "Member"
   }
-  object Shape extends NodeShape {
+
+  object Shape extends TypedShape {
+    type Typed[T <: NodeLike] = ObjectLiteral[T]
+
+    override def neww[T <: NodeLike](value: T): ObjectLiteral[T] = ObjectLiteral(value)
+
     override def toString = "Object"
   }
+
   override def shape: NodeShape = Shape
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {

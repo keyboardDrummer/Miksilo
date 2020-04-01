@@ -1,14 +1,14 @@
 package miksilo.modularLanguages.deltas.expression
 
-import miksilo.modularLanguages.core.bigrammar.grammars.StringLiteral
-import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithGrammar}
-import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
-import miksilo.modularLanguages.core.deltas.path.NodePath
-import miksilo.modularLanguages.core.node.{Node, NodeField, NodeShape}
 import miksilo.languageServer.core.language.{Compilation, Language}
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.languageServer.core.smarts.types.objects.{PrimitiveType, Type}
+import miksilo.modularLanguages.core.bigrammar.grammars.StringLiteralGrammar
+import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
+import miksilo.modularLanguages.core.deltas.path.NodePath
+import miksilo.modularLanguages.core.deltas.{Contract, DeltaWithGrammar}
+import miksilo.modularLanguages.core.node._
 
 object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
@@ -20,17 +20,21 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
-    val inner = StringLiteral
+    val inner = StringLiteralGrammar
     val grammar = inner.as(Value).asLabelledNode(Shape)
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(grammar)
   }
 
-  def literal(value: String) = new Node(Shape, Value -> value)
+  object Shape extends TypedShape {
+    type Typed[T <: NodeLike] = StringLiteral[T]
 
-  def getValue(literal: Node): String = literal(Value).asInstanceOf[String]
+    override def neww[T <: NodeLike](value: T) = new StringLiteral(value)
 
-  object Shape extends NodeShape {
     override def toString = "String"
+  }
+
+  implicit class StringLiteral[T <: NodeLike](val node: T) extends NodeWrapper[T] {
+    def value: String = node(Value).asInstanceOf[String]
   }
 
   object Value extends NodeField {

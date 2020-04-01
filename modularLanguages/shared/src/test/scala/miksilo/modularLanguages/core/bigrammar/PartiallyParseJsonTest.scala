@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.core.bigrammar
 
-import miksilo.modularLanguages.core.bigrammar.grammars.{BiFallback, Labelled, NumberGrammar, StringLiteral}
+import miksilo.modularLanguages.core.bigrammar.grammars.{BiFallback, Labelled, NumberGrammar, StringLiteralGrammar}
 import miksilo.modularLanguages.core.node.GrammarKey
 import miksilo.editorParser.parsers.editorParsers.{SingleParseResult, UntilBestAndXStepsStopFunction}
 import org.scalatest.funsuite.AnyFunSuite
@@ -11,12 +11,12 @@ class PartiallyParseJsonTest extends AnyFunSuite with DefaultBiGrammarWriter {
 
   object Json extends GrammarKey
   val jsonGrammar = new Labelled(Json, new BiFallback(UnknownExpression, "value"))
-  private val memberParser: BiGrammar = StringLiteral ~< ":" ~ jsonGrammar
+  private val memberParser: BiGrammar = StringLiteralGrammar ~< ":" ~ jsonGrammar
   private val objectParser: BiGrammar = "{" ~> memberParser.manySeparated(",") ~< "}"
   object UnknownExpression {
     override def toString = "<unknown>"
   }
-  jsonGrammar.addAlternative(StringLiteral | objectParser | NumberGrammar)
+  jsonGrammar.addAlternative(StringLiteralGrammar | objectParser | NumberGrammar)
   val jsonParser = toParserBuilder(jsonGrammar)
 
   test("object with single member with number value") {

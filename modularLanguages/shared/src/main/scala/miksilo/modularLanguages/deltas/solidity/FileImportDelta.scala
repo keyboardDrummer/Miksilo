@@ -1,6 +1,6 @@
 package miksilo.modularLanguages.deltas.solidity
 
-import miksilo.modularLanguages.core.bigrammar.grammars.StringLiteral
+import miksilo.modularLanguages.core.bigrammar.grammars.StringLiteralGrammar
 import miksilo.modularLanguages.core.deltas.DeltaWithGrammar
 import miksilo.modularLanguages.core.deltas.grammars.LanguageGrammars
 import miksilo.modularLanguages.core.deltas.path.NodePath
@@ -35,7 +35,7 @@ object FileImportDelta extends DeltaWithGrammar with HasConstraintsDelta {
   override def transformGrammars(grammars: LanguageGrammars, language: Language): Unit = {
     import grammars._
     val newName = create(NewName, (printSpace ~> "as" ~~> identifier).option.as(NewName))
-    val simpleImport = "import" ~~ StringLiteral.as(FileName) ~~ (printSpace ~> "as" ~~> identifier).option.as(NewName) ~ ";" asNode Shape
+    val simpleImport = "import" ~~ StringLiteralGrammar.as(FileName) ~~ (printSpace ~> "as" ~~> identifier).option.as(NewName) ~ ";" asNode Shape
     find(FileWithMembersDelta.Members).addAlternative(simpleImport)
   }
 
