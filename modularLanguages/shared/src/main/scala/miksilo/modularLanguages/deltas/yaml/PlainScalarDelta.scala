@@ -55,7 +55,7 @@ object PlainScalarDelta extends DeltaWithGrammar {
       case _ => FlowOut
     }, plainStyleMultiLineString | plainStyleSingleLineString)
     val plainScalar: BiGrammar = plainScalarNaked.
-      as(JsonStringLiteralDelta.Value).asLabelledNode(StringLiteralDelta.Shape)
+      as(StringLiteralDelta.Value).asLabelledNode(StringLiteralDelta.Shape)
 
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(plainScalar)
 

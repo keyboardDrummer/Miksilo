@@ -28,7 +28,9 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   object Shape extends TypedShape {
     type Typed[T <: NodeLike] = StringLiteral[T]
 
-    override def neww[T <: NodeLike](value: T) = new StringLiteral(value)
+    def neww(value: String) = this.create(Value -> value)
+
+    override def wrap[T <: NodeLike](value: T) = new StringLiteral(value)
 
     override def toString = "String"
   }

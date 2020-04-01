@@ -5,7 +5,7 @@ import miksilo.modularLanguages.core.bigrammar.SelectGrammar
 import miksilo.modularLanguages.core.deltas.path.{ChildPath, PathRoot}
 import miksilo.languageServer.core.language.Compilation
 import miksilo.editorParser.parsers.editorParsers.UntilBestAndXStepsStopFunction
-import miksilo.modularLanguages.deltas.expression.{ArrayLiteralDelta, ExpressionDelta}
+import miksilo.modularLanguages.deltas.expression.{ArrayLiteralDelta, ExpressionDelta, StringLiteralDelta}
 import miksilo.modularLanguages.deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import miksilo.editorParser.SourceUtils
 import miksilo.modularLanguages.util.TestLanguageBuilder
@@ -214,7 +214,7 @@ class ModularYamlTest extends AnyFunSuite {
 
   private def replaceDefaultWithDefaultString(compilation: Compilation): Unit = {
     compilation.program.asInstanceOf[PathRoot].visitShape(ExpressionDelta.DefaultShape,
-      p => p.asInstanceOf[ChildPath].replaceWith(JsonStringLiteralDelta.neww("default")))
+      p => p.asInstanceOf[ChildPath].replaceWith(StringLiteralDelta.Shape.neww("default")))
   }
 
   test("tagged block key") {

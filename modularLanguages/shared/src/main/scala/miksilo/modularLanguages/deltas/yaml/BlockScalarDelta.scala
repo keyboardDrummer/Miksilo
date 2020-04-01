@@ -27,7 +27,7 @@ object BlockScalarDelta extends DeltaWithGrammar {
     val literal = new WithIndentationGrammar(("|" | ">" ) ~ chompingIndicator ~ lineSeparator) ~> lines
 
     find(IndentationSensitiveExpression).addAlternative(literal.
-      as(JsonStringLiteralDelta.Value).asLabelledNode(StringLiteralDelta.Shape))
+      as(StringLiteralDelta.Value).asLabelledNode(StringLiteralDelta.Shape))
   }
 
   override def description = "Introduce literal and folded scalar styles"

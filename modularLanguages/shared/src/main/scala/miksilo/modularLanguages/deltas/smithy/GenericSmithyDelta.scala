@@ -15,7 +15,7 @@ object GenericSmithyDelta extends DeltaWithGrammar {
 
     find(JsonObjectLiteralDelta.MemberKey).addAlternative(identifier.as(MemberKey))
 
-    val plainString = identifier.as(JsonStringLiteralDelta.Value) asNode StringLiteralDelta.Shape
+    val plainString = identifier.as(StringLiteralDelta.Value) asNode StringLiteralDelta.Shape
     find(ExpressionDelta.FirstPrecedenceGrammar).addAlternative(plainString)
 
     create(TextGrammar, plainString | find(StringLiteralDelta.Shape) | find(SingleQuotedStringLiteralDelta.Grammar))

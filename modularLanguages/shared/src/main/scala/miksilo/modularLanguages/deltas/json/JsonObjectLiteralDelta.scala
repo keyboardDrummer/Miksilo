@@ -46,7 +46,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
   object MemberShape extends TypedShape {
     type Typed[T <: NodeLike] = ObjectLiteralMember[T]
 
-    override def neww[T <: NodeLike](value: T) = ObjectLiteralMember(value)
+    override def wrap[T <: NodeLike](value: T) = ObjectLiteralMember(value)
 
     override def toString = "Member"
   }
@@ -65,7 +65,7 @@ object JsonObjectLiteralDelta extends DeltaWithGrammar with ExpressionInstance w
   object Shape extends TypedShape {
     type Typed[T <: NodeLike] = ObjectLiteral[T]
 
-    override def neww[T <: NodeLike](value: T): ObjectLiteral[T] = ObjectLiteral(value)
+    override def wrap[T <: NodeLike](value: T): ObjectLiteral[T] = ObjectLiteral(value)
 
     override def toString = "Object"
   }
