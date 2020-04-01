@@ -155,7 +155,7 @@ trait OptimizingParserWriter extends ParserWriter {
                             nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]],
                             recursiveComponents: Seq[Set[ParserBuilder[_]]]) {
 
-    val loopBreakers = recursiveComponents.map(c => (c.head, 200 / c.size)).toMap
+    val loopBreakers = recursiveComponents.map(c => (c.head, 300)).toMap
 
     def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
