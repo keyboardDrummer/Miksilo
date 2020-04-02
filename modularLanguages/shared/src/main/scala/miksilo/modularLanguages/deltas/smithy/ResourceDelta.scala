@@ -53,7 +53,7 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
           identifierMember.value
           val shapeReference = identifierMember.value
           if (shapeReference.shape == StringLiteralDelta.Shape) {
-            builder.resolveToType(shapeReference.getField(JsonStringLiteralDelta.Value), parentScope,
+            builder.resolveToType(shapeReference.getField(StringLiteralDelta.Value), parentScope,
               RelativeShapeIdentifierDelta.shapeType)
           }
         })
@@ -64,7 +64,7 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
       val operationOption = resource.body.get(lifeCycleOperation)
       operationOption.foreach(operation => {
         if (operation.shape == StringLiteralDelta.Shape) {
-          builder.resolveToType(operation.getField(JsonStringLiteralDelta.Value), parentScope,
+          builder.resolveToType(operation.getField(StringLiteralDelta.Value), parentScope,
             OperationDelta.operationType)
         }
       })
@@ -78,7 +78,7 @@ object ResourceDelta extends DeltaWithGrammar with HasConstraintsDelta {
         val resourcesArray: ArrayLiteral[NodePath] = resources
         resourcesArray.members.foreach(resource => {
           if (resource.shape == StringLiteralDelta.Shape) {
-            builder.resolveToType(resource.getField(JsonStringLiteralDelta.Value), parentScope, resourceType)
+            builder.resolveToType(resource.getField(StringLiteralDelta.Value), parentScope, resourceType)
           }
         })
       }

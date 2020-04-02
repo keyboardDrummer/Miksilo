@@ -56,7 +56,7 @@ object ServiceDelta extends DeltaWithGrammar with HasConstraintsDelta {
         val resourcesArray: ArrayLiteral[NodePath] = resources
         resourcesArray.members.foreach(resource => {
           if (resource.shape == StringLiteralDelta.Shape) {
-            builder.resolveToType(resource.getField(JsonStringLiteralDelta.Value), parentScope, OperationDelta.operationType)
+            builder.resolveToType(resource.getField(StringLiteralDelta.Value), parentScope, OperationDelta.operationType)
           }
         })
       }

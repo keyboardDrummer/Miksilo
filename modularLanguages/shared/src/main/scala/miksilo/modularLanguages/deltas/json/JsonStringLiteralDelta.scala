@@ -11,6 +11,7 @@ import miksilo.editorParser.parsers.editorParsers.{OffsetPointerRange, Position,
 import miksilo.languageServer.core.smarts.ConstraintBuilder
 import miksilo.languageServer.core.smarts.scopes.objects.Scope
 import miksilo.languageServer.core.smarts.types.objects.{PrimitiveType, Type}
+import miksilo.modularLanguages.deltas.expression.StringLiteralDelta.Value
 import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, ExpressionInstance, StringLiteralDelta}
 
 import scala.util.matching.Regex
@@ -41,14 +42,6 @@ object JsonStringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
     import grammars._
     regex.map[String, String](r => r.substring(prefix.length), s => { prefix + s }).
       as(field, (from, until) => OffsetPointerRange(from.drop(prefix.length), until))
-  }
-
-  def neww(value: String) = new Node(Shape, Value -> value)
-
-  def getValue(literal: Node): String = literal(Value).asInstanceOf[String]
-
-  object Value extends NodeField {
-    override def toString = "Value"
   }
 
   override def constraints(compilation: Compilation, builder: ConstraintBuilder, expression: NodePath, _type: Type, parentScope: Scope): Unit = {

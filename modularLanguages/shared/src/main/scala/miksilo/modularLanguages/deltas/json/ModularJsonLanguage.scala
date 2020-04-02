@@ -89,7 +89,7 @@ object JsonPrinter {
           add(member.value)
 
         case StringLiteralDelta.Shape =>
-          val regex = JsonStringLiteralDelta.getValue(node)
+          val regex = StringLiteralDelta.shape.wrap(node).value
           builder.append(stringToStringLiteral(regex))
 
         case ExpressionDelta.DefaultShape =>

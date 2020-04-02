@@ -4,11 +4,11 @@ trait TypedShape extends NodeShape {
 
   type Typed[T <: NodeLike] <: NodeWrapper[T]
 
-  def neww[T <: NodeLike](value: T): Typed[T]
+  def wrap[T <: NodeLike](value: T): Typed[T]
 
   def from[T <: NodeLike](value: T): Option[Typed[T]] = {
     if (value.shape == this)
-      Some(neww(value))
+      Some(wrap(value))
     else
       None
   }
@@ -17,11 +17,11 @@ trait TypedShape extends NodeShape {
                             beforeChildren: Typed[root.Self] => Boolean = child => true): Unit = {
     root.visit(afterChild => {
       if (afterChild.shape == this) {
-        afterChildren(neww(afterChild))
+        afterChildren(wrap(afterChild))
       }
     }, beforeChild => {
       if (beforeChild.shape == this)
-        beforeChildren(neww[root.Self](beforeChild))
+        beforeChildren(wrap[root.Self](beforeChild))
       else
         true
     })

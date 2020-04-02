@@ -5,7 +5,7 @@ import miksilo.modularLanguages.core.deltas.path.{NodePath, PathRoot}
 import miksilo.modularLanguages.core.node.Node
 import miksilo.editorParser.parsers.core.ParseText
 import miksilo.editorParser.parsers.editorParsers.{Position, UntilBestAndXStepsStopFunction}
-import miksilo.modularLanguages.deltas.expression.ExpressionDelta
+import miksilo.modularLanguages.deltas.expression.{ExpressionDelta, StringLiteralDelta}
 import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta.{MemberValue, ObjectLiteral}
 import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
@@ -16,7 +16,7 @@ class JsonTest extends AnyFunSuite {
   ignore("removes incorrect b at start") {
     val input = """b{"hello":"jo"}"""
     val compilation = language.compileString(input)
-    val expectedProgram = JsonObjectLiteralDelta.neww(Map("hello" -> JsonStringLiteralDelta.neww("jo")))
+    val expectedProgram = JsonObjectLiteralDelta.neww(Map("hello" -> StringLiteralDelta.Shape.neww("jo")))
     assertResult(expectedProgram)(compilation.program.asInstanceOf[PathRoot].current)
     assert(compilation.diagnostics.size == 1)
   }
@@ -24,7 +24,7 @@ class JsonTest extends AnyFunSuite {
   ignore("removes incorrect garbage at start") {
     val input = """bdddwd{"hello":"jo"}"""
     val compilation = language.compileString(input)
-    val expectedProgram = JsonObjectLiteralDelta.neww(Map("hello" -> JsonStringLiteralDelta.neww("jo")))
+    val expectedProgram = JsonObjectLiteralDelta.neww(Map("hello" -> StringLiteralDelta.Shape.neww("jo")))
     assertResult(expectedProgram)(compilation.program.asInstanceOf[PathRoot].current)
     assert(compilation.diagnostics.size == 1)
   }
@@ -77,7 +77,7 @@ class JsonTest extends AnyFunSuite {
     assertResult(Position(1, 20))(sourceRange.end)
 
     val stringValue = member.value
-    val stringLocation = stringValue.getField(JsonStringLiteralDelta.Value).rangeOption.get.toSourceRange
+    val stringLocation = stringValue.getField(StringLiteralDelta.Value).rangeOption.get.toSourceRange
     assertResult(Position(1, 8))(stringLocation.start)
     assertResult(Position(1, 19))(stringLocation.end)
   }
