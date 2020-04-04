@@ -159,6 +159,27 @@ class LeftRecursionTest extends AnyFunSuite with CommonParserWriter
     assert(result.errors.isEmpty)
   }
 
+  test("figure eight deep right") {
+    lazy val a: Parser[Any] = new Lazy(literal("a") ~ (b | c)) | succeed(())
+    lazy val b: Parser[Any] = new Lazy(literal("b") ~ (a | c)) | succeed(())
+    lazy val c: Parser[Any] = new Lazy(literal("c") ~ (a | b)) | succeed(())
+    val start = a | b | c
+
+    val parser = start.getWholeInputParser()
+
+    val input = new String(Array.fill(1000)("ab").flatten)
+    val result = parser.parse(input)
+    assert(result.errors.isEmpty)
+
+    val input2 = new String(Array.fill(1000)("bc").flatten)
+    val result2 = parser.parse(input2)
+    assert(result2.errors.isEmpty)
+
+    val input3 = new String(Array.fill(1000)("ac").flatten)
+    val result3 = parser.parse(input3)
+    assert(result3.errors.isEmpty)
+  }
+
   def attempts(steps: Int): () => Boolean = {
     var stepsTaken = 0
     () => {
