@@ -22,14 +22,6 @@ const languages: Array<LanguageConfiguration> = [
          miksiloName: "java"
     },
     {
-         vscodeName: "cloudFormation",
-         miksiloName: "cloudFormation"
-    },
-    {
-         vscodeName: "yamlCloudFormation",
-         miksiloName: "yamlCloudFormation"
-    },
-    {
          vscodeName: "smithy",
          miksiloName: "smithy"
     },

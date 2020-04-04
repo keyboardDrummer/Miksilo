@@ -18,9 +18,7 @@
 	"activationEvents": [
 		"onLanguage:systemverilog",
 		"onLanguage:solidity",
-		"onLanguage:cloudFormation",
 		"onLanguage:java",
-		"onLanguage:yamlCloudFormation",
 		"onLanguage:smithy",
 		"onLanguage:miksiloJson",
 		"onLanguage:miksiloYaml"

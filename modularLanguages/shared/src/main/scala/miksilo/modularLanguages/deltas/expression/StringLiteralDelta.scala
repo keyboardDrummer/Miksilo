@@ -36,7 +36,7 @@ object StringLiteralDelta extends DeltaWithGrammar with ExpressionInstance {
   }
 
   implicit class StringLiteral[T <: NodeLike](val node: T) extends NodeWrapper[T] {
-    def value: String = node(Value).asInstanceOf[String]
+    def value: String = node.getValue(Value).asInstanceOf[String]
   }
 
   object Value extends NodeField {
