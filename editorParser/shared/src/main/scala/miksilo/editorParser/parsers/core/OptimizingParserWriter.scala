@@ -19,7 +19,7 @@ trait OptimizingParserWriter extends ParserWriter {
 
     override def apply(input: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
       if (fixPointState.stackDepth > maxStackDepth) {
-        ParseResults.singleResult[State, Result](new DelayedParseResult(input, SpotlessHistory(100000000),
+        ParseResults.singleResult[State, Result](new DelayedParseResult(input, SpotlessHistory(Int.MaxValue),
           () => _original.apply(input, state, FixPointState(fixPointState.offset, 0, fixPointState.callStack))))
       } else {
         _original.apply(input, state, FixPointState(fixPointState.offset, fixPointState.stackDepth + 1, fixPointState.callStack))
@@ -155,7 +155,7 @@ trait OptimizingParserWriter extends ParserWriter {
                             nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]],
                             recursiveComponents: Seq[Set[ParserBuilder[_]]]) {
 
-    val loopBreakers = recursiveComponents.map(c => (c.head, 300)).toMap
+    val loopBreakers = recursiveComponents.map(c => (c.head, 100)).toMap
 
     def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
@@ -167,7 +167,7 @@ trait OptimizingParserWriter extends ParserWriter {
             val loopBreaker = loopBreakers.get(parser)
             val wrappedParser = wrapParser(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
 
-            if (loopBreaker.nonEmpty) new LoopBreaker(wrappedParser, loopBreaker.get) else wrappedParser
+            new LoopBreaker(wrappedParser, 500)
           }).asInstanceOf[BuiltParser[SomeResult]]
         }
       }
