@@ -285,4 +285,11 @@ class ModularYamlTest extends AnyFunSuite {
     val compilation = language.compileString(contents)
     assert(compilation.diagnostics.isEmpty)
   }
+
+  test("large recursion yaml") {
+    val contents = SourceUtils.getResourceFileContents("yaml/LargeRecursionyaml")
+
+    val compilation = language.compileString(contents)
+    assert(compilation.diagnostics.isEmpty)
+  }
 }

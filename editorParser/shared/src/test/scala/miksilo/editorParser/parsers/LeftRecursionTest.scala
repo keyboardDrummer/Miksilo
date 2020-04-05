@@ -180,6 +180,13 @@ class LeftRecursionTest extends AnyFunSuite with CommonParserWriter
     assert(result3.errors.isEmpty)
   }
 
+  test("some separated recursion") {
+    val input = new String(Array.fill(5000)("a,").flatten.concat(Array('a')))
+    lazy val parser: Parser[Any] = literal("a").someSeparated(",", "a")
+    val result = parser.getWholeInputParser().parse(input)
+    assert(result.errors.isEmpty)
+  }
+
   def attempts(steps: Int): () => Boolean = {
     var stepsTaken = 0
     () => {

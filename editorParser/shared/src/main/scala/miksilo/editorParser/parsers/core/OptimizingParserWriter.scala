@@ -14,15 +14,15 @@ trait OptimizingParserWriter extends ParserWriter {
 
   def newParseState(input: TextPointer): FixPointState
 
-  class LoopBreaker[Result](_original: => BuiltParser[Result], maxStackDepth: Int)
+  class LoopBreaker[Result](_original: => BuiltParser[Result], cycleLength: Int)
     extends BuiltParser[Result] {
 
     override def apply(input: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
-      if (fixPointState.stackDepth > maxStackDepth) {
-        ParseResults.singleResult[State, Result](new DelayedParseResult(input, SpotlessHistory(Int.MaxValue),
+      if (fixPointState.stackDepth > 100) {
+        ParseResults.singleResult[State, Result](new DelayedParseResult(input, SpotlessHistory(Int.MaxValue / 2),
           () => _original.apply(input, state, FixPointState(fixPointState.offset, 0, fixPointState.callStack))))
       } else {
-        _original.apply(input, state, FixPointState(fixPointState.offset, fixPointState.stackDepth + 1, fixPointState.callStack))
+        _original.apply(input, state, FixPointState(fixPointState.offset, fixPointState.stackDepth + cycleLength, fixPointState.callStack))
       }
     }
   }
@@ -121,6 +121,7 @@ trait OptimizingParserWriter extends ParserWriter {
     var nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]] = Set.empty
     val mustConsumeCache = new ConsumeCache
 
+    var loopBreakers = Map.empty[ParserBuilder[_], Int]
     val reverseGraph = mutable.HashMap.empty[ParserBuilder[_], mutable.Set[ParserBuilder[_]]]
     GraphAlgorithms.depthFirst[ParserBuilder[_]](root,
       node => {
@@ -134,28 +135,31 @@ trait OptimizingParserWriter extends ParserWriter {
         case _ =>
       },
       cycle => {
-          nodesThatShouldDetectLeftRecursion += cycle.head
+        nodesThatShouldDetectLeftRecursion += cycle.head
+        val backNode = cycle.head
+        val existingValue = loopBreakers.getOrElse(backNode, 0)
+        val loopLength = cycle.length + 2 // + 2 because we're inserting some recursion detection and the loop breaker
+        if (existingValue < loopLength)
+          loopBreakers += (backNode -> loopLength)
       })
 
-    val leftComponents = StronglyConnectedComponents.computeComponents[ParserBuilder[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
+    //val leftComponents = StronglyConnectedComponents.computeComponents[ParserBuilder[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
     val components = StronglyConnectedComponents.computeComponents[ParserBuilder[_]](reverseGraph.keys.toSet, node => node.children.toSet)
     val recursiveComponents: Seq[Set[ParserBuilder[_]]] = components.filter(c => c.size > 1)
-    val nodesInCycle: Set[ParserBuilder[_]] = leftComponents.filter(c => c.size > 1).flatten.toSet
+    //val nodesInCycle: Set[ParserBuilder[_]] = leftComponents.filter(c => c.size > 1).flatten.toSet
 
     val nodesWithMultipleIncomingEdges: Set[ParserBuilder[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
-    val nodesWithIncomingCycleEdge: Set[ParserBuilder[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
-    val nodesThatShouldCache: Set[ParserBuilder[_]] = nodesWithIncomingCycleEdge ++ nodesWithMultipleIncomingEdges
+    //val nodesWithIncomingCycleEdge: Set[ParserBuilder[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
+    val nodesThatShouldCache: Set[ParserBuilder[_]] = /*nodesWithIncomingCycleEdge ++*/ nodesWithMultipleIncomingEdges
 
-    ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion, recursiveComponents)
+    ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion, loopBreakers)
   }
 
   case class ParserAndCaches[Result](parser: BuiltParser[Result])
 
   case class ParserAnalysis(nodesThatShouldCache: Set[ParserBuilder[_]],
                             nodesThatShouldDetectLeftRecursion: Set[ParserBuilder[_]],
-                            recursiveComponents: Seq[Set[ParserBuilder[_]]]) {
-
-    val loopBreakers = recursiveComponents.map(c => (c.head, 100)).toMap
+                            loopBreakers: Map[ParserBuilder[_], Int]) {
 
     def buildParser[Result](root: Parser[Result]): ParserAndCaches[Result] = {
       val cacheOfParses = new mutable.HashMap[Parser[Any], BuiltParser[Any]]
@@ -167,7 +171,7 @@ trait OptimizingParserWriter extends ParserWriter {
             val loopBreaker = loopBreakers.get(parser)
             val wrappedParser = wrapParser(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
 
-            new LoopBreaker(wrappedParser, 500)
+            loopBreaker.fold(wrappedParser)(length => new LoopBreaker(wrappedParser, length))
           }).asInstanceOf[BuiltParser[SomeResult]]
         }
       }

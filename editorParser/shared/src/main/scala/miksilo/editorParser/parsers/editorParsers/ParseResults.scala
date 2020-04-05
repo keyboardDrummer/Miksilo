@@ -69,7 +69,7 @@ final class SRCons[State, +Result](
   def getTail = tail
   lazy val tail = _tail
 
-  if (tailDepth == 50) {
+  if (tailDepth == 2) {
     tail
     tailDepth = 0
   }
