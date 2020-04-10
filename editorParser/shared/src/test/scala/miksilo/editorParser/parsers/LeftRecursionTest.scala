@@ -1,6 +1,7 @@
 package miksilo.editorParser.parsers
 
 import editorParsers.LeftRecursiveCorrectingParserWriter
+import miksilo.editorParser.languages.yaml.YamlParser
 import miksilo.editorParser.parsers.strings.{CommonParserWriter, NoStateParserWriter}
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.concurrent.TimeLimits
