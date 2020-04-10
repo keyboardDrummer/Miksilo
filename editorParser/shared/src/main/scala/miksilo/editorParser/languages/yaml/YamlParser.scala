@@ -59,33 +59,35 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   lazy val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
   lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
-  lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseFlowStringLiteral | parseNumber
-  lazy val parseFlowValue = (tag ~ parseUntaggedFlowValue).
+  lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseNumber | parseFlowStringLiteral | plainScalar
+  lazy val parseFlowValue: Parser[YamlValue] = (tag ~ parseUntaggedFlowValue).
     withSourceRange((range, v) => TaggedNode(Some(range), v._1, v._2)) | parseUntaggedFlowValue
-  lazy val parseUntaggedBlockValue = new Lazy(parseArray | parseBlockMapping | plainScalar | hole, "untagged value")
+  lazy val parseUntaggedBlockValue: Parser[YamlValue] = new Lazy(parseArray | parseBlockMapping | blockScalar | hole, "untagged value")
 
   lazy val parseBlockValue: Parser[YamlValue] = (tag ~ parseUntaggedBlockValue).
     withSourceRange((range, v) => TaggedNode(Some(range), v._1, v._2)) | parseUntaggedBlockValue
 
-  lazy val parseYaml = trivias ~> (parseBlockValue | parseFlowValue) ~< trivias
+  lazy val parseValue = parseFlowValue | parseBlockValue
+  lazy val parseYaml = trivias ~> literal("---").option ~> parseValue ~< trivias
   lazy val parser = parseYaml.getWholeInputParser()
 
   lazy val parseBlockMapping: Parser[YamlValue] = {
     val member = new WithContext(_ =>
-      BlockKey, parseFlowValue) ~< literalOrKeyword(":") ~ greaterThan(parseBlockValue)
+      BlockKey, parseFlowValue) ~< literalOrKeyword(":") ~ greaterThan(parseValue)
     alignedList(member).withSourceRange((range, values) => {
       YamlObject(Some(range), values.toArray)
     })
   }
 
-  val blockScalar: Parser[String] = {
+  val blockScalar: Parser[StringLiteral] = {
     val nbChar = parseRegex("""[^\n]+""".r, "non break character")
     val chompingIndicator: Parser[String] = "-" | "+" | literal("")
     val lineSeparator = leftRightSimple(literal("\n", penalty = History.failPenalty, allowDrop = false), whiteSpace, Processor.ignoreLeft[String, String])
 
-    val lines: Parser[String] = {
+    val lines: Parser[StringLiteral] = {
       val line = greaterThanOrEqualTo(nbChar)
-      greaterThan(new WithIndentation(line.someSeparated(lineSeparator, "line").map(lines => lines.reduce((a,b) => a + "\n" + b))))
+      greaterThan(new WithIndentation(line.someSeparated(lineSeparator, "line").
+        withSourceRange((range, lines) => new StringLiteral(Some(range), lines.reduce((a,b) => a + "\n" + b)))))
     }
 
     WithIndentation(("|" | ">") ~ chompingIndicator ~ lineSeparator) ~> lines
@@ -102,7 +104,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   }
 
   lazy val parseArray: Parser[YamlValue] = {
-    val element = literalOrKeyword("- ") ~> greaterThan(parseBlockValue)
+    val element = literalOrKeyword("- ") ~> greaterThan(parseValue)
     alignedList(element).withSourceRange((range, elements) => YamlArray(Some(range), elements.toArray))
   }
 
