@@ -69,7 +69,7 @@ final class SRCons[State, +Result](
   def getTail = tail
   lazy val tail = _tail
 
-  if (tailDepth == 2) {
+  if (true /*tailDepth == 2*/) {
     tail
     tailDepth = 0
   }
@@ -104,11 +104,18 @@ final class SRCons[State, +Result](
   override def merge[Other >: Result](other: ParseResults[State, Other],
                                       mergeDepth: Int,
                                       bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
-    if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
+    if (mergeDepth > 100) { // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
+      other match {
+        case cons: SRCons[_, _] if cons.head.score > 10000 =>
+          System.out.append("")
+        case _ =>
+      }
       return SREmpty.empty[State]
+    }
 
     def getResult(head: LazyParseResult[State, Other], tailDepth: Int,
                   getTail: Map[Int, Double] => ParseResults[State, Other]): ParseResults[State, Other] = {
+
       head match {
         case ready: ReadyParseResult[State, Other] =>
           bests.get(ready.remainder.offset) match {

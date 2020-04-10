@@ -11,11 +11,11 @@ trait YamlValue extends SourceElement {
   override def toString: String = toDocument.renderString()
 }
 
-case class YamlObject(rangeOption: Option[OffsetPointerRange],members: Array[(YamlValue, YamlValue)]) extends YamlValue {
+case class YamlObject(rangeOption: Option[OffsetPointerRange], members: Array[(YamlValue, YamlValue)]) extends YamlValue {
   override def toDocument: ResponsiveDocument = {
     members.
       map(member => member._1.toDocument ~ ":" ~~ member._2.toDocument).
-      reduce((t,b) => t % b)
+      fold[ResponsiveDocument](Empty)((t,b) => t % b)
   }
 }
 

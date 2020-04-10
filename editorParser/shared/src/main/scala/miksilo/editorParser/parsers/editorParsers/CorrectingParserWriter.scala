@@ -203,7 +203,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
           val firstResult = parseFirst(position, state, fixPointState)
           val secondResult = parseSecond(position, state, fixPointState)
-          firstResult.merge(secondResult)
+          val result = firstResult.merge(secondResult)
+          if (position.offset == 70) {
+            System.out.append("")
+          }
+          result
         }
       }
     }
