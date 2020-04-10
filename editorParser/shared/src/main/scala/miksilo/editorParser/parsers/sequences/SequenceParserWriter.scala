@@ -15,11 +15,52 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     override def getMustConsume(cache: ConsumeCache) = false
   }
 
-  def many[Result, Sum](original: ParserBuilder[Result],
+  def many[Result, Sum](element: ParserBuilder[Result],
                         zero: Sum, reduce: (Result, Sum) => Sum,
                         parseGreedy: Boolean = true) = {
-    lazy val result: Parser[Sum] = choice(leftRight(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
-    result
+    new Many(element, zero, reduce, parseGreedy)
+  }
+
+  class Many[Result, Sum](element: ParserBuilder[Result],
+                          zero: Sum, reduce: (Result, Sum) => Sum,
+                          parseGreedy: Boolean = true) extends ParserBuilderBase[Sum] {
+
+    lazy val infinite: Parser[Sum] = choice(leftRight(element, infinite, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
+    override def getParser(recursive: GetParser) = {
+      val elementParser = recursive(element)
+      val recursiveManyParser = recursive(infinite)
+      new BuiltParser[Sum] {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
+          var result: ParseResult[Sum] = singleResult(ReadyParseResult(Some(zero), position, state, History.empty))
+          while(result match {
+            case cons: SRCons[State, Result] => cons.head.isInstanceOf[ReadyParseResult[_, Result]]
+            case _ => false
+          }) {
+            val extraElement = result.flatMapReady(ready => elementParser(ready.remainder, ready.state, fixPointState).
+              mapReady(r => ReadyParseResult(ready.resultOption.flatMap(s => r.resultOption.map(reduce(_, s))), r.remainder, r.state, r.history), uniform = true), uniform = false)
+
+            result = extraElement match {
+              case cons: SRCons[State, Result]
+                if !cons.head.history.flawed && parseGreedy => extraElement
+              case _ =>
+                extraElement.merge(result)
+            }
+          }
+          result match {
+            case cons: SRCons[State, Result]
+              if !cons.head.history.flawed && parseGreedy => result
+            case _ =>
+              result.merge(result.flatMapReady(ready => recursiveManyParser(ready.remainder, ready.state, fixPointState), uniform = false))
+          }
+        }
+      }
+    }
+
+    override def getMustConsume(cache: ConsumeCache) = false
+
+    override def leftChildren = List(element)
+
+    override def children = List(element)
   }
 
   // Why can't the drop be done after the original, then it wouldn't need this tricky mayFail mechanism?
