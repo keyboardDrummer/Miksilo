@@ -72,7 +72,8 @@ final class SRCons[State, +Result](
   def getTail = tail
   lazy val tail = _tail
 
-  if (true /*tailDepth == 2*/) {
+  // TODO stack overflow if I increase the depth to >1
+  if (tailDepth == 1)   {
     tail
     tailDepth = 0
   }
@@ -140,7 +141,7 @@ final class SRCons[State, +Result](
           getResult(head, 1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
         } else
           getResult(cons.head, 1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
-      case earlier => earlier.merge(this)
+      case earlier => earlier.merge(this, mergeDepth)
     }
   }
 
