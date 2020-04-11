@@ -178,11 +178,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       new BuiltParser[Result] {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
           val firstResult = parseFirst(position, state, fixPointState)
-          val secondResult = parseSecond(position, state, fixPointState)
           firstResult match {
             case cons: SRCons[State, Result]
               if !cons.head.history.flawed => firstResult
             case _ =>
+              val secondResult = parseSecond(position, state, fixPointState)
               firstResult.merge(secondResult)
           }
         }

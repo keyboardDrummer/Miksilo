@@ -18,37 +18,60 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   def many[Result, Sum](element: ParserBuilder[Result],
                         zero: Sum, reduce: (Result, Sum) => Sum,
                         parseGreedy: Boolean = true) = {
+//    lazy val infinite: Parser[Sum] = choice(leftRight(element, infinite, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
+//    infinite
     new Many(element, zero, reduce, parseGreedy)
   }
 
-  class Many[Result, Sum](element: ParserBuilder[Result],
-                          zero: Sum, reduce: (Result, Sum) => Sum,
-                          parseGreedy: Boolean = true) extends ParserBuilderBase[Sum] {
+  // TODO Make the LoopBreaker so reliable that we don't need this.
+  class Many[Element, Sum](element: ParserBuilder[Element],
+                           zero: Sum, reduce: (Element, Sum) => Sum,
+                           var parseGreedy: Boolean = true) extends ParserBuilderBase[Sum] {
 
     lazy val infinite: Parser[Sum] = choice(leftRight(element, infinite, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
+    //parseGreedy = false
+
     override def getParser(recursive: GetParser) = {
       val elementParser = recursive(element)
       val recursiveManyParser = recursive(infinite)
       new BuiltParser[Sum] {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
-          var result: ParseResult[Sum] = singleResult(ReadyParseResult(Some(zero), position, state, History.empty))
-          while(result match {
-            case cons: SRCons[State, Result] => cons.head.isInstanceOf[ReadyParseResult[_, Result]]
+
+          var latestResult: ParseResult[Sum] = singleResult(ReadyParseResult(Some(zero), position, state, History.empty))
+          var result: ParseResult[Sum] = latestResult
+          while(latestResult match {
+            case cons: SRCons[State, Element] => cons.head.isInstanceOf[ReadyParseResult[_, Element]]
             case _ => false
           }) {
-            val extraElement = result.flatMapReady(ready => elementParser(ready.remainder, ready.state, fixPointState).
-              mapReady(r => ReadyParseResult(ready.resultOption.flatMap(s => r.resultOption.map(reduce(_, s))), r.remainder, r.state, r.history), uniform = true), uniform = false)
 
-            result = extraElement match {
-              case cons: SRCons[State, Result]
-                if !cons.head.history.flawed && parseGreedy => extraElement
+            latestResult = latestResult.flatMapReady(ready => {
+              val elementResult = elementParser.apply(ready.remainder, ready.state, fixPointState)
+
+              val delayedElementResult: ParseResults[State, Element] = elementResult.mapResult({
+                case ready: ReadyParseResult[State, Element] =>
+                  if (ready.history.flawed) {
+                    new DelayedParseResult[State, Element](ready.remainder, ready.history, () => singleResult(ready))
+                  }
+                  else
+                    ready
+                case lazyResult => lazyResult
+              }, false) // TODO set to true?
+
+              delayedElementResult.mapReady(readyElement =>
+                ReadyParseResult(ready.resultOption.flatMap(s => readyElement.resultOption.map(reduce(_, s))), readyElement.remainder, readyElement.state, readyElement.history), uniform = true)
+            }, uniform = false)
+
+            result = latestResult match {
+              case cons: SRCons[State, Element]
+                if !cons.head.history.flawed && parseGreedy =>
+                  latestResult
               case _ =>
-                extraElement.merge(result)
+                latestResult.merge(result)
             }
           }
           result match {
-            case cons: SRCons[State, Result]
-              if !cons.head.history.flawed && parseGreedy => result
+//            case cons: SRCons[State, Element]
+//              if false !cons.head.history.flawed && parseGreedy => result
             case _ =>
               result.merge(result.flatMapReady(ready => recursiveManyParser(ready.remainder, ready.state, fixPointState), uniform = false))
           }

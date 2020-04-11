@@ -144,6 +144,21 @@ class YamlTest extends AnyFunSuite {
     parseAndCompare(program, expectation)
   }
 
+  test("complex composite 2.5") {
+    val program =
+      """- x: 3
+        |  y: a: 4
+        |  z: - 2
+        |     - 4""".stripMargin
+
+    val expectation =
+      Seq(
+        Seq("x" -> 3,
+          "y" -> Seq("a" -> 4),
+          "z" -> Seq(2, 4)))
+    parseAndCompare(program, expectation)
+  }
+
   test("complex composite 3") {
     val program =
       """- 2
