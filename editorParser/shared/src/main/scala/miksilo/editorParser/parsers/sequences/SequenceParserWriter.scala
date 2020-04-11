@@ -18,7 +18,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   def many[Result, Sum](element: ParserBuilder[Result],
                         zero: Sum, append: (Result, Sum) => Sum,
                         parseGreedy: Boolean = true) = {
-    lazy val infinite: Parser[Sum] = choice(leftRight(infinite, element, (a, b) => combineFold(zero, append)(b,a)), succeed(zero), firstIsLonger = parseGreedy)
+    lazy val infinite: Parser[Sum] = new Lazy(choice(leftRight(infinite, element, (a, b) => combineFold(zero, append)(b,a)), succeed(zero), firstIsLonger = parseGreedy))
     infinite
   }
 
@@ -277,9 +277,9 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     case _ => None
   }
 
-  private def combineMany[Result]: (Option[Result], Option[List[Result]]) => Option[List[Result]] = {
-    val zero = List.empty[Result]
-    val reduce = (x: Result, xs: List[Result]) => x :: xs
+  private def combineMany[Result]: (Option[Result], Option[Vector[Result]]) => Option[Vector[Result]] = {
+    val zero = Vector.empty[Result]
+    val reduce = (x: Result, xs: Vector[Result]) => xs.prepended(x)
     combineFold(zero, reduce)
   }
 
@@ -288,9 +288,8 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def many[Sum](zero: Sum, append: (Result, Sum) => Sum,
                   parseGreedy: Boolean = true): Parser[Sum] = SequenceParserWriter.this.many(parser, zero, append, parseGreedy)
 
-    def * : Parser[List[Result]] = {
-      val value: ParserBuilder[List[Result]] = many(List.empty, (h: Result, t: List[Result]) => h :: t)
-      ParserExtensions(value).map((r: List[Result]) => r.reverse)
+    def * : Parser[Vector[Result]] = {
+      many(Vector.empty, (h: Result, t: Vector[Result]) => t.appended(h))
     }
 
     def ~[Right](right: => Parser[Right]): Parser[(Result, Right)] = leftRightSimple(parser, right, (a: Result, b: Right) => (a,b))
@@ -299,7 +298,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
     def ~>[Right](right: Parser[Right]): ParserBuilder[Right] = leftRight(parser, right, Processor.ignoreLeft[Option[Result], Option[Right]])
 
-    def +(elementName: String): Parser[List[Result]] = {
+    def +(elementName: String): Parser[Vector[Result]] = {
       leftRight(parser, parser.*, combineMany[Result])
     }
 

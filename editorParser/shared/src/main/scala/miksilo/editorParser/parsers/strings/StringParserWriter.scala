@@ -117,7 +117,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
             case Some(matched) =>
               val value = position.subSequence(position.offset, position.offset + matched.end).toString
               val remainder = position.drop(matched.end)
-              singleResult(ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value, score)))
+              singleResult(ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value, score + value.length * 0.00001)))
             case None =>
               penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
                 val history = History.error(new MissingInput(position, s"<$regexName>", defaultValue.getOrElse(""), penalty))
