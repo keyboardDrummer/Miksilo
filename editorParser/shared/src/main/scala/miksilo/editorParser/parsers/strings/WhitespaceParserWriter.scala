@@ -21,9 +21,9 @@ trait WhitespaceParserWriter extends StringParserWriter {
   }
 
   override def many[Element, Sum](element: ParserBuilder[Element],
-                                  zero: Sum, reduce: (Element, Sum) => Sum,
+                                  zero: Sum, append: (Element, Sum) => Sum,
                                   parseGreedy: Boolean = true) = {
-    new Many(new LeftIfRightMoved(someTrivias, element, Processor.ignoreLeft[Option[Any], Option[Element]]), zero, reduce, parseGreedy)
+    new Many(new LeftIfRightMoved(someTrivias, element, Processor.ignoreLeft[Option[Any], Option[Element]]), zero, append, parseGreedy)
   }
 
   private lazy val someTrivias: Parser[List[String]] = oldSome(trivia, List.empty, (h: String, t: List[String]) =>  h :: t)
