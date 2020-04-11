@@ -25,10 +25,10 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
   // TODO Make the LoopBreaker so reliable that we don't need this.
   class Many[Element, Sum](element: ParserBuilder[Element],
-                           zero: Sum, reduce: (Element, Sum) => Sum,
+                           zero: Sum, append: (Element, Sum) => Sum,
                            var parseGreedy: Boolean = true) extends ParserBuilderBase[Sum] {
 
-    lazy val infinite: Parser[Sum] = choice(leftRight(element, infinite, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
+    lazy val infinite: Parser[Sum] = choice(leftRight(element, infinite, combineFold(zero, append)), succeed(zero), firstIsLonger = parseGreedy)
     //parseGreedy = false
 
     override def getParser(recursive: GetParser) = {
@@ -58,7 +58,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
               }, false) // TODO set to true?
 
               delayedElementResult.mapReady(readyElement =>
-                ReadyParseResult(ready.resultOption.flatMap(s => readyElement.resultOption.map(reduce(_, s))), readyElement.remainder, readyElement.state, readyElement.history), uniform = true)
+                ReadyParseResult(ready.resultOption.flatMap(s => readyElement.resultOption.map(append(_, s))), readyElement.remainder, readyElement.state, readyElement.history), uniform = true)
             }, uniform = false)
 
             result = latestResult match {
@@ -349,11 +349,12 @@ trait SequenceParserWriter extends CorrectingParserWriter {
 
   implicit class SequenceParserExtensions[Result](parser: Parser[Result]) extends ParserExtensions(parser) {
 
-    def many[Sum](zero: Sum, reduce: (Result, Sum) => Sum,
-                  parseGreedy: Boolean = true): Parser[Sum] = SequenceParserWriter.this.many(parser, zero, reduce, parseGreedy)
+    def many[Sum](zero: Sum, append: (Result, Sum) => Sum,
+                  parseGreedy: Boolean = true): Parser[Sum] = SequenceParserWriter.this.many(parser, zero, append, parseGreedy)
 
     def * : Parser[List[Result]] = {
-      many(List.empty, (h: Result, t: List[Result]) => h :: t)
+      val value: ParserBuilder[List[Result]] = many(List.empty, (h: Result, t: List[Result]) => h :: t)
+      ParserExtensions(value).map((r: List[Result]) => r.reverse)
     }
 
     def ~[Right](right: => Parser[Right]): Parser[(Result, Right)] = leftRightSimple(parser, right, (a: Result, b: Right) => (a,b))
@@ -366,16 +367,17 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       leftRight(parser, parser.*, combineMany[Result])
     }
 
-    def someSeparated(separator: Parser[Any], elementName: String): Parser[List[Result]] = {
-      lazy val result: Parser[List[Result]] = separator ~>
-        leftRight[Result, List[Result], List[Result]](parser, result, combineMany[Result]) |
-          Fail(Some(List.empty[Result]), elementName, History.insertDefaultPenalty) | // TODO can we remove this Fail?
-          succeed(List.empty[Result])
-      leftRight(parser, result, combineMany[Result])
+    def someSeparated(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
+      val result = (separator ~> parser).many[Vector[Result]](Vector.empty, (a,b) => b.appended(a))
+//      lazy val result: Parser[List[Result]] = separator ~>
+//        leftRight[Result, List[Result], List[Result]](parser, result, combineMany[Result]) |
+//          Fail(Some(List.empty[Result]), elementName, History.insertDefaultPenalty) | // TODO can we remove this Fail?
+//          succeed(List.empty[Result])
+      leftRight[Result, Vector[Result], Vector[Result]](parser, result, combineFold(Vector.empty, (a,b) => b.prepended(a)))
     }
 
-    def manySeparated(separator: Parser[Any], elementName: String): Parser[List[Result]] = {
-      val zero = List.empty[Result]
+    def manySeparated(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
+      val zero = Vector.empty[Result]
       choice(someSeparated(separator, elementName), succeed(zero), firstIsLonger = true)
     }
 
