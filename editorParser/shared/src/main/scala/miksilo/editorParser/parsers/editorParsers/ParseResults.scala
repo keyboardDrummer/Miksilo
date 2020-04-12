@@ -61,7 +61,7 @@ final class SRCons[State, +Result](
                                     _tail: => ParseResults[State, Result])
   extends ParseResults[State, Result] {
 
-  val maxListDepth = 200
+  val maxListDepth = 10 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
   override def latestRemainder: OffsetPointer = {
     head.offset
   }
@@ -72,8 +72,7 @@ final class SRCons[State, +Result](
   def getTail = tail
   lazy val tail = _tail
 
-  // TODO stack overflow if I increase the depth to >1
-  if (tailDepth == 1)   {
+  if (tailDepth == 100)   {
     tail
     tailDepth = 0
   }
@@ -81,6 +80,7 @@ final class SRCons[State, +Result](
   def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
                          uniform: Boolean,
                          depth: Int): ParseResults[State, NewResult] = {
+
 
     if (depth > maxListDepth) {
       return SREmpty.empty[State]
@@ -114,12 +114,12 @@ final class SRCons[State, +Result](
   override def merge[Other >: Result](other: ParseResults[State, Other],
                                       mergeDepth: Int,
                                       bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
-    if (mergeDepth > maxListDepth) { // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
+    if (mergeDepth > maxListDepth) {
       return SREmpty.empty[State]
     }
 
     def getResult(head: LazyParseResult[State, Other], tailDepth: Int,
-                  getTail: Map[Int, Double] => ParseResults[State, Other]): ParseResults[State, Other] = {
+                  getTail: (Map[Int, Double]) => ParseResults[State, Other]): ParseResults[State, Other] = {
 
       head match {
         case ready: ReadyParseResult[State, Other] =>
@@ -138,9 +138,11 @@ final class SRCons[State, +Result](
       case _: SREmpty[State] => this
       case cons: SRCons[State, Other] =>
         if (head.score >= cons.head.score) {
-          getResult(head, 1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
-        } else
-          getResult(cons.head, 1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
+          getResult(head, Math.max(maxListDepth, 1 + tailDepth), (newBests) => tail.merge(cons, mergeDepth + 1, newBests))
+        }
+        else {
+          getResult(cons.head, Math.max(maxListDepth, 1 + cons.tailDepth), (newBests) => this.merge(cons.tail, mergeDepth + 1, newBests))
+        }
       case earlier => earlier.merge(this, mergeDepth)
     }
   }
