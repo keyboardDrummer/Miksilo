@@ -283,6 +283,12 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     combineFold(zero, reduce)
   }
 
+  private def combineMany2[Result]: (Option[Result], Option[List[Result]]) => Option[List[Result]] = {
+    val zero = List.empty[Result]
+    val reduce = (x: Result, xs: List[Result]) => x :: xs
+    combineFold(zero, reduce)
+  }
+
   implicit class SequenceParserExtensions[Result](parser: Parser[Result]) extends ParserExtensions(parser) {
 
     def many[Sum](zero: Sum, append: (Result, Sum) => Sum,
@@ -303,12 +309,11 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     }
 
     def someSeparated(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
-      val result = (separator ~> parser).many[Vector[Result]](Vector.empty, (a,b) => b.appended(a))
-//      lazy val result: Parser[List[Result]] = separator ~>
-//        leftRight[Result, List[Result], List[Result]](parser, result, combineMany[Result]) |
-//          Fail(Some(List.empty[Result]), elementName, History.insertDefaultPenalty) | // TODO can we remove this Fail?
-//          succeed(List.empty[Result])
-      leftRight[Result, Vector[Result], Vector[Result]](parser, result, combineFold(Vector.empty, (a,b) => b.prepended(a)))
+      lazy val result: Parser[Vector[Result]] = separator ~>
+        leftRight[Result, Vector[Result], Vector[Result]](parser, result, combineMany[Result]) |
+        Fail(Some(Vector.empty[Result]), elementName, History.insertDefaultPenalty) |
+        succeed(Vector.empty[Result])
+      leftRight[Result, Vector[Result], Vector[Result]](parser, result, combineMany[Result])
     }
 
     def manySeparated(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
