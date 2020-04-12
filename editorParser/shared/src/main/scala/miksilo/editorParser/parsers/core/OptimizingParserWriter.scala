@@ -143,14 +143,9 @@ trait OptimizingParserWriter extends ParserWriter {
           loopBreakers += (backNode -> loopLength)
       })
 
-    //val leftComponents = StronglyConnectedComponents.computeComponents[ParserBuilder[_]](reverseGraph.keys.toSet, node => node.leftChildren.toSet)
     val components = StronglyConnectedComponents.computeComponents[ParserBuilder[_]](reverseGraph.keys.toSet, node => node.children.toSet)
-    val recursiveComponents: Seq[Set[ParserBuilder[_]]] = components.filter(c => c.size > 1)
-    //val nodesInCycle: Set[ParserBuilder[_]] = leftComponents.filter(c => c.size > 1).flatten.toSet
-
     val nodesWithMultipleIncomingEdges: Set[ParserBuilder[_]] = reverseGraph.filter(e => e._2.size > 1).keys.toSet
-    //val nodesWithIncomingCycleEdge: Set[ParserBuilder[_]] = reverseGraph.filter(e => e._2.exists(parent => nodesInCycle.contains(parent))).keys.toSet
-    val nodesThatShouldCache: Set[ParserBuilder[_]] = /*nodesWithIncomingCycleEdge ++*/ nodesWithMultipleIncomingEdges
+    val nodesThatShouldCache: Set[ParserBuilder[_]] = nodesWithMultipleIncomingEdges
 
     ParserAnalysis(nodesThatShouldCache, nodesThatShouldDetectLeftRecursion, loopBreakers)
   }

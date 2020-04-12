@@ -53,6 +53,8 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 object ParseResults {
   def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] =
     new SRCons(parseResult,0, SREmpty.empty[State])
+
+  val maxListDepth = 200 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
 }
 
 final class SRCons[State, +Result](
@@ -61,7 +63,6 @@ final class SRCons[State, +Result](
                                     _tail: => ParseResults[State, Result])
   extends ParseResults[State, Result] {
 
-  val maxListDepth = 10 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
   override def latestRemainder: OffsetPointer = {
     head.offset
   }
