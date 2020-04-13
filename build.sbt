@@ -68,7 +68,7 @@ lazy val commonSettings = Seq(
       Opts.resolver.sonatypeStaging
   ),
 
-  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0" % "test"
+  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
 )
 
 lazy val assemblySettings = Seq(
@@ -87,8 +87,6 @@ lazy val editorParser = crossProject(JVMPlatform, JSPlatform).
   jvmSettings(
     assemblySettings,
   ).
-  jsSettings(
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   jvmSettings(
     // Only used for SourceUtils, should get rid of it.
     // https://mvnrepository.com/artifact/org.scala-lang/scala-reflect
@@ -103,10 +101,8 @@ lazy val LSPProtocol = crossProject(JVMPlatform, JSPlatform).
     assemblySettings,
   ).
   settings(
-    libraryDependencies += "com.typesafe.play" %%% "play-json" % "2.8.1",
+    libraryDependencies += "com.malliina" %%% "play-json" % "2.8.1"
   ).
-  jsSettings(
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   dependsOn(editorParser)
 
 lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
@@ -123,7 +119,6 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
     }
   ).
   jsSettings(
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
 
     scalaJSUseMainModuleInitializer := true,
     vscode := {
@@ -155,7 +150,6 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
 
   ).
   jsSettings(
-    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     scalaJSUseMainModuleInitializer := true,
 
     vscode := {
