@@ -18,7 +18,8 @@ trait SequenceParserWriter extends CorrectingParserWriter {
   def many[Result, Sum](element: ParserBuilder[Result],
                         zero: Sum, append: (Result, Sum) => Sum,
                         parseGreedy: Boolean = true) = {
-    lazy val infinite: Parser[Sum] = new Lazy(choice(leftRight(infinite, element, (a, b) => combineFold(zero, append)(b,a)), succeed(zero), firstIsLonger = parseGreedy))
+    lazy val infinite: Parser[Sum] = new Lazy(choice(leftRight(infinite, element,
+      (a, b) => combineFold(zero, append)(b,a)), succeed(zero), firstIsLonger = parseGreedy))
     infinite
   }
 
@@ -277,16 +278,16 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     case _ => None
   }
 
-  private def combineMany[Result]: (Option[Result], Option[Vector[Result]]) => Option[Vector[Result]] = {
+  private def prependCombine[Result]: (Option[Result], Option[Vector[Result]]) => Option[Vector[Result]] = {
     val zero = Vector.empty[Result]
     val reduce = (x: Result, xs: Vector[Result]) => xs.prepended(x)
     combineFold(zero, reduce)
   }
 
-  private def combineMany2[Result]: (Option[Result], Option[List[Result]]) => Option[List[Result]] = {
-    val zero = List.empty[Result]
-    val reduce = (x: Result, xs: List[Result]) => x :: xs
-    combineFold(zero, reduce)
+  private def appendCombine[Result]: (Option[Vector[Result]], Option[Result]) => Option[Vector[Result]] = {
+    val zero = Vector.empty[Result]
+    val reduce = (x: Result, xs: Vector[Result]) => xs.appended(x)
+    (a,b) => combineFold(zero, reduce)(b,a)
   }
 
   implicit class SequenceParserExtensions[Result](parser: Parser[Result]) extends ParserExtensions(parser) {
@@ -305,15 +306,23 @@ trait SequenceParserWriter extends CorrectingParserWriter {
     def ~>[Right](right: Parser[Right]): ParserBuilder[Right] = leftRight(parser, right, Processor.ignoreLeft[Option[Result], Option[Right]])
 
     def +(elementName: String): Parser[Vector[Result]] = {
-      leftRight(parser, parser.*, combineMany[Result])
+      leftRight(parser, parser.*, prependCombine[Result])
+    }
+
+    def someSeparated2(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
+      lazy val result: Parser[Vector[Result]] = new Lazy(separator ~>
+        leftRight(parser, result, prependCombine[Result]) |
+        Fail(Some(Vector.empty[Result]), elementName, History.insertDefaultPenalty) |
+        succeed(Vector.empty[Result]))
+      leftRight[Result, Vector[Result], Vector[Result]](parser, result, prependCombine[Result])
     }
 
     def someSeparated(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
-      lazy val result: Parser[Vector[Result]] = separator ~>
-        leftRight[Result, Vector[Result], Vector[Result]](parser, result, combineMany[Result]) |
+      lazy val result: Parser[Vector[Result]] = new Lazy(separator ~>
+        leftRight[Vector[Result], Result, Vector[Result]](result, parser, appendCombine[Result]) |
         Fail(Some(Vector.empty[Result]), elementName, History.insertDefaultPenalty) |
-        succeed(Vector.empty[Result])
-      leftRight[Result, Vector[Result], Vector[Result]](parser, result, combineMany[Result])
+        succeed(Vector.empty[Result]))
+      leftRight[Result, Vector[Result], Vector[Result]](parser, result, prependCombine[Result])
     }
 
     def manySeparated(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
