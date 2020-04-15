@@ -20,7 +20,9 @@ trait ParseResults[State, +Result] extends CachingParseResult {
     flatMap(r => singleResult(f(r)), uniform)
   }
 
-  def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean): ParseResults[State, NewResult]
+  def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
+                         uniform: Boolean,
+                         depth: Int = 0): ParseResults[State, NewResult]
 
   def addHistory(errors: History): ParseResults[State, Result] = {
     mapWithHistory(x => x, errors)
@@ -51,6 +53,8 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 object ParseResults {
   def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] =
     new SRCons(parseResult,0, SREmpty.empty[State])
+
+  val maxListDepth = 200 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
 }
 
 final class SRCons[State, +Result](
@@ -69,27 +73,34 @@ final class SRCons[State, +Result](
   def getTail = tail
   lazy val tail = _tail
 
-  if (tailDepth == 50) {
+  if (tailDepth == 100)   {
     tail
     tailDepth = 0
   }
 
   def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
-                         uniform: Boolean): ParseResults[State, NewResult] = {
+                         uniform: Boolean,
+                         depth: Int): ParseResults[State, NewResult] = {
+
+
+    if (depth > maxListDepth) {
+      return SREmpty.empty[State]
+    }
+
     f(head) match {
-      case _: SREmpty[State] => tail.flatMap(f, uniform)
+      case _: SREmpty[State] => tail.flatMap(f, uniform, depth)
       case cons: SRCons[State, NewResult] =>
 
         if (!uniform && head.score != cons.head.score)
-          cons.merge(tail.flatMap(f, uniform))
+          cons.merge(tail.flatMap(f, uniform, depth + 1), depth)
         else
         {
           new SRCons(
             cons.head,
             1 + Math.max(this.tailDepth, cons.tailDepth),
-            cons.tail.merge(tail.flatMap(f, uniform)))
+            cons.tail.merge(tail.flatMap(f, uniform, depth + 1), + 1))
         }
-      case other => other.merge(tail.flatMap(f, uniform))
+      case other => other.merge(tail.flatMap(f, uniform, depth + 1), depth)
     }
   }
 
@@ -104,11 +115,13 @@ final class SRCons[State, +Result](
   override def merge[Other >: Result](other: ParseResults[State, Other],
                                       mergeDepth: Int,
                                       bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
-    if (mergeDepth > 200) // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
+    if (mergeDepth > maxListDepth) {
       return SREmpty.empty[State]
+    }
 
     def getResult(head: LazyParseResult[State, Other], tailDepth: Int,
-                  getTail: Map[Int, Double] => ParseResults[State, Other]): ParseResults[State, Other] = {
+                  getTail: (Map[Int, Double]) => ParseResults[State, Other]): ParseResults[State, Other] = {
+
       head match {
         case ready: ReadyParseResult[State, Other] =>
           bests.get(ready.remainder.offset) match {
@@ -126,10 +139,12 @@ final class SRCons[State, +Result](
       case _: SREmpty[State] => this
       case cons: SRCons[State, Other] =>
         if (head.score >= cons.head.score) {
-          getResult(head, 1 + tailDepth, newBests => tail.merge(cons, mergeDepth + 1, newBests))
-        } else
-          getResult(cons.head, 1 + cons.tailDepth, newBests => this.merge(cons.tail, mergeDepth + 1, newBests))
-      case earlier => earlier.merge(this)
+          getResult(head, Math.max(maxListDepth, 1 + tailDepth), (newBests) => tail.merge(cons, mergeDepth + 1, newBests))
+        }
+        else {
+          getResult(cons.head, Math.max(maxListDepth, 1 + cons.tailDepth), (newBests) => this.merge(cons.tail, mergeDepth + 1, newBests))
+        }
+      case earlier => earlier.merge(this, mergeDepth)
     }
   }
 
@@ -149,7 +164,9 @@ class SREmpty[State] extends ParseResults[State, Nothing] {
 
   override def mapResult[NewResult](f: LazyParseResult[State, Nothing] => LazyParseResult[State, NewResult], uniform: Boolean) = this
 
-  override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult], uniform: Boolean) = this
+  override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult],
+                                  uniform: Boolean,
+                                  depth: Int) = this
 
   override def map[NewResult](f: Nothing => NewResult) = this
 

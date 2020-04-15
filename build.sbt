@@ -114,7 +114,7 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
   in(file("languageServer")).
   settings(commonSettings: _*).
   settings(
-    mainClass in Compile := Some("languageServer.Program")).
+    mainClass in Compile := Some("miksilo.languageServer.Program")).
   jvmSettings(
     assemblySettings,
     vscode := {
