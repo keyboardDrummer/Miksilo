@@ -46,7 +46,8 @@ case class UpdateLatestRemainder[State, Result](remainder: OffsetPointer) extend
   override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult], uniform: Boolean) =
     this.asInstanceOf[ParseResults[State, NewResult]]
 
-  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean) =
+  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean,
+                                  depth: Int) =
     this.asInstanceOf[ParseResults[State, NewResult]]
 
   override def map[NewResult](f: Result => NewResult) =

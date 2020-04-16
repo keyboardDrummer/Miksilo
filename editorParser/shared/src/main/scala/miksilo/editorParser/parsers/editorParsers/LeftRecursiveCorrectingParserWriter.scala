@@ -143,7 +143,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         RecursiveResults(this.recursions, tail.merge(other))
     }
 
-    override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean) = {
+    override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
+                                    uniform: Boolean,
+                                    depth: Int) = {
       RecursiveResults(
         recursions.view.mapValues(s => s.map(r => r.compose(pr => pr.flatMap(f, uniform)))).toMap,
         tail.flatMap(f, uniform))
