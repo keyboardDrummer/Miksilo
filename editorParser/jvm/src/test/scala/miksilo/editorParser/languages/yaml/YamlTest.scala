@@ -7,6 +7,12 @@ import org.scalatest.funsuite.AnyFunSuite
 class YamlTest extends AnyFunSuite {
   val parser = YamlParser.parser
 
+  test("scalars nested in bracket array") {
+    val program = """AllowedValues: [m3.medium]""".stripMargin
+    val result = parser.parse(program)
+    assert(result.successful)
+  }
+
   test("plainStyleMultineLineInFlowCollection") {
     val input = """                  [<img src=", !FindInMap [Region2Examples, !Ref 'AWS::Region',
                   |                                              Examples], /cloudformation_graphic.png" alt="AWS CloudFormation
@@ -135,6 +141,21 @@ class YamlTest extends AnyFunSuite {
         "a" -> Seq(1)),
       Seq(
         "b" -> Seq(2)))
+    parseAndCompare(program, expectation)
+  }
+
+  test("complex composite 2.5") {
+    val program =
+      """- x: 3
+        |  y: a: 4
+        |  z: - 2
+        |     - 4""".stripMargin
+
+    val expectation =
+      Seq(
+        Seq("x" -> 3,
+          "y" -> Seq("a" -> 4),
+          "z" -> Seq(2, 4)))
     parseAndCompare(program, expectation)
   }
 

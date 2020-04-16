@@ -55,32 +55,60 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     }
   }
 
+
   lazy val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
   lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
-  lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseStringLiteral
-  lazy val parseFlowValue = (tag ~ parseUntaggedFlowValue).
+  lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseNumber | parseFlowStringLiteral | plainScalar
+  lazy val parseFlowValue: Parser[YamlValue] = (tag ~ parseUntaggedFlowValue).
     withSourceRange((range, v) => TaggedNode(Some(range), v._1, v._2)) | parseUntaggedFlowValue
-  lazy val parseUntaggedValue = new Lazy(parseBracketArray | parseArray | parseNumber | parseStringLiteral |
-    parseBlockMapping | hole, "untagged value")
+  lazy val flowInBlock = new WithContext(_ => FlowOut, parseFlowValue)
+  lazy val parseUntaggedBlockValue: Parser[YamlValue] = new Lazy(parseBlockArray | parseBlockMapping | blockScalar | hole, "untagged value")
 
-  lazy val parseValue: Parser[YamlValue] = (tag ~ parseUntaggedValue).
-    withSourceRange((range, v) => TaggedNode(Some(range), v._1, v._2)) | parseUntaggedValue
+  lazy val parseBlockValue: Parser[YamlValue] = (tag ~ parseUntaggedBlockValue).
+    withSourceRange((range, v) => TaggedNode(Some(range), v._1, v._2)) | parseUntaggedBlockValue
 
-  lazy val parseYaml = trivias ~> parseValue ~< trivias
+  lazy val parseValue = flowInBlock | parseBlockValue
+  lazy val parseYaml = trivias ~> literal("---").option ~> parseValue ~< trivias
   lazy val parser = parseYaml.getWholeInputParser()
 
   lazy val parseBlockMapping: Parser[YamlValue] = {
     val member = new WithContext(_ =>
-      BlockKey, parseFlowValue) ~< literalOrKeyword(":") ~ greaterThan(parseValue)
+      BlockKey,
+      //parseUntaggedFlowValue
+      parseFlowValue
+    ) ~< literalOrKeyword(":") ~ greaterThan(parseValue)
     alignedList(member).withSourceRange((range, values) => {
       YamlObject(Some(range), values.toArray)
     })
   }
 
+  val blockScalar: Parser[StringLiteral] = {
+    val nbChar = parseRegex("""[^\n]+""".r, "non break character")
+    val chompingIndicator: Parser[String] = "-" | "+" | literal("")
+    val lineSeparator = leftRightSimple(literal("\n", penalty = History.failPenalty, allowDrop = false), whiteSpace, Processor.ignoreLeft[String, String])
+
+    val lines: Parser[StringLiteral] = {
+      val line = greaterThanOrEqualTo(nbChar)
+      greaterThan(new WithIndentation(line.someSeparated(lineSeparator, "line").
+        withSourceRange((range, lines) => new StringLiteral(Some(range), lines.reduce((a,b) => a + "\n" + b)))))
+    }
+
+    WithIndentation(("|" | ">") ~ chompingIndicator ~ lineSeparator) ~> lines
+  }
+
   lazy val objectMember = parseFlowValue ~< ":" ~ parseFlowValue
-  lazy val parseBraceObject = (literal("{", 2 * History.missingInputPenalty) ~> objectMember.manySeparated(",", "member") ~< "}").
-    withSourceRange((range, value) => YamlObject(Some(range), value.toArray))
+  lazy val parseBraceObject = {
+    val result = (literal("{", 2 * History.missingInputPenalty) ~> objectMember.manySeparated(",", "member") ~< "}").
+      withSourceRange((range, value) => YamlObject(Some(range), value.toArray))
+
+    new WithContext({
+      case FlowOut => FlowIn
+      case BlockKey => FlowKey
+      case FlowIn => FlowIn
+      case FlowKey => FlowKey
+    }, result)
+  }
 
   lazy val parseBracketArray: Parser[YamlValue] = {
     val inner = "[" ~> parseFlowValue.manySeparated(",", "array element").
@@ -88,7 +116,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     new WithContext(_ => FlowIn, inner)
   }
 
-  lazy val parseArray: Parser[YamlValue] = {
+  lazy val parseBlockArray: Parser[YamlValue] = {
     val element = literalOrKeyword("- ") ~> greaterThan(parseValue)
     alignedList(element).withSourceRange((range, elements) => YamlArray(Some(range), elements.toArray))
   }
@@ -96,29 +124,34 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   lazy val parseNumber: Parser[YamlValue] =
     wholeNumber.withSourceRange((range, n) => NumberLiteral(Some(range), n))
 
-  lazy val parseStringLiteral: Parser[YamlValue] =
+  lazy val parseFlowStringLiteral: Parser[YamlValue] =
     parseStringLiteralInner.withSourceRange((range, s) => StringLiteral(Some(range), s))
   lazy val parseStringLiteralInner: Parser[String] =
-    RegexParser("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1)) | plainScalar
+    RegexParser("""'[^']*'""".r, "single quote string literal").map(n => n.drop(1).dropRight(1))
 
   lazy val plainScalar = new WithContext({
     case FlowIn => FlowIn
     case BlockKey => BlockKey
     case FlowKey => FlowKey
     case _ => FlowOut
-  }, plainStyleMultiLineString | plainStyleSingleLineString)
+  }, plainStyleMultiLineString | plainStyleSingleLineString).
+    withSourceRange((range, s) => StringLiteral(Some(range), s))
 
-  val nbChars = """\n"""
-  val nsChars = nbChars + " "
+  val nonBreakChars = """\n"""
+  val nonSpaceChars = nonBreakChars + " "
 
-  def flowIndicatorChars = """,\[\]{}"""
+  val flowIndicatorChars = """,\[\]{}"""
+  val indicatorChars = """-\?:,\[\]\{\}#&*!\|>'"%@`"""
 
-  val plainSafeOutChars = s"""$nbChars#'"""
+  val plainSafeOutChars = s"""$nonBreakChars#'"""
   val plainSafeInChars = s"""$plainSafeOutChars$flowIndicatorChars"""
 
+  val allowedInFirst = Set('?',':','-')
+  val nonPlainFirstChars = (nonSpaceChars + indicatorChars).filter((c: Char) => !allowedInFirst.contains(c))
+
   //first char shouldn't be a space.
-  val doubleColonPlainSafeIn = RegexParser(s"""([^$plainSafeInChars: ]|:[^$plainSafeInChars ])([^$plainSafeInChars:]|:[^$plainSafeInChars ])*""".r, "plain scalar")
-  val doubleColonPlainSafeOut = RegexParser(s"""([^$plainSafeInChars: ]|:[^$plainSafeInChars ])([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])*""".r, "plain scalar")
+  val doubleColonPlainSafeIn = RegexParser(s"""[^$nonPlainFirstChars]([^$plainSafeInChars:]|:[^$plainSafeInChars ])*""".r, "plain scalar")
+  val doubleColonPlainSafeOut = RegexParser(s"""[^$nonPlainFirstChars]([^$plainSafeOutChars:]|:[^$plainSafeOutChars ])*""".r, "plain scalar")
 
   val nsPlainSafe = new IfContext(Map(
     FlowIn -> doubleColonPlainSafeIn,
