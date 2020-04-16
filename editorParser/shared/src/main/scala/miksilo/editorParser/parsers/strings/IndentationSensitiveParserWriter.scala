@@ -51,6 +51,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
 
   def equal[Result](inner: Parser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
   def greaterThan[Result](inner: Parser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
+  def greaterThanOrEqualTo[Result](inner: Parser[Result]) = CheckIndentation(delta => delta >= 0, "greater than or equal to", inner)
 
   case class IndentationError(from: TextPointer, expectedIndentation: Int, property: String) extends NextCharError {
     override def penalty = History.indentationErrorPenalty
