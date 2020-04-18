@@ -13,7 +13,7 @@ class YamlTest extends AnyFunSuite {
     assert(result.successful)
   }
 
-  test("plainStyleMultineLineInFlowCollection") {
+  test("plainStyleMultilineLineInFlowCollection") {
     val input = """                  [<img src=", !FindInMap [Region2Examples, !Ref 'AWS::Region',
                   |                                              Examples], /cloudformation_graphic.png" alt="AWS CloudFormation
                   |                                                           Logo"/>, '<h1>Congratulations, you have successfully launched

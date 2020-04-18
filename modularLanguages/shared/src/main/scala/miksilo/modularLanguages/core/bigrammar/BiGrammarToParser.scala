@@ -96,9 +96,9 @@ object BiGrammarToParser extends CommonParserWriter with LeftRecursiveCorrecting
 
       case many: miksilo.modularLanguages.core.bigrammar.grammars.Many =>
         val innerParser = recursive(many.inner)
-        val parser = innerParser.many[WithMap[List[Any]]](
-          WithMap(List.empty[Any], Map.empty[Any, Any]),
-          (element, result) => WithMap(element.value :: result.value, element.namedValues ++ result.namedValues), many.parseGreedy)
+        val parser = innerParser.many[WithMap[Vector[Any]]](
+          WithMap(Vector.empty[Any], Map.empty[Any, Any]),
+          (element, result) => WithMap(result.value.appended(element.value), element.namedValues ++ result.namedValues), many.parseGreedy)
 
         parser
       case mapGrammar: MapGrammar[_, _] =>
