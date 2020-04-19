@@ -82,16 +82,12 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     def growStep(recursions: List[RecursiveParseResult[State, Result, Result]], prev: ReadyParseResult[State, Result]): ParseResults[State, Result] = {
-      if (prev.history.flawed)
-        SREmpty.empty // TODO consider growing this as well
-      else {
-        recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
-          val results = recursive.get(singleResult(prev))
-          results.flatMapReady(
-            ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else SREmpty.empty,
-            uniform = false) // TODO maybe set this to uniform = true
-        }).reduce((a, b) => a.merge(b))
-      }
+      recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
+        val results = recursive.get(singleResult(prev))
+        results.flatMapReady(
+          ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else SREmpty.empty,
+          uniform = false) // TODO maybe set this to uniform = true
+      }).reduce((a, b) => a.merge(b))
     }
 
     def getPreviousResult(position: TextPointer, fixPointState: FixPointState): Option[ParseResult[Result]] = {
