@@ -267,6 +267,17 @@ class ModularYamlTest extends AnyFunSuite {
     assert(compilation.diagnostics.nonEmpty)
   }
 
+  test("missing :value error correction") {
+    val contents =
+      """A: B
+        |C
+        |D: E""".stripMargin
+
+    val compilation = blockLanguage.compileString(contents)
+    assert(compilation.diagnostics.size == 1)
+    assert(compilation.diagnostics.head.diagnostic.message.contains(":<value>"))
+  }
+
   test("composite") {
     val contents =
       """Metadata:
