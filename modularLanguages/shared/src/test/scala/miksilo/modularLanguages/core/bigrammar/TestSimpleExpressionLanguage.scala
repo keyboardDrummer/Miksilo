@@ -59,7 +59,7 @@ class TestSimpleExpressionLanguage extends AnyFunSuite with WhitespaceTriviaSequ
                           |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
                           |Grammar: multiply TriviasGrammar * TriviasGrammar multiply | number | ( TriviasGrammar expression TriviasGrammar )
                           |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
-                          |Grammar: add TriviasGrammar + TriviasGrammar add | multiply
+                          |Grammar: multiply TriviasGrammar + TriviasGrammar add | multiply
                           |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
                           |Grammar: expression % TriviasGrammar % ? TriviasGrammar expression % TriviasGrammar % : TriviasGrammar expression | add
                           |Depth: 25
