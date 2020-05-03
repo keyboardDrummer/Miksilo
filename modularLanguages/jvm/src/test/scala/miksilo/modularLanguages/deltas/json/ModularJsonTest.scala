@@ -10,7 +10,7 @@ import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta.{MemberValue,
 import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
 
-class JsonTest extends AnyFunSuite {
+class ModularJsonTest extends AnyFunSuite {
   val language = TestLanguageBuilder.buildWithParser(ModularJsonLanguage.deltas, UntilBestAndXStepsStopFunction())
 
   ignore("removes incorrect b at start") {
