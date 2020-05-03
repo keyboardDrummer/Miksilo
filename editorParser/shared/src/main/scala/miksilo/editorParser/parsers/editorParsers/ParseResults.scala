@@ -91,7 +91,7 @@ final class SRCons[State, +Result](
       case _: SREmpty[State] => tail.flatMap(f, uniform, depth)
       case cons: SRCons[State, NewResult] =>
 
-        if (!uniform && head.score != cons.head.score)
+        if (!uniform && head.score > cons.head.score)
           cons.merge(tail.flatMap(f, uniform, depth + 1), depth)
         else
         {
