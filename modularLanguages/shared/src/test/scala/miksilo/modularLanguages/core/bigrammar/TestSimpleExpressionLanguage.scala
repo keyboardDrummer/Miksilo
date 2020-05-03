@@ -51,11 +51,11 @@ class TestSimpleExpressionLanguage extends AnyFunSuite with WhitespaceTriviaSequ
                           |Value: (WithMap(Undefined,Map()),Map())
                           |Grammar: multiply TriviasGrammar * TriviasGrammar multiply | number | ( TriviasGrammar expression TriviasGrammar )
                           |Value: (WithMap(Add(Value(4),Undefined),Map()),Map())
-                          |Grammar: add TriviasGrammar + TriviasGrammar add | multiply
+                          |Grammar: multiply TriviasGrammar + TriviasGrammar add | multiply
                           |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
                           |Grammar: multiply TriviasGrammar * TriviasGrammar multiply | number | ( TriviasGrammar expression TriviasGrammar )
                           |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
-                          |Grammar: add TriviasGrammar + TriviasGrammar add | multiply
+                          |Grammar: multiply TriviasGrammar + TriviasGrammar add | multiply
                           |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
                           |Grammar: multiply TriviasGrammar * TriviasGrammar multiply | number | ( TriviasGrammar expression TriviasGrammar )
                           |Value: (WithMap(Multiply(Value(3),Add(Value(4),Undefined)),Map()),Map())
@@ -107,7 +107,7 @@ class TestSimpleExpressionLanguage extends AnyFunSuite with WhitespaceTriviaSequ
     multipleLabel.addAlternative(parenthesis)
 
     val addLabel = new Labelled(StringKey("add"))
-    val add: BiGrammar = (addLabel ~~< "+" ~~ addLabel).map[(TestExpression, TestExpression), Add](
+    val add: BiGrammar = (multipleLabel ~~< "+" ~~ addLabel).map[(TestExpression, TestExpression), Add](
       t => Add(t._1, t._2)
       , add => (add.first, add.second))
     addLabel.addAlternative(add)

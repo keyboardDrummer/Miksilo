@@ -1,13 +1,13 @@
 
 package miksilo.modularLanguages.deltas.yaml
 
+import miksilo.editorParser.SourceUtils
+import miksilo.editorParser.parsers.editorParsers.UntilBestAndXStepsStopFunction
+import miksilo.languageServer.core.language.Compilation
 import miksilo.modularLanguages.core.bigrammar.SelectGrammar
 import miksilo.modularLanguages.core.deltas.path.{ChildPath, PathRoot}
-import miksilo.languageServer.core.language.Compilation
-import miksilo.editorParser.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import miksilo.modularLanguages.deltas.expression.{ArrayLiteralDelta, ExpressionDelta, StringLiteralDelta}
-import miksilo.modularLanguages.deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
-import miksilo.editorParser.SourceUtils
+import miksilo.modularLanguages.deltas.json.JsonObjectLiteralDelta
 import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
 

@@ -64,6 +64,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     def grow(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): ParseResult[Result] = {
       val (result: ParseResults[State, Result], delayedResult) = growReadyResults(recursions, previous)
       val next = delayedResult.flatMapReady(prev => grow(recursions, growStep(recursions, prev)), uniform = false)
+
+      // The order of the merge determines whether ambiguous grammars are left or right associative by default.
       result.merge(next)
     }
 
@@ -76,7 +78,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
       while (current.isInstanceOf[SRCons[State, Result]] && current.asInstanceOf[SRCons[State, Result]].head.isInstanceOf[ReadyParseResult[_, Result]]) {
         current = current.flatMapReady(growStep(recursions, _), uniform = false)
-        result = current.merge(result)
+
+        // The order of the merge determines whether ambiguous grammars are left or right associative by default.
+        result = result.merge(current)
       }
 
       (result, current)
