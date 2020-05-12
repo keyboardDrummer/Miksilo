@@ -173,7 +173,7 @@ lazy val playground = (project in file("playground")).
     skip in publish := true,
 
     assemblySettings,
-    mainClass in Compile := Some("application.Program"),
+    mainClass in Compile := Some("miksilo.playground.application.Program"),
     libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "2.1.1",
     libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "3.0.8",
     libraryDependencies += "org.bidib.org.oxbow" % "swingbits" % "1.2.2",
