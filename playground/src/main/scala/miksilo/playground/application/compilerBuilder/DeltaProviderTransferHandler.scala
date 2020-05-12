@@ -13,7 +13,7 @@ class DeltaProviderTransferHandler(val availableList: JList[_]) extends Transfer
 
   @Override
   override def createTransferable(comp: JComponent): Transferable = {
-    new ListItemTransferable(CollectionConverters.ListHasAsScala(availableList.getSelectedValuesList).asScala.map(x => x.getParticleInstance).toSeq)
+    new ListItemTransferable(CollectionConverters.ListHasAsScala(availableList.getSelectedValuesList).asScala.map(x => x.getDeltaInstance).toSeq)
   }
 
   override def getSourceActions(c: JComponent): Int = DnDConstants.ACTION_COPY
