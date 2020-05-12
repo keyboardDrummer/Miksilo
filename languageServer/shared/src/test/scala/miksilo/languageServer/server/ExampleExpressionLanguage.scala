@@ -36,8 +36,6 @@ case class Identifier(range: OffsetPointerRange, name: String) extends Expressio
     builder.resolve(name, scope, this.addFile(uri))
   }
 
-// Other data types...
-
   override def childElements = Seq.empty
 }
 
@@ -52,6 +50,9 @@ case class Number(range: OffsetPointerRange, value: Int) extends Expression {
   override def childElements: Seq[Nothing] = Seq.empty
 }
 
+/** Occurs in places where an expression is missing, like `3 + <here>`
+  * In that case, provide code completion for variables
+  */
 case class ExpressionHole(range: OffsetPointerRange) extends Expression {
 
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
@@ -61,7 +62,7 @@ case class ExpressionHole(range: OffsetPointerRange) extends Expression {
   override def childElements = Seq.empty
 }
 
-// 3 + 2
+// Syntax: 3 + 2
 case class Addition(range: OffsetPointerRange, left: Expression, right: Expression) extends Expression {
   override def collectConstraints(builder: ConstraintBuilder, uri: String, scope: Scope): Unit = {
     left.collectConstraints(builder, uri, scope)
