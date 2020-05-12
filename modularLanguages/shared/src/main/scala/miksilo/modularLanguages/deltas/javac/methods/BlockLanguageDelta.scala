@@ -35,7 +35,7 @@ object BlockLanguageDelta extends DeltaWithGrammar with DeltaWithPhase
     val mainArgument: Node = MethodParameters.neww("args", ArrayTypeDelta.neww(UnqualifiedObjectTypeDelta.neww("String")))
     val method = MethodDelta.neww("main",VoidTypeDelta.voidType,Seq(mainArgument), block, static = true, AccessibilityFieldsDelta.PublicVisibility)
     val javaClass = JavaClassDelta.neww(Seq.empty,"Block",Seq(method))
-    compilation.program = javaClass
+    compilation.program = PathRoot(javaClass)
   }
 
   //TODO bring back. override def dependencies: Set[Contract] = Set(ImplicitObjectSuperClass, MethodDelta)
