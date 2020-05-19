@@ -45,6 +45,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 
+  def singleDelayedResult[Result](parseResult: ReadyParseResult[State, Result]) =
+    new SRCons(new DelayedParseResult(parseResult.remainder, parseResult.history, () => singleResult(parseResult)), 0, SREmpty.empty) //parseResult, 0, SREmpty.empty)
 
   def singleResult[Result](parseResult: LazyParseResult[State, Result]) =
     new SRCons(parseResult, 0, SREmpty.empty)
@@ -140,16 +142,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
           val leftResults = parseLeft(position, state, fixPointState)
 
-          val delayedLeftResults: ParseResults[State, Left] = leftResults.mapResult({
-            case ready: ReadyParseResult[State, Left] =>
-              if (ready.history.flawed) {
-                new DelayedParseResult[State, Left](ready.remainder, ready.history, () => singleResult(ready))
-              }
-              else
-                ready
-            case lazyResult => lazyResult
-          }, false) // TODO set to true?
-
           def rightFromLeftReady(leftReady: ReadyParseResult[State, Left]): ParseResults[State, Result] = {
             def mapRightResult(rightResult: ReadyParseResult[State, Right]): ReadyParseResult[State, Result] = ReadyParseResult(
               combine(leftReady.resultOption, rightResult.resultOption),
@@ -160,7 +152,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             val rightResult = parseRight(leftReady.remainder, leftReady.state, fixPointState)
             rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
           }
-          delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false)
+          leftResults.flatMapReady(rightFromLeftReady, uniform = false)
         }
       }
     }

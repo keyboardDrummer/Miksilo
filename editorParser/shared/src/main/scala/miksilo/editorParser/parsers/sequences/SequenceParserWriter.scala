@@ -98,9 +98,9 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       val parseOriginal = recursive(original)
       (position, state, fixPointState) => {
         val originalResult = parseOriginal.apply(position, state, fixPointState)
-        originalResult.mapReady(r => {
+        originalResult.flatMapReady(r => {
           val history = History.error(MissingInput(position, r.remainder, s"<$name>", " ", History.insertFallbackPenalty))
-          ReadyParseResult(r.resultOption, r.remainder, r.state, history)
+          singleDelayedResult(ReadyParseResult(r.resultOption, r.remainder, r.state, history))
         }, uniform = true)
       }
     }

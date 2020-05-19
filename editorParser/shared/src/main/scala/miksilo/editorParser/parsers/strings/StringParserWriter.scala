@@ -46,9 +46,12 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
             val remainder = position.drop(index)
             val errorHistory = History.error(new MissingInput(remainder, value.substring(index), value.substring(index), penalty))
             if (position.length <= arrayIndex) {
-              return singleResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
+              return singleDelayedResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
             } else if (position.charAt(arrayIndex) != value.charAt(index)) {
-              return singleResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
+              if (value == ":" && position.charAt(arrayIndex) == ',') {
+                System.out.append("")
+              }
+              return singleDelayedResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
             }
             index += 1
           }
@@ -60,7 +63,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
 
     }
 
-    override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
+    override def getMustConsume(cache: ConsumeCache): Boolean = value.nonEmpty
   }
 
   /**
@@ -121,7 +124,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
             case None =>
               penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
                 val history = History.error(new MissingInput(position, s"<$regexName>", defaultValue.getOrElse(""), penalty))
-                singleResult(ReadyParseResult[State, String](defaultValue, position, state, history))
+                singleDelayedResult(ReadyParseResult[State, String](defaultValue, position, state, history))
               })
 
           }
@@ -131,7 +134,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
       result
     }
 
-    override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
+    override def getMustConsume(cache: ConsumeCache): Boolean = regex.findFirstIn("").isEmpty
   }
 
   implicit class StringParserExtensions[Result](parser: Parser[Result]) {

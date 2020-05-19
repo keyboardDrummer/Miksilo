@@ -66,21 +66,22 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       val next = delayedResult.flatMapReady(prev => grow(recursions, growStep(recursions, prev)), uniform = false)
 
       // The order of the merge determines whether ambiguous grammars are left or right associative by default.
-      result.merge(next)
+      val bla = result.merge(next)
+      bla
     }
 
     /**
       * Grows ready results without risking a stack overflow
       */
     def growReadyResults(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): (ParseResults[State, Result], ParseResults[State, Result]) = {
-      var result: ParseResults[State, Result] = previous
+      var result: ParseResults[State, Result] = SREmpty.empty[State]
       var current = previous
 
       while (current.isInstanceOf[SRCons[State, Result]] && current.asInstanceOf[SRCons[State, Result]].head.isInstanceOf[ReadyParseResult[_, Result]]) {
-        current = current.flatMapReady(growStep(recursions, _), uniform = false)
-
         // The order of the merge determines whether ambiguous grammars are left or right associative by default.
         result = result.merge(current)
+
+        current = current.flatMapReady(growStep(recursions, _), uniform = false)
       }
 
       (result, current)
@@ -90,7 +91,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
         val results = recursive.get(singleResult(prev))
         results.flatMapReady(
-          ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else SREmpty.empty,
+          ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else
+            SREmpty.empty,
           uniform = false) // TODO maybe set this to uniform = true
       }).reduce((a, b) => a.merge(b))
     }
