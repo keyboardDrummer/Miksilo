@@ -63,6 +63,10 @@ final class SRCons[State, +Result](
                                     _tail: => ParseResults[State, Result])
   extends ParseResults[State, Result] {
 
+  if (head.offset.offset < 16500) {
+    System.out.append("")
+  }
+
   override def latestRemainder: OffsetPointer = {
     head.offset
   }
@@ -138,6 +142,14 @@ final class SRCons[State, +Result](
     other match {
       case _: SREmpty[State] => this
       case cons: SRCons[State, Other] =>
+
+        if (cons.head.history.toString.contains("expected ','") && cons.head.history.score > 337.0569) {
+          System.out.append("")
+        }
+        if (cons.head.history.toString.contains("expected ','") && cons.head.history.score > 337.0569) {
+          System.out.append("")
+        }
+
         if (head.score >= cons.head.score) {
           getResult(head, Math.max(maxListDepth, 1 + tailDepth), (newBests) => tail.merge(cons, mergeDepth + 1, newBests))
         }

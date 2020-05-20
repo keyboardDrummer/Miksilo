@@ -37,6 +37,15 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
     })
   }
 
+  test("regression") {
+    val program = """{"A":"B","Parameters" : {
+                    |    "BrokenParameter",
+                    |  }
+                    |}""".stripMargin
+    val compilation = json.compileString(program)
+    assert(compilation.diagnostics.nonEmpty)
+  }
+
   val smallErrorsTargetTime = PerformanceTest.smallErrorsTargetTime * modularGrammarSlowdown // We only allow the small errors to make the parsing 5ms slower
   test("JSON with small errors bigrammar performance") {
     val source = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications_edited.json")
@@ -45,6 +54,14 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
       assert(result.diagnostics.size == 2)
       assert(result.program.childElements.size == 6)
     })
+  }
+
+  test("regression 2") {
+    val program = """{"A":"B",
+                    |"
+                    |}""".stripMargin
+    val compilation = json.compileString(program)
+    assert(compilation.diagnostics.nonEmpty)
   }
 
   val yaml = TestLanguageBuilder.buildWithParser(ModularYamlLanguage.deltasWithoutParser, UntilBestAndXStepsStopFunction())

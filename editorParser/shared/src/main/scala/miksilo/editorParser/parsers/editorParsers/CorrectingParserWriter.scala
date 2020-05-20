@@ -27,7 +27,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }
           tail match {
             case tailCons: SRCons[State, Result] =>
-              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
+              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.score, tailCons.head.score))
                 SREmpty.empty[State]
               else
                 tail
@@ -35,8 +35,12 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
               SREmpty.empty[State]
           }
         case delayedResult: DelayedParseResult[State, Result] =>
+          if (delayedResult.toString.contains("-1.8010000000000002 delayed: score: -1.8010000000000002, errors: List(expected '\":<value>,' but found '\n')")) {
+            System.out.append("")
+          }
           val results = delayedResult.getResults
-          tail.merge(results)
+          val bla = tail.merge(results)
+          bla
       }
     }
     val millisecondsSpent = System.currentTimeMillis() - start
@@ -69,7 +73,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     new Sequence(left, right, combine)
 
   override def choice[Result](first: Parser[Result], other: => Parser[Result], firstIsLonger: Boolean = false): Parser[Result] =
-    if (firstIsLonger) new FirstIsLonger(first, other) else new Choice(first, other)
+    if (false && firstIsLonger) new FirstIsLonger(first, other) else new Choice(first, other)
 
   override def map[Result, NewResult](original: Parser[Result], f: Result => NewResult): Parser[NewResult] = MapParser(original, f)
 
@@ -195,7 +199,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
           val firstResult = parseFirst(position, state, fixPointState)
           val secondResult = parseSecond(position, state, fixPointState)
-          firstResult.merge(secondResult)
+          val result = firstResult.merge(secondResult)
+          if (position.offset >= 3304/*16550*/) {
+            System.out.append("")
+          }
+          result
         }
       }
     }

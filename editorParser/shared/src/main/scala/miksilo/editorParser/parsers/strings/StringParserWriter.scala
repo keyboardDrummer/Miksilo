@@ -40,6 +40,9 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
 
       lazy val result: BuiltParser[String] = new BuiltParser[String] {
         def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[String] = {
+          if (position.lineCharacter.line > 450) {
+            System.out.append("")
+          }
           var index = 0
           while (index < value.length) {
             val arrayIndex = index + position.offset
@@ -48,7 +51,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
             if (position.length <= arrayIndex) {
               return singleDelayedResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
             } else if (position.charAt(arrayIndex) != value.charAt(index)) {
-              if (value == ":" && position.charAt(arrayIndex) == ',') {
+              if (position.offset > 16550 && value == "\"" && position.charAt(arrayIndex) == '\n') {
                 System.out.append("")
               }
               return singleDelayedResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
@@ -122,6 +125,9 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
               val remainder = position.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value, score)))
             case None =>
+              if (regexName == "string literal" && position.offset > 16540) {
+                System.out.println("")
+              }
               penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
                 val history = History.error(new MissingInput(position, s"<$regexName>", defaultValue.getOrElse(""), penalty))
                 singleDelayedResult(ReadyParseResult[State, String](defaultValue, position, state, history))

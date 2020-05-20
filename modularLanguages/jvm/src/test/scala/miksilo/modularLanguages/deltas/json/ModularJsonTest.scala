@@ -115,6 +115,10 @@ class ModularJsonTest extends AnyFunSuite {
     val printResult = utils.getPrintResult(ast)
     assertResult(expected)(printResult)
   }
+
+  test("optional comma") {
+
+  }
 }
 
 
