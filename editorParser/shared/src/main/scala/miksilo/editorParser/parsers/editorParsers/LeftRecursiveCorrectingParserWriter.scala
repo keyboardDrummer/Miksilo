@@ -72,15 +72,20 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         current = current.flatMapReady(growStep(recursions, _), uniform = false)
       }
 
-      result.merge(grow(recursions, current))
+      val grown = grow(recursions, current)
+      val finalResult = grown.merge(result)
+      finalResult
     }
 
     def grow(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): ParseResult[Result] = {
-      val next = previous.flatMapReady(prev => growWithTrampoline(recursions, growStep(recursions, prev)), uniform = false)
+      val next = previous.flatMapReady(prev => {
+        val grown = growWithTrampoline(recursions, growStep(recursions, prev))
+        // The order of the merge determines whether ambiguous grammars are left or right associative by default.
+        val result = grown.merge(singleResult(prev))
+        result
+      }, uniform = false)
 
-      // The order of the merge determines whether ambiguous grammars are left or right associative by default.
-      val bla = previous.merge(next)
-      bla
+      next
     }
 
     def growStep(recursions: List[RecursiveParseResult[State, Result, Result]], prev: ReadyParseResult[State, Result]): ParseResults[State, Result] = {

@@ -125,9 +125,6 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
               val remainder = position.drop(matched.end)
               singleResult(ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value, score)))
             case None =>
-              if (regexName == "string literal" && position.offset > 16540) {
-                System.out.println("")
-              }
               penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
                 val history = History.error(new MissingInput(position, s"<$regexName>", defaultValue.getOrElse(""), penalty))
                 singleDelayedResult(ReadyParseResult[State, String](defaultValue, position, state, history))

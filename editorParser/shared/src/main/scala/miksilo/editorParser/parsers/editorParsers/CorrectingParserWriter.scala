@@ -35,9 +35,6 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
               SREmpty.empty[State]
           }
         case delayedResult: DelayedParseResult[State, Result] =>
-          if (delayedResult.toString.contains("-1.8010000000000002 delayed: score: -1.8010000000000002, errors: List(expected '\":<value>,' but found '\n')")) {
-            System.out.append("")
-          }
           val results = delayedResult.getResults
           val bla = tail.merge(results)
           bla

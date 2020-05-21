@@ -64,6 +64,12 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
     assert(compilation.diagnostics.nonEmpty)
   }
 
+  test("regression 3") {
+    val program = """{"A":"B","C",}""".stripMargin
+    val compilation = json.compileString(program)
+    assert(compilation.diagnostics.nonEmpty)
+  }
+
   val yaml = TestLanguageBuilder.buildWithParser(ModularYamlLanguage.deltasWithoutParser, UntilBestAndXStepsStopFunction())
   test("YAML with small errors bigrammar performance") {
     val source = SourceUtils.getResourceFileContents("yaml/AutoScalingMultiAZWithNotifications_edited.yaml")
