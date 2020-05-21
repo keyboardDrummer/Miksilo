@@ -4,7 +4,7 @@ A parsing library that creates parsers suitable for use in text editors. Parsers
 
 Parsers used for text editors have unique requirements when compared to parsers used for machine consumption, which EditorParser satisfies:
 - Parsers must be error correcting, meaning that when the parser encounters errors in the input, it can correct them and continue parsing. This feature is important because while a user is typing there are often parse errors in the input text, and without error correction it's not possible to provide good feedback to the user. Most importantly, without error correction features like code completion won't work at the times when they're most useful!
-- Parsers must be incremental, meaning that if the user makes a small change in the input text, only this piece of text needs to be re-parsed. This is important to allow the editor tooling to remain responsive even when large files are edited. __NOTE this is still WIP!__
+- Parsers must be incremental, meaning that if the user makes a small change in the input text, only this piece of text needs to be re-parsed. This is important to allow the editor tooling to remain responsive even when large files are edited.
 
 ### Error Correction
 In general, an error correction parser can produce many different results for a given input text, since adding an removing input symbols can be done in many different ways. To determine which of the parse results is most likely to be what the human writer intended to write, heuristics are used to score each parse result, after which the best scoring one is picked. 
