@@ -67,13 +67,13 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
       while (current.isInstanceOf[SRCons[State, Result]] && current.asInstanceOf[SRCons[State, Result]].head.isInstanceOf[ReadyParseResult[_, Result]]) {
         // The order of the merge determines whether ambiguous grammars are left or right associative by default.
-        result = result.merge(current)
+        result = result.merge(current, maxListDepth)
 
-        current = current.flatMapReady(growStep(recursions, _), uniform = false)
+        current = current.flatMapReady(growStep(recursions, _), uniform = false, maxListDepth)
       }
 
       val grown = grow(recursions, current)
-      val finalResult = grown.merge(result)
+      val finalResult = grown.merge(result, maxListDepth)
       finalResult
     }
 
@@ -81,20 +81,10 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       val next = previous.flatMapReady(prev => {
         val grown = growWithTrampoline(recursions, growStep(recursions, prev))
         // The order of the merge determines whether ambiguous grammars are left or right associative by default.
-        val result = grown.merge(singleResult(prev))
+        val result = grown.merge(singleResult(prev), maxListDepth)
         result
-      }, uniform = false)
+      }, uniform = false, maxListDepth)
 
-      next
-    }
-
-    def oldGrow(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): ParseResult[Result] = {
-      val next = previous.flatMapReady(prev => {
-        growWithTrampoline(recursions, growStep(recursions, prev))
-      }, uniform = false)
-
-      // The order of the merge determines whether ambiguous grammars are left or right associative by default.
-      val result = next.merge(previous)
       next
     }
 
@@ -104,8 +94,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         results.flatMapReady(
           ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else
             SREmpty.empty,
-          uniform = false) // TODO maybe set this to uniform = true
-      }).reduce((a, b) => a.merge(b))
+          uniform = false, maxListDepth) // TODO maybe set this to uniform = true
+      }).reduce((a, b) => a.merge(b, maxListDepth))
     }
 
     def getPreviousResult(position: TextPointer, fixPointState: FixPointState): Option[ParseResult[Result]] = {
@@ -142,7 +132,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
     override def tailDepth = 0
 
-    override def merge[Other >: Result](other: ParseResults[State, Other], depth: Int,
+    override def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int,
                                         bests: Map[Int, Double] = Map.empty): RecursiveResults[Other] = other match {
       case otherRecursions: RecursiveResults[Result] =>
         val merged = this.recursions.foldLeft(otherRecursions.recursions)((acc, entry) => {
@@ -152,17 +142,17 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           }
           acc + (entry._1 -> value)
         })
-        RecursiveResults(merged, tail.merge(otherRecursions.tail))
+        RecursiveResults(merged, tail.merge(otherRecursions.tail, remainingListLength))
       case _ =>
-        RecursiveResults(this.recursions, tail.merge(other))
+        RecursiveResults(this.recursions, tail.merge(other, remainingListLength))
     }
 
     override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
                                     uniform: Boolean,
-                                    depth: Int) = {
+                                    remainingListLength: Int) = {
       RecursiveResults(
-        recursions.view.mapValues(s => s.map(r => r.compose(pr => pr.flatMap(f, uniform)))).toMap,
-        tail.flatMap(f, uniform))
+        recursions.view.mapValues(s => s.map(r => r.compose(pr => pr.flatMap(f, uniform, remainingListLength)))).toMap,
+        tail.flatMap(f, uniform, remainingListLength))
     }
 
     override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult],

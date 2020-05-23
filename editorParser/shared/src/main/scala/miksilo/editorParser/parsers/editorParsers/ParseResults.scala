@@ -9,20 +9,20 @@ trait ParseResults[State, +Result] extends CachingParseResult {
   def toList: List[LazyParseResult[State, Result]]
   def tailDepth: Int
 
-  def merge[Other >: Result](other: ParseResults[State, Other], depth: Int = 0,
+  def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int,
                              bests: Map[Int, Double] = Map.empty): ParseResults[State, Other]
 
   def map[NewResult](f: Result => NewResult): ParseResults[State, NewResult] = {
-    flatMap(lazyParseResult => singleResult(lazyParseResult.map(f)), uniform = true)
+    flatMap(lazyParseResult => singleResult(lazyParseResult.map(f)), uniform = true, Int.MaxValue)
   }
 
   def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult], uniform: Boolean): ParseResults[State, NewResult] = {
-    flatMap(r => singleResult(f(r)), uniform)
+    flatMap(r => singleResult(f(r)), uniform, Int.MaxValue)
   }
 
   def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
                          uniform: Boolean,
-                         depth: Int = 0): ParseResults[State, NewResult]
+                         remainingListLength: Int): ParseResults[State, NewResult]
 
   def addHistory(errors: History): ParseResults[State, Result] = {
     mapWithHistory(x => x, errors)
@@ -38,8 +38,8 @@ trait ParseResults[State, +Result] extends CachingParseResult {
     mapResult(l => l.mapReady(f, uniform), uniform)
   }
 
-  def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean): ParseResults[State, NewResult] = {
-    flatMap[NewResult](l => l.flatMapReady(f, uniform), uniform)
+  def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean, maxListDepth: Int): ParseResults[State, NewResult] = {
+    flatMap[NewResult](l => l.flatMapReady(f, uniform, maxListDepth), uniform, maxListDepth)
   }
 
   def updateRemainder(f: (TextPointer, State) => (TextPointer, State)): ParseResults[State, Result] = {
@@ -53,8 +53,6 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 object ParseResults {
   def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] =
     new SRCons(parseResult,0, SREmpty.empty[State])
-
-  val maxListDepth = 200 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
 }
 
 final class SRCons[State, +Result](
@@ -62,10 +60,6 @@ final class SRCons[State, +Result](
                                     var tailDepth: Int,
                                     _tail: => ParseResults[State, Result])
   extends ParseResults[State, Result] {
-
-  if (head.offset.offset < 16500) {
-    System.out.append("")
-  }
 
   override def latestRemainder: OffsetPointer = {
     head.offset
@@ -84,27 +78,28 @@ final class SRCons[State, +Result](
 
   def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
                          uniform: Boolean,
-                         depth: Int): ParseResults[State, NewResult] = {
+                         remainingListLength: Int): ParseResults[State, NewResult] = {
 
 
-    if (depth > maxListDepth) {
+    if (remainingListLength == 0) {
       return SREmpty.empty[State]
     }
 
     f(head) match {
-      case _: SREmpty[State] => tail.flatMap(f, uniform, depth)
+      case _: SREmpty[State] => tail.flatMap(f, uniform, remainingListLength)
       case cons: SRCons[State, NewResult] =>
 
         if (!uniform && head.score > cons.head.score)
-          cons.merge(tail.flatMap(f, uniform, depth + 1), depth)
+          // TODO do we need this then branch?
+          cons.merge(tail.flatMap(f, uniform, remainingListLength - 1), remainingListLength)
         else
         {
           new SRCons(
             cons.head,
             1 + Math.max(this.tailDepth, cons.tailDepth),
-            cons.tail.merge(tail.flatMap(f, uniform, depth + 1), + 1))
+            cons.tail.merge(tail.flatMap(f, uniform, remainingListLength - 1), remainingListLength - 1))
         }
-      case other => other.merge(tail.flatMap(f, uniform, depth + 1), depth)
+      case other => other.merge(tail.flatMap(f, uniform, remainingListLength - 1), remainingListLength)
     }
   }
 
@@ -117,9 +112,9 @@ final class SRCons[State, +Result](
   To accomplish this, we use the bests parameter.
    */
   override def merge[Other >: Result](other: ParseResults[State, Other],
-                                      mergeDepth: Int,
+                                      remainingListLength: Int,
                                       bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
-    if (mergeDepth > maxListDepth) {
+    if (remainingListLength == 0) {
       return SREmpty.empty[State]
     }
 
@@ -143,20 +138,18 @@ final class SRCons[State, +Result](
       case _: SREmpty[State] => this
       case cons: SRCons[State, Other] =>
 
-        if (cons.head.history.toString.contains("expected ','") && cons.head.history.score > 337.0569) {
-          System.out.append("")
-        }
-        if (cons.head.history.toString.contains("expected ','") && cons.head.history.score > 337.0569) {
-          System.out.append("")
-        }
-
+        val maxListDepth = 200
         if (head.score >= cons.head.score) {
-          getResult(head, Math.max(maxListDepth, 1 + tailDepth), (newBests) => tail.merge(cons, mergeDepth + 1, newBests))
+          // TODO describe what the Math.max here is for.
+          getResult(head, Math.max(maxListDepth, 1 + tailDepth), (newBests) => {
+            val merged = tail.merge(cons, remainingListLength - 1, newBests)
+            merged
+          })
         }
         else {
-          getResult(cons.head, Math.max(maxListDepth, 1 + cons.tailDepth), (newBests) => this.merge(cons.tail, mergeDepth + 1, newBests))
+          getResult(cons.head, Math.max(maxListDepth, 1 + cons.tailDepth), (newBests) => this.merge(cons.tail, remainingListLength - 1, newBests))
         }
-      case earlier => earlier.merge(this, mergeDepth)
+      case earlier => earlier.merge(this, remainingListLength)
     }
   }
 
@@ -171,14 +164,19 @@ object SREmpty {
 }
 
 class SREmpty[State] extends ParseResults[State, Nothing] {
-  override def merge[Other >: Nothing](other: ParseResults[State, Other], depth: Int,
-                                       bests: Map[Int, Double] = Map.empty) = other
+  override def merge[Other >: Nothing](other: ParseResults[State, Other], remainingListLength: Int,
+                                       bests: Map[Int, Double] = Map.empty) = {
+    if (remainingListLength == 0)
+      this
+    else
+      other
+  }
 
   override def mapResult[NewResult](f: LazyParseResult[State, Nothing] => LazyParseResult[State, NewResult], uniform: Boolean) = this
 
   override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult],
                                   uniform: Boolean,
-                                  depth: Int) = this
+                                  remainingListLength: Int) = this
 
   override def map[NewResult](f: Nothing => NewResult) = this
 
