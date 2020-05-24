@@ -41,7 +41,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
                 SREmpty.empty
               else
                 singleResult(ready)
-            }, uniform = true)
+            }, uniform = true, maxListDepth)
           }
 
           val droppedInput = position.drop(1)
@@ -50,7 +50,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           val withDrop = singleResult(new DelayedParseResult(position, dropHistory , () => {
             parse(droppedInput, state, fixPointState, mayFail = false).addHistory(dropHistory)
           }))
-          originalResult.merge(withDrop)
+          originalResult.merge(withDrop, maxListDepth)
         }
 
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {

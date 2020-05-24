@@ -30,12 +30,12 @@ case class WithTrivia(var inner: BiGrammar, var trivia: BiGrammar = ParseWhiteSp
 
 case class UpdateLatestRemainder[State, Result](remainder: OffsetPointer) extends ParseResults[State, Result] {
 
-  override def merge[Other >: Result](other: ParseResults[State, Other], mergeDepth: Int,
-                                       bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
+  override def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int,
+                                      bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
     other match {
       case _: SREmpty[State] => this
       case cons: SRCons[State, Other] =>
-        new SRCons(cons.head, cons.tailDepth + 1, this.merge(cons.tail, mergeDepth + 1, bests))
+        new SRCons(cons.head, cons.tailDepth + 1, this.merge(cons.tail, remainingListLength - 1, bests))
       case latestRemainder: UpdateLatestRemainder[State, Result] =>
         if (latestRemainder.remainder.offset > remainder.offset) latestRemainder else this
     }
@@ -47,7 +47,7 @@ case class UpdateLatestRemainder[State, Result](remainder: OffsetPointer) extend
     this.asInstanceOf[ParseResults[State, NewResult]]
 
   override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean,
-                                  depth: Int) =
+                                  remainingListLength: Int) =
     this.asInstanceOf[ParseResults[State, NewResult]]
 
   override def map[NewResult](f: Result => NewResult) =
@@ -100,9 +100,9 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
                 rightReady.state,
                 rightReady.history ++ leftReady.history))
             }
-          }, uniform = true)
+          }, uniform = true, maxListDepth)
         }
-        leftResults.flatMapReady(rightFromLeftReady, uniform = false)
+        leftResults.flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
       }
     }
   }
