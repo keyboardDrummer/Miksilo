@@ -48,7 +48,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 
   def singleDelayedResult[Result](parseResult: ReadyParseResult[State, Result]) =
-    new SRCons(new DelayedParseResult(parseResult.remainder, parseResult.history, () => singleResult(parseResult)), 0, SREmpty.empty) //parseResult, 0, SREmpty.empty)
+    new SRCons(new DelayedParseResult(parseResult.remainder, parseResult.history, () => singleResult(parseResult)), 0, SREmpty.empty)
 
   def singleResult[Result](parseResult: LazyParseResult[State, Result]) =
     new SRCons(parseResult, 0, SREmpty.empty)
