@@ -172,9 +172,9 @@ object SREmpty {
 class SREmpty[State] extends ParseResults[State, Nothing] {
   override def merge[Other >: Nothing](other: ParseResults[State, Other], remainingListLength: Int,
                                        bests: Map[Int, Double] = Map.empty) = {
-//    if (remainingListLength == 0)
-//      this
-//    else
+    if (remainingListLength == 0)
+      this
+    else
       other
   }
 

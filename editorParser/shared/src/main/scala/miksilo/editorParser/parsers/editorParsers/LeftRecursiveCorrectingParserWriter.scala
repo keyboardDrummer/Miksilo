@@ -50,7 +50,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
               val foundRecursion = recursions.nonEmpty
 
               val result = if (foundRecursion)
-                grow(recursions, resultWithoutRecursion)
+                growWithTrampoline(recursions, resultWithoutRecursion)
               else
                 resultWithoutRecursion
 
@@ -61,38 +61,41 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       }
     }
 
-    def grow(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): ParseResult[Result] = {
-      val (result: ParseResults[State, Result], delayedResult) = growReadyResults(recursions, previous)
-      val next = delayedResult.flatMapReady(prev => grow(recursions, growStep(recursions, prev)), uniform = false, maxListDepth)
-      result.merge(next, maxListDepth)
-    }
-
-    /**
-      * Grows ready results without risking a stack overflow
-      */
-    def growReadyResults(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): (ParseResults[State, Result], ParseResults[State, Result]) = {
-      var result: ParseResults[State, Result] = previous
+    def growWithTrampoline(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): ParseResult[Result] = {
+      var result: ParseResults[State, Result] = SREmpty.empty[State]
       var current = previous
 
       while (current.isInstanceOf[SRCons[State, Result]] && current.asInstanceOf[SRCons[State, Result]].head.isInstanceOf[ReadyParseResult[_, Result]]) {
+        // The order of the merge determines whether ambiguous grammars are left or right associative by default.
         result = result.merge(current, maxListDepth)
+
         current = current.flatMapReady(growStep(recursions, _), uniform = false, maxListDepth)
       }
 
-      (result, current)
+      val grown = grow(recursions, current)
+      val finalResult = grown.merge(result, maxListDepth)
+      finalResult
+    }
+
+    def grow(recursions: List[RecursiveParseResult[State, Result, Result]], previous: ParseResult[Result]): ParseResult[Result] = {
+      val next = previous.flatMapReady(prev => {
+        val grown = growWithTrampoline(recursions, growStep(recursions, prev))
+        // The order of the merge determines whether ambiguous grammars are left or right associative by default.
+        val result = grown.merge(singleResult(prev), maxListDepth)
+        result
+      }, uniform = false, maxListDepth)
+
+      next
     }
 
     def growStep(recursions: List[RecursiveParseResult[State, Result, Result]], prev: ReadyParseResult[State, Result]): ParseResults[State, Result] = {
-      if (prev.history.flawed)
-        SREmpty.empty // TODO consider growing this as well
-      else {
-        recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
-          val results = recursive.get(singleResult(prev))
-          results.flatMapReady(
-            ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else SREmpty.empty,
-            uniform = false, maxListDepth) // TODO maybe set this to uniform = true
-        }).reduce((a, b) => a.merge(b, maxListDepth))
-      }
+      recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
+        val results = recursive.get(singleResult(prev))
+        results.flatMapReady(
+          ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else
+            SREmpty.empty,
+          uniform = false, maxListDepth) // TODO maybe set this to uniform = true
+      }).reduce((a, b) => a.merge(b, maxListDepth))
     }
 
     def getPreviousResult(position: TextPointer, fixPointState: FixPointState): Option[ParseResult[Result]] = {
