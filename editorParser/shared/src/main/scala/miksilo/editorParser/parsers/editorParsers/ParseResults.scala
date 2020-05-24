@@ -3,6 +3,12 @@ package miksilo.editorParser.parsers.editorParsers
 import miksilo.editorParser.parsers.core.{OffsetPointer, TextPointer}
 import miksilo.editorParser.parsers.editorParsers.ParseResults._
 
+/**
+  * A collection of paths in the parse graph.
+  * The parse graph is the graph containing all triples of offset, parser and context as nodes.
+  * Paths can be partial, meaning we can still continue parsing from the end of the path.
+  * Path are sorted according to their score. The score indicates how likely this path is what the writer intended.
+  */
 trait ParseResults[State, +Result] extends CachingParseResult {
   def nonEmpty: Boolean
   def pop(): (LazyParseResult[State, Result], ParseResults[State, Result])
