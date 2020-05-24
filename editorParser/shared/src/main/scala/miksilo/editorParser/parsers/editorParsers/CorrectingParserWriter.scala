@@ -4,6 +4,8 @@ import miksilo.editorParser.parsers.core._
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
+  val maxListDepth = 200 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
+
   def findBestParseResult[Result](zero: TextPointer, parser: BuiltParser[Result], mayStop: StopFunction,
                                   metrics: Metrics): SingleParseResult[Result] = {
 
@@ -36,7 +38,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }
         case delayedResult: DelayedParseResult[State, Result] =>
           val results = delayedResult.getResults
-          tail.merge(results)
+          tail.merge(results, maxListDepth)
       }
     }
     val millisecondsSpent = System.currentTimeMillis() - start
@@ -104,7 +106,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                   singleResult(rightReady.mapWithHistory(mapRightResult, leftReady.history))
                 }
               case other => singleResult(other.mapWithHistory(mapRightResult, leftReady.history))
-            }, uniform = !leftReady.history.canMerge)
+            }, uniform = !leftReady.history.canMerge, maxListDepth)
           }
 
           val withoutLeft = parseRight(position, state, fixPointState)
@@ -113,8 +115,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           if (position.atEnd())
             return withoutLeft
 
-          val withLeft = parseLeft(position, state, fixPointState).flatMapReady(rightFromLeftReady, uniform = false)
-          withoutLeft.merge(withLeft)
+          val withLeft = parseLeft(position, state, fixPointState).flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
+          withoutLeft.merge(withLeft, maxListDepth)
         }
 
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
@@ -160,7 +162,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             val rightResult = parseRight(leftReady.remainder, leftReady.state, fixPointState)
             rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
           }
-          delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false)
+          delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
         }
       }
     }
@@ -183,7 +185,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
               if !cons.head.history.flawed => firstResult
             case _ =>
               val secondResult = parseSecond(position, state, fixPointState)
-              firstResult.merge(secondResult)
+              firstResult.merge(secondResult, maxListDepth)
           }
         }
       }
@@ -203,7 +205,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
           val firstResult = parseFirst(position, state, fixPointState)
           val secondResult = parseSecond(position, state, fixPointState)
-          firstResult.merge(secondResult)
+          val result = firstResult.merge(secondResult, maxListDepth)
+          result
         }
       }
     }
