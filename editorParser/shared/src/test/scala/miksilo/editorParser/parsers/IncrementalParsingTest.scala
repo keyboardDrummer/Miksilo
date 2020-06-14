@@ -39,7 +39,7 @@ class IncrementalParsingTest extends AnyFunSuite {
 
   test("inserts work") {
     val input = """[1,3]"""
-    val input2 = """[1,2,0]"""
+    val input2 = """[1,0]"""
     val change = getChange
     change(0,0,input)
     change.setText(input2)
@@ -48,14 +48,12 @@ class IncrementalParsingTest extends AnyFunSuite {
   }
 
   test("multiple inserts work") {
-    val input = """[1,3,5]"""
-    val input2 = """[1,2,0,0]"""
-    val input3 = """[0,2,3,4,0]"""
     val change = getChange
-    change(0,0,"[1,3,5]")
-    change.setText(input2)
-    change(2,2,",2")
-    change.setText(input3)
+    change(0,0, """[1,3,5]""")
+    change.setText("""[0,0,0]""") // Set everything to zero.
+    val result0 = change(3,3,"2,")
+    assertResult(Array(1,2,3,5))(result0.resultOption.get)
+    change.setText("""[0,0,3,0]""") // Set 2 to zero, 3 is not cached because we modified the comma after it and that's part of that element.
     val result = change(6,6,",4")
     assertResult(Array(1,2,3,4,5))(result.resultOption.get)
   }
@@ -113,19 +111,21 @@ class IncrementalParsingTest extends AnyFunSuite {
                     |      "e" : "f"
                     |    }
                     |  }
-                    |}""".stripMargin
+                    |}""".stripMargin.replaceAll(System.lineSeparator(), "\n")
 
     val insert = """
                    |    "b" : "c",
                    |    "d" : {
                    |      "e" : "f"
-                   |    }""".stripMargin
+                   |    }""".stripMargin.replaceAll(System.lineSeparator(), "\n")
 
     val change = getChange
     val result0 = change(0, 0, program)
+    assert(result0.errors.isEmpty)
     val result1 = change(11, 60, "")
-    val result2 = change(11, 11, insert)
     assert(result1.errors.isEmpty)
+    val result2 = change(11, 11, insert)
+    assert(result2.errors.isEmpty)
   }
 
   def getChange: Change = {

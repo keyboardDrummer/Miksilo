@@ -14,7 +14,7 @@ trait LazyParseResult[State, +Result] {
 
   def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], uniform: Boolean): LazyParseResult[State, NewResult]
 
-  val score: Double = (if (history.flawed) 0 else 10000) + history.score
+  val score: Double = history.score
 
   def history: History
   def map[NewResult](f: Result => NewResult): LazyParseResult[State, NewResult]
@@ -74,9 +74,6 @@ case class RecursiveParseResult[State, SeedResult, +Result](
 
 case class ReadyParseResult[State, +Result](resultOption: Option[Result], remainder: TextPointer, state: State, history: History)
   extends LazyParseResult[State, Result] {
-
-  val originalScore = (if (history.flawed) 0 else 10000) + history.score
-  override val score = 10000 + originalScore
 
   override def map[NewResult](f: Result => NewResult): ReadyParseResult[State, NewResult] = {
     ReadyParseResult(resultOption.map(f), remainder, state, history)
