@@ -56,7 +56,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   }
 
 
-  lazy val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
+  lazy val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n\r !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
   lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
   lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseNumber | parseFlowStringLiteral | plainScalar
@@ -83,15 +83,16 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     })
   }
 
+  val newLineRegex = """\r?\n""".r
   val blockScalar: Parser[StringLiteral] = {
-    val nbChar = parseRegex("""[^\n]+""".r, "non break character")
+    val nbChar = parseRegex("""[^\n\r]+""".r, "non break character")
     val chompingIndicator: Parser[String] = "-" | "+" | literal("")
-    val lineSeparator = leftRightSimple(literal("\n", penalty = History.failPenalty, allowDrop = false), whiteSpace, Processor.ignoreLeft[String, String])
+    val lineSeparator = leftRightSimple(parseRegex(newLineRegex, penaltyOption = Some(History.failPenalty), allowDrop = false, regexName = "newline"), whiteSpace, Processor.ignoreLeft[String, String])
 
     val lines: Parser[StringLiteral] = {
       val line = greaterThanOrEqualTo(nbChar)
-      greaterThan(new WithIndentation(line.someSeparated(lineSeparator, "line").
-        withSourceRange((range, lines) => new StringLiteral(Some(range), lines.reduce((a,b) => a + "\n" + b)))))
+      greaterThan(WithIndentation(line.someSeparated(lineSeparator, "line").
+        withSourceRange((range, lines) => new StringLiteral(Some(range), lines.reduce((a, b) => a + "\n" + b)))))
     }
 
     WithIndentation(("|" | ">") ~ chompingIndicator ~ lineSeparator) ~> lines
@@ -137,7 +138,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   }, plainStyleMultiLineString | plainStyleSingleLineString).
     withSourceRange((range, s) => StringLiteral(Some(range), s))
 
-  val nonBreakChars = """\n"""
+  val nonBreakChars = """\n\r"""
   val nonSpaceChars = nonBreakChars + " "
 
   val flowIndicatorChars = """,\[\]{}"""
@@ -162,7 +163,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   lazy val plainStyleSingleLineString = nsPlainSafe
   lazy val plainStyleMultiLineString = {
     val firstLine = new Sequence[String, Any, String](nsPlainSafe, whiteSpace, Processor.ignoreRight)
-    val followingLines = greaterThan(WithIndentation(equal(nsPlainSafe).someSeparated("\n", "line")))
+    val followingLines = greaterThan(WithIndentation(equal(nsPlainSafe).someSeparated(parseRegex(newLineRegex, regexName = "newline"), "line")))
     new Sequence(firstLine, followingLines, combineSimple((firstLine: String, rest: List[String]) => {
       rest.fold(firstLine)((a, b) => a + " " + b)
     }))
