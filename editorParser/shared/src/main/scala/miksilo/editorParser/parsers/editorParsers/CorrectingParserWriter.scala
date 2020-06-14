@@ -29,7 +29,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }
           tail match {
             case tailCons: SRCons[State, Result] =>
-              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
+              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.score, tailCons.head.score))
                 SREmpty.empty[State]
               else
                 tail
