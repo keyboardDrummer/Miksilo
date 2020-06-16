@@ -3,7 +3,7 @@ package miksilo.editorParser.parsers
 import miksilo.editorParser.languages.json.JsonParser
 import miksilo.editorParser.parsers.caching.ArrayOffsetManager
 import miksilo.editorParser.parsers.core.ParseText
-import miksilo.editorParser.parsers.editorParsers.SingleParseResult
+import miksilo.editorParser.parsers.editorParsers.{Position, SingleParseResult}
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.immutable.ListMap
@@ -111,20 +111,21 @@ class IncrementalParsingTest extends AnyFunSuite {
                     |      "e" : "f"
                     |    }
                     |  }
-                    |}""".stripMargin.replaceAll(System.lineSeparator(), "\n")
+                    |}""".stripMargin
 
     val insert = """
                    |    "b" : "c",
                    |    "d" : {
                    |      "e" : "f"
-                   |    }""".stripMargin.replaceAll(System.lineSeparator(), "\n")
+                   |    }""".stripMargin
 
     val change = getChange
-    val result0 = change(0, 0, program)
+    val result0 = change(Position(0,0), Position(0,0), program)
     assert(result0.errors.isEmpty)
-    val result1 = change(11, 60, "")
+    val afterSecondBrace = Position(1, 9)
+    val result1 = change(afterSecondBrace, Position(6,2), "")
     assert(result1.errors.isEmpty)
-    val result2 = change(11, 11, insert)
+    val result2 = change(afterSecondBrace, afterSecondBrace, insert)
     assert(result2.errors.isEmpty)
   }
 
@@ -133,9 +134,11 @@ class IncrementalParsingTest extends AnyFunSuite {
     val parser = ArrayOffsetManager.getCachingParser(text, JsonParser.parser, indentationSensitive = false)
     new Change {
 
-      override def apply(from: Int, until: Int, newText: String) = {
-        text.applyRangeChange(start = from, end = until, newText = newText)
-        parser.changeRange(from, until, newText.length)
+      override def apply(from: Position, until: Position, newText: String) = {
+        val untilOffset = text.getOffset(until)
+        val fromOffset = text.getOffset(from)
+        text.applyRangeChange(fromOffset, end = untilOffset, newText = newText)
+        parser.changeRange(fromOffset, untilOffset, newText.length)
         val parseResult = parser.parse()
         parseResult.map(JsonTestUtils.valueToPrimitive)
       }
@@ -147,7 +150,10 @@ class IncrementalParsingTest extends AnyFunSuite {
   }
 
   trait Change {
-    def apply(from: Int, until: Int, newText: String): SingleParseResult[Any]
+    def apply(from: Position, until: Position, newText: String): SingleParseResult[Any]
+    def apply(from: Int, until: Int, newText: String): SingleParseResult[Any] = {
+      apply(Position(0, from), Position(0, until), newText)
+    }
     def setText(newText: String): Unit
   }
 

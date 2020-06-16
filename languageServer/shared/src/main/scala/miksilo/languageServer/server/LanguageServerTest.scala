@@ -41,8 +41,12 @@ trait LanguageServerTest {
   }
 
   def applyChange(server: MiksiloLanguageServer, document: TextDocumentIdentifier, from: Int, until: Int, newText: String): Seq[Diagnostic] = {
+    applyChange(server, document, Position(0, from), Position(0, until), newText)
+  }
+
+  def applyChange(server: MiksiloLanguageServer, document: TextDocumentIdentifier, from: Position, until: Position, newText: String): Seq[Diagnostic] = {
     getDiagnostics(server, DidChangeTextDocumentParams(new VersionedTextDocumentIdentifier(document.uri, 0L),
-      Seq(TextDocumentContentChangeEvent(Some(SourceRange(Position(0, from), Position(0, until))), Some(until - from), newText))))
+      Seq(TextDocumentContentChangeEvent(Some(SourceRange(from, until)), None, newText))))
   }
 
   def getDiagnostics(server: LanguageServer, change: DidChangeTextDocumentParams): Seq[Diagnostic] = {
