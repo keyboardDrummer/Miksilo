@@ -39,7 +39,7 @@ class YamlTest extends AnyFunSuite {
                   |             '
                   |
                   |            ']
-                  |""".stripMargin
+                  |""".stripMargin.replaceAll("\r\n", "\n")
     val result = parser.parse(input)
     assert(result.successful)
   }
@@ -187,7 +187,7 @@ class YamlTest extends AnyFunSuite {
   }
 
   test("big yaml file") {
-    val contents = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.yaml")
+    val contents = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.yaml").replaceAll("\r\n", "\n")
     val result = parser.parse(contents)
     assert(result.successful, result.toString)
   }
