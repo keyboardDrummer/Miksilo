@@ -17,8 +17,8 @@ object PlainScalarDelta extends DeltaWithGrammar {
     val grammars = _grammars
     import grammars._
 
-    val nonBreakChars = """\n"""
-    val nonSpaceChars = """\n """
+    val nonBreakChars = """\r\n"""
+    val nonSpaceChars = """\r\n """
     val indicatorChars = """-\?:,\[\]\{\}#&*!\|>'"%@`"""
     val allowedInFirst = Set('?',':','-')
     val nonPlainFirstChars = (nonSpaceChars + indicatorChars).filter(c => !allowedInFirst.contains(c))
@@ -36,8 +36,9 @@ object PlainScalarDelta extends DeltaWithGrammar {
       FlowKey -> doubleColonPlainSafeIn), doubleColonPlainSafeOut)
 
     val plainStyleSingleLineString: BiGrammar = nsPlainSafe
+    val newLine = RegexGrammar("""\r?\n""".r, "newLine", penaltyOption = Some(History.failPenalty), allowDrop = false)
     val plainStyleMultiLineString: BiGrammar = {
-      val lineSeparator = new BiSequence(Delimiter("\n", penalty = History.failPenalty, allowDrop = false), _grammars.trivia, BiSequence.ignoreLeft, true)
+      val lineSeparator = new BiSequence(newLine, _grammars.trivia, BiSequence.ignoreLeft, true)
       val firstLine = new BiSequence(nsPlainSafe, lineSeparator, BiSequence.ignoreRight, false)
       val followingLine = CheckIndentationGrammar.equal(nsPlainSafe)
       val otherLines = CheckIndentationGrammar.greaterThan(new WithIndentationGrammar(followingLine.someSeparated(lineSeparator)))

@@ -44,6 +44,9 @@ final class ParseText extends CharSequence with LazyLogging {
   }
 
   def getOffset(position: Position): Int = {
+    if (position.character == 0 && position.line == 0)
+      return 0
+
     if (position.line < 0 || position.line >= lineStarts.length) {
       throw new IllegalArgumentException(s"Line ${position.line} is not in the document.")
     }
