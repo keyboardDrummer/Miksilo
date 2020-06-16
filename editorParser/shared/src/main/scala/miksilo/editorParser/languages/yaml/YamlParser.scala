@@ -165,7 +165,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   lazy val plainStyleMultiLineString = {
     val firstLine = new Sequence[String, Any, String](nsPlainSafe, whiteSpace, Processor.ignoreRight)
     val followingLines = greaterThan(WithIndentation(equal(nsPlainSafe).someSeparated(newLine, "line")))
-    new Sequence(firstLine, followingLines, combineSimple((firstLine: String, rest: List[String]) => {
+    new Sequence(firstLine, followingLines, combineSimple((firstLine: String, rest: Vector[String]) => {
       rest.fold(firstLine)((a, b) => a + " " + b)
     }))
   }
