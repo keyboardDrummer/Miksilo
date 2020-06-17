@@ -34,11 +34,17 @@ object CallDelta extends DeltaWithGrammar with ExpressionInstance {
     core.addAlternative(parseCall)
   }
 
-  object Shape extends NodeShape
+  object Shape extends NodeShape {
+    override def toString: String = "Call"
+  }
 
-  object Callee extends NodeField
+  object Callee extends NodeField {
+    override def toString: String = "Callee"
+  }
 
-  object Arguments extends NodeField
+  object Arguments extends NodeField {
+    override def toString: String = "Arguments"
+  }
 
   object CallArgumentsGrammar extends GrammarKey
 

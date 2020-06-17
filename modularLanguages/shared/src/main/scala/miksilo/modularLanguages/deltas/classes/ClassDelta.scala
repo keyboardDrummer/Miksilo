@@ -5,15 +5,27 @@ import miksilo.modularLanguages.deltas.HasNameDelta.HasName
 
 object ClassDelta {
 
-  object Shape extends NodeShape
+  override def toString: String = "ClassDelta"
 
-  object Members extends NodeField
+  object Shape extends NodeShape {
+    override def toString: String = "Class"
+  }
 
-  object ClassImports extends NodeField
+  object Members extends NodeField {
+    override def toString: String = "Members"
+  }
 
-  object ClassParent extends NodeField
+  object ClassImports extends NodeField {
+    override def toString: String = "Imports"
+  }
 
-  object ClassPackage extends NodeField
+  object ClassParent extends NodeField {
+    override def toString: String = "Parent"
+  }
+
+  object ClassPackage extends NodeField {
+    override def toString: String = "Package"
+  }
 
   implicit class JavaClass[T <: NodeLike](val node: T) extends HasName[T] {
     def _package: Seq[String] = node(ClassPackage).asInstanceOf[Seq[String]]

@@ -29,52 +29,51 @@ object PrintByteCode {
   val versionNumber: Seq[Byte] = intToBytes(0x00000033)
 
   def getBytes(compilation: Compilation, byteCode: Node): LazyList[Byte] = {
-
+    if (compilation.diagnostics.nonEmpty) {
+      throw new Error("Cannot get bytes for program with errors")
+    }
     val classFile = new ClassFile(byteCode)
-    def getBytes(byteCode: Node): LazyList[Byte] = {
-      var result = LazyList[Byte]()
 
-      result ++= cafeBabeBytes
-      result ++= versionNumber
-      val constantPool = classFile.constantPool.constants
-      val constantPoolItemCountPlusOne = shortToBytes(constantPool.length + 1)
-      result ++= constantPoolItemCountPlusOne
-      for (constantPoolEntry <- constantPool) {
-        result ++= getConstantEntryByteCode(constantPoolEntry)
-      }
-      result ++= getAccessFlagsByteCode(classFile)
-      result ++= shortToBytes(classFile.classInfoIndex)
-      result ++= shortToBytes(classFile.parentIndex)
-      result ++= getInterfacesByteCode(classFile)
-      result ++= getFieldsByteCode(classFile)
-      result ++= getMethodsByteCode(classFile)
-      result ++= getAttributesByteCode(compilation, classFile.attributes)
-      result
+    var result = LazyList[Byte]()
+
+    result ++= cafeBabeBytes
+    result ++= versionNumber
+    val constantPool = classFile.constantPool.constants
+    val constantPoolItemCountPlusOne = shortToBytes(constantPool.length + 1)
+    result ++= constantPoolItemCountPlusOne
+    for (constantPoolEntry <- constantPool) {
+      result ++= getConstantEntryByteCode(compilation, constantPoolEntry)
     }
+    result ++= getAccessFlagsByteCode(classFile)
+    result ++= shortToBytes(classFile.classInfoIndex)
+    result ++= shortToBytes(classFile.parentIndex)
+    result ++= getInterfacesByteCode(classFile)
+    result ++= getFieldsByteCode(compilation, classFile)
+    result ++= getMethodsByteCode(compilation, classFile)
+    result ++= getAttributesByteCode(compilation, classFile.attributes)
+    result
+  }
 
-    def getMethodsByteCode(classFile: ClassFile[Node]): Seq[Byte] = {
-      val methods = classFile.methods
-      shortToBytes(methods.length) ++ methods.flatMap(method => {
-        ByteCodeSkeleton.getBytes(compilation, method)
-      })
+  def getMethodsByteCode(compilation: Compilation, classFile: ClassFile[Node]): Seq[Byte] = {
+    val methods = classFile.methods
+    shortToBytes(methods.length) ++ methods.flatMap(method => {
+      ByteCodeSkeleton.getBytes(compilation, method)
+    })
+  }
+
+  def getFieldsByteCode(compilation: Compilation, classFile: ClassFile[Node]): Seq[Byte] = {
+    val fields = classFile.fields
+    PrintByteCode.shortToBytes(fields.length) ++ fields.flatMap(field => {
+      ByteCodeSkeleton.getBytes(compilation, field)
+    })
+  }
+
+  def getConstantEntryByteCode(compilation: Compilation, entry: Any): Seq[Byte] = {
+    entry match {
+      case metaEntry: Node => ByteCodeSkeleton.getBytes(compilation, metaEntry)
+      case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/")) //TODO is this still used?
+      case utf8: String => toUTF8ConstantEntry(utf8)
     }
-
-    def getFieldsByteCode(classFile: ClassFile[Node]): Seq[Byte] = {
-      val fields = classFile.fields
-      PrintByteCode.shortToBytes(fields.length) ++ fields.flatMap(field => {
-        ByteCodeSkeleton.getBytes(compilation, field)
-      })
-    }
-
-    def getConstantEntryByteCode(entry: Any): Seq[Byte] = {
-      entry match {
-        case metaEntry: Node => ByteCodeSkeleton.getBytes(compilation, metaEntry)
-        case qualifiedName: QualifiedClassName => toUTF8ConstantEntry(qualifiedName.parts.mkString("/")) //TODO is this still used?
-        case utf8: String => toUTF8ConstantEntry(utf8)
-      }
-    }
-
-    getBytes(byteCode)
   }
 
   def prefixWithIntLength(_bytes: () => Seq[Byte]): LazyList[Byte] = {
