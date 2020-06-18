@@ -95,7 +95,7 @@ final class SRCons[State, +Result](
       case _: SREmpty[State] => tail.flatMap(f, uniform, remainingListLength)
       case cons: SRCons[State, NewResult] =>
 
-        if (!uniform && head.score > cons.head.score)
+        if (!uniform && head.score != cons.head.score)
           // TODO do we need this then branch?
           cons.merge(tail.flatMap(f, uniform, remainingListLength - 1), remainingListLength)
         else
