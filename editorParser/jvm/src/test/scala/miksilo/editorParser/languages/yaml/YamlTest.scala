@@ -191,4 +191,11 @@ class YamlTest extends AnyFunSuite {
     val result = parser.parse(contents)
     assert(result.successful, result.toString)
   }
+
+  test("large recursion yaml") {
+    val blockScalarParser = YamlParser.blockScalar
+    val contents = SourceUtils.getResourceFileContents("LargeRecursionyaml")
+    val result = blockScalarParser.getWholeInputParser().parse(contents)
+    assert(result.errors.isEmpty)
+  }
 }

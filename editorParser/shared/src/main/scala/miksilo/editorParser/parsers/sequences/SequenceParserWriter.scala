@@ -309,15 +309,8 @@ trait SequenceParserWriter extends CorrectingParserWriter {
       leftRight(parser, parser.*, prependCombine[Result])
     }
 
-    def someSeparated(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
-      lazy val result: Parser[Vector[Result]] = new Lazy(separator ~>
-        leftRight(parser, result, prependCombine[Result]) |
-        Fail(Some(Vector.empty[Result]), elementName, History.insertDefaultPenalty) |
-        succeed(Vector.empty[Result]))
-      leftRight[Result, Vector[Result], Vector[Result]](parser, result, prependCombine[Result])
-    }
 
-    def someSeparated2(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
+    def someSeparated(separator: Parser[Any], elementName: String): Parser[Vector[Result]] = {
       lazy val result: Parser[Vector[Result]] = new Lazy(
         leftRight[Vector[Result], Result, Vector[Result]](result, parser ~< separator, appendCombine[Result]) |
         //Fail(Some(Vector.empty[Result]), elementName, History.insertDefaultPenalty) |

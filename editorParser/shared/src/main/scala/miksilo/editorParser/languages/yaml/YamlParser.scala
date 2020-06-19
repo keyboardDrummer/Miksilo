@@ -92,8 +92,8 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
 
     val lines: Parser[StringLiteral] = {
       val line = greaterThanOrEqualTo(nbChar)
-      greaterThan(new WithIndentation(line.someSeparated(lineSeparator, "line").
-        withSourceRange((range, lines) => new StringLiteral(Some(range), lines.reduce((a,b) => a + "\n" + b)))))
+      greaterThan(WithIndentation(line.someSeparated(lineSeparator, "line").
+        withSourceRange((range, lines) => StringLiteral(Some(range), lines.mkString("\n")))))
     }
 
     WithIndentation(("|" | ">") ~ chompingIndicator ~ lineSeparator) ~> lines
