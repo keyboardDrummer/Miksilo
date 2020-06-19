@@ -31,7 +31,7 @@ class PerformanceTest extends AnyFunSuite {
   test("Correct JSON large file performance") {
 
     val source = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
-    val manySources = s"[${1.to(manySourcesCount).map(_ => source).reduce((a,b) => a + "," + b)}]"
+    val manySources = s"[${1.to(manySourcesCount).map(_ => source).mkString(",")}]"
 
     TestUtils.runPerformanceTest(manySourcesTargetTime, 10, () => {
       val result = jsonFileParser.parse(manySources)
