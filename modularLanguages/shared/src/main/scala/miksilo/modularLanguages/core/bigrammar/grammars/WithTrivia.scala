@@ -100,7 +100,7 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
                 rightReady.state,
                 rightReady.history ++ leftReady.history))
             }
-          }, uniform = true, maxListDepth)
+          }, uniform = false, maxListDepth) // Changing this uniform to false was required to make parseByteCode succeed.
         }
         leftResults.flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
       }

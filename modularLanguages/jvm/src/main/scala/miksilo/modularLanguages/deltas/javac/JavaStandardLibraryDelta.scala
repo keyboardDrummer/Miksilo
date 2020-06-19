@@ -16,7 +16,8 @@ object JavaStandardLibraryDelta extends Delta {
 
   def getByteCodeNode(uri: String): Node = {
     val fileStream = SourceUtils.getResourceFile(uri)
-    LanguageFromDeltas(ClassFileSignatureDecompiler.getDecompiler(uri, fileStream)).compile().program.asInstanceOf[NodePath].current
+    val compilation = LanguageFromDeltas(ClassFileSignatureDecompiler.getDecompiler(uri, fileStream)).compile()
+    compilation.program.asInstanceOf[NodePath].current
   }
 
   override def inject(language: Language): Unit = {

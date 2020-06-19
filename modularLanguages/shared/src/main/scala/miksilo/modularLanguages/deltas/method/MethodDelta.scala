@@ -120,15 +120,25 @@ object MethodDelta extends DeltaWithGrammar
 
   val state = new CompilationField[MethodCompiler](null)
 
-  object Shape extends NodeShape
+  object Shape extends NodeShape {
+    override def toString: String = "Method"
+  }
 
-  object Body extends NodeField
+  object Body extends NodeField {
+    override def toString: String = "Body"
+  }
 
-  object ReturnType extends NodeField
+  object ReturnType extends NodeField {
+    override def toString: String = "ReturnType"
+  }
 
-  object Parameters extends NodeField
+  object Parameters extends NodeField {
+    override def toString: String = "Parameters"
+  }
 
-  object TypeParameters extends NodeField
+  object TypeParameters extends NodeField {
+    override def toString: String = "TypeParameters"
+  }
 
   override def getDeclaration(compilation: Compilation, builder: ConstraintBuilder, path: NodePath, parentScope: Scope): Declaration = {
     val method: Method[NodePath] = path

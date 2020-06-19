@@ -8,6 +8,8 @@ trait NoStateParserWriter extends OptimizingParserWriter {
   override def startState: Unit = ()
 }
 
+object CommonStringReaderParser extends CommonStringReaderParser
+
 trait CommonStringReaderParser extends CommonParserWriter with NoStateParserWriter {
 
 }

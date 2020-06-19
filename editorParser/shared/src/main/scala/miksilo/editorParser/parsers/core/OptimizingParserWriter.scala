@@ -167,7 +167,7 @@ trait OptimizingParserWriter extends ParserWriter {
             val loopBreaker = loopBreakers.get(parser)
             val wrappedParser = wrapParser(result, nodesThatShouldCache(parser), nodesThatShouldDetectLeftRecursion(parser))
 
-            if (loopBreaker.nonEmpty) new LoopBreaker(wrappedParser, loopBreaker.get) else wrappedParser
+            wrappedParser // if (loopBreaker.nonEmpty) new LoopBreaker(wrappedParser, loopBreaker.get) else wrappedParser
           }).asInstanceOf[BuiltParser[SomeResult]]
         }
       }

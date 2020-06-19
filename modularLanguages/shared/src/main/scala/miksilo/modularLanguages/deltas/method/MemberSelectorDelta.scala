@@ -21,11 +21,17 @@ object MemberSelectorDelta extends DeltaWithGrammar {
     (expression.as(Target) ~< ".") ~ identifier.as(Member) asLabelledNode Shape
   }
 
-  object Shape extends NodeShape
+  object Shape extends NodeShape {
+    override def toString: String = "MemberSelector"
+  }
 
-  object Target  extends NodeField
+  object Target  extends NodeField {
+    override def toString: String = "Target"
+  }
 
-  object Member extends NodeField
+  object Member extends NodeField {
+    override def toString: String = "Member"
+  }
 
   def neww(_object: Any, member: Any): Node = neww(_object.asInstanceOf[Node], member.asInstanceOf[String])
 
