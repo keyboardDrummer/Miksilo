@@ -1,3 +1,5 @@
+import java.nio.file.{Files, Paths, StandardCopyOption}
+
 import sbt.Keys.{homepage, scmInfo}
 
 import scala.sys.process._
@@ -115,7 +117,7 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
     assemblySettings,
     vscode := {
       val assemblyFile: String = assembly.value.getAbsolutePath
-      languageServerCommonTask(assemblyFile).run
+      languageServerCommonTask(assemblyFile)
     }
   ).
   jsSettings(
@@ -123,18 +125,30 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
     scalaJSUseMainModuleInitializer := true,
     vscode := {
       val assemblyFile: String = (fastOptJS in Compile).value.data.getAbsolutePath
-      languageServerCommonTask(assemblyFile).run
+      languageServerCommonTask(assemblyFile)
     }).
   dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
-def languageServerCommonTask(assemblyFile: String) = {
+def languageServerCommonTask(assemblyFile: String): Unit = {
+  val extensionPath = Paths.get(".", "vscode-extension")
+  val outPath = extensionPath.resolve("out")
+  outPath.toFile.mkdir()
+  outPath.resolve("LanguageServer.jar").toFile.delete()
   val extension = assemblyFile.split("\\.").last
-  val removePrevious = Process(Seq("rm", "-f", "./vscode-extension/out/LanguageServer.jar"))
-  val copyJar = Process(Seq("cp", assemblyFile, s"./vscode-extension/out/LanguageServer.$extension"))
-  val yarn = Process(Seq("yarn", "compile"), file("./vscode-extension"))
-  val extensionDirectory = file("./vscode-extension").getAbsolutePath
-  val vscode = Process(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory"))
-  removePrevious.#&&(copyJar).#&&(yarn).#&&(vscode)
+  Files.copy(Paths.get(assemblyFile),
+    outPath.resolve(s"LanguageServer.$extension"), StandardCopyOption.REPLACE_EXISTING)
+  val yarn = Process(enableForWindows(Seq("yarn", "compile")), file("./vscode-extension"))
+  val extensionDirectory = Paths.get(".", "vscode-extension").toAbsolutePath
+  val vscode = Process(enableForWindows(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory")))
+  yarn.#&&(vscode).run
+}
+
+def enableForWindows(parts: Seq[String]): Seq[String] = {
+  val os = sys.props("os.name").toLowerCase
+  os match {
+    case x if x contains "windows" => Seq("cmd", "/C") ++ parts
+    case _ => parts
+  }
 }
 
 lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
@@ -145,7 +159,7 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
     assemblySettings,
     vscode := {
       val assemblyFile: String = assembly.value.getAbsolutePath
-      languageServerCommonTask(assemblyFile).run
+      languageServerCommonTask(assemblyFile)
     },
 
   ).
@@ -154,7 +168,7 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
 
     vscode := {
       val assemblyFile: String = (fastOptJS in Compile).value.data.getAbsolutePath
-      languageServerCommonTask(assemblyFile).run
+      languageServerCommonTask(assemblyFile)
     }).
   settings(
     name := "modularLanguages",
