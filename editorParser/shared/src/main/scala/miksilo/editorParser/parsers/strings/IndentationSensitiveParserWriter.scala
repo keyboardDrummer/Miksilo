@@ -27,16 +27,18 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
-      def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
-        val previous = state
-        val lineCharacter = position.lineCharacter
-        val result: ParseResult[Result] = parseOriginal(position, state.withIndentation(lineCharacter.character), fixPointState)
-        result.updateRemainder((remainder, _) => {
-          (remainder, previous)
-        })
-      }
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
+          val previous = state
+          val lineCharacter = position.lineCharacter
+          val result: ParseResult[Result] = parseOriginal(position, state.withIndentation(lineCharacter.character), fixPointState)
+          result.updateRemainder((remainder, _) => {
+            (remainder, previous)
+          })
+        }
 
-      apply
+        override def origin: Option[ParserBuilder[Result]] = Some(WithIndentation.this)
+      }
     }
   }
 
@@ -70,16 +72,19 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     override def getParser(recursive: GetParser) = {
       val parseOriginal = recursive(original)
 
-      def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
-        val lineCharacter = position.lineCharacter
-        val delta = lineCharacter.character - state.indentation
-        if (position.atEnd() || deltaPredicate(delta)) {
-          parseOriginal(position, state, fixPointState)
-        } else {
-          newFailure(None, position, state, History.error(IndentationError(position, lineCharacter.character, property)))
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
+          val lineCharacter = position.lineCharacter
+          val delta = lineCharacter.character - state.indentation
+          if (position.atEnd() || deltaPredicate(delta)) {
+            parseOriginal(position, state, fixPointState)
+          } else {
+            newFailure(None, position, state, History.error(IndentationError(position, lineCharacter.character, property)))
+          }
         }
+
+        override def origin: Option[ParserBuilder[Result]] = Some(CheckIndentation.this)
       }
-      apply
     }
 
     override def leftChildren = List(original)

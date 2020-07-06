@@ -192,14 +192,18 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
 
     override def getParser(recursive: GetParser) = {
       val parseOriginal = recursive(original)
-      (position: TextPointer, state: State, fixPointState: FixPointState) => {
-        val result = parseOriginal(position, state, fixPointState)
-        result.map(resultValue => {
-          if (resultValue == valueToDetect) {
-            detected = true
-          }
-          resultValue
-        })
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: Unit, fixPointState: FixPointState): ParseResult[Result] = {
+          val result = parseOriginal(position, state, fixPointState)
+          result.map(resultValue => {
+            if (resultValue == valueToDetect) {
+              detected = true
+            }
+            resultValue
+          })
+        }
+
+        override def origin: Option[ParserBuilder[Result]] = Some(DetectValueParser.this)
       }
     }
   }

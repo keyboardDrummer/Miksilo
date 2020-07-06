@@ -29,7 +29,12 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
 
     override def getParser(recursive: GetParser) = {
       val innerParsers = inners.view.mapValues(p => recursive(p)).toMap
-      (position, state, fixPointState) => innerParsers(state.context)(position, state, fixPointState)
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: MyState, fixPointState: YamlParser.FixPointState): YamlParser.ParseResult[Result] =
+          innerParsers(state.context)(position, state, fixPointState)
+
+        override def origin: Option[YamlParser.ParserBuilder[Result]] = Some(IfContext.this)
+      }
     }
 
     override def leftChildren = inners.values.toList
@@ -45,13 +50,15 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseOriginal = recursive(original)
 
-      def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
-        val context: YamlContext = state.context
-        val result = parseOriginal(position, state.withContext(update(context)), fixPointState)
-        result.updateRemainder((position, state) => (position, state.withContext(context)))
-      }
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: MyState, fixPointState: YamlParser.FixPointState): YamlParser.ParseResult[Result] = {
+          val context: YamlContext = state.context
+          val result = parseOriginal(position, state.withContext(update(context)), fixPointState)
+          result.updateRemainder((position, state) => (position, state.withContext(context)))
+        }
 
-      apply
+        override def origin: Option[YamlParser.ParserBuilder[Result]] = Some(WithContext.this)
+      }
     }
   }
 

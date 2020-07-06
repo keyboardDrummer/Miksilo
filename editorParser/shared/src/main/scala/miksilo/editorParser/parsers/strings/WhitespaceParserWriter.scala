@@ -7,13 +7,14 @@ trait WhitespaceParserWriter extends StringParserWriter {
   final val whiteSpace: Parser[String] = RegexParser("""\s+""".r, "whitespace", score = 0, penaltyOption = None)
   def trivia = whiteSpace
 
-  def oldSome[Result, Sum](original: ParserBuilder[Result],
+  private def oldSome[Result, Sum](original: ParserBuilder[Result],
                            zero: Sum, reduce: (Result, Sum) => Sum,
                            parseGreedy: Boolean = true) = {
-    leftRight(original, oldMany(original, zero, reduce, parseGreedy), combineFold(zero, reduce))
+    lazy val result: Parser[Sum] = choice(new Sequence(original, result, combineFold(zero, reduce)), original.map(r => reduce(r, zero)), firstIsLonger = parseGreedy)
+    result
   }
 
-  def oldMany[Result, Sum](original: ParserBuilder[Result],
+  private def oldMany[Result, Sum](original: ParserBuilder[Result],
                            zero: Sum, reduce: (Result, Sum) => Sum,
                            parseGreedy: Boolean = true) = {
     lazy val result: Parser[Sum] = choice(new Sequence(original, result, combineFold(zero, reduce)), succeed(zero), firstIsLonger = parseGreedy)
@@ -26,7 +27,7 @@ trait WhitespaceParserWriter extends StringParserWriter {
     super.many(new LeftIfRightMoved(someTrivias, element, Processor.ignoreLeft[Option[Any], Option[Element]]), zero, append, parseGreedy)
   }
 
-  private lazy val someTrivias: Parser[Vector[String]] = oldSome(trivia, Vector.empty, (h: String, t: Vector[String]) => t.appended(h))
+  protected lazy val someTrivias: Parser[Vector[String]] = oldSome(trivia, Vector.empty, (h: String, t: Vector[String]) => t.appended(h))
   lazy val trivias: Parser[Vector[String]] = oldMany(trivia, Vector.empty, (h: String, t: Vector[String]) => t.appended(h))
 
   override def leftRight[Left, Right, Result](left: ParserBuilder[Left], right: => ParserBuilder[Right],

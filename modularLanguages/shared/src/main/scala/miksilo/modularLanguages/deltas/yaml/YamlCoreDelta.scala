@@ -48,12 +48,14 @@ object YamlCoreDelta extends DeltaWithGrammar {
     override def getParser(recursive: BiGrammarToParser.GetParser): BuiltParser[Result] = {
       val innerParsers = inners.view.mapValues(p => recursive(p)).toMap
 
-      def apply(position: TextPointer, state: State, fixPointState: FixPointState) = {
-        val context: YamlContext = state.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-        innerParsers(context)(position, state, fixPointState)
-      }
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: MyState, fixPointState: BiGrammarToParser.FixPointState): BiGrammarToParser.ParseResult[Result] = {
+          val context: YamlContext = state.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
+          innerParsers(context)(position, state, fixPointState)
+        }
 
-      apply
+        override def origin: Option[BiGrammarToParser.ParserBuilder[Result]] = Some(IfContextParser.this)
+      }
     }
 
     override def leftChildren = children
@@ -69,13 +71,15 @@ object YamlCoreDelta extends DeltaWithGrammar {
     override def getParser(recursive: BiGrammarToParser.GetParser) = {
       val parseOriginal = recursive(original)
 
-      def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
-        val context: YamlContext = state.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
-        val result = parseOriginal(position, MyState(state.state + (ContextKey -> update(context))), fixPointState)
-        result.updateRemainder((p, s) => (p, MyState(s.state + (ContextKey -> context))))
-      }
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: MyState, fixPointState: BiGrammarToParser.FixPointState): BiGrammarToParser.ParseResult[Result] = {
+          val context: YamlContext = state.state.getOrElse(ContextKey, BlockOut).asInstanceOf[YamlContext]
+          val result = parseOriginal(position, MyState(state.state + (ContextKey -> update(context))), fixPointState)
+          result.updateRemainder((p, s) => (p, MyState(s.state + (ContextKey -> context))))
+        }
 
-      apply
+        override def origin: Option[BiGrammarToParser.ParserBuilder[Result]] = Some(WithContextParser.this)
+      }
     }
   }
 
