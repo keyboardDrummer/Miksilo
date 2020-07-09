@@ -68,7 +68,8 @@ final class SRCons[State, +Result](
   extends ParseResults[State, Result] {
 
   override def latestRemainder: OffsetPointer = {
-    head.offset
+    val tailRemainder = tail.latestRemainder
+    if (tailRemainder.offset > head.offset.offset) tailRemainder else head.offset
   }
 
   // Used for debugging
