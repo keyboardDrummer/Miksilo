@@ -2,6 +2,8 @@ package miksilo.editorParser.parsers.editorParsers
 
 import miksilo.editorParser.parsers.core._
 
+import scala.collection.mutable
+
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
   val maxListDepth = 200 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
