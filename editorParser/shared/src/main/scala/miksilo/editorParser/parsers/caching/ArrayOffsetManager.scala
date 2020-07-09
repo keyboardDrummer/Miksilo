@@ -71,7 +71,7 @@ class ArrayOffsetManager(var text: ParseText, indentationSensitive: Boolean) {
       for(entry <- entries) {
         val entryStart = offset.offset
         val parseResults = entry._2.asInstanceOf[ParseResults[_, _]]
-        val entryEnd = Math.max(entryStart + 1, remainder(parseResults).offset)
+        val entryEnd = Math.max(entryStart + 1, parseResults.latestRemainder.offset)
         val entryIntersectsWithRemoval = from <= entryEnd && entryStart < until
         if (entryIntersectsWithRemoval) {
           offset.cache.remove(entry._1)
@@ -100,19 +100,5 @@ class ArrayOffsetManager(var text: ParseText, indentationSensitive: Boolean) {
   def clear(): Unit = {
     offsets.clear()
     offsetCache.clear()
-  }
-  def remainder(parseResults: ParseResults[_, _]): OffsetPointer = {
-    var current = parseResults
-    var latestRemainder: OffsetPointer = EmptyRemainder
-    while(current != null) {
-      val newRemainder = current.latestRemainder
-      latestRemainder = if (newRemainder.offset > latestRemainder.offset) newRemainder else latestRemainder
-      if (current.nonEmpty) {
-        current = current.pop()._2
-      } else {
-        current = null
-      }
-    }
-    latestRemainder
   }
 }

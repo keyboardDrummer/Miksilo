@@ -13,7 +13,7 @@ case class TypeApplication(override val function: Type, var arguments: Seq[Type]
   override def fullyApplied: Boolean = arguments.forall(a => a.fullyApplied)
 
   override def toString: String = {
-    val typeArgument = if (arguments.nonEmpty) "<" + arguments.map(a => a.toString).reduce((a, b) => a + ", " + b) + ">" else ""
+    val typeArgument = if (arguments.nonEmpty) "<" + arguments.map(a => a.toString).mkString(", ") + ">" else ""
     s"$function$typeArgument"
   }
 

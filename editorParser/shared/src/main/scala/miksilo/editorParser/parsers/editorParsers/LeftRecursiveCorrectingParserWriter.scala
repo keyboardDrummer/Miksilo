@@ -186,6 +186,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
           value
       }
     }
+
+    override def origin: Option[ParserBuilder[Result]] = None
   }
 
   def getSingleResultParser[Result](parser: ParserBuilder[Result]): SingleResultParser[Result] = {

@@ -25,6 +25,8 @@ trait OptimizingParserWriter extends ParserWriter {
         _original.apply(input, state, FixPointState(fixPointState.offset, fixPointState.stackDepth + 1, fixPointState.callStack))
       }
     }
+
+    override def origin: Option[ParserBuilder[Result]] = None
   }
 
   case class FixPointState(offset: Int, // TODO try to remove this offset, since we can also clear the callStack whenever we move forward.
@@ -37,7 +39,9 @@ trait OptimizingParserWriter extends ParserWriter {
 
   trait BuiltParser[+Result] {
     def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result]
-    def debugName: Any = null
+    def origin: Option[ParserBuilder[Result]]
+
+    override def toString: String = origin.fold("generated")(o => o.toString)
   }
 
   trait GetParser {
@@ -50,10 +54,29 @@ trait OptimizingParserWriter extends ParserWriter {
     def getMustConsume(cache: ConsumeCache): Boolean
     def leftChildren: List[ParserBuilder[_]]
     def children: List[ParserBuilder[_]]
+
+    def print(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String
   }
 
   trait ParserBuilderBase[Result] extends ParserBuilder[Result] {
     var mustConsumeInput: Boolean = false
+
+    override def toString: String = print(Set.empty, mutable.HashMap.empty)
+
+    def print(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String = {
+      if (visited.contains(this)) {
+        names.addOne(this -> names.size)
+        "ref" + names(this)
+      } else {
+        val result = printInner(visited + this, names)
+        if (names.contains(this)) {
+          s"def${names(this)}($result)"
+        } else {
+          result
+        }
+      }
+    }
+    def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String = super.toString
   }
 
   trait SequenceLike[+Result] extends ParserBuilder[Result] {
@@ -100,13 +123,13 @@ trait OptimizingParserWriter extends ParserWriter {
           parseOriginal(input, state, fixPointState)
         }
 
-        override def debugName = Lazy.this.debugName
-
-        override def toString = Lazy.this.toString()
+        override def origin = Some(Lazy.this)
       }
     }
 
-    override def toString = if (debugName != null) debugName.toString else super.toString
+    override def print(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String = printInner(visited, names)
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String =
+      if (debugName != null) debugName.toString else original.print(visited, names)
 
     override def getMustConsume(cache: ConsumeCache) = cache(original)
   }

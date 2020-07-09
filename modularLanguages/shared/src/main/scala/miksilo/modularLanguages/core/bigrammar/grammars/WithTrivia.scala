@@ -104,6 +104,8 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
         }
         leftResults.flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
       }
+
+      override def origin: Option[BiGrammarToParser.ParserBuilder[Result]] = Some(WithTriviaParser.this)
     }
   }
 

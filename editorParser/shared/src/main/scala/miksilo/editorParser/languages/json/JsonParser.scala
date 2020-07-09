@@ -1,5 +1,6 @@
 package miksilo.editorParser.languages.json
 
+import miksilo.editorParser.parsers.core.Processor
 import miksilo.editorParser.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import miksilo.editorParser.parsers.strings.{CommonParserWriter, NoStateParserWriter, WhitespaceParserWriter}
 
@@ -20,6 +21,6 @@ object JsonParser extends CommonParserWriter
   lazy val string = stringLiteral.withSourceRange((range, value) => StringLiteral(Some(range), value))
   lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(Some(range))), "value")
 
-  lazy val valueParser: Parser[JsonValue] = new Lazy(array | objectParser | number | string | hole)
-  val parser = valueParser.getWholeInputParser()
+  lazy val valueParser: Parser[JsonValue] = new Lazy(array | objectParser | number | string | hole, "value")
+  val parser = new Sequence(valueParser, trivias,  Processor.ignoreRight[Option[JsonValue], Option[Any]]).getWholeInputParser()
 }

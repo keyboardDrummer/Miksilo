@@ -28,7 +28,7 @@ class ModularGrammarPerformanceTest extends AnyFunSuite {
 
   test("Correct JSON large file bigrammar performance") {
     val source = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.json")
-    val tenTimesSource = s"[${1.to(manySourcesCount).map(_ => source).reduce((a,b) => a + "," + b)}]"
+    val tenTimesSource = s"[${1.to(manySourcesCount).map(_ => source).mkString(",")}]"
 
     TestUtils.runPerformanceTest(manySourcesTargetTime, 10, () => {
       val result = json.compileString(tenTimesSource)

@@ -2,6 +2,8 @@ package miksilo.editorParser.parsers.editorParsers
 
 import miksilo.editorParser.parsers.core._
 
+import scala.collection.mutable
+
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
   val maxListDepth = 200 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
@@ -122,12 +124,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
           parse(position, state, fixPointState, mayFail = true)
         }
+
+        override def origin: Option[ParserBuilder[Result]] = Some(LeftIfRightMoved.this)
       }
       new LeftIfRightParser
     }
+
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String =
+      s"${left.print(visited, names)} ?~> ${right.print(visited, names)}"
   }
 
-  class Sequence[+Left, +Right, Result](val left: Parser[Left],
+  class Sequence[+Left, +Right, Result](
+                                         val left: Parser[Left],
                                         _right: => Parser[Right],
                                         combine: (Option[Left], Option[Right]) => Option[Result])
     extends ParserBuilderBase[Result] with SequenceLike[Result] {
@@ -164,8 +172,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }
           delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
         }
+
+        override def origin: Option[ParserBuilder[Result]] = Some(Sequence.this)
       }
     }
+
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String =
+      s"${left.print(visited, names)} ~ ${right.print(visited, names)}"
   }
 
   class FirstIsLonger[+First <: Result, +Second <: Result, Result](val first: Parser[First], _second: => Parser[Second])
@@ -188,11 +201,16 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
               firstResult.merge(secondResult, maxListDepth)
           }
         }
+
+        override def origin: Option[ParserBuilder[Result]] = Some(FirstIsLonger.this)
       }
     }
+
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String =
+      s"(${first.print(visited, names)} | ${second.print(visited, names)})"
   }
 
-  class Choice[+First <: Result, +Second <: Result, Result](val first: Parser[First], _second: => Parser[Second])
+  class Choice[+First <: Result, +Second <: Result, Result](val first: ParserBuilder[First], _second: => ParserBuilder[Second])
     extends ParserBuilderBase[Result] with ChoiceLike[Result] {
 
     lazy val second = _second
@@ -208,15 +226,23 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           val result = firstResult.merge(secondResult, maxListDepth)
           result
         }
+
+        override def origin: Option[ParserBuilder[Result]] = Some(Choice.this)
       }
     }
+
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String =
+      s"(${first.print(visited, names)} | ${second.print(visited, names)})"
   }
 
   object PositionParser extends ParserBuilderBase[TextPointer] with LeafParser[TextPointer] {
 
     override def getParser(recursive: GetParser): BuiltParser[TextPointer] = {
-      (position, state, _) => {
-        singleResult(ReadyParseResult(Some(position), position, state, History.empty))
+      new BuiltParser[TextPointer] {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[TextPointer] =
+          singleResult(ReadyParseResult(Some(position), position, state, History.empty))
+
+        override def origin: Option[ParserBuilder[TextPointer]] = Some(PositionParser)
       }
     }
 
@@ -228,11 +254,15 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     override def getParser(recursive: GetParser): BuiltParser[NewResult] = {
       val parseOriginal = recursive(original)
-      (position, state, fixPointState) => {
-        parseOriginal(position, state, fixPointState).mapReady(ready => {
-          val newValue = ready.resultOption.map(v => addRange(position, ready.remainder, v))
-          ReadyParseResult(newValue, ready.remainder, ready.state, ready.history)
-        }, uniform = true)
+      new BuiltParser[NewResult] {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[NewResult] = {
+          parseOriginal(position, state, fixPointState).mapReady(ready => {
+            val newValue = ready.resultOption.map(v => addRange(position, ready.remainder, v))
+            ReadyParseResult(newValue, ready.remainder, ready.state, ready.history)
+          }, uniform = true)
+        }
+
+        override def origin: Option[ParserBuilder[NewResult]] = Some(WithRangeParser.this)
       }
     }
   }
@@ -245,10 +275,17 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {
 
     override def getParser(recursive: GetParser): BuiltParser[Result] = {
-      (position: TextPointer, state: State, _: FixPointState) => newSuccess(value, position, state, 0)
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = newSuccess(value, position, state, 0)
+
+        override def origin: Option[ParserBuilder[Result]] = Some(Succeed.this)
+      }
     }
 
     override def getMustConsume(cache: ConsumeCache) = false
+
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String = s"Succeed($value)"
+
   }
 
   case class MapParser[Result, NewResult](original: Parser[Result], f: Result => NewResult)
@@ -256,8 +293,15 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     override def getParser(recursive: GetParser): BuiltParser[NewResult] = {
       val parseOriginal = recursive(original)
-      (input, state, fixPointState) => parseOriginal(input, state, fixPointState).map(f)
+      new BuiltParser[NewResult] {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[NewResult] =
+          parseOriginal(position, state, fixPointState).map(f)
+
+        override def origin: Option[ParserBuilder[NewResult]] = Some(MapParser.this)
+      }
     }
+
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String = s"Map(${original.print(visited, names)})"
   }
 
   def newFailure[Result](partial: Option[Result], position: TextPointer, state: State, errors: MyHistory) =

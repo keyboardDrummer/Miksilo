@@ -9,7 +9,7 @@ class ShowPhasesButton(compilerCockpit: LanguageSandbox) extends JButton("Show p
   addActionListener((e: ActionEvent) => {
     val text: String = compilerCockpit.language.compilerPhases.zipWithIndex.
       map(indexedPhase => getIndexedPhaseDescription(indexedPhase)).
-      reduce((a, b) => a + "\n\n" + b)
+      mkString("\n\n")
     compilerCockpit.setOutputText(text)
   })
 

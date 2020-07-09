@@ -4,6 +4,7 @@ import miksilo.editorParser.parsers.core.TextPointer
 import miksilo.editorParser.parsers.editorParsers._
 import miksilo.editorParser.parsers.sequences.SequenceParserWriter
 
+import scala.collection.mutable
 import scala.language.implicitConversions
 import scala.util.matching.Regex
 
@@ -55,10 +56,14 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
           val remainder = position.drop(value.length)
           singleResult(ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value)))
         }
+
+        override def origin: Option[ParserBuilder[String]] = Some(Literal.this)
       }
       result
 
     }
+
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String = "'" + value + "'"
 
     override def getMustConsume(cache: ConsumeCache): Boolean = value.nonEmpty
   }
@@ -81,8 +86,12 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
             }
           }, uniform = false)
         }
+
+        override def origin: Option[ParserBuilder[String]] = Some(KeywordParser.this)
       }
     }
+
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String = "'" + value + "'"
 
     override def original: Parser[String] = parseIdentifier
   }
@@ -126,10 +135,14 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
 
           }
         }
+
+        override def origin: Option[ParserBuilder[String]] = Some(RegexParser.this)
       }
 
       result
     }
+
+    override def printInner(visited: Set[ParserBuilder[Any]], names: mutable.Map[ParserBuilder[Any], Int]): String = regexName
 
     override def getMustConsume(cache: ConsumeCache): Boolean = regex.findFirstIn("").isEmpty
   }

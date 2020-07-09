@@ -78,15 +78,19 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
 
-      (position: TextPointer, state: State, fixPointState: FixPointState) => {
-        val firstResult = parseFirst(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> first)))
-        val secondResult = parseSecond(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> second)))
-        firstResult match {
-          case cons: SRCons[State, Result]
-            if !cons.head.history.flawed => firstResult
-          case _ =>
-            firstResult.merge(secondResult, maxListDepth)
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
+          val firstResult = parseFirst(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> first)))
+          val secondResult = parseSecond(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> second)))
+          firstResult match {
+            case cons: SRCons[State, Result]
+              if !cons.head.history.flawed => firstResult
+            case _ =>
+              firstResult.merge(secondResult, maxListDepth)
+          }
         }
+
+        override def origin: Option[ParserBuilder[Result]] = Some(TrackingFirstIsLonger.this)
       }
     }
   }
@@ -99,12 +103,15 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
     override def getParser(recursive: GetParser): BuiltParser[Result] = {
       val parseFirst = recursive(first)
       lazy val parseSecond = recursive(second)
+      new BuiltParser[Result] {
+        override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
 
-      (position: TextPointer, state: State, fixPointState: FixPointState) => {
-        val firstResult = parseFirst(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> first)))
-        val secondResult = parseSecond(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> second)))
-        val merged = firstResult.merge(secondResult, maxListDepth)
-        merged
+          val firstResult = parseFirst(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> first)))
+          val secondResult = parseSecond(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> second)))
+          val merged = firstResult.merge(secondResult, maxListDepth)
+          merged
+        }
+        override def origin: Option[ParserBuilder[Result]] = Some(TrackingChoice.this)
       }
     }
   }

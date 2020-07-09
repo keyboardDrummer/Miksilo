@@ -14,7 +14,7 @@ class LSPServerMessagePreprocessor(original: JsonRpcHandler, workQueue: SerialWo
     if (messages.size < 2) {
       return
     }
-    logger.info(s"Aggregating ${messages.size} messages: ${messages.map(m => m.method).reduce((a,b) => a + ", " + b)}")
+    logger.info(s"Aggregating ${messages.size} messages: ${messages.map(m => m.method).mkString(", ")}")
 
     val firstSecond = messages.takeRight(2)
     val first = firstSecond.head
