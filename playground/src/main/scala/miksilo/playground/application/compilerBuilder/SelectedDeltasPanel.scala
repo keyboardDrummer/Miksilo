@@ -10,15 +10,15 @@ import miksilo.playground.application.StyleSheet
 
 object DeltaInstance
 {
-  implicit class DeltaLike(val deltaLike: Any)
+  implicit class ParticleLike(val particleLike: Any)
   {
-    def getDelta: Delta = deltaLike match {
-      case delta: Delta => delta
+    def getParticle: Delta = particleLike match {
+      case particle: Delta => particle
       case instance: DeltaInstance => instance.delta
     }
 
-    def getDeltaInstance: DeltaInstance = deltaLike match {
-      case delta: Delta => new DeltaInstance(delta)
+    def getParticleInstance: DeltaInstance = particleLike match {
+      case particle: Delta => new DeltaInstance(particle)
       case instance: DeltaInstance => instance
     }
   }

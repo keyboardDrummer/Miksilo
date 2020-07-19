@@ -6,9 +6,7 @@ import miksilo.languageServer.core.language.Language
 import miksilo.modularLanguages.core.node.{NodeField, NodeLike, NodeWrapper}
 
 object HasNameDelta extends DeltaWithGrammar {
-  object Name extends NodeField {
-    override def toString: String = "Name"
-  }
+  object Name extends NodeField
 
   trait HasName[T <: NodeLike] extends NodeWrapper[T] {
     def name: String = node.getValue(Name).asInstanceOf[String]

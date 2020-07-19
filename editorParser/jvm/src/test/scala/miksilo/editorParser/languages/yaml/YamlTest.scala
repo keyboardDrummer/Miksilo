@@ -13,7 +13,7 @@ class YamlTest extends AnyFunSuite {
     assert(result.successful)
   }
 
-  test("plainStyleMultilineLineInFlowCollection") {
+  test("plainStyleMultineLineInFlowCollection") {
     val input = """                  [<img src=", !FindInMap [Region2Examples, !Ref 'AWS::Region',
                   |                                              Examples], /cloudformation_graphic.png" alt="AWS CloudFormation
                   |                                                           Logo"/>, '<h1>Congratulations, you have successfully launched
@@ -39,7 +39,7 @@ class YamlTest extends AnyFunSuite {
                   |             '
                   |
                   |            ']
-                  |""".stripMargin.replaceAll("\r\n", "\n")
+                  |""".stripMargin
     val result = parser.parse(input)
     assert(result.successful)
   }
@@ -144,21 +144,6 @@ class YamlTest extends AnyFunSuite {
     parseAndCompare(program, expectation)
   }
 
-  test("complex composite 2.5") {
-    val program =
-      """- x: 3
-        |  y: a: 4
-        |  z: - 2
-        |     - 4""".stripMargin
-
-    val expectation =
-      Seq(
-        Seq("x" -> 3,
-          "y" -> Seq("a" -> 4),
-          "z" -> Seq(2, 4)))
-    parseAndCompare(program, expectation)
-  }
-
   test("complex composite 3") {
     val program =
       """- 2
@@ -186,9 +171,26 @@ class YamlTest extends AnyFunSuite {
     parseAndCompare(program, expectation)
   }
 
+  test("test empty bracket array nested") {
+    val program = """Resources:
+                    |  WebServerGroup:
+                    |    Properties:
+                    |      AvailabilityZones: !GetAZs ''
+                    |      LoadBalancerNames: [!Ref 'ElasticLoadBalancer']""".stripMargin
+    val result = parser.parse(program)
+    assert(result.successful)
+  }
+
   test("big yaml file") {
-    val contents = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.yaml").replaceAll("\r\n", "\n")
+    val contents = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications.yaml")
     val result = parser.parse(contents)
     assert(result.successful, result.toString)
+  }
+
+  test("large recursion yaml") {
+    val blockScalarParser = YamlParser.blockScalar
+    val contents = SourceUtils.getResourceFileContents("LargeRecursionyaml")
+    val result = blockScalarParser.getWholeInputParser().parse(contents)
+    assert(result.errors.isEmpty)
   }
 }

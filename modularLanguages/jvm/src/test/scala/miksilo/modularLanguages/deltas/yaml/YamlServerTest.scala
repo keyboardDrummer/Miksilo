@@ -1,7 +1,7 @@
 package miksilo.modularLanguages.deltas.yaml
 
 import miksilo.modularLanguages.core.deltas.{LanguageFromDeltas, ParseUsingTextualGrammar}
-import miksilo.editorParser.parsers.editorParsers.{NeverStop, Position, UntilBestAndXStepsStopFunction}
+import miksilo.editorParser.parsers.editorParsers.{NeverStop, UntilBestAndXStepsStopFunction}
 import miksilo.languageServer.server.{LanguageServerTest, MiksiloLanguageServer}
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -44,9 +44,9 @@ class YamlServerTest extends AnyFunSuite with LanguageServerTest {
 
     val (results0, document) = this.openAndCheckDocument(server, input)
     assert(results0.isEmpty)
-    val results1 = applyChange(server, document, Position(1,7), Position(1,8), "")
+    val results1 = applyChange(server, document, 12,13, "")
     assert(results1.nonEmpty)
-    val results2 = applyChange(server, document, Position(1,7), Position(1,7), "3")
+    val results2 = applyChange(server, document, 12,12, "3")
     assert(results2.isEmpty)
   }
 }

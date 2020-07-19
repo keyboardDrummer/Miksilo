@@ -37,7 +37,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
           tail match {
             case tailCons: SRCons[State, _] =>
-              if (mayStop(bestResult.remainder.offset, bestResult.score, tailCons.head.score))
+              if (mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty.empty
               else
                 tail
@@ -46,7 +46,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
           }
         case delayedResult: DelayedParseResult[State, _] =>
           val results = delayedResult.getResults
-          tail.merge(results, maxListDepth)
+          tail.merge(results)
       }
     }
     SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
@@ -85,7 +85,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
           case cons: SRCons[State, Result]
             if !cons.head.history.flawed => firstResult
           case _ =>
-            firstResult.merge(secondResult, maxListDepth)
+            firstResult.merge(secondResult)
         }
       }
     }
@@ -103,7 +103,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       (position: TextPointer, state: State, fixPointState: FixPointState) => {
         val firstResult = parseFirst(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> first)))
         val secondResult = parseSecond(position, state, fixPointState).addHistory(HistoryWithChoices(Seq(position -> second)))
-        val merged = firstResult.merge(secondResult, maxListDepth)
+        val merged = firstResult.merge(secondResult)
         merged
       }
     }

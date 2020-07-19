@@ -56,7 +56,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   }
 
 
-  lazy val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\r\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
+  lazy val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
   lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
   lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseNumber | parseFlowStringLiteral | plainScalar
@@ -83,12 +83,10 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     })
   }
 
-  val newLine = parseRegex("""\r?\n""".r, "newline", penaltyOption = Some(History.failPenalty), allowDrop = false)
   val blockScalar: Parser[StringLiteral] = {
-    val nbChar = parseRegex("""[^\r\n]+""".r, "non break character")
+    val nbChar = parseRegex("""[^\n]+""".r, "non break character")
     val chompingIndicator: Parser[String] = "-" | "+" | literal("")
-    val lineSeparator = leftRightSimple(newLine,
-      whiteSpace, Processor.ignoreLeft[String, String])
+    val lineSeparator = leftRightSimple(literal("\n", penalty = History.failPenalty, allowDrop = false), whiteSpace, Processor.ignoreLeft[String, String])
 
     val lines: Parser[StringLiteral] = {
       val line = greaterThanOrEqualTo(nbChar)
@@ -139,7 +137,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   }, plainStyleMultiLineString | plainStyleSingleLineString).
     withSourceRange((range, s) => StringLiteral(Some(range), s))
 
-  val nonBreakChars = """\r\n"""
+  val nonBreakChars = """\n"""
   val nonSpaceChars = nonBreakChars + " "
 
   val flowIndicatorChars = """,\[\]{}"""
@@ -164,8 +162,8 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   lazy val plainStyleSingleLineString = nsPlainSafe
   lazy val plainStyleMultiLineString = {
     val firstLine = new Sequence[String, Any, String](nsPlainSafe, whiteSpace, Processor.ignoreRight)
-    val followingLines = greaterThan(WithIndentation(equal(nsPlainSafe).someSeparated(newLine, "line")))
-    new Sequence(firstLine, followingLines, combineSimple((firstLine: String, rest: Vector[String]) => {
+    val followingLines = greaterThan(WithIndentation(equal(nsPlainSafe).someSeparated("\n", "line")))
+    new Sequence(firstLine, followingLines, combineSimple((firstLine: String, rest: List[String]) => {
       rest.fold(firstLine)((a, b) => a + " " + b)
     }))
   }

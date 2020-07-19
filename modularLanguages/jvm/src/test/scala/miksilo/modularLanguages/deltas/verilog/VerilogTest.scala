@@ -99,7 +99,7 @@ class VerilogTest extends AnyFunSuite with LanguageServerTest {
 
   test("can compile multiple files") {
     val fileSystem = InMemoryFileSystem(Map(
-      (Path(".") / "Bus_pkg.sv").toString() -> SourceUtils.getResourceFileContents(Path("verilog") / "Bus_pkg.sv"),
+      "./Bus_pkg.sv" -> SourceUtils.getResourceFileContents(Path("verilog") / "Bus_pkg.sv"),
       "testbench.sv" -> SourceUtils.getResourceFileContents(Path("verilog") / "testbench.sv")))
     val compilation = new Compilation(new CompilationCache(language.language, fileSystem), Some("testbench.sv"))
     compilation.runPhases()

@@ -12,7 +12,7 @@ public class ParticleList extends JXList {
         var model = this.getModel();
         if (index >= 0)
         {
-            return DeltaInstance.DeltaLike(model.getElementAt(index)).getDelta().description();
+            return ((Delta)model.getElementAt(index)).description();
         }
         else {
             return "";

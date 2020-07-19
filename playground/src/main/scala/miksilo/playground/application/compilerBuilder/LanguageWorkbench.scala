@@ -45,7 +45,7 @@ class LanguageWorkbench extends JPanel(new GridBagLayout()) {
     list.setAutoCreateRowSorter(true)
 
     list.addListSelectionListener((e: ListSelectionEvent) => {
-      painter.select(list.getSelectedValues.map(i => i.getDelta).toSeq)
+      painter.select(list.getSelectedValues.map(i => i.getParticle).toSeq)
     })
 
     val listener = new SearchFieldListener(list)

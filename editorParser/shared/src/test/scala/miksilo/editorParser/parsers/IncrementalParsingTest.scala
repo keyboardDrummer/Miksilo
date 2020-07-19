@@ -3,7 +3,7 @@ package miksilo.editorParser.parsers
 import miksilo.editorParser.languages.json.JsonParser
 import miksilo.editorParser.parsers.caching.ArrayOffsetManager
 import miksilo.editorParser.parsers.core.ParseText
-import miksilo.editorParser.parsers.editorParsers.{Position, SingleParseResult}
+import miksilo.editorParser.parsers.editorParsers.SingleParseResult
 import org.scalatest.funsuite.AnyFunSuite
 
 import scala.collection.immutable.ListMap
@@ -39,7 +39,7 @@ class IncrementalParsingTest extends AnyFunSuite {
 
   test("inserts work") {
     val input = """[1,3]"""
-    val input2 = """[1,0]"""
+    val input2 = """[1,2,0]"""
     val change = getChange
     change(0,0,input)
     change.setText(input2)
@@ -48,12 +48,14 @@ class IncrementalParsingTest extends AnyFunSuite {
   }
 
   test("multiple inserts work") {
+    val input = """[1,3,5]"""
+    val input2 = """[1,2,0,0]"""
+    val input3 = """[0,2,3,4,0]"""
     val change = getChange
-    change(0,0, """[1,3,5]""")
-    change.setText("""[0,0,0]""") // Set everything to zero.
-    val result0 = change(3,3,"2,")
-    assertResult(Array(1,2,3,5))(result0.resultOption.get)
-    change.setText("""[0,0,3,0]""") // Set 2 to zero, 3 is not cached because we modified the comma after it and that's part of that element.
+    change(0,0,"[1,3,5]")
+    change.setText(input2)
+    change(2,2,",2")
+    change.setText(input3)
     val result = change(6,6,",4")
     assertResult(Array(1,2,3,4,5))(result.resultOption.get)
   }
@@ -120,13 +122,10 @@ class IncrementalParsingTest extends AnyFunSuite {
                    |    }""".stripMargin
 
     val change = getChange
-    val result0 = change(Position(0,0), Position(0,0), program)
-    assert(result0.errors.isEmpty)
-    val afterSecondBrace = Position(1, 9)
-    val result1 = change(afterSecondBrace, Position(6,2), "")
+    val result0 = change(0, 0, program)
+    val result1 = change(11, 60, "")
+    val result2 = change(11, 11, insert)
     assert(result1.errors.isEmpty)
-    val result2 = change(afterSecondBrace, afterSecondBrace, insert)
-    assert(result2.errors.isEmpty)
   }
 
   def getChange: Change = {
@@ -134,11 +133,9 @@ class IncrementalParsingTest extends AnyFunSuite {
     val parser = ArrayOffsetManager.getCachingParser(text, JsonParser.parser, indentationSensitive = false)
     new Change {
 
-      override def apply(from: Position, until: Position, newText: String) = {
-        val untilOffset = text.getOffset(until)
-        val fromOffset = text.getOffset(from)
-        text.applyRangeChange(fromOffset, end = untilOffset, newText = newText)
-        parser.changeRange(fromOffset, untilOffset, newText.length)
+      override def apply(from: Int, until: Int, newText: String) = {
+        text.applyRangeChange(start = from, end = until, newText = newText)
+        parser.changeRange(from, until, newText.length)
         val parseResult = parser.parse()
         parseResult.map(JsonTestUtils.valueToPrimitive)
       }
@@ -150,10 +147,7 @@ class IncrementalParsingTest extends AnyFunSuite {
   }
 
   trait Change {
-    def apply(from: Position, until: Position, newText: String): SingleParseResult[Any]
-    def apply(from: Int, until: Int, newText: String): SingleParseResult[Any] = {
-      apply(Position(0, from), Position(0, until), newText)
-    }
+    def apply(from: Int, until: Int, newText: String): SingleParseResult[Any]
     def setText(newText: String): Unit
   }
 

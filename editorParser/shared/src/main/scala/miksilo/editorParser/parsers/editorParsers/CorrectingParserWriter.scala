@@ -4,8 +4,6 @@ import miksilo.editorParser.parsers.core._
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
-  val maxListDepth = 200 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
-
   def findBestParseResult[Result](zero: TextPointer, parser: BuiltParser[Result], mayStop: StopFunction,
                                   metrics: Metrics): SingleParseResult[Result] = {
 
@@ -29,7 +27,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }
           tail match {
             case tailCons: SRCons[State, Result] =>
-              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.score, tailCons.head.score))
+              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.originalScore, tailCons.head.score))
                 SREmpty.empty[State]
               else
                 tail
@@ -38,7 +36,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }
         case delayedResult: DelayedParseResult[State, Result] =>
           val results = delayedResult.getResults
-          tail.merge(results, maxListDepth)
+          tail.merge(results)
       }
     }
     val millisecondsSpent = System.currentTimeMillis() - start
@@ -106,7 +104,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                   singleResult(rightReady.mapWithHistory(mapRightResult, leftReady.history))
                 }
               case other => singleResult(other.mapWithHistory(mapRightResult, leftReady.history))
-            }, uniform = !leftReady.history.canMerge, maxListDepth)
+            }, uniform = !leftReady.history.canMerge)
           }
 
           val withoutLeft = parseRight(position, state, fixPointState)
@@ -115,8 +113,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           if (position.atEnd())
             return withoutLeft
 
-          val withLeft = parseLeft(position, state, fixPointState).flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
-          withoutLeft.merge(withLeft, maxListDepth)
+          val withLeft = parseLeft(position, state, fixPointState).flatMapReady(rightFromLeftReady, uniform = false)
+          withoutLeft.merge(withLeft)
         }
 
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
@@ -162,7 +160,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             val rightResult = parseRight(leftReady.remainder, leftReady.state, fixPointState)
             rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
           }
-          delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
+          delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false)
         }
       }
     }
@@ -180,12 +178,12 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
       new BuiltParser[Result] {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
           val firstResult = parseFirst(position, state, fixPointState)
+          val secondResult = parseSecond(position, state, fixPointState)
           firstResult match {
             case cons: SRCons[State, Result]
               if !cons.head.history.flawed => firstResult
             case _ =>
-              val secondResult = parseSecond(position, state, fixPointState)
-              firstResult.merge(secondResult, maxListDepth)
+              firstResult.merge(secondResult)
           }
         }
       }
@@ -205,7 +203,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
           val firstResult = parseFirst(position, state, fixPointState)
           val secondResult = parseSecond(position, state, fixPointState)
-          val result = firstResult.merge(secondResult, maxListDepth)
+          val result = firstResult.merge(secondResult)
+          if (position.offset == 70) {
+            System.out.append("")
+          }
           result
         }
       }

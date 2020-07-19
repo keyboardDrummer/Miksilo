@@ -23,9 +23,7 @@ object VariableDelta extends DeltaWithGrammar with ExpressionInstance with Refer
 
   def neww(name: String) = new Node(Shape, Name -> name)
 
-  object Shape extends NodeShape {
-    override def toString: String = "Variable"
-  }
+  object Shape extends NodeShape
 
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._

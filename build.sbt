@@ -1,5 +1,3 @@
-import java.nio.file.{Files, Paths, StandardCopyOption}
-
 import sbt.Keys.{homepage, scmInfo}
 
 import scala.sys.process._
@@ -70,7 +68,7 @@ lazy val commonSettings = Seq(
       Opts.resolver.sonatypeStaging
   ),
 
-  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.1" % "test"
+  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.0" % "test"
 )
 
 lazy val assemblySettings = Seq(
@@ -89,6 +87,8 @@ lazy val editorParser = crossProject(JVMPlatform, JSPlatform).
   jvmSettings(
     assemblySettings,
   ).
+  jsSettings(
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   jvmSettings(
     // Only used for SourceUtils, should get rid of it.
     // https://mvnrepository.com/artifact/org.scala-lang/scala-reflect
@@ -103,8 +103,10 @@ lazy val LSPProtocol = crossProject(JVMPlatform, JSPlatform).
     assemblySettings,
   ).
   settings(
-    libraryDependencies += "com.malliina" %%% "play-json" % "2.8.1"
+    libraryDependencies += "com.typesafe.play" %%% "play-json" % "2.8.1",
   ).
+  jsSettings(
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault").
   dependsOn(editorParser)
 
 lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
@@ -117,38 +119,27 @@ lazy val languageServer = crossProject(JVMPlatform, JSPlatform).
     assemblySettings,
     vscode := {
       val assemblyFile: String = assembly.value.getAbsolutePath
-      languageServerCommonTask(assemblyFile)
+      languageServerCommonTask(assemblyFile).run
     }
   ).
   jsSettings(
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
 
     scalaJSUseMainModuleInitializer := true,
     vscode := {
       val assemblyFile: String = (fastOptJS in Compile).value.data.getAbsolutePath
-      languageServerCommonTask(assemblyFile)
+      languageServerCommonTask(assemblyFile).run
     }).
   dependsOn(editorParser % "compile->compile;test->test", LSPProtocol)
 
-def languageServerCommonTask(assemblyFile: String): Unit = {
-  val extensionPath = Paths.get(".", "vscode-extension")
-  val outPath = extensionPath.resolve("out")
-  outPath.toFile.mkdir()
-  outPath.resolve("LanguageServer.jar").toFile.delete()
+def languageServerCommonTask(assemblyFile: String) = {
   val extension = assemblyFile.split("\\.").last
-  Files.copy(Paths.get(assemblyFile),
-    outPath.resolve(s"LanguageServer.$extension"), StandardCopyOption.REPLACE_EXISTING)
-  val yarn = Process(enableForWindows(Seq("yarn", "compile")), file("./vscode-extension"))
-  val extensionDirectory = Paths.get(".", "vscode-extension").toAbsolutePath
-  val vscode = Process(enableForWindows(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory")))
-  yarn.#&&(vscode).run
-}
-
-def enableForWindows(parts: Seq[String]): Seq[String] = {
-  val os = sys.props("os.name").toLowerCase
-  os match {
-    case x if x contains "windows" => Seq("cmd", "/C") ++ parts
-    case _ => parts
-  }
+  val removePrevious = Process(Seq("rm", "-f", "./vscode-extension/out/LanguageServer.jar"))
+  val copyJar = Process(Seq("cp", assemblyFile, s"./vscode-extension/out/LanguageServer.$extension"))
+  val yarn = Process(Seq("yarn", "compile"), file("./vscode-extension"))
+  val extensionDirectory = file("./vscode-extension").getAbsolutePath
+  val vscode = Process(Seq("code", s"--extensionDevelopmentPath=$extensionDirectory"))
+  removePrevious.#&&(copyJar).#&&(yarn).#&&(vscode)
 }
 
 lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
@@ -159,16 +150,17 @@ lazy val modularLanguages = crossProject(JVMPlatform, JSPlatform).
     assemblySettings,
     vscode := {
       val assemblyFile: String = assembly.value.getAbsolutePath
-      languageServerCommonTask(assemblyFile)
+      languageServerCommonTask(assemblyFile).run
     },
 
   ).
   jsSettings(
+    scalacOptions += "-P:scalajs:sjsDefinedByDefault",
     scalaJSUseMainModuleInitializer := true,
 
     vscode := {
       val assemblyFile: String = (fastOptJS in Compile).value.data.getAbsolutePath
-      languageServerCommonTask(assemblyFile)
+      languageServerCommonTask(assemblyFile).run
     }).
   settings(
     name := "modularLanguages",
@@ -187,7 +179,7 @@ lazy val playground = (project in file("playground")).
     skip in publish := true,
 
     assemblySettings,
-    mainClass in Compile := Some("miksilo.playground.application.Program"),
+    mainClass in Compile := Some("application.Program"),
     libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "2.1.1",
     libraryDependencies += "com.fifesoft" % "rsyntaxtextarea" % "3.0.8",
     libraryDependencies += "org.bidib.org.oxbow" % "swingbits" % "1.2.2",

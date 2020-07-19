@@ -15,11 +15,9 @@ object BlockScalarDelta extends DeltaWithGrammar {
     val _grammars = grammars
     import grammars._
 
-    val nbChar = RegexGrammar("""[^\r\n]+""".r, "non break character")
+    val nbChar = RegexGrammar("""[^\n]+""".r, "non break character")
     val chompingIndicator: BiGrammar = "-" | "+" | value("")
-    val newLine = RegexGrammar("""\r?\n""".r, "newLine", penaltyOption = Some(History.failPenalty), allowDrop = false)
-    val lineSeparator = new BiSequence(newLine,
-      _grammars.trivia, BiSequence.ignoreLeft, true)
+    val lineSeparator = new BiSequence(Delimiter("\n", penalty = History.failPenalty, allowDrop = false), _grammars.trivia, BiSequence.ignoreLeft, true)
 
     val lines: BiGrammar = {
       val line = CheckIndentationGrammar.greaterThanOrEqualTo(nbChar)

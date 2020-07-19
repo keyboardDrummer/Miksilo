@@ -13,13 +13,9 @@ import miksilo.modularLanguages.deltas.statement.{StatementDelta, StatementInsta
 object ExpressionAsStatementDelta extends StatementInstance
   with DeltaWithGrammar {
 
-  object Shape extends NodeShape {
-    override def toString: String = "ExpressionAsStatement"
-  }
+  object Shape extends NodeShape
 
-  object Expression extends NodeField {
-    override def toString: String = "Expression"
-  }
+  object Expression extends NodeField
 
   def create(expression: Node): Node = new Node(Shape, Expression -> expression)
 

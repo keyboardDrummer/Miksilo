@@ -88,7 +88,7 @@ object YamlCoreDelta extends DeltaWithGrammar {
 
     //Should be 	ns-uri-char - “!” - c-flow-indicator
     val tag: BiGrammar = JsonStringLiteralDelta.dropPrefix(grammars,
-        RegexGrammar(s"""![^'\r\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name", penaltyOption = Some(History.failPenalty),
+        RegexGrammar(s"""![^'\n !${PlainScalarDelta.flowIndicatorChars}]+""".r, "tag name", penaltyOption = Some(History.failPenalty),
                      defaultValue = Some("!")), TagName, "!")
 
     val flowValue = find(ExpressionDelta.FirstPrecedenceGrammar)

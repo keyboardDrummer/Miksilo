@@ -15,7 +15,7 @@ object HashLineCommentsDelta extends DeltaWithGrammar {
   }
 
   val commentGrammar: BiGrammar = {
-    val comment = RegexGrammar("""#[^\r\n]*\r?\n""".r, "line comment")
+    val comment = RegexGrammar("""#[^\n]*\n""".r, "line comment")
     Colorize(comment, "comment.line.hash")
   }
 

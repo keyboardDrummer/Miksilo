@@ -1,6 +1,3 @@
-.bloop/
-.metals/
-project/metals.sbt
 testOutput/
 app/
 

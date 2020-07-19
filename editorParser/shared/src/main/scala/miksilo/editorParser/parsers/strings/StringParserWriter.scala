@@ -60,7 +60,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
 
     }
 
-    override def getMustConsume(cache: ConsumeCache): Boolean = value.nonEmpty
+    override def getMustConsume(cache: ConsumeCache) = value.nonEmpty
   }
 
   /**
@@ -131,7 +131,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
       result
     }
 
-    override def getMustConsume(cache: ConsumeCache): Boolean = regex.findFirstIn("").isEmpty
+    override def getMustConsume(cache: ConsumeCache) = regex.findFirstIn("").isEmpty
   }
 
   implicit class StringParserExtensions[Result](parser: Parser[Result]) {

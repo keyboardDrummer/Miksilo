@@ -119,8 +119,7 @@ class TestDocumentGrammarWithJavaExamples extends AnyFunSuite {
   test("parseByteCode") {
     val input = SourceUtils.getResourceFileContents("FibonacciByteCodePrettyPrinted.txt")
     val deltas = Seq(RunWithJVM) ++ ByteCodeLanguage.byteCodeDeltas
-    val compilation = TestLanguageBuilder.buildWithParser(deltas).compileString(input)
-    val output = compilation.output
+    val output = TestLanguageBuilder.buildWithParser(deltas).compileString(input).output
     assertResult("8")(output)
   }
 }

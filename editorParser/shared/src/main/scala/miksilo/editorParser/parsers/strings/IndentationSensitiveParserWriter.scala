@@ -40,20 +40,18 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
     }
   }
 
-  def alignedList[Element](element: Parser[Element]): Parser[Vector[Element]] = {
-    aligned(element, Vector.empty,
-      (a: Element, b: Vector[Element]) => b.prepended(a),
-      (a: Element, b: Vector[Element]) => b.appended(a))
+  def alignedList[Element](element: Parser[Element]): Parser[List[Element]] = {
+    aligned(element, List.empty, (a: Element, b: List[Element]) => a :: b)
   }
 
-  def aligned[Element, Sum](line: Parser[Element], zero: Sum, prepend: (Element, Sum) => Sum, append: (Element, Sum) => Sum): Parser[Sum] = {
-    val remainingLines = equal(line).many(zero, append)
-    WithIndentation(leftRight(line, remainingLines, combineFold(zero, prepend)))
+  def aligned[Element, Sum](firstLine: Parser[Element], zero: Sum, reduce: (Element, Sum) => Sum): Parser[Sum] = {
+    val remainingLines = equal(firstLine).many(zero, reduce)
+    WithIndentation(leftRight(firstLine, remainingLines, combineFold(zero, reduce)))
   }
 
   def equal[Result](inner: Parser[Result]) = CheckIndentation(delta => delta == 0, "equal to", inner)
   def greaterThan[Result](inner: Parser[Result]) = CheckIndentation(delta => delta > 0, "greater than", inner)
-  def greaterThanOrEqualTo[Result](inner: Parser[Result]) = CheckIndentation(delta => delta >= 0, "greater than or equal to", inner)
+  def greaterThanOrEqualTo[Result](inner: Parser[Result]) = CheckIndentation(delta => delta >= 0, "greater than or equal", inner)
 
   case class IndentationError(from: TextPointer, expectedIndentation: Int, property: String) extends NextCharError {
     override def penalty = History.indentationErrorPenalty
