@@ -1,6 +1,6 @@
 LanguageServer
 =====
-A library for implementing language servers. LanguageServer will do most of the heavy lifting involved, leaving language designers free to focus on the language instead of diving into the science of error correcting and incremental parsing, and constraint solving.
+A library for implementing language servers. LanguageServer will do most of the heavy lifting involved, leaving language designers free to focus on the language instead of diving into the science of parsing and constraint solving.
 
 Creating language tooling is a hard problem: the topic of many academic publications. Parsers used by interpreters or compilers don't suffice for the editor case, because parsers for editors need to be error correcting, so they continue parsing and still return results when they encounter errors in the input text. Also, parsers for editors must be responsive when the users makes small changes in the text, which requires incremental parsing. There are many tools that help with generating parsers, however it is hard to find those that create parsers suitable for editors. One option is TreeSitter.
 
