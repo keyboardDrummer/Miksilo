@@ -8,6 +8,7 @@ import miksilo.editorParser.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import miksilo.modularLanguages.deltas.expression.{ArrayLiteralDelta, ExpressionDelta, StringLiteralDelta}
 import miksilo.modularLanguages.deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import miksilo.editorParser.SourceUtils
+import miksilo.editorParser.languages.yaml.YamlParser
 import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -212,6 +213,23 @@ class ModularYamlTest extends AnyFunSuite {
     assert(compilation.diagnostics.size == 2)
   }
 
+  // This test succeeds if CorrectingParserWriter.maxListDepth is increased. Probably there is a mistake in the grammar that causes the error correction to go off track in the below scenario. Would be good to resolve.
+  test("Broken in the middle 2") {
+    val program =
+      """Parameters:
+        |  KeyName: The EC2 Key Pair to allow SSH access to the instances
+        |  MemberWithOnlyKeyAndColon:
+        |Resources:
+        |  MemberWithOnlyKey
+        |  LaunchConfig:
+        |    Type: AWS::AutoScaling::LaunchConfiguration
+        |    Properties:
+        |      KeyName: !Ref 'KeyName'
+      """.stripMargin
+    val compilation = language.compileString(program)
+    assert(compilation.diagnostics.size == 2)
+  }
+
   private def replaceDefaultWithDefaultString(compilation: Compilation): Unit = {
     compilation.program.asInstanceOf[PathRoot].visitShape(ExpressionDelta.DefaultShape,
       p => p.asInstanceOf[ChildPath].replaceWith(StringLiteralDelta.Shape.neww("default")))
@@ -288,6 +306,13 @@ class ModularYamlTest extends AnyFunSuite {
 
   test("large recursion yaml") {
     val contents = SourceUtils.getResourceFileContents("yaml/LargeRecursionyaml")
+
+    val compilation = language.compileString(contents)
+    assert(compilation.diagnostics.isEmpty)
+  }
+
+  test("performance regression") {
+    val contents = SourceUtils.getResourceFileContents("app-environment.cfn.yaml")
 
     val compilation = language.compileString(contents)
     assert(compilation.diagnostics.isEmpty)
