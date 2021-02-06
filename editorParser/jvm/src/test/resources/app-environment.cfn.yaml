@@ -1,0 +1,133 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ""
+Mappings:
+  SubnetConfig:
+    VPC:
+      CIDR: '10.0.0.0/16'
+    PublicOne:
+      CIDR: '10.0.0.0/24'
+    PublicTwo:
+      CIDR: '10.0.1.0/24'
+    PrivateOne:
+      CIDR: '10.0.2.0/24'
+    PrivateTwo:
+      CIDR: '10.0.3.0/24'
+Parameters:
+  ApplicationName:
+    Default: AppName
+    Description: Application Name
+    Type: String
+  EnvironmentName:
+    Description: Environment name(dev/uat/qa/prod)
+    Type: String
+    Default: dev
+  LcpServerImage:
+    Description: LCP Server Image URI
+    Type: String
+    Default: 123456789012.dkr.ecr.ca-central-1.amazonaws.com/image:latest
+  LsdServerImage:
+    Description: LSD Server Image URI
+    Type: String
+    Default: 123456789012.dkr.ecr.ca-central-1.amazonaws.com/other-image:latest
+
+Resources:
+
+  SSMParameterReadPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: >-
+        Policy to allow reading of SSM parameters
+      ManagedPolicyName: !Sub "${ApplicationName}-ssm-read-policy"
+      Path: !Sub "/${ApplicationName}/Policies/${EnvironmentName}/"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+              - ssm:GetParametersByPath
+            Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${ApplicationName}/${EnvironmentName}/*"
+
+  EcsTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          Effect: Allow
+          Principal:
+            Service: ecs-tasks.amazonaws.com
+          Action: sts:AssumeRole
+      Path: !Sub "/${ApplicationName}/Roles/${EnvironmentName}/"
+      ManagedPolicyArns:
+        - !Ref SSMParameterReadPolicy
+        - "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+
+  EC2VPC:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      CidrBlock: !FindInMap ['SubnetConfig', 'VPC', 'CIDR']
+      EnableDnsSupport: true
+      EnableDnsHostnames: false
+      InstanceTenancy: "default"
+      Tags:
+        -
+          Key: "Name"
+          Value: !Sub "${ApplicationName}-${EnvironmentName}-vpc"
+
+  PrivateSubnetOne:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !Select
+        - '0'
+        - !GetAZs ''
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateOne', 'CIDR']
+      VpcId: !Ref EC2VPC
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "Private Subnet 1 - ${ApplicationName}-${EnvironmentName}"
+
+  PrivateSubnetTwo:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !Select
+        - '1'
+        - !GetAZs ''
+      CidrBlock: !FindInMap ['SubnetConfig', 'PrivateTwo', 'CIDR']
+      VpcId: !Ref EC2VPC
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "Private Subnet 2 - ${ApplicationName}-${EnvironmentName}"
+
+  PublicSubnetOne:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !GetAtt PrivateSubnetOne.AvailabilityZone
+      CidrBlock: !FindInMap ['SubnetConfig', 'PublicOne', 'CIDR']
+      VpcId: !Ref EC2VPC
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "Public Subnet 1 - ${ApplicationName}-${EnvironmentName}"
+
+  PublicSubnetTwo:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      AvailabilityZone: !GetAtt PrivateSubnetTwo.AvailabilityZone
+      CidrBlock: !FindInMap [ 'SubnetConfig', 'PublicTwo', 'CIDR' ]
+      VpcId: !Ref EC2VPC
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub "Public Subnet 2 - ${ApplicationName}-${EnvironmentName}"
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub "${ApplicationName}-${EnvironmentName}-IGW"
+
