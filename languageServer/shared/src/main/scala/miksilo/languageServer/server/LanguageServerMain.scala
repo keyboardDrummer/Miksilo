@@ -3,18 +3,18 @@ package miksilo.languageServer.server
 import miksilo.editorParser.LazyLogging
 import miksilo.languageServer.core.language.Language
 import miksilo.lspprotocol.jsonRpc.{JsonRpcConnection, SerialWorkQueue, WorkItem}
-import miksilo.lspprotocol.lsp.SharedLSPServer
+import miksilo.lspprotocol.lsp.{LanguageServer, SharedLSPServer}
 
 import scala.util.Try
 
 trait LanguageBuilder {
   def key: String
-  def build(arguments: collection.Seq[String]): Language
+  def build(arguments: collection.Seq[String]): LanguageServer
 }
 
 case class SimpleLanguageBuilder(key: String, language: Language) extends LanguageBuilder {
 
-  override def build(arguments: collection.Seq[String]) = language
+  override def build(arguments: collection.Seq[String]) = new MiksiloLanguageServer(language)
 }
 
 class LanguageServerMain(builders: Seq[LanguageBuilder],
@@ -24,11 +24,11 @@ class LanguageServerMain(builders: Seq[LanguageBuilder],
   val languageMap = builders.map(l => (l.key, l)).toMap
 
   def main(args: Array[String]): Unit = {
-    val languageOption = getLanguage(args)
-    languageOption.foreach(language => {
+    val serverOption = getServer(args)
+    serverOption.foreach(server => {
       logger.debug(s"Starting server in ${System.getenv("PWD")}")
       val lspServer = Try {
-        val languageServer = new MiksiloLanguageServer(language)
+        val languageServer = server
         new SharedLSPServer(languageServer, connection, workQueue)
       }
       lspServer.recover{case e => logger.error(e.getMessage); e.printStackTrace() }
@@ -36,7 +36,7 @@ class LanguageServerMain(builders: Seq[LanguageBuilder],
     })
   }
 
-  def getLanguage(args: collection.Seq[String]): Option[Language] = {
+  def getServer(args: collection.Seq[String]): Option[LanguageServer] = {
     if (builders.size == 1) {
       Some(builders.head.build(args))
     } else {

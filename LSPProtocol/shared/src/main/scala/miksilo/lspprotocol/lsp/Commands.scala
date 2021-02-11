@@ -173,8 +173,6 @@ object MessageActionItem {
 
 case class DocumentPosition(textDocument: TextDocumentIdentifier, position: Position)
 
-case class TextDocumentHoverRequest(params: DocumentPosition) extends ServerCommand
-
 case class Hover(contents: Seq[MarkedString], range: Option[SourceRange]) extends ResultResponse
 object Hover {
   implicit val rangeFormat = SourceRangeFormat.format

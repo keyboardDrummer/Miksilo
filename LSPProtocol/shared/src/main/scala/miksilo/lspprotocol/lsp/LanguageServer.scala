@@ -17,7 +17,7 @@ case class RenameParams(textDocument: TextDocumentIdentifier, position: Position
 case class DocumentSymbolParams(textDocument: TextDocumentIdentifier)
 
 trait HoverProvider {
-  def hoverRequest(request: TextDocumentHoverRequest): Hover
+  def hover(params: DocumentPosition): Option[Hover]
 }
 
 trait CompletionProvider {
@@ -53,15 +53,18 @@ object SourceRangeFormat {
 
 object Diagnostic {
   implicit val rangeFormat = SourceRangeFormat.format
+  implicit val positionFormat = PositionFormat.format
+  implicit val filePositionFormat = Json.format[FileRange]
+  implicit val informationFormat = Json.format[RelatedInformation]
   implicit val format = Json.format[Diagnostic]
 }
 case class Diagnostic(range: SourceRange, severity: Option[Int],
                       message: String, code: Option[String] = None, source: Option[String] = None,
-                      relatedInformation: Seq[RelatedInformation]) {
+                      relatedInformation: Seq[RelatedInformation] = Seq.empty) {
   def identifier = Diagnostic(range, None, message, None, None, Seq.empty)
 }
 
-case class RelatedInformation(location: FilePosition, message: String)
+case class RelatedInformation(location: FileRange, message: String)
 
 object TextEditFormat {
   implicit val rangeFormat = SourceRangeFormat.format
