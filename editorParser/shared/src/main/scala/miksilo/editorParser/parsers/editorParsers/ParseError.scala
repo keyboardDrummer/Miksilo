@@ -9,11 +9,15 @@ case class Fix(title: String, edit: TextEdit)
 /**
   * Position in a text document expressed as zero-based line and character offset.
   */
-case class Position(line: Int, character: Int)
+case class Position(line: Int, character: Int) {
+  def span(steps: Int): SourceRange = {
+    SourceRange(this, Position(line, character + steps))
+  }
+}
 
 case class OffsetPointerRange(from: OffsetPointer, until: OffsetPointer) {
-  def toSourceRange = SourceRange(from.lineCharacter, until.lineCharacter)
-  def toOffsetRange = OffsetRange(from.offset, until.offset)
+  def toSourceRange: SourceRange = SourceRange(from.lineCharacter, until.lineCharacter)
+  def toOffsetRange: OffsetRange = OffsetRange(from.offset, until.offset)
 
   def contains(offset: Int): Boolean = {
     from.offset <= offset && offset <= until.offset
@@ -24,7 +28,7 @@ case class OffsetRange(from: Int, until: Int) {
   def contains(offset: Int): Boolean = {
     from <= offset && offset <= until
   }
-  def toRange(text: ParseText) = SourceRange(text.getPosition(from), text.getPosition(until))
+  def toRange(text: ParseText): SourceRange = SourceRange(text.getPosition(from), text.getPosition(until))
 }
 case class FileOffsetRange(uri: String, range: OffsetRange)
 
@@ -57,7 +61,7 @@ trait ParseError {
   def message: String
   def from: TextPointer
   def to: TextPointer
-  def range = SourceRange(from.lineCharacter, to.lineCharacter)
+  def range: SourceRange = SourceRange(from.lineCharacter, to.lineCharacter)
 
   def canMerge: Boolean = false
   def penalty: Double
