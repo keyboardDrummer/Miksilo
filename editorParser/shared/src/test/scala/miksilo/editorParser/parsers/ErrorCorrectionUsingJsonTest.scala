@@ -1,6 +1,6 @@
 package miksilo.editorParser.parsers
 
-import miksilo.editorParser.languages.json.JsonParser
+import miksilo.editorParser.languages.json.{JsonObject, JsonParser}
 import miksilo.editorParser.parsers.core.TextPointer
 import miksilo.editorParser.parsers.editorParsers.{SourceRange, UntilBestAndXStepsStopFunction}
 import miksilo.editorParser.parsers.strings.CommonStringReaderParser
@@ -187,6 +187,24 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
     assertResult("!")(result.resultOption.get)
   }
 
+  test("blie bla bloe") {
+    val input =
+      """{
+        |  "1" : {
+        |    "2",
+        |    "3" : {
+        |      "4" : "5",
+        |      "6" : "7"
+        |    }
+        |  },
+        |  "8" : "9"
+        |}
+        |""".stripMargin
+    val result = jsonParser.parse(input, UntilBestAndXStepsStopFunction())
+    assertResult(2)(result.resultOption.head.asInstanceOf[JsonObject].members.size)
+    assertResult(1)(result.errors.size)
+  }
+
   class DetectValueParser[Result](valueToDetect: Result, val original: ParserBuilder[Result]) extends ParserBuilderBase[Result] with ParserWrapper[Result] {
     var detected = false
 
@@ -208,7 +226,7 @@ class ErrorCorrectionUsingJsonTest extends AnyFunSuite with CommonStringReaderPa
     }
   }
 
-  val jsonParser = JsonParser.parser
+  def jsonParser = JsonParser.parser
 
   // Add test for left recursion and errors
   // Add test with multiple errors in one branch "b" => "a" "b" "c"

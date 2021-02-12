@@ -43,8 +43,8 @@ class PerformanceTest extends AnyFunSuite {
     val program = SourceUtils.getResourceFileContents("AutoScalingMultiAZWithNotifications_edited.json")
     TestUtils.runPerformanceTest(smallErrorsTargetTime, 300, () => {
       val result = jsonFileParser.parse(program, UntilBestAndXStepsStopFunction())
-      assert(result.errors.size == 2)
-      assert(result.resultOption.head.asInstanceOf[JsonObject].members.size == 6)
+      //assert(result.errors.size == 2)
+      assertResult(6)(result.resultOption.head.asInstanceOf[JsonObject].members.size)
     })
   }
 
