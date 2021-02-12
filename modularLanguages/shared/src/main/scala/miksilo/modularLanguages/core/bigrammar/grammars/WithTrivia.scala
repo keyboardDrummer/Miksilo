@@ -30,12 +30,11 @@ case class WithTrivia(var inner: BiGrammar, var trivia: BiGrammar = ParseWhiteSp
 
 case class UpdateLatestRemainder[State, Result](remainder: OffsetPointer) extends ParseResults[State, Result] {
 
-  override def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int,
-                                      bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
+  override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {
     other match {
       case _: SREmpty[State] => this
-      case cons: SRCons[State, Other] =>
-        new SRCons(cons.head, cons.tailDepth + 1, this.merge(cons.tail, remainingListLength - 1, bests))
+//      case cons: SRCons[State, Other] =>
+//        new SRCons(cons.head, cons.tailDepth + 1, this.merge(cons.tail, remainingListLength - 1, bests))
       case latestRemainder: UpdateLatestRemainder[State, Result] =>
         if (latestRemainder.remainder.offset > remainder.offset) latestRemainder else this
     }
@@ -46,18 +45,13 @@ case class UpdateLatestRemainder[State, Result](remainder: OffsetPointer) extend
   override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult], uniform: Boolean) =
     this.asInstanceOf[ParseResults[State, NewResult]]
 
-  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean,
-                                  remainingListLength: Int) =
+  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean) =
     this.asInstanceOf[ParseResults[State, NewResult]]
 
   override def map[NewResult](f: Result => NewResult) =
     this.asInstanceOf[ParseResults[State, NewResult]]
 
-  override def tailDepth = 0
-
   override def toList = List.empty
-
-  override def nonEmpty = false
 
   override def pop() = throw new Exception("Can't pop empty results")
 }
@@ -100,9 +94,9 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
                 rightReady.state,
                 rightReady.history ++ leftReady.history))
             }
-          }, uniform = false, maxListDepth) // Changing this uniform to false was required to make parseByteCode succeed.
+          }, uniform = false) // Changing this uniform to false was required to make parseByteCode succeed.
         }
-        leftResults.flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
+        leftResults.flatMapReady(rightFromLeftReady, uniform = false)
       }
 
       override def origin: Option[BiGrammarToParser.ParserBuilder[Result]] = Some(WithTriviaParser.this)

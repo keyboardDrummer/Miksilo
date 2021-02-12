@@ -6,7 +6,6 @@ import scala.collection.mutable
 
 trait CorrectingParserWriter extends OptimizingParserWriter {
 
-  val maxListDepth = 200 // Should be 200, since 100 is not enough to let CorrectionJsonTest.realLifeExample2 pass
 
   def findBestParseResult[Result](zero: TextPointer, parser: BuiltParser[Result], mayStop: StopFunction,
                                   metrics: Metrics): SingleParseResult[Result] = {
@@ -19,9 +18,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     var cycles = 0
     var queue = parser(zero, startState, newParseState(zero))
-    while(queue.nonEmpty) {
+    var popResult = queue.pop()
+    while(popResult.nonEmpty) {
       cycles += 1
-      val (parseResult, tail) = queue.pop()
+      var (parseResult, tail) = popResult.get
 
       queue = parseResult match {
         case parseResult: ReadyParseResult[State, Result] =>
@@ -29,19 +29,17 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           if (bestResult.score < parseResult.score) {
             bestResult = parseResult
           }
-          tail match {
-            case tailCons: SRCons[State, Result] =>
-              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.score, tailCons.head.score))
-                SREmpty.empty[State]
-              else
-                tail
-            case _ =>
-              SREmpty.empty[State]
+          if (bestResult.history.spotless) {
+            SREmpty.empty[State]
+          } else {
+            // mayStop(bestResult.remainder.offset, bestResult.score, bestResult.score))
+            tail
           }
         case delayedResult: DelayedParseResult[State, Result] =>
           val results = delayedResult.getResults
-          tail.merge(results, maxListDepth)
+          tail.merge(results)
       }
+      popResult = queue.pop()
     }
     val millisecondsSpent = System.currentTimeMillis() - start
     metrics.measure("Parse trees evaluated", cycles)
@@ -50,10 +48,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 
 
-  def singleResult[Result](parseResult: LazyParseResult[State, Result]) =
-    new SRCons(parseResult, 0, SREmpty.empty)
+  def singleResult[Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] =
+    ParseResults.singleResult(parseResult)
 
-  def newFailure[Result](position: TextPointer, state: State, error: ParseError): SRCons[State, Result] =
+  def newFailure[Result](position: TextPointer, state: State, error: ParseError): ParseResults[State, Result] =
     singleResult(ReadyParseResult(None, position, state, History.error(error)))
 
   def leftRightSimple[Left, Right, Result](left: Parser[Left],
@@ -108,7 +106,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                   singleResult(rightReady.mapWithHistory(mapRightResult, leftReady.history))
                 }
               case other => singleResult(other.mapWithHistory(mapRightResult, leftReady.history))
-            }, uniform = !leftReady.history.canMerge, maxListDepth)
+            }, uniform = !leftReady.history.canMerge)
           }
 
           val withoutLeft = parseRight(position, state, fixPointState)
@@ -117,8 +115,8 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           if (position.atEnd())
             return withoutLeft
 
-          val withLeft = parseLeft(position, state, fixPointState).flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
-          withoutLeft.merge(withLeft, maxListDepth)
+          val withLeft = parseLeft(position, state, fixPointState).flatMapReady(rightFromLeftReady, uniform = false)
+          withoutLeft.merge(withLeft)
         }
 
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
@@ -170,7 +168,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             val rightResult = parseRight(leftReady.remainder, leftReady.state, fixPointState)
             rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
           }
-          delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false, maxListDepth)
+          delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false)
         }
 
         override def origin: Option[ParserBuilder[Result]] = Some(Sequence.this)
@@ -194,11 +192,11 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
           val firstResult = parseFirst(position, state, fixPointState)
           firstResult match {
-            case cons: SRCons[State, Result]
-              if !cons.head.history.flawed => firstResult
+//            case cons: ReadyResults[State, Result]
+//              if !cons.head.history.flawed => firstResult
             case _ =>
               val secondResult = parseSecond(position, state, fixPointState)
-              firstResult.merge(secondResult, maxListDepth)
+              firstResult.merge(secondResult)
           }
         }
 
@@ -223,7 +221,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResults[State, Result] = {
           val firstResult = parseFirst(position, state, fixPointState)
           val secondResult = parseSecond(position, state, fixPointState)
-          val result = firstResult.merge(secondResult, maxListDepth)
+          val result = firstResult.merge(secondResult)
           result
         }
 
@@ -269,7 +267,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   override def succeed[Result](result: Result): Parser[Result] = Succeed(result)
 
-  def newSuccess[Result](result: Result, remainder: TextPointer, state: State, score: Double): SRCons[State, Result] =
+  def newSuccess[Result](result: Result, remainder: TextPointer, state: State, score: Double): ParseResults[State, Result] =
     singleResult(ReadyParseResult(Some(result), remainder.drop(0), state, History.success(remainder, remainder, result, score)))
 
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {

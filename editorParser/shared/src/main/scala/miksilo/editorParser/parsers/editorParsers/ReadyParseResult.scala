@@ -10,7 +10,7 @@ case class RecursionsList[State, SeedResult, +Result](
 trait LazyParseResult[State, +Result] {
   def offset: OffsetPointer
   def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult],
-                              uniform: Boolean, maxListDepth: Int): ParseResults[State, NewResult]
+                              uniform: Boolean): ParseResults[State, NewResult]
 
   def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], uniform: Boolean): LazyParseResult[State, NewResult]
 
@@ -53,10 +53,11 @@ class DelayedParseResult[State, Result](val initialOffset: OffsetPointer,
       intermediate.mapReady(f, uniform)
     })
 
-  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean, maxListDepth: Int) =
+  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult],
+                                       uniform: Boolean): ParseResults[State, NewResult] =
     singleResult(new DelayedParseResult(initialOffset, this.history, () => {
       val intermediate = this.getResults
-      intermediate.flatMapReady(f, uniform, maxListDepth)
+      intermediate.flatMapReady(f, uniform)
     }))
 
   override def offset: OffsetPointer = if (_results != null) _results.latestRemainder else initialOffset
@@ -87,7 +88,8 @@ case class ReadyParseResult[State, +Result](resultOption: Option[Result], remain
   override def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], uniform: Boolean):
     ReadyParseResult[State, NewResult] = f(this)
 
-  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean, maxListDepth: Int) = f(this)
+  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult],
+                                       uniform: Boolean) = f(this)
 
-  override def offset = remainder
+  override def offset: TextPointer = remainder
 }
