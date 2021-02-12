@@ -43,5 +43,5 @@ class SortedDelayedList[State, Result](val sortedItems: List[DelayedParseResult[
     sortedItems.map(d => f(d)).fold(SREmpty.empty[State])((a, b) => a.merge(b))
   }
 
-  override def latestRemainder: OffsetPointer = ???
+  override def latestRemainder: OffsetPointer = sortedItems.map(d => d.initialOffset).max(OffsetPointer.ordering)
 }
