@@ -44,8 +44,7 @@ class PairingNode[State, Result](val value: DelayedParseResult[State, Result],
     }
   }
 
-  override def latestRemainder: OffsetPointer = OffsetPointer.ordering.max(value.initialOffset,
-    children.map(c => c.latestRemainder).max)
+  override def latestRemainder: OffsetPointer = (value.initialOffset :: children.map(c => c.latestRemainder)).max
 }
 
 trait LazyPairingResults[State, +Result] extends PairingResults[State, Result] {
