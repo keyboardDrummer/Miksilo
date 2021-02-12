@@ -7,11 +7,9 @@ class NilDelayed[State] extends DelayedResults[State, Nothing] {
 
   override def merge[Other >: Nothing](other: ParseResults[State, Other]): ParseResults[State, Other] = other
 
-  override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult],
-                                  uniform: Boolean): ParseResults[State, NewResult] = this
+  override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult]): ParseResults[State, NewResult] = this
 
-  override def mapResult[NewResult](f: LazyParseResult[State, Nothing] => LazyParseResult[State, NewResult],
-                                    uniform: Boolean): ParseResults[State, NewResult] = {
+  override def mapResult[NewResult](f: LazyParseResult[State, Nothing] => LazyParseResult[State, NewResult]): ParseResults[State, NewResult] = {
     this
   }
 
@@ -62,9 +60,8 @@ case class ReadyResults[State, +Result](ready: Map[Int, ReadyParseResult[State, 
     }
   }
 
-  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
-                                  uniform: Boolean): ParseResults[State, NewResult] = {
-    ready.values.map(ready => f(ready)).fold(delayed.flatMap(f, uniform))((a, b) => a.merge(b))
+  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult]): ParseResults[State, NewResult] = {
+    ready.values.map(ready => f(ready)).fold(delayed.flatMap(f))((a, b) => a.merge(b))
   }
 
   override def toList: List[LazyParseResult[State, Result]] = {

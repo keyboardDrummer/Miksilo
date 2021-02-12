@@ -4,13 +4,11 @@ import miksilo.editorParser.parsers.core.OffsetPointer
 
 trait PairingResults[State, +Result] extends DelayedResults[State, Result] {
 
-  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult],
-                                    uniform: Boolean): ParseResults[State, NewResult] = {
+  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult]): ParseResults[State, NewResult] = {
     new MapPairing(this, f)
   }
 
-  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
-                                  uniform: Boolean): ParseResults[State, NewResult] = {
+  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult]): ParseResults[State, NewResult] = {
     new FlatMapPairing(this, f)
   }
 
@@ -22,10 +20,9 @@ class PairingNode[State, Result](val value: DelayedParseResult[State, Result],
                           val children: List[DelayedResults[State, Result]] = List.empty)
   extends PairingResults[State, Result] {
 
-  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult],
-                                    uniform: Boolean): ParseResults[State, NewResult] = {
+  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult]): ParseResults[State, NewResult] = {
     new PairingNode(f(value).asInstanceOf[DelayedParseResult[State, NewResult]],
-      children.map(c => c.mapResult(f, uniform).asInstanceOf[DelayedResults[State, NewResult]]))
+      children.map(c => c.mapResult(f).asInstanceOf[DelayedResults[State, NewResult]]))
   }
 
   override def pop(): Option[(DelayedParseResult[State, Result], DelayedResults[State, Result])] = {
@@ -74,7 +71,7 @@ class MapPairing[State, Result, +NewResult](val original: DelayedResults[State, 
   override def pop(): Option[(DelayedParseResult[State, NewResult], DelayedResults[State, NewResult])] = {
     original.pop().map(p => (
       f(p._1).asInstanceOf[DelayedParseResult[State, NewResult]],
-      p._2.mapResult(f, uniform = true).asInstanceOf[DelayedResults[State, NewResult]]))
+      p._2.mapResult(f).asInstanceOf[DelayedResults[State, NewResult]]))
   }
 }
 

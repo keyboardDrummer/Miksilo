@@ -18,15 +18,14 @@ trait ParseResults[State, +Result] extends CachingParseResult {
   def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other]
 
   def map[NewResult](f: Result => NewResult): ParseResults[State, NewResult] = {
-    mapResult(lazyParseResult => lazyParseResult.map(f), uniform = true)
+    mapResult(lazyParseResult => lazyParseResult.map(f))
   }
 
-  def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult], uniform: Boolean): ParseResults[State, NewResult] = {
-    flatMap(r => singleResult(f(r)), uniform)
+  def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult]): ParseResults[State, NewResult] = {
+    flatMap(r => singleResult(f(r)))
   }
 
-  def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
-                         uniform: Boolean): ParseResults[State, NewResult]
+  def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult]): ParseResults[State, NewResult]
 
   def addHistory(errors: History): ParseResults[State, Result] = {
     mapWithHistory(x => x, errors)
@@ -34,16 +33,16 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 
   def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult],
                                 oldHistory: History): ParseResults[State, NewResult] = {
-    mapResult(l => l.mapWithHistory(f, oldHistory), uniform = !oldHistory.canMerge)
+    mapResult(l => l.mapWithHistory(f, oldHistory))
   }
 
   def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult],
                           uniform: Boolean): ParseResults[State, NewResult] = {
-    mapResult(l => l.mapReady(f, uniform), uniform)
+    mapResult(l => l.mapReady(f, uniform))
   }
 
   def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean): ParseResults[State, NewResult] = {
-    flatMap[NewResult](l => l.flatMapReady(f, uniform), uniform)
+    flatMap[NewResult](l => l.flatMapReady(f, uniform))
   }
 
   def updateRemainder(f: (TextPointer, State) => (TextPointer, State)): ParseResults[State, Result] = {
@@ -94,10 +93,9 @@ class SREmpty[State] extends ParseResults[State, Nothing] {
       other
   }
 
-  override def mapResult[NewResult](f: LazyParseResult[State, Nothing] => LazyParseResult[State, NewResult], uniform: Boolean) = this
+  override def mapResult[NewResult](f: LazyParseResult[State, Nothing] => LazyParseResult[State, NewResult]) = this
 
-  override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult],
-                                  uniform: Boolean) = this
+  override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult]) = this
 
   override def map[NewResult](f: Nothing => NewResult) = this
 

@@ -76,14 +76,14 @@ case class RecursiveParseResult[State, SeedResult, +Result](
 class ReadyParseResult[State, +Result](val resultOption: Option[Result], val remainder: TextPointer, val state: State, val history: History)
   extends LazyParseResult[State, Result] {
 
-
   override def toString: String = s"Ready, score: ${history.score}"
 
   override def map[NewResult](f: Result => NewResult): ReadyParseResult[State, NewResult] = {
     new ReadyParseResult(resultOption.map(f), remainder, state, history)
   }
 
-  override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], oldHistory: History) = {
+  override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult],
+                                         oldHistory: History): ReadyParseResult[State, NewResult] = {
     val newReady = f(this)
     new ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.state, newReady.history ++ oldHistory)
   }

@@ -39,8 +39,7 @@ class SortedDelayedList[State, Result](val sortedItems: List[DelayedParseResult[
     }
   }
 
-  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
-                                  uniform: Boolean): ParseResults[State, NewResult] = {
+  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult]): ParseResults[State, NewResult] = {
     sortedItems.map(d => f(d)).fold(SREmpty.empty[State])((a, b) => a.merge(b))
   }
 

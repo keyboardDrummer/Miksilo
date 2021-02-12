@@ -5,17 +5,17 @@ import miksilo.editorParser.parsers.core.OffsetPointer
 trait LazyDelayedResults[State, +Result] extends DelayedResults[State, Result] {
   override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult],
                                          oldHistory: History): ParseResults[State, NewResult] = {
-    mapResult(l => l.mapWithHistory(f, oldHistory), uniform = !oldHistory.canMerge)
+    mapResult(l => l.mapWithHistory(f, oldHistory))
   }
 
-  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
-                                  uniform: Boolean): ParseResults[State, NewResult] = {
+  override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult]):
+    ParseResults[State, NewResult] = {
     new FlatMapDelayed(this, f)
   }
 
 
-  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult],
-                                    uniform: Boolean): ParseResults[State, NewResult] = {
+  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult]):
+    ParseResults[State, NewResult] = {
     new MapPairing(this, f)
   }
 
@@ -110,7 +110,7 @@ class MapDelayed[State, Result, +NewResult](original: DelayedResults[State, Resu
   override def pop(): Option[(DelayedParseResult[State, NewResult], DelayedResults[State, NewResult])] = {
     original.pop().map(p => (
       f(p._1).asInstanceOf[DelayedParseResult[State, NewResult]],
-      p._2.mapResult(f, uniform = true).asInstanceOf[DelayedResults[State, NewResult]]))
+      p._2.mapResult(f).asInstanceOf[DelayedResults[State, NewResult]]))
   }
 }
 
@@ -124,7 +124,7 @@ class FlatMapDelayed[State, Result, +NewResult](original: DelayedResults[State, 
       val appliedPop = applied.pop()
       val result = appliedPop.map(p => (
         p._1.asInstanceOf[DelayedParseResult[State, NewResult]],
-        p._2.merge(originalPop._2.flatMap(f, uniform = true)).asInstanceOf[DelayedResults[State, NewResult]]))
+        p._2.merge(originalPop._2.flatMap(f)).asInstanceOf[DelayedResults[State, NewResult]]))
       result
     })
   }

@@ -10,8 +10,8 @@ class AmbiguityFindingParserWriterTest extends AnyFunSuite
   with CommonParserWriter with LeftRecursiveCorrectingParserWriter {
 
   test("detects trivial ambiguity") {
-    val ambiguis = Literal("a") | Literal("a")
-    val input = "a"
-    assertThrows[Exception](ambiguis.getWholeInputParser().parse(input, NeverStop))
+    val ambiguous = Literal("aa") | Literal("a")
+    val input = "aa"
+    assertThrows[Exception](ambiguous.getWholeInputParser().parse(input, NeverStop))
   }
 }

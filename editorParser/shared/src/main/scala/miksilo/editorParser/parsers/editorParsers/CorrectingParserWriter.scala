@@ -111,7 +111,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                   singleResult(rightReady.mapWithHistory(mapRightResult, leftReady.history))
                 }
               case other => singleResult(other.mapWithHistory(mapRightResult, leftReady.history))
-            }, uniform = !leftReady.history.canMerge)
+            })
           }
 
           val withoutLeft = parseRight(position, state, fixPointState)
@@ -161,7 +161,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
               else
                 ready
             case lazyResult => lazyResult
-          }, false) // TODO set to true?
+          })
 
           def rightFromLeftReady(leftReady: ReadyParseResult[State, Left]): ParseResults[State, Result] = {
             def mapRightResult(rightResult: ReadyParseResult[State, Right]): ReadyParseResult[State, Result] = new ReadyParseResult(
