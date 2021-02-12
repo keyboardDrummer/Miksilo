@@ -3,10 +3,12 @@ package miksilo.editorParser.parsers.editorParsers
 import miksilo.editorParser.parsers.core.{OffsetPointer, TextPointer}
 import miksilo.editorParser.parsers.editorParsers.ParseResults._
 
-
 trait DelayedResults[State, +Result] extends ParseResults[State, Result] {
 
-  def pop(): Option[(LazyParseResult[State, Result], DelayedResults[State, Result])]
+  override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult],
+                                         oldHistory: History): ParseResults[State, NewResult] = {
+    mapResult(l => l.mapWithHistory(f, oldHistory), uniform = !oldHistory.canMerge)
+  }
 
   override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
                                   uniform: Boolean): DelayedResults[State, NewResult] = {
@@ -15,7 +17,8 @@ trait DelayedResults[State, +Result] extends ParseResults[State, Result] {
 
   override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {
     other match {
-      case delayedOther: DelayedResults[State, Result] => new MergeDelayed(this, delayedOther)
+      case mergeDelayedList: MergeDelayedList[State, Result] => mergeDelayedList.merge(this)
+      case delayedOther: DelayedResults[State, Result] => new MergeDelayedList(List(this, delayedOther))
       case _ => other.merge(this)
     }
 
@@ -29,7 +32,7 @@ trait DelayedResults[State, +Result] extends ParseResults[State, Result] {
 class ConsDelayed[State, +Result](head: LazyParseResult[State, Result], tail: DelayedResults[State, Result])
   extends DelayedResults[State, Result] {
 
-  override def pop(): Option[(LazyParseResult[State, Result], DelayedResults[State, Result])] = {
+  override def pop(): Option[(LazyParseResult[State, Result], ParseResults[State, Result])] = {
     Some(head, tail)
   }
 }
@@ -38,10 +41,33 @@ class NilDelayed[State] extends DelayedResults[State, Nothing] {
   override def pop(): Option[(LazyParseResult[State, Nothing], DelayedResults[State, Nothing])] = None
 }
 
+class MergeDelayedList[State, +Result](val options: List[DelayedResults[State, Result]])
+  extends DelayedResults[State, Result] {
+
+  override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {
+    other match {
+      case mergeDelayedList: MergeDelayedList[State, Result] => new MergeDelayedList(options ++ mergeDelayedList.options)
+      case delayedOther: DelayedResults[State, Result] => new MergeDelayedList(delayedOther :: options)
+      case _ => other.merge(this)
+    }
+
+  }
+
+  override def pop(): Option[(LazyParseResult[State, Result], ParseResults[State, Result])] = {
+    val pops = options.flatMap(o => o.pop().toSeq)
+    if (pops.isEmpty)
+      return None
+
+    val maxPop = pops.maxBy(p => p._1.score)
+    val otherPops = pops.filter(p => p != maxPop).map(t => singleResult(t._1).merge(t._2)).fold(maxPop._2)((a,b) => a.merge(b))
+    Some(maxPop._1, otherPops)
+  }
+}
+
 class MergeDelayed[State, +Result](first: DelayedResults[State, Result], second: DelayedResults[State, Result])
   extends DelayedResults[State, Result] {
 
-  override def pop(): Option[(LazyParseResult[State, Result], DelayedResults[State, Result])] = {
+  override def pop(): Option[(LazyParseResult[State, Result], ParseResults[State, Result])] = {
     val firstPop = first.pop()
     val secondPop = second.pop()
     (firstPop, secondPop) match {
@@ -49,9 +75,9 @@ class MergeDelayed[State, +Result](first: DelayedResults[State, Result], second:
       case (_, None) => firstPop
       case (Some((firstHead, firstTail)), Some((secondHead, secondTail))) =>
         if (firstHead.score > secondHead.score) {
-          Some(firstHead, new MergeDelayed(firstTail, new ConsDelayed(secondHead, secondTail)))
+          Some(firstHead, firstTail.merge(singleResult(secondHead).merge(secondTail)))
         } else {
-          Some(secondHead, new MergeDelayed(secondTail, new ConsDelayed(firstHead, firstTail)))
+          Some(secondHead, secondTail.merge(singleResult(firstHead).merge(firstTail)))
         }
     }
   }
@@ -60,15 +86,11 @@ class MergeDelayed[State, +Result](first: DelayedResults[State, Result], second:
 class FlatMapDelayed[State, Result, +NewResult](original: DelayedResults[State, Result], f: LazyParseResult[State, Result] => ParseResults[State, NewResult])
   extends DelayedResults[State, NewResult] {
 
-  override def pop(): Option[(LazyParseResult[State, NewResult], DelayedResults[State, NewResult])] = {
-    original.pop().map(r => {
-      val delayedHead = r._1.asInstanceOf[DelayedParseResult[State, Result]]
-      val head = new DelayedParseResult(delayedHead.initialOffset, delayedHead.history, () => {
-        val intermediate = delayedHead.getResults
-        intermediate.flatMap(f, uniform = true)
-      })
-      val tail = r._2.flatMap(f, uniform = true)
-      (head, tail)
+  override def pop(): Option[(LazyParseResult[State, NewResult], ParseResults[State, NewResult])] = {
+    original.pop().flatMap(originalPop => {
+      val applied = f(originalPop._1)
+      val appliedPop = applied.pop()
+      appliedPop.map(p => (p._1, p._2.merge(originalPop._2.flatMap(f, uniform = true))))
     })
   }
 }
@@ -176,114 +198,10 @@ object ParseResults {
       case ready: ReadyParseResult[State, Result] =>
         ReadyResults(Map(ready.remainder.offset -> ready), new NilDelayed())
       case delayed: DelayedParseResult[State, Result] =>
-        ReadyResults(Map.empty, new ConsDelayed(delayed, new NilDelayed[State]))
+        new ConsDelayed(delayed, new NilDelayed[State])
     }
   }
 }
-
-//final class SRCons[State, +Result](
-//                                    val head: LazyParseResult[State, Result],
-//                                    var tailDepth: Int,
-//                                    _tail: => ParseResults[State, Result])
-//  extends ParseResults[State, Result] {
-//
-//  override def latestRemainder: OffsetPointer = {
-//    val tailRemainder = tail.latestRemainder
-//    if (tailRemainder.offset > head.offset.offset) tailRemainder else head.offset
-//  }
-//
-//  // Used for debugging
-//  def toList: List[LazyParseResult[State, Result]] = head :: tail.toList
-//
-//  def getTail = tail
-//  lazy val tail = _tail
-//
-//  if (tailDepth == 100)   {
-//    tail
-//    tailDepth = 0
-//  }
-//
-//  def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
-//                         uniform: Boolean,
-//                         remainingListLength: Int): ParseResults[State, NewResult] = {
-//
-//
-//    if (remainingListLength == 0) {
-//      return SREmpty.empty[State]
-//    }
-//
-//    f(head) match {
-//      case _: SREmpty[State] => tail.flatMap(f, uniform, remainingListLength)
-//      case cons: SRCons[State, NewResult] =>
-//
-//        if (!uniform && head.score != cons.head.score)
-//          // TODO do we need this then branch?
-//          cons.merge(tail.flatMap(f, uniform, remainingListLength - 1), remainingListLength)
-//        else
-//        {
-//          new SRCons(
-//            cons.head,
-//            1 + Math.max(this.tailDepth, cons.tailDepth),
-//            cons.tail.merge(tail.flatMap(f, uniform, remainingListLength - 1), remainingListLength - 1))
-//        }
-//      case other => other.merge(tail.flatMap(f, uniform, remainingListLength - 1), remainingListLength)
-//    }
-//  }
-//
-//  override def map[NewResult](f: Result => NewResult): SRCons[State, NewResult] = {
-//    new SRCons(head.map(f), tailDepth + 1, tail.map(f))
-//  }
-//
-//  /*
-//  We don't want multiple results in the list with the same remainder. Instead we can just have the one with the best score.
-//  To accomplish this, we use the bests parameter.
-//   */
-//  override def merge[Other >: Result](other: ParseResults[State, Other],
-//                                      remainingListLength: Int,
-//                                      bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
-//    if (remainingListLength == 0) {
-//      return SREmpty.empty[State]
-//    }
-//
-//    def getResult(head: LazyParseResult[State, Other], tailDepth: Int,
-//                  getTail: ParseResults[State, Other]): ParseResults[State, Other] = {
-//
-//      head match {
-//        case ready: ReadyParseResult[State, Other] =>
-//          bests.get(ready.remainder.offset) match {
-//            case Some(previousBest) if previousBest >= ready.score =>
-//              getTail(bests)
-//            case _ =>
-//              new SRCons(head, tailDepth, getTail(bests + (ready.remainder.offset -> ready.score)))
-//          }
-//        case _ =>
-//          new SRCons(head, tailDepth, getTail(bests))
-//      }
-//    }
-//
-//    other match {
-//      case _: SREmpty[State] => this
-//      case cons: SRCons[State, Other] =>
-//
-//        val maxListDepth = 200
-//        if (head.score >= cons.head.score) {
-//          // TODO describe what the Math.max here is for.
-//          getResult(head, Math.max(maxListDepth, 1 + tailDepth), (newBests) => {
-//            val merged = tail.merge(cons, remainingListLength - 1)
-//            merged
-//          })
-//        }
-//        else {
-//          getResult(cons.head, Math.max(maxListDepth, 1 + cons.tailDepth), (newBests) => this.merge(cons.tail, remainingListLength - 1, newBests))
-//        }
-//      case earlier => earlier.merge(this, remainingListLength)
-//    }
-//  }
-//
-//  override def nonEmpty = true
-//
-//  override def pop(): (LazyParseResult[State, Result], ParseResults[State, Result]) = (head, tail)
-//}
 
 object SREmpty {
   private val value = new SREmpty[Nothing]

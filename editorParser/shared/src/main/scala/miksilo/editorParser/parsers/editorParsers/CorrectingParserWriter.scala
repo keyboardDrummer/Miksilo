@@ -21,7 +21,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     var popResult = queue.pop()
     while(popResult.nonEmpty) {
       cycles += 1
-      var (parseResult, tail) = popResult.get
+      val (parseResult, tail) = popResult.get
 
       queue = parseResult match {
         case parseResult: ReadyParseResult[State, Result] =>
@@ -32,13 +32,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           if (bestResult.history.spotless) {
             SREmpty.empty[State]
           } else {
-            // mayStop(bestResult.remainder.offset, bestResult.score, bestResult.score))
             tail
           }
         case delayedResult: DelayedParseResult[State, Result] =>
-          val results = delayedResult.getResults
-          tail.merge(results)
+
+          if (mayStop(bestResult.remainder.offset, bestResult.score, delayedResult.score)) {
+            SREmpty.empty[State]
+          } else {
+            val results = delayedResult.getResults
+            tail.merge(results)
+          }
       }
+
       popResult = queue.pop()
     }
     val millisecondsSpent = System.currentTimeMillis() - start
