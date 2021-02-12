@@ -16,8 +16,6 @@ trait PairingResults[State, +Result] extends DelayedResults[State, Result] {
 
   override def toList: List[LazyParseResult[State, Result]] = ???
 
-  override def latestRemainder: OffsetPointer = ???
-
 }
 
 class PairingNode[State, Result](val value: DelayedParseResult[State, Result],
@@ -48,9 +46,15 @@ class PairingNode[State, Result](val value: DelayedParseResult[State, Result],
       case _ => other.merge(this)
     }
   }
+
+  override def latestRemainder: OffsetPointer = OffsetPointer.ordering.max(value.initialOffset,
+    children.map(c => c.latestRemainder).max)
 }
 
 trait LazyPairingResults[State, +Result] extends PairingResults[State, Result] {
+  def original: DelayedResults[State, Any]
+
+  override def latestRemainder: OffsetPointer = original.latestRemainder
 
   override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {
     other match {
@@ -63,7 +67,7 @@ trait LazyPairingResults[State, +Result] extends PairingResults[State, Result] {
   }
 }
 
-class MapPairing[State, Result, +NewResult](original: DelayedResults[State, Result],
+class MapPairing[State, Result, +NewResult](val original: DelayedResults[State, Result],
                                             f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult])
   extends LazyPairingResults[State, NewResult] {
 
@@ -74,7 +78,7 @@ class MapPairing[State, Result, +NewResult](original: DelayedResults[State, Resu
   }
 }
 
-class FlatMapPairing[State, Result, +NewResult](original: DelayedResults[State, Result],
+class FlatMapPairing[State, Result, +NewResult](val original: DelayedResults[State, Result],
                                                 f: LazyParseResult[State, Result] => ParseResults[State, NewResult])
   extends LazyPairingResults[State, NewResult] {
 

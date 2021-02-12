@@ -15,9 +15,9 @@ class NilDelayed[State] extends DelayedResults[State, Nothing] {
     this
   }
 
-  override def latestRemainder: OffsetPointer = ???
+  override def latestRemainder: OffsetPointer = EmptyRemainder
 
-  override def toList: List[LazyParseResult[State, Nothing]] = ???
+  override def toList: List[LazyParseResult[State, Nothing]] = List.empty
 }
 
 trait DelayedResults[State, +Result] extends ParseResults[State, Result] {
@@ -72,5 +72,8 @@ case class ReadyResults[State, +Result](ready: Map[Int, ReadyParseResult[State, 
     ready.values.foldLeft(delayedList)((a, b) => b :: a)
   }
 
-  override def latestRemainder: OffsetPointer = ???
+  override def latestRemainder: OffsetPointer = {
+    OffsetPointer.ordering.max(ready.values.map(r => r.remainder).max(OffsetPointer.ordering),
+      delayed.latestRemainder)
+  }
 }
