@@ -47,14 +47,14 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
             val remainder = position.drop(index)
             val errorHistory = History.error(new MissingInput(remainder, value.substring(index), value.substring(index), penalty))
             if (position.length <= arrayIndex) {
-              return singleResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
+              return singleResult(new ReadyParseResult(Some(value), remainder, state, errorHistory))
             } else if (position.charAt(arrayIndex) != value.charAt(index)) {
-              return singleResult(ReadyParseResult(Some(value), remainder, state, errorHistory))
+              return singleResult(new ReadyParseResult(Some(value), remainder, state, errorHistory))
             }
             index += 1
           }
           val remainder = position.drop(value.length)
-          singleResult(ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value)))
+          singleResult(new ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value)))
         }
 
         override def origin: Option[ParserBuilder[String]] = Some(Literal.this)
@@ -82,7 +82,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
               ready
             } else {
               val insertError = new MissingInput(position, value, value + " ")
-              ReadyParseResult(Some(value), position, state, History.error(insertError))
+              new ReadyParseResult(Some(value), position, state, History.error(insertError))
             }
           }, uniform = false)
         }
@@ -126,11 +126,11 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
             case Some(matched) =>
               val value = position.subSequence(position.offset, position.offset + matched.end).toString
               val remainder = position.drop(matched.end)
-              singleResult(ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value, score)))
+              singleResult(new ReadyParseResult(Some(value), remainder, state, History.success(position, remainder, value, score)))
             case None =>
               penaltyOption.fold[ParseResult[String]](SREmpty.empty)(penalty => {
                 val history = History.error(new MissingInput(position, s"<$regexName>", defaultValue.getOrElse(""), penalty))
-                singleResult(ReadyParseResult[State, String](defaultValue, position, state, history))
+                singleResult(new ReadyParseResult[State, String](defaultValue, position, state, history))
               })
 
           }

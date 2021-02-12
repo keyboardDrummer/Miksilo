@@ -108,7 +108,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           val originalResult = parseOriginal.apply(position, state, fixPointState)
           originalResult.mapReady(r => {
             val history = History.error(MissingInput(position, r.remainder, s"<$name>", " ", History.insertFallbackPenalty))
-            ReadyParseResult(r.resultOption, r.remainder, r.state, history)
+            new ReadyParseResult(r.resultOption, r.remainder, r.state, history)
           }, uniform = true)
         }
 
@@ -190,7 +190,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
               parseResult
             else {
               val error = DropError(remainder, remainder.end())
-              ReadyParseResult(parseResult.resultOption, remainder.end(), parseResult.state, parseResult.history.addError(error))
+              new ReadyParseResult(parseResult.resultOption, remainder.end(), parseResult.state, parseResult.history.addError(error))
             }
           }, uniform = false)
         }
@@ -248,9 +248,9 @@ trait SequenceParserWriter extends CorrectingParserWriter {
                 newResultOption match {
                   case Left(message) =>
                     val leftHistory = ready.history.addError(FilterError(position, ready.remainder, message))
-                    ReadyParseResult(None, ready.remainder, ready.state, leftHistory)
+                    new ReadyParseResult(None, ready.remainder, ready.state, leftHistory)
                   case Right(value) =>
-                    ReadyParseResult(Some(value), ready.remainder, ready.state, ready.history)
+                    new ReadyParseResult(Some(value), ready.remainder, ready.state, ready.history)
                 }
               case None =>
                 ready.asInstanceOf[ReadyParseResult[State, NewResult]]
@@ -280,7 +280,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
                   ready
                 else {
                   val history = ready.history.addError(FilterError(position, ready.remainder, getMessage(result)))
-                  ReadyParseResult(None, ready.remainder, ready.state, history)
+                  new ReadyParseResult(None, ready.remainder, ready.state, history)
                 }
               case None => ready
             }

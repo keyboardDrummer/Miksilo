@@ -7,7 +7,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
   override def findBestParseResult[Result](zero: TextPointer, parser: BuiltParser[Result],
                                            mayStop: StopFunction, metrics: Metrics): SingleParseResult[Result] = {
 
-    val noResultFound = ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Grammar is always recursive")))
+    val noResultFound = new ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[State, Result] = noResultFound
 
     var resultsSeen = Map.empty[Any, ReadyParseResult[State, Result]]
@@ -19,7 +19,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
       queue = parseResult match {
         case _parseResult: ReadyParseResult[State, _] =>
           val parseResult = _parseResult.asInstanceOf[ReadyParseResult[State, Result]]
-          val parseResultKey = ReadyParseResult(parseResult.resultOption, parseResult.remainder, parseResult.state, getHistoryWithoutChoices(parseResult.history))
+          val parseResultKey = new ReadyParseResult(parseResult.resultOption, parseResult.remainder, parseResult.state, getHistoryWithoutChoices(parseResult.history))
           if (resultsSeen.contains(parseResultKey)) {
             val previousResult = resultsSeen(parseResultKey)
             val oldChoices = getHistoryChoices(previousResult.history)

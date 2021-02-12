@@ -89,7 +89,7 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
                 })
               )
 
-              singleResult(ReadyParseResult(value,
+              singleResult(new ReadyParseResult(value,
                 rightReady.remainder,
                 rightReady.state,
                 rightReady.history ++ leftReady.history))

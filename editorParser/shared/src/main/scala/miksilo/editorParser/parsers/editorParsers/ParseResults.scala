@@ -187,7 +187,7 @@ trait ParseResults[State, +Result] extends CachingParseResult {
   def updateRemainder(f: (TextPointer, State) => (TextPointer, State)): ParseResults[State, Result] = {
     mapReady(r => {
       val (newPosition, newState) = f(r.remainder, r.state)
-      ReadyParseResult(r.resultOption, newPosition, newState, r.history)
+      new ReadyParseResult(r.resultOption, newPosition, newState, r.history)
     }, uniform = true)
   }
 }

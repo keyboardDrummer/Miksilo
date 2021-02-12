@@ -11,7 +11,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                                   metrics: Metrics): SingleParseResult[Result] = {
 
     val start = System.currentTimeMillis()
-    val noResultFound = ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Grammar is always recursive")))
+    val noResultFound = new ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Grammar is always recursive")))
     var bestResult: ReadyParseResult[State, Result] = noResultFound
 
     mayStop.reset()
@@ -36,7 +36,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }
         case delayedResult: DelayedParseResult[State, Result] =>
 
-          if (mayStop(bestResult.remainder.offset, bestResult.score, delayedResult.score)) {
+          if (bestResult != noResultFound && mayStop(bestResult.remainder.offset, bestResult.score, delayedResult.score)) {
             SREmpty.empty[State]
           } else {
             val results = delayedResult.getResults
@@ -57,7 +57,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     ParseResults.singleResult(parseResult)
 
   def newFailure[Result](position: TextPointer, state: State, error: ParseError): ParseResults[State, Result] =
-    singleResult(ReadyParseResult(None, position, state, History.error(error)))
+    singleResult(new ReadyParseResult(None, position, state, History.error(error)))
 
   def leftRightSimple[Left, Right, Result](left: Parser[Left],
                                            right: => Parser[Right],
@@ -96,7 +96,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
           def rightFromLeftReady(leftReady: ReadyParseResult[State, Left]): ParseResults[State, Result] = {
 
-            def mapRightResult(rightResult: ReadyParseResult[State, Result]): ReadyParseResult[State, Result] = ReadyParseResult(
+            def mapRightResult(rightResult: ReadyParseResult[State, Result]): ReadyParseResult[State, Result] = new ReadyParseResult(
               combine(leftReady.resultOption, rightResult.resultOption),
               rightResult.remainder,
               rightResult.state,
@@ -164,7 +164,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           }, false) // TODO set to true?
 
           def rightFromLeftReady(leftReady: ReadyParseResult[State, Left]): ParseResults[State, Result] = {
-            def mapRightResult(rightResult: ReadyParseResult[State, Right]): ReadyParseResult[State, Result] = ReadyParseResult(
+            def mapRightResult(rightResult: ReadyParseResult[State, Right]): ReadyParseResult[State, Result] = new ReadyParseResult(
               combine(leftReady.resultOption, rightResult.resultOption),
               rightResult.remainder,
               rightResult.state,
@@ -243,7 +243,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     override def getParser(recursive: GetParser): BuiltParser[TextPointer] = {
       new BuiltParser[TextPointer] {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[TextPointer] =
-          singleResult(ReadyParseResult(Some(position), position, state, History.empty))
+          singleResult(new ReadyParseResult(Some(position), position, state, History.empty))
 
         override def origin: Option[ParserBuilder[TextPointer]] = Some(PositionParser)
       }
@@ -261,7 +261,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
         override def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[NewResult] = {
           parseOriginal(position, state, fixPointState).mapReady(ready => {
             val newValue = ready.resultOption.map(v => addRange(position, ready.remainder, v))
-            ReadyParseResult(newValue, ready.remainder, ready.state, ready.history)
+            new ReadyParseResult(newValue, ready.remainder, ready.state, ready.history)
           }, uniform = true)
         }
 
@@ -273,7 +273,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   override def succeed[Result](result: Result): Parser[Result] = Succeed(result)
 
   def newSuccess[Result](result: Result, remainder: TextPointer, state: State, score: Double): ParseResults[State, Result] =
-    singleResult(ReadyParseResult(Some(result), remainder.drop(0), state, History.success(remainder, remainder, result, score)))
+    singleResult(new ReadyParseResult(Some(result), remainder.drop(0), state, History.success(remainder, remainder, result, score)))
 
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {
 
@@ -308,7 +308,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
   }
 
   def newFailure[Result](partial: Option[Result], position: TextPointer, state: State, errors: MyHistory) =
-    singleResult(ReadyParseResult(partial, position, state, errors))
+    singleResult(new ReadyParseResult(partial, position, state, errors))
 
   type MyHistory = History
 
