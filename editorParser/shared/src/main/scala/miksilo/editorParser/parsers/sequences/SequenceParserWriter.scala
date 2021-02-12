@@ -47,7 +47,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
                 SREmpty.empty
               else
                 singleResult(ready)
-            }, uniform = true)
+            })
           }
 
           val droppedInput = position.drop(1)
@@ -109,7 +109,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
           originalResult.mapReady(r => {
             val history = History.error(MissingInput(position, r.remainder, s"<$name>", " ", History.insertFallbackPenalty))
             new ReadyParseResult(r.resultOption, r.remainder, r.state, history)
-          }, uniform = true)
+          })
         }
 
         override def origin: Option[ParserBuilder[Result]] = Some(Fallback.this)
@@ -192,7 +192,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
               val error = DropError(remainder, remainder.end())
               new ReadyParseResult(parseResult.resultOption, remainder.end(), parseResult.state, parseResult.history.addError(error))
             }
-          }, uniform = false)
+          })
         }
 
         override def origin: Option[ParserBuilder[Result]] = Some(ParseWholeInput.this)
@@ -255,7 +255,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
               case None =>
                 ready.asInstanceOf[ReadyParseResult[State, NewResult]]
             }
-          }, uniform = false)
+          })
         }
 
         override def origin: Option[ParserBuilder[NewResult]] = Some(FilterMap.this)
@@ -284,7 +284,7 @@ trait SequenceParserWriter extends CorrectingParserWriter {
                 }
               case None => ready
             }
-          }, uniform = false)
+          })
         }
 
         override def origin: Option[ParserBuilder[Result]] = Some(Filter.this)

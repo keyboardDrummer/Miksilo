@@ -69,7 +69,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         // The order of the merge determines whether ambiguous grammars are left or right associative by default.
         result = result.merge(current)
 
-        current = current.flatMapReady(growStep(recursions, _), uniform = false)
+        current = current.flatMapReady(growStep(recursions, _))
       }
 
       val grown = grow(recursions, current)
@@ -83,7 +83,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         // The order of the merge determines whether ambiguous grammars are left or right associative by default.
         val result = grown.merge(singleResult(prev))
         result
-      }, uniform = false)
+      })
 
       next
     }
@@ -93,8 +93,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
         val results = recursive.get(singleResult(prev))
         results.flatMapReady(
           ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else
-            SREmpty.empty,
-          uniform = false) // TODO maybe set this to uniform = true
+            SREmpty.empty) // TODO maybe set this to uniform = true
       }).reduce((a, b) => a.merge(b))
     }
 

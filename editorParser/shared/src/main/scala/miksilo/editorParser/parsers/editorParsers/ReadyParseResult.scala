@@ -9,10 +9,9 @@ case class RecursionsList[State, SeedResult, +Result](
 
 trait LazyParseResult[State, +Result] {
   def offset: OffsetPointer
-  def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult],
-                              uniform: Boolean): ParseResults[State, NewResult]
+  def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult]): ParseResults[State, NewResult]
 
-  def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], uniform: Boolean): LazyParseResult[State, NewResult]
+  def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult]): LazyParseResult[State, NewResult]
 
   val score: Double = history.score
 
@@ -47,17 +46,16 @@ class DelayedParseResult[State, +Result](val initialOffset: OffsetPointer,
       intermediate.mapWithHistory(f, oldHistory)
     })
 
-  override def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], uniform: Boolean): DelayedParseResult[State, NewResult] =
+  override def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult]): DelayedParseResult[State, NewResult] =
     new DelayedParseResult(initialOffset, this.history, () => {
       val intermediate = this.getResults
-      intermediate.mapReady(f, uniform)
+      intermediate.mapReady(f)
     })
 
-  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult],
-                                       uniform: Boolean): ParseResults[State, NewResult] =
+  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult]): ParseResults[State, NewResult] =
     singleResult(new DelayedParseResult(initialOffset, this.history, () => {
       val intermediate = this.getResults
-      intermediate.flatMapReady(f, uniform)
+      intermediate.flatMapReady(f)
     }))
 
   override def offset: OffsetPointer = if (_results != null) _results.latestRemainder else initialOffset
@@ -88,11 +86,10 @@ class ReadyParseResult[State, +Result](val resultOption: Option[Result], val rem
     new ReadyParseResult(newReady.resultOption, newReady.remainder, newReady.state, newReady.history ++ oldHistory)
   }
 
-  override def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], uniform: Boolean):
+  override def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult]):
     ReadyParseResult[State, NewResult] = f(this)
 
-  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult],
-                                       uniform: Boolean) = f(this)
+  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult]) = f(this)
 
   override def offset: TextPointer = remainder
 }

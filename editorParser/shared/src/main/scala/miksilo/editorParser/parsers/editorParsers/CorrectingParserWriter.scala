@@ -120,7 +120,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           if (position.atEnd())
             return withoutLeft
 
-          val withLeft = parseLeft(position, state, fixPointState).flatMapReady(rightFromLeftReady, uniform = false)
+          val withLeft = parseLeft(position, state, fixPointState).flatMapReady(rightFromLeftReady)
           withoutLeft.merge(withLeft)
         }
 
@@ -173,7 +173,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
             val rightResult = parseRight(leftReady.remainder, leftReady.state, fixPointState)
             rightResult.mapWithHistory[Result](mapRightResult, leftReady.history)
           }
-          delayedLeftResults.flatMapReady(rightFromLeftReady, uniform = false)
+          delayedLeftResults.flatMapReady(rightFromLeftReady)
         }
 
         override def origin: Option[ParserBuilder[Result]] = Some(Sequence.this)
@@ -262,7 +262,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           parseOriginal(position, state, fixPointState).mapReady(ready => {
             val newValue = ready.resultOption.map(v => addRange(position, ready.remainder, v))
             new ReadyParseResult(newValue, ready.remainder, ready.state, ready.history)
-          }, uniform = true)
+          })
         }
 
         override def origin: Option[ParserBuilder[NewResult]] = Some(WithRangeParser.this)

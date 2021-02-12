@@ -36,20 +36,19 @@ trait ParseResults[State, +Result] extends CachingParseResult {
     mapResult(l => l.mapWithHistory(f, oldHistory))
   }
 
-  def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult],
-                          uniform: Boolean): ParseResults[State, NewResult] = {
-    mapResult(l => l.mapReady(f, uniform))
+  def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult]): ParseResults[State, NewResult] = {
+    mapResult(l => l.mapReady(f))
   }
 
-  def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean): ParseResults[State, NewResult] = {
-    flatMap[NewResult](l => l.flatMapReady(f, uniform))
+  def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult]): ParseResults[State, NewResult] = {
+    flatMap[NewResult](l => l.flatMapReady(f))
   }
 
   def updateRemainder(f: (TextPointer, State) => (TextPointer, State)): ParseResults[State, Result] = {
     mapReady(r => {
       val (newPosition, newState) = f(r.remainder, r.state)
       new ReadyParseResult(r.resultOption, newPosition, newState, r.history)
-    }, uniform = true)
+    })
   }
 }
 

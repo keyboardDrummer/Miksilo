@@ -3,20 +3,15 @@ package miksilo.editorParser.parsers.editorParsers
 import miksilo.editorParser.parsers.core.OffsetPointer
 
 trait LazyDelayedResults[State, +Result] extends DelayedResults[State, Result] {
-  override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult],
-                                         oldHistory: History): ParseResults[State, NewResult] = {
-    mapResult(l => l.mapWithHistory(f, oldHistory))
-  }
 
   override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult]):
     ParseResults[State, NewResult] = {
     new FlatMapDelayed(this, f)
   }
 
-
   override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult]):
     ParseResults[State, NewResult] = {
-    new MapPairing(this, f)
+    new MapDelayed(this, f)
   }
 
   override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {

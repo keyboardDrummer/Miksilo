@@ -84,7 +84,7 @@ trait StringParserWriter extends SequenceParserWriter with LeftRecursiveCorrecti
               val insertError = new MissingInput(position, value, value + " ")
               new ReadyParseResult(Some(value), position, state, History.error(insertError))
             }
-          }, uniform = false)
+          })
         }
 
         override def origin: Option[ParserBuilder[String]] = Some(KeywordParser.this)

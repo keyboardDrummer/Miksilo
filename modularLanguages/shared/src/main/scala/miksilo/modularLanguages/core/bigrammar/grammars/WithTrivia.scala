@@ -94,9 +94,9 @@ class WithTriviaParser(original: BiGrammarToParser.Parser[Result], triviasParser
                 rightReady.state,
                 rightReady.history ++ leftReady.history))
             }
-          }, uniform = false) // Changing this uniform to false was required to make parseByteCode succeed.
+          })
         }
-        leftResults.flatMapReady(rightFromLeftReady, uniform = false)
+        leftResults.flatMapReady(rightFromLeftReady)
       }
 
       override def origin: Option[BiGrammarToParser.ParserBuilder[Result]] = Some(WithTriviaParser.this)
