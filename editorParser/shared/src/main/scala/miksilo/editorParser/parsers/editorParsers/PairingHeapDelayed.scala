@@ -4,10 +4,10 @@ import miksilo.editorParser.parsers.core.OffsetPointer
 
 trait PairingResults[State, +Result] extends DelayedResults[State, Result] {
 
-//  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult],
-//                                    uniform: Boolean): ParseResults[State, NewResult] = {
-//    new MapDelayed(this, f)
-//  }
+  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult],
+                                    uniform: Boolean): ParseResults[State, NewResult] = {
+    new MapPairing(this, f)
+  }
 
   override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
                                   uniform: Boolean): ParseResults[State, NewResult] = {
@@ -23,6 +23,12 @@ trait PairingResults[State, +Result] extends DelayedResults[State, Result] {
 class PairingNode[State, Result](val value: DelayedParseResult[State, Result],
                           val children: List[DelayedResults[State, Result]] = List.empty)
   extends PairingResults[State, Result] {
+
+  override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult],
+                                    uniform: Boolean): ParseResults[State, NewResult] = {
+    new PairingNode(f(value).asInstanceOf[DelayedParseResult[State, NewResult]],
+      children.map(c => c.mapResult(f, uniform).asInstanceOf[DelayedResults[State, NewResult]]))
+  }
 
   override def pop(): Option[(DelayedParseResult[State, Result], DelayedResults[State, Result])] = {
     val tail: DelayedResults[State, Result] =
@@ -44,21 +50,33 @@ class PairingNode[State, Result](val value: DelayedParseResult[State, Result],
   }
 }
 
-//class MapDelayed[State, Result, +NewResult](original: PairingDelayedResults[State, Result],
-//                                            f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult])
-//  extends PairingDelayedResults[State, NewResult] {
-//
-//  override def pop(): Option[(DelayedParseResult[State, NewResult], DelayedResults[State, NewResult])] = {
-//    original.pop().map(p => (
-//      f(p._1).asInstanceOf[DelayedParseResult[State, NewResult]],
-//      p._2.mapResult(f, uniform = true).asInstanceOf[DelayedResults[State, NewResult]]))
-//  }
-//}
-//
+trait LazyPairingResults[State, +Result] extends PairingResults[State, Result] {
+
+  override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {
+    other match {
+      case ready: ReadyResults[State, Other] => ready.merge(this)
+      case _ =>
+        pop().fold(other)(popped => {
+          new PairingNode(popped._1, List(popped._2)).merge(other)
+        })
+    }
+  }
+}
+
+class MapPairing[State, Result, +NewResult](original: DelayedResults[State, Result],
+                                            f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult])
+  extends LazyPairingResults[State, NewResult] {
+
+  override def pop(): Option[(DelayedParseResult[State, NewResult], DelayedResults[State, NewResult])] = {
+    original.pop().map(p => (
+      f(p._1).asInstanceOf[DelayedParseResult[State, NewResult]],
+      p._2.mapResult(f, uniform = true).asInstanceOf[DelayedResults[State, NewResult]]))
+  }
+}
 
 class FlatMapPairing[State, Result, +NewResult](original: DelayedResults[State, Result],
                                                 f: LazyParseResult[State, Result] => ParseResults[State, NewResult])
-  extends PairingResults[State, NewResult] {
+  extends LazyPairingResults[State, NewResult] {
 
   override def pop(): Option[(DelayedParseResult[State, NewResult], DelayedResults[State, NewResult])] = {
     original.pop().flatMap(originalPop => {
@@ -70,27 +88,4 @@ class FlatMapPairing[State, Result, +NewResult](original: DelayedResults[State, 
       result
     })
   }
-
-  override def merge[Other >: NewResult](other: ParseResults[State, Other]): ParseResults[State, Other] = {
-    other match {
-      case ready: ReadyResults[State, Other] => ready.merge(this)
-      case _ =>
-        pop().fold(other)(popped => {
-          new PairingNode(popped._1, List(popped._2)).merge(other)
-        })
-    }
-  }
 }
-
-//class PairingNilDelayed[State] extends PairingDelayedResults[State, Nothing] {
-//  override def pop(): Option[(LazyParseResult[State, Nothing], ParseResults[State, Nothing])] = None
-//
-//  override def merge[Other >: Nothing](other: ParseResults[State, Other]): ParseResults[State, Other] = other
-//
-//  override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult],
-//                                  uniform: Boolean): ParseResults[State, NewResult] = this
-//
-//  override def latestRemainder: OffsetPointer = ???
-//
-//  override def toList: List[LazyParseResult[State, Nothing]] = ???
-//}

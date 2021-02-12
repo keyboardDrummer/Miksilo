@@ -2,7 +2,7 @@ package miksilo.editorParser.parsers.editorParsers
 
 import miksilo.editorParser.parsers.core.OffsetPointer
 
-class StrictDelayedList[State, Result](val sortedItems: List[DelayedParseResult[State, Result]])
+class SortedDelayedList[State, Result](val sortedItems: List[DelayedParseResult[State, Result]])
   extends DelayedResults[State, Result] {
 
   override def toList: List[LazyParseResult[State, Result]] = {
@@ -11,7 +11,7 @@ class StrictDelayedList[State, Result](val sortedItems: List[DelayedParseResult[
 
   override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {
     other match {
-      case delayedList: StrictDelayedList[State, Result] =>
+      case delayedList: SortedDelayedList[State, Result] =>
         var reverseSorted = List.empty[DelayedParseResult[State, Result]]
         var leftRemainder = sortedItems
         var rightRemainder = delayedList.sortedItems
@@ -26,7 +26,7 @@ class StrictDelayedList[State, Result](val sortedItems: List[DelayedParseResult[
         }
         reverseSorted = leftRemainder.reverse ++ rightRemainder.reverse ++ reverseSorted
         val sorted = reverseSorted.reverse
-        new StrictDelayedList(sorted)
+        new SortedDelayedList(sorted)
       case _ => other.merge(this)
     }
 
@@ -35,7 +35,7 @@ class StrictDelayedList[State, Result](val sortedItems: List[DelayedParseResult[
   override def pop(): Option[(DelayedParseResult[State, Result], DelayedResults[State, Result])] = {
     sortedItems match {
       case Nil => None
-      case head :: tail => Some((head, new StrictDelayedList(tail)))
+      case head :: tail => Some((head, new SortedDelayedList(tail)))
     }
   }
 

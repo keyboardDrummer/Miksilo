@@ -2,6 +2,24 @@ package miksilo.editorParser.parsers.editorParsers
 
 import miksilo.editorParser.parsers.core.OffsetPointer
 
+class NilDelayed[State] extends DelayedResults[State, Nothing] {
+  override def pop(): Option[(DelayedParseResult[State, Nothing], DelayedResults[State, Nothing])] = None
+
+  override def merge[Other >: Nothing](other: ParseResults[State, Other]): ParseResults[State, Other] = other
+
+  override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult],
+                                  uniform: Boolean): ParseResults[State, NewResult] = this
+
+  override def mapResult[NewResult](f: LazyParseResult[State, Nothing] => LazyParseResult[State, NewResult],
+                                    uniform: Boolean): ParseResults[State, NewResult] = {
+    this
+  }
+
+  override def latestRemainder: OffsetPointer = ???
+
+  override def toList: List[LazyParseResult[State, Nothing]] = ???
+}
+
 trait DelayedResults[State, +Result] extends ParseResults[State, Result] {
 
   override def pop(): Option[(DelayedParseResult[State, Result], DelayedResults[State, Result])]

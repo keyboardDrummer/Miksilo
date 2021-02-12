@@ -82,9 +82,9 @@ object ParseResults {
     parseResult match {
       case ready: ReadyParseResult[State, Result] =>
         ReadyResults(Map(ready.remainder.offset -> ready),
-          new StrictDelayedList(List.empty))
+          new SortedDelayedList(List.empty))
       case delayed: DelayedParseResult[State, Result] =>
-        new StrictDelayedList(List(delayed))
+        new SortedDelayedList(List(delayed))
     }
   }
 }

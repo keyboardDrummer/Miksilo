@@ -16,7 +16,7 @@ trait LazyDelayedResults[State, +Result] extends DelayedResults[State, Result] {
 
   override def mapResult[NewResult](f: LazyParseResult[State, Result] => LazyParseResult[State, NewResult],
                                     uniform: Boolean): ParseResults[State, NewResult] = {
-    new MapDelayed(this, f)
+    new MapPairing(this, f)
   }
 
   override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {
@@ -138,20 +138,3 @@ class ConsDelayed[State, +Result](head: DelayedParseResult[State, Result], tail:
   }
 }
 
-class NilDelayed[State] extends DelayedResults[State, Nothing] {
-  override def pop(): Option[(DelayedParseResult[State, Nothing], DelayedResults[State, Nothing])] = None
-
-  override def merge[Other >: Nothing](other: ParseResults[State, Other]): ParseResults[State, Other] = other
-
-  override def flatMap[NewResult](f: LazyParseResult[State, Nothing] => ParseResults[State, NewResult],
-                                  uniform: Boolean): ParseResults[State, NewResult] = this
-
-  override def mapResult[NewResult](f: LazyParseResult[State, Nothing] => LazyParseResult[State, NewResult],
-                                    uniform: Boolean): ParseResults[State, NewResult] = {
-    this
-  }
-
-  override def latestRemainder: OffsetPointer = ???
-
-  override def toList: List[LazyParseResult[State, Nothing]] = ???
-}
