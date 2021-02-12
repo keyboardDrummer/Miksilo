@@ -4,6 +4,7 @@ import miksilo.editorParser.parsers.core.{Processor, TextPointer}
 import miksilo.editorParser.parsers.editorParsers.{History, LeftRecursiveCorrectingParserWriter}
 import miksilo.editorParser.parsers.strings.{CommonParserWriter, IndentationSensitiveParserWriter, WhitespaceParserWriter}
 
+//noinspection TypeAnnotation
 object YamlParser extends LeftRecursiveCorrectingParserWriter
   with IndentationSensitiveParserWriter with CommonParserWriter with WhitespaceParserWriter {
 
@@ -66,7 +67,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   lazy val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\r\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
   lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
-  lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseNumber | parseFlowStringLiteral | plainScalar
+  lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseFlowStringLiteral | plainScalar
   lazy val parseFlowValue: Parser[YamlValue] = (tag ~ parseUntaggedFlowValue).
     withSourceRange((range, v) => TaggedNode(Some(range), v._1, v._2)) | parseUntaggedFlowValue
   lazy val flowInBlock = new WithContext(_ => FlowOut, parseFlowValue)
@@ -130,9 +131,6 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     alignedList(element).withSourceRange((range, elements) => YamlArray(Some(range), elements.toArray))
   }
 
-  lazy val parseNumber: Parser[YamlValue] =
-    wholeNumber.withSourceRange((range, n) => NumberLiteral(Some(range), n))
-
   lazy val parseFlowStringLiteral: Parser[YamlValue] =
     parseStringLiteralInner.withSourceRange((range, s) => StringLiteral(Some(range), s))
   lazy val parseStringLiteralInner: Parser[String] =
@@ -144,7 +142,9 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
     case FlowKey => FlowKey
     case _ => FlowOut
   }, plainStyleMultiLineString | plainStyleSingleLineString).
-    withSourceRange((range, s) => StringLiteral(Some(range), s))
+    withSourceRange((range, s) => {
+      s.toIntOption.fold[YamlValue](StringLiteral(Some(range), s))(_ => NumberLiteral(Some(range), s))
+    })
 
   val nonBreakChars = """\r\n"""
   val nonSpaceChars = nonBreakChars + " "

@@ -40,7 +40,7 @@ class PairingNode[State, Result](val value: DelayedParseResult[State, Result],
   override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {
     other match {
       case otherNode: PairingNode[State, Result] =>
-        if (value.score > otherNode.value.score)
+        if (value.score >= otherNode.value.score)
           new PairingNode(value, otherNode :: children)
         else {
           new PairingNode(otherNode.value, this :: otherNode.children)

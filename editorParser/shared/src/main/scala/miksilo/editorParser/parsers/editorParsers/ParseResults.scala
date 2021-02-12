@@ -3,11 +3,6 @@ package miksilo.editorParser.parsers.editorParsers
 import miksilo.editorParser.parsers.core.{OffsetPointer, TextPointer}
 import miksilo.editorParser.parsers.editorParsers.ParseResults._
 
-
-
-
-
-
 /**
   * A collection of paths in the parse graph.
   * The parse graph is the graph containing all triples of offset, parser and context as nodes.
