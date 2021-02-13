@@ -53,6 +53,7 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 }
 
 object ParseResults {
+
   def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] = {
     parseResult match {
       case ready: ReadyParseResult[State, Result] =>

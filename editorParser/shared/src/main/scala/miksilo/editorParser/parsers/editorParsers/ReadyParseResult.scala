@@ -43,7 +43,8 @@ class DelayedParseResult[State, +Result](val initialOffset: OffsetPointer,
   override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], oldHistory: History) =
     new DelayedParseResult(initialOffset, this.history ++ oldHistory, () => {
       val intermediate = this.getResults
-      intermediate.mapWithHistory(f, oldHistory)
+      val result = intermediate.mapWithHistory(f, oldHistory)
+      result
     })
 
   override def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult]): DelayedParseResult[State, NewResult] =
@@ -71,10 +72,8 @@ case class RecursiveParseResult[State, SeedResult, +Result](
   }
 }
 
-class ReadyParseResult[State, +Result](val resultOption: Option[Result], val remainder: TextPointer, val state: State, val history: History)
+case class ReadyParseResult[State, +Result](val resultOption: Option[Result], val remainder: TextPointer, val state: State, val history: History)
   extends LazyParseResult[State, Result] {
-
-  override def toString: String = s"Ready, score: ${history.score}"
 
   override def map[NewResult](f: Result => NewResult): ReadyParseResult[State, NewResult] = {
     new ReadyParseResult(resultOption.map(f), remainder, state, history)
