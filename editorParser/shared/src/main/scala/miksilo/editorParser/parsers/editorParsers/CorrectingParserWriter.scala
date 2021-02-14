@@ -12,7 +12,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                                   metrics: Metrics): SingleParseResult[Result] = {
 
     val start = System.currentTimeMillis()
-    val noResultFound = ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Grammar is always recursive")))
+    val noResultFound = ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Could not parse program")))
     var bestResult: ReadyParseResult[State, Result] = noResultFound
 
     mayStop.reset()
