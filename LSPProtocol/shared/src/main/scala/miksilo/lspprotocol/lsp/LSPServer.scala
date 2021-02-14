@@ -59,6 +59,7 @@ class SharedLSPServer(languageServer: LanguageServer,
     implicit val codeActionContext: OFormat[CodeActionContext] = Json.format
     implicit val codeAction: OFormat[CodeAction] = Json.format
 
+    addProvider(LSPProtocol.typeDefinition, (provider: TypeDefinitionProvider) => provider.gotoTypeDefinition)(Json.format, Writes.of[Seq[FileRange]])
     addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[FileRange]])
     addProvider(LSPProtocol.documentSymbol, (provider: DocumentSymbolProvider) => provider.documentSymbols)(Json.format, Writes.of[Seq[SymbolInformation]])
     addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[collection.Seq[FileRange]])
@@ -90,6 +91,7 @@ class SharedLSPServer(languageServer: LanguageServer,
       documentSymbolProvider = languageServer.isInstanceOf[DocumentSymbolProvider],
       referencesProvider = languageServer.isInstanceOf[ReferencesProvider],
       hoverProvider = languageServer.isInstanceOf[HoverProvider],
+      typeDefinitionProvider = languageServer.isInstanceOf[TypeDefinitionProvider],
       definitionProvider = languageServer.isInstanceOf[DefinitionProvider],
       renameProvider = languageServer.isInstanceOf[RenameProvider],
       completionProvider = languageServer match {

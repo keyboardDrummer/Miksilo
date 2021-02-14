@@ -25,6 +25,10 @@ trait CompletionProvider {
   def complete(request: DocumentPosition): CompletionList
 }
 
+trait TypeDefinitionProvider {
+  def gotoTypeDefinition(parameters: DocumentPosition): Seq[FileRange]
+}
+
 trait DefinitionProvider {
   def gotoDefinition(parameters: DocumentPosition): Seq[FileRange]
 }

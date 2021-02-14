@@ -65,6 +65,9 @@ case class ServerCapabilities(
      * The server provides goto definition support.
      */
    definitionProvider: Boolean = false,
+
+   typeDefinitionProvider: Boolean = false,
+
    /**
      * The server provides find references support.
      */
