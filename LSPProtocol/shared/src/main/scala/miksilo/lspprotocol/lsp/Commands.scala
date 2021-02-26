@@ -136,6 +136,8 @@ object DocumentOnTypeFormattingOptions {
 
 case class CompletionList(isIncomplete: Boolean, items: Seq[CompletionItem]) extends ResultResponse
 object CompletionList {
+  implicit val markupContentFormat = Json.format[MarkupContent]
+  implicit val completionItemFormat = Json.format[CompletionItem]
   implicit val format = Json.format[CompletionList]
 }
 
@@ -176,8 +178,11 @@ object MessageActionItem {
 
 case class DocumentPosition(textDocument: TextDocumentIdentifier, position: Position)
 
-case class Hover(contents: Seq[MarkedString], range: Option[SourceRange]) extends ResultResponse
+case class Hover(contents: MarkupContent, range: Option[SourceRange]) extends ResultResponse
+
 object Hover {
+  implicit val markupContentFormat = Json.format[MarkupContent]
+  implicit val completionItemFormat = Json.format[CompletionItem]
   implicit val rangeFormat = SourceRangeFormat.format
   implicit val format = Json.format[Hover]
 }

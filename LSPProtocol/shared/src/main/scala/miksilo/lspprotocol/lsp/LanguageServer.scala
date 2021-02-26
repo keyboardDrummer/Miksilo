@@ -203,7 +203,7 @@ case class CompletionItem(
                            label: String,
                            kind: Option[Int] = None,
                            detail: Option[String] = None,
-                           documentation: Option[String] = None,
+                           documentation: Option[MarkupContent] = None,
                            sortText: Option[String] = None,
                            filterText: Option[String] = None,
                            insertText: Option[String] = None,
@@ -212,8 +212,14 @@ case class CompletionItem(
 // a [CompletionRequest](#CompletionRequest) and a [CompletionResolveRequest]
 //   (#CompletionResolveRequest)
 
-object CompletionItem {
-  implicit def format = Json.format[CompletionItem]
+
+object MarkupContent {
+  def plainText(value: String): MarkupContent = MarkupContent("plaintext", value)
+  def markdown(value: String): MarkupContent = MarkupContent("markdown", value)
+}
+
+case class MarkupContent(kind: String, value: String) {
+
 }
 
 trait MarkedString

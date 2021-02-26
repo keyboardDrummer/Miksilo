@@ -58,6 +58,9 @@ class SharedLSPServer(languageServer: LanguageServer,
     implicit val textEdit: OFormat[TextEdit] = Json.format[TextEdit]
     implicit val codeActionContext: OFormat[CodeActionContext] = Json.format
     implicit val codeAction: OFormat[CodeAction] = Json.format
+    implicit val markupContentFormat = Json.format[MarkupContent]
+    implicit val completionItemFormat = Json.format[CompletionItem]
+    implicit val hoverFormat = Json.format[Hover]
 
     addProvider(LSPProtocol.typeDefinition, (provider: TypeDefinitionProvider) => provider.gotoTypeDefinition)(Json.format, Writes.of[Seq[FileRange]])
     addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[FileRange]])
