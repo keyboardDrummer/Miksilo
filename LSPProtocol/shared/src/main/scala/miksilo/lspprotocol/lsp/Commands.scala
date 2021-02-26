@@ -65,6 +65,9 @@ case class ServerCapabilities(
      * The server provides goto definition support.
      */
    definitionProvider: Boolean = false,
+
+   typeDefinitionProvider: Boolean = false,
+
    /**
      * The server provides find references support.
      */
@@ -133,6 +136,8 @@ object DocumentOnTypeFormattingOptions {
 
 case class CompletionList(isIncomplete: Boolean, items: Seq[CompletionItem]) extends ResultResponse
 object CompletionList {
+  implicit val markupContentFormat = Json.format[MarkupContent]
+  implicit val completionItemFormat = Json.format[CompletionItem]
   implicit val format = Json.format[CompletionList]
 }
 
@@ -173,10 +178,11 @@ object MessageActionItem {
 
 case class DocumentPosition(textDocument: TextDocumentIdentifier, position: Position)
 
-case class TextDocumentHoverRequest(params: DocumentPosition) extends ServerCommand
+case class Hover(contents: MarkupContent, range: Option[SourceRange]) extends ResultResponse
 
-case class Hover(contents: Seq[MarkedString], range: Option[SourceRange]) extends ResultResponse
 object Hover {
+  implicit val markupContentFormat = Json.format[MarkupContent]
+  implicit val completionItemFormat = Json.format[CompletionItem]
   implicit val rangeFormat = SourceRangeFormat.format
   implicit val format = Json.format[Hover]
 }

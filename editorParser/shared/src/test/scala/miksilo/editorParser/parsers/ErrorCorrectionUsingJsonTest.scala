@@ -2,7 +2,7 @@ package miksilo.editorParser.parsers
 
 import miksilo.editorParser.languages.json.JsonParser
 import miksilo.editorParser.parsers.core.TextPointer
-import miksilo.editorParser.parsers.editorParsers.UntilBestAndXStepsStopFunction
+import miksilo.editorParser.parsers.editorParsers.{SourceRange, UntilBestAndXStepsStopFunction}
 import miksilo.editorParser.parsers.strings.CommonStringReaderParser
 import org.scalatest.funsuite.AnyFunSuite
 

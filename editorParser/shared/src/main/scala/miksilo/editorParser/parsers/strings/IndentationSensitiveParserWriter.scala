@@ -79,7 +79,7 @@ trait IndentationSensitiveParserWriter extends StringParserWriter {
           if (position.atEnd() || deltaPredicate(delta)) {
             parseOriginal(position, state, fixPointState)
           } else {
-            newFailure(None, position, state, History.error(IndentationError(position, lineCharacter.character, property)))
+            newFailure(None, position, state, History.error(IndentationError(position, state.indentation, property)))
           }
         }
 

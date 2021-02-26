@@ -93,7 +93,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   val newLine = parseRegex("""\r?\n""".r, "newline", penaltyOption = Some(History.failPenalty), allowDrop = false)
   val blockScalar: Parser[StringLiteral] = {
     val nbChar = parseRegex("""[^\r\n]+""".r, "non break character")
-    val chompingIndicator: Parser[String] = "-" | "+" | literal("")
+    val chompingIndicator: Parser[String] = "-" | "+" | succeed("")
     val lineSeparator = leftRightSimple(newLine,
       whiteSpace, Processor.ignoreLeft[String, String])
 

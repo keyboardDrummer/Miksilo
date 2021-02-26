@@ -30,6 +30,9 @@ class LSPClient(languageClient: LanguageClient, connection: JsonRpcConnection) {
   implicit val positionFormat = PositionFormat.format
   implicit val sourceRangeFormat = SourceRangeFormat.format
   implicit val textEditFormat = TextEditFormat.format
+  implicit val markupContentFormat = Json.format[MarkupContent]
+  implicit val completionItemFormat = Json.format[CompletionItem]
+
   def rename(parameters: RenameParams): Future[WorkspaceEdit] = {
     simpleConnection.sendRequest[RenameParams, WorkspaceEdit](
       LSPProtocol.rename, getCorrelationId, parameters)(Json.format, Json.format[WorkspaceEdit])

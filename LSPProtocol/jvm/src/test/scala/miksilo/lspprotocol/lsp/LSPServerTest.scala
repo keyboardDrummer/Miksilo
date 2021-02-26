@@ -290,7 +290,7 @@ class LSPServerTest extends AsyncFunSpec {
         |
         |{"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"a","languageId":"","version":0,"text":"content"}}}""".stripMargin
 
-    val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)), Some(2), "Woeps", None, None))
+    val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)), Some(2), "Woeps", None, None, Seq.empty))
     val p = Promise[Assertion]()
     val languageClient = new TestLanguageClient {
       override def sendDiagnostics(receivedDiagnostics: PublishDiagnostics): Unit = {
@@ -316,7 +316,7 @@ class LSPServerTest extends AsyncFunSpec {
   ignore("merges change notifications") {
     val document = TextDocumentItem("a","",0,"content")
 
-    val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)), Some(2), "Woeps", None, None))
+    val diagnostics = Seq(Diagnostic(SourceRange(HumanPosition(0,1), HumanPosition(0, 5)), Some(2), "Woeps", None, None, Seq.empty))
     val promise = Promise[Assertion]()
     val languageClient = new TestLanguageClient {
     }

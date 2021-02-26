@@ -8,6 +8,7 @@ import miksilo.editorParser.parsers.editorParsers.UntilBestAndXStepsStopFunction
 import miksilo.modularLanguages.deltas.expression.{ArrayLiteralDelta, ExpressionDelta, StringLiteralDelta}
 import miksilo.modularLanguages.deltas.json.{JsonObjectLiteralDelta, JsonStringLiteralDelta}
 import miksilo.editorParser.SourceUtils
+import miksilo.editorParser.languages.yaml.YamlParser
 import miksilo.modularLanguages.util.TestLanguageBuilder
 import org.scalatest.funsuite.AnyFunSuite
 

@@ -1,6 +1,7 @@
 package miksilo.lspprotocol.lsp
 
 object LSPProtocol {
+  val typeDefinition = "textDocument/typeDefinition"
   val telemetry = "telemetry/event"
   val diagnostics = "textDocument/publishDiagnostics"
   val references = "textDocument/references"

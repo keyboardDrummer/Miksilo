@@ -14,7 +14,7 @@ trait LazyParseResult[State, +Result] {
 
   def mapReady[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], uniform: Boolean): LazyParseResult[State, NewResult]
 
-  val score: Double = history.score
+  def score: Double = history.score
 
   def history: History
   def map[NewResult](f: Result => NewResult): LazyParseResult[State, NewResult]
