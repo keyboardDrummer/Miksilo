@@ -75,8 +75,6 @@ case class RecursiveParseResult[State, SeedResult, +Result](
 case class ReadyParseResult[State, +Result](resultOption: Option[Result], remainder: TextPointer, state: State, history: History)
   extends LazyParseResult[State, Result] {
 
-  override def score: Double = history.score + 10000
-
   override def map[NewResult](f: Result => NewResult): ReadyParseResult[State, NewResult] = {
     ReadyParseResult(resultOption.map(f), remainder, state, history)
   }
