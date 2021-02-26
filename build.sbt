@@ -40,7 +40,7 @@ lazy val jvm = project
 
 lazy val commonSettings = Seq(
 
-  version := "0.1.8",
+  version := "0.1.9",
   resolvers := Seq("Repo" at "https://oss.sonatype.org/content/repositories/releases/"),
   logLevel := Level.Info,
   logBuffered in Test := false,
