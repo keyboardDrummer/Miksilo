@@ -59,17 +59,6 @@ case class PairingNode[State, Result](value: DelayedParseResult[State, Result],
       case _ => other.merge(this)
     }
   }
-//  override def merge[Other >: Result](other: ParseResults[State, Other]): ParseResults[State, Other] = {
-//    other match {
-//      case otherNode: PairingNode[State, Result] =>
-//        if (value.score >= otherNode.value.score)
-//          PairingNode(value, otherNode :: children)
-//        else {
-//          PairingNode(otherNode.value, this :: otherNode.children)
-//        }
-//      case _ => other.merge(this)
-//    }
-//  }
 
   override def latestRemainder: OffsetPointer = (value.initialOffset :: children.map(c => c.latestRemainder)).max
 }
