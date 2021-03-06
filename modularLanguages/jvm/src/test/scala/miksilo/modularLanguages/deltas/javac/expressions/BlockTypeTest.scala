@@ -4,17 +4,20 @@ import miksilo.modularLanguages.deltas.javac.JavaLanguage
 import miksilo.modularLanguages.deltas.javac.methods.BlockLanguageDelta
 import miksilo.modularLanguages.util.TestLanguageBuilder
 import miksilo.modularLanguages.util.LanguageTest
+import org.scalatest.funsuite.AnyFunSuite
 
-class BlockTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
-  Seq(DropPhases(1), BlockLanguageDelta) ++
-    JavaLanguage.blockWithVariables)) {
+class BlockTypeTest extends AnyFunSuite {
+
+  val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(
+    Seq(DropPhases(1), BlockLanguageDelta) ++
+      JavaLanguage.blockWithVariables))
 
   test("int variable") {
     val program =
       """int x;
         |x = 3;
       """.stripMargin
-    val compilation = compile(program)
+    val compilation = utils.compile(program)
     assert(compilation.remainingConstraints.isEmpty)
   }
 
@@ -23,7 +26,7 @@ class BlockTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
       """int x;
         |x = 3l;
       """.stripMargin
-    val compilation = compile(program)
+    val compilation = utils.compile(program)
     assert(compilation.remainingConstraints.nonEmpty)
   }
 
@@ -32,7 +35,7 @@ class BlockTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
       """int x;
         |int x;
       """.stripMargin
-    val compilation = compile(program)
+    val compilation = utils.compile(program)
     assert(compilation.remainingConstraints.nonEmpty)
   }
 
@@ -41,7 +44,7 @@ class BlockTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
       """int x;
         |y = 3;
       """.stripMargin
-    val compilation = compile(program)
+    val compilation = utils.compile(program)
     assert(compilation.remainingConstraints.nonEmpty)
   }
 
@@ -53,7 +56,7 @@ class BlockTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
         |  x += y;
         |}
       """.stripMargin
-    val compilation = compile(program)
+    val compilation = utils.compile(program)
     assert(compilation.remainingConstraints.isEmpty)
   }
 
@@ -65,24 +68,24 @@ class BlockTypeTest extends LanguageTest(TestLanguageBuilder.buildWithParser(
         |}
         |x += y;
       """.stripMargin
-    val compilation = compile(program)
+    val compilation = utils.compile(program)
     assert(compilation.remainingConstraints.nonEmpty)
   }
 
   test("int + int") {
     val program = "3 + 2;"
-    compile(program)
+    utils.compile(program)
   }
 
   test("int + long") {
     val program = "3 + 2l;"
-    val compilation = compile(program)
+    val compilation = utils.compile(program)
     assert(compilation.remainingConstraints.nonEmpty)
   }
 
   test("long + long") {
     val program = "3l + 2l;"
-    val compilation = compile(program)
+    val compilation = utils.compile(program)
     assert(compilation.remainingConstraints.isEmpty)
   }
 }

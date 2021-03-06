@@ -1,7 +1,0 @@
-language: scala
-jdk:
-  - oraclejdk12
-scala:
-  - 2.13.1
-env:
-  PLATFORM=travis

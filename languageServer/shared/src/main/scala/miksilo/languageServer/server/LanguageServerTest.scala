@@ -33,7 +33,7 @@ trait LanguageServerTest {
     server.asInstanceOf[ReferencesProvider].references(ReferencesParams(document, position, ReferenceContext(includeDeclaration)))
   }
 
-  def createCompletionItem(value: String) = CompletionItem(value, Some(CompletionItemKind.Variable), insertText = Some(value))
+  def createCompletionItem(value: String): CompletionItem = CompletionItem(value, Some(CompletionItemKind.Variable), insertText = Some(value))
 
   def complete(server: LanguageServer, program: String, position: HumanPosition): CompletionList = {
     val document = openDocument(server, program)

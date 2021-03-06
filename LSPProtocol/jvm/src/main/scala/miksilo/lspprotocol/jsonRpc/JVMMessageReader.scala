@@ -31,6 +31,8 @@ class JVMMessageReader(in: InputStream) extends MessageReader with LazyLogging {
 
   private val lock = new Object
 
+  private var started = false
+
   private class PumpInput extends Thread("Input Reader") {
     override def run(): Unit = {
       var nRead = 0
@@ -48,8 +50,6 @@ class JVMMessageReader(in: InputStream) extends MessageReader with LazyLogging {
       }
     }
   }
-
-  (new PumpInput).start()
 
   /**
     * Return headers, if any are available. It returns only full headers, after the
@@ -128,24 +128,33 @@ class JVMMessageReader(in: InputStream) extends MessageReader with LazyLogging {
   /**
     * Return the next JSON RPC content payload. Blocks until enough data has been received.
     */
-  def nextPayload(): Future[String] = if (streamClosed) Future.successful(null) else {
-    // blocks until headers are available
-    val headers = readHeaders()
+  def nextPayload(): Future[String] = {
+    if (!started) {
+      started = true
+      (new PumpInput).start()
+    }
 
-    if (headers.isEmpty && streamClosed)
-      Future.successful(null)
+    if (streamClosed) Future.successful(null)
+
     else {
-      val length = headers.get("Content-Length") match {
-        case Some(len) => try len.toInt catch { case e: NumberFormatException => -1 }
-        case _ => -1
-      }
+      // blocks until headers are available
+      val headers = readHeaders()
 
-      if (length > 0) {
-        val content = getContent(length)
-        if (content.isEmpty && streamClosed) Future.successful(null) else Future.successful(content)
-      } else {
-        logger.error("Input must have Content-Length header with a numeric value.")
-        nextPayload()
+      if (headers.isEmpty && streamClosed)
+        Future.successful(null)
+      else {
+        val length = headers.get("Content-Length") match {
+          case Some(len) => try len.toInt catch { case e: NumberFormatException => -1 }
+          case _ => -1
+        }
+
+        if (length > 0) {
+          val content = getContent(length)
+          if (content.isEmpty && streamClosed) Future.successful(null) else Future.successful(content)
+        } else {
+          logger.error("Input must have Content-Length header with a numeric value.")
+          nextPayload()
+        }
       }
     }
   }

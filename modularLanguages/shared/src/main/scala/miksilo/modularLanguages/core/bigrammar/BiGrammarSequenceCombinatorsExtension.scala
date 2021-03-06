@@ -50,8 +50,8 @@ trait BiGrammarSequenceCombinatorsExtension extends BiGrammarWriter {
   def manySeparatedVertical(separator: BiGrammar): BiGrammar = new BiChoice(someSeparatedVertical(separator),
     ValueGrammar(Seq.empty[Node]), true)
 
-  def some: BiGrammar = someMap(grammar ~ (grammar*))
-  def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> grammar) *))
+  def some: BiGrammar = someMap(grammar ~ (grammar.*))
+  def someSeparated(separator: BiGrammar): BiGrammar = someMap(this ~ ((separator ~> grammar).*))
 
   def inParenthesis: BiGrammar = ("(": BiGrammar) ~> grammar ~< ")"
   def inBraces: BiGrammar = ("{": BiGrammar) ~> grammar ~< "}"

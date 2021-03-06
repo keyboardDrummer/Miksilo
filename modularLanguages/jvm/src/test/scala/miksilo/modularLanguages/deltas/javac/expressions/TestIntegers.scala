@@ -1,10 +1,11 @@
 package miksilo.modularLanguages.deltas.javac.expressions
 
 import miksilo.modularLanguages.util.JavaLanguageTest
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestIntegers extends JavaLanguageTest {
+class TestIntegers extends AnyFunSuite {
 
   test("simpleInteger") {
-    compareWithJavacAfterRunning("BigInteger")
+    JavaLanguageTest.compareWithJavacAfterRunning("BigInteger")
   }
 }
