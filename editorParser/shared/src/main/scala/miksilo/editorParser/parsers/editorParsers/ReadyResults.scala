@@ -3,7 +3,8 @@ package miksilo.editorParser.parsers.editorParsers
 import miksilo.editorParser.parsers.core.OffsetPointer
 
 case class ReadyResults[State, +Result](ready: Map[Int, ReadyParseResult[State, Result]],
-                                        delayed: ParseResultsWithDelayed[State, Result]) extends ParseResults[State, Result] {
+                                        delayed: ParseResultsWithDelayed[State, Result])
+  extends ParseResults[State, Result] {
 
   override def pop(): Option[(LazyParseResult[State, Result], ParseResults[State, Result])] = {
     if (ready.nonEmpty) {
