@@ -6,12 +6,12 @@ import miksilo.editorParser.parsers.strings.CommonStringReaderParser
 
 class AssociativityTest extends AnyFunSuite with CommonStringReaderParser with LeftRecursiveCorrectingParserWriter {
 
-  test("binary operators are right associative by default") {
+  test("binary operators are left associative by default") {
     lazy val expr: Parser[Any] = new Lazy(expr) ~< "-" ~ expr | wholeNumber
     val input = "1-2-3"
     val result = expr.getWholeInputParser().parse(input)
     assert(result.successful)
-    assertResult(("1",("2","3")))(result.get)
+    assertResult((("1","2"), "3"))(result.get)
   }
 
   test("binary operators can be made left associative") {
@@ -50,7 +50,7 @@ class AssociativityTest extends AnyFunSuite with CommonStringReaderParser with L
     assert(result3.successful)
   }
 
-  test("if-then-else is left-associative by default") {
+  test("if-then-else is right-associative by default") {
     lazy val expr = wholeNumber
     lazy val stmt: Parser[Any] = expr |
       "if{" ~> expr ~ "then{" ~ stmt ~ "else{" ~ stmt |
@@ -59,8 +59,12 @@ class AssociativityTest extends AnyFunSuite with CommonStringReaderParser with L
     val result = stmt.getWholeInputParser().parse(input)
     assert(result.successful)
 
-    val nestedIf = (("2", "then{"), "3")
-    assertResult((((("1","then{"),nestedIf),"else{"),"4"))(result.get)
+    // left-associative results
+    // val nestedIf = (("2", "then{"), "3")
+    // assertResult((((("1","then{"),nestedIf),"else{"),"4"))(result.get)
+
+    val nestedIf = (((("2", "then{"), "3"),"else{"),"4")
+    assertResult((("1","then{"),nestedIf))(result.get)
   }
 
   test("if-then-else can be made left-associative") {

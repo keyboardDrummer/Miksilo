@@ -49,7 +49,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
         //          }
         case delayedResult: DelayedParseResult[State, _] =>
           val results = delayedResult.getResults
-          tail.merge(results)
+          tail.merge(results, maxListDepth)
 
       }
       popResult = queue.pop()
