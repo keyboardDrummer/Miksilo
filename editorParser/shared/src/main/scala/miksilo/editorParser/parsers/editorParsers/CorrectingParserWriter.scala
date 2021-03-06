@@ -19,32 +19,35 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     var cycles = 0
     var queue = parser(zero, startState, newParseState(zero))
-    var top = queue.pop()
-    while(top.nonEmpty) {
+    var popResult = queue.pop()
+    while(popResult.nonEmpty) {
       cycles += 1
-      val (parseResult, tail) = top.head
+      val (parseResult, tail) = popResult.get
 
       queue = parseResult match {
         case parseResult: ReadyParseResult[State, Result] =>
-
           if (bestResult.score < parseResult.score) {
             bestResult = parseResult
           }
-          tail match {
-            case tailCons: SRCons[State, Result] =>
-              if (bestResult.history.spotless || mayStop(bestResult.remainder.offset, bestResult.score, tailCons.head.score))
-                SREmpty.empty[State]
-              else
-                tail
-            case _ =>
-              SREmpty.empty[State]
+          if (bestResult.history.spotless) {
+            SREmpty.empty[State]
+          } else {
+            tail
           }
         case delayedResult: DelayedParseResult[State, Result] =>
-          val results = delayedResult.getResults
-          tail.merge(results, maxListDepth)
+          if (bestResult.score != noResultFound.score &&
+            mayStop(bestResult.remainder.offset, bestResult.score, delayedResult.score)) {
+            SREmpty.empty[State]
+          } else {
+            val results = delayedResult.getResults
+            val newTail = tail.merge(results, maxListDepth)
+            newTail
+          }
       }
-      top = queue.pop()
+
+      popResult = queue.pop()
     }
+
     val millisecondsSpent = System.currentTimeMillis() - start
     metrics.measure("Parse trees evaluated", cycles)
     metrics.measure("Parse time", millisecondsSpent)

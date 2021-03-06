@@ -28,10 +28,11 @@ case class ReadyResults[State, +Result](ready: Map[Int, ReadyParseResult[State, 
     result
   }
 
-  override def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int): ParseResults[State, Other] = {
+  override def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int):
+    ParseResults[State, Other] = {
     other match {
       case otherReady: ReadyResults[State, Result] =>
-        val mergedReady = mergeMaps[Int, ReadyParseResult[State, Result]](ready, otherReady.ready, (key, value1, value2) => {
+        val mergedReady = mergeMaps[Int, ReadyParseResult[State, Result]](ready, otherReady.ready, (_, value1, value2) => {
           if (value1.score > value2.score) value1 else value2
         })
         ReadyResults(mergedReady, delayed.merge(otherReady.delayed, remainingListLength).asInstanceOf[ParseResultsWithDelayed[State, Result]])
@@ -44,7 +45,8 @@ case class ReadyResults[State, +Result](ready: Map[Int, ReadyParseResult[State, 
   override def flatMap[NewResult](f: LazyParseResult[State, Result] => ParseResults[State, NewResult],
                                   uniform: Boolean,
                                   remainingListLength: Int): ParseResults[State, NewResult] = {
-    ready.values.map(ready => f(ready)).fold(delayed.flatMap(f, uniform, remainingListLength))((a, b) => a.merge(b, remainingListLength))
+    val newDelayed = delayed.flatMap(f, uniform, remainingListLength)
+    ready.values.map(ready => f(ready)).fold(newDelayed)((a, b) => a.merge(b, remainingListLength))
   }
 
   override def toList: List[LazyParseResult[State, Result]] = {

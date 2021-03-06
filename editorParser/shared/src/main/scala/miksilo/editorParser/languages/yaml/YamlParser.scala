@@ -66,7 +66,7 @@ object YamlParser extends LeftRecursiveCorrectingParserWriter
   lazy val tag: Parser[String] = "!" ~> RegexParser(s"""[^'\r\n !$flowIndicatorChars]+""".r, "tag name") //Should be 	ns-uri-char - “!” - c-flow-indicator
 
   lazy val hole = Fallback(RegexParser(" *".r, "spaces").withSourceRange((range,_) => ValueHole(range)), "value")
-  lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseNumber | parseFlowStringLiteral | plainScalar
+  lazy val parseUntaggedFlowValue: Parser[YamlValue] = parseBraceObject | parseBracketArray | parseFlowStringLiteral | plainScalar | parseNumber
   lazy val parseFlowValue: Parser[YamlValue] = (tag ~ parseUntaggedFlowValue).
     withSourceRange((range, v) => TaggedNode(Some(range), v._1, v._2)) | parseUntaggedFlowValue
   lazy val flowInBlock = new WithContext(_ => FlowOut, parseFlowValue)
