@@ -14,6 +14,8 @@ trait ParseResults[State, +Result] extends CachingParseResult {
   def toList: List[LazyParseResult[State, Result]]
   def tailDepth: Int
 
+  def containsStrictParts: Boolean
+
   def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int): ParseResults[State, Other]
 
   def map[NewResult](f: Result => NewResult): ParseResults[State, NewResult] = {
@@ -57,7 +59,7 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 object ParseResults {
   def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] = parseResult match {
     case readyParseResult: ReadyParseResult[State, Result] => ReadyResults(Map(readyParseResult.offset.offset -> readyParseResult), SREmpty.empty[State])
-    case delayed: DelayedParseResult[State, Result] => ReadyResults(Map.empty, new SRCons(delayed, 0, SREmpty.empty[State]))
+    case delayed: DelayedParseResult[State, Result] => new SRCons(delayed, 0, SREmpty.empty[State])
   }
 }
 
@@ -143,6 +145,8 @@ final class SRCons[State, +Result](
   }
 
   override def pop(): Option[(LazyParseResult[State, Result], ParseResults[State, Result])] = Some(head, tail)
+
+  override def containsStrictParts: Boolean = false
 }
 
 object SREmpty {
@@ -173,6 +177,8 @@ class SREmpty[State] extends ParseResultsWithDelayed[State, Nothing] {
   override def pop() = None
 
   override def latestRemainder: OffsetPointer = EmptyRemainder
+
+  override def containsStrictParts: Boolean = false
 }
 
 object EmptyRemainder extends OffsetPointer {

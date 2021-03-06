@@ -57,4 +57,6 @@ case class ReadyResults[State, +Result](ready: Map[Int, ReadyParseResult[State, 
   }
 
   override def tailDepth: Int = delayed.tailDepth
+
+  override def containsStrictParts: Boolean = true
 }

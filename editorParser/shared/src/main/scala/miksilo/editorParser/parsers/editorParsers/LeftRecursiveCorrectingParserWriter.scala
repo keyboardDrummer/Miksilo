@@ -65,7 +65,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       var result: ParseResults[State, Result] = SREmpty.empty[State]
       var current = previous
 
-      while (current.isInstanceOf[SRCons[State, Result]] && current.asInstanceOf[SRCons[State, Result]].head.isInstanceOf[ReadyParseResult[_, Result]]) {
+      while (current.containsStrictParts) {
         // The order of the merge determines whether ambiguous grammars are left or right associative by default.
         result = result.merge(current, maxListDepth)
 
@@ -161,6 +161,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     }
 
     override def latestRemainder = tail.latestRemainder
+
+    override def containsStrictParts: Boolean = tail.containsStrictParts
   }
 
   def moveState(position: TextPointer, state: FixPointState) =
