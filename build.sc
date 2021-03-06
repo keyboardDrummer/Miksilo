@@ -83,7 +83,7 @@ trait CommonJVMModule extends CommonMainModule {
 
 object editorParser extends Module {
   object js extends CommonScalaJSModule {
-    object test extends Tests
+//    object test extends Tests
   }
   object jvm extends CommonJVMModule {
     override def ivyDeps = Agg(ivy"${scalaOrganization()}:scala-reflect:${scalaVersion()}")
@@ -98,7 +98,7 @@ object LSPProtocol extends Module {
   object js extends CommonScalaJSModule {
     override def ivyDeps = Agg(ivy"com.malliina::play-json::2.8.1")
     override def moduleDeps = Seq(editorParser.js)
-    object test extends Tests
+//    object test extends Tests
   }
   object jvm extends CommonJVMModule {
     override def moduleDeps = Seq(editorParser.jvm)
@@ -112,7 +112,7 @@ object LSPProtocol extends Module {
 object languageServer extends Module {
   object js extends CommonScalaJSModule {
     override def moduleDeps = Seq(LSPProtocol.js)
-   object test extends Tests
+//    object test extends Tests
   }
   object jvm extends CommonJVMModule {
     override def moduleDeps = Seq(LSPProtocol.jvm)
@@ -129,7 +129,7 @@ object modularLanguages extends Module {
   object js extends CommonScalaJSModule with DefinesLanguageServerModule {
     override def ivyDeps = Agg(ivy"org.scala-lang.modules::scala-parser-combinators:1.1.2")
     override def moduleDeps = super.moduleDeps ++ Seq(languageServer.js)
-    object test extends Tests
+//    object test extends Tests
   }
   object jvm extends CommonJVMModule with DefinesLanguageServerModule {
     override def ivyDeps = Agg(ivy"org.scala-lang.modules::scala-parser-combinators:1.1.2")
