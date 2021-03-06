@@ -13,14 +13,14 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
     var resultsSeen = Map.empty[Any, ReadyParseResult[State, Result]]
     var queue: ParseResults[State, Result] = parser(zero, startState, newParseState(zero))
 
-    var top = queue.pop()
-    while(top.nonEmpty) {
-      val (parseResult: LazyParseResult[State, Result], tail) = top.head
+    var popResult = queue.pop()
+    while(popResult.nonEmpty) {
+      val (parseResult: LazyParseResult[State, Result], tail) = popResult.get
 
       queue = parseResult match {
         case _parseResult: ReadyParseResult[State, _] =>
           val parseResult = _parseResult.asInstanceOf[ReadyParseResult[State, Result]]
-          val parseResultKey = ReadyParseResult(parseResult.resultOption, parseResult.remainder, parseResult.state, getHistoryWithoutChoices(parseResult.history))
+          val parseResultKey = new ReadyParseResult(parseResult.resultOption, parseResult.remainder, parseResult.state, getHistoryWithoutChoices(parseResult.history))
           if (resultsSeen.contains(parseResultKey)) {
             val previousResult = resultsSeen(parseResultKey)
             val oldChoices = getHistoryChoices(previousResult.history)
@@ -37,20 +37,22 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
             resultsSeen += parseResultKey -> parseResult
 
           bestResult = if (bestResult.score >= parseResult.score) bestResult else parseResult
-          tail match {
-            case tailCons: SRCons[State, _] =>
-              if (mayStop(bestResult.remainder.offset, bestResult.score, tailCons.head.score))
-                SREmpty.empty
-              else
-                tail
-            case _ =>
-              SREmpty.empty
-          }
+          tail
+        //          match {
+        //            case tailCons: SRCons[State, _] =>
+        //              if (mayStop(bestResult.remainder.offset, bestResult.score, tailCons.head.score))
+        //                SREmpty.empty
+        //              else
+        //                tail
+        //            case _ =>
+        //              SREmpty.empty
+        //          }
         case delayedResult: DelayedParseResult[State, _] =>
           val results = delayedResult.getResults
-          tail.merge(results, maxListDepth)
+          tail.merge(results)
+
       }
-      top = queue.pop()
+      popResult = queue.pop()
     }
     SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
