@@ -19,9 +19,10 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
     var cycles = 0
     var queue = parser(zero, startState, newParseState(zero))
-    while(queue.nonEmpty) {
+    var top = queue.pop()
+    while(top.nonEmpty) {
       cycles += 1
-      val (parseResult, tail) = queue.pop()
+      val (parseResult, tail) = top.head
 
       queue = parseResult match {
         case parseResult: ReadyParseResult[State, Result] =>
@@ -42,6 +43,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           val results = delayedResult.getResults
           tail.merge(results, maxListDepth)
       }
+      top = queue.pop()
     }
     val millisecondsSpent = System.currentTimeMillis() - start
     metrics.measure("Parse trees evaluated", cycles)
@@ -51,9 +53,9 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
 
   def singleResult[Result](parseResult: LazyParseResult[State, Result]) =
-    new SRCons(parseResult, 0, SREmpty.empty)
+    ParseResults.singleResult(parseResult)
 
-  def newFailure[Result](position: TextPointer, state: State, error: ParseError): SRCons[State, Result] =
+  def newFailure[Result](position: TextPointer, state: State, error: ParseError): ParseResults[State, Result] =
     singleResult(ReadyParseResult(None, position, state, History.error(error)))
 
   def leftRightSimple[Left, Right, Result](left: Parser[Left],
@@ -269,7 +271,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
 
   override def succeed[Result](result: Result): Parser[Result] = Succeed(result)
 
-  def newSuccess[Result](result: Result, remainder: TextPointer, state: State, score: Double): SRCons[State, Result] =
+  def newSuccess[Result](result: Result, remainder: TextPointer, state: State, score: Double): ParseResults[State, Result] =
     singleResult(ReadyParseResult(Some(result), remainder.drop(0), state, History.success(remainder, remainder, result, score)))
 
   case class Succeed[Result](value: Result) extends ParserBuilderBase[Result] with LeafParser[Result] {

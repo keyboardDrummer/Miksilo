@@ -12,8 +12,10 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
 
     var resultsSeen = Map.empty[Any, ReadyParseResult[State, Result]]
     var queue: ParseResults[State, Result] = parser(zero, startState, newParseState(zero))
-    while(queue.nonEmpty) {
-      val (parseResult: LazyParseResult[State, Result], tail) = queue.pop()
+
+    var top = queue.pop()
+    while(top.nonEmpty) {
+      val (parseResult: LazyParseResult[State, Result], tail) = top.head
 
       queue = parseResult match {
         case _parseResult: ReadyParseResult[State, _] =>
@@ -48,6 +50,7 @@ trait AmbiguityFindingParserWriter extends CorrectingParserWriter {
           val results = delayedResult.getResults
           tail.merge(results, maxListDepth)
       }
+      top = queue.pop()
     }
     SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
   }

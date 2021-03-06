@@ -23,7 +23,7 @@ trait LazyParseResult[State, +Result] {
                                 oldHistory: History): LazyParseResult[State, NewResult]
 }
 
-class DelayedParseResult[State, Result](val initialOffset: OffsetPointer,
+class DelayedParseResult[State, +Result](val initialOffset: OffsetPointer,
                                         val history: History, _getResults: () => ParseResults[State, Result])
   extends LazyParseResult[State, Result] {
 
@@ -33,12 +33,12 @@ class DelayedParseResult[State, Result](val initialOffset: OffsetPointer,
     new DelayedParseResult(initialOffset, history, () => this.getResults.map(f))
   }
 
-  var _results: ParseResults[State, Result] = _
-  def getResults = {
+  var _results: ParseResults[State, Any] = _
+  def getResults: ParseResults[State, Result] = {
     if (_results == null) {
       _results = _getResults()
     }
-    _results
+    _results.asInstanceOf[ParseResults[State, Result]]
   }
 
   override def mapWithHistory[NewResult](f: ReadyParseResult[State, Result] => ReadyParseResult[State, NewResult], oldHistory: History) =

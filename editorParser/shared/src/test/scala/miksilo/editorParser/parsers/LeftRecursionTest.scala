@@ -134,7 +134,7 @@ class LeftRecursionTest extends AnyFunSuite with CommonParserWriter
     lazy val relational: Parser[Any] = new Lazy(relationalInner | equality, "relational")
     lazy val assignmentTarget: Parser[Any] = new Lazy(Fail(None, "fail", 1), "assignmentTarget")
     lazy val simpleAssignment: Parser[Any] = new Lazy(assignmentTarget.map(x => x) ~ literalOrKeyword("=") ~ expression.map(x => x), "equality")
-    lazy val assignment: Parser[Any] = new Lazy(relational | simpleAssignment, "assignemnt")
+    lazy val assignment: Parser[Any] = new Lazy(relational | simpleAssignment, "assignment")
     lazy val memberSelector = new Lazy(expression.map(x => x) ~ literalOrKeyword(".") ~ parseIdentifier.map(x => x), "member selector")
     lazy val callCallee = new Lazy(variable | memberSelector, "callCallee")
     lazy val call = new Lazy(callCallee.map(x => x) ~ "(" ~ expression.manySeparated(",", "parameter").map(x => x) ~ ")", "call")

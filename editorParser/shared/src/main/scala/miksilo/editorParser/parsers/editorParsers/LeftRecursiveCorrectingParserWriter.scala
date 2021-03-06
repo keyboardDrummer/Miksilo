@@ -124,16 +124,13 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
                                        tail: ParseResults[State, Result])
     extends ParseResults[State, Result] {
 
-    override def nonEmpty = false
-
     override def pop() = throw new Exception("Can't pop recursions")
 
     override def toList = tail.toList
 
     override def tailDepth = 0
 
-    override def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int,
-                                        bests: Map[Int, Double] = Map.empty): RecursiveResults[Other] = other match {
+    override def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int): RecursiveResults[Other] = other match {
       case otherRecursions: RecursiveResults[Result] =>
         val merged = this.recursions.foldLeft(otherRecursions.recursions)((acc, entry) => {
           val value = acc.get(entry._1) match {

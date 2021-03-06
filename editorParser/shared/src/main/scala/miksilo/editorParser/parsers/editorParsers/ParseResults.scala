@@ -10,13 +10,11 @@ import miksilo.editorParser.parsers.editorParsers.ParseResults._
   * Path are sorted according to their score. The score indicates how likely this path is what the writer intended.
   */
 trait ParseResults[State, +Result] extends CachingParseResult {
-  def nonEmpty: Boolean
-  def pop(): (LazyParseResult[State, Result], ParseResults[State, Result])
+  def pop(): Option[(LazyParseResult[State, Result], ParseResults[State, Result])]
   def toList: List[LazyParseResult[State, Result]]
   def tailDepth: Int
 
-  def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int,
-                             bests: Map[Int, Double] = Map.empty): ParseResults[State, Other]
+  def merge[Other >: Result](other: ParseResults[State, Other], remainingListLength: Int): ParseResults[State, Other]
 
   def map[NewResult](f: Result => NewResult): ParseResults[State, NewResult] = {
     flatMap(lazyParseResult => singleResult(lazyParseResult.map(f)), uniform = true, Int.MaxValue)
@@ -57,15 +55,19 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 }
 
 object ParseResults {
-  def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] =
-    new SRCons(parseResult,0, SREmpty.empty[State])
+  def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] = parseResult match {
+    case readyParseResult: ReadyParseResult[State, Result] => ReadyResults(Map(readyParseResult.offset.offset -> readyParseResult), SREmpty.empty[State])
+    case delayed: DelayedParseResult[State, Result] => ReadyResults(Map.empty, new SRCons(delayed, 0, SREmpty.empty[State]))
+  }
 }
 
+trait ParseResultsWithDelayed[State, +Result] extends ParseResults[State, Result]
+
 final class SRCons[State, +Result](
-                                    val head: LazyParseResult[State, Result],
+                                    val head: DelayedParseResult[State, Result],
                                     var tailDepth: Int,
                                     _tail: => ParseResults[State, Result])
-  extends ParseResults[State, Result] {
+  extends ParseResultsWithDelayed[State, Result] {
 
   override def latestRemainder: OffsetPointer = {
     val tailRemainder = tail.latestRemainder
@@ -119,26 +121,9 @@ final class SRCons[State, +Result](
   To accomplish this, we use the bests parameter.
    */
   override def merge[Other >: Result](other: ParseResults[State, Other],
-                                      remainingListLength: Int,
-                                      bests: Map[Int, Double] = Map.empty): ParseResults[State, Other] = {
+                                      remainingListLength: Int): ParseResults[State, Other] = {
     if (remainingListLength == 0) {
       return SREmpty.empty[State]
-    }
-
-    def getResult(head: LazyParseResult[State, Other], tailDepth: Int,
-                  getTail: (Map[Int, Double]) => ParseResults[State, Other]): ParseResults[State, Other] = {
-
-      head match {
-        case ready: ReadyParseResult[State, Other] =>
-          bests.get(ready.remainder.offset) match {
-            case Some(previousBest) if previousBest >= ready.score =>
-              getTail(bests)
-            case _ =>
-              new SRCons(head, tailDepth, getTail(bests + (ready.remainder.offset -> ready.score)))
-          }
-        case _ =>
-          new SRCons(head, tailDepth, getTail(bests))
-      }
     }
 
     other match {
@@ -148,21 +133,16 @@ final class SRCons[State, +Result](
         val maxListDepth = 200
         if (head.score >= cons.head.score) {
           // TODO describe what the Math.max here is for.
-          getResult(head, Math.max(maxListDepth, 1 + tailDepth), (newBests) => {
-            val merged = tail.merge(cons, remainingListLength - 1, newBests)
-            merged
-          })
+          new SRCons(head, Math.max(maxListDepth, 1 + tailDepth), tail.merge(cons, remainingListLength - 1))
         }
         else {
-          getResult(cons.head, Math.max(maxListDepth, 1 + cons.tailDepth), (newBests) => this.merge(cons.tail, remainingListLength - 1, newBests))
+          new SRCons(cons.head, Math.max(maxListDepth, 1 + cons.tailDepth), this.merge(cons.tail, remainingListLength - 1))
         }
       case earlier => earlier.merge(this, remainingListLength)
     }
   }
 
-  override def nonEmpty = true
-
-  override def pop(): (LazyParseResult[State, Result], ParseResults[State, Result]) = (head, tail)
+  override def pop(): Option[(LazyParseResult[State, Result], ParseResults[State, Result])] = Some(head, tail)
 }
 
 object SREmpty {
@@ -170,9 +150,8 @@ object SREmpty {
   def empty[State]: SREmpty[State] = value.asInstanceOf[SREmpty[State]]
 }
 
-class SREmpty[State] extends ParseResults[State, Nothing] {
-  override def merge[Other >: Nothing](other: ParseResults[State, Other], remainingListLength: Int,
-                                       bests: Map[Int, Double] = Map.empty) = {
+class SREmpty[State] extends ParseResultsWithDelayed[State, Nothing] {
+  override def merge[Other >: Nothing](other: ParseResults[State, Other], remainingListLength: Int) = {
     if (remainingListLength == 0)
       this
     else
@@ -191,9 +170,7 @@ class SREmpty[State] extends ParseResults[State, Nothing] {
 
   override def toList = List.empty
 
-  override def nonEmpty = false
-
-  override def pop() = throw new Exception("Can't pop empty results")
+  override def pop() = None
 
   override def latestRemainder: OffsetPointer = EmptyRemainder
 }
