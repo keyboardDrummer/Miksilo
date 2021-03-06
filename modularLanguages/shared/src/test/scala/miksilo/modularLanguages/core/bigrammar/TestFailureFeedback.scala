@@ -7,7 +7,7 @@ class TestFailureFeedback extends AnyFunSuite with WhitespaceTriviaSequenceCombi
 
   test("FailureFeedback") {
     val input = ("1", "2")
-    val grammar: BiGrammar = ("1": BiGrammar) *
+    val grammar: BiGrammar = ("1": BiGrammar).*
 
     try {
       BiGrammarToPrinter.toDocument(input, grammar)
