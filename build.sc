@@ -37,6 +37,7 @@ trait CommonModule extends ScalaModule {
 }
 
 trait CommonMainModule extends CommonModule with MavenModule {
+
   override def sources = T.sources(
     millSourcePath / "src" / "main" / "java",
     millSourcePath / "src" / "main" / "scala",
@@ -46,25 +47,31 @@ trait CommonMainModule extends CommonModule with MavenModule {
 
   trait MyModuleTests extends ScalaModuleTests with MavenModuleTests {
     override def sources = T.sources(
-      millSourcePath / "src" / "test" / "scala",
-      millSourcePath / "src" / "test" / "java",
-      millSourcePath / os.up / "shared" / "src" / "test" / "java",
-      millSourcePath / os.up / "shared" / "src" / "test" / "scala"
-    )
+        millSourcePath / "src" / "test" / "scala",
+        millSourcePath / "src" / "test" / "java",
+        millSourcePath / os.up / "shared" / "src" / "test" / "java",
+        millSourcePath / os.up / "shared" / "src" / "test" / "scala"
+      )
+
     override def ivyDeps = Agg(ivy"org.scalatest::scalatest:3.1.1")
     def testFrameworks = Seq("org.scalatest.tools.Framework")
   }
   trait Tests extends MyModuleTests
 }
 
-trait CommonScalaJSModule extends ScalaJSModule with CommonModule {
+trait CommonScalaJSModule extends ScalaJSModule with CommonMainModule {
   def scalaJSVersion = "1.5.0"
 
-  trait Tests extends super.Tests /*with CommonTestModule*/ {
+  trait Tests extends super.Tests with TestScalaJSModule {
+    def scalaJSVersion = "1.5.0"
     override def scalaVersion = "2.13.1"
 
-    override def ivyDeps = Agg(ivy"org.scalatest::scalatest:3.1.1")
-    def testFrameworks = Seq("org.scalatest.tools.Framework")
+    override def sources = {
+      T.sources(
+        millSourcePath / "src" / "test" / "scala",
+        millSourcePath / "src" / "test" / "java",
+      )
+    }
   }
 }
 
@@ -75,10 +82,8 @@ trait CommonJVMModule extends CommonMainModule {
 }
 
 object editorParser extends Module {
-  object js extends CommonScalaJSModule with CommonMainModule {
-//    object test extends Tests {
-//
-//    }
+  object js extends CommonScalaJSModule {
+    object test extends Tests
   }
   object jvm extends CommonJVMModule {
     override def ivyDeps = Agg(ivy"${scalaOrganization()}:scala-reflect:${scalaVersion()}")
@@ -90,12 +95,10 @@ object editorParser extends Module {
 }
 
 object LSPProtocol extends Module {
-  object js extends CommonScalaJSModule with CommonMainModule {
+  object js extends CommonScalaJSModule {
     override def ivyDeps = Agg(ivy"com.malliina::play-json::2.8.1")
     override def moduleDeps = Seq(editorParser.js)
-//    object test extends super[CommonScalaJSModule].Tests {
-//
-//    }
+    object test extends Tests
   }
   object jvm extends CommonJVMModule {
     override def moduleDeps = Seq(editorParser.jvm)
@@ -107,11 +110,9 @@ object LSPProtocol extends Module {
 }
 
 object languageServer extends Module {
-  object js extends CommonScalaJSModule with CommonMainModule {
+  object js extends CommonScalaJSModule {
     override def moduleDeps = Seq(LSPProtocol.js)
-//    object test extends super[CommonScalaJSModule].Tests {
-//
-//    }
+   object test extends Tests
   }
   object jvm extends CommonJVMModule {
     override def moduleDeps = Seq(LSPProtocol.jvm)
@@ -125,12 +126,10 @@ object languageServer extends Module {
 }
 
 object modularLanguages extends Module {
-  object js extends CommonScalaJSModule with CommonMainModule with DefinesLanguageServerModule {
+  object js extends CommonScalaJSModule with DefinesLanguageServerModule {
     override def ivyDeps = Agg(ivy"org.scala-lang.modules::scala-parser-combinators:1.1.2")
     override def moduleDeps = super.moduleDeps ++ Seq(languageServer.js)
-    //    object test extends super[CommonScalaJSModule].Tests {
-    //
-    //    }
+    object test extends Tests
   }
   object jvm extends CommonJVMModule with DefinesLanguageServerModule {
     override def ivyDeps = Agg(ivy"org.scala-lang.modules::scala-parser-combinators:1.1.2")
