@@ -2,7 +2,6 @@ package miksilo.modularLanguages.util
 
 import java.io.{BufferedInputStream, InputStream}
 import java.nio.file.Files
-
 import miksilo.modularLanguages.core.deltas.path.PathRoot
 import miksilo.languageServer.core.language.Compilation
 import miksilo.modularLanguages.core.node.{Node, NodeComparer}
@@ -14,13 +13,13 @@ import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import miksilo.editorParser.SourceUtils
 import miksilo.modularLanguages.util.JavaSourceUtils.LineProcessLogger
 import miksilo.modularLanguages.util.{JavaSourceUtils, TestingLanguage}
-import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.{BeforeAndAfterAllConfigMap, ConfigMap}
+import org.scalatest.funsuite.{AnyFunSuite, AnyFunSuiteLike}
+import org.scalatest.{Assertions, BeforeAndAfterAllConfigMap, ConfigMap}
 
 import scala.reflect.io.{Directory, File, Path}
 import scala.sys.process.Process
 
-class JavaLanguageTest
+object JavaLanguageTest
   extends LanguageTest(TestLanguageBuilder.buildWithParser(JavaToByteCodeLanguage.javaCompilerDeltas)) {}
 
 object LanguageTest {
@@ -40,11 +39,11 @@ object LanguageTest {
   }
 }
 
-class LanguageTest(val language: TestingLanguage) extends AnyFunSuite with BeforeAndAfterAllConfigMap {
+class LanguageTest(val language: TestingLanguage) extends Assertions {
 
-  override protected def afterAll(configMap: ConfigMap): Unit = {
-    //TestLanguageBuilder.statistics.printAll()
-  }
+//  override protected def afterAll(configMap: ConfigMap): Unit = {
+//    //TestLanguageBuilder.statistics.printAll()
+//  }
 
   def toFile(fileName: String, program: String): Path = {
     val directory = Directory.makeTemp()

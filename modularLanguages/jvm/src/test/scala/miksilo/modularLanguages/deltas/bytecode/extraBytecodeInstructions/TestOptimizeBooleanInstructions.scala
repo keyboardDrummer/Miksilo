@@ -5,13 +5,14 @@ import miksilo.modularLanguages.deltas.bytecode.ByteCodeSkeleton.ClassFile
 import miksilo.modularLanguages.deltas.bytecode.extraBooleanInstructions.OptimizeComparisonInstructionsDelta
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import miksilo.modularLanguages.util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.reflect.io.Path
 
-class TestOptimizeBooleanInstructions extends JavaLanguageTest {
+class TestOptimizeBooleanInstructions extends AnyFunSuite {
 
   test("ForFibonacci") {
-    val withOptimization = parseAndTransform("Fibonacci", Path(""))
+    val withOptimization = JavaLanguageTest.parseAndTransform("Fibonacci", Path(""))
     val withoutOptimizationTransformations = JavaToByteCodeLanguage.javaCompilerDeltas.filter(i => i != OptimizeComparisonInstructionsDelta)
     val withoutOptimization = new LanguageTest(TestLanguageBuilder.buildWithParser(withoutOptimizationTransformations)).parseAndTransform("Fibonacci", Path(""))
 

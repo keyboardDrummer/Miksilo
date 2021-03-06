@@ -10,8 +10,10 @@ import mill.scalalib.publish.{Developer, License, PomSettings, VersionControl}
 
 trait MiksiloPublishModule extends PublishModule {
 
+  def publishVersion = "0.1.10"
+
   def pomSettings = PomSettings(
-    description = "Hello",
+    description = "Libraries for modular programming language construction",
     organization = "com.github.keyboardDrummer",
     url = "https://github.com/keyboardDrummer/Miksilo",
     licenses = Seq(License.MIT),
@@ -36,7 +38,7 @@ trait CommonModule extends ScalaModule {
   })
 }
 
-trait CommonMainModule extends CommonModule with MavenModule {
+trait CommonMainModule extends CommonModule with MavenModule with MiksiloPublishModule {
 
   override def sources = T.sources(
     millSourcePath / "src" / "main" / "java",

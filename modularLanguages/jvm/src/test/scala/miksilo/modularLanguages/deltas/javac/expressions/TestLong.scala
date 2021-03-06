@@ -3,11 +3,12 @@ package miksilo.modularLanguages.deltas.javac.expressions
 import miksilo.modularLanguages.deltas.bytecode.additions.PoptimizeDelta
 import miksilo.modularLanguages.deltas.javac.JavaToByteCodeLanguage
 import miksilo.modularLanguages.util.{JavaLanguageTest, LanguageTest, TestLanguageBuilder}
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestLong extends JavaLanguageTest {
+class TestLong extends AnyFunSuite {
 
   test("simpleLong") {
-    compareWithJavacAfterRunning("SimpleLong")
+    JavaLanguageTest.compareWithJavacAfterRunning("SimpleLong")
   }
 
   test("longWithoutPoptimize") {
@@ -37,7 +38,7 @@ class TestLong extends JavaLanguageTest {
         |    }
         |}""".stripMargin
 
-    compareWithJavacAfterRunning(toFile("OverloadedLongMethod", program))
+    JavaLanguageTest.compareWithJavacAfterRunning(JavaLanguageTest.toFile("OverloadedLongMethod", program))
   }
 
 }

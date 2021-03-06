@@ -15,9 +15,10 @@ import miksilo.modularLanguages.deltas.javac.classes.skeleton.{JavaClassDelta, Q
 import miksilo.modularLanguages.deltas.javac.types.MethodTypeDelta
 import miksilo.modularLanguages.util.TestLanguageBuilder
 import miksilo.modularLanguages.util.{JavaLanguageTest, LanguageTest}
+import org.scalatest.funsuite.AnyFunSuite
 
 
-class TestEmptyClassCompilation extends JavaLanguageTest {
+class TestEmptyClassCompilation extends AnyFunSuite {
   val className: String = "EmptyClass"
   val classPackage: Seq[String] = Seq("transformations", "java", "testing")
 
@@ -26,7 +27,7 @@ class TestEmptyClassCompilation extends JavaLanguageTest {
     val javaCode: Node = getEmptyClass
     val java = TestLanguageBuilder.build(JavaToByteCodeLanguage.javaCompilerDeltas)
     val compiledCode = java.compileAst(javaCode).program.asInstanceOf[PathRoot].current
-    compareConstantPools(expectedByteCode, compiledCode)
+    JavaLanguageTest.compareConstantPools(expectedByteCode, compiledCode)
   }
 
   test("EquivalentMethod") {

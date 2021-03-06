@@ -14,8 +14,9 @@ import miksilo.modularLanguages.deltas.javac.classes.ConstantPool
 import miksilo.modularLanguages.deltas.javac.classes.skeleton.QualifiedClassName
 import miksilo.modularLanguages.deltas.javac.types.MethodTypeDelta
 import miksilo.modularLanguages.util.{JavaLanguageTest, LanguageTest}
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
+class TestPrintByteCodeFibonacciWithMain extends AnyFunSuite {
 
   val className = "Fibonacci"
   val fibonacciMethodName = "fibonacci"
@@ -33,7 +34,7 @@ class TestPrintByteCodeFibonacciWithMain extends JavaLanguageTest {
   test("runCompiledFibonacci") {
     val code = getByteCode
     val expectedResult = 8
-    runByteCode(className, code, expectedResult)
+    JavaLanguageTest.runByteCode(className, code, expectedResult)
   }
 
   def getExpectedUnoptimizedFibonacciWithoutMainByteCode: Node = {

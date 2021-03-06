@@ -61,7 +61,7 @@ class JsonTest extends AnyFunSuite {
     assert(compilation.diagnostics.size == 2)
   }
 
-  val utils = TestLanguageGrammarUtils(ModularJsonLanguage.deltas)
+  val utils = new TestLanguageGrammarUtils(ModularJsonLanguage.deltas)
 
   test("testStringValueSourceLocation") {
     val example =

@@ -1,24 +1,25 @@
 package miksilo.modularLanguages.deltas.javac.classes
 
 import miksilo.modularLanguages.util.JavaLanguageTest
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestFields extends JavaLanguageTest {
+class TestFields extends AnyFunSuite {
 
   test("FieldAssignment") {
-    compareWithJavacAfterRunning("FieldAssignment.java")
+    JavaLanguageTest.compareWithJavacAfterRunning("FieldAssignment.java")
   }
 
   test("fieldMethodMix") {
-    compareWithJavacAfterRunning("FieldMethodMix.java")
+    JavaLanguageTest.compareWithJavacAfterRunning("FieldMethodMix.java")
   }
 
   //Don't yet feel like testing cases where Javac fails.
   ignore("illegalForwardFieldReference") {
-    compareWithJavacAfterRunning("IllegalForwardFieldReference.java")
+    JavaLanguageTest.compareWithJavacAfterRunning("IllegalForwardFieldReference.java")
   }
 
   //Don't yet feel like testing cases where Javac fails.
   ignore("fieldAndMethodOverloading") {
-    compareWithJavacAfterRunning("FieldAndMethodOverloading.java")
+    JavaLanguageTest.compareWithJavacAfterRunning("FieldAndMethodOverloading.java")
   }
 }
