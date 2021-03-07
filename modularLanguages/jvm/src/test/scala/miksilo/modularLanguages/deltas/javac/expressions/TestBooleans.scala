@@ -1,10 +1,11 @@
 package miksilo.modularLanguages.deltas.javac.expressions
 
 import miksilo.modularLanguages.util.JavaLanguageTest
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestBooleans extends JavaLanguageTest {
+class TestBooleans extends AnyFunSuite {
 
   def test(): Unit = {
-    compareWithJavacAfterRunning("Booleans")
+    JavaLanguageTest.compareWithJavacAfterRunning("Booleans")
   }
 }

@@ -58,13 +58,17 @@ class SharedLSPServer(languageServer: LanguageServer,
     implicit val textEdit: OFormat[TextEdit] = Json.format[TextEdit]
     implicit val codeActionContext: OFormat[CodeActionContext] = Json.format
     implicit val codeAction: OFormat[CodeAction] = Json.format
+    implicit val markupContentFormat = Json.format[MarkupContent]
+    implicit val completionItemFormat = Json.format[CompletionItem]
+    implicit val hoverFormat = Json.format[Hover]
 
+    addProvider(LSPProtocol.typeDefinition, (provider: TypeDefinitionProvider) => provider.gotoTypeDefinition)(Json.format, Writes.of[Seq[FileRange]])
     addProvider(LSPProtocol.definition, (provider: DefinitionProvider) => provider.gotoDefinition)(Json.format, Writes.of[Seq[FileRange]])
     addProvider(LSPProtocol.documentSymbol, (provider: DocumentSymbolProvider) => provider.documentSymbols)(Json.format, Writes.of[Seq[SymbolInformation]])
     addProvider(LSPProtocol.references, (provider: ReferencesProvider) => provider.references)(Json.format, Writes.of[collection.Seq[FileRange]])
     addProvider(LSPProtocol.codeAction, (provider: CodeActionProvider) => provider.getCodeActions)(Json.format, Writes.of[Seq[CodeAction]])
     addProvider(LSPProtocol.completion, (provider: CompletionProvider) => provider.complete)(Json.format, Json.format)
-    addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hoverRequest)(Json.format[TextDocumentHoverRequest], Json.format[Hover])
+    addProvider(LSPProtocol.hover, (provider: HoverProvider) => provider.hover)(Json.format, Writes.of[Option[Hover]])
     addProvider(LSPProtocol.rename, (provider: RenameProvider) => provider.rename)(Json.format, WorkspaceEdit.format)
   }
 
@@ -90,6 +94,7 @@ class SharedLSPServer(languageServer: LanguageServer,
       documentSymbolProvider = languageServer.isInstanceOf[DocumentSymbolProvider],
       referencesProvider = languageServer.isInstanceOf[ReferencesProvider],
       hoverProvider = languageServer.isInstanceOf[HoverProvider],
+      typeDefinitionProvider = languageServer.isInstanceOf[TypeDefinitionProvider],
       definitionProvider = languageServer.isInstanceOf[DefinitionProvider],
       renameProvider = languageServer.isInstanceOf[RenameProvider],
       completionProvider = languageServer match {

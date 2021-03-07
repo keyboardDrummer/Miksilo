@@ -1,14 +1,15 @@
 package miksilo.modularLanguages.deltas.javac.statement
 
 import miksilo.modularLanguages.util.JavaLanguageTest
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestForLoop extends JavaLanguageTest {
+class TestForLoop extends AnyFunSuite {
 
   test("testSimple") {
-    compareWithJavacAfterRunning("SimpleForLoop")
+    JavaLanguageTest.compareWithJavacAfterRunning("SimpleForLoop")
   }
 
   test("WithContinue") {
-    compareWithJavacAfterRunning("ForLoopWithContinue")
+    JavaLanguageTest.compareWithJavacAfterRunning("ForLoopWithContinue")
   }
 }

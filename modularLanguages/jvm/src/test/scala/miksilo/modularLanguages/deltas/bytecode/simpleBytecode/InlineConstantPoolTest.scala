@@ -1,4 +1,4 @@
-package miksilo.modularLanguages.deltas.bytecode.simplebytecode
+package miksilo.modularLanguages.deltas.bytecode.simpleBytecode
 
 import miksilo.modularLanguages.core.bigrammar.TestLanguageGrammarUtils
 import miksilo.modularLanguages.deltas.PrettyPrint

@@ -1,15 +1,16 @@
 package miksilo.modularLanguages.deltas.javac.statement
 
 import miksilo.modularLanguages.util.JavaLanguageTest
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestLocalDeclaration extends JavaLanguageTest {
+class TestLocalDeclaration extends AnyFunSuite {
 
   test("IfElseBlockScoping") {
-    compareWithJavacAfterRunning("IfElseBlockScoping.java")
+    JavaLanguageTest.compareWithJavacAfterRunning("IfElseBlockScoping.java")
   }
 
   test("WhileBlockScoping") {
-    compareWithJavacAfterRunning("WhileBlockScoping.java")
+    JavaLanguageTest.compareWithJavacAfterRunning("WhileBlockScoping.java")
   }
 
   ignore("IfElseWhereBothBranchesDefineSameVariableAndItIsUsedAfterwards") {

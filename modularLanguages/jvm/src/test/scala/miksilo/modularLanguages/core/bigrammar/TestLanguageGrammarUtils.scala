@@ -12,7 +12,7 @@ import org.scalatest.funsuite.AnyFunSuite
 
 object TestLanguageGrammarUtils extends TestLanguageGrammarUtils(JavaToByteCodeLanguage.javaCompilerDeltas)
 
-case class TestLanguageGrammarUtils(deltas: Seq[Delta]) extends AnyFunSuite {
+class TestLanguageGrammarUtils(deltas: Seq[Delta]) {
 
   def compareInputWithPrint(input: String, expected: Option[Any] = None, grammarTransformer: GrammarKey = null): Unit = {
     val grammar = getGrammarUsingTransformer(grammarTransformer)

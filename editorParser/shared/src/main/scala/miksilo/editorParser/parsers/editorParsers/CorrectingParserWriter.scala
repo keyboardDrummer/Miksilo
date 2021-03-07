@@ -11,7 +11,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
                                   metrics: Metrics): SingleParseResult[Result] = {
 
     val start = System.currentTimeMillis()
-    val noResultFound = new ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Could not parse program")))
+    val noResultFound = ReadyParseResult(None, zero, startState, History.error(FatalError(zero, "Could not parse program")))
     var bestResult: ReadyParseResult[State, Result] = noResultFound
 
     mayStop.reset()

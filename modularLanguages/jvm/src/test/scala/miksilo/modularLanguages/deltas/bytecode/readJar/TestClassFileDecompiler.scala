@@ -135,23 +135,23 @@ class TestClassFileDecompiler extends AnyFunSuite {
   }
 
   test("ParseByteCodeType3") {
-    val grammarUtils = TestLanguageGrammarUtils(testingLanguage.deltas)
+    val grammarUtils = new TestLanguageGrammarUtils(testingLanguage.deltas)
     grammarUtils.compareInputWithPrint("([BII)V", None, ByteCodeTypeGrammar)
   }
 
 
   test("ParseByteCodeType2") {
-    val grammarUtils = TestLanguageGrammarUtils(testingLanguage.deltas)
+    val grammarUtils = new TestLanguageGrammarUtils(testingLanguage.deltas)
     grammarUtils.compareInputWithPrint("[B", None, ByteCodeTypeGrammar)
   }
 
   test("ParseByteCodeType1") {
-    val grammarUtils = TestLanguageGrammarUtils(testingLanguage.deltas)
+    val grammarUtils = new TestLanguageGrammarUtils(testingLanguage.deltas)
     grammarUtils.compareInputWithPrint("B", None, ByteCodeTypeGrammar)
   }
 
   test("ParseByteCodeType0") {
-    val grammarUtils = TestLanguageGrammarUtils(testingLanguage.deltas)
+    val grammarUtils = new TestLanguageGrammarUtils(testingLanguage.deltas)
     grammarUtils.compareInputWithPrint("I", None, ByteCodeTypeGrammar)
   }
 }

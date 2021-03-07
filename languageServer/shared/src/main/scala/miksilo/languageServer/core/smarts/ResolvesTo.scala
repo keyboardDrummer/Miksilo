@@ -38,7 +38,8 @@ case class ResolvesTo(reference: Reference, var declaration: Declaration) extend
       fileRange <- reference.origin.flatMap(e => e.fileRange)
     } yield {
       val text = compilation.fileSystem.getFileParseText(fileRange.uri)
-      val diagnostic = Diagnostic(fileRange.range.toRange(text), Some(DiagnosticSeverity.Error), s"Could not find definition of ${reference.name}", None, None)
+      val diagnostic = Diagnostic(fileRange.range.toRange(text), Some(DiagnosticSeverity.Error),
+        s"Could not find definition of ${reference.name}", None, None, Seq.empty)
       FileDiagnostic(fileRange.uri, diagnostic)
     }
   }

@@ -32,7 +32,7 @@ class TestParseTypes extends AnyFunSuite {
 
   test("labelWithAppendFrame") {
     val input = "label start-4962768465676381896\n        appendFrame int int"
-    val result = TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas).
+    val result = new TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas).
       parse(input, CodeAttributeDelta.InstructionGrammar)
     assertResult(LabelDelta.Shape)(result.asInstanceOf[Node].shape)
   }
@@ -40,7 +40,7 @@ class TestParseTypes extends AnyFunSuite {
   test("labelWithAppendFrameInInstructions1") {
     val input = "Code: name:9, stack:2, locals:3\n    \n " +
       "label start-4962768465676381896\n        sameFrame\n iload 2 \n    Exceptions:"
-    val result = TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas).
+    val result = new TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas).
       parse(input, CodeAttributeDelta.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].shape)
   }
@@ -48,7 +48,7 @@ class TestParseTypes extends AnyFunSuite {
   ignore("labelWithAppendFrameInInstructions2") {
     val input = "code: name:9, stack:2, locals:3\n    \n " +
       "label \"start-4962768465676381896\"\n        appendFrame int int\n iload 2 \n    Exceptions:"
-    val result = TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas).
+    val result = new TestLanguageGrammarUtils(Seq[Delta](LabelledLocations) ++ ByteCodeLanguage.byteCodeDeltas).
       parse(input, CodeAttributeDelta.CodeKey)
     assertResult(CodeKey)(result.asInstanceOf[Node].shape)
   }

@@ -17,7 +17,7 @@ object DiagnosticUtil {
   }
 
   def getDiagnosticsFromParseFailure(uri: String, error: ParseError): (FileDiagnostic, Option[CodeAction]) = {
-    val diagnostic = Diagnostic(error.range, Some(DiagnosticSeverity.Error), error.message, None, None)
+    val diagnostic = Diagnostic(error.range, Some(DiagnosticSeverity.Error), error.message, None, None, Seq.empty)
     val codeAction = error.fix.map(fix =>
       CodeAction(fix.title, "quickfix", Some(Seq(diagnostic.identifier)), Some(WorkspaceEdit(Map(uri -> Seq(fix.edit)))))
     )

@@ -48,7 +48,6 @@ class JsonRpcConnection(reader: MessageReader, writer: MessageWriter) extends La
   }
 
   def listen(): Unit = {
-
     def processItem(): Unit = {
       reader.nextPayload().foreach({
         case null =>

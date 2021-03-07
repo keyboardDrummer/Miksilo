@@ -17,12 +17,16 @@ case class RenameParams(textDocument: TextDocumentIdentifier, position: Position
 case class DocumentSymbolParams(textDocument: TextDocumentIdentifier)
 
 trait HoverProvider {
-  def hoverRequest(request: TextDocumentHoverRequest): Hover
+  def hover(params: DocumentPosition): Option[Hover]
 }
 
 trait CompletionProvider {
   def getOptions: CompletionOptions
   def complete(request: DocumentPosition): CompletionList
+}
+
+trait TypeDefinitionProvider {
+  def gotoTypeDefinition(parameters: DocumentPosition): Seq[FileRange]
 }
 
 trait DefinitionProvider {
@@ -55,8 +59,10 @@ object Diagnostic {
   implicit val rangeFormat = SourceRangeFormat.format
   implicit val fileRangeFormat = Json.format[FileRange]
   implicit val relatedInformation = Json.format[RelatedInformation]
+  implicit val positionFormat = PositionFormat.format
   implicit val format = Json.format[Diagnostic]
 }
+
 case class Diagnostic(range: SourceRange, severity: Option[Int],
                       message: String, code: Option[String] = None, source: Option[String] = None,
                       relatedInformation: Seq[RelatedInformation] = Seq.empty) {
@@ -198,7 +204,7 @@ case class CompletionItem(
                            label: String,
                            kind: Option[Int] = None,
                            detail: Option[String] = None,
-                           documentation: Option[String] = None,
+                           documentation: Option[MarkupContent] = None,
                            sortText: Option[String] = None,
                            filterText: Option[String] = None,
                            insertText: Option[String] = None,
@@ -207,8 +213,14 @@ case class CompletionItem(
 // a [CompletionRequest](#CompletionRequest) and a [CompletionResolveRequest]
 //   (#CompletionResolveRequest)
 
-object CompletionItem {
-  implicit def format = Json.format[CompletionItem]
+
+object MarkupContent {
+  def plainText(value: String): MarkupContent = MarkupContent("plaintext", value)
+  def markdown(value: String): MarkupContent = MarkupContent("markdown", value)
+}
+
+case class MarkupContent(kind: String, value: String) {
+
 }
 
 trait MarkedString

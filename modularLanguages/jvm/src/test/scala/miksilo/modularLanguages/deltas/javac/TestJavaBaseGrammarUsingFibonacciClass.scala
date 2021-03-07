@@ -14,10 +14,12 @@ import miksilo.modularLanguages.deltas.method.call.CallDelta
 import miksilo.modularLanguages.deltas.statement.BlockDelta
 import miksilo.modularLanguages.deltas.statement.assignment.AddAssignmentDelta
 import miksilo.modularLanguages.deltas.trivia.SlashStarBlockCommentsDelta
+import org.scalatest.funsuite.AnyFunSuite
 
 class TestJavaBaseGrammarUsingFibonacciClass
-  extends TestLanguageGrammarUtils(JavaToByteCodeLanguage.javaCompilerDeltas.filter(p => p != SlashStarBlockCommentsDelta))
+  extends AnyFunSuite
 {
+  val utils = new TestLanguageGrammarUtils(JavaToByteCodeLanguage.javaCompilerDeltas.filter(p => p != SlashStarBlockCommentsDelta))
 
   test("BasicClass") {
     val input = "package bla; class Help {}"
@@ -66,7 +68,7 @@ class TestJavaBaseGrammarUsingFibonacciClass
   }
 
   def getExpressionGrammarResult(input: String): Any = {
-    val result: Any = parse(input, ExpressionDelta.FirstPrecedenceGrammar)
+    val result: Any = utils.parse(input, ExpressionDelta.FirstPrecedenceGrammar)
     result
   }
 

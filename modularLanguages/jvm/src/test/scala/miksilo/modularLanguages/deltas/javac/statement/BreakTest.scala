@@ -1,8 +1,9 @@
 package miksilo.modularLanguages.deltas.javac.statement
 
 import miksilo.modularLanguages.util.JavaLanguageTest
+import org.scalatest.funsuite.AnyFunSuite
 
-class BreakTest extends JavaLanguageTest {
+class BreakTest extends AnyFunSuite {
 
   test("BreakInWhile") {
     val program =
@@ -18,7 +19,7 @@ class BreakTest extends JavaLanguageTest {
         |  }
         |}
       """.stripMargin
-    compareWithJavacAfterRunning("BreakInWhile", program)
+    JavaLanguageTest.compareWithJavacAfterRunning("BreakInWhile", program)
   }
 
   test("BreakInForLoop") {
@@ -34,6 +35,6 @@ class BreakTest extends JavaLanguageTest {
         |  }
         |}
       """.stripMargin
-    compareWithJavacAfterRunning("BreakInWhile", program)
+    JavaLanguageTest.compareWithJavacAfterRunning("BreakInWhile", program)
   }
 }

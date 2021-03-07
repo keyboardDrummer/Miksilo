@@ -1,15 +1,16 @@
 package miksilo.modularLanguages.deltas.javac
 
 import miksilo.modularLanguages.util.JavaLanguageTest
+import org.scalatest.funsuite.AnyFunSuite
 
-class TestFibonacciWithMain extends JavaLanguageTest {
+class TestFibonacciWithMain extends AnyFunSuite {
 
   def test(): Unit = {
-    compareWithJavacAfterRunning("Fibonacci")
+    JavaLanguageTest.compareWithJavacAfterRunning("Fibonacci")
   }
 
   def testInstanceMethod(): Unit = {
-    compareWithJavacAfterRunning("FibonacciInstanceMethod")
+    JavaLanguageTest.compareWithJavacAfterRunning("FibonacciInstanceMethod")
   }
 
 }

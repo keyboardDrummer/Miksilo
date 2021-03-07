@@ -14,6 +14,7 @@ import miksilo.modularLanguages.deltas.statement.{BlockDelta, StatementDelta}
 import miksilo.modularLanguages.deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 import miksilo.editorParser.SourceUtils
 import miksilo.modularLanguages.util.{JavaSourceUtils, LanguageTest, TestLanguageBuilder}
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.reflect.io.Path
 
@@ -29,10 +30,12 @@ object ExpressionAsRoot extends DeltaWithGrammar
 }
 
 class JavaStyleCommentsTest
-  extends LanguageTest(TestLanguageBuilder.buildWithParser(
-    Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++
-    JavaToByteCodeLanguage.javaCompilerDeltas))
+  extends AnyFunSuite
 {
+  val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(
+    Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta) ++
+      JavaToByteCodeLanguage.javaCompilerDeltas))
+
   object ParentClass extends NodeShape
   object ChildClass extends NodeShape
   object ParentName extends NodeField
@@ -66,7 +69,7 @@ class JavaStyleCommentsTest
     assertResult(slaveExpectation)(slavePrinted)
   }
 
-  val testGrammar = TestLanguageGrammarUtils(this.language.deltas)
+  val testGrammar = new TestLanguageGrammarUtils(utils.language.deltas)
 
   test("BasicClass") {
     val input = "/* jooo */"
@@ -77,7 +80,7 @@ class JavaStyleCommentsTest
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
       ExtendedByteCode.allByteCodeDeltas))
-    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
+    val grammarUtils = new TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -87,7 +90,7 @@ class JavaStyleCommentsTest
   test("addition2") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(AdditionDelta, SubtractionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta)))
-    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
+    val grammarUtils = new TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -98,7 +101,7 @@ class JavaStyleCommentsTest
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       Seq(SubtractionDelta, AdditionDelta, AdditivePrecedenceDelta, IntLiteralDelta, ExpressionDelta) ++
       ExtendedByteCode.allByteCodeDeltas))
-    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
+    val grammarUtils = new TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -108,7 +111,7 @@ class JavaStyleCommentsTest
   test("addition4") {
     val utils = new LanguageTest(TestLanguageBuilder.buildWithParser(Seq(TriviaInsideNode, StoreTriviaDelta, SlashStarBlockCommentsDelta, ExpressionAsRoot) ++
       JavaToByteCodeLanguage.javaCompilerDeltas))
-    val grammarUtils = TestLanguageGrammarUtils(utils.language.deltas)
+    val grammarUtils = new TestLanguageGrammarUtils(utils.language.deltas)
 
     grammarUtils.compareInputWithPrint("2 + 1")
     grammarUtils.compareInputWithPrint("/* Hello */ 2")
@@ -135,7 +138,7 @@ class JavaStyleCommentsTest
     import DefaultBiGrammarWriter._
     val expectedBlockGrammar = "{" %>
       As(new Labelled(StatementDelta.Grammar).manyVertical, BlockDelta.Statements).indent() %<
-      new NodeGrammar(new WithTrivia(BiGrammarWriter.stringToGrammar("}"), language.grammars.trivia, false), BlockDelta.Shape)
+      new NodeGrammar(new WithTrivia(BiGrammarWriter.stringToGrammar("}"), utils.language.grammars.trivia, false), BlockDelta.Shape)
     assertResult(expectedBlockGrammar.toString)(blockGrammar.inner.toString) //TODO don't use toString
     assertResult(expectedStatementGrammar.toString)(statementGrammar.inner.toString) //TODO don't use toString
   }
@@ -154,7 +157,7 @@ class JavaStyleCommentsTest
 
   test("FullPipeline") {
     val inputDirectory = Path("")
-    val output: String = compileAndRun("WhileeWithComment.java", inputDirectory)
+    val output: String = utils.compileAndRun("WhileeWithComment.java", inputDirectory)
     assertResult("3")( output)
   }
 
