@@ -54,8 +54,13 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
     SingleParseResult(bestResult.resultOption, bestResult.history.errors.toList)
   }
 
+  def singleResult[Result](resultOption: Option[Result], remainder: TextPointer, state: State, history: History): ParseResults[State, Result] = {
+    val ready = ReadyParseResult[State, Result](resultOption, remainder, state, history)
+    val _lazy = if (!history.spotless) new DelayedParseResult(remainder, history, () => singleResult(ready)) else ready
+    singleResult(_lazy)
+  }
 
-  def singleResult[Result](parseResult: LazyParseResult[State, Result]) =
+  def singleResult[Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] =
     ParseResults.singleResult(parseResult)
 
   def newFailure[Result](position: TextPointer, state: State, error: ParseError): ParseResults[State, Result] =

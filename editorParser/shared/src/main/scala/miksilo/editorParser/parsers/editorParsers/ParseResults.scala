@@ -58,7 +58,7 @@ trait ParseResults[State, +Result] extends CachingParseResult {
 
 object ParseResults {
   def singleResult[State, Result](parseResult: LazyParseResult[State, Result]): ParseResults[State, Result] = parseResult match {
-    case readyParseResult: ReadyParseResult[State, Result] => ReadyResults(Map(readyParseResult.offset.offset -> readyParseResult), SREmpty.empty[State])
+    case readyParseResult: ReadyParseResult[State, Result] => new ReadyResults(readyParseResult)
     case delayed: DelayedParseResult[State, Result] => new SRCons(delayed, 0, SREmpty.empty[State])
   }
 }

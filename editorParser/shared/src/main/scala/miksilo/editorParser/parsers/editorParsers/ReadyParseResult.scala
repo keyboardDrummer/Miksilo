@@ -53,7 +53,8 @@ class DelayedParseResult[State, +Result](val initialOffset: OffsetPointer,
       intermediate.mapReady(f, uniform)
     })
 
-  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult], uniform: Boolean, maxListDepth: Int) =
+  override def flatMapReady[NewResult](f: ReadyParseResult[State, Result] => ParseResults[State, NewResult],
+                                       uniform: Boolean, maxListDepth: Int): ParseResults[State, NewResult] =
     singleResult(new DelayedParseResult(initialOffset, this.history, () => {
       val intermediate = this.getResults
       intermediate.flatMapReady(f, uniform, maxListDepth)
