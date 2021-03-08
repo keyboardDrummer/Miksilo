@@ -24,8 +24,7 @@ class SortedDelayedList[State, Result](val sortedItems: List[DelayedParseResult[
             rightRemainder = rightRemainder.tail
           }
         }
-        reverseSorted = leftRemainder.reverse ++ rightRemainder.reverse ++ reverseSorted
-        val sorted = reverseSorted.reverse
+        val sorted = reverseSorted.reverse ++ rightRemainder ++ leftRemainder
         new SortedDelayedList(sorted)
       case _ => other.merge(this)
     }
