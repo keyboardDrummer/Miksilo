@@ -199,7 +199,7 @@ class YamlTest extends AnyFunSuite {
     assert(result.errors.isEmpty)
   }
 
-  test("performance regression") {
+  ignore("performance regression") {
     val blockScalarParser = YamlParser.blockScalar
     val contents = SourceUtils.getResourceFileContents("app-environment.cfn.yaml")
     val result = blockScalarParser.getWholeInputParser().parse(contents)

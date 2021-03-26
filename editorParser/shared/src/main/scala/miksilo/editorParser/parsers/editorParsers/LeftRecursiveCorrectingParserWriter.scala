@@ -33,9 +33,9 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
 
       val key = (state, parser, newState.callStack)
       position.cache.get(key) match {
-//        case Some(value) =>
-//          value.asInstanceOf[ParseResult[Result]]
-        case _ =>
+        case Some(value) =>
+          value.asInstanceOf[ParseResult[Result]]
+        case None =>
           getPreviousResult(position, newState) match {
             case Some(intermediate) =>
               intermediate
@@ -68,6 +68,7 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       while (current.isInstanceOf[ReadyResults[State, Result]]) {
         // The order of the merge determines whether ambiguous grammars are left or right associative by default.
         result = result.merge(current)
+
         current = current.flatMapReady(growStep(recursions, _))
       }
 
@@ -91,10 +92,8 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
       recursions.map((recursive: RecursiveParseResult[State, Result, Result]) => {
         val results = recursive.get(singleResult(prev))
         results.flatMapReady(
-          //ready =>  singleResult(ready)
           ready => if (ready.remainder.offset > prev.remainder.offset) singleResult(ready) else
-            SREmpty.empty
-        )
+            SREmpty.empty) // TODO maybe set this to uniform = true
       }).reduce((a, b) => a.merge(b))
     }
 
@@ -166,12 +165,12 @@ trait LeftRecursiveCorrectingParserWriter extends CorrectingParserWriter {
     // TODO I can differentiate between recursive and non-recursive results. Only the former depend on the state.
 
     def apply(position: TextPointer, state: State, fixPointState: FixPointState): ParseResult[Result] = {
-      val newFixPointState = moveState(position, fixPointState)
+      val newFixPointState =  moveState(position, fixPointState)
       val key = (state, parser, newFixPointState.callStack)
 
       position.cache.get(key) match {
-//        case Some(value) =>
-//          value.asInstanceOf[ParseResult[Result]]
+        case Some(value) =>
+          value.asInstanceOf[ParseResult[Result]]
         case _ =>
           val value: ParseResult[Result] = parser(position, state, newFixPointState)
 

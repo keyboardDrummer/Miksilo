@@ -5,6 +5,9 @@ import miksilo.editorParser.parsers.core.OffsetPointer
 class SortedDelayedList[State, Result](val sortedItems: List[DelayedParseResult[State, Result]])
   extends DelayedResults[State, Result] {
 
+  // Minimum length required to make "starting brace insertion unambiguous" pass
+  val maxLength = 17
+
   override def toList: List[LazyParseResult[State, Result]] = {
     sortedItems
   }
@@ -15,7 +18,8 @@ class SortedDelayedList[State, Result](val sortedItems: List[DelayedParseResult[
         var reverseSorted = List.empty[DelayedParseResult[State, Result]]
         var leftRemainder = sortedItems
         var rightRemainder = delayedList.sortedItems
-        while(leftRemainder.nonEmpty && rightRemainder.nonEmpty) {
+        var count = 0
+        while(count < maxLength && leftRemainder.nonEmpty && rightRemainder.nonEmpty) {
           if (leftRemainder.head.score > rightRemainder.head.score) {
             reverseSorted ::= leftRemainder.head
             leftRemainder = leftRemainder.tail
@@ -23,8 +27,13 @@ class SortedDelayedList[State, Result](val sortedItems: List[DelayedParseResult[
             reverseSorted ::= rightRemainder.head
             rightRemainder = rightRemainder.tail
           }
+          count += 1
         }
-        val sorted = reverseSorted.reverse ++ rightRemainder ++ leftRemainder
+        val sorted = if (count == maxLength) {
+          reverseSorted.reverse
+        } else {
+          reverseSorted.reverse ++ rightRemainder ++ leftRemainder
+        }
         new SortedDelayedList(sorted)
       case _ => other.merge(this)
     }
@@ -42,5 +51,6 @@ class SortedDelayedList[State, Result](val sortedItems: List[DelayedParseResult[
     sortedItems.map(d => f(d)).fold(SREmpty.empty[State])((a, b) => a.merge(b))
   }
 
-  override def latestRemainder: OffsetPointer = sortedItems.map(d => d.initialOffset).max(OffsetPointer.ordering)
+  override def latestRemainder: OffsetPointer = sortedItems.map(d => d.initialOffset).
+    maxOption(OffsetPointer.ordering).getOrElse(EmptyRemainder)
 }

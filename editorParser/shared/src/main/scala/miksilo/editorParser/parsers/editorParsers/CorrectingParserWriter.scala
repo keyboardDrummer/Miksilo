@@ -29,24 +29,18 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           if (bestResult.score < parseResult.score) {
             bestResult = parseResult
           }
-          if (false && bestResult.history.spotless) {
+          if (bestResult.history.spotless) {
             SREmpty.empty[State]
           } else {
             tail
           }
         case delayedResult: DelayedParseResult[State, Result] =>
 
-          if (bestResult.score != noResultFound.score && mayStop(bestResult.remainder.offset, bestResult.score, delayedResult.score)) {
+          if (bestResult != noResultFound && mayStop(bestResult.remainder.offset, bestResult.score, delayedResult.score)) {
             SREmpty.empty[State]
           } else {
             val results = delayedResult.getResults
-            val newTail = tail.merge(results)
-            /*
-            Caching uitzetten?
-            NewTail has a ready with history expected ':<value>' but found ',', expected '}' but found ',', Did not expect ',  "8" : "9" }
-            3 errors! while delayedResult only has 1 error. How??
-             */
-            newTail
+            tail.merge(results)
           }
       }
 
@@ -204,7 +198,7 @@ trait CorrectingParserWriter extends OptimizingParserWriter {
           val firstResult = parseFirst(position, state, fixPointState)
           firstResult match {
 //            case cons: ReadyResults[State, Result]
-//              if cons.ready.exists(r => !r._2.history.flawed) => firstResult
+//              if !cons.head.history.flawed => firstResult
             case _ =>
               val secondResult = parseSecond(position, state, fixPointState)
               firstResult.merge(secondResult)
