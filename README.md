@@ -31,9 +31,7 @@ This repository is divided into the following sub-projects:
 - [Playground](playground): A desktop UI application that enables constructing languages on-the-fly by combining predefined languages blocks using drag and drop. This application is for educational purposes.
 
 ### Contributing
-There's an infinite amount of work to be done for Miksilo, so contributions are very welcome. There are many different topics to work on, some suitable for a Bachelor's or Master's thesis.
-
-Some examples of cool features:
+We would love your contributions. Here are some ideas for new topics to work on:
 - A DSL for static semantics, such as name binding and type checking. See the paper [A constraint language for static semantic analysis based on scope graphs](http://delivery.acm.org/10.1145/2850000/2847543/p49-antwerpen.pdf?ip=145.129.111.38&id=2847543&acc=OA&key=4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E77FCF3B2F09622E1&CFID=992904318&CFTOKEN=51306518&__acm__=1507451717_5c1e5970ab3ac31fbd9849edb486a802) for inspiration
 - Generating syntactic code completion from a grammar, as in the paper [Principled syntactic code completion using placeholders](http://delivery.acm.org/10.1145/3000000/2997374/p163-amorim.pdf?ip=145.129.111.38&id=2997374&acc=OA&key=4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E77FCF3B2F09622E1&CFID=992904318&CFTOKEN=51306518&__acm__=1507451951_eb454d2173854f174d05e3c1e1526bbd)
 - Incremental compilation: incremental parsing, incremental type checking, etc.
