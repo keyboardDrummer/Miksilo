@@ -27,7 +27,7 @@ This repository is divided into the following sub-projects:
 - [EditorParser](editorParser): Defines a parser API that can be used to create parsers suitable for use in text editors.
 - [LSPProtocol](LSPProtocol): Defines the communication layers of an LSP client and an LSP server.
 - [LanguageServer](languageServer): Enables starting an LSP server from a language definition. Consume this library if you already have a codebase that defines your language and you want to create a language server for it.
-- [ModularLanguages](modularLanguages): Defines various tools for defining languages in a modular way, and come with many predefined language building blocks. Consume this library if you're writing a language from scratch.
+- [ModularLanguages](modularLanguages): Defines various tools for defining languages in a modular way. Comes with many predefined language building blocks. Consume this library if you're writing a language from scratch.
 - [Playground](playground): A desktop UI application that enables constructing languages on-the-fly by combining predefined languages blocks using drag and drop. This application is for educational purposes.
 
 ### Contributing
