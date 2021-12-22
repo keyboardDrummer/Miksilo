@@ -11,7 +11,7 @@ Using the ModularLanguages library is recommended when:
 - Your language is turing complete and has features that commonly occur in languages such as expressions or statements.
 
 The LanguageServer library does not enable modular language definition, but it can integrate directly with an existing language definition if you already have one. Using this is recommended when:
-- You already have type definitions for your language that you want Miksilo to directly integrate with.
+- You already have type definitions for your language
 - Your language has custom syntax and doesn't contain any typical language features, an example could be a small configuration language with very custom syntax.
 
 
