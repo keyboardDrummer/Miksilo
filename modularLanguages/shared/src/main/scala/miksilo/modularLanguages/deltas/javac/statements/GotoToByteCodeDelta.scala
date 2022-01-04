@@ -11,13 +11,13 @@ import miksilo.modularLanguages.deltas.statement.GotoStatementDelta.getTarget
 
 object GotoToByteCodeDelta extends ConvertsToByteCodeDelta {
 
+  override def description: String = "Convert a goto statement to bytecode"
+
+  override def dependencies: Set[Contract] = Set(GotoStatementDelta, LabelledLocations)
+
   override def toByteCode(statement: NodePath, compilation: Compilation): Seq[Node] = {
     Seq(LabelledLocations.goTo(getTarget(statement.current)))
   }
 
   override def shape: NodeShape = GotoStatementDelta.Shape
-
-  override def description: String = "Convert a goto statement to bytecode"
-
-  override def dependencies: Set[Contract] = Set(GotoStatementDelta, LabelledLocations)
 }

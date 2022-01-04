@@ -121,8 +121,10 @@ class Language extends LazyLogging {
 
   def insertPhaseAfter(insert: Phase, phaseKey: Any): Unit = {
     val index = compilerPhases.indexWhere(phase => phase.key == phaseKey)
-    val (left, right) = compilerPhases.splitAt(index + 1)
-    compilerPhases = left ++ (insert :: right)
+    if (index != -1) {
+      val (left, right) = compilerPhases.splitAt(index + 1)
+      compilerPhases = left ++ (insert :: right)
+    }
   }
 
   def compileAst(program: SourcePath): Compilation = {

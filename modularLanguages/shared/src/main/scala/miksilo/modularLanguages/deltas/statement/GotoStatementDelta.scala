@@ -21,7 +21,7 @@ object GotoStatementDelta extends DeltaWithGrammar with StatementInstance {
   override def transformGrammars(grammars: LanguageGrammars, state: Language): Unit = {
     import grammars._
     val statementGrammar = find(StatementDelta.Grammar)
-    statementGrammar.addAlternative("goto" ~~> identifier.as(Target) ~< ";" asNode Shape)
+    statementGrammar.addAlternative("goto" ~~> identifier.as(Target) ~< ";" asLabelledNode Shape)
   }
 
   override def getControlFlowGraph(language: Language, statement: NodePath, labels: Map[Any, NodePath]): ControlFlowGraph = {

@@ -43,10 +43,10 @@ object JavaLanguage {
 
   def method = Seq(ImplicitReturnAtEndOfMethod,
     ReturnExpressionDelta, ReturnVoidDelta,
-    CallVariableDelta, CallDelta, MethodDelta, AccessibilityFieldsDelta) ++ blockWithVariables
+    CallVariableDelta, CallDelta, MethodDelta, AccessibilityFieldsDelta, RemoveGotoAndLabelStatementDelta) ++ blockWithVariables
 
   def blockWithVariables = {
-    //ForLoop has to come before declaration with initializer, so it will move the loop initializer to a block context.
+    // ForLoop has to come before declaration with initializer, so it will move the loop initializer to a block context.
     val movedDeltas = Seq(ForLoopContinueDelta, ForLoopDelta)
 
     val aboveForLoop = movedDeltas ++ Seq(
