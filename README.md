@@ -18,8 +18,8 @@ The LanguageServer library does not enable modular language definition, but it c
 ### Build instructions
 1. Grab [the source](https://github.com/keyboardDrummer/Miksilo) from GitHub
 1. Make sure you have installed the Java 8 JDK, or a higher version.
-1. Install <a href="http://www.scala-sbt.org/">sbt</a>
-1. Call 'sbt playground/run' in the project root to build Miksilo and start the sandbox desktop application.
+1. Install <a href="https://com-lihaoyi.github.io/mill/mill/Intro_to_Mill.html#_installation">Mill</a>
+1. Call 'mill playground.run' in the project root to build Miksilo and start the sandbox desktop application.
 
 ### Repository structure
 This repository is divided into the following sub-projects:
