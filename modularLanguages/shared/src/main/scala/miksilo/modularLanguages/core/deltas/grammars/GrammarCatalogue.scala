@@ -22,7 +22,7 @@ class GrammarCatalogue {
     result
   }
 
-  def findPath(to: GrammarKey, from: GrammarKey): GrammarReference = {
+  def findPath(from: GrammarKey, to: GrammarKey): GrammarReference = {
     val rootGrammar = new RootGrammar(find(from))
     rootGrammar.findLabelled(to)
   }

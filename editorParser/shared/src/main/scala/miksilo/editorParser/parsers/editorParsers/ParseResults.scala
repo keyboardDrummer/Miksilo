@@ -199,6 +199,6 @@ class SREmpty[State] extends ParseResults[State, Nothing] {
 }
 
 object EmptyRemainder extends OffsetPointer {
-  override def offset() = Int.MinValue
+  override def offset = Int.MinValue
   override def lineCharacter = Position(Int.MinValue, Int.MinValue)
 }

@@ -16,7 +16,7 @@ import miksilo.modularLanguages.deltas.javac.expressions.relational.{GreaterThan
 import miksilo.modularLanguages.deltas.javac.methods.{AssignmentToByteCodeDelta, BlockLanguageDelta, ReturnExpressionToByteCodeDelta, ReturnVoidToByteCodeDelta, VariableToByteCodeDelta}
 import miksilo.modularLanguages.deltas.javac.methods.call.CallStaticOrInstanceDelta
 import miksilo.modularLanguages.deltas.javac.statements._
-import miksilo.modularLanguages.deltas.trivia.{SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
+import miksilo.modularLanguages.deltas.trivia.{SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta, StoreTriviaDelta, TriviaInsideNode}
 
 object JavaToByteCodeLanguage {
 
@@ -25,7 +25,7 @@ object JavaToByteCodeLanguage {
   def prettyPrintJavaDeltas: Seq[Delta] = Seq(PrettyPrint()) ++ javaCompilerDeltas
 
   def allDeltas: Set[Delta] = javaCompilerDeltas.toSet ++
-    Set(ConstantPoolIndices, SlashStarBlockCommentsDelta, StoreTriviaDelta,
+    Set(ConstantPoolIndices, SlashSlashLineCommentsDelta, SlashStarBlockCommentsDelta, StoreTriviaDelta,
       TriviaInsideNode, ExpressionMethodDelta, BlockLanguageDelta, ReorderMembersDelta,
       ParseUsingTextualGrammar())
 
